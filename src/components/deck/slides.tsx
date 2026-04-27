@@ -4,6 +4,7 @@ import camera from "@/assets/camera.png";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import audience from "@/assets/audience.jpg";
 import musicVideo from "@/assets/music-video.jpg";
+import bwfLogo from "@/assets/bwf-logo.jpg";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight
@@ -20,7 +21,7 @@ export function Slide1() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.7 }}
-          className="flex items-center gap-4 mb-6"
+          className="flex items-center gap-4 mb-8"
         >
           <div className="flex items-center justify-center w-14 h-10 rounded" style={{ backgroundColor: "var(--blood)" }}>
             <Play className="w-5 h-5 fill-bone text-bone" />
@@ -30,22 +31,36 @@ export function Slide1() {
           </span>
         </motion.div>
 
-        <motion.h1
+        <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="font-display text-[10rem] leading-[0.85] tracking-tighter heavy-shadow"
+          className="relative flex items-center justify-center"
         >
-          <span className="text-bone">BWF</span>{" "}
-          <span style={{ color: "var(--blood)" }}>MEDIA</span>{" "}
-          <span className="text-bone">TV</span>
-        </motion.h1>
+          <div
+            className="absolute inset-0 blur-3xl opacity-40 -z-10"
+            style={{ backgroundColor: "var(--blood)" }}
+          />
+          <img
+            src={bwfLogo}
+            alt="BWF Media"
+            className="w-[420px] h-[420px] object-contain mix-blend-screen drop-shadow-[0_0_40px_rgba(220,38,38,0.4)]"
+          />
+        </motion.div>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.35 }}
+          className="font-display text-7xl tracking-tight text-bone heavy-shadow mt-2"
+        >
+          MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
+        </motion.div>
 
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="mt-6 font-cond font-bold tracking-[0.3em] text-xl uppercase text-bone"
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mt-8 font-cond font-bold tracking-[0.3em] text-xl uppercase text-bone"
         >
           Real Content. Real People. <span style={{ color: "var(--blood)" }}>Real Views.</span>
         </motion.p>
@@ -53,8 +68,8 @@ export function Slide1() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          className="mt-14 flex items-center gap-12"
+          transition={{ duration: 0.7, delay: 0.7 }}
+          className="mt-12 flex items-center gap-12"
         >
           <Stat big="686M+" label="Views" />
           <div className="w-px h-20 bg-bone/20" />
@@ -65,10 +80,21 @@ export function Slide1() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.9 }}
-          className="mt-12 font-brush text-3xl text-bone/80"
+          className="mt-10 font-brush text-3xl text-bone/80"
         >
           Where Culture <span style={{ color: "var(--blood)" }}>Goes Viral</span>
         </motion.p>
+        <motion.a
+          href="https://youtube.com/@bwfmedia"
+          target="_blank"
+          rel="noreferrer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.1 }}
+          className="mt-4 font-cond tracking-[0.3em] text-xs uppercase text-bone/50 hover:text-bone transition-colors"
+        >
+          youtube.com/@bwfmedia
+        </motion.a>
       </div>
 
       <img
@@ -588,11 +614,19 @@ export function Slide11() {
           {[
             { icon: Mail, label: "Email", value: "bookbwfmediatv@mail.com" },
             { icon: Instagram, label: "Instagram", value: "@bwfmediatv" },
-            { icon: Youtube, label: "YouTube", value: "BWF MEDIA TV" },
+            { icon: Youtube, label: "YouTube", value: "@bwfmedia" },
           ].map((c, i) => (
             <motion.a
               key={i}
-              href="#"
+              href={
+                c.label === "Email"
+                  ? "mailto:bookbwfmediatv@mail.com"
+                  : c.label === "Instagram"
+                  ? "https://instagram.com/bwfmediatv"
+                  : "https://youtube.com/@bwfmedia"
+              }
+              target={c.label === "Email" ? undefined : "_blank"}
+              rel={c.label === "Email" ? undefined : "noreferrer"}
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: i * 0.1 }}
