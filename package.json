@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
+    "@fontsource/anton": "^5.2.7",
     "@fontsource/bebas-neue": "^5.2.7",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/oswald": "^5.2.8",
