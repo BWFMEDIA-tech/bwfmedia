@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import grunge from "@/assets/grunge-bg.jpg";
+import logo from "@/assets/bwf-logo.jpg";
 
 export function SlideShell({
   children,
@@ -37,10 +38,7 @@ export function SlideShell({
       {/* Top brand strip */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-12 py-6 z-20">
         <div className="flex items-center gap-3">
-          <div
-            className="w-3 h-8"
-            style={{ backgroundColor: "var(--blood)" }}
-          />
+          <img src={logo} alt="BWF Media" className="w-8 h-8 object-contain" />
           <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/80">
             BWF Media TV
           </span>
