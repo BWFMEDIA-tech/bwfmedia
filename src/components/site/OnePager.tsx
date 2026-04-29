@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
+  Share2, Eye, Heart, Camera, Video, Megaphone,
 } from "lucide-react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
@@ -76,7 +77,9 @@ function StatBlock({ big, label }: { big: string; label: string }) {
 
 function Nav() {
   const links = [
+    { href: "#about", label: "About" },
     { href: "#proof", label: "Proof" },
+    { href: "#services", label: "Services" },
     { href: "#engine", label: "Engine" },
     { href: "#audience", label: "Audience" },
     { href: "#revenue", label: "Revenue" },
