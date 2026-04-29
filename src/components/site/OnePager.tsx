@@ -712,13 +712,16 @@ export function OnePager() {
     <div className="bg-black text-bone">
       <Nav />
       <Hero />
+      <About />
       <Shift />
       <Proof />
+      <Services />
       <Engine />
       <Audience />
       <Revenue />
       <Scale />
       <Partner />
+      <Promoters />
       <Why />
       <Vision />
       <Contact />
