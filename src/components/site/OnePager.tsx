@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
-  Share2, Eye, Heart, Camera, Video, Megaphone,
+  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3,
 } from "lucide-react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
