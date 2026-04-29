@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
+  Share2, Eye, Heart, Camera, Video, Megaphone,
 } from "lucide-react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
@@ -76,7 +77,9 @@ function StatBlock({ big, label }: { big: string; label: string }) {
 
 function Nav() {
   const links = [
+    { href: "#about", label: "About" },
     { href: "#proof", label: "Proof" },
+    { href: "#services", label: "Services" },
     { href: "#engine", label: "Engine" },
     { href: "#audience", label: "Audience" },
     { href: "#revenue", label: "Revenue" },
@@ -236,6 +239,212 @@ function Hero() {
 
       <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: "var(--gradient-blood)" }} />
     </section>
+  );
+}
+
+/* ---------- ABOUT ---------- */
+
+function About() {
+  const focus = [
+    "Live concert coverage",
+    "Artist interviews",
+    "Behind-the-scenes access",
+    "Viral short-form music clips",
+  ];
+  const perf = [
+    { big: "686M+", label: "Total Views" },
+    { big: "324K+", label: "Subscribers" },
+    { big: "18M+", label: "Total Likes" },
+    { big: "2.9M+", label: "Shares" },
+    { big: "4.2M+", label: "Weekly Views" },
+  ];
+  return (
+    <Section id="about" number="00" label="About BWF™">
+      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+        <div>
+          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
+            ABOUT <span style={{ color: "var(--blood)" }}>BWF™</span>
+          </h2>
+          <p className="text-bone/80 text-base md:text-lg leading-relaxed mb-5">
+            BWF™ is a fast-growing digital media platform covering music, live events,
+            interviews, and viral cultural moments.
+          </p>
+          <p className="text-bone/70 text-base md:text-lg leading-relaxed mb-8">
+            We specialize in turning live performances and artist moments into
+            high-reach, high-engagement content distributed across multiple platforms.
+          </p>
+          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-4" style={{ color: "var(--blood)" }}>
+            Our content focuses on
+          </div>
+          <ul className="space-y-3">
+            {focus.map((t, i) => (
+              <li key={i} className="flex gap-4 items-start">
+                <span className="block w-2 h-2 mt-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                <span className="text-bone/85">{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5" style={{ color: "var(--blood)" }}>
+            📊 Platform Reach & Performance
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            {perf.map((s, i) => (
+              <div
+                key={i}
+                className="border-l-4 pl-5 py-4"
+                style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
+              >
+                <div className="font-display text-3xl md:text-5xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{s.big}</div>
+                <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/70 mt-2">{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="p-6 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
+            <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-3" style={{ color: "var(--blood)" }}>
+              Engagement Strength
+            </div>
+            <ul className="space-y-2 text-bone/80 text-sm md:text-base">
+              <li className="flex gap-3"><Share2 className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> High share-to-view ratio — content spreads beyond platform reach</li>
+              <li className="flex gap-3"><Flame className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Strong short-form viral performance</li>
+              <li className="flex gap-3"><Eye className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Consistent weekly audience activity</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-16 grid md:grid-cols-4 gap-5">
+        <div className="md:col-span-1">
+          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-2" style={{ color: "var(--blood)" }}>🎯 Audience Insight</div>
+          <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone">WHO'S<br /><span style={{ color: "var(--blood)" }}>WATCHING.</span></h3>
+        </div>
+        {[
+          { k: "Music-Driven", v: "Hip-hop / R&B / mainstream culture" },
+          { k: "Highly Active", v: "Sharing & resharing across platforms" },
+          { k: "Engaged", v: "Viral clips & interviews" },
+          { k: "Demo", v: "Primarily 16–34" },
+        ].map((row, i) => (
+          <div key={i} className="p-5 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
+            <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase mb-2" style={{ color: "var(--blood)" }}>{row.k}</div>
+            <div className="font-display text-lg md:text-xl text-bone leading-tight tracking-tight">{row.v}</div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------- SERVICES ---------- */
+
+function Services() {
+  const services = [
+    {
+      icon: Mic,
+      tag: "🎤 Live Event Coverage",
+      title: "EVENT COVERAGE",
+      items: ["Performance highlights", "Crowd energy captures", "Viral clip editing (vertical + horizontal)"],
+    },
+    {
+      icon: Video,
+      tag: "🎙 Artist Interviews",
+      title: "INTERVIEWS",
+      items: ["Short-form interviews (5–15 min)", "Press-style conversations", "Promo for upcoming releases"],
+    },
+    {
+      icon: Camera,
+      tag: "🎬 Behind-the-Scenes",
+      title: "BTS ACCESS",
+      items: ["Tour moments", "Backstage coverage", "Venue + crowd storytelling"],
+    },
+    {
+      icon: Smartphone,
+      tag: "📱 Distribution",
+      title: "DISTRIBUTION",
+      items: ["YouTube", "Instagram Reels", "TikTok", "Short-form viral networks"],
+    },
+  ];
+  return (
+    <Section id="services" number="2.5" label="Content Services">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
+          WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
+        </h2>
+        <p className="text-bone/70 max-w-md md:text-right">
+          When covering events, BWF™ delivers a full content stack — built for reach, engagement, and post-show momentum.
+        </p>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {services.map((s, i) => (
+          <div
+            key={i}
+            className="relative flex flex-col p-6 border-2 hover:border-blood transition-colors"
+            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
+          >
+            <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
+            <div className="font-cond font-bold tracking-[0.2em] text-[10px] uppercase text-bone/60 mb-4">{s.tag}</div>
+            <s.icon className="w-8 h-8 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
+            <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-4 leading-tight">{s.title}</div>
+            <ul className="space-y-2 mt-auto">
+              {s.items.map((it, j) => (
+                <li key={j} className="flex gap-2 text-bone/75 text-sm leading-snug">
+                  <span className="block w-1.5 h-1.5 mt-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                  {it}
+                </li>
+              ))}
+            </ul>
+            <div className="absolute top-4 right-4 font-cond text-xs tracking-widest text-bone/30">0{i + 1}</div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------- PROMOTERS ---------- */
+
+function Promoters() {
+  const benefits = [
+    { icon: Eye, title: "INCREASED VISIBILITY", body: "Boost online presence for your event before, during, and after the show." },
+    { icon: Share2, title: "VIRAL CIRCULATION", body: "Post-show content engineered for share-driven distribution." },
+    { icon: Megaphone, title: "PROMO REACH WITHOUT AD SPEND", body: "Tap our existing audience instead of paying for impressions." },
+    { icon: Heart, title: "HIGH-ENGAGEMENT EXPOSURE", body: "Reach a culture-driven audience that actually reacts and shares." },
+  ];
+  return (
+    <Section id="promoters" number="07.5" label="Why Promoters Work With BWF™">
+      <div className="grid md:grid-cols-5 gap-10 md:gap-16">
+        <div className="md:col-span-2">
+          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
+            WE DON'T JUST<br />
+            COVER EVENTS —<br />
+            <span style={{ color: "var(--blood)" }}>WE AMPLIFY THEM.</span>
+          </h2>
+          <p className="text-bone/70 text-base md:text-lg leading-relaxed max-w-md">
+            Our goal is to help elevate event awareness before, during, and after the show — turning one night into weeks of content circulation.
+          </p>
+          <div className="mt-8 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
+            <span className="font-display text-xl md:text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
+              ONE SHOW. WEEKS OF REACH.
+            </span>
+          </div>
+        </div>
+        <div className="md:col-span-3 grid sm:grid-cols-2 gap-5">
+          {benefits.map((b, i) => (
+            <div
+              key={i}
+              className="p-6 border-2"
+              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
+            >
+              <div className="w-11 h-11 rounded flex items-center justify-center mb-4" style={{ backgroundColor: "var(--blood)" }}>
+                <b.icon className="w-5 h-5 text-bone" strokeWidth={2.5} />
+              </div>
+              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">{b.title}</div>
+              <div className="text-bone/65 text-sm leading-relaxed">{b.body}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -709,13 +918,16 @@ export function OnePager() {
     <div className="bg-black text-bone">
       <Nav />
       <Hero />
+      <About />
       <Shift />
       <Proof />
+      <Services />
       <Engine />
       <Audience />
       <Revenue />
       <Scale />
       <Partner />
+      <Promoters />
       <Why />
       <Vision />
       <Contact />
