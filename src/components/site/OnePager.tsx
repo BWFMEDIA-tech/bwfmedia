@@ -337,6 +337,172 @@ function About() {
 
 /* ---------- SERVICES ---------- */
 
+/* ---------- GLOBAL AUDIENCE (analytics panel) ---------- */
+
+function GlobalAudience() {
+  const primary = {
+    flag: "🇺🇸",
+    country: "United States",
+    pct: "45.5%",
+    views: "312.7M views",
+    watch: "0:38",
+    note: "Primary audience base and ticket-driving region",
+  };
+  const others = [
+    { flag: "🇬🇧", country: "United Kingdom", pct: "4.7%", views: "32.5M", watch: "0:31" },
+    { flag: "🇮🇳", country: "India",          pct: "4.6%", views: "31.5M", watch: "0:25" },
+    { flag: "🇩🇪", country: "Germany",        pct: "4.1%", views: "27.9M", watch: "0:26" },
+    { flag: "🇨🇦", country: "Canada",         pct: "3.3%", views: "22.7M", watch: "0:33" },
+  ];
+  const additional = [
+    "Australia", "France", "Mexico", "Brazil", "South Africa",
+    "Philippines", "Nigeria", "Indonesia", "Japan", "UAE",
+  ];
+  const insights = [
+    "Strong U.S. audience base for live event promotion",
+    "Global distribution across major music markets",
+    "High engagement short-form viewing behavior",
+    "Content optimized for viral sharing and reposting",
+  ];
+  return (
+    <Section id="reach" number="00.5" label="Global Audience Reach">
+      <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-12">
+        <div className="md:col-span-2">
+          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
+            GLOBAL <span style={{ color: "var(--blood)" }}>AUDIENCE</span><br />REACH.
+          </h2>
+          <p className="text-bone/75 text-base md:text-lg leading-relaxed max-w-2xl">
+            BWF™ Media Network reaches a highly engaged global audience across music, culture,
+            and live event content. Distribution is driven by strong U.S. viewership combined
+            with international viral reach across key global markets.
+          </p>
+        </div>
+        <div className="flex md:justify-end">
+          <div className="inline-flex items-center gap-3 px-4 py-3 border-2" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.6)" }}>
+            <BarChart3 className="w-5 h-5" style={{ color: "var(--blood)" }} />
+            <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/80">
+              Live Network Analytics
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Primary US card — full width */}
+      <div
+        className="relative p-6 md:p-8 mb-5 border-2 overflow-hidden"
+        style={{ borderColor: "var(--blood)", backgroundColor: "rgba(10,10,15,0.85)" }}
+      >
+        <div className="absolute top-0 left-0 h-full w-1.5" style={{ backgroundColor: "var(--blood)" }} />
+        <div className="grid md:grid-cols-12 gap-6 items-center">
+          <div className="md:col-span-5 flex items-center gap-4">
+            <span className="text-5xl md:text-6xl leading-none">{primary.flag}</span>
+            <div>
+              <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-1">Primary Market</div>
+              <div className="font-display text-2xl md:text-3xl text-bone tracking-tight">{primary.country}</div>
+            </div>
+          </div>
+          <div className="md:col-span-3">
+            <div className="font-display text-5xl md:text-6xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{primary.pct}</div>
+            <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/60 mt-2">{primary.views}</div>
+          </div>
+          <div className="md:col-span-2">
+            <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-1">Avg Watch</div>
+            <div className="font-display text-3xl md:text-4xl text-bone tracking-tight">{primary.watch}</div>
+          </div>
+          <div className="md:col-span-2 text-bone/70 text-sm leading-snug border-l border-border pl-4">
+            {primary.note}
+          </div>
+        </div>
+      </div>
+
+      {/* Other countries grid */}
+      <div className="grid sm:grid-cols-2 gap-4 mb-10">
+        {others.map((c, i) => (
+          <div
+            key={i}
+            className="relative p-5 border-2 hover:border-blood transition-colors flex items-center justify-between gap-4"
+            style={{ borderColor: "var(--border)", backgroundColor: "rgba(10,10,15,0.7)" }}
+          >
+            <div className="flex items-center gap-4 min-w-0">
+              <span className="text-3xl leading-none flex-shrink-0">{c.flag}</span>
+              <div className="min-w-0">
+                <div className="font-display text-lg md:text-xl text-bone tracking-tight truncate">{c.country}</div>
+                <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/55 mt-0.5">
+                  {c.views} views
+                </div>
+              </div>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <div className="font-display text-2xl md:text-3xl leading-none" style={{ color: "var(--blood)" }}>{c.pct}</div>
+              <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/55 mt-1">
+                {c.watch} watch
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Additional reach */}
+      <div
+        className="p-5 md:p-6 mb-10 border border-border"
+        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <Globe className="w-4 h-4" style={{ color: "var(--blood)" }} />
+          <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/70">
+            Additional Global Reach
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {additional.map((c) => (
+            <span
+              key={c}
+              className="px-3 py-1.5 text-xs font-cond tracking-widest uppercase text-bone/80 border border-border"
+              style={{ backgroundColor: "rgba(255,255,255,0.03)" }}
+            >
+              {c}
+            </span>
+          ))}
+          <span className="px-3 py-1.5 text-xs font-cond tracking-widest uppercase border" style={{ color: "var(--blood)", borderColor: "var(--blood)" }}>
+            + more
+          </span>
+        </div>
+      </div>
+
+      {/* Why this matters insight box */}
+      <div
+        className="relative p-6 md:p-8 border-2 overflow-hidden"
+        style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.7)" }}
+      >
+        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ backgroundColor: "var(--blood)" }} />
+        <div className="relative grid md:grid-cols-3 gap-8">
+          <div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase mb-3" style={{ color: "var(--blood)" }}>
+              💡 Why This Matters
+            </div>
+            <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone tracking-tight">
+              BUILT FOR<br /><span style={{ color: "var(--blood)" }}>TOUR PROMOTION.</span>
+            </h3>
+          </div>
+          <ul className="md:col-span-2 grid sm:grid-cols-2 gap-4">
+            {insights.map((t, i) => (
+              <li key={i} className="flex gap-3 items-start text-bone/85 text-sm md:text-base leading-snug">
+                <span className="block w-2 h-2 mt-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                <span>{t}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="relative mt-8 pt-6 border-t border-border text-bone/90 text-sm md:text-base">
+          👉 This combination makes BWF™ Media ideal for <span style={{ color: "var(--blood)" }}>concert coverage, artist interviews, and tour promotion campaigns.</span>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ---------- SERVICES ---------- */
+
 function Services() {
   const services = [
     {
