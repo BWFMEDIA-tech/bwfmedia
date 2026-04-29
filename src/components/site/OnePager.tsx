@@ -78,6 +78,7 @@ function StatBlock({ big, label }: { big: string; label: string }) {
 function Nav() {
   const links = [
     { href: "#about", label: "About" },
+    { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
     { href: "#services", label: "Services" },
     { href: "#engine", label: "Engine" },
@@ -1085,6 +1086,7 @@ export function OnePager() {
       <Nav />
       <Hero />
       <About />
+      <GlobalAudience />
       <Shift />
       <Proof />
       <Services />
