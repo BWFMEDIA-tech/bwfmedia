@@ -84,6 +84,7 @@ function Nav() {
     { href: "#engine", label: "Engine" },
     { href: "#audience", label: "Audience" },
     { href: "#revenue", label: "Revenue" },
+    { href: "#pricing", label: "Pricing" },
     { href: "#partner", label: "Partner" },
     { href: "#contact", label: "Contact" },
   ];
@@ -659,6 +660,106 @@ function Shift() {
   );
 }
 
+/* ---------- PRICING ---------- */
+
+function Pricing() {
+  const tiers = [
+    {
+      name: "BASIC PROMO",
+      price: "$400 – $600",
+      reach: "25K – 75K views",
+      tag: "Entry",
+      bullets: ["Good for new artists", "Low risk entry point", "Single-platform push"],
+      featured: false,
+    },
+    {
+      name: "STANDARD PROMO",
+      price: "$700 – $1,000",
+      reach: "75K – 200K views",
+      tag: "Most Popular",
+      bullets: ["Stronger promotional push", "Includes Shorts cutdowns", "Where most artists land"],
+      featured: true,
+    },
+    {
+      name: "PREMIUM PLACEMENT",
+      price: "$1,200 – $2,000",
+      reach: "150K – 500K+ views",
+      tag: "Priority",
+      bullets: ["Priority posting slot", "Strong promo push", "Possibly pinned or repeated exposure"],
+      featured: false,
+    },
+    {
+      name: "INTERVIEW + PROMO COMBO",
+      price: "$1,500 – $3,000",
+      reach: "Multi-week exposure cycle",
+      tag: "Flagship",
+      bullets: ["Full interview content", "Clips + Shorts package", "Multiple posts & longer cycle"],
+      featured: false,
+    },
+  ];
+  return (
+    <Section id="pricing" number="08" label="Pricing Tiers">
+      <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-4">
+        PICK YOUR <span style={{ color: "var(--blood)" }}>PUSH.</span>
+      </h2>
+      <p className="text-bone/70 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
+        Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach — no smoke, no inflated numbers.
+      </p>
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {tiers.map((t, i) => (
+          <div
+            key={i}
+            className="relative p-6 border-2 flex flex-col"
+            style={{
+              borderColor: t.featured ? "var(--blood)" : "var(--border)",
+              backgroundColor: t.featured ? "rgba(120,0,0,0.18)" : "rgba(0,0,0,0.55)",
+            }}
+          >
+            <div
+              className="absolute -top-3 left-4 px-3 py-1 font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone"
+              style={{ backgroundColor: t.featured ? "var(--blood)" : "#1a1a1a", border: "1px solid var(--border)" }}
+            >
+              {t.tag}
+            </div>
+            <div className="font-display text-xl md:text-2xl tracking-tight text-bone leading-tight mt-2 mb-4">
+              {t.name}
+            </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <DollarSign className="w-5 h-5" style={{ color: "var(--blood)" }} />
+              <span className="font-display text-3xl md:text-4xl leading-none" style={{ color: "var(--blood)" }}>
+                {t.price.replace("$", "")}
+              </span>
+            </div>
+            <div className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase text-bone/70 mb-5">
+              {t.reach}
+            </div>
+            <ul className="space-y-2 text-bone/80 text-sm leading-relaxed mb-6 flex-1">
+              {t.bullets.map((b, j) => (
+                <li key={j} className="flex gap-3 items-start">
+                  <span className="block w-1.5 h-1.5 mt-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#contact"
+              className="block text-center px-4 py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone transition-opacity hover:opacity-90"
+              style={{ backgroundColor: t.featured ? "var(--blood)" : "transparent", border: "1px solid var(--blood)" }}
+            >
+              Book This Tier
+            </a>
+          </div>
+        ))}
+      </div>
+      <div className="mt-10 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
+        <span className="font-display text-xl md:text-2xl tracking-tight text-bone">
+          INTERVIEW + PROMO COMBO — <span style={{ color: "var(--blood)" }}>WHERE THE REAL MONEY IS.</span>
+        </span>
+      </div>
+    </Section>
+  );
+}
+
 /* ---------- PROOF ---------- */
 
 function Proof() {
@@ -1097,6 +1198,7 @@ export function OnePager() {
       <Partner />
       <Promoters />
       <Why />
+      <Pricing />
       <Vision />
       <Contact />
       <Footer />
