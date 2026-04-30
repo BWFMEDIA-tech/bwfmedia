@@ -84,6 +84,7 @@ function Nav() {
     { href: "#engine", label: "Engine" },
     { href: "#audience", label: "Audience" },
     { href: "#revenue", label: "Revenue" },
+    { href: "#pricing", label: "Pricing" },
     { href: "#partner", label: "Partner" },
     { href: "#contact", label: "Contact" },
   ];
