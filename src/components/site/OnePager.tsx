@@ -1198,6 +1198,7 @@ export function OnePager() {
       <Partner />
       <Promoters />
       <Why />
+      <Pricing />
       <Vision />
       <Contact />
       <Footer />
