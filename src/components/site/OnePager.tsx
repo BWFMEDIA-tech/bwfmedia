@@ -94,7 +94,7 @@ function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur bg-black/70 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-28 h-28 md:w-36 md:h-36 object-contain" />
+          <img src={bwfLogo} alt="BWF Media" className="w-16 h-16 md:w-20 md:h-20 object-contain" />
         </a>
         <div className="hidden md:flex items-center gap-7">
           {links.map((l) => (
