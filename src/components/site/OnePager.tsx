@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
@@ -13,6 +13,36 @@ import viralThumbs from "@/assets/viral-thumbs.jpg";
 import musicVideo from "@/assets/music-video.jpg";
 
 /* ---------- shared bits ---------- */
+
+function Reveal({
+  children,
+  delay = 0,
+  y = 24,
+  className = "",
+}: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-[3px] z-[60] origin-left pointer-events-none"
+      style={{ scaleX, background: "var(--gradient-blood)" }}
+    />
+  );
+}
 
 function Section({
   id,
@@ -48,9 +78,21 @@ function Section({
       {(label || number) && (
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 flex items-center justify-between">
           {label && (
-            <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-              {number ? `${number} — ${label}` : label}
-            </span>
+            <motion.div
+              initial={{ opacity: 0, x: -16 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center gap-3"
+            >
+              <span
+                className="block h-px w-10 section-bar"
+                style={{ backgroundColor: "var(--blood)" }}
+              />
+              <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
+                {number ? `${number} — ${label}` : label}
+              </span>
+            </motion.div>
           )}
           <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 hidden md:block">
             BWF MEDIA TV
@@ -58,7 +100,7 @@ function Section({
         </div>
       )}
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">
-        {children}
+        <Reveal>{children}</Reveal>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: "var(--gradient-blood)" }} />
     </section>
