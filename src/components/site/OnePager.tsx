@@ -100,7 +100,7 @@ function Section({
         </div>
       )}
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">
-        <Reveal>{children}</Reveal>
+        {children}
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: "var(--gradient-blood)" }} />
     </section>
