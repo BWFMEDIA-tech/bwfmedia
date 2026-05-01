@@ -840,17 +840,10 @@ function Proof() {
           </div>
         ))}
       </div>
-      <div className="relative aspect-[16/7] overflow-hidden border" style={{ borderColor: "var(--blood)" }}>
-        <img src={viralThumbs} alt="Viral video stills" className="w-full h-full object-cover" loading="lazy" />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.85), transparent 40%)" }} />
-        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+      <div>
+        <div className="flex items-end justify-between mb-5">
           <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/80">Featured viral hits</span>
           <span className="font-brush text-xl" style={{ color: "var(--blood)" }}>+ 200 more</span>
-        </div>
-      </div>
-      <div className="mt-10">
-        <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60 mb-5">
-          Watch the hits
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
