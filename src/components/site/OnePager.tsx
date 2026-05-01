@@ -1215,17 +1215,121 @@ function Contact() {
 /* ---------- FOOTER ---------- */
 
 function Footer() {
+  const navLinks = [
+    { href: "#about", label: "About" },
+    { href: "#reach", label: "Reach" },
+    { href: "#proof", label: "Proof" },
+    { href: "#services", label: "Services" },
+    { href: "#engine", label: "Engine" },
+  ];
+  const moreLinks = [
+    { href: "#audience", label: "Audience" },
+    { href: "#revenue", label: "Revenue" },
+    { href: "#pricing", label: "Pricing" },
+    { href: "#partner", label: "Partner" },
+    { href: "#contact", label: "Contact" },
+  ];
   return (
     <footer className="relative bg-black border-t border-border">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-7 h-7 object-contain" />
-          <span className="font-display text-lg tracking-tight text-bone">
-            BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
-          </span>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
+          <div className="col-span-2 md:col-span-1">
+            <a href="#top" className="flex items-center gap-3">
+              <img src={bwfLogo} alt="BWF Media" className="w-8 h-8 object-contain" />
+              <span className="font-display text-lg tracking-tight text-bone">
+                BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
+              </span>
+            </a>
+            <p className="mt-4 text-bone/50 text-sm max-w-xs leading-relaxed">
+              Real content. Real people. Real reach. Where culture goes viral.
+            </p>
+          </div>
+          <div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
+              Explore
+            </div>
+            <ul className="space-y-2">
+              {navLinks.map((l) => (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    className="font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
+              Company
+            </div>
+            <ul className="space-y-2">
+              {moreLinks.map((l) => (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    className="font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href="/deck"
+                  className="font-cond tracking-[0.2em] text-xs uppercase hover:text-bone transition-colors"
+                  style={{ color: "var(--blood)" }}
+                >
+                  Pitch Deck
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
+              Connect
+            </div>
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="https://youtube.com/@bwfmediatv"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
+                >
+                  <Youtube size={14} /> YouTube
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com/bwfmediatv"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
+                >
+                  <Instagram size={14} /> Instagram
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#contact"
+                  className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
+                >
+                  <Mail size={14} /> Contact
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
-          © {new Date().getFullYear()} BWF Media TV — Where Culture Goes Viral
+        <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3">
+          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
+            © {new Date().getFullYear()} BWF Media TV — Where Culture Goes Viral
+          </div>
+          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/30">
+            Founded by Dantavious Lee
+          </div>
         </div>
       </div>
     </footer>
