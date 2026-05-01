@@ -1467,6 +1467,36 @@ function Footer() {
   ];
   return (
     <footer className="relative bg-black border-t border-border">
+      {/* CTA strip */}
+      <div
+        className="relative overflow-hidden border-b border-border"
+        style={{ background: "var(--gradient-blood)" }}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="font-display text-3xl md:text-5xl tracking-tight text-bone heavy-shadow text-center md:text-left leading-tight">
+            READY TO GO <span className="text-outline">VIRAL</span>?
+          </div>
+          <a
+            href="#contact"
+            className="group inline-flex items-center gap-3 px-7 py-4 bg-black text-bone font-cond font-bold tracking-[0.3em] text-xs uppercase border-2 border-black hover:bg-bone hover:text-black transition-colors"
+          >
+            Lock In Your Shoot
+            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        </div>
+      </div>
+
+      {/* Massive outline wordmark */}
+      <div className="relative max-w-7xl mx-auto px-6 md:px-12 pt-14 overflow-hidden">
+        <div
+          aria-hidden
+          className="font-display text-outline leading-[0.85] tracking-tight select-none"
+          style={{ fontSize: "clamp(4rem, 16vw, 14rem)" }}
+        >
+          BWFMEDIA
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
           <div className="col-span-2 md:col-span-1">
