@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
-import bwfLogo from "@/assets/bwf-logo.jpg";
+import bwfLogo from "@/assets/bwf-logo.png";
 import camera from "@/assets/camera.png";
 import audience from "@/assets/audience.jpg";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
