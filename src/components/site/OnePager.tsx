@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
@@ -136,14 +136,17 @@ function Nav() {
           </button>
         </div>
       </div>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          className="md:hidden border-t border-border bg-black/95 backdrop-blur"
-        >
-          <div className="px-6 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="md:hidden border-t border-border bg-black/95 backdrop-blur overflow-hidden"
+          >
+            <div className="px-6 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
             {links.map((l) => (
               <a
                 key={l.href}
@@ -162,9 +165,10 @@ function Nav() {
             >
               Pitch Deck
             </a>
-          </div>
-        </motion.div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
