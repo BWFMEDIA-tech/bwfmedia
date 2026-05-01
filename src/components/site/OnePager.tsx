@@ -305,7 +305,7 @@ function About() {
                 className="border-l-4 pl-5 py-4"
                 style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
               >
-                <div className="font-display text-3xl md:text-5xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{s.big}</div>
+                <div className="font-display text-3xl md:text-5xl leading-none" style={{ color: "var(--blood)" }}>{s.big}</div>
                 <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/70 mt-2">{s.label}</div>
               </div>
             ))}
@@ -411,7 +411,7 @@ function GlobalAudience() {
             </div>
           </div>
           <div className="md:col-span-3">
-            <div className="font-display text-5xl md:text-6xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{primary.pct}</div>
+            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>{primary.pct}</div>
             <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/60 mt-2">{primary.views}</div>
           </div>
           <div className="md:col-span-2">
@@ -788,7 +788,7 @@ function Proof() {
             className="border-l-4 pl-6 py-4"
             style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
           >
-            <div className="font-display text-5xl md:text-7xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{s.big}</div>
+            <div className="font-display text-5xl md:text-7xl leading-none" style={{ color: "var(--blood)" }}>{s.big}</div>
             <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone mt-3">{s.label}</div>
             <div className="text-bone/60 text-sm mt-1">{s.sub}</div>
           </div>
