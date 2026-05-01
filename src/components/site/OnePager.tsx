@@ -67,8 +67,8 @@ function Section({
 function StatBlock({ big, label }: { big: string; label: string }) {
   return (
     <div className="text-left">
-      <div className="font-display text-5xl md:text-7xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{big}</div>
-      <div className="font-cond font-bold tracking-[0.4em] text-[10px] md:text-xs uppercase text-bone/70 mt-2">{label}</div>
+      <div className="font-display text-4xl md:text-5xl leading-none font-light text-bone/90">{big}</div>
+      <div className="font-cond tracking-[0.35em] text-[10px] md:text-xs uppercase text-bone/50 mt-3">{label}</div>
     </div>
   );
 }
