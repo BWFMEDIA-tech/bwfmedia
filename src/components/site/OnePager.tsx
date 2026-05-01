@@ -94,8 +94,8 @@ function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur bg-black/70 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-14 h-14 md:w-16 md:h-16 object-contain" />
-          <span className="font-display text-2xl md:text-3xl tracking-tight text-bone">
+          <img src={bwfLogo} alt="BWF Media" className="w-20 h-20 md:w-24 md:h-24 object-contain" />
+          <span className="font-display text-3xl md:text-4xl tracking-tight text-bone">
             <span style={{ color: "var(--blood)" }}>TV</span>
           </span>
         </a>
