@@ -358,7 +358,7 @@ function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed"
+            className="mt-8 max-w-xl mx-auto md:mx-0 text-bone/75 text-base md:text-lg leading-relaxed"
           >
             BWF™ is a media network turning artists, moments, and movements into{" "}
             <span className="text-bone font-semibold">cultural events</span>. Interviews,
@@ -371,7 +371,7 @@ function Hero() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="mt-10 flex flex-wrap items-center gap-4"
+            className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-4"
           >
             <a
               href="#contact"
@@ -398,7 +398,7 @@ function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.95 }}
-            className="mt-12 grid grid-cols-3 gap-4 md:gap-8 max-w-xl border-t border-border pt-8"
+            className="mt-12 grid grid-cols-3 gap-4 md:gap-8 max-w-xl mx-auto md:mx-0 border-t border-border pt-8"
           >
             <div>
               <div className="font-display text-3xl md:text-5xl leading-none text-bone">
