@@ -614,14 +614,13 @@ function GlobalAudience() {
     country: "United States",
     pct: "45.5%",
     views: "312.7M views",
-    watch: "0:38",
     note: "Primary audience base and ticket-driving region",
   };
   const others = [
-    { flag: "🇬🇧", country: "United Kingdom", pct: "4.7%", views: "32.5M", watch: "0:31" },
-    { flag: "🇮🇳", country: "India",          pct: "4.6%", views: "31.5M", watch: "0:25" },
-    { flag: "🇩🇪", country: "Germany",        pct: "4.1%", views: "27.9M", watch: "0:26" },
-    { flag: "🇨🇦", country: "Canada",         pct: "3.3%", views: "22.7M", watch: "0:33" },
+    { flag: "🇬🇧", country: "United Kingdom", pct: "4.7%", views: "32.5M" },
+    { flag: "🇮🇳", country: "India",          pct: "4.6%", views: "31.5M" },
+    { flag: "🇩🇪", country: "Germany",        pct: "4.1%", views: "27.9M" },
+    { flag: "🇨🇦", country: "Canada",         pct: "3.3%", views: "22.7M" },
   ];
   const additional = [
     "Australia", "France", "Mexico", "Brazil", "South Africa",
@@ -674,11 +673,7 @@ function GlobalAudience() {
             <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>{primary.pct}</div>
             <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/60 mt-2">{primary.views}</div>
           </div>
-          <div className="md:col-span-2">
-            <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-1">Avg Watch</div>
-            <div className="font-display text-3xl md:text-4xl text-bone tracking-tight">{primary.watch}</div>
-          </div>
-          <div className="md:col-span-2 text-bone/70 text-sm leading-snug border-l border-border pl-4">
+          <div className="md:col-span-4 text-bone/70 text-sm leading-snug border-l border-border pl-4">
             {primary.note}
           </div>
         </div>
@@ -703,9 +698,6 @@ function GlobalAudience() {
             </div>
             <div className="text-right flex-shrink-0">
               <div className="font-display text-2xl md:text-3xl leading-none" style={{ color: "var(--blood)" }}>{c.pct}</div>
-              <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/55 mt-1">
-                {c.watch} watch
-              </div>
             </div>
           </div>
         ))}
