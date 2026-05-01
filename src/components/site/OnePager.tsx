@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
@@ -13,6 +13,36 @@ import viralThumbs from "@/assets/viral-thumbs.jpg";
 import musicVideo from "@/assets/music-video.jpg";
 
 /* ---------- shared bits ---------- */
+
+function Reveal({
+  children,
+  delay = 0,
+  y = 24,
+  className = "",
+}: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: "some" }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-[3px] z-[60] origin-left pointer-events-none"
+      style={{ scaleX, background: "var(--gradient-blood)" }}
+    />
+  );
+}
 
 function Section({
   id,
@@ -48,9 +78,21 @@ function Section({
       {(label || number) && (
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 flex items-center justify-between">
           {label && (
-            <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-              {number ? `${number} — ${label}` : label}
-            </span>
+            <motion.div
+              initial={{ opacity: 0, x: -16 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center gap-3"
+            >
+              <span
+                className="block h-px w-10 section-bar"
+                style={{ backgroundColor: "var(--blood)" }}
+              />
+              <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
+                {number ? `${number} — ${label}` : label}
+              </span>
+            </motion.div>
           )}
           <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 hidden md:block">
             BWF MEDIA TV
@@ -90,8 +132,19 @@ function Nav() {
     { href: "#contact", label: "Contact" },
   ];
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur bg-black/70 border-b border-border">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "backdrop-blur-xl bg-black/85 border-b border-blood/40" : "backdrop-blur bg-black/40 border-b border-border"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
           <img src={bwfLogo} alt="BWF Media" className="w-16 h-16 md:w-20 md:h-20 object-contain" />
@@ -517,7 +570,7 @@ function About() {
               </div>
             ))}
           </div>
-          <div className="p-6 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
+          <div className="card-tick p-6 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
             <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-3" style={{ color: "var(--blood)" }}>
               Engagement Strength
             </div>
@@ -541,7 +594,7 @@ function About() {
           { k: "Engaged", v: "Viral clips & interviews" },
           { k: "Demo", v: "Primarily 16–34" },
         ].map((row, i) => (
-          <div key={i} className="p-5 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
+          <div key={i} className="card-tick p-5 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
             <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase mb-2" style={{ color: "var(--blood)" }}>{row.k}</div>
             <div className="font-display text-lg md:text-xl text-bone leading-tight tracking-tight">{row.v}</div>
           </div>
@@ -636,7 +689,7 @@ function GlobalAudience() {
         {others.map((c, i) => (
           <div
             key={i}
-            className="relative p-5 border-2 hover:border-blood transition-colors flex items-center justify-between gap-4"
+            className="card-tick relative p-5 border-2 flex items-center justify-between gap-4"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(10,10,15,0.7)" }}
           >
             <div className="flex items-center gap-4 min-w-0">
@@ -760,7 +813,7 @@ function Services() {
         {services.map((s, i) => (
           <div
             key={i}
-            className="relative flex flex-col p-6 border-2 hover:border-blood transition-colors"
+            className="card-tick relative flex flex-col p-6 border-2"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
           >
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
@@ -923,7 +976,7 @@ function Pricing() {
         {tiers.map((t, i) => (
           <div
             key={i}
-            className="relative p-6 border-2 flex flex-col"
+            className="card-tick relative p-6 border-2 flex flex-col"
             style={{
               borderColor: t.featured ? "var(--blood)" : "var(--border)",
               backgroundColor: t.featured ? "rgba(120,0,0,0.18)" : "rgba(0,0,0,0.55)",
@@ -1151,7 +1204,7 @@ function Revenue() {
         {tiers.map((t, i) => (
           <div
             key={i}
-            className="relative flex flex-col p-6 border-2"
+            className="card-tick relative flex flex-col p-6 border-2"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
           >
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
@@ -1237,7 +1290,7 @@ function Partner() {
         {opts.map((o, i) => (
           <div
             key={i}
-            className="relative flex flex-col p-7 border-2 overflow-hidden"
+            className="card-tick relative flex flex-col p-7 border-2 overflow-hidden"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
           >
             <div
@@ -1368,7 +1421,7 @@ function Contact() {
               href={c.href}
               target={c.external ? "_blank" : undefined}
               rel={c.external ? "noreferrer" : undefined}
-              className="flex items-center gap-5 p-5 border-2 group hover:border-blood transition-all"
+              className="card-tick flex items-center gap-5 p-5 border-2 group transition-all"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
               <div className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--blood)" }}>
@@ -1414,6 +1467,36 @@ function Footer() {
   ];
   return (
     <footer className="relative bg-black border-t border-border">
+      {/* CTA strip */}
+      <div
+        className="relative overflow-hidden border-b border-border"
+        style={{ background: "var(--gradient-blood)" }}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="font-display text-3xl md:text-5xl tracking-tight text-bone heavy-shadow text-center md:text-left leading-tight">
+            READY TO GO <span className="text-outline">VIRAL</span>?
+          </div>
+          <a
+            href="#contact"
+            className="group inline-flex items-center gap-3 px-7 py-4 bg-black text-bone font-cond font-bold tracking-[0.3em] text-xs uppercase border-2 border-black hover:bg-bone hover:text-black transition-colors"
+          >
+            Lock In Your Shoot
+            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        </div>
+      </div>
+
+      {/* Massive outline wordmark */}
+      <div className="relative max-w-7xl mx-auto px-6 md:px-12 pt-14 overflow-hidden">
+        <div
+          aria-hidden
+          className="font-display text-outline leading-[0.85] tracking-tight select-none"
+          style={{ fontSize: "clamp(4rem, 16vw, 14rem)" }}
+        >
+          BWFMEDIA
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
           <div className="col-span-2 md:col-span-1">
@@ -1524,6 +1607,7 @@ function Footer() {
 export function OnePager() {
   return (
     <div className="bg-black text-bone">
+      <ScrollProgress />
       <Nav />
       <Hero />
       <About />
