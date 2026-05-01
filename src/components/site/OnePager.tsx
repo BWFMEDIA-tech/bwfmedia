@@ -532,7 +532,7 @@ function About() {
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            ABOUT <span style={{ color: "var(--blood)" }}>BWF™</span>
+            ABOUT <span style={{ color: "var(--blood)" }}>BWF<sup className="text-[0.4em] align-super">™</sup></span>
           </h2>
           <p className="text-bone text-base md:text-lg leading-relaxed mb-5">
             BWF™ is a fast-growing digital media platform covering music, live events,
