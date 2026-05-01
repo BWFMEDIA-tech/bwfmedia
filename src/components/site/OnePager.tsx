@@ -534,11 +534,11 @@ function About() {
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
             ABOUT <span style={{ color: "var(--blood)" }}>BWF™</span>
           </h2>
-          <p className="text-bone/80 text-base md:text-lg leading-relaxed mb-5">
+          <p className="text-bone text-base md:text-lg leading-relaxed mb-5">
             BWF™ is a fast-growing digital media platform covering music, live events,
             interviews, and viral cultural moments.
           </p>
-          <p className="text-bone/70 text-base md:text-lg leading-relaxed mb-8">
+          <p className="text-bone text-base md:text-lg leading-relaxed mb-8">
             We specialize in turning live performances and artist moments into
             high-reach, high-engagement content distributed across multiple platforms.
           </p>
@@ -639,7 +639,7 @@ function GlobalAudience() {
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
             GLOBAL <span style={{ color: "var(--blood)" }}>AUDIENCE</span><br />REACH.
           </h2>
-          <p className="text-bone/75 text-base md:text-lg leading-relaxed max-w-2xl">
+          <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl">
             BWF™ Media Network reaches a highly engaged global audience across music, culture,
             and live event content. Distribution is driven by strong U.S. viewership combined
             with international viral reach across key global markets.
@@ -797,7 +797,7 @@ function Services() {
         <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
           WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
         </h2>
-        <p className="text-bone/70 max-w-md md:text-right">
+        <p className="text-bone max-w-md md:text-right">
           When covering events, BWF™ delivers a full content stack — built for reach, engagement, and post-show momentum.
         </p>
       </div>
@@ -846,7 +846,7 @@ function Promoters() {
             COVER EVENTS —<br />
             <span style={{ color: "var(--blood)" }}>WE AMPLIFY THEM.</span>
           </h2>
-          <p className="text-bone/70 text-base md:text-lg leading-relaxed max-w-md">
+          <p className="text-bone text-base md:text-lg leading-relaxed max-w-md">
             Our goal is to help elevate event awareness before, during, and after the show — turning one night into weeks of content circulation.
           </p>
           <div className="mt-8 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
@@ -961,7 +961,7 @@ function Pricing() {
       <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-4">
         PICK YOUR <span style={{ color: "var(--blood)" }}>PUSH.</span>
       </h2>
-      <p className="text-bone/70 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
+      <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl mb-12">
         Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach — no smoke, no inflated numbers.
       </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -1098,7 +1098,7 @@ function Engine() {
             <span style={{ color: "var(--blood)" }}>MULTIPLE</span><br />
             VIRAL ASSETS.
           </h2>
-          <p className="mt-6 text-bone/70 text-base md:text-lg leading-relaxed max-w-sm">
+          <p className="mt-6 text-bone text-base md:text-lg leading-relaxed max-w-sm">
             Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG — turning one shoot into a full media cycle.
           </p>
         </div>
@@ -1292,7 +1292,7 @@ function Partner() {
             <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5" style={{ color: "var(--blood)" }}>{o.tag}</div>
             <o.icon className="w-10 h-10 mb-5 text-bone" strokeWidth={2} />
             <div className="font-display text-2xl md:text-3xl tracking-tight text-bone mb-3 leading-tight">{o.title}</div>
-            <p className="text-bone/70 leading-relaxed text-sm md:text-base">{o.body}</p>
+            <p className="text-bone leading-relaxed text-sm md:text-base">{o.body}</p>
             <div className="mt-auto pt-6 flex items-center gap-2">
               <Handshake className="w-5 h-5" style={{ color: "var(--blood)" }} />
               <span className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/60">Open to discuss</span>
@@ -1320,7 +1320,7 @@ function Why() {
           <h2 className="font-display text-6xl md:text-8xl leading-[0.85] text-bone heavy-shadow mb-6">
             WHY <span style={{ color: "var(--blood)" }}>US?</span>
           </h2>
-          <p className="text-bone/70 text-base md:text-lg leading-relaxed max-w-md mb-8">
+          <p className="text-bone text-base md:text-lg leading-relaxed max-w-md mb-8">
             Anyone can shoot video. Few can move culture. We've been doing it long enough to know exactly which lane we own.
           </p>
           <div className="inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.5)" }}>
@@ -1402,7 +1402,7 @@ function Contact() {
             <span style={{ color: "var(--blood)" }}>SOMETHING</span><br />
             BIG.
           </h2>
-          <p className="mt-6 text-bone/70 text-base md:text-lg max-w-md leading-relaxed">
+          <p className="mt-6 text-bone text-base md:text-lg max-w-md leading-relaxed">
             The numbers are real. The audience is real. The opportunity is now. Lock it in.
           </p>
         </div>
@@ -1498,7 +1498,7 @@ function Footer() {
                 BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
               </span>
             </a>
-            <p className="mt-4 text-bone/50 text-sm max-w-xs leading-relaxed">
+            <p className="mt-4 text-bone text-sm max-w-xs leading-relaxed">
               Real content. Real people. Real reach. Where culture goes viral.
             </p>
           </div>
