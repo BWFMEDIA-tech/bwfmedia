@@ -94,9 +94,7 @@ function Section({
               </span>
             </motion.div>
           )}
-          <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 hidden md:block">
-            BWF MEDIA TV
-          </span>
+
         </div>
       )}
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">
@@ -264,7 +262,6 @@ function Hero() {
     "WHERE CULTURE GOES VIRAL",
     "REAL CONTENT • REAL PEOPLE • REAL VIEWS",
     "BOOK A SHOOT",
-    "BWF MEDIA TV",
   ];
   return (
     <section
@@ -340,9 +337,6 @@ function Hero() {
             className="flex items-center gap-3 mb-6"
           >
             <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
-            <span className="font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/60">
-              BWF Media TV — Issue №01
-            </span>
           </motion.div>
 
           <motion.h1
