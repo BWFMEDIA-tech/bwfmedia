@@ -570,7 +570,7 @@ function About() {
               </div>
             ))}
           </div>
-          <div className="p-6 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
+          <div className="card-tick p-6 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
             <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-3" style={{ color: "var(--blood)" }}>
               Engagement Strength
             </div>
@@ -594,7 +594,7 @@ function About() {
           { k: "Engaged", v: "Viral clips & interviews" },
           { k: "Demo", v: "Primarily 16–34" },
         ].map((row, i) => (
-          <div key={i} className="p-5 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
+          <div key={i} className="card-tick p-5 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
             <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase mb-2" style={{ color: "var(--blood)" }}>{row.k}</div>
             <div className="font-display text-lg md:text-xl text-bone leading-tight tracking-tight">{row.v}</div>
           </div>
@@ -689,7 +689,7 @@ function GlobalAudience() {
         {others.map((c, i) => (
           <div
             key={i}
-            className="relative p-5 border-2 hover:border-blood transition-colors flex items-center justify-between gap-4"
+            className="card-tick relative p-5 border-2 flex items-center justify-between gap-4"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(10,10,15,0.7)" }}
           >
             <div className="flex items-center gap-4 min-w-0">
@@ -813,7 +813,7 @@ function Services() {
         {services.map((s, i) => (
           <div
             key={i}
-            className="relative flex flex-col p-6 border-2 hover:border-blood transition-colors"
+            className="card-tick relative flex flex-col p-6 border-2"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
           >
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
@@ -976,7 +976,7 @@ function Pricing() {
         {tiers.map((t, i) => (
           <div
             key={i}
-            className="relative p-6 border-2 flex flex-col"
+            className="card-tick relative p-6 border-2 flex flex-col"
             style={{
               borderColor: t.featured ? "var(--blood)" : "var(--border)",
               backgroundColor: t.featured ? "rgba(120,0,0,0.18)" : "rgba(0,0,0,0.55)",
@@ -1204,7 +1204,7 @@ function Revenue() {
         {tiers.map((t, i) => (
           <div
             key={i}
-            className="relative flex flex-col p-6 border-2"
+            className="card-tick relative flex flex-col p-6 border-2"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
           >
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
@@ -1290,7 +1290,7 @@ function Partner() {
         {opts.map((o, i) => (
           <div
             key={i}
-            className="relative flex flex-col p-7 border-2 overflow-hidden"
+            className="card-tick relative flex flex-col p-7 border-2 overflow-hidden"
             style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
           >
             <div
@@ -1421,7 +1421,7 @@ function Contact() {
               href={c.href}
               target={c.external ? "_blank" : undefined}
               rel={c.external ? "noreferrer" : undefined}
-              className="flex items-center gap-5 p-5 border-2 group hover:border-blood transition-all"
+              className="card-tick flex items-center gap-5 p-5 border-2 group transition-all"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
               <div className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--blood)" }}>
