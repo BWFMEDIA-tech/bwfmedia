@@ -95,9 +95,6 @@ function Nav() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
           <img src={bwfLogo} alt="BWF Media" className="w-28 h-28 md:w-36 md:h-36 object-contain" />
-          <span className="font-display text-4xl md:text-5xl tracking-tight text-bone">
-            <span style={{ color: "var(--blood)" }}>TV</span>
-          </span>
         </a>
         <div className="hidden md:flex items-center gap-7">
           {links.map((l) => (
