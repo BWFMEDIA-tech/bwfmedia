@@ -203,20 +203,6 @@ function Hero() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 py-16 text-center flex flex-col items-center">
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.7 }}
-          className="flex items-center gap-4 mb-8"
-        >
-          <div className="flex items-center justify-center w-12 h-9 rounded" style={{ backgroundColor: "var(--blood)" }}>
-            <Play className="w-4 h-4 fill-bone text-bone" />
-          </div>
-          <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/70">
-            YouTube Channel
-          </span>
-        </motion.div>
-
-        <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.15 }}
