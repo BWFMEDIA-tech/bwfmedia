@@ -1472,22 +1472,10 @@ function Footer() {
         </div>
       </div>
 
-      {/* Massive outline wordmark */}
-      <div className="relative max-w-7xl mx-auto px-6 md:px-12 pt-14 overflow-hidden">
-        <div
-          aria-hidden
-          className="font-display text-outline leading-[0.85] tracking-tight select-none"
-          style={{ fontSize: "clamp(4rem, 16vw, 14rem)" }}
-        >
-          BWFMEDIA
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
           <div className="col-span-2 md:col-span-1">
             <a href="#top" className="flex items-center gap-3">
-              <img src={bwfLogo} alt="BWF Media" className="w-8 h-8 object-contain" />
               <span className="font-display text-lg tracking-tight text-bone">
                 BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
               </span>
