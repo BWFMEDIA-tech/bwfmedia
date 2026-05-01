@@ -4,7 +4,7 @@ import {
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
   Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.png";
 import camera from "@/assets/camera.png";
@@ -172,110 +172,288 @@ function Nav() {
 
 /* ---------- HERO ---------- */
 
+function AnimatedCounter({
+  to,
+  suffix = "",
+  duration = 2.2,
+  className = "",
+}: { to: number; suffix?: string; duration?: number; className?: string }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / (duration * 1000), 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(Math.floor(eased * to));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to, duration]);
+  const formatted =
+    to >= 1_000_000 ? `${(val / 1_000_000).toFixed(val >= to ? 0 : 1)}M`
+    : to >= 1_000   ? `${(val / 1_000).toFixed(val >= to ? 0 : 1)}K`
+    : `${val}`;
+  return <span ref={ref} className={className}>{formatted}{suffix}</span>;
+}
+
 function Hero() {
+  const tickerItems = [
+    "686M+ TOTAL VIEWS",
+    "324K+ SUBSCRIBERS",
+    "18M+ LIKES",
+    "2.9M+ SHARES",
+    "WHERE CULTURE GOES VIRAL",
+    "REAL CONTENT • REAL PEOPLE • REAL VIEWS",
+    "BOOK A SHOOT",
+    "BWF MEDIA TV",
+  ];
   return (
     <section
       id="top"
-      className="relative min-h-screen w-full overflow-hidden grunge-overlay flex items-center justify-center pt-20"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), url(${grunge})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className="relative min-h-screen w-full overflow-hidden grunge-overlay scanlines flex flex-col pt-20"
     >
+      {/* Background image with slow zoom */}
       <div
-        className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-40 blur-3xl pointer-events-none"
+        className="absolute inset-0 animate-slow-zoom pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.92)), url(${grunge})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+      {/* Ambient blood glows */}
+      <div
+        className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full opacity-50 blur-3xl pointer-events-none"
         style={{ backgroundColor: "var(--blood)" }}
       />
       <div
-        className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl pointer-events-none"
+        className="absolute -bottom-40 -right-40 w-[700px] h-[700px] rounded-full opacity-30 blur-3xl pointer-events-none"
         style={{ backgroundColor: "var(--blood)" }}
       />
 
+      {/* Camera prop */}
       <img
         src={camera}
         alt=""
-        className="absolute -right-16 -bottom-12 w-[280px] md:w-[420px] opacity-25 mix-blend-screen pointer-events-none"
+        className="absolute right-[-60px] bottom-[8%] w-[260px] md:w-[460px] opacity-20 mix-blend-screen pointer-events-none rotate-[-8deg]"
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 py-16 text-center flex flex-col items-center">
+      {/* Crosshair grid lines */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--bone) 1px, transparent 1px), linear-gradient(to bottom, var(--bone) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
+        }}
+      />
+
+      {/* Top meta bar */}
+      <div className="relative z-20 max-w-7xl w-full mx-auto px-6 md:px-12 mt-4 md:mt-6 flex items-center justify-between">
         <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="relative flex items-center justify-center"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="inline-flex items-center gap-2 px-3 py-1.5 border border-border bg-black/60 backdrop-blur"
         >
-          <div className="absolute inset-0 blur-3xl opacity-40 -z-10" style={{ backgroundColor: "var(--blood)" }} />
-          <img
-            src={bwfLogo}
-            alt="BWF Media"
-            className="w-[220px] md:w-[340px] h-[220px] md:h-[340px] object-contain mix-blend-screen drop-shadow-[0_0_40px_rgba(220,38,38,0.4)]"
-          />
+          <span className="w-2 h-2 rounded-full animate-pulse-dot" style={{ backgroundColor: "var(--blood)" }} />
+          <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/80">
+            Now Streaming Worldwide
+          </span>
         </motion.div>
-
-        <motion.h1
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="font-display text-5xl md:text-7xl tracking-tight text-bone heavy-shadow"
-        >
-          MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.45 }}
-          className="mt-6 font-cond font-bold tracking-[0.3em] text-base md:text-xl uppercase text-bone"
-        >
-          Real Content. Real People. <span style={{ color: "var(--blood)" }}>Real Views.</span>
-        </motion.p>
-
-        <motion.div
+        <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          className="mt-10 flex items-center gap-8 md:gap-12"
+          transition={{ delay: 0.4 }}
+          className="hidden md:block font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/40"
         >
-          <StatBlock big="686M+" label="Views" />
-          <div className="w-px h-16 md:h-20 bg-bone/20" />
-          <StatBlock big="324K+" label="Subscribers" />
-        </motion.div>
+          EST. — HIP-HOP / CULTURE / MEDIA
+        </motion.span>
+      </div>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.75 }}
-          className="mt-10 font-brush text-2xl md:text-3xl text-bone/80"
-        >
-          Where Culture <span style={{ color: "var(--blood)" }}>Goes Viral</span>
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
-        >
-          <a
-            href="#contact"
-            className="px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone"
-            style={{ backgroundColor: "var(--blood)" }}
+      {/* Main hero content */}
+      <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-12 py-10 md:py-16 grid md:grid-cols-12 gap-10 items-center">
+        {/* LEFT — typography column */}
+        <div className="md:col-span-7 text-left">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex items-center gap-3 mb-6"
           >
-            Book a Shoot
-          </a>
-          <a
-            href="https://youtube.com/@bwfmedia"
-            target="_blank"
-            rel="noreferrer"
-            className="px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone border-2 border-border hover:border-blood transition-colors"
+            <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
+            <span className="font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/60">
+              BWF Media TV — Issue №01
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="font-display leading-[0.82] tracking-tight text-bone heavy-shadow"
           >
-            Watch on YouTube
-          </a>
+            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem]">WHERE</span>
+            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem]" style={{ color: "var(--blood)" }}>
+              CULTURE
+            </span>
+            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem] text-outline">
+              GOES VIRAL.
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed"
+          >
+            BWF™ is a media network turning artists, moments, and movements into{" "}
+            <span className="text-bone font-semibold">cultural events</span>. Interviews,
+            music videos, viral clips — distributed to a global audience that{" "}
+            <span style={{ color: "var(--blood)" }} className="font-semibold">actually watches</span>.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="mt-10 flex flex-wrap items-center gap-4"
+          >
+            <a
+              href="#contact"
+              className="group relative inline-flex items-center gap-3 px-8 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone overflow-hidden"
+              style={{ backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }}
+            >
+              <span className="relative z-10">Book a Shoot</span>
+              <ArrowUpRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <span className="absolute inset-0 bg-black/30 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+            </a>
+            <a
+              href="https://youtube.com/@bwfmedia"
+              target="_blank"
+              rel="noreferrer"
+              className="group inline-flex items-center gap-3 px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone border-2 border-border hover:border-blood transition-colors backdrop-blur bg-black/40"
+            >
+              <Play className="w-4 h-4 fill-bone" />
+              Watch on YouTube
+            </a>
+          </motion.div>
+
+          {/* Animated stats row */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 0.95 }}
+            className="mt-12 grid grid-cols-3 gap-4 md:gap-8 max-w-xl border-t border-border pt-8"
+          >
+            <div>
+              <div className="font-display text-3xl md:text-5xl leading-none text-bone">
+                <AnimatedCounter to={686} suffix="M+" />
+              </div>
+              <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50 mt-2">Views</div>
+            </div>
+            <div className="border-l border-border pl-4 md:pl-8">
+              <div className="font-display text-3xl md:text-5xl leading-none" style={{ color: "var(--blood)" }}>
+                <AnimatedCounter to={324} suffix="K+" />
+              </div>
+              <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50 mt-2">Subscribers</div>
+            </div>
+            <div className="border-l border-border pl-4 md:pl-8">
+              <div className="font-display text-3xl md:text-5xl leading-none text-bone">
+                <AnimatedCounter to={18} suffix="M+" />
+              </div>
+              <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50 mt-2">Likes</div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* RIGHT — featured visual card */}
+        <motion.div
+          initial={{ opacity: 0, x: 30, rotate: 4 }}
+          animate={{ opacity: 1, x: 0, rotate: 2 }}
+          transition={{ duration: 0.9, delay: 0.4 }}
+          className="md:col-span-5 hidden md:block"
+        >
+          <div className="relative group">
+            {/* Floating tag */}
+            <div
+              className="absolute -top-5 -left-5 z-20 px-4 py-2 font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone rotate-[-4deg]"
+              style={{ backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }}
+            >
+              ▶ Featured Drop
+            </div>
+            {/* Card */}
+            <div
+              className="relative border-2 overflow-hidden"
+              style={{ borderColor: "var(--blood)", boxShadow: "var(--shadow-deep)" }}
+            >
+              <img src={viralThumbs} alt="Featured BWF Media content" className="w-full h-[480px] object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+              {/* Play overlay */}
+              <button className="absolute inset-0 flex items-center justify-center group/play">
+                <span
+                  className="w-20 h-20 rounded-full flex items-center justify-center backdrop-blur transition-transform group-hover/play:scale-110"
+                  style={{ backgroundColor: "var(--blood)", boxShadow: "0 0 60px var(--blood-glow)" }}
+                >
+                  <Play className="w-8 h-8 text-bone fill-bone ml-1" />
+                </span>
+              </button>
+              {/* Bottom meta */}
+              <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between">
+                <div>
+                  <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/60 mb-1">
+                    Latest Interview
+                  </div>
+                  <div className="font-display text-2xl text-bone leading-tight">
+                    REAL ARTISTS.<br />REAL STORIES.
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-display text-2xl" style={{ color: "var(--blood)" }}>4.2M</div>
+                  <div className="font-cond tracking-[0.25em] text-[9px] uppercase text-bone/50">weekly</div>
+                </div>
+              </div>
+            </div>
+            {/* Decorative stack card behind */}
+            <div
+              className="absolute -bottom-4 -right-4 w-full h-full border-2 -z-10"
+              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.4)" }}
+            />
+          </div>
         </motion.div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: "var(--gradient-blood)" }} />
+      {/* Scroll cue */}
+      <div className="relative z-10 hidden md:flex flex-col items-center pb-6">
+        <span className="font-cond tracking-[0.4em] text-[10px] uppercase text-bone/40 mb-2">Scroll</span>
+        <div className="w-px h-10 bg-bone/20 relative overflow-hidden">
+          <span className="absolute top-0 left-0 w-full h-3 animate-scroll-cue" style={{ backgroundColor: "var(--blood)" }} />
+        </div>
+      </div>
+
+      {/* Marquee ticker */}
+      <div
+        className="relative z-10 border-y border-border overflow-hidden py-3"
+        style={{ backgroundColor: "var(--blood)" }}
+      >
+        <div className="flex animate-marquee whitespace-nowrap">
+          {[...tickerItems, ...tickerItems].map((item, i) => (
+            <span key={i} className="mx-8 font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone inline-flex items-center gap-8">
+              {item}
+              <span className="text-bone/60">★</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-1.5 z-20" style={{ background: "var(--gradient-blood)" }} />
     </section>
   );
 }
