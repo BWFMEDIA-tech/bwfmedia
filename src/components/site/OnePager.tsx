@@ -840,12 +840,14 @@ function Proof() {
           </div>
         ))}
       </div>
-      <div>
-        <div className="flex items-end justify-between mb-5">
-          <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/80">Featured viral hits</span>
-          <span className="font-brush text-xl" style={{ color: "var(--blood)" }}>+ 200 more</span>
+      <div className="bg-black rounded-2xl p-6 md:p-10">
+        <div className="flex items-end justify-between mb-8">
+          <h3 className="font-display text-3xl md:text-4xl text-bone">
+            Featured <span style={{ color: "var(--blood)" }}>Videos</span>
+          </h3>
+          <span className="font-brush text-xl hidden sm:block" style={{ color: "var(--blood)" }}>+ 200 more</span>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
           {[
             "9vGoBJa1DnM",
             "2yIdA5Jp7vU",
@@ -854,12 +856,11 @@ function Proof() {
           ].map((id) => (
             <div
               key={id}
-              className="relative aspect-video overflow-hidden border"
-              style={{ borderColor: "var(--blood)" }}
+              className="group relative aspect-video overflow-hidden rounded-xl border border-border transition-all duration-300 hover:scale-[1.02] hover:border-[color:var(--blood)] hover:shadow-[0_0_40px_-5px_rgba(180,0,0,0.5)]"
             >
               <iframe
                 src={`https://www.youtube.com/embed/${id}`}
-                title={`BWF Media viral hit ${id}`}
+                title={`BWF Media featured video ${id}`}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
