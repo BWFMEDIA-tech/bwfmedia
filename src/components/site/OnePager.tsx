@@ -329,14 +329,14 @@ function Hero() {
       {/* Main hero content */}
       <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-12 py-10 md:py-16 grid md:grid-cols-12 gap-10 items-center">
         {/* LEFT — typography column */}
-        <div className="md:col-span-7 text-left">
+        <div className="md:col-span-7 text-center md:text-left flex flex-col items-center md:items-start">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 mb-6"
+            className="flex items-center justify-center md:justify-start gap-3 mb-6"
           >
-            <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 md:w-14 md:h-14 object-contain" />
+            <img src={bwfLogo} alt="BWF Media" className="w-32 h-32 md:w-44 md:h-44 lg:w-52 lg:h-52 object-contain" />
           </motion.div>
 
           <motion.h1
