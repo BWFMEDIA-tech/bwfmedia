@@ -297,7 +297,7 @@ function About() {
     { big: "4.2M+", label: "Weekly Views" },
   ];
   return (
-    <Section id="about" number="00" label="About BWF™">
+    <Section id="about" label="About BWF™">
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
@@ -403,7 +403,7 @@ function GlobalAudience() {
     "Content optimized for viral sharing and reposting",
   ];
   return (
-    <Section id="reach" number="00.5" label="Global Audience Reach">
+    <Section id="reach" label="Global Audience Reach">
       <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-12">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
@@ -569,7 +569,7 @@ function Services() {
     },
   ];
   return (
-    <Section id="services" number="2.5" label="Content Services">
+    <Section id="services" label="Content Services">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
           WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
@@ -615,7 +615,7 @@ function Promoters() {
     { icon: Heart, title: "HIGH-ENGAGEMENT EXPOSURE", body: "Reach a culture-driven audience that actually reacts and shares." },
   ];
   return (
-    <Section id="promoters" number="07.5" label="Why Promoters Work With BWF™">
+    <Section id="promoters" label="Why Promoters Work With BWF™">
       <div className="grid md:grid-cols-5 gap-10 md:gap-16">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
@@ -656,7 +656,7 @@ function Promoters() {
 
 function Shift() {
   return (
-    <Section id="shift" number="01" label="The Shift">
+    <Section id="shift" label="The Shift">
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
@@ -734,7 +734,7 @@ function Pricing() {
     },
   ];
   return (
-    <Section id="pricing" number="08" label="Pricing Tiers">
+    <Section id="pricing" label="Pricing Tiers">
       <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-4">
         PICK YOUR <span style={{ color: "var(--blood)" }}>PUSH.</span>
       </h2>
@@ -805,7 +805,7 @@ function Proof() {
     { big: "324K+", label: "SUBSCRIBERS", sub: "Active community" },
   ];
   return (
-    <Section id="proof" number="02" label="Track Record">
+    <Section id="proof" label="Track Record">
       <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
         WE DON'T CHASE VIRAL —<br />
         <span style={{ color: "var(--blood)" }}>WE CREATE IT.</span>
@@ -867,7 +867,7 @@ function Engine() {
     { icon: Flame, title: "Street Content", desc: "Raw, unscripted moments straight from the culture." },
   ];
   return (
-    <Section id="engine" number="03" label="Content Engine">
+    <Section id="engine" label="Content Engine">
       <div className="grid md:grid-cols-5 gap-10 md:gap-12">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
@@ -910,7 +910,7 @@ function Audience() {
     { k: "ENGAGEMENT", v: "Above category average", note: "Comments, shares, repeat views" },
   ];
   return (
-    <Section id="audience" number="04" label="Demographics">
+    <Section id="audience" label="Demographics">
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div className="relative aspect-[4/5] md:aspect-auto md:h-[520px] overflow-hidden">
           <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
@@ -957,7 +957,7 @@ function Revenue() {
     { name: "AD REVENUE", price: "Recurring", deposit: "YouTube Partner", icon: DollarSign, items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"] },
   ];
   return (
-    <Section id="revenue" number="05" label="Monetization">
+    <Section id="revenue" label="Monetization">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
         <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
           PROVEN <span style={{ color: "var(--blood)" }}>REVENUE</span> MODEL
@@ -1006,7 +1006,7 @@ function Scale() {
     "Expanded reach into new regional markets",
   ];
   return (
-    <Section id="scale" number="06" label="The Opportunity">
+    <Section id="scale" label="The Opportunity">
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
@@ -1051,7 +1051,7 @@ function Partner() {
     { tag: "Option 03", title: "UPFRONT INVESTMENT", body: "Capital injection to scale production, talent, and content velocity.", icon: TrendingUp },
   ];
   return (
-    <Section id="partner" number="07" label="The Partnership">
+    <Section id="partner" label="The Partnership">
       <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
         THREE WAYS TO <span style={{ color: "var(--blood)" }}>RUN IT UP.</span>
       </h2>
@@ -1091,7 +1091,7 @@ function Why() {
     { icon: Sparkles, title: "CONSISTENT OUTPUT", body: "We don't go quiet. New drops, every week." },
   ];
   return (
-    <Section id="why" number="08" label="The Edge">
+    <Section id="why" label="The Edge">
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-6xl md:text-8xl leading-[0.85] text-bone heavy-shadow mb-6">
@@ -1135,7 +1135,7 @@ function Vision() {
     { n: "03", h: "CULTURAL", s: "Authority" },
   ];
   return (
-    <Section id="vision" number="09" label="The Future">
+    <Section id="vision" label="The Future">
       <div className="text-center flex flex-col items-center">
         <h2 className="font-display text-6xl md:text-[7rem] leading-[0.85] text-bone heavy-shadow max-w-5xl">
           THE FUTURE OF<br />
@@ -1171,7 +1171,7 @@ function Contact() {
     { icon: Youtube, label: "YouTube", value: "@bwfmedia", href: "https://youtube.com/@bwfmedia", external: true },
   ];
   return (
-    <Section id="contact" number="10" label="Let's Talk">
+    <Section id="contact" label="Let's Talk">
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-6xl md:text-[7rem] leading-[0.85] text-bone heavy-shadow">
