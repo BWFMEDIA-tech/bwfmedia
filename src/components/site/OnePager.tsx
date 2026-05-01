@@ -107,6 +107,13 @@ function Nav() {
               {l.label}
             </a>
           ))}
+          <a
+            href="/deck"
+            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase hover:text-bone transition-colors"
+            style={{ color: "var(--blood)" }}
+          >
+            Pitch Deck
+          </a>
         </div>
         <a
           href="#contact"
