@@ -848,6 +848,34 @@ function Proof() {
           <span className="font-brush text-xl" style={{ color: "var(--blood)" }}>+ 200 more</span>
         </div>
       </div>
+      <div className="mt-10">
+        <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60 mb-5">
+          Watch the hits
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            "9vGoBJa1DnM",
+            "2yIdA5Jp7vU",
+            "LeMMMetmTT0",
+            "xXBDvU2S9Es",
+          ].map((id) => (
+            <div
+              key={id}
+              className="relative aspect-video overflow-hidden border"
+              style={{ borderColor: "var(--blood)" }}
+            >
+              <iframe
+                src={`https://www.youtube.com/embed/${id}`}
+                title={`BWF Media viral hit ${id}`}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </Section>
   );
 }
