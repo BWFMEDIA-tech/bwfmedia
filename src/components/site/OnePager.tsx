@@ -11,6 +11,7 @@ import camera from "@/assets/camera.png";
 import audience from "@/assets/audience.jpg";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import musicVideo from "@/assets/music-video.jpg";
+import bwfIntroVideo from "@/assets/bwf-intro.mp4.asset.json";
 
 /* ---------- shared bits ---------- */
 
@@ -275,6 +276,22 @@ function Hero() {
           backgroundImage: `linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.92)), url(${grunge})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
+        }}
+      />
+      {/* Cinematic intro video layer */}
+      <video
+        src={bwfIntroVideo.url}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen pointer-events-none"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.85) 100%)",
         }}
       />
       {/* Ambient blood glows */}
