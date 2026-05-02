@@ -1508,9 +1508,9 @@ function Footer() {
             <div className="mt-5 flex items-center gap-3">
               {[
                 { Icon: Youtube, href: "https://youtube.com/@bwfmediatv", label: "YouTube" },
-                { Icon: Instagram, href: "https://instagram.com/bwfmediatv", label: "Instagram" },
+                { Icon: Instagram, href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", label: "Instagram" },
                 { Icon: Music2, href: "https://tiktok.com/@bwfmediatv", label: "TikTok" },
-                { Icon: Facebook, href: "https://facebook.com/bwfmediatv", label: "Facebook" },
+                { Icon: Facebook, href: "https://www.facebook.com/share/1FmVHYjMfE/?mibextid=wwXIfr", label: "Facebook" },
                 { Icon: Twitter, href: "https://twitter.com/bwfmediatv", label: "Twitter / X" },
                 { Icon: Mail, href: "#contact", label: "Email" },
               ].map(({ Icon, href, label }) => (
