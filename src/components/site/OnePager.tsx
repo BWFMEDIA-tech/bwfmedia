@@ -11,6 +11,7 @@ import camera from "@/assets/camera.png";
 import audience from "@/assets/audience.jpg";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import musicVideo from "@/assets/music-video.jpg";
+import bwfIntroVideo from "@/assets/bwf-intro.mp4.asset.json";
 
 /* ---------- shared bits ---------- */
 
