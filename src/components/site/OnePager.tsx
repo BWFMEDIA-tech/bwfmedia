@@ -11,6 +11,8 @@ import camera from "@/assets/camera.png";
 import audience from "@/assets/audience.jpg";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import musicVideo from "@/assets/music-video.jpg";
+import servicesCrowd from "@/assets/services-crowd.jpg";
+import audienceMap from "@/assets/audience-map.jpg";
 import bwfIntroVideo from "@/assets/bwf-intro.mp4.asset.json";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
@@ -808,6 +810,19 @@ function Services() {
   ];
   return (
     <Section id="services" label="Content Services">
+      <img
+        src={servicesCrowd}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none mix-blend-screen"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(to bottom, rgba(11,11,11,0.85), rgba(11,11,11,0.95))" }}
+      />
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
           WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
@@ -1149,6 +1164,19 @@ function Audience() {
   ];
   return (
     <Section id="audience" label="Demographics">
+      <img
+        src={audienceMap}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at center, rgba(11,11,11,0.55), rgba(11,11,11,0.92))" }}
+      />
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div className="relative aspect-[4/5] md:aspect-auto md:h-[520px] overflow-hidden">
           <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
