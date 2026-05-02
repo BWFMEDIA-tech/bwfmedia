@@ -279,11 +279,11 @@ function Hero() {
       />
       {/* Ambient blood glows */}
       <div
-        className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full opacity-50 blur-3xl pointer-events-none"
+        className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full blur-3xl pointer-events-none animate-pulse-glow"
         style={{ backgroundColor: "var(--blood)" }}
       />
       <div
-        className="absolute -bottom-40 -right-40 w-[700px] h-[700px] rounded-full opacity-30 blur-3xl pointer-events-none"
+        className="absolute -bottom-40 -right-40 w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none animate-pulse-glow-slow"
         style={{ backgroundColor: "var(--blood)" }}
       />
 
