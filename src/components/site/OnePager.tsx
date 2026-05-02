@@ -1458,15 +1458,13 @@ function Contact() {
 
 function Footer() {
   const navLinks = [
-    { href: "#about", label: "About" },
     { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
     { href: "#services", label: "Services" },
-    { href: "#engine", label: "Engine" },
+    { href: "#audience", label: "Audience" },
   ];
   const moreLinks = [
-    { href: "#audience", label: "Audience" },
-    { href: "#revenue", label: "Revenue" },
+    { href: "#engine", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
     { href: "#partner", label: "Partner" },
     { href: "#contact", label: "Contact" },
