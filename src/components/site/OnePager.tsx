@@ -1406,7 +1406,7 @@ function Vision() {
 function Contact() {
   const contacts = [
     { icon: Mail, label: "Email", value: "bookbwfmediatv@mail.com", href: "mailto:bookbwfmediatv@mail.com", external: false },
-    { icon: Instagram, label: "Instagram", value: "@bwfmediatv", href: "https://instagram.com/bwfmediatv", external: true },
+    { icon: Instagram, label: "Instagram", value: "@bwfmediatv", href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", external: true },
     { icon: Youtube, label: "YouTube", value: "@bwfmedia", href: "https://youtube.com/@bwfmedia", external: true },
   ];
   return (
