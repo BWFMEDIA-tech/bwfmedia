@@ -20,6 +20,7 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          external_url: string | null
           id: string
           storage_path: string
           thumbnail_path: string | null
@@ -31,6 +32,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          external_url?: string | null
           id?: string
           storage_path: string
           thumbnail_path?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          external_url?: string | null
           id?: string
           storage_path?: string
           thumbnail_path?: string | null
