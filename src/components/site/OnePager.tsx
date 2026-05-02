@@ -12,6 +12,7 @@ import audience from "@/assets/audience.jpg";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import musicVideo from "@/assets/music-video.jpg";
 import bwfIntroVideo from "@/assets/bwf-intro.mp4.asset.json";
+import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 /* ---------- shared bits ---------- */
 
@@ -278,12 +279,12 @@ function Hero() {
       />
       {/* Cinematic intro video layer */}
       <video
-        src={bwfIntroVideo.url}
+        src={heroRapperVideo.url}
         autoPlay
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
       />
       <div
         className="absolute inset-0 pointer-events-none"
