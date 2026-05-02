@@ -1577,6 +1577,88 @@ function Footer() {
 
 /* ---------- PAGE ---------- */
 
+function RedMicPodcast() {
+  const links = [
+    { label: "Listen / Watch", href: "https://tr.ee/SuQHFE0IPd" },
+    { label: "Featured Episode", href: "https://tr.ee/q2Uu1lnrlI" },
+  ];
+  return (
+    <Section id="red-mic" number="06" label="The Red Mic Podcast">
+      <div className="grid md:grid-cols-12 gap-10 items-center">
+        <Reveal className="md:col-span-7">
+          <div className="inline-flex items-center gap-3 mb-6">
+            <span
+              className="inline-flex items-center justify-center w-12 h-12 rounded-full"
+              style={{ backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }}
+            >
+              <Mic className="w-6 h-6 text-bone" />
+            </span>
+            <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/60">
+              Something Else We Offer
+            </span>
+          </div>
+          <h2 className="font-display leading-[0.85] tracking-tight text-bone heavy-shadow text-6xl md:text-8xl">
+            THE <span style={{ color: "var(--blood)" }}>RED MIC</span>
+            <span className="block text-outline">PODCAST</span>
+          </h2>
+          <p className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed">
+            Unfiltered conversations from the front lines of hip-hop and culture.
+            Long-form interviews, raw stories, and the moments that don't fit a
+            30-second clip — straight from <span style={{ color: "var(--blood)" }} className="font-semibold">The Red Mic</span>.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            {links.map((l, i) => (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`group inline-flex items-center gap-3 px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone transition-colors ${
+                  i === 0
+                    ? ""
+                    : "border-2 border-border hover:border-blood backdrop-blur bg-black/40"
+                }`}
+                style={
+                  i === 0
+                    ? { backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }
+                    : undefined
+                }
+              >
+                {i === 0 ? <Play className="w-4 h-4 fill-bone" /> : <ArrowUpRight className="w-4 h-4" />}
+                {l.label}
+              </a>
+            ))}
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.15} className="md:col-span-5">
+          <div
+            className="relative aspect-square w-full border-2 border-blood/60 bg-black/60 backdrop-blur overflow-hidden"
+            style={{ boxShadow: "var(--shadow-blood)" }}
+          >
+            <div
+              className="absolute inset-0 opacity-40"
+              style={{
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)), url(${grunge})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+            <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-8">
+              <Mic className="w-24 h-24 mb-6" style={{ color: "var(--blood)" }} />
+              <div className="font-display text-5xl md:text-6xl text-bone leading-none">RED</div>
+              <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>MIC</div>
+              <div className="mt-6 font-cond tracking-[0.4em] text-[10px] uppercase text-bone/60">
+                New Episodes Weekly
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </Section>
+  );
+}
+
 export function OnePager() {
   return (
     <div className="bg-black text-bone">
