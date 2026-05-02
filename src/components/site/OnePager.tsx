@@ -450,13 +450,6 @@ function Hero() {
           className="md:col-span-5 hidden md:block"
         >
           <div className="relative group">
-            {/* Floating tag */}
-            <div
-              className="absolute -top-5 -left-5 z-20 px-4 py-2 font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone rotate-[-4deg]"
-              style={{ backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }}
-            >
-              ▶ Featured Drop
-            </div>
             {/* Card */}
             <div
               className="relative border-2 overflow-hidden"
