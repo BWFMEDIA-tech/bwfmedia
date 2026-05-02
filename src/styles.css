@@ -44,6 +44,9 @@
   --color-bone: var(--bone);
   --color-ash: var(--ash);
 
+  --color-trust: var(--trust);
+  --color-success: var(--success);
+
   --font-display: "Anton", "Bebas Neue", system-ui, sans-serif;
   --font-brush: "Bebas Neue", system-ui, sans-serif;
   --font-cond: "Oswald", system-ui, sans-serif;
@@ -53,42 +56,46 @@
 :root {
   --radius: 0.25rem;
 
-  --background: oklch(0.05 0 0);
-  --foreground: oklch(0.98 0.005 60);
+  /* BWFMEDIA premium dark theme */
+  --background: #0B0B0B;
+  --foreground: #FFFFFF;
 
-  --card: oklch(0.09 0.005 30);
-  --card-foreground: oklch(0.98 0.005 60);
-  --popover: oklch(0.09 0.005 30);
-  --popover-foreground: oklch(0.98 0.005 60);
+  --card: #111111;
+  --card-foreground: #FFFFFF;
+  --popover: #111111;
+  --popover-foreground: #FFFFFF;
 
-  --primary: oklch(0.62 0.24 25);
-  --primary-foreground: oklch(0.98 0.005 60);
+  --primary: #FF2D2D;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: oklch(0.15 0.01 30);
-  --secondary-foreground: oklch(0.98 0.005 60);
+  --secondary: #111111;
+  --secondary-foreground: #FFFFFF;
 
-  --muted: oklch(0.15 0.01 30);
-  --muted-foreground: oklch(0.65 0.02 30);
+  --muted: #111111;
+  --muted-foreground: #A0A0A0;
 
-  --accent: oklch(0.62 0.24 25);
-  --accent-foreground: oklch(0.98 0.005 60);
+  --accent: #FF2D2D;
+  --accent-foreground: #FFFFFF;
 
-  --destructive: oklch(0.62 0.24 25);
-  --destructive-foreground: oklch(0.98 0.005 60);
+  --destructive: #FF2D2D;
+  --destructive-foreground: #FFFFFF;
 
-  --border: oklch(0.2 0.02 30);
-  --input: oklch(0.2 0.02 30);
-  --ring: oklch(0.62 0.24 25);
+  --border: #1c1c1c;
+  --input: #1c1c1c;
+  --ring: #FF2D2D;
 
-  --blood: oklch(0.58 0.26 25);
-  --blood-glow: oklch(0.65 0.28 25);
-  --bone: oklch(0.96 0.01 60);
-  --ash: oklch(0.55 0.02 30);
+  --blood: #FF2D2D;
+  --blood-glow: #FF4D4D;
+  --bone: #FFFFFF;
+  --ash: #6A6A6A;
 
-  --gradient-blood: linear-gradient(135deg, oklch(0.58 0.26 25), oklch(0.45 0.22 20));
-  --gradient-dark: linear-gradient(180deg, oklch(0.05 0 0), oklch(0.02 0 0));
-  --shadow-blood: 0 20px 60px -10px oklch(0.58 0.26 25 / 0.5);
-  --shadow-deep: 0 40px 80px -20px oklch(0 0 0 / 0.9);
+  --trust: #1E90FF;
+  --success: #00C853;
+
+  --gradient-blood: linear-gradient(135deg, #FF2D2D, #FF4D4D);
+  --gradient-dark: linear-gradient(180deg, #0B0B0B, #050505);
+  --shadow-blood: 0 20px 60px -10px rgb(255 45 45 / 0.45);
+  --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
 
 @layer base {
