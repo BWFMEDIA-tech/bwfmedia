@@ -810,6 +810,19 @@ function Services() {
   ];
   return (
     <Section id="services" label="Content Services">
+      <img
+        src={servicesCrowd}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none mix-blend-screen"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(to bottom, rgba(11,11,11,0.85), rgba(11,11,11,0.95))" }}
+      />
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
           WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
