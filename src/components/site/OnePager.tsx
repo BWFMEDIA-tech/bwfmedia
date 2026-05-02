@@ -1508,7 +1508,7 @@ function Footer() {
                 { Icon: Instagram, href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", label: "Instagram" },
                 { Icon: Music2, href: "https://www.tiktok.com/@bwfmedia?_r=1&_t=ZT-961GRjFEpdl", label: "TikTok" },
                 { Icon: Facebook, href: "https://www.facebook.com/share/1FmVHYjMfE/?mibextid=wwXIfr", label: "Facebook" },
-                { Icon: Twitter, href: "https://twitter.com/bwfmediatv", label: "Twitter / X" },
+                { Icon: Twitter, href: "https://x.com/bwfmediatv", label: "Twitter / X" },
                 { Icon: Mail, href: "#contact", label: "Email" },
               ].map(({ Icon, href, label }) => (
                 <a
