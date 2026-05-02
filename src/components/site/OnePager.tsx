@@ -164,6 +164,12 @@ function Nav() {
           >
             Pitch Deck
           </a>
+          <a
+            href="/blog"
+            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+          >
+            Blog
+          </a>
         </div>
         <div className="flex items-center gap-2">
           <a
