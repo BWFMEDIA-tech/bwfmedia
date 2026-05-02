@@ -1579,7 +1579,7 @@ function Footer() {
 
 function RedMicPodcast() {
   const links = [
-    { label: "Listen on iHeart", href: "https://tr.ee/SuQHFE0IPd" },
+    { label: "Listen on iHeart", href: "https://media.rss.com/thebwfmediaredmicpodcast/feed.xml" },
     { label: "Featured Episode", href: "https://tr.ee/q2Uu1lnrlI" },
   ];
   return (
