@@ -2,7 +2,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
-  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X,
+  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X, Facebook, Twitter, Music2,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
@@ -1505,6 +1505,28 @@ function Footer() {
             <p className="mt-4 text-bone text-sm max-w-xs leading-relaxed">
               Real content. Real people. Real reach. Where culture goes viral.
             </p>
+            <div className="mt-5 flex items-center gap-3">
+              {[
+                { Icon: Youtube, href: "https://youtube.com/@bwfmediatv", label: "YouTube" },
+                { Icon: Instagram, href: "https://instagram.com/bwfmediatv", label: "Instagram" },
+                { Icon: Music2, href: "https://tiktok.com/@bwfmediatv", label: "TikTok" },
+                { Icon: Facebook, href: "https://facebook.com/bwfmediatv", label: "Facebook" },
+                { Icon: Twitter, href: "https://twitter.com/bwfmediatv", label: "Twitter / X" },
+                { Icon: Mail, href: "#contact", label: "Email" },
+              ].map(({ Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noreferrer" : undefined}
+                  aria-label={label}
+                  className="w-9 h-9 inline-flex items-center justify-center border border-bone/20 text-bone/70 hover:text-bone hover:border-bone hover:bg-bone/5 transition-colors"
+                  style={{ borderRadius: 2 }}
+                >
+                  <Icon size={15} />
+                </a>
+              ))}
+            </div>
           </div>
           <div>
             <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
