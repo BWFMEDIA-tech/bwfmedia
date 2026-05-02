@@ -119,13 +119,11 @@ function StatBlock({ big, label }: { big: string; label: string }) {
 
 function Nav() {
   const links = [
-    { href: "#about", label: "About" },
     { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
     { href: "#services", label: "Services" },
-    { href: "#engine", label: "Engine" },
     { href: "#audience", label: "Audience" },
-    { href: "#revenue", label: "Revenue" },
+    { href: "#engine", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
     { href: "#partner", label: "Partner" },
     { href: "#contact", label: "Contact" },
@@ -1628,20 +1626,13 @@ export function OnePager() {
       <ScrollProgress />
       <Nav />
       <Hero />
-      <About />
       <GlobalAudience />
-      <Shift />
       <Proof />
       <Services />
-      <Engine />
       <Audience />
-      <Revenue />
-      <Scale />
-      <Partner />
-      <Promoters />
-      <Why />
+      <Engine />
       <Pricing />
-      <Vision />
+      <Partner />
       <Contact />
       <Footer />
     </div>
