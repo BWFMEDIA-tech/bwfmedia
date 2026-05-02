@@ -1636,26 +1636,17 @@ function RedMicPodcast() {
 
         <Reveal delay={0.15} className="md:col-span-5">
           <div
-            className="relative aspect-square w-full border-2 border-blood/60 bg-black/60 backdrop-blur overflow-hidden"
+            className="relative w-full border-2 border-blood/60 bg-black/60 backdrop-blur overflow-hidden p-2"
             style={{ boxShadow: "var(--shadow-blood)" }}
           >
-            <div
-              className="absolute inset-0 opacity-40"
-              style={{
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)), url(${grunge})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
+            <iframe
+              title="BWFMEDIA Red Mic Podcast on Apple Podcasts"
+              allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+              height={450}
+              style={{ width: "100%", maxWidth: 660, overflow: "hidden", borderRadius: 10 }}
+              sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+              src="https://embed.podcasts.apple.com/us/podcast/bwfmedia-red-mic-podcast/id1777695203"
             />
-            <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-8">
-              <Mic className="w-24 h-24 mb-6" style={{ color: "var(--blood)" }} />
-              <div className="font-display text-3xl md:text-4xl text-bone leading-none">BWF MEDIA</div>
-              <div className="font-display text-5xl md:text-6xl leading-none mt-2" style={{ color: "var(--blood)" }}>RED MIC</div>
-              <div className="font-display text-3xl md:text-4xl text-bone leading-none mt-2">PODCAST</div>
-              <div className="mt-6 font-cond tracking-[0.4em] text-[10px] uppercase text-bone/60">
-                Streaming on iHeart
-              </div>
-            </div>
           </div>
         </Reveal>
       </div>
