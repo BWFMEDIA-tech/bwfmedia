@@ -2,7 +2,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
-  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X,
+  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X, Facebook, Twitter, Music2,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
