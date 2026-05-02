@@ -345,7 +345,7 @@ function Hero() {
       {/* Main hero content */}
       <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-12 py-10 md:py-16 grid md:grid-cols-12 gap-10 items-center">
         {/* LEFT — typography column */}
-        <div className="md:col-span-7 text-center md:text-left flex flex-col items-center md:items-start">
+        <div className="md:col-span-12 text-center md:text-left flex flex-col items-center md:items-start">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -442,53 +442,6 @@ function Hero() {
           </motion.div>
         </div>
 
-        {/* RIGHT — featured visual card */}
-        <motion.div
-          initial={{ opacity: 0, x: 30, rotate: 4 }}
-          animate={{ opacity: 1, x: 0, rotate: 2 }}
-          transition={{ duration: 0.9, delay: 0.4 }}
-          className="md:col-span-5 hidden md:block"
-        >
-          <div className="relative group">
-            {/* Card */}
-            <div
-              className="relative border-2 overflow-hidden"
-              style={{ borderColor: "var(--blood)", boxShadow: "var(--shadow-deep)" }}
-            >
-              <img src={viralThumbs} alt="Featured BWF Media content" className="w-full h-[480px] object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-              {/* Play overlay */}
-              <button className="absolute inset-0 flex items-center justify-center group/play">
-                <span
-                  className="w-20 h-20 rounded-full flex items-center justify-center backdrop-blur transition-transform group-hover/play:scale-110"
-                  style={{ backgroundColor: "var(--blood)", boxShadow: "0 0 60px var(--blood-glow)" }}
-                >
-                  <Play className="w-8 h-8 text-bone fill-bone ml-1" />
-                </span>
-              </button>
-              {/* Bottom meta */}
-              <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between">
-                <div>
-                  <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/60 mb-1">
-                    Latest Interview
-                  </div>
-                  <div className="font-display text-2xl text-bone leading-tight">
-                    REAL ARTISTS.<br />REAL STORIES.
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-display text-2xl" style={{ color: "var(--blood)" }}>4.2M</div>
-                  <div className="font-cond tracking-[0.25em] text-[9px] uppercase text-bone/50">weekly</div>
-                </div>
-              </div>
-            </div>
-            {/* Decorative stack card behind */}
-            <div
-              className="absolute -bottom-4 -right-4 w-full h-full border-2 -z-10"
-              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.4)" }}
-            />
-          </div>
-        </motion.div>
       </div>
 
       {/* Scroll cue */}
