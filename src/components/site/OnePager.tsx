@@ -119,13 +119,11 @@ function StatBlock({ big, label }: { big: string; label: string }) {
 
 function Nav() {
   const links = [
-    { href: "#about", label: "About" },
     { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
     { href: "#services", label: "Services" },
-    { href: "#engine", label: "Engine" },
     { href: "#audience", label: "Audience" },
-    { href: "#revenue", label: "Revenue" },
+    { href: "#engine", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
     { href: "#partner", label: "Partner" },
     { href: "#contact", label: "Contact" },
@@ -1106,7 +1104,7 @@ function Engine() {
     { icon: Flame, title: "Street Content", desc: "Raw, unscripted moments straight from the culture." },
   ];
   return (
-    <Section id="engine" label="Content Engine">
+    <Section id="engine" label="How It Works">
       <div className="grid md:grid-cols-5 gap-10 md:gap-12">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
@@ -1460,15 +1458,13 @@ function Contact() {
 
 function Footer() {
   const navLinks = [
-    { href: "#about", label: "About" },
     { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
     { href: "#services", label: "Services" },
-    { href: "#engine", label: "Engine" },
+    { href: "#audience", label: "Audience" },
   ];
   const moreLinks = [
-    { href: "#audience", label: "Audience" },
-    { href: "#revenue", label: "Revenue" },
+    { href: "#engine", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
     { href: "#partner", label: "Partner" },
     { href: "#contact", label: "Contact" },
@@ -1628,20 +1624,13 @@ export function OnePager() {
       <ScrollProgress />
       <Nav />
       <Hero />
-      <About />
       <GlobalAudience />
-      <Shift />
       <Proof />
       <Services />
-      <Engine />
       <Audience />
-      <Revenue />
-      <Scale />
-      <Partner />
-      <Promoters />
-      <Why />
+      <Engine />
       <Pricing />
-      <Vision />
+      <Partner />
       <Contact />
       <Footer />
     </div>
