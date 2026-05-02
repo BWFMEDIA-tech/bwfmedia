@@ -278,6 +278,22 @@ function Hero() {
           backgroundPosition: "center",
         }}
       />
+      {/* Cinematic intro video layer */}
+      <video
+        src={bwfIntroVideo.url}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen pointer-events-none"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.85) 100%)",
+        }}
+      />
       {/* Ambient blood glows */}
       <div
         className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full blur-3xl pointer-events-none animate-pulse-glow"
