@@ -336,7 +336,12 @@ function Hero() {
             transition={{ duration: 0.6 }}
             className="flex items-center justify-center md:justify-start gap-3 mb-6"
           >
-            <img src={bwfLogo} alt="BWF Media" className="w-32 h-32 md:w-44 md:h-44 lg:w-52 lg:h-52 object-contain" />
+            <span
+              className="font-display tracking-[0.15em] text-2xl md:text-3xl lg:text-4xl text-bone"
+              style={{ textShadow: "0 0 24px var(--blood-glow)" }}
+            >
+              BWF <span style={{ color: "var(--blood)" }}>MEDIA</span> TV
+            </span>
           </motion.div>
 
           <motion.h1
