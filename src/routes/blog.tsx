@@ -4,9 +4,9 @@ import { ArrowUpRight, Calendar, Clock, Mic, Video, Flame, TrendingUp, Camera, M
 export const Route = createFileRoute("/blog")({
   head: () => ({
     meta: [
-      { title: "Blog — BWF Media TV | Culture, Interviews & Industry Insights" },
-      { name: "description", content: "Read the latest from BWF Media TV — interviews, behind-the-scenes stories, viral content breakdowns, and culture commentary from the heart of hip-hop." },
-      { property: "og:title", content: "BWF Media TV Blog — Where Culture Speaks" },
+      { title: "Blog, BWF Media TV | Culture, Interviews & Industry Insights" },
+      { name: "description", content: "Read the latest from BWF Media TV, interviews, behind-the-scenes stories, viral content breakdowns, and culture commentary from the heart of hip-hop." },
+      { property: "og:title", content: "BWF Media TV Blog, Where Culture Speaks" },
       { property: "og:description", content: "Interviews, BTS, and culture commentary from BWF Media TV." },
       { property: "og:type", content: "website" },
     ],
@@ -38,7 +38,7 @@ const posts = [
     category: "Behind The Scenes",
     Icon: Camera,
     title: "Inside the Studio: A Day Shooting With BWF Media",
-    excerpt: "From load-in to wrap — what really happens during a BWF interview shoot.",
+    excerpt: "From load-in to wrap, what really happens during a BWF interview shoot.",
     date: "Apr 15, 2026",
     readTime: "4 min read",
   },
@@ -46,7 +46,7 @@ const posts = [
     category: "Industry",
     Icon: TrendingUp,
     title: "Why Independent Media Is Eating the Majors' Lunch",
-    excerpt: "The shift from press releases to platform-native content — and why artists are coming to us first.",
+    excerpt: "The shift from press releases to platform-native content, and why artists are coming to us first.",
     date: "Apr 09, 2026",
     readTime: "7 min read",
   },
@@ -54,7 +54,7 @@ const posts = [
     category: "Culture",
     Icon: Music2,
     title: "Southern Hip-Hop's Next Wave: 5 Names On Our Radar",
-    excerpt: "The artists building real audiences without label backing — and why they matter right now.",
+    excerpt: "The artists building real audiences without label backing, and why they matter right now.",
     date: "Apr 02, 2026",
     readTime: "8 min read",
   },
@@ -110,7 +110,7 @@ function BlogPage() {
             <span style={{ color: "var(--blood)" }}>CULTURE</span> COMMENTARY.
           </h1>
           <p className="mt-6 text-bone/70 max-w-2xl text-base md:text-lg">
-            Long-form perspectives from the BWF Media TV editorial team — viral breakdowns,
+            Long-form perspectives from the BWF Media TV editorial team, viral breakdowns,
             artist conversations, and the strategy behind the content that moves culture.
           </p>
         </div>
@@ -206,7 +206,7 @@ function BlogPage() {
             GET THE NEXT DROP IN YOUR INBOX.
           </h2>
           <p className="text-bone/65 mb-8 max-w-xl mx-auto">
-            New interviews, BTS access, and culture commentary — straight to you, no spam.
+            New interviews, BTS access, and culture commentary, straight to you, no spam.
           </p>
           <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
             <input

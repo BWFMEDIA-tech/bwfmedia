@@ -92,7 +92,7 @@ function Section({
                 style={{ backgroundColor: "var(--blood)" }}
               />
               <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-                {number ? `${number} — ${label}` : label}
+                {number ? `${number}, ${label}` : label}
               </span>
             </motion.div>
           )}
@@ -350,13 +350,13 @@ function Hero() {
           transition={{ delay: 0.4 }}
           className="hidden md:block font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/40"
         >
-          EST. — HIP-HOP / CULTURE / MEDIA
+          EST., HIP-HOP / CULTURE / MEDIA
         </motion.span>
       </div>
 
       {/* Main hero content */}
       <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-12 py-10 md:py-16 grid md:grid-cols-12 gap-10 items-center">
-        {/* LEFT — typography column */}
+        {/* LEFT, typography column */}
         <div className="md:col-span-12 text-center md:text-left flex flex-col items-center md:items-start">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -395,7 +395,7 @@ function Hero() {
           >
             BWF™ is a media network turning artists, moments, and movements into{" "}
             <span className="text-bone font-semibold">cultural events</span>. Interviews,
-            music videos, viral clips — distributed to a global audience that{" "}
+            music videos, viral clips, distributed to a global audience that{" "}
             <span style={{ color: "var(--blood)" }} className="font-semibold">actually watches</span>.
           </motion.p>
 
@@ -548,7 +548,7 @@ function About() {
               Engagement Strength
             </div>
             <ul className="space-y-2 text-bone/80 text-sm md:text-base">
-              <li className="flex gap-3"><Share2 className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> High share-to-view ratio — content spreads beyond platform reach</li>
+              <li className="flex gap-3"><Share2 className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> High share-to-view ratio, content spreads beyond platform reach</li>
               <li className="flex gap-3"><Flame className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Strong short-form viral performance</li>
               <li className="flex gap-3"><Eye className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Consistent weekly audience activity</li>
             </ul>
@@ -628,7 +628,7 @@ function GlobalAudience() {
         </div>
       </div>
 
-      {/* Primary US card — full width */}
+      {/* Primary US card, full width */}
       <div
         className="relative p-6 md:p-8 mb-5 border-2 overflow-hidden"
         style={{ borderColor: "var(--blood)", backgroundColor: "rgba(10,10,15,0.85)" }}
@@ -771,7 +771,7 @@ function Services() {
           WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
         </h2>
         <p className="text-bone max-w-md md:text-right">
-          When covering events, BWF™ delivers a full content stack — built for reach, engagement, and post-show momentum.
+          When covering events, BWF™ delivers a full content stack, built for reach, engagement, and post-show momentum.
         </p>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -816,11 +816,11 @@ function Promoters() {
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
             WE DON'T JUST<br />
-            COVER EVENTS —<br />
+            COVER EVENTS -<br />
             <span style={{ color: "var(--blood)" }}>WE AMPLIFY THEM.</span>
           </h2>
           <p className="text-bone text-base md:text-lg leading-relaxed max-w-md">
-            Our goal is to help elevate event awareness before, during, and after the show — turning one night into weeks of content circulation.
+            Our goal is to help elevate event awareness before, during, and after the show, turning one night into weeks of content circulation.
           </p>
           <div className="mt-8 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
             <span className="font-display text-xl md:text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
@@ -935,7 +935,7 @@ function Pricing() {
         PICK YOUR <span style={{ color: "var(--blood)" }}>PUSH.</span>
       </h2>
       <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl mb-12">
-        Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach — no smoke, no inflated numbers.
+        Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach, no smoke, no inflated numbers.
       </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
         {tiers.map((t, i) => (
@@ -985,7 +985,7 @@ function Pricing() {
       </div>
       <div className="mt-10 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
         <span className="font-display text-xl md:text-2xl tracking-tight text-bone">
-          INTERVIEW + PROMO COMBO — <span style={{ color: "var(--blood)" }}>WHERE THE REAL MONEY IS.</span>
+          INTERVIEW + PROMO COMBO, <span style={{ color: "var(--blood)" }}>WHERE THE REAL MONEY IS.</span>
         </span>
       </div>
     </Section>
@@ -1003,7 +1003,7 @@ function Proof() {
   return (
     <Section id="proof" label="Track Record">
       <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
-        WE DON'T CHASE VIRAL —<br />
+        WE DON'T CHASE VIRAL -<br />
         <span style={{ color: "var(--blood)" }}>WE CREATE IT.</span>
       </h2>
       <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
@@ -1072,7 +1072,7 @@ function Engine() {
             VIRAL ASSETS.
           </h2>
           <p className="mt-6 text-bone text-base md:text-lg leading-relaxed max-w-sm">
-            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG — turning one shoot into a full media cycle.
+            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning one shoot into a full media cycle.
           </p>
         </div>
         <div className="md:col-span-3 grid sm:grid-cols-2 gap-5">
@@ -1281,7 +1281,7 @@ function Partner() {
 
 function Why() {
   const reasons = [
-    { icon: Trophy, title: "PROVEN VIRAL SUCCESS", body: "686M+ views isn't theory — it's a track record." },
+    { icon: Trophy, title: "PROVEN VIRAL SUCCESS", body: "686M+ views isn't theory, it's a track record." },
     { icon: Users, title: "DIRECT ARTIST ACCESS", body: "Trusted relationships across the hip-hop ecosystem." },
     { icon: Flame, title: "STRONG REGIONAL INFLUENCE", body: "Deep cultural roots in the South & beyond." },
     { icon: Sparkles, title: "CONSISTENT OUTPUT", body: "We don't go quiet. New drops, every week." },
@@ -1564,7 +1564,7 @@ function Footer() {
         </div>
         <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
-            © {new Date().getFullYear()} BWF Media TV — Where Culture Goes Viral
+            © {new Date().getFullYear()} BWF Media TV, Where Culture Goes Viral
           </div>
           <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/30">
             Founded by Dantavious Lee

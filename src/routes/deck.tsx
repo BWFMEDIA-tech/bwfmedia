@@ -10,9 +10,9 @@ import bwfLogo from "@/assets/bwf-logo.jpg";
 export const Route = createFileRoute("/deck")({
   head: () => ({
     meta: [
-      { title: "BWFMEDIA — Investor Pitch Deck" },
+      { title: "BWFMEDIA, Investor Pitch Deck" },
       { name: "description", content: "BWFMEDIA Inc. investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
-      { property: "og:title", content: "BWFMEDIA — Investor Pitch Deck" },
+      { property: "og:title", content: "BWFMEDIA, Investor Pitch Deck" },
       { property: "og:description", content: "Real Content. Real People. Real Reach. Raising $500K–$1M to scale the #1 independent digital network for culture-driven content." },
     ],
   }),
@@ -52,7 +52,7 @@ function Slide({
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 py-20 md:py-28 w-full">
         <div className="flex items-center justify-between mb-10">
           <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-            {number} — {label}
+            {number}, {label}
           </span>
           <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 hidden md:block">
             BWFMEDIA · PITCH DECK
@@ -233,7 +233,7 @@ function Traction() {
         <StatCard big="2.9M" label="Shares" />
       </div>
       <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">
-        These aren't projections — this is a <span className="text-bone font-bold">live, engaged audience</span> we already command across YouTube, Instagram, TikTok and short-form networks.
+        These aren't projections, this is a <span className="text-bone font-bold">live, engaged audience</span> we already command across YouTube, Instagram, TikTok and short-form networks.
       </p>
     </Slide>
   );
