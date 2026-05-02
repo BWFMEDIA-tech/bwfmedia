@@ -1588,7 +1588,7 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="https://instagram.com/bwfmediatv"
+                  href="https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr"
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
