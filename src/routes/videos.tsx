@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Upload, Play, LogIn, LogOut, Music2, Megaphone } from "lucide-react";
+import { Trash2, Upload, LogIn, LogOut, Music2, Megaphone, ExternalLink } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import grunge from "@/assets/grunge-bg.jpg";
 
@@ -23,6 +23,7 @@ type VideoRow = {
   description: string | null;
   category: "music" | "sponsored";
   storage_path: string;
+  external_url: string | null;
   created_at: string;
 };
 
@@ -167,18 +168,44 @@ function VideosPage() {
                   </span>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-display text-2xl uppercase leading-tight">{v.title}</h3>
+                  <Link
+                    to="/videos/$id"
+                    params={{ id: v.id }}
+                    className="font-display text-2xl uppercase leading-tight hover:text-blood transition-colors"
+                    style={{ display: "block" }}
+                  >
+                    {v.title}
+                  </Link>
                   {v.artist && <p className="text-bone/70 text-sm mt-1">{v.artist}</p>}
                   {v.description && <p className="text-bone/50 text-sm mt-2 line-clamp-2">{v.description}</p>}
-                  {userId === v.user_id && (
-                    <button
-                      onClick={() => handleDelete(v)}
-                      className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 border border-blood/60 text-blood text-[10px] font-cond font-bold tracking-[0.25em] uppercase hover:bg-blood hover:text-bone transition-colors"
-                      style={{ borderColor: "var(--blood)", color: "var(--blood)" }}
+                  <div className="mt-4 flex items-center gap-2 flex-wrap">
+                    <Link
+                      to="/videos/$id"
+                      params={{ id: v.id }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-blood/20 border border-blood/40 text-bone text-[10px] font-cond font-bold tracking-[0.25em] uppercase hover:bg-blood transition-colors"
                     >
-                      <Trash2 size={12} /> Delete
-                    </button>
-                  )}
+                      View Details
+                    </Link>
+                    {v.external_url && (
+                      <a
+                        href={v.external_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-bone/20 text-bone/70 text-[10px] font-cond font-bold tracking-[0.25em] uppercase hover:text-bone hover:border-bone/40 transition-colors"
+                      >
+                        <ExternalLink size={11} /> Link
+                      </a>
+                    )}
+                    {userId === v.user_id && (
+                      <button
+                        onClick={() => handleDelete(v)}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 border text-[10px] font-cond font-bold tracking-[0.25em] uppercase hover:bg-blood hover:text-bone transition-colors"
+                        style={{ borderColor: "var(--blood)", color: "var(--blood)" }}
+                      >
+                        <Trash2 size={12} /> Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
               </article>
             ))}
@@ -255,6 +282,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [description, setDescription] = useState("");
+  const [externalUrl, setExternalUrl] = useState("");
   const [category, setCategory] = useState<"music" | "sponsored">("music");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -271,7 +299,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     if (up.error) { setErr(up.error.message); setBusy(false); return; }
     const ins = await supabase.from("videos").insert({
       user_id: userId, title, artist: artist || null, description: description || null,
-      category, storage_path: path,
+      category, storage_path: path, external_url: externalUrl || null,
     });
     setBusy(false);
     if (ins.error) { setErr(ins.error.message); return; }
@@ -286,6 +314,9 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
         <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artist / Sponsor"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" rows={3}
+          className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
+        <input type="url" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)}
+          placeholder="External link (YouTube, Spotify, sponsor URL…)"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
         <div className="flex gap-2">
           {(["music", "sponsored"] as const).map((c) => (
