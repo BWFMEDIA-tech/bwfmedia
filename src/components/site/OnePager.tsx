@@ -1406,7 +1406,7 @@ function Vision() {
 function Contact() {
   const contacts = [
     { icon: Mail, label: "Email", value: "bookbwfmediatv@mail.com", href: "mailto:bookbwfmediatv@mail.com", external: false },
-    { icon: Instagram, label: "Instagram", value: "@bwfmediatv", href: "https://instagram.com/bwfmediatv", external: true },
+    { icon: Instagram, label: "Instagram", value: "@bwfmediatv", href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", external: true },
     { icon: Youtube, label: "YouTube", value: "@bwfmedia", href: "https://youtube.com/@bwfmedia", external: true },
   ];
   return (
@@ -1508,9 +1508,9 @@ function Footer() {
             <div className="mt-5 flex items-center gap-3">
               {[
                 { Icon: Youtube, href: "https://youtube.com/@bwfmediatv", label: "YouTube" },
-                { Icon: Instagram, href: "https://instagram.com/bwfmediatv", label: "Instagram" },
+                { Icon: Instagram, href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", label: "Instagram" },
                 { Icon: Music2, href: "https://tiktok.com/@bwfmediatv", label: "TikTok" },
-                { Icon: Facebook, href: "https://facebook.com/bwfmediatv", label: "Facebook" },
+                { Icon: Facebook, href: "https://www.facebook.com/share/1FmVHYjMfE/?mibextid=wwXIfr", label: "Facebook" },
                 { Icon: Twitter, href: "https://twitter.com/bwfmediatv", label: "Twitter / X" },
                 { Icon: Mail, href: "#contact", label: "Email" },
               ].map(({ Icon, href, label }) => (
@@ -1588,7 +1588,7 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="https://instagram.com/bwfmediatv"
+                  href="https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr"
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
