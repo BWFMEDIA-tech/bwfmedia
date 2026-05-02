@@ -1580,7 +1580,7 @@ function Footer() {
 function RedMicPodcast() {
   const links = [
     { label: "Listen on iHeart", href: "https://www.iheart.com/podcast/269-bwfmedia-red-mic-podcast-235207492?app=listen" },
-    { label: "Featured Episode", href: "https://podcasts.apple.com/us/podcast/bwfmedia-red-mic-podcast/id1769796027" },
+    { label: "Featured Episode", href: "https://podcasts.apple.com/us/podcast/bwfmedia-red-mic-podcast/id1777695203" },
   ];
   return (
     <Section id="red-mic" number="06" label="BWF Media Red Mic Podcast | iHeart">
