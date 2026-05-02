@@ -1104,7 +1104,7 @@ function Engine() {
     { icon: Flame, title: "Street Content", desc: "Raw, unscripted moments straight from the culture." },
   ];
   return (
-    <Section id="engine" label="Content Engine">
+    <Section id="engine" label="How It Works">
       <div className="grid md:grid-cols-5 gap-10 md:gap-12">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
