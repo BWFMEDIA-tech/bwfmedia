@@ -282,6 +282,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [description, setDescription] = useState("");
+  const [externalUrl, setExternalUrl] = useState("");
   const [category, setCategory] = useState<"music" | "sponsored">("music");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -298,7 +299,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     if (up.error) { setErr(up.error.message); setBusy(false); return; }
     const ins = await supabase.from("videos").insert({
       user_id: userId, title, artist: artist || null, description: description || null,
-      category, storage_path: path,
+      category, storage_path: path, external_url: externalUrl || null,
     });
     setBusy(false);
     if (ins.error) { setErr(ins.error.message); return; }
@@ -313,6 +314,9 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
         <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artist / Sponsor"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" rows={3}
+          className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
+        <input type="url" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)}
+          placeholder="External link (YouTube, Spotify, sponsor URL…)"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
         <div className="flex gap-2">
           {(["music", "sponsored"] as const).map((c) => (
