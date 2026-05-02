@@ -1607,7 +1607,7 @@ function RedMicPodcast() {
           <p className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed">
             Unfiltered conversations from the front lines of hip-hop and culture.
             Long-form interviews, raw stories, and the moments that don't fit a
-            30-second clip — straight from <span style={{ color: "var(--blood)" }} className="font-semibold">The Red Mic</span>.
+            30-second clip, straight from <span style={{ color: "var(--blood)" }} className="font-semibold">The Red Mic</span>.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             {links.map((l, i) => (
