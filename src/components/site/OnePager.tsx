@@ -1579,11 +1579,11 @@ function Footer() {
 
 function RedMicPodcast() {
   const links = [
-    { label: "Listen / Watch", href: "https://tr.ee/SuQHFE0IPd" },
+    { label: "Listen on iHeart", href: "https://tr.ee/SuQHFE0IPd" },
     { label: "Featured Episode", href: "https://tr.ee/q2Uu1lnrlI" },
   ];
   return (
-    <Section id="red-mic" number="06" label="The Red Mic Podcast">
+    <Section id="red-mic" number="06" label="BWF Media Red Mic Podcast | iHeart">
       <div className="grid md:grid-cols-12 gap-10 items-center">
         <Reveal className="md:col-span-7">
           <div className="inline-flex items-center gap-3 mb-6">
@@ -1594,12 +1594,15 @@ function RedMicPodcast() {
               <Mic className="w-6 h-6 text-bone" />
             </span>
             <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/60">
-              Something Else We Offer
+              On iHeartRadio • Something Else We Offer
             </span>
           </div>
           <h2 className="font-display leading-[0.85] tracking-tight text-bone heavy-shadow text-6xl md:text-8xl">
-            THE <span style={{ color: "var(--blood)" }}>RED MIC</span>
+            BWF MEDIA <span style={{ color: "var(--blood)" }}>RED MIC</span>
             <span className="block text-outline">PODCAST</span>
+            <span className="block font-cond tracking-[0.3em] text-base md:text-xl text-bone/60 mt-4">
+              | iHeart
+            </span>
           </h2>
           <p className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed">
             Unfiltered conversations from the front lines of hip-hop and culture.
@@ -1646,10 +1649,11 @@ function RedMicPodcast() {
             />
             <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-8">
               <Mic className="w-24 h-24 mb-6" style={{ color: "var(--blood)" }} />
-              <div className="font-display text-5xl md:text-6xl text-bone leading-none">RED</div>
-              <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>MIC</div>
+              <div className="font-display text-3xl md:text-4xl text-bone leading-none">BWF MEDIA</div>
+              <div className="font-display text-5xl md:text-6xl leading-none mt-2" style={{ color: "var(--blood)" }}>RED MIC</div>
+              <div className="font-display text-3xl md:text-4xl text-bone leading-none mt-2">PODCAST</div>
               <div className="mt-6 font-cond tracking-[0.4em] text-[10px] uppercase text-bone/60">
-                New Episodes Weekly
+                Streaming on iHeart
               </div>
             </div>
           </div>
