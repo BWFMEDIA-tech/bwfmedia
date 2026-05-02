@@ -661,4 +661,5 @@ export function Slide11() {
   );
 }
 
-export const SLIDES = [Slide1, Slide2, Slide3, Slide4, Slide5, Slide6, Slide7, Slide8, Slide9, Slide10, Slide11];
+// Pitch flow: Cover → Problem → Solution → Traction → Market → Model → Advantage → Growth → Financials → Ask → Vision
+export const SLIDES = [Slide1, Slide2, Slide4, Slide3, Slide5, Slide6, Slide9, Slide7, Slide8, Slide11, Slide10];
