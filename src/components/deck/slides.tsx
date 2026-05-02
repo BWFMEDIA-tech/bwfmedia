@@ -119,7 +119,7 @@ function Stat({ big, label }: { big: string; label: string }) {
 /* ================= SLIDE 2 — ATTENTION ================= */
 export function Slide2() {
   return (
-    <SlideShell number={2} total={TOTAL} label="The Shift">
+    <SlideShell number={2} total={TOTAL} label="Problem">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
           <motion.div
@@ -178,7 +178,7 @@ export function Slide2() {
 /* ================= SLIDE 3 — PROOF ================= */
 export function Slide3() {
   return (
-    <SlideShell number={3} total={TOTAL} label="The Proof">
+    <SlideShell number={4} total={TOTAL} label="Traction">
       <div className="flex-1 px-20 py-24 flex flex-col">
         <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
           02 — Track Record
@@ -231,7 +231,7 @@ export function Slide4() {
     { icon: Flame, title: "Street Content", desc: "Raw, unscripted moments straight from the culture." },
   ];
   return (
-    <SlideShell number={4} total={TOTAL} label="The Engine">
+    <SlideShell number={3} total={TOTAL} label="Solution">
       <div className="flex-1 px-20 py-24 grid grid-cols-5 gap-12">
         <div className="col-span-2">
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
@@ -274,7 +274,7 @@ export function Slide4() {
 /* ================= SLIDE 5 — AUDIENCE ================= */
 export function Slide5() {
   return (
-    <SlideShell number={5} total={TOTAL} label="The Audience">
+    <SlideShell number={5} total={TOTAL} label="Market">
       <div className="flex-1 grid grid-cols-2">
         <div className="relative">
           <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
@@ -337,7 +337,7 @@ export function Slide6() {
     { name: "AD REVENUE", price: "Recurring", deposit: "YouTube Partner", icon: DollarSign, items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"] },
   ];
   return (
-    <SlideShell number={6} total={TOTAL} label="The Revenue">
+    <SlideShell number={6} total={TOTAL} label="Model">
       <div className="flex-1 px-20 py-20 flex flex-col">
         <div className="flex items-end justify-between mb-10">
           <div>
@@ -390,7 +390,7 @@ export function Slide6() {
 /* ================= SLIDE 7 — SCALE ================= */
 export function Slide7() {
   return (
-    <SlideShell number={7} total={TOTAL} label="The Opportunity">
+    <SlideShell number={8} total={TOTAL} label="Growth">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
@@ -449,7 +449,7 @@ export function Slide8() {
     { tag: "Option 03", title: "UPFRONT INVESTMENT", body: "Capital injection to scale production, talent, and content velocity.", icon: TrendingUp },
   ];
   return (
-    <SlideShell number={8} total={TOTAL} label="The Partnership">
+    <SlideShell number={9} total={TOTAL} label="Financials">
       <div className="flex-1 px-20 py-24 flex flex-col">
         <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
           07 — How We Work Together
@@ -497,7 +497,7 @@ export function Slide9() {
     { icon: Sparkles, title: "CONSISTENT OUTPUT", body: "We don't go quiet. New drops, every week." },
   ];
   return (
-    <SlideShell number={9} total={TOTAL} label="Why BWF">
+    <SlideShell number={7} total={TOTAL} label="Advantage">
       <div className="flex-1 px-20 py-24 grid grid-cols-2 gap-16 items-center">
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
@@ -542,7 +542,7 @@ export function Slide9() {
 /* ================= SLIDE 10 — VISION ================= */
 export function Slide10() {
   return (
-    <SlideShell number={10} total={TOTAL} label="The Vision">
+    <SlideShell number={11} total={TOTAL} label="Vision">
       <div className="flex-1 flex flex-col items-center justify-center px-20 text-center relative">
         <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6" style={{ color: "var(--blood)" }}>
           09 — The Future
@@ -594,7 +594,7 @@ export function Slide10() {
 /* ================= SLIDE 11 — CLOSE ================= */
 export function Slide11() {
   return (
-    <SlideShell number={11} total={TOTAL} label="Let's Talk">
+    <SlideShell number={10} total={TOTAL} label="Ask">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6" style={{ color: "var(--blood)" }}>
