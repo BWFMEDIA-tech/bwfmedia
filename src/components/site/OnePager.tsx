@@ -1164,6 +1164,19 @@ function Audience() {
   ];
   return (
     <Section id="audience" label="Demographics">
+      <img
+        src={audienceMap}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at center, rgba(11,11,11,0.55), rgba(11,11,11,0.92))" }}
+      />
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div className="relative aspect-[4/5] md:aspect-auto md:h-[520px] overflow-hidden">
           <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
