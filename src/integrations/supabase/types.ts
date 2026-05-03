@@ -176,6 +176,51 @@ export type Database = {
         }
         Relationships: []
       }
+      studio_bookings: {
+        Row: {
+          created_at: string
+          crew_size: string
+          duration: string
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          preferred_date: string
+          preferred_time: string
+          session_type: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          crew_size: string
+          duration: string
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          preferred_date: string
+          preferred_time: string
+          session_type: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          crew_size?: string
+          duration?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          preferred_date?: string
+          preferred_time?: string
+          session_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
