@@ -3,7 +3,7 @@ import { Link as RouterLink } from "@tanstack/react-router";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
-  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X, Facebook, Twitter, Music2,
+  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X, Facebook, Twitter, Music2, ChevronDown,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
@@ -123,7 +123,6 @@ function Nav() {
   const links = [
     { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
-    { href: "#services", label: "Services" },
     { href: "#audience", label: "Audience" },
     { href: "#engine", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
@@ -132,6 +131,7 @@ function Nav() {
   ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -158,18 +158,56 @@ function Nav() {
               {l.label}
             </a>
           ))}
-          <RouterLink
-            to="/off-the-block"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+          <div
+            className="relative"
+            onMouseEnter={() => setServicesOpen(true)}
+            onMouseLeave={() => setServicesOpen(false)}
           >
-            Off The Block
-          </RouterLink>
-          <RouterLink
-            to="/studio"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-          >
-            Studio
-          </RouterLink>
+            <a
+              href="#services"
+              className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors inline-flex items-center gap-1"
+              aria-haspopup="true"
+              aria-expanded={servicesOpen}
+            >
+              Services
+              <ChevronDown size={12} className={`transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
+            </a>
+            <AnimatePresence>
+              {servicesOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-1/2 -translate-x-1/2 top-full pt-3 min-w-[200px] z-50"
+                >
+                  <div className="bg-black/95 backdrop-blur-xl border border-blood/40 shadow-xl py-2">
+                    <a
+                      href="#services"
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
+                    >
+                      All Services
+                    </a>
+                    <RouterLink
+                      to="/off-the-block"
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
+                    >
+                      Off The Block
+                    </RouterLink>
+                    <RouterLink
+                      to="/studio"
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
+                    >
+                      Studio Bookings
+                    </RouterLink>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <a
             href="/deck"
             className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase hover:text-bone transition-colors"
