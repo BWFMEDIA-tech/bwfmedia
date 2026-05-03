@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as DeckRouteImport } from './routes/deck'
@@ -26,6 +27,11 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudioRoute = StudioRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/studio': typeof StudioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/studio': typeof StudioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/studio': typeof StudioRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/deck'
     | '/off-the-block'
     | '/studio'
+    | '/unsubscribe'
     | '/videos'
     | '/email/unsubscribe'
     | '/videos/$id'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/deck'
     | '/off-the-block'
     | '/studio'
+    | '/unsubscribe'
     | '/videos'
     | '/email/unsubscribe'
     | '/videos/$id'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/deck'
     | '/off-the-block'
     | '/studio'
+    | '/unsubscribe'
     | '/videos'
     | '/email/unsubscribe'
     | '/videos/$id'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   DeckRoute: typeof DeckRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   StudioRoute: typeof StudioRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/videos'
       fullPath: '/videos'
       preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/studio': {
@@ -314,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeckRoute: DeckRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   StudioRoute: StudioRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
@@ -325,3 +346,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
