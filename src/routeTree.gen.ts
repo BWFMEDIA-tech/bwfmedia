@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -67,6 +68,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStudioBookingRoute = ApiPublicStudioBookingRouteImport.update({
+  id: '/api/public/studio-booking',
+  path: '/api/public/studio-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
+  '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
+  '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
+  '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/email/unsubscribe'
     | '/videos/$id'
+    | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/email/unsubscribe'
     | '/videos/$id'
+    | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/email/unsubscribe'
     | '/videos/$id'
+    | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   VideosRoute: typeof VideosRouteWithChildren
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/studio-booking': {
+      id: '/api/public/studio-booking'
+      path: '/api/public/studio-booking'
+      fullPath: '/api/public/studio-booking'
+      preLoaderRoute: typeof ApiPublicStudioBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -296,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   VideosRoute: VideosRouteWithChildren,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
