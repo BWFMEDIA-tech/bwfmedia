@@ -7,6 +7,7 @@ import {
 import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/deck")({
   head: () => ({
@@ -472,16 +473,21 @@ function Closing() {
 
 function DeckPage() {
   const [unlocked, setUnlocked] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(false);
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && sessionStorage.getItem("deck_unlocked") === "1") {
       setUnlocked(true);
     }
+    if (typeof window !== "undefined" && sessionStorage.getItem("deck_lead_captured") === "1") {
+      setLeadCaptured(true);
+    }
     setChecked(true);
   }, []);
 
   if (!checked) return <main className="bg-black min-h-screen" />;
+  if (!leadCaptured) return <DeckLeadForm onSubmitted={() => setLeadCaptured(true)} />;
   if (!unlocked) return <DeckGate onUnlock={() => setUnlocked(true)} />;
 
   return (
@@ -505,6 +511,214 @@ function DeckPage() {
 }
 
 const DECK_PASSWORD = "#1SMARTINVESTMENT";
+
+const INVESTOR_TYPES = [
+  "Angel investor",
+  "Brand partner",
+  "Media company",
+  "Private investor",
+  "Just exploring",
+];
+
+const INVESTMENT_RANGES = [
+  "$1K – $10K",
+  "$10K – $50K",
+  "$50K – $250K",
+  "$250K+",
+  "Not investing yet (just learning)",
+];
+
+function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [investorType, setInvestorType] = useState("");
+  const [investmentRange, setInvestmentRange] = useState("");
+  const [company, setCompany] = useState("");
+  const [link, setLink] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const name = fullName.trim();
+    const mail = email.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (name.length < 2 || name.length > 120) return setError("Please enter your full name.");
+    if (!emailRe.test(mail) || mail.length > 255) return setError("Please enter a valid email.");
+    if (!investorType) return setError("Select an investor type.");
+    if (!investmentRange) return setError("Select an investment range.");
+
+    setSubmitting(true);
+    const { error: insertError } = await supabase.from("deck_leads").insert({
+      full_name: name,
+      email: mail,
+      investor_type: investorType,
+      investment_range: investmentRange,
+      company: company.trim() ? company.trim().slice(0, 200) : null,
+      website_or_linkedin: link.trim() ? link.trim().slice(0, 300) : null,
+    });
+    setSubmitting(false);
+
+    if (insertError) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
+    sessionStorage.setItem("deck_lead_captured", "1");
+    onSubmitted();
+  };
+
+  const fieldClass =
+    "w-full bg-black/60 border border-border text-bone font-cond px-4 py-3 outline-none focus:border-bone/50 placeholder:text-bone/30";
+
+  return (
+    <main
+      className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-black py-16"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url(${grunge})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(circle at 50% 30%, color-mix(in oklab, var(--blood) 22%, transparent), transparent 60%)" }}
+      />
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-xl mx-auto px-6"
+      >
+        <div className="border border-border bg-black/70 backdrop-blur p-8 md:p-10">
+          <div className="flex items-center justify-center mb-6">
+            <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 object-contain" />
+          </div>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Lock className="w-3.5 h-3.5" style={{ color: "var(--blood)" }} />
+            <span className="font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/60">
+              Request Access
+            </span>
+          </div>
+          <h1 className="text-center font-display text-3xl md:text-4xl text-bone leading-tight">
+            BWFMEDIA <span style={{ color: "var(--blood)" }}>Investor Deck</span>
+          </h1>
+          <p className="mt-3 text-center font-cond text-sm text-bone/70">
+            Tell us a little about yourself to unlock the deck.
+          </p>
+
+          <form onSubmit={submit} className="mt-8 space-y-4">
+            <div>
+              <label className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60">Full name *</label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="First and last name"
+                maxLength={120}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+
+            <div>
+              <label className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60">Email *</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                maxLength={255}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60">Investor type *</label>
+                <select
+                  value={investorType}
+                  onChange={(e) => setInvestorType(e.target.value)}
+                  className={`${fieldClass} mt-2`}
+                >
+                  <option value="" className="bg-black">Select...</option>
+                  {INVESTOR_TYPES.map((t) => (
+                    <option key={t} value={t} className="bg-black">{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60">Investment range *</label>
+                <select
+                  value={investmentRange}
+                  onChange={(e) => setInvestmentRange(e.target.value)}
+                  className={`${fieldClass} mt-2`}
+                >
+                  <option value="" className="bg-black">Select...</option>
+                  {INVESTMENT_RANGES.map((r) => (
+                    <option key={r} value={r} className="bg-black">{r}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60">Company / Organization</label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Optional"
+                maxLength={200}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+
+            <div>
+              <label className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60">Website or LinkedIn</label>
+              <input
+                type="text"
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                placeholder="Optional"
+                maxLength={300}
+                className={`${fieldClass} mt-2`}
+              />
+            </div>
+
+            {error && (
+              <div className="font-cond text-sm" style={{ color: "var(--blood)" }}>{error}</div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full px-6 py-3 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone disabled:opacity-60"
+              style={{ backgroundColor: "var(--blood)" }}
+            >
+              {submitting ? "Submitting..." : "Continue to Password"}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 hover:text-bone"
+            >
+              <ArrowLeft className="w-3 h-3" /> Back to Site
+            </Link>
+          </div>
+        </div>
+        <p className="mt-6 text-center font-cond text-[11px] tracking-[0.3em] uppercase text-bone/40">
+          BWFMEDIA · Private & Confidential
+        </p>
+      </motion.div>
+    </main>
+  );
+}
 
 function DeckGate({ onUnlock }: { onUnlock: () => void }) {
   const [pw, setPw] = useState("");
