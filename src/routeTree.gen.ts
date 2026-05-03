@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -75,6 +76,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminBookingsRoute = AdminBookingsRouteImport.update({
+  id: '/admin/bookings',
+  path: '/admin/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/bookings'
     | '/admin/login'
     | '/email/unsubscribe'
     | '/videos/$id'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/bookings'
     | '/admin/login'
     | '/email/unsubscribe'
     | '/videos/$id'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/bookings'
     | '/admin/login'
     | '/email/unsubscribe'
     | '/videos/$id'
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
+  AdminBookingsRoute: typeof AdminBookingsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/bookings': {
+      id: '/admin/bookings'
+      path: '/admin/bookings'
+      fullPath: '/admin/bookings'
+      preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
+  AdminBookingsRoute: AdminBookingsRoute,
   AdminLoginRoute: AdminLoginRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
@@ -367,3 +388,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
