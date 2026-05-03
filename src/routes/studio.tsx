@@ -1,11 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import {
-  Mail, Instagram, Phone, ArrowLeft, MapPin, Check, Mic, Clapperboard,
-  Camera, Smartphone, Calendar, Lock, CheckCircle2, User, Users, Plane,
+  Mail, Instagram, Phone, MapPin, Mic, Clapperboard, Camera, Smartphone,
+  Calendar, Lock, CheckCircle2, User, Users, Plane, ArrowRight, Zap,
 } from "lucide-react";
-import bwfLogo from "@/assets/bwf-logo.png";
-
-const GOLD = "#D4A24C";
+import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -19,214 +18,262 @@ export const Route = createFileRoute("/studio")({
   component: StudioPage,
 });
 
+const services = [
+  { icon: Mic,          title: "ARTIST INTERVIEWS" },
+  { icon: Clapperboard, title: "MUSIC VIDEO CONTENT" },
+  { icon: Mic,          title: "PODCAST RECORDING" },
+  { icon: Camera,       title: "PRESS + MEDIA SESSIONS" },
+  { icon: Smartphone,   title: "SOCIAL CONTENT PACKS" },
+];
+
 function StudioPage() {
   return (
-    <div className="min-h-screen w-full bg-black text-bone">
-      <header className="max-w-6xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 object-contain" />
-          <span className="font-cond font-bold tracking-[0.3em] text-[11px] uppercase text-bone/70">BWF Media</span>
-        </Link>
-        <Link to="/" className="font-cond font-bold tracking-[0.3em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors inline-flex items-center gap-2">
-          <ArrowLeft className="w-3 h-3" /> Back to Home
-        </Link>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-6 md:px-10 pb-20">
+    <FutureShell label="STUDIO / NODE 02">
+      <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
         {/* HERO */}
-        <section className="pt-6 md:pt-10 pb-14 border-b border-bone/10">
-          <div className="font-display leading-[0.85] text-6xl md:text-8xl uppercase">
-            <span className="text-bone">BWF</span><span style={{ color: GOLD }}>MEDIA</span>
-          </div>
-          <div className="mt-3 font-cond tracking-[0.45em] text-xs md:text-sm uppercase text-bone/70">
-            Visuals That Move Culture
+        <section className="pt-10 md:pt-16 pb-20">
+          <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
+            BWF / Media <span style={{ color: GOLD }}>// node_02_active</span>
           </div>
 
-          <h1 className="mt-10 font-display text-bone uppercase leading-[0.9] text-5xl md:text-7xl">
-            Studio<br/>Bookings Only
-          </h1>
-          <div className="mt-5 inline-block px-4 py-2 font-cond font-bold tracking-[0.2em] text-xs uppercase" style={{ background: GOLD, color: "#000" }}>
-            A Premium Media Production Hub for Artists & Creators
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="mt-6 font-display leading-[0.82] text-6xl md:text-[8.5rem] uppercase"
+          >
+            <span className="block text-bone">STUDIO</span>
+            <span
+              className="block"
+              style={{
+                background: `linear-gradient(180deg, ${GOLD_GLOW}, ${GOLD} 60%, #6b4f1f)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: `drop-shadow(0 0 28px ${GOLD}66)`,
+              }}
+            >
+              BOOKINGS
+            </span>
+            <span className="block text-bone/30" style={{ WebkitTextStroke: `2px ${GOLD}`, color: "transparent" }}>
+              ONLY
+            </span>
+          </motion.h1>
+
+          <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 font-cond font-bold tracking-[0.3em] text-[11px] uppercase"
+               style={{ background: GOLD, color: "#000" }}>
+            <Zap className="w-3 h-3" /> Premium Production Hub
           </div>
+
+          <p className="mt-8 max-w-2xl text-bone/80 text-base md:text-lg leading-relaxed">
+            A controlled creative environment for artists & creators. Calibrated sound,
+            cinematic lighting, and brand-ready delivery — every frame engineered.
+          </p>
         </section>
 
-        {/* LOCATION CALLOUT */}
-        <section className="py-14 border-b border-bone/10">
-          <div className="p-7 md:p-9" style={{ border: `1.5px solid ${GOLD}` }}>
-            <div className="flex items-start gap-4">
-              <div className="shrink-0 w-12 h-12 rounded grid place-items-center" style={{ border: `1.5px solid ${GOLD}` }}>
-                <MapPin className="w-5 h-5" style={{ color: GOLD }} />
+        {/* LOCATION */}
+        <section className="pb-16">
+          <HUDFrame className="p-8 md:p-10">
+            <div className="flex items-start gap-5">
+              <div className="shrink-0 w-14 h-14 grid place-items-center"
+                   style={{ border: `1px solid ${GOLD}`, background: `${GOLD}15`, boxShadow: `0 0 20px ${GOLD}55` }}>
+                <MapPin className="w-6 h-6" style={{ color: GOLD }} />
               </div>
-              <div>
-                <h2 className="font-cond font-bold tracking-[0.15em] text-base md:text-lg uppercase" style={{ color: GOLD }}>
-                  All Sessions Are Recorded At BWFMedia Studio
+              <div className="flex-1">
+                <h2 className="font-cond font-bold tracking-[0.2em] text-base md:text-lg uppercase" style={{ color: GOLD }}>
+                  All Sessions Recorded At BWFMedia Studio
                 </h2>
-                <p className="mt-2 text-bone/80">We do not operate as a mobile setup for standard bookings.</p>
-                <div className="my-5 h-px bg-bone/15" />
-                <p className="text-bone/80">Every project is filmed in a controlled studio environment to ensure:</p>
-                <ul className="mt-4 space-y-2.5">
-                  {["High-quality visuals","Professional sound + lighting","Consistent branding & production value"].map(t => (
-                    <li key={t} className="flex items-center gap-3">
-                      <span className="w-5 h-5 rounded-full grid place-items-center" style={{ border: `1.5px solid ${GOLD}` }}>
-                        <Check className="w-3 h-3" style={{ color: GOLD }} />
-                      </span>
-                      <span className="text-bone/90">{t}</span>
-                    </li>
+                <p className="mt-2 text-bone/75">We do not operate as a mobile setup for standard bookings.</p>
+                <div className="my-6 h-px" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)` }} />
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {["High-Quality Visuals","Professional Sound + Lighting","Consistent Brand Production"].map(t => (
+                    <div key={t} className="flex items-center gap-2 px-3 py-3"
+                         style={{ border: `1px solid ${GOLD}33`, background: "rgba(212,162,76,0.04)" }}>
+                      <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: GOLD }} />
+                      <span className="font-cond tracking-[0.12em] text-[11px] uppercase text-bone/85">{t}</span>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICES AVAILABLE */}
-        <section className="py-14 border-b border-bone/10">
-          <div className="flex items-center gap-4 justify-center">
-            <div className="h-px flex-1" style={{ background: GOLD, opacity: 0.5 }} />
-            <h2 className="font-cond font-bold tracking-[0.4em] text-sm md:text-base uppercase" style={{ color: GOLD }}>Services Available</h2>
-            <div className="h-px flex-1" style={{ background: GOLD, opacity: 0.5 }} />
-          </div>
-
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-5 gap-6">
-            {[
-              { icon: Mic,         title: ["Artist","Interviews"] },
-              { icon: Clapperboard,title: ["Music Video","Content"] },
-              { icon: Mic,         title: ["Podcast","Recording"] },
-              { icon: Camera,      title: ["Press +","Media Sessions"] },
-              { icon: Smartphone,  title: ["Social Media","Content Packages"] },
-            ].map(({ icon: Icon, title }, i) => (
-              <div key={i} className="text-center">
-                <Icon className="w-9 h-9 mx-auto" style={{ color: GOLD }} />
-                <div className="mt-3 font-cond font-bold tracking-[0.15em] text-xs uppercase text-bone/85">
-                  {title.map((l, idx) => <div key={idx}>{l}</div>)}
                 </div>
               </div>
+            </div>
+          </HUDFrame>
+        </section>
+
+        {/* SERVICES */}
+        <section className="py-16">
+          <SectionTag>Services Available</SectionTag>
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-5 gap-4">
+            {services.map(({ icon: Icon, title }, i) => (
+              <motion.div
+                key={title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <HUDFrame className="p-5 text-center h-full hover:translate-y-[-2px] transition-transform">
+                  <div className="font-cond text-[10px] tracking-[0.3em]" style={{ color: GOLD }}>
+                    0{i + 1}
+                  </div>
+                  <Icon className="w-8 h-8 mx-auto mt-3" style={{ color: GOLD }} />
+                  <div className="mt-4 font-cond font-bold tracking-[0.15em] text-[11px] uppercase text-bone/90 leading-tight">
+                    {title}
+                  </div>
+                </HUDFrame>
+              </motion.div>
             ))}
           </div>
         </section>
 
-        {/* THREE-COL DETAILS */}
-        <section className="py-14 border-b border-bone/10 grid md:grid-cols-3 gap-6">
-          {/* Studio Experience Includes */}
-          <div className="p-6" style={{ border: `1.5px solid ${GOLD}` }}>
-            <h3 className="font-cond font-bold tracking-[0.18em] text-sm uppercase text-center" style={{ color: GOLD }}>Studio Experience Includes</h3>
-            <ul className="mt-5 space-y-4">
+        {/* DETAILS */}
+        <section className="py-16 grid md:grid-cols-3 gap-5">
+          {/* Includes */}
+          <HUDFrame className="p-7">
+            <div className="font-cond tracking-[0.3em] text-[10px] uppercase" style={{ color: GOLD }}>// Module_A</div>
+            <h3 className="mt-2 font-display text-2xl uppercase text-bone">Studio Includes</h3>
+            <ul className="mt-5 space-y-3">
               {[
-                { icon: Camera,    text: "Professional filming setup" },
+                { icon: Camera,       text: "Professional filming setup" },
                 { icon: Clapperboard, text: "Directed shoot sessions" },
-                { icon: Mic,       text: "Content capture & editing options" },
+                { icon: Mic,          text: "Capture & editing options" },
                 { icon: CheckCircle2, text: "Brand-ready delivery formats" },
               ].map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-center gap-3">
-                  <Icon className="w-5 h-5 shrink-0" style={{ color: GOLD }} />
+                  <Icon className="w-4 h-4 shrink-0" style={{ color: GOLD }} />
                   <span className="text-bone/85 text-sm">{text}</span>
                 </li>
               ))}
             </ul>
-          </div>
+          </HUDFrame>
 
-          {/* Crew Size */}
-          <div className="p-6" style={{ border: `1.5px solid ${GOLD}` }}>
-            <h3 className="font-cond font-bold tracking-[0.18em] text-sm uppercase text-center" style={{ color: GOLD }}>Crew Size</h3>
-            <div className="text-center font-cond tracking-[0.15em] text-[11px] uppercase text-bone/60">(Based on Project)</div>
+          {/* Crew */}
+          <HUDFrame className="p-7">
+            <div className="font-cond tracking-[0.3em] text-[10px] uppercase" style={{ color: GOLD }}>// Module_B</div>
+            <h3 className="mt-2 font-display text-2xl uppercase text-bone">Crew Size</h3>
             <ul className="mt-5 space-y-4">
               {[
-                { icon: User,  title: "SOLO PRODUCTION", sub: "1 Person" },
-                { icon: Users, title: "DUO PRODUCTION",  sub: "2 People" },
-                { icon: Users, title: "FULL CREW (3–4 MEMBERS)", sub: "3–4 People" },
+                { icon: User,  title: "SOLO PRODUCTION", sub: "1 Operator" },
+                { icon: Users, title: "DUO PRODUCTION",  sub: "2 Operators" },
+                { icon: Users, title: "FULL CREW",       sub: "3–4 Operators" },
               ].map(({ icon: Icon, title, sub }) => (
                 <li key={title} className="flex items-start gap-3">
-                  <Icon className="w-5 h-5 mt-0.5 shrink-0" style={{ color: GOLD }} />
+                  <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: GOLD }} />
                   <div>
-                    <div className="font-cond font-bold tracking-[0.12em] text-xs uppercase text-bone/90">{title}</div>
-                    <div className="text-bone/65 text-sm">{sub}</div>
+                    <div className="font-cond font-bold tracking-[0.15em] text-[11px] uppercase text-bone/90">{title}</div>
+                    <div className="text-bone/60 text-xs">{sub}</div>
                   </div>
                 </li>
               ))}
             </ul>
-            <div className="mt-5 pt-4 border-t border-bone/15 text-bone/70 text-xs text-center">
-              Final crew setup is determined by project scope.
+            <div className="mt-5 pt-4 border-t border-bone/10 text-bone/55 text-[11px]">
+              Final crew determined by project scope.
             </div>
-          </div>
+          </HUDFrame>
 
-          {/* Travel Bookings */}
-          <div className="p-6" style={{ border: `1.5px solid ${GOLD}` }}>
-            <h3 className="font-cond font-bold tracking-[0.18em] text-sm uppercase text-center" style={{ color: GOLD }}>Travel Bookings</h3>
-            <div className="text-center font-cond tracking-[0.15em] text-[11px] uppercase text-bone/60">(Optional Upgrade)</div>
-            <Plane className="w-7 h-7 mx-auto mt-4" style={{ color: GOLD }} />
-            <p className="mt-4 text-bone/85 text-sm text-center">Available only for:</p>
+          {/* Travel */}
+          <HUDFrame className="p-7">
+            <div className="font-cond tracking-[0.3em] text-[10px] uppercase" style={{ color: GOLD }}>// Module_C</div>
+            <h3 className="mt-2 font-display text-2xl uppercase text-bone">Travel Bookings</h3>
+            <Plane className="w-7 h-7 mt-4" style={{ color: GOLD }} />
+            <p className="mt-3 text-bone/85 text-sm">Available exclusively for:</p>
             <ul className="mt-3 space-y-2 text-bone/85 text-sm">
-              <li className="flex gap-2"><span style={{ color: GOLD }}>•</span> High-budget productions</li>
-              <li className="flex gap-2"><span style={{ color: GOLD }}>•</span> Live events</li>
-              <li className="flex gap-2"><span style={{ color: GOLD }}>•</span> Special brand collaborations</li>
+              {["High-budget productions","Live events","Brand collaborations"].map(t => (
+                <li key={t} className="flex gap-2"><span style={{ color: GOLD }}>▸</span> {t}</li>
+              ))}
             </ul>
-            <div className="mt-5 pt-4 border-t border-bone/15 text-bone/70 text-xs text-center">
-              Travel is not included in standard studio sessions.
+            <div className="mt-5 pt-4 border-t border-bone/10 text-bone/55 text-[11px]">
+              Not included in standard sessions.
             </div>
-          </div>
+          </HUDFrame>
         </section>
 
-        {/* BOOKING POLICY */}
-        <section className="py-14 border-b border-bone/10">
-          <div className="flex items-center gap-4 justify-center">
-            <div className="h-px flex-1" style={{ background: GOLD, opacity: 0.5 }} />
-            <h2 className="font-cond font-bold tracking-[0.4em] text-sm md:text-base uppercase" style={{ color: GOLD }}>Booking Policy</h2>
-            <div className="h-px flex-1" style={{ background: GOLD, opacity: 0.5 }} />
-          </div>
-
-          <div className="mt-8 p-6 grid md:grid-cols-3 gap-6" style={{ border: `1.5px solid ${GOLD}` }}>
+        {/* POLICY */}
+        <section className="py-16">
+          <SectionTag>Booking Protocol</SectionTag>
+          <div className="mt-10 grid md:grid-cols-3 gap-5">
             {[
-              { icon: Calendar,     title: "Limited Weekly Availability" },
-              { icon: Lock,         title: "Deposit Required to Secure Session" },
-              { icon: CheckCircle2, title: "All Bookings Confirmed in Advance" },
-            ].map(({ icon: Icon, title }) => (
-              <div key={title} className="flex items-center gap-3 justify-center md:justify-start">
-                <Icon className="w-7 h-7 shrink-0" style={{ color: GOLD }} />
-                <div className="font-cond font-bold tracking-[0.15em] text-xs uppercase text-bone/90">{title}</div>
-              </div>
+              { icon: Calendar,     title: "LIMITED WEEKLY AVAILABILITY", n: "01" },
+              { icon: Lock,         title: "DEPOSIT REQUIRED",            n: "02" },
+              { icon: CheckCircle2, title: "CONFIRMED IN ADVANCE",        n: "03" },
+            ].map(({ icon: Icon, title, n }) => (
+              <HUDFrame key={title} className="p-6">
+                <div className="flex items-center justify-between">
+                  <Icon className="w-7 h-7" style={{ color: GOLD }} />
+                  <span className="font-display text-3xl text-bone/15">{n}</span>
+                </div>
+                <div className="mt-4 font-cond font-bold tracking-[0.18em] text-xs uppercase text-bone/90">
+                  {title}
+                </div>
+              </HUDFrame>
             ))}
           </div>
         </section>
 
         {/* CTA */}
-        <section className="py-14 border-b border-bone/10">
-          <div className="max-w-2xl mx-auto p-8 text-center" style={{ background: GOLD, color: "#000" }}>
-            <h2 className="font-brush text-4xl md:text-5xl tracking-wide">BOOK YOUR SESSION</h2>
-            <p className="mt-2 text-black/85">Limited weekly availability. Deposit required to secure your session.</p>
-            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="mailto:bookbwfmedia@gmail.com?subject=Studio%20Booking%20Request" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-black text-bone font-cond font-bold tracking-[0.25em] text-xs uppercase hover:bg-black/80 transition-colors">
-                <Calendar className="w-4 h-4" /> Request Booking
+        <section className="py-16">
+          <HUDFrame className="relative overflow-hidden p-10 md:p-14 text-center">
+            <div
+              className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{ background: `radial-gradient(circle at 50% 0%, ${GOLD}55, transparent 60%)` }}
+            />
+            <Zap className="relative w-8 h-8 mx-auto mb-4" style={{ color: GOLD }} />
+            <h2 className="relative font-display text-5xl md:text-7xl uppercase">
+              BOOK <span style={{ color: GOLD }}>YOUR SESSION</span>
+            </h2>
+            <p className="relative mt-3 text-bone/75 max-w-xl mx-auto">
+              Limited weekly slots. Deposit required to secure your transmission window.
+            </p>
+            <div className="relative mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="mailto:bookbwfmedia@gmail.com?subject=Studio%20Booking%20Request"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase transition-all hover:scale-[1.02]"
+                style={{ background: GOLD, color: "#000", boxShadow: `0 0 30px ${GOLD}66` }}
+              >
+                <Calendar className="w-4 h-4" /> Request Booking <ArrowRight className="w-4 h-4" />
               </a>
-              <a href="https://instagram.com/bwf.media" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-black text-bone font-cond font-bold tracking-[0.25em] text-xs uppercase hover:bg-black/80 transition-colors">
+              <a
+                href="https://instagram.com/bwf.media"
+                target="_blank" rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone hover:bg-bone/5 transition"
+                style={{ border: `1px solid ${GOLD}` }}
+              >
                 <Instagram className="w-4 h-4" /> DM Us
               </a>
             </div>
-          </div>
+          </HUDFrame>
         </section>
 
-        {/* CONTACT FOOTER */}
-        <section className="pt-12 grid md:grid-cols-2 gap-10 items-center">
-          <div>
-            <div className="font-brush text-5xl md:text-6xl">
+        {/* FOOTER */}
+        <section className="pt-10 grid md:grid-cols-2 gap-8">
+          <HUDFrame className="p-7">
+            <div className="font-display text-5xl md:text-6xl">
               <span className="text-bone">BWF</span><span style={{ color: GOLD }}>MEDIA</span>
             </div>
-            <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/70 mt-1">
+            <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
               Visuals That Move Culture
             </div>
-          </div>
-          <div className="space-y-3 font-cond tracking-[0.15em] text-sm">
-            <div className="flex items-center gap-3 text-bone/85"><MapPin className="w-4 h-4" style={{ color: GOLD }} /> BWFMedia Studio (Location Provided After Booking)</div>
-            <a href="https://instagram.com/bwf.media" className="flex items-center gap-3 text-bone/85 hover:text-bone"><Instagram className="w-4 h-4" style={{ color: GOLD }} /> @bwf.media</a>
-            <a href="mailto:bookbwfmedia@gmail.com" className="flex items-center gap-3 text-bone/85 hover:text-bone"><Mail className="w-4 h-4" style={{ color: GOLD }} /> bookbwfmedia@gmail.com</a>
-            <a href="tel:+14703336136" className="flex items-center gap-3 text-bone/85 hover:text-bone"><Phone className="w-4 h-4" style={{ color: GOLD }} /> (470) 333-6136</a>
+          </HUDFrame>
+          <div className="space-y-3 font-cond tracking-[0.18em] text-sm self-center">
+            {[
+              { Icon: MapPin,    label: "Location Provided After Booking", href: "#" },
+              { Icon: Instagram, label: "@bwf.media", href: "https://instagram.com/bwf.media" },
+              { Icon: Mail,      label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
+              { Icon: Phone,     label: "(470) 333-6136", href: "tel:+14703336136" },
+            ].map(({ Icon, label, href }) => (
+              <a key={label} href={href} className="flex items-center gap-3 text-bone/85 hover:text-bone transition group">
+                <span className="w-8 h-8 grid place-items-center" style={{ border: `1px solid ${GOLD}55` }}>
+                  <Icon className="w-3.5 h-3.5" style={{ color: GOLD }} />
+                </span>
+                <span className="group-hover:translate-x-1 transition-transform">{label}</span>
+              </a>
+            ))}
           </div>
         </section>
 
-        <div className="mt-14 pt-8 border-t border-bone/10 font-brush text-3xl md:text-4xl tracking-wide text-center uppercase">
-          Where <span style={{ color: GOLD }}>Culture, Content,</span><br/>
-          and <span style={{ color: GOLD }}>Creators</span> <span className="italic">Meet.</span>
+        <div className="mt-16 pt-8 border-t border-bone/10 font-display text-2xl md:text-3xl tracking-wide text-center uppercase">
+          Where <span style={{ color: GOLD }}>Culture, Content,</span> and{" "}
+          <span style={{ color: GOLD }}>Creators</span> Meet.
         </div>
       </main>
-    </div>
+    </FutureShell>
   );
 }
