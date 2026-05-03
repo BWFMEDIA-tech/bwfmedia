@@ -10,7 +10,6 @@ import {
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -315,24 +314,34 @@ function StudioBookingCalendar() {
     if (!time) return toast.error("Select a time slot");
     if (!name || !email) return toast.error("Fill in all required fields");
     setSubmitting(true);
-    const { error } = await supabase.from("studio_bookings").insert({
-      full_name: name,
-      email,
-      phone: phone || null,
-      session_type: sessionType,
-      crew_size: crewSize,
-      duration,
-      preferred_date: format(date, "yyyy-MM-dd"),
-      preferred_time: time,
-      notes: notes || null,
-    });
+    let ok = false;
+    try {
+      const res = await fetch("/api/public/studio-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: name,
+          email,
+          phone: phone || null,
+          session_type: sessionType,
+          crew_size: crewSize,
+          duration,
+          preferred_date: format(date, "yyyy-MM-dd"),
+          preferred_time: time,
+          notes: notes || null,
+        }),
+      });
+      ok = res.ok;
+    } catch {
+      ok = false;
+    }
     setSubmitting(false);
-    if (error) {
+    if (!ok) {
       toast.error("Transmission failed. Try again.");
       return;
     }
     setDone(true);
-    toast.success("Booking request received. We'll confirm shortly.");
+    toast.success("Booking received — confirmation email sent.");
   }
 
   if (done) {
