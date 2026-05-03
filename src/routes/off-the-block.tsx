@@ -191,6 +191,12 @@ function OffTheBlockPage() {
           </div>
         </section>
 
+        {/* BOOKING CALENDAR */}
+        <section id="book" className="py-16">
+          <SectionTag>Schedule // Pull-Up Request</SectionTag>
+          <BookingCalendar />
+        </section>
+
         {/* CTA */}
         <section className="py-16">
           <HUDFrame className="relative overflow-hidden p-10 md:p-14 text-center">
