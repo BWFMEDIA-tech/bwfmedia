@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import {
   Play, TrendingUp, AlertTriangle, Lightbulb, BarChart3, Layers,
   Globe, DollarSign, Swords, Rocket, LineChart, Target, Eye, Mail, ArrowLeft, Lock,
+  ShieldCheck, Radio, ChevronRight,
 } from "lucide-react";
 import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
