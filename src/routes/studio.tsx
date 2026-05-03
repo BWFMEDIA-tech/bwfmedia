@@ -280,3 +280,274 @@ function StudioPage() {
     </FutureShell>
   );
 }
+
+const SESSION_TYPES = [
+  "Artist Interview",
+  "Music Video Content",
+  "Podcast Recording",
+  "Press + Media Session",
+  "Social Content Pack",
+];
+const CREW_SIZES = ["Solo (1 Operator)", "Duo (2 Operators)", "Full Crew (3–4)"];
+const DURATIONS = ["1 Hour", "2 Hours", "Half Day (4h)", "Full Day (8h)"];
+const TIME_SLOTS = ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM", "8:00 PM"];
+
+function StudioBookingCalendar() {
+  const [date, setDate] = useState<Date | undefined>();
+  const [time, setTime] = useState("");
+  const [sessionType, setSessionType] = useState(SESSION_TYPES[0]);
+  const [crewSize, setCrewSize] = useState(CREW_SIZES[0]);
+  const [duration, setDuration] = useState(DURATIONS[0]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const inputClass =
+    "w-full bg-black/60 px-4 py-3 font-cond tracking-[0.15em] text-sm text-bone placeholder:text-bone/30 focus:outline-none transition";
+  const inputStyle = { border: `1px solid ${GOLD}44` } as React.CSSProperties;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!date) return toast.error("Select a date");
+    if (!time) return toast.error("Select a time slot");
+    if (!name || !email) return toast.error("Fill in all required fields");
+    setSubmitting(true);
+    const { error } = await supabase.from("studio_bookings").insert({
+      full_name: name,
+      email,
+      phone: phone || null,
+      session_type: sessionType,
+      crew_size: crewSize,
+      duration,
+      preferred_date: format(date, "yyyy-MM-dd"),
+      preferred_time: time,
+      notes: notes || null,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Transmission failed. Try again.");
+      return;
+    }
+    setDone(true);
+    toast.success("Booking request received. We'll confirm shortly.");
+  }
+
+  if (done) {
+    return (
+      <HUDFrame className="mt-10 p-10 md:p-14 text-center">
+        <CheckCircle2 className="w-12 h-12 mx-auto" style={{ color: GOLD }} />
+        <h3 className="mt-6 font-display text-4xl md:text-5xl uppercase">
+          Session <span style={{ color: GOLD }}>Locked In</span>
+        </h3>
+        <p className="mt-4 text-bone/75 max-w-md mx-auto">
+          Your <span style={{ color: GOLD }}>{sessionType}</span> request for{" "}
+          <span style={{ color: GOLD }}>{date && format(date, "PPP")}</span> at{" "}
+          <span style={{ color: GOLD }}>{time}</span> has been received. We'll
+          reach you at <span style={{ color: GOLD }}>{email}</span> with deposit
+          + confirmation details.
+        </p>
+        <div className="mt-8 font-cond tracking-[0.4em] text-[10px] uppercase" style={{ color: GOLD }}>
+          // Transmission Complete
+        </div>
+      </HUDFrame>
+    );
+  }
+
+  return (
+    <HUDFrame className="mt-10 p-6 md:p-10">
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Calendar side */}
+        <div>
+          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/60 flex items-center gap-2">
+            <Calendar className="w-3 h-3" style={{ color: GOLD }} />
+            Step 01 // Select Date
+          </div>
+          <div
+            className="mt-4 p-3"
+            style={{ background: "rgba(212,162,76,0.04)", border: `1px solid ${GOLD}33` }}
+          >
+            <CalendarPicker
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+              initialFocus
+              className={cn("p-3 pointer-events-auto mx-auto")}
+            />
+          </div>
+
+          <div className="mt-6 font-cond tracking-[0.3em] text-[10px] uppercase text-bone/60 flex items-center gap-2">
+            <Clock className="w-3 h-3" style={{ color: GOLD }} />
+            Step 02 // Select Time Slot
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {TIME_SLOTS.map((slot) => {
+              const active = time === slot;
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  onClick={() => setTime(slot)}
+                  className="py-2.5 font-cond tracking-[0.2em] text-[11px] uppercase transition-all"
+                  style={{
+                    border: `1px solid ${active ? GOLD : GOLD + "44"}`,
+                    background: active ? GOLD : "transparent",
+                    color: active ? "#000" : "rgba(245,235,210,0.8)",
+                    boxShadow: active ? `0 0 20px ${GOLD}66` : "none",
+                  }}
+                >
+                  {slot}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div>
+              <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+                Crew Size
+              </label>
+              <select
+                className={inputClass}
+                style={inputStyle}
+                value={crewSize}
+                onChange={(e) => setCrewSize(e.target.value)}
+              >
+                {CREW_SIZES.map((s) => (
+                  <option key={s} value={s} className="bg-black">{s}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+                Duration
+              </label>
+              <select
+                className={inputClass}
+                style={inputStyle}
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+              >
+                {DURATIONS.map((d) => (
+                  <option key={d} value={d} className="bg-black">{d}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Form side */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/60 flex items-center gap-2">
+            <Radio className="w-3 h-3" style={{ color: GOLD }} />
+            Step 03 // Identify & Brief
+          </div>
+
+          <div>
+            <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+              Session Type
+            </label>
+            <select
+              className={inputClass}
+              style={inputStyle}
+              value={sessionType}
+              onChange={(e) => setSessionType(e.target.value)}
+            >
+              {SESSION_TYPES.map((s) => (
+                <option key={s} value={s} className="bg-black">{s}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+              Full Name *
+            </label>
+            <input
+              className={inputClass}
+              style={inputStyle}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name / Artist name"
+              required
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                className={inputClass}
+                style={inputStyle}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@domain.com"
+                required
+              />
+            </div>
+            <div>
+              <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+                Phone
+              </label>
+              <input
+                className={inputClass}
+                style={inputStyle}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(555) 555-5555"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
+              Project Notes
+            </label>
+            <textarea
+              className={inputClass}
+              style={inputStyle}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Tell us about your session..."
+              rows={4}
+            />
+          </div>
+
+          <div
+            className="px-4 py-3 font-cond tracking-[0.2em] text-[11px] uppercase"
+            style={{ background: "rgba(212,162,76,0.06)", border: `1px solid ${GOLD}33`, color: "rgba(245,235,210,0.85)" }}
+          >
+            <span className="text-bone/50">Slot //</span>{" "}
+            <span style={{ color: GOLD }}>
+              {date ? format(date, "MMM d, yyyy") : "—"} @ {time || "—"} · {duration}
+            </span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full inline-flex items-center justify-center gap-2 px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ background: GOLD, color: "#000", boxShadow: `0 0 30px ${GOLD}66` }}
+          >
+            {submitting ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Transmitting...</>
+            ) : (
+              <><Zap className="w-4 h-4" /> Lock In Session <ArrowRight className="w-4 h-4" /></>
+            )}
+          </button>
+
+          <p className="text-center font-cond tracking-[0.2em] text-[10px] uppercase text-bone/45">
+            <Lock className="inline w-3 h-3 mr-1" style={{ color: GOLD }} />
+            Deposit required after confirmation
+          </p>
+        </form>
+      </div>
+    </HUDFrame>
+  );
+}
