@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      deck_leads: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          investment_range: string
+          investor_type: string
+          website_or_linkedin: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          investment_range: string
+          investor_type: string
+          website_or_linkedin?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          investment_range?: string
+          investor_type?: string
+          website_or_linkedin?: string | null
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           artist: string | null
