@@ -1,11 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { format } from "date-fns";
 import {
   Mail, Instagram, Phone, Mic, Camera, Globe, PlayCircle,
   Check, Users, Tv, Youtube, Radio, Zap, ArrowRight,
+  Calendar as CalendarIcon, Clock, MapPin, Loader2,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import heroVideo from "@/assets/off-the-block-hero.mp4.asset.json";
+import { Calendar } from "@/components/ui/calendar";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/off-the-block")({
   head: () => ({
