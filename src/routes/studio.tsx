@@ -1,11 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { format } from "date-fns";
 import {
   Mail, Instagram, Phone, MapPin, Mic, Clapperboard, Camera, Smartphone,
   Calendar, Lock, CheckCircle2, User, Users, Plane, ArrowRight, Zap,
+  Clock, Loader2, Radio,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -228,36 +235,14 @@ function StudioPage() {
 
         {/* CTA */}
         <section className="py-16">
-          <HUDFrame className="relative overflow-hidden p-10 md:p-14 text-center">
-            <div
-              className="absolute inset-0 opacity-30 pointer-events-none"
-              style={{ background: `radial-gradient(circle at 50% 0%, ${GOLD}55, transparent 60%)` }}
-            />
-            <Zap className="relative w-8 h-8 mx-auto mb-4" style={{ color: GOLD }} />
-            <h2 className="relative font-display text-5xl md:text-7xl uppercase">
-              BOOK <span style={{ color: GOLD }}>YOUR SESSION</span>
-            </h2>
-            <p className="relative mt-3 text-bone/75 max-w-xl mx-auto">
-              Limited weekly slots. Deposit required to secure your transmission window.
-            </p>
-            <div className="relative mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="mailto:bookbwfmedia@gmail.com?subject=Studio%20Booking%20Request"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase transition-all hover:scale-[1.02]"
-                style={{ background: GOLD, color: "#000", boxShadow: `0 0 30px ${GOLD}66` }}
-              >
-                <Calendar className="w-4 h-4" /> Request Booking <ArrowRight className="w-4 h-4" />
-              </a>
-              <a
-                href="https://instagram.com/bwf.media"
-                target="_blank" rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone hover:bg-bone/5 transition"
-                style={{ border: `1px solid ${GOLD}` }}
-              >
-                <Instagram className="w-4 h-4" /> DM Us
-              </a>
-            </div>
-          </HUDFrame>
+          <SectionTag>Schedule // Studio Session</SectionTag>
+          <h2 className="mt-6 font-display text-5xl md:text-7xl uppercase">
+            BOOK <span style={{ color: GOLD }}>YOUR SESSION</span>
+          </h2>
+          <p className="mt-3 text-bone/75 max-w-xl">
+            Limited weekly slots. Lock in your transmission window below.
+          </p>
+          <StudioBookingCalendar />
         </section>
 
         {/* FOOTER */}
