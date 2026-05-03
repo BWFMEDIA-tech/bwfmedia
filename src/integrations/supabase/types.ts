@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      block_bookings: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          location: string
+          notes: string | null
+          phone: string | null
+          preferred_date: string
+          preferred_time: string
+          shoot_type: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          location: string
+          notes?: string | null
+          phone?: string | null
+          preferred_date: string
+          preferred_time: string
+          shoot_type: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          location?: string
+          notes?: string | null
+          phone?: string | null
+          preferred_date?: string
+          preferred_time?: string
+          shoot_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
       deck_leads: {
         Row: {
           company: string | null
