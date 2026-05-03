@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   Play, TrendingUp, AlertTriangle, Lightbulb, BarChart3, Layers,
-  Globe, DollarSign, Swords, Rocket, LineChart, Target, Eye, Mail, ArrowLeft,
+  Globe, DollarSign, Swords, Rocket, LineChart, Target, Eye, Mail, ArrowLeft, Lock,
 } from "lucide-react";
+import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
 
@@ -470,6 +471,19 @@ function Closing() {
 }
 
 function DeckPage() {
+  const [unlocked, setUnlocked] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("deck_unlocked") === "1") {
+      setUnlocked(true);
+    }
+    setChecked(true);
+  }, []);
+
+  if (!checked) return <main className="bg-black min-h-screen" />;
+  if (!unlocked) return <DeckGate onUnlock={() => setUnlocked(true)} />;
+
   return (
     <main className="bg-black min-h-screen">
       <DeckNav />
@@ -486,6 +500,96 @@ function DeckPage() {
       <Ask />
       <Vision />
       <Closing />
+    </main>
+  );
+}
+
+const DECK_PASSWORD = "BWF2026";
+
+function DeckGate({ onUnlock }: { onUnlock: () => void }) {
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (pw === DECK_PASSWORD) {
+      sessionStorage.setItem("deck_unlocked", "1");
+      onUnlock();
+    } else {
+      setError("Incorrect password.");
+    }
+  };
+
+  return (
+    <main
+      className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-black"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url(${grunge})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(circle at 50% 40%, color-mix(in oklab, var(--blood) 22%, transparent), transparent 60%)" }}
+      />
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-md mx-auto px-6"
+      >
+        <div className="border border-border bg-black/70 backdrop-blur p-8 md:p-10">
+          <div className="flex items-center justify-center mb-6">
+            <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 object-contain" />
+          </div>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Lock className="w-3.5 h-3.5" style={{ color: "var(--blood)" }} />
+            <span className="font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/60">
+              Confidential
+            </span>
+          </div>
+          <h1 className="text-center font-display text-3xl md:text-4xl text-bone leading-tight">
+            Investor <span style={{ color: "var(--blood)" }}>Pitch Deck</span>
+          </h1>
+          <p className="mt-3 text-center font-cond text-sm text-bone/70">
+            Enter the access password to view this deck.
+          </p>
+
+          <form onSubmit={submit} className="mt-8 space-y-4">
+            <input
+              type="password"
+              autoFocus
+              value={pw}
+              onChange={(e) => { setPw(e.target.value); setError(""); }}
+              placeholder="Access password"
+              className="w-full bg-black/60 border border-border text-bone font-cond tracking-widest px-4 py-3 outline-none focus:border-bone/50 placeholder:text-bone/30"
+            />
+            {error && (
+              <div className="font-cond text-sm" style={{ color: "var(--blood)" }}>{error}</div>
+            )}
+            <button
+              type="submit"
+              className="w-full px-6 py-3 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone"
+              style={{ backgroundColor: "var(--blood)" }}
+            >
+              Unlock Deck
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 hover:text-bone"
+            >
+              <ArrowLeft className="w-3 h-3" /> Back to Site
+            </Link>
+          </div>
+        </div>
+        <p className="mt-6 text-center font-cond text-[11px] tracking-[0.3em] uppercase text-bone/40">
+          BWFMEDIA · Private & Confidential
+        </p>
+      </motion.div>
     </main>
   );
 }
