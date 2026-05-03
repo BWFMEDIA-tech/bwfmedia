@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as StudioRouteImport } from './routes/studio'
+import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,6 +20,16 @@ import { Route as VideosIdRouteImport } from './routes/videos.$id'
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudioRoute = StudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffTheBlockRoute = OffTheBlockRouteImport.update({
+  id: '/off-the-block',
+  path: '/off-the-block',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckRoute = DeckRouteImport.update({
@@ -45,6 +57,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
   '/deck': typeof DeckRoute
+  '/off-the-block': typeof OffTheBlockRoute
+  '/studio': typeof StudioRoute
   '/videos': typeof VideosRouteWithChildren
   '/videos/$id': typeof VideosIdRoute
 }
@@ -52,6 +66,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
   '/deck': typeof DeckRoute
+  '/off-the-block': typeof OffTheBlockRoute
+  '/studio': typeof StudioRoute
   '/videos': typeof VideosRouteWithChildren
   '/videos/$id': typeof VideosIdRoute
 }
@@ -60,21 +76,47 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
   '/deck': typeof DeckRoute
+  '/off-the-block': typeof OffTheBlockRoute
+  '/studio': typeof StudioRoute
   '/videos': typeof VideosRouteWithChildren
   '/videos/$id': typeof VideosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/blog' | '/deck' | '/videos' | '/videos/$id'
+  fullPaths:
+    | '/'
+    | '/blog'
+    | '/deck'
+    | '/off-the-block'
+    | '/studio'
+    | '/videos'
+    | '/videos/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/blog' | '/deck' | '/videos' | '/videos/$id'
-  id: '__root__' | '/' | '/blog' | '/deck' | '/videos' | '/videos/$id'
+  to:
+    | '/'
+    | '/blog'
+    | '/deck'
+    | '/off-the-block'
+    | '/studio'
+    | '/videos'
+    | '/videos/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/blog'
+    | '/deck'
+    | '/off-the-block'
+    | '/studio'
+    | '/videos'
+    | '/videos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BlogRoute: typeof BlogRoute
   DeckRoute: typeof DeckRoute
+  OffTheBlockRoute: typeof OffTheBlockRoute
+  StudioRoute: typeof StudioRoute
   VideosRoute: typeof VideosRouteWithChildren
 }
 
@@ -85,6 +127,20 @@ declare module '@tanstack/react-router' {
       path: '/videos'
       fullPath: '/videos'
       preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/studio': {
+      id: '/studio'
+      path: '/studio'
+      fullPath: '/studio'
+      preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/off-the-block': {
+      id: '/off-the-block'
+      path: '/off-the-block'
+      fullPath: '/off-the-block'
+      preLoaderRoute: typeof OffTheBlockRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck': {
@@ -133,6 +189,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BlogRoute: BlogRoute,
   DeckRoute: DeckRoute,
+  OffTheBlockRoute: OffTheBlockRoute,
+  StudioRoute: StudioRoute,
   VideosRoute: VideosRouteWithChildren,
 }
 export const routeTree = rootRouteImport
