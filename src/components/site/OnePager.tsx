@@ -1,4 +1,5 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { Link as RouterLink } from "@tanstack/react-router";
 import {
   Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
   DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
@@ -157,6 +158,18 @@ function Nav() {
               {l.label}
             </a>
           ))}
+          <RouterLink
+            to="/off-the-block"
+            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+          >
+            Off The Block
+          </RouterLink>
+          <RouterLink
+            to="/studio"
+            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+          >
+            Studio
+          </RouterLink>
           <a
             href="/deck"
             className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase hover:text-bone transition-colors"
@@ -217,6 +230,20 @@ function Nav() {
                 {l.label}
               </a>
             ))}
+            <RouterLink
+              to="/off-the-block"
+              onClick={() => setOpen(false)}
+              className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
+            >
+              Off The Block
+            </RouterLink>
+            <RouterLink
+              to="/studio"
+              onClick={() => setOpen(false)}
+              className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
+            >
+              Studio
+            </RouterLink>
             <a
               href="/deck"
               onClick={() => setOpen(false)}
