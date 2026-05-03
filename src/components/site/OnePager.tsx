@@ -132,6 +132,7 @@ function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -268,20 +269,52 @@ function Nav() {
                 {l.label}
               </a>
             ))}
-            <RouterLink
-              to="/off-the-block"
-              onClick={() => setOpen(false)}
-              className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
-            >
-              Off The Block
-            </RouterLink>
-            <RouterLink
-              to="/studio"
-              onClick={() => setOpen(false)}
-              className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
-            >
-              Studio
-            </RouterLink>
+            <div className="border-b border-border/40">
+              <button
+                type="button"
+                onClick={() => setMobileServicesOpen((v) => !v)}
+                aria-expanded={mobileServicesOpen}
+                className="w-full flex items-center justify-between font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3"
+              >
+                Services
+                <ChevronDown size={14} className={`transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence initial={false}>
+                {mobileServicesOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-4 pb-2 flex flex-col">
+                      <a
+                        href="#services"
+                        onClick={() => { setOpen(false); setMobileServicesOpen(false); }}
+                        className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                      >
+                        All Services
+                      </a>
+                      <RouterLink
+                        to="/off-the-block"
+                        onClick={() => { setOpen(false); setMobileServicesOpen(false); }}
+                        className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                      >
+                        Off The Block
+                      </RouterLink>
+                      <RouterLink
+                        to="/studio"
+                        onClick={() => { setOpen(false); setMobileServicesOpen(false); }}
+                        className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                      >
+                        Studio Bookings
+                      </RouterLink>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <a
               href="/deck"
               onClick={() => setOpen(false)}
