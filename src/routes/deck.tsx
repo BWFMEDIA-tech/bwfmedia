@@ -7,6 +7,7 @@ import {
 import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/deck")({
   head: () => ({
