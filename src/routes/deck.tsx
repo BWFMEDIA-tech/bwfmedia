@@ -504,7 +504,7 @@ function DeckPage() {
   );
 }
 
-const DECK_PASSWORD = "BWF2026";
+const DECK_PASSWORD = "#1SMARTINVESTMENT";
 
 function DeckGate({ onUnlock }: { onUnlock: () => void }) {
   const [pw, setPw] = useState("");
