@@ -1,9 +1,35 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
 import {
-  Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
-  DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight,
-  Share2, Eye, Heart, Camera, Video, Megaphone, BarChart3, Menu, X, Facebook, Twitter, Music2, ChevronDown,
+  Play,
+  Mic,
+  Film,
+  Smartphone,
+  Flame,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Globe,
+  Handshake,
+  Trophy,
+  Sparkles,
+  Mail,
+  Instagram,
+  Youtube,
+  ArrowUpRight,
+  Share2,
+  Eye,
+  Heart,
+  Camera,
+  Video,
+  Megaphone,
+  BarChart3,
+  Menu,
+  X,
+  Facebook,
+  Twitter,
+  Music2,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
@@ -22,7 +48,12 @@ function Reveal({
   delay = 0,
   y = 24,
   className = "",
-}: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  y?: number;
+  className?: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y }}
@@ -88,21 +119,18 @@ function Section({
               transition={{ duration: 0.6 }}
               className="flex items-center gap-3"
             >
+              <span className="block h-px w-10 section-bar" style={{ backgroundColor: "var(--blood)" }} />
               <span
-                className="block h-px w-10 section-bar"
-                style={{ backgroundColor: "var(--blood)" }}
-              />
-              <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
+                className="font-cond font-bold tracking-[0.4em] text-xs uppercase"
+                style={{ color: "var(--blood)" }}
+              >
                 {number ? `${number}, ${label}` : label}
               </span>
             </motion.div>
           )}
-
         </div>
       )}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">
-        {children}
-      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">{children}</div>
       <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: "var(--gradient-blood)" }} />
     </section>
   );
@@ -142,7 +170,9 @@ function Nav() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "backdrop-blur-xl bg-black/85 border-b border-blood/40" : "backdrop-blur bg-black/40 border-b border-border"
+        scrolled
+          ? "backdrop-blur-xl bg-black/85 border-b border-blood/40"
+          : "backdrop-blur bg-black/40 border-b border-border"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
@@ -259,70 +289,79 @@ function Nav() {
             className="md:hidden border-t border-border bg-black/95 backdrop-blur overflow-hidden"
           >
             <div className="px-6 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
-            {links.map((l) => (
+              {links.map((l) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
+                >
+                  {l.label}
+                </a>
+              ))}
+              <div className="border-b border-border/40">
+                <button
+                  type="button"
+                  onClick={() => setMobileServicesOpen((v) => !v)}
+                  aria-expanded={mobileServicesOpen}
+                  className="w-full flex items-center justify-between font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3"
+                >
+                  Services
+                  <ChevronDown size={14} className={`transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence initial={false}>
+                  {mobileServicesOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 pb-2 flex flex-col">
+                        <a
+                          href="#services"
+                          onClick={() => {
+                            setOpen(false);
+                            setMobileServicesOpen(false);
+                          }}
+                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                        >
+                          All Services
+                        </a>
+                        <RouterLink
+                          to="/off-the-block"
+                          onClick={() => {
+                            setOpen(false);
+                            setMobileServicesOpen(false);
+                          }}
+                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                        >
+                          Off The Block
+                        </RouterLink>
+                        <RouterLink
+                          to="/studio"
+                          onClick={() => {
+                            setOpen(false);
+                            setMobileServicesOpen(false);
+                          }}
+                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                        >
+                          Studio Bookings
+                        </RouterLink>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <a
-                key={l.href}
-                href={l.href}
+                href="/deck"
                 onClick={() => setOpen(false)}
-                className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
+                className="font-cond font-bold tracking-[0.25em] text-xs uppercase py-3"
+                style={{ color: "var(--blood)" }}
               >
-                {l.label}
+                Pitch Deck
               </a>
-            ))}
-            <div className="border-b border-border/40">
-              <button
-                type="button"
-                onClick={() => setMobileServicesOpen((v) => !v)}
-                aria-expanded={mobileServicesOpen}
-                className="w-full flex items-center justify-between font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3"
-              >
-                Services
-                <ChevronDown size={14} className={`transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
-              </button>
-              <AnimatePresence initial={false}>
-                {mobileServicesOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pl-4 pb-2 flex flex-col">
-                      <a
-                        href="#services"
-                        onClick={() => { setOpen(false); setMobileServicesOpen(false); }}
-                        className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                      >
-                        All Services
-                      </a>
-                      <RouterLink
-                        to="/off-the-block"
-                        onClick={() => { setOpen(false); setMobileServicesOpen(false); }}
-                        className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                      >
-                        Off The Block
-                      </RouterLink>
-                      <RouterLink
-                        to="/studio"
-                        onClick={() => { setOpen(false); setMobileServicesOpen(false); }}
-                        className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                      >
-                        Studio Bookings
-                      </RouterLink>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            <a
-              href="/deck"
-              onClick={() => setOpen(false)}
-              className="font-cond font-bold tracking-[0.25em] text-xs uppercase py-3"
-              style={{ color: "var(--blood)" }}
-            >
-              Pitch Deck
-            </a>
             </div>
           </motion.div>
         )}
@@ -338,7 +377,12 @@ function AnimatedCounter({
   suffix = "",
   duration = 2.2,
   className = "",
-}: { to: number; suffix?: string; duration?: number; className?: string }) {
+}: {
+  to: number;
+  suffix?: string;
+  duration?: number;
+  className?: string;
+}) {
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const started = useRef(false);
@@ -357,10 +401,17 @@ function AnimatedCounter({
     return () => cancelAnimationFrame(raf);
   }, [to, duration]);
   const formatted =
-    to >= 1_000_000 ? `${(val / 1_000_000).toFixed(val >= to ? 0 : 1)}M`
-    : to >= 1_000   ? `${(val / 1_000).toFixed(val >= to ? 0 : 1)}K`
-    : `${val}`;
-  return <span ref={ref} className={className}>{formatted}{suffix}</span>;
+    to >= 1_000_000
+      ? `${(val / 1_000_000).toFixed(val >= to ? 0 : 1)}M`
+      : to >= 1_000
+        ? `${(val / 1_000).toFixed(val >= to ? 0 : 1)}K`
+        : `${val}`;
+  return (
+    <span ref={ref} className={className}>
+      {formatted}
+      {suffix}
+    </span>
+  );
 }
 
 function Hero() {
@@ -399,8 +450,7 @@ function Hero() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.85) 100%)",
+          background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.85) 100%)",
         }}
       />
       {/* Ambient blood glows */}
@@ -421,7 +471,8 @@ function Hero() {
       />
 
       {/* Crosshair grid lines */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.07]"
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.07]"
         style={{
           backgroundImage:
             "linear-gradient(to right, var(--bone) 1px, transparent 1px), linear-gradient(to bottom, var(--bone) 1px, transparent 1px)",
@@ -480,9 +531,7 @@ function Hero() {
             <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem]" style={{ color: "var(--blood)" }}>
               CULTURE
             </span>
-            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem] text-outline">
-              GOES VIRAL.
-            </span>
+            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem] text-outline">GOES VIRAL.</span>
           </motion.h1>
 
           <motion.p
@@ -492,9 +541,12 @@ function Hero() {
             className="mt-8 max-w-xl mx-auto md:mx-0 text-bone/75 text-base md:text-lg leading-relaxed"
           >
             BWF™ is a media network turning artists, moments, and movements into{" "}
-            <span className="text-bone font-semibold">cultural events</span>. Interviews,
-            music videos, viral clips, distributed to a global audience that{" "}
-            <span style={{ color: "var(--blood)" }} className="font-semibold">actually watches</span>.
+            <span className="text-bone font-semibold">cultural events</span>. Interviews, music videos, viral clips,
+            distributed to a global audience that{" "}
+            <span style={{ color: "var(--blood)" }} className="font-semibold">
+              actually watches
+            </span>
+            .
           </motion.p>
 
           {/* CTAs */}
@@ -551,14 +603,16 @@ function Hero() {
             </div>
           </motion.div>
         </div>
-
       </div>
 
       {/* Scroll cue */}
       <div className="relative z-10 hidden md:flex flex-col items-center pb-6">
         <span className="font-cond tracking-[0.4em] text-[10px] uppercase text-bone/40 mb-2">Scroll</span>
         <div className="w-px h-10 bg-bone/20 relative overflow-hidden">
-          <span className="absolute top-0 left-0 w-full h-3 animate-scroll-cue" style={{ backgroundColor: "var(--blood)" }} />
+          <span
+            className="absolute top-0 left-0 w-full h-3 animate-scroll-cue"
+            style={{ backgroundColor: "var(--blood)" }}
+          />
         </div>
       </div>
 
@@ -569,7 +623,10 @@ function Hero() {
       >
         <div className="flex animate-marquee whitespace-nowrap">
           {[...tickerItems, ...tickerItems].map((item, i) => (
-            <span key={i} className="mx-8 font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone inline-flex items-center gap-8">
+            <span
+              key={i}
+              className="mx-8 font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone inline-flex items-center gap-8"
+            >
               {item}
               <span className="text-bone/60">★</span>
             </span>
@@ -603,30 +660,42 @@ function About() {
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            ABOUT <span style={{ color: "var(--blood)" }}>BWF<sup className="text-[0.4em] align-super">™</sup></span>
+            ABOUT{" "}
+            <span style={{ color: "var(--blood)" }}>
+              BWF<sup className="text-[0.4em] align-super">™</sup>
+            </span>
           </h2>
           <p className="text-bone text-base md:text-lg leading-relaxed mb-5">
-            BWF™ is a fast-growing digital media platform covering music, live events,
-            interviews, and viral cultural moments.
+            BWF™ is a fast-growing digital media platform covering music, live events, interviews, and viral cultural
+            moments.
           </p>
           <p className="text-bone text-base md:text-lg leading-relaxed mb-8">
-            We specialize in turning live performances and artist moments into
-            high-reach, high-engagement content distributed across multiple platforms.
+            We specialize in turning live performances and artist moments into high-reach, high-engagement content
+            distributed across multiple platforms.
           </p>
-          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-4" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-4"
+            style={{ color: "var(--blood)" }}
+          >
             Our content focuses on
           </div>
           <ul className="space-y-3">
             {focus.map((t, i) => (
               <li key={i} className="flex gap-4 items-start">
-                <span className="block w-2 h-2 mt-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                <span
+                  className="block w-2 h-2 mt-2.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: "var(--blood)" }}
+                />
                 <span className="text-bone/85">{t}</span>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5"
+            style={{ color: "var(--blood)" }}
+          >
             📊 Platform Reach & Performance
           </div>
           <div className="grid grid-cols-2 gap-4 mb-8">
@@ -636,19 +705,38 @@ function About() {
                 className="border-l-4 pl-5 py-4"
                 style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
               >
-                <div className="font-display text-3xl md:text-5xl leading-none" style={{ color: "var(--blood)" }}>{s.big}</div>
-                <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/70 mt-2">{s.label}</div>
+                <div className="font-display text-3xl md:text-5xl leading-none" style={{ color: "var(--blood)" }}>
+                  {s.big}
+                </div>
+                <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/70 mt-2">
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
-          <div className="card-tick p-6 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
-            <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-3" style={{ color: "var(--blood)" }}>
+          <div
+            className="card-tick p-6 border-2"
+            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
+          >
+            <div
+              className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-3"
+              style={{ color: "var(--blood)" }}
+            >
               Engagement Strength
             </div>
             <ul className="space-y-2 text-bone/80 text-sm md:text-base">
-              <li className="flex gap-3"><Share2 className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> High share-to-view ratio, content spreads beyond platform reach</li>
-              <li className="flex gap-3"><Flame className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Strong short-form viral performance</li>
-              <li className="flex gap-3"><Eye className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Consistent weekly audience activity</li>
+              <li className="flex gap-3">
+                <Share2 className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> High share-to-view
+                ratio, content spreads beyond platform reach
+              </li>
+              <li className="flex gap-3">
+                <Flame className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Strong short-form
+                viral performance
+              </li>
+              <li className="flex gap-3">
+                <Eye className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Consistent weekly
+                audience activity
+              </li>
             </ul>
           </div>
         </div>
@@ -656,8 +744,17 @@ function About() {
 
       <div className="mt-16 grid md:grid-cols-4 gap-5">
         <div className="md:col-span-1">
-          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-2" style={{ color: "var(--blood)" }}>🎯 Audience Insight</div>
-          <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone">WHO'S<br /><span style={{ color: "var(--blood)" }}>WATCHING.</span></h3>
+          <div
+            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-2"
+            style={{ color: "var(--blood)" }}
+          >
+            🎯 Audience Insight
+          </div>
+          <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone">
+            WHO'S
+            <br />
+            <span style={{ color: "var(--blood)" }}>WATCHING.</span>
+          </h3>
         </div>
         {[
           { k: "Music-Driven", v: "Hip-hop / R&B / mainstream culture" },
@@ -665,8 +762,17 @@ function About() {
           { k: "Engaged", v: "Viral clips & interviews" },
           { k: "Demo", v: "Primarily 16–34" },
         ].map((row, i) => (
-          <div key={i} className="card-tick p-5 border-2" style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}>
-            <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase mb-2" style={{ color: "var(--blood)" }}>{row.k}</div>
+          <div
+            key={i}
+            className="card-tick p-5 border-2"
+            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
+          >
+            <div
+              className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase mb-2"
+              style={{ color: "var(--blood)" }}
+            >
+              {row.k}
+            </div>
             <div className="font-display text-lg md:text-xl text-bone leading-tight tracking-tight">{row.v}</div>
           </div>
         ))}
@@ -689,13 +795,21 @@ function GlobalAudience() {
   };
   const others = [
     { flag: "🇬🇧", country: "United Kingdom", pct: "4.7%", views: "32.5M" },
-    { flag: "🇮🇳", country: "India",          pct: "4.6%", views: "31.5M" },
-    { flag: "🇩🇪", country: "Germany",        pct: "4.1%", views: "27.9M" },
-    { flag: "🇨🇦", country: "Canada",         pct: "3.3%", views: "22.7M" },
+    { flag: "🇮🇳", country: "India", pct: "4.6%", views: "31.5M" },
+    { flag: "🇩🇪", country: "Germany", pct: "4.1%", views: "27.9M" },
+    { flag: "🇨🇦", country: "Canada", pct: "3.3%", views: "22.7M" },
   ];
   const additional = [
-    "Australia", "France", "Mexico", "Brazil", "South Africa",
-    "Philippines", "Nigeria", "Indonesia", "Japan", "UAE",
+    "Australia",
+    "France",
+    "Mexico",
+    "Brazil",
+    "South Africa",
+    "Philippines",
+    "Nigeria",
+    "Indonesia",
+    "Japan",
+    "UAE",
   ];
   const insights = [
     "Strong U.S. audience base for live event promotion",
@@ -708,16 +822,21 @@ function GlobalAudience() {
       <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-12">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
-            GLOBAL <span style={{ color: "var(--blood)" }}>AUDIENCE</span><br />REACH.
+            GLOBAL <span style={{ color: "var(--blood)" }}>AUDIENCE</span>
+            <br />
+            REACH.
           </h2>
           <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl">
-            BWF™ Media Network reaches a highly engaged global audience across music, culture,
-            and live event content. Distribution is driven by strong U.S. viewership combined
-            with international viral reach across key global markets.
+            BWF™ Media Network reaches a highly engaged global audience across music, culture, and live event content.
+            Distribution is driven by strong U.S. viewership combined with international viral reach across key global
+            markets.
           </p>
         </div>
         <div className="flex md:justify-end">
-          <div className="inline-flex items-center gap-3 px-4 py-3 border-2" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.6)" }}>
+          <div
+            className="inline-flex items-center gap-3 px-4 py-3 border-2"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.6)" }}
+          >
             <BarChart3 className="w-5 h-5" style={{ color: "var(--blood)" }} />
             <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/80">
               Live Network Analytics
@@ -736,12 +855,16 @@ function GlobalAudience() {
           <div className="md:col-span-5 flex items-center gap-4">
             <span className="text-5xl md:text-6xl leading-none">{primary.flag}</span>
             <div>
-              <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-1">Primary Market</div>
+              <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-1">
+                Primary Market
+              </div>
               <div className="font-display text-2xl md:text-3xl text-bone tracking-tight">{primary.country}</div>
             </div>
           </div>
           <div className="md:col-span-3">
-            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>{primary.pct}</div>
+            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>
+              {primary.pct}
+            </div>
             <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/60 mt-2">{primary.views}</div>
           </div>
           <div className="md:col-span-4 text-bone/70 text-sm leading-snug border-l border-border pl-4">
@@ -768,17 +891,16 @@ function GlobalAudience() {
               </div>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className="font-display text-2xl md:text-3xl leading-none" style={{ color: "var(--blood)" }}>{c.pct}</div>
+              <div className="font-display text-2xl md:text-3xl leading-none" style={{ color: "var(--blood)" }}>
+                {c.pct}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Additional reach */}
-      <div
-        className="p-5 md:p-6 mb-10 border border-border"
-        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-      >
+      <div className="p-5 md:p-6 mb-10 border border-border" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
         <div className="flex items-center gap-3 mb-4">
           <Globe className="w-4 h-4" style={{ color: "var(--blood)" }} />
           <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/70">
@@ -795,7 +917,10 @@ function GlobalAudience() {
               {c}
             </span>
           ))}
-          <span className="px-3 py-1.5 text-xs font-cond tracking-widest uppercase border" style={{ color: "var(--blood)", borderColor: "var(--blood)" }}>
+          <span
+            className="px-3 py-1.5 text-xs font-cond tracking-widest uppercase border"
+            style={{ color: "var(--blood)", borderColor: "var(--blood)" }}
+          >
             + more
           </span>
         </div>
@@ -806,27 +931,38 @@ function GlobalAudience() {
         className="relative p-6 md:p-8 border-2 overflow-hidden"
         style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.7)" }}
       >
-        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ backgroundColor: "var(--blood)" }} />
+        <div
+          className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none"
+          style={{ backgroundColor: "var(--blood)" }}
+        />
         <div className="relative grid md:grid-cols-3 gap-8">
           <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase mb-3" style={{ color: "var(--blood)" }}>
+            <div
+              className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase mb-3"
+              style={{ color: "var(--blood)" }}
+            >
               💡 Why This Matters
             </div>
             <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone tracking-tight">
-              BUILT FOR<br /><span style={{ color: "var(--blood)" }}>TOUR PROMOTION.</span>
+              BUILT FOR
+              <br />
+              <span style={{ color: "var(--blood)" }}>TOUR PROMOTION.</span>
             </h3>
           </div>
           <ul className="md:col-span-2 grid sm:grid-cols-2 gap-4">
             {insights.map((t, i) => (
               <li key={i} className="flex gap-3 items-start text-bone/85 text-sm md:text-base leading-snug">
-                <span className="block w-2 h-2 mt-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                <span
+                  className="block w-2 h-2 mt-2 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: "var(--blood)" }}
+                />
                 <span>{t}</span>
               </li>
             ))}
           </ul>
         </div>
         <div className="relative mt-8 pt-6 border-t border-border text-bone/90 text-sm md:text-base">
-          👉 This combination makes BWF™ Media ideal for <span style={{ color: "var(--blood)" }}>concert coverage, artist interviews, and tour promotion campaigns.</span>
+          <span style={{ color: "var(--blood)" }}></span>
         </div>
       </div>
     </Section>
@@ -882,11 +1018,16 @@ function Services() {
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
             <div className="font-cond font-bold tracking-[0.2em] text-[10px] uppercase text-bone/60 mb-4">{s.tag}</div>
             <s.icon className="w-8 h-8 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
-            <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-4 leading-tight">{s.title}</div>
+            <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-4 leading-tight">
+              {s.title}
+            </div>
             <ul className="space-y-2 mt-auto">
               {s.items.map((it, j) => (
                 <li key={j} className="flex gap-2 text-bone/75 text-sm leading-snug">
-                  <span className="block w-1.5 h-1.5 mt-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                  <span
+                    className="block w-1.5 h-1.5 mt-1.5 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: "var(--blood)" }}
+                  />
                   {it}
                 </li>
               ))}
@@ -903,24 +1044,41 @@ function Services() {
 
 function Promoters() {
   const benefits = [
-    { icon: Eye, title: "INCREASED VISIBILITY", body: "Boost online presence for your event before, during, and after the show." },
+    {
+      icon: Eye,
+      title: "INCREASED VISIBILITY",
+      body: "Boost online presence for your event before, during, and after the show.",
+    },
     { icon: Share2, title: "VIRAL CIRCULATION", body: "Post-show content engineered for share-driven distribution." },
-    { icon: Megaphone, title: "PROMO REACH WITHOUT AD SPEND", body: "Tap our existing audience instead of paying for impressions." },
-    { icon: Heart, title: "HIGH-ENGAGEMENT EXPOSURE", body: "Reach a culture-driven audience that actually reacts and shares." },
+    {
+      icon: Megaphone,
+      title: "PROMO REACH WITHOUT AD SPEND",
+      body: "Tap our existing audience instead of paying for impressions.",
+    },
+    {
+      icon: Heart,
+      title: "HIGH-ENGAGEMENT EXPOSURE",
+      body: "Reach a culture-driven audience that actually reacts and shares.",
+    },
   ];
   return (
     <Section id="promoters" label="Why Promoters Work With BWF™">
       <div className="grid md:grid-cols-5 gap-10 md:gap-16">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
-            WE DON'T JUST<br />
+            WE DON'T JUST
+            <br />
             COVER EVENTS -<br />
             <span style={{ color: "var(--blood)" }}>WE AMPLIFY THEM.</span>
           </h2>
           <p className="text-bone text-base md:text-lg leading-relaxed max-w-md">
-            Our goal is to help elevate event awareness before, during, and after the show, turning one night into weeks of content circulation.
+            Our goal is to help elevate event awareness before, during, and after the show, turning one night into weeks
+            of content circulation.
           </p>
-          <div className="mt-8 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
+          <div
+            className="mt-8 inline-block px-6 py-4 border-l-4"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
+          >
             <span className="font-display text-xl md:text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
               ONE SHOW. WEEKS OF REACH.
             </span>
@@ -933,10 +1091,15 @@ function Promoters() {
               className="p-6 border-2"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
-              <div className="w-11 h-11 rounded flex items-center justify-center mb-4" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-11 h-11 rounded flex items-center justify-center mb-4"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <b.icon className="w-5 h-5 text-bone" strokeWidth={2.5} />
               </div>
-              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">{b.title}</div>
+              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">
+                {b.title}
+              </div>
               <div className="text-bone/65 text-sm leading-relaxed">{b.body}</div>
             </div>
           ))}
@@ -954,7 +1117,8 @@ function Shift() {
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            HIP-HOP MEDIA<br />
+            HIP-HOP MEDIA
+            <br />
             <span style={{ color: "var(--blood)" }}>IS CHANGING</span>
           </h2>
           <ul className="space-y-4 text-bone/85 text-base md:text-lg">
@@ -964,12 +1128,18 @@ function Shift() {
               "Audiences want raw, unfiltered, real content",
             ].map((t, i) => (
               <li key={i} className="flex gap-4 items-start">
-                <span className="block w-2 h-2 mt-3 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                <span
+                  className="block w-2 h-2 mt-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: "var(--blood)" }}
+                />
                 <span>{t}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-10 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}>
+          <div
+            className="mt-10 inline-block px-6 py-4 border-l-4"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
+          >
             <span className="font-display text-2xl md:text-3xl tracking-tight" style={{ color: "var(--blood)" }}>
               BWF MEDIA IS ALREADY THERE.
             </span>
@@ -977,13 +1147,23 @@ function Shift() {
         </div>
         <div className="relative aspect-[4/5] overflow-hidden">
           <img src={audience} alt="" className="w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.85))" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.85))" }}
+          />
           <div className="absolute bottom-6 left-6 right-6">
-            <div className="font-brush text-xl md:text-2xl" style={{ color: "var(--blood)" }}>The next generation</div>
+            <div className="font-brush text-xl md:text-2xl" style={{ color: "var(--blood)" }}>
+              The next generation
+            </div>
             <div className="font-display text-4xl md:text-5xl text-bone leading-none mt-1">DOESN'T WAIT.</div>
           </div>
-          <div className="absolute top-4 right-4 w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: "var(--blood)" }} />
-          <div className="absolute top-3 right-10 font-cond font-bold tracking-widest text-[10px] uppercase text-bone">LIVE</div>
+          <div
+            className="absolute top-4 right-4 w-3 h-3 rounded-full animate-pulse"
+            style={{ backgroundColor: "var(--blood)" }}
+          />
+          <div className="absolute top-3 right-10 font-cond font-bold tracking-widest text-[10px] uppercase text-bone">
+            LIVE
+          </div>
         </div>
       </div>
     </Section>
@@ -1033,7 +1213,8 @@ function Pricing() {
         PICK YOUR <span style={{ color: "var(--blood)" }}>PUSH.</span>
       </h2>
       <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl mb-12">
-        Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach, no smoke, no inflated numbers.
+        Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach, no smoke, no
+        inflated numbers.
       </p>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
         {tiers.map((t, i) => (
@@ -1066,7 +1247,10 @@ function Pricing() {
             <ul className="space-y-2 text-bone/80 text-sm leading-relaxed mb-6 flex-1">
               {t.bullets.map((b, j) => (
                 <li key={j} className="flex gap-3 items-start">
-                  <span className="block w-1.5 h-1.5 mt-2 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                  <span
+                    className="block w-1.5 h-1.5 mt-2 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: "var(--blood)" }}
+                  />
                   <span>{b}</span>
                 </li>
               ))}
@@ -1081,7 +1265,10 @@ function Pricing() {
           </div>
         ))}
       </div>
-      <div className="mt-10 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}>
+      <div
+        className="mt-10 inline-block px-6 py-4 border-l-4"
+        style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
+      >
         <span className="font-display text-xl md:text-2xl tracking-tight text-bone">
           INTERVIEW + PROMO COMBO, <span style={{ color: "var(--blood)" }}>WHERE THE REAL MONEY IS.</span>
         </span>
@@ -1111,7 +1298,9 @@ function Proof() {
             className="border-l-4 pl-6 py-4"
             style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
           >
-            <div className="font-display text-5xl md:text-7xl leading-none" style={{ color: "var(--blood)" }}>{s.big}</div>
+            <div className="font-display text-5xl md:text-7xl leading-none" style={{ color: "var(--blood)" }}>
+              {s.big}
+            </div>
             <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone mt-3">{s.label}</div>
             <div className="text-bone/60 text-sm mt-1">{s.sub}</div>
           </div>
@@ -1122,15 +1311,12 @@ function Proof() {
           <h3 className="font-display text-3xl md:text-4xl text-bone">
             Featured <span style={{ color: "var(--blood)" }}>Videos</span>
           </h3>
-          <span className="font-brush text-xl hidden sm:block" style={{ color: "var(--blood)" }}>+ 200 more</span>
+          <span className="font-brush text-xl hidden sm:block" style={{ color: "var(--blood)" }}>
+            + 200 more
+          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-          {[
-            "9vGoBJa1DnM",
-            "2yIdA5Jp7vU",
-            "LeMMMetmTT0",
-            "xXBDvU2S9Es",
-          ].map((id) => (
+          {["9vGoBJa1DnM", "2yIdA5Jp7vU", "LeMMMetmTT0", "xXBDvU2S9Es"].map((id) => (
             <div
               key={id}
               className="group relative aspect-video overflow-hidden rounded-xl border border-border transition-all duration-300 hover:scale-[1.02] hover:border-[color:var(--blood)] hover:shadow-[0_0_40px_-5px_rgba(180,0,0,0.5)]"
@@ -1165,12 +1351,15 @@ function Engine() {
       <div className="grid md:grid-cols-5 gap-10 md:gap-12">
         <div className="md:col-span-2">
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
-            ONE SHOOT.<br />
-            <span style={{ color: "var(--blood)" }}>MULTIPLE</span><br />
+            ONE SHOOT.
+            <br />
+            <span style={{ color: "var(--blood)" }}>MULTIPLE</span>
+            <br />
             VIRAL ASSETS.
           </h2>
           <p className="mt-6 text-bone text-base md:text-lg leading-relaxed max-w-sm">
-            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning one shoot into a full media cycle.
+            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning
+            one shoot into a full media cycle.
           </p>
         </div>
         <div className="md:col-span-3 grid sm:grid-cols-2 gap-5">
@@ -1180,10 +1369,15 @@ function Engine() {
               className="relative p-6 border-2 hover:border-blood transition-colors"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.5)" }}
             >
-              <div className="w-12 h-12 flex items-center justify-center rounded mb-4" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-12 h-12 flex items-center justify-center rounded mb-4"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <it.icon className="w-6 h-6 text-bone" strokeWidth={2.5} />
               </div>
-              <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-2">{it.title.toUpperCase()}</div>
+              <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-2">
+                {it.title.toUpperCase()}
+              </div>
               <div className="text-bone/60 text-sm leading-relaxed">{it.desc}</div>
               <div className="absolute top-4 right-4 font-cond text-xs tracking-widest text-bone/30">0{i + 1}</div>
             </div>
@@ -1208,21 +1402,32 @@ function Audience() {
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div className="relative aspect-[4/5] md:aspect-auto md:h-[520px] overflow-hidden">
           <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, transparent, rgba(0,0,0,0.85))" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(135deg, transparent, rgba(0,0,0,0.85))" }}
+          />
           <div className="absolute bottom-6 left-6">
             <div className="font-brush text-2xl text-bone">Culture is</div>
-            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>WATCHING.</div>
+            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>
+              WATCHING.
+            </div>
           </div>
         </div>
         <div>
           <h2 className="font-display text-5xl md:text-6xl leading-[0.9] text-bone heavy-shadow mb-8">
-            REAL AUDIENCE.<br />
+            REAL AUDIENCE.
+            <br />
             <span style={{ color: "var(--blood)" }}>REAL ENGAGEMENT.</span>
           </h2>
           <div className="space-y-5">
             {rows.map((row, i) => (
               <div key={i} className="grid grid-cols-[100px_1fr] gap-5 items-baseline pb-4 border-b border-border">
-                <span className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase" style={{ color: "var(--blood)" }}>{row.k}</span>
+                <span
+                  className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase"
+                  style={{ color: "var(--blood)" }}
+                >
+                  {row.k}
+                </span>
                 <div>
                   <div className="font-display text-xl md:text-2xl text-bone tracking-tight">{row.v}</div>
                   <div className="text-bone/50 text-sm">{row.note}</div>
@@ -1230,7 +1435,10 @@ function Audience() {
               </div>
             ))}
           </div>
-          <div className="mt-8 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}>
+          <div
+            className="mt-8 inline-block px-6 py-4 border-l-4"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
+          >
             <span className="font-display text-xl md:text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
               THIS AUDIENCE DRIVES CULTURE.
             </span>
@@ -1245,10 +1453,34 @@ function Audience() {
 
 function Revenue() {
   const tiers = [
-    { name: "LIVE INTERVIEW", price: "$500", deposit: "$250 deposit", icon: Mic, items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"] },
-    { name: "MUSIC VIDEO", price: "$900", deposit: "$400 deposit", icon: Film, items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"] },
-    { name: "PROMO PACKAGE", price: "$300", deposit: "$150 deposit", icon: TrendingUp, items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"] },
-    { name: "AD REVENUE", price: "Recurring", deposit: "YouTube Partner", icon: DollarSign, items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"] },
+    {
+      name: "LIVE INTERVIEW",
+      price: "$500",
+      deposit: "$250 deposit",
+      icon: Mic,
+      items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"],
+    },
+    {
+      name: "MUSIC VIDEO",
+      price: "$900",
+      deposit: "$400 deposit",
+      icon: Film,
+      items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"],
+    },
+    {
+      name: "PROMO PACKAGE",
+      price: "$300",
+      deposit: "$150 deposit",
+      icon: TrendingUp,
+      items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"],
+    },
+    {
+      name: "AD REVENUE",
+      price: "Recurring",
+      deposit: "YouTube Partner",
+      icon: DollarSign,
+      items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"],
+    },
   ];
   return (
     <Section id="revenue" label="Monetization">
@@ -1258,7 +1490,10 @@ function Revenue() {
         </h2>
         <div className="md:text-right">
           <div className="font-brush text-xl md:text-2xl text-bone/70">4 active streams</div>
-          <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mt-1" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mt-1"
+            style={{ color: "var(--blood)" }}
+          >
             Already generating
           </div>
         </div>
@@ -1273,12 +1508,17 @@ function Revenue() {
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
             <t.icon className="w-7 h-7 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
             <div className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/70 mb-2">{t.name}</div>
-            <div className="font-display text-4xl md:text-5xl leading-none mb-1" style={{ color: "var(--blood)" }}>{t.price}</div>
+            <div className="font-display text-4xl md:text-5xl leading-none mb-1" style={{ color: "var(--blood)" }}>
+              {t.price}
+            </div>
             <div className="font-cond text-[10px] tracking-widest uppercase text-bone/50 mb-5">{t.deposit}</div>
             <ul className="space-y-2 mt-auto">
               {t.items.map((it, j) => (
                 <li key={j} className="flex gap-2 text-bone/75 text-xs leading-snug">
-                  <span className="block w-1 h-1 mt-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                  <span
+                    className="block w-1 h-1 mt-1.5 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: "var(--blood)" }}
+                  />
                   {it}
                 </li>
               ))}
@@ -1304,14 +1544,18 @@ function Scale() {
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            WITH THE RIGHT<br />
-            PARTNER,<br />
+            WITH THE RIGHT
+            <br />
+            PARTNER,
+            <br />
             <span style={{ color: "var(--blood)" }}>WE SCALE FAST.</span>
           </h2>
           <div className="space-y-2">
             {items.map((t, i) => (
               <div key={i} className="flex items-center gap-5 py-3 border-b border-border">
-                <span className="font-display text-2xl md:text-3xl w-10" style={{ color: "var(--blood)" }}>0{i + 1}</span>
+                <span className="font-display text-2xl md:text-3xl w-10" style={{ color: "var(--blood)" }}>
+                  0{i + 1}
+                </span>
                 <span className="text-bone text-base md:text-lg">{t}</span>
                 <ArrowUpRight className="w-5 h-5 ml-auto text-bone/30" />
               </div>
@@ -1320,10 +1564,18 @@ function Scale() {
         </div>
         <div className="relative aspect-square">
           <img src={musicVideo} alt="" className="w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.85))" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.85))" }}
+          />
           <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
             <div className="font-brush text-xl md:text-2xl text-bone/80">Ready for</div>
-            <div className="font-display text-4xl md:text-6xl leading-none heavy-shadow" style={{ color: "var(--blood)" }}>NATIONAL</div>
+            <div
+              className="font-display text-4xl md:text-6xl leading-none heavy-shadow"
+              style={{ color: "var(--blood)" }}
+            >
+              NATIONAL
+            </div>
             <div className="font-display text-4xl md:text-6xl leading-none text-bone heavy-shadow">EXPOSURE.</div>
           </div>
           <div className="absolute top-6 left-6 flex items-center gap-2">
@@ -1340,9 +1592,24 @@ function Scale() {
 
 function Partner() {
   const opts = [
-    { tag: "Option 01", title: "CONTENT LICENSING", body: "Pay per video for premium long-form content, interviews, and franchise series.", icon: Film },
-    { tag: "Option 02", title: "DISTRIBUTION DEAL", body: "Partner to expand BWF reach across networks, platforms, and new markets.", icon: Globe },
-    { tag: "Option 03", title: "UPFRONT INVESTMENT", body: "Capital injection to scale production, talent, and content velocity.", icon: TrendingUp },
+    {
+      tag: "Option 01",
+      title: "CONTENT LICENSING",
+      body: "Pay per video for premium long-form content, interviews, and franchise series.",
+      icon: Film,
+    },
+    {
+      tag: "Option 02",
+      title: "DISTRIBUTION DEAL",
+      body: "Partner to expand BWF reach across networks, platforms, and new markets.",
+      icon: Globe,
+    },
+    {
+      tag: "Option 03",
+      title: "UPFRONT INVESTMENT",
+      body: "Capital injection to scale production, talent, and content velocity.",
+      icon: TrendingUp,
+    },
   ];
   return (
     <Section id="partner" label="The Partnership">
@@ -1360,13 +1627,22 @@ function Partner() {
               className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-20 blur-2xl"
               style={{ backgroundColor: "var(--blood)" }}
             />
-            <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5" style={{ color: "var(--blood)" }}>{o.tag}</div>
+            <div
+              className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5"
+              style={{ color: "var(--blood)" }}
+            >
+              {o.tag}
+            </div>
             <o.icon className="w-10 h-10 mb-5 text-bone" strokeWidth={2} />
-            <div className="font-display text-2xl md:text-3xl tracking-tight text-bone mb-3 leading-tight">{o.title}</div>
+            <div className="font-display text-2xl md:text-3xl tracking-tight text-bone mb-3 leading-tight">
+              {o.title}
+            </div>
             <p className="text-bone leading-relaxed text-sm md:text-base">{o.body}</p>
             <div className="mt-auto pt-6 flex items-center gap-2">
               <Handshake className="w-5 h-5" style={{ color: "var(--blood)" }} />
-              <span className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/60">Open to discuss</span>
+              <span className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/60">
+                Open to discuss
+              </span>
             </div>
           </div>
         ))}
@@ -1392,9 +1668,13 @@ function Why() {
             WHY <span style={{ color: "var(--blood)" }}>US?</span>
           </h2>
           <p className="text-bone text-base md:text-lg leading-relaxed max-w-md mb-8">
-            Anyone can shoot video. Few can move culture. We've been doing it long enough to know exactly which lane we own.
+            Anyone can shoot video. Few can move culture. We've been doing it long enough to know exactly which lane we
+            own.
           </p>
-          <div className="inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div
+            className="inline-block px-6 py-4 border-l-4"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.5)" }}
+          >
             <span className="font-display text-2xl md:text-3xl tracking-tight" style={{ color: "var(--blood)" }}>
               WE CONTROL A CULTURE LANE.
             </span>
@@ -1407,10 +1687,15 @@ function Why() {
               className="p-6 border-2"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
-              <div className="w-11 h-11 rounded flex items-center justify-center mb-4" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-11 h-11 rounded flex items-center justify-center mb-4"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <r.icon className="w-5 h-5 text-bone" strokeWidth={2.5} />
               </div>
-              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">{r.title}</div>
+              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">
+                {r.title}
+              </div>
               <div className="text-bone/65 text-sm leading-relaxed">{r.body}</div>
             </div>
           ))}
@@ -1432,17 +1717,16 @@ function Vision() {
     <Section id="vision" label="The Future">
       <div className="text-center flex flex-col items-center">
         <h2 className="font-display text-6xl md:text-[7rem] leading-[0.85] text-bone heavy-shadow max-w-5xl">
-          THE FUTURE OF<br />
+          THE FUTURE OF
+          <br />
           <span style={{ color: "var(--blood)" }}>BWF MEDIA.</span>
         </h2>
         <div className="mt-12 grid sm:grid-cols-3 gap-8 md:gap-10 max-w-5xl w-full">
           {pillars.map((p, i) => (
-            <div
-              key={i}
-              className="border-t-2 pt-6 text-left"
-              style={{ borderColor: "var(--blood)" }}
-            >
-              <div className="font-display text-3xl md:text-4xl mb-2" style={{ color: "var(--blood)" }}>{p.n}</div>
+            <div key={i} className="border-t-2 pt-6 text-left" style={{ borderColor: "var(--blood)" }}>
+              <div className="font-display text-3xl md:text-4xl mb-2" style={{ color: "var(--blood)" }}>
+                {p.n}
+              </div>
               <div className="font-display text-2xl md:text-3xl text-bone tracking-tight leading-tight">{p.h}</div>
               <div className="font-cond text-bone/60 tracking-widest text-sm uppercase mt-1">{p.s}</div>
             </div>
@@ -1460,8 +1744,20 @@ function Vision() {
 
 function Contact() {
   const contacts = [
-    { icon: Mail, label: "Email", value: "bookbwfmediatv@mail.com", href: "mailto:bookbwfmediatv@mail.com", external: false },
-    { icon: Instagram, label: "Instagram", value: "@bwfmediatv", href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", external: true },
+    {
+      icon: Mail,
+      label: "Email",
+      value: "bookbwfmediatv@mail.com",
+      href: "mailto:bookbwfmediatv@mail.com",
+      external: false,
+    },
+    {
+      icon: Instagram,
+      label: "Instagram",
+      value: "@bwfmediatv",
+      href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr",
+      external: true,
+    },
     { icon: Youtube, label: "YouTube", value: "@bwfmedia", href: "https://youtube.com/@bwfmedia", external: true },
   ];
   return (
@@ -1469,8 +1765,10 @@ function Contact() {
       <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <div>
           <h2 className="font-display text-6xl md:text-[7rem] leading-[0.85] text-bone heavy-shadow">
-            LET'S BUILD<br />
-            <span style={{ color: "var(--blood)" }}>SOMETHING</span><br />
+            LET'S BUILD
+            <br />
+            <span style={{ color: "var(--blood)" }}>SOMETHING</span>
+            <br />
             BIG.
           </h2>
           <p className="mt-6 text-bone text-base md:text-lg max-w-md leading-relaxed">
@@ -1487,7 +1785,10 @@ function Contact() {
               className="card-tick flex items-center gap-5 p-5 border-2 group transition-all"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
-              <div className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <c.icon className="w-6 h-6 text-bone" strokeWidth={2} />
               </div>
               <div className="flex-1 min-w-0">
@@ -1529,10 +1830,7 @@ function Footer() {
   return (
     <footer className="relative bg-black border-t border-border">
       {/* CTA strip */}
-      <div
-        className="relative overflow-hidden border-b border-border"
-        style={{ background: "var(--gradient-blood)" }}
-      >
+      <div className="relative overflow-hidden border-b border-border" style={{ background: "var(--gradient-blood)" }}>
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="font-display text-3xl md:text-5xl tracking-tight text-bone heavy-shadow text-center md:text-left leading-tight">
             READY TO GO <span className="text-outline">VIRAL</span>?
@@ -1561,9 +1859,17 @@ function Footer() {
             <div className="mt-5 flex items-center gap-3">
               {[
                 { Icon: Youtube, href: "https://youtube.com/@bwfmediatv", label: "YouTube" },
-                { Icon: Instagram, href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr", label: "Instagram" },
+                {
+                  Icon: Instagram,
+                  href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr",
+                  label: "Instagram",
+                },
                 { Icon: Music2, href: "https://www.tiktok.com/@bwfmedia?_r=1&_t=ZT-961GRjFEpdl", label: "TikTok" },
-                { Icon: Facebook, href: "https://www.facebook.com/share/1FmVHYjMfE/?mibextid=wwXIfr", label: "Facebook" },
+                {
+                  Icon: Facebook,
+                  href: "https://www.facebook.com/share/1FmVHYjMfE/?mibextid=wwXIfr",
+                  label: "Facebook",
+                },
                 { Icon: Twitter, href: "https://x.com/bwfmediatv", label: "Twitter / X" },
                 { Icon: Mail, href: "#contact", label: "Email" },
               ].map(({ Icon, href, label }) => (
@@ -1582,9 +1888,7 @@ function Footer() {
             </div>
           </div>
           <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
-              Explore
-            </div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Explore</div>
             <ul className="space-y-2">
               {navLinks.map((l) => (
                 <li key={l.href}>
@@ -1599,9 +1903,7 @@ function Footer() {
             </ul>
           </div>
           <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
-              Company
-            </div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Company</div>
             <ul className="space-y-2">
               {moreLinks.map((l) => (
                 <li key={l.href}>
@@ -1625,9 +1927,7 @@ function Footer() {
             </ul>
           </div>
           <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
-              Connect
-            </div>
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Connect</div>
             <ul className="space-y-3">
               <li>
                 <a
@@ -1664,9 +1964,7 @@ function Footer() {
           <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
             © {new Date().getFullYear()} BWF Media TV, Where Culture Goes Viral
           </div>
-          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/30">
-            Founded by Dantavious Lee
-          </div>
+          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/30">Founded by Dantavious Lee</div>
         </div>
       </div>
     </footer>
@@ -1677,7 +1975,10 @@ function Footer() {
 
 function RedMicPodcast() {
   const links = [
-    { label: "Listen on iHeart", href: "https://www.iheart.com/podcast/269-bwfmedia-red-mic-podcast-235207492?app=listen" },
+    {
+      label: "Listen on iHeart",
+      href: "https://www.iheart.com/podcast/269-bwfmedia-red-mic-podcast-235207492?app=listen",
+    },
     { label: "Featured Episode", href: "https://podcasts.apple.com/us/podcast/bwfmedia-red-mic-podcast/id1777695203" },
   ];
   return (
@@ -1698,14 +1999,15 @@ function RedMicPodcast() {
           <h2 className="font-display leading-[0.85] tracking-tight text-bone heavy-shadow text-6xl md:text-8xl">
             BWF MEDIA <span style={{ color: "var(--blood)" }}>RED MIC</span>
             <span className="block text-outline">PODCAST</span>
-            <span className="block font-cond tracking-[0.3em] text-base md:text-xl text-bone/60 mt-4">
-              | iHeart
-            </span>
+            <span className="block font-cond tracking-[0.3em] text-base md:text-xl text-bone/60 mt-4">| iHeart</span>
           </h2>
           <p className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed">
-            Unfiltered conversations from the front lines of hip-hop and culture.
-            Long-form interviews, raw stories, and the moments that don't fit a
-            30-second clip, straight from <span style={{ color: "var(--blood)" }} className="font-semibold">The Red Mic</span>.
+            Unfiltered conversations from the front lines of hip-hop and culture. Long-form interviews, raw stories, and
+            the moments that don't fit a 30-second clip, straight from{" "}
+            <span style={{ color: "var(--blood)" }} className="font-semibold">
+              The Red Mic
+            </span>
+            .
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             {links.map((l, i) => (
@@ -1715,15 +2017,9 @@ function RedMicPodcast() {
                 target="_blank"
                 rel="noreferrer"
                 className={`group inline-flex items-center gap-3 px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone transition-colors ${
-                  i === 0
-                    ? ""
-                    : "border-2 border-border hover:border-blood backdrop-blur bg-black/40"
+                  i === 0 ? "" : "border-2 border-border hover:border-blood backdrop-blur bg-black/40"
                 }`}
-                style={
-                  i === 0
-                    ? { backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }
-                    : undefined
-                }
+                style={i === 0 ? { backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" } : undefined}
               >
                 {i === 0 ? <Play className="w-4 h-4 fill-bone" /> : <ArrowUpRight className="w-4 h-4" />}
                 {l.label}
