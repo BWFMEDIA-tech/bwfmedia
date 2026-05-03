@@ -5,6 +5,7 @@ import {
   Check, Users, Tv, Youtube, Radio, Zap, ArrowRight,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
+import heroVideo from "@/assets/off-the-block-hero.mp4.asset.json";
 
 export const Route = createFileRoute("/off-the-block")({
   head: () => ({
@@ -24,6 +25,24 @@ function OffTheBlockPage() {
       <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
         {/* HERO */}
         <section className="pt-10 md:pt-16 pb-20 relative">
+          {/* Background video */}
+          <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+            <video
+              src={heroVideo.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover opacity-50"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 60%, #000 100%)`,
+              }}
+            />
+          </div>
+
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
             BWF Media <span style={{ color: GOLD }}>// transmission_001</span>
           </div>
