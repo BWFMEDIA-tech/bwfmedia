@@ -42,6 +42,11 @@ export const Route = createRootRoute({
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png" },
     ],
+    scripts: [
+      {
+        children: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1448122316522268');fbq('track','PageView');`,
+      },
+    ],
     links: [
       {
         rel: "stylesheet",
