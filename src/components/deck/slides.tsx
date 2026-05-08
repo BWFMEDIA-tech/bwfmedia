@@ -12,7 +12,7 @@ import {
 
 const TOTAL = 11;
 
-/* ================= SLIDE 1, COVER ================= */
+/* ================= SLIDE 1 — COVER ================= */
 export function Slide1() {
   return (
     <SlideShell number={1} total={TOTAL} label="Investor Deck / 2026">
@@ -116,7 +116,7 @@ function Stat({ big, label }: { big: string; label: string }) {
   );
 }
 
-/* ================= SLIDE 2, ATTENTION ================= */
+/* ================= SLIDE 2 — ATTENTION ================= */
 export function Slide2() {
   return (
     <SlideShell number={2} total={TOTAL} label="Problem">
@@ -128,7 +128,7 @@ export function Slide2() {
             className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6"
             style={{ color: "var(--blood)" }}
           >
-            01, The Attention
+            01 — The Attention
           </motion.div>
           <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow mb-10">
             HIP-HOP MEDIA<br />
@@ -175,16 +175,16 @@ export function Slide2() {
   );
 }
 
-/* ================= SLIDE 3, PROOF ================= */
+/* ================= SLIDE 3 — PROOF ================= */
 export function Slide3() {
   return (
     <SlideShell number={4} total={TOTAL} label="Traction">
       <div className="flex-1 px-20 py-24 flex flex-col">
         <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
-          02, Track Record
+          02 — Track Record
         </div>
         <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
-          WE DON'T CHASE VIRAL -<br />
+          WE DON'T CHASE VIRAL —<br />
           <span style={{ color: "var(--blood)" }}>WE CREATE IT.</span>
         </h2>
 
@@ -222,7 +222,7 @@ export function Slide3() {
   );
 }
 
-/* ================= SLIDE 4, CONTENT ENGINE ================= */
+/* ================= SLIDE 4 — CONTENT ENGINE ================= */
 export function Slide4() {
   const items = [
     { icon: Mic, title: "Interviews", desc: "1-on-1 viral conversations with artists, athletes, and culture-shakers." },
@@ -235,7 +235,7 @@ export function Slide4() {
       <div className="flex-1 px-20 py-24 grid grid-cols-5 gap-12">
         <div className="col-span-2">
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
-            03, Content Engine
+            03 — Content Engine
           </div>
           <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow">
             ONE SHOOT.<br />
@@ -243,7 +243,7 @@ export function Slide4() {
             VIRAL ASSETS.
           </h2>
           <p className="mt-8 text-bone/70 text-lg leading-relaxed max-w-sm">
-            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning one shoot into a full media cycle.
+            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG — turning one shoot into a full media cycle.
           </p>
         </div>
 
@@ -271,7 +271,7 @@ export function Slide4() {
   );
 }
 
-/* ================= SLIDE 5, AUDIENCE ================= */
+/* ================= SLIDE 5 — AUDIENCE ================= */
 export function Slide5() {
   return (
     <SlideShell number={5} total={TOTAL} label="Market">
@@ -287,7 +287,7 @@ export function Slide5() {
 
         <div className="px-16 py-24 flex flex-col justify-center">
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
-            04, Demographics
+            04 — Demographics
           </div>
           <h2 className="font-display text-6xl leading-[0.9] text-bone heavy-shadow mb-10">
             REAL AUDIENCE.<br />
@@ -328,7 +328,7 @@ export function Slide5() {
   );
 }
 
-/* ================= SLIDE 6, MONETIZATION ================= */
+/* ================= SLIDE 6 — MONETIZATION ================= */
 export function Slide6() {
   const tiers = [
     { name: "LIVE INTERVIEW", price: "$500", deposit: "$250 deposit", icon: Mic, items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"] },
@@ -342,7 +342,7 @@ export function Slide6() {
         <div className="flex items-end justify-between mb-10">
           <div>
             <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-3" style={{ color: "var(--blood)" }}>
-              05, Monetization
+              05 — Monetization
             </div>
             <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow">
               PROVEN <span style={{ color: "var(--blood)" }}>REVENUE</span> MODEL
@@ -387,14 +387,14 @@ export function Slide6() {
   );
 }
 
-/* ================= SLIDE 7, SCALE ================= */
+/* ================= SLIDE 7 — SCALE ================= */
 export function Slide7() {
   return (
     <SlideShell number={8} total={TOTAL} label="Growth">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
-            06, Scale
+            06 — Scale
           </div>
           <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow mb-10">
             WITH THE RIGHT<br />
@@ -441,7 +441,7 @@ export function Slide7() {
   );
 }
 
-/* ================= SLIDE 8, PARTNERSHIP ================= */
+/* ================= SLIDE 8 — PARTNERSHIP ================= */
 export function Slide8() {
   const opts = [
     { tag: "Option 01", title: "CONTENT LICENSING", body: "Pay per video for premium long-form content, interviews, and franchise series.", icon: Film },
@@ -452,7 +452,7 @@ export function Slide8() {
     <SlideShell number={9} total={TOTAL} label="Financials">
       <div className="flex-1 px-20 py-24 flex flex-col">
         <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
-          07, How We Work Together
+          07 — How We Work Together
         </div>
         <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
           THREE WAYS TO <span style={{ color: "var(--blood)" }}>RUN IT UP.</span>
@@ -488,10 +488,10 @@ export function Slide8() {
   );
 }
 
-/* ================= SLIDE 9, WHY US ================= */
+/* ================= SLIDE 9 — WHY US ================= */
 export function Slide9() {
   const reasons = [
-    { icon: Trophy, title: "PROVEN VIRAL SUCCESS", body: "686M+ views isn't theory, it's a track record." },
+    { icon: Trophy, title: "PROVEN VIRAL SUCCESS", body: "686M+ views isn't theory — it's a track record." },
     { icon: Users, title: "DIRECT ARTIST ACCESS", body: "Trusted relationships across the hip-hop ecosystem." },
     { icon: Flame, title: "STRONG REGIONAL INFLUENCE", body: "Deep cultural roots in the South & beyond." },
     { icon: Sparkles, title: "CONSISTENT OUTPUT", body: "We don't go quiet. New drops, every week." },
@@ -501,7 +501,7 @@ export function Slide9() {
       <div className="flex-1 px-20 py-24 grid grid-cols-2 gap-16 items-center">
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
-            08, The Edge
+            08 — The Edge
           </div>
           <h2 className="font-display text-8xl leading-[0.85] text-bone heavy-shadow mb-8">
             WHY <span style={{ color: "var(--blood)" }}>US?</span>
@@ -539,13 +539,13 @@ export function Slide9() {
   );
 }
 
-/* ================= SLIDE 10, VISION ================= */
+/* ================= SLIDE 10 — VISION ================= */
 export function Slide10() {
   return (
     <SlideShell number={11} total={TOTAL} label="Vision">
       <div className="flex-1 flex flex-col items-center justify-center px-20 text-center relative">
         <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6" style={{ color: "var(--blood)" }}>
-          09, The Future
+          09 — The Future
         </div>
         <motion.h2
           initial={{ scale: 0.95, opacity: 0 }}
@@ -591,14 +591,14 @@ export function Slide10() {
   );
 }
 
-/* ================= SLIDE 11, CLOSE ================= */
+/* ================= SLIDE 11 — CLOSE ================= */
 export function Slide11() {
   return (
     <SlideShell number={10} total={TOTAL} label="Ask">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6" style={{ color: "var(--blood)" }}>
-            10, Contact
+            10 — Contact
           </div>
           <h2 className="font-display text-[7rem] leading-[0.85] text-bone heavy-shadow">
             LET'S BUILD<br />

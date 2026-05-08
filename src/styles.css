@@ -56,23 +56,23 @@
 :root {
   --radius: 0.25rem;
 
-  /* BWFMEDIA premium light theme (reversed) */
-  --background: #FFFFFF;
-  --foreground: #0B0B0B;
+  /* BWFMEDIA premium dark theme */
+  --background: #0B0B0B;
+  --foreground: #FFFFFF;
 
-  --card: #F5F5F5;
-  --card-foreground: #0B0B0B;
-  --popover: #F5F5F5;
-  --popover-foreground: #0B0B0B;
+  --card: #111111;
+  --card-foreground: #FFFFFF;
+  --popover: #111111;
+  --popover-foreground: #FFFFFF;
 
   --primary: #FF2D2D;
   --primary-foreground: #FFFFFF;
 
-  --secondary: #F5F5F5;
-  --secondary-foreground: #0B0B0B;
+  --secondary: #111111;
+  --secondary-foreground: #FFFFFF;
 
-  --muted: #F0F0F0;
-  --muted-foreground: #5F5F5F;
+  --muted: #111111;
+  --muted-foreground: #A0A0A0;
 
   --accent: #FF2D2D;
   --accent-foreground: #FFFFFF;
@@ -80,22 +80,22 @@
   --destructive: #FF2D2D;
   --destructive-foreground: #FFFFFF;
 
-  --border: #E5E5E5;
-  --input: #E5E5E5;
+  --border: #1c1c1c;
+  --input: #1c1c1c;
   --ring: #FF2D2D;
 
   --blood: #FF2D2D;
   --blood-glow: #FF4D4D;
-  --bone: #0B0B0B;
-  --ash: #9A9A9A;
+  --bone: #FFFFFF;
+  --ash: #6A6A6A;
 
   --trust: #1E90FF;
   --success: #00C853;
 
   --gradient-blood: linear-gradient(135deg, #FF2D2D, #FF4D4D);
-  --gradient-dark: linear-gradient(180deg, #FFFFFF, #F0F0F0);
+  --gradient-dark: linear-gradient(180deg, #0B0B0B, #050505);
   --shadow-blood: 0 20px 60px -10px rgb(255 45 45 / 0.45);
-  --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.18);
+  --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
 
 @layer base {

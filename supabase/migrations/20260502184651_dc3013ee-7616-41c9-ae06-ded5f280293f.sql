@@ -1,1 +1,0 @@
-ALTER TABLE public.videos ADD COLUMN external_url TEXT;
