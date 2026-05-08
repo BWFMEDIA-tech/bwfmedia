@@ -2,17 +2,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   Play, TrendingUp, AlertTriangle, Lightbulb, BarChart3, Layers,
-  Globe, DollarSign, Swords, Rocket, LineChart, Target, Eye, Mail, ArrowLeft,
+  Globe, DollarSign, Swords, Rocket, LineChart, Target, Eye, Mail, ArrowLeft, Lock,
+  ShieldCheck, Radio, ChevronRight,
 } from "lucide-react";
+import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/deck")({
   head: () => ({
     meta: [
-      { title: "BWFMEDIA — Investor Pitch Deck" },
+      { title: "BWFMEDIA, Investor Pitch Deck" },
       { name: "description", content: "BWFMEDIA Inc. investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
-      { property: "og:title", content: "BWFMEDIA — Investor Pitch Deck" },
+      { property: "og:title", content: "BWFMEDIA, Investor Pitch Deck" },
       { property: "og:description", content: "Real Content. Real People. Real Reach. Raising $500K–$1M to scale the #1 independent digital network for culture-driven content." },
     ],
   }),
@@ -52,7 +55,7 @@ function Slide({
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 py-20 md:py-28 w-full">
         <div className="flex items-center justify-between mb-10">
           <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-            {number} — {label}
+            {number}, {label}
           </span>
           <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 hidden md:block">
             BWFMEDIA · PITCH DECK
@@ -233,7 +236,7 @@ function Traction() {
         <StatCard big="2.9M" label="Shares" />
       </div>
       <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">
-        These aren't projections — this is a <span className="text-bone font-bold">live, engaged audience</span> we already command across YouTube, Instagram, TikTok and short-form networks.
+        These aren't projections, this is a <span className="text-bone font-bold">live, engaged audience</span> we already command across YouTube, Instagram, TikTok and short-form networks.
       </p>
     </Slide>
   );
@@ -470,6 +473,24 @@ function Closing() {
 }
 
 function DeckPage() {
+  const [unlocked, setUnlocked] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("deck_unlocked") === "1") {
+      setUnlocked(true);
+    }
+    if (typeof window !== "undefined" && sessionStorage.getItem("deck_lead_captured") === "1") {
+      setLeadCaptured(true);
+    }
+    setChecked(true);
+  }, []);
+
+  if (!checked) return <main className="bg-black min-h-screen" />;
+  if (!leadCaptured) return <DeckLeadForm onSubmitted={() => setLeadCaptured(true)} />;
+  if (!unlocked) return <DeckGate onUnlock={() => setUnlocked(true)} />;
+
   return (
     <main className="bg-black min-h-screen">
       <DeckNav />
@@ -486,6 +507,488 @@ function DeckPage() {
       <Ask />
       <Vision />
       <Closing />
+    </main>
+  );
+}
+
+const DECK_PASSWORD = "#1SMARTINVESTMENT";
+
+const INVESTOR_TYPES = [
+  "Angel investor",
+  "Brand partner",
+  "Media company",
+  "Private investor",
+  "Just exploring",
+];
+
+const INVESTMENT_RANGES = [
+  "$1K – $10K",
+  "$10K – $50K",
+  "$50K – $250K",
+  "$250K+",
+  "Not investing yet (just learning)",
+];
+
+const HUD_GOLD = "#D4A24C";
+
+function HudAtmosphere() {
+  return (
+    <>
+      {/* base black */}
+      <div className="absolute inset-0 -z-30 bg-black" />
+      {/* animated grid */}
+      <div
+        className="absolute inset-0 -z-20 opacity-[0.18]"
+        style={{
+          backgroundImage: `linear-gradient(${HUD_GOLD}55 1px, transparent 1px), linear-gradient(90deg, ${HUD_GOLD}55 1px, transparent 1px)`,
+          backgroundSize: "44px 44px",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+          animation: "hud-grid-pan 18s linear infinite",
+        }}
+      />
+      {/* radial glow */}
+      <div
+        className="absolute inset-0 -z-20 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at 50% 30%, ${HUD_GOLD}33 0%, transparent 55%)`,
+        }}
+      />
+      {/* scanlines */}
+      <div
+        className="absolute inset-0 -z-10 pointer-events-none opacity-[0.08] mix-blend-screen"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.6) 0px, rgba(255,255,255,0.6) 1px, transparent 1px, transparent 3px)",
+        }}
+      />
+      {/* moving scan line */}
+      <div
+        className="absolute left-0 right-0 -z-10 h-[2px] pointer-events-none"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${HUD_GOLD}, transparent)`,
+          boxShadow: `0 0 24px ${HUD_GOLD}`,
+          animation: "hud-scan 6s linear infinite",
+        }}
+      />
+      <style>{`
+        @keyframes hud-grid-pan {
+          0% { background-position: 0 0, 0 0; }
+          100% { background-position: 44px 44px, 44px 44px; }
+        }
+        @keyframes hud-scan {
+          0% { top: -2%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 102%; opacity: 0; }
+        }
+        @keyframes hud-pulse {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </>
+  );
+}
+
+function HudFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="relative bg-black/80 backdrop-blur-sm"
+      style={{
+        border: `1px solid ${HUD_GOLD}66`,
+        boxShadow: `0 0 0 1px #00000080 inset, 0 30px 80px -20px ${HUD_GOLD}44, 0 0 60px -20px ${HUD_GOLD}66`,
+      }}
+    >
+      {/* corner ticks */}
+      {[
+        "top-0 left-0 border-t-2 border-l-2",
+        "top-0 right-0 border-t-2 border-r-2",
+        "bottom-0 left-0 border-b-2 border-l-2",
+        "bottom-0 right-0 border-b-2 border-r-2",
+      ].map((c) => (
+        <span key={c} className={`absolute w-4 h-4 ${c}`} style={{ borderColor: HUD_GOLD }} />
+      ))}
+      {/* top channel labels */}
+      <div
+        className="absolute -top-3 left-6 px-2 font-mono text-[9px] tracking-[0.35em] uppercase"
+        style={{ background: "#000", color: HUD_GOLD }}
+      >
+        CH-01 // SECURE
+      </div>
+      <div
+        className="absolute -top-3 right-6 px-2 font-mono text-[9px] tracking-[0.35em] uppercase flex items-center gap-1.5"
+        style={{ background: "#000", color: HUD_GOLD }}
+      >
+        <span
+          className="inline-block w-1.5 h-1.5 rounded-full"
+          style={{ background: HUD_GOLD, animation: "hud-pulse 1.6s ease-in-out infinite" }}
+        />
+        LIVE LINK
+      </div>
+      {children}
+    </div>
+  );
+}
+
+const hudFieldClass =
+  "w-full bg-black border text-bone font-mono text-sm tracking-wider px-4 py-3 outline-none transition-colors placeholder:text-bone/25";
+const hudFieldStyle = { borderColor: `${HUD_GOLD}55` } as const;
+const hudFieldFocus = "focus:border-[var(--hud-gold)]";
+
+function HudLabel({ children, code }: { children: React.ReactNode; code: string }) {
+  return (
+    <div className="flex items-center justify-between mb-2">
+      <label className="font-mono text-[10px] tracking-[0.3em] uppercase" style={{ color: HUD_GOLD }}>
+        {children}
+      </label>
+      <span className="font-mono text-[9px] tracking-[0.3em] uppercase text-bone/30">{code}</span>
+    </div>
+  );
+}
+
+function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [investorType, setInvestorType] = useState("");
+  const [investmentRange, setInvestmentRange] = useState("");
+  const [company, setCompany] = useState("");
+  const [link, setLink] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const name = fullName.trim();
+    const mail = email.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (name.length < 2 || name.length > 120) return setError("Please enter your full name.");
+    if (!emailRe.test(mail) || mail.length > 255) return setError("Please enter a valid email.");
+    if (!investorType) return setError("Select an investor type.");
+    if (!investmentRange) return setError("Select an investment range.");
+
+    setSubmitting(true);
+    const { error: insertError } = await supabase.from("deck_leads").insert({
+      full_name: name,
+      email: mail,
+      investor_type: investorType,
+      investment_range: investmentRange,
+      company: company.trim() ? company.trim().slice(0, 200) : null,
+      website_or_linkedin: link.trim() ? link.trim().slice(0, 300) : null,
+    });
+    setSubmitting(false);
+
+    if (insertError) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
+    sessionStorage.setItem("deck_lead_captured", "1");
+    onSubmitted();
+  };
+
+  return (
+    <main className="relative min-h-screen w-full overflow-hidden flex items-center justify-center py-20">
+      <HudAtmosphere />
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 w-full max-w-2xl mx-auto px-6"
+      >
+        {/* Top status bar */}
+        <div className="flex items-center justify-between mb-4 font-mono text-[10px] tracking-[0.35em] uppercase" style={{ color: HUD_GOLD }}>
+          <div className="flex items-center gap-2">
+            <Radio className="w-3 h-3" />
+            <span>BWFMEDIA // NODE-04</span>
+          </div>
+          <div className="flex items-center gap-2 text-bone/50">
+            <span>SEC.LVL</span>
+            <span style={{ color: HUD_GOLD }}>03</span>
+            <span className="hidden sm:inline">/ ENCRYPTED</span>
+          </div>
+        </div>
+
+        <HudFrame>
+          <div className="p-8 md:p-10">
+            <div className="flex items-center justify-center mb-6">
+              <div
+                className="relative p-3"
+                style={{ border: `1px solid ${HUD_GOLD}66`, boxShadow: `0 0 30px ${HUD_GOLD}55` }}
+              >
+                <img src={bwfLogo} alt="BWF Media" className="w-10 h-10 object-contain" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <ShieldCheck className="w-3.5 h-3.5" style={{ color: HUD_GOLD }} />
+              <span className="font-mono text-[10px] tracking-[0.5em] uppercase" style={{ color: HUD_GOLD }}>
+                Identity Required
+              </span>
+            </div>
+            <h1 className="text-center font-display text-3xl md:text-5xl text-bone leading-[0.95] uppercase">
+              Investor <span style={{ color: HUD_GOLD, textShadow: `0 0 20px ${HUD_GOLD}88` }}>Access</span>
+            </h1>
+            <p className="mt-4 text-center font-mono text-[11px] tracking-[0.25em] uppercase text-bone/55">
+              {`> Provide credentials to authorize transmission of pitch deck.`}
+            </p>
+
+            <form onSubmit={submit} className="mt-10 space-y-5">
+              <div>
+                <HudLabel code="ID-001">Full Name *</HudLabel>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="First and last"
+                  maxLength={120}
+                  className={hudFieldClass}
+                  style={hudFieldStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                />
+              </div>
+
+              <div>
+                <HudLabel code="ID-002">Email *</HudLabel>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  maxLength={255}
+                  className={hudFieldClass}
+                  style={hudFieldStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                <div>
+                  <HudLabel code="CLS-01">Investor Type *</HudLabel>
+                  <select
+                    value={investorType}
+                    onChange={(e) => setInvestorType(e.target.value)}
+                    className={hudFieldClass}
+                    style={hudFieldStyle}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                  >
+                    <option value="">— Select —</option>
+                    {INVESTOR_TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <HudLabel code="CAP-01">Investment Range *</HudLabel>
+                  <select
+                    value={investmentRange}
+                    onChange={(e) => setInvestmentRange(e.target.value)}
+                    className={hudFieldClass}
+                    style={hudFieldStyle}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                  >
+                    <option value="">— Select —</option>
+                    {INVESTMENT_RANGES.map((r) => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <HudLabel code="ORG-01">Company / Organization</HudLabel>
+                <input
+                  type="text"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Optional"
+                  maxLength={200}
+                  className={hudFieldClass}
+                  style={hudFieldStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                />
+              </div>
+
+              <div>
+                <HudLabel code="REF-01">Website or LinkedIn</HudLabel>
+                <input
+                  type="text"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder="Optional"
+                  maxLength={300}
+                  className={hudFieldClass}
+                  style={hudFieldStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                />
+              </div>
+
+              {error && (
+                <div
+                  className="font-mono text-xs tracking-wider px-3 py-2 border"
+                  style={{ color: "var(--blood)", borderColor: "var(--blood)", background: "rgba(0,0,0,0.6)" }}
+                >
+                  {`!! ERROR: ${error}`}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="group relative w-full px-6 py-4 font-mono font-bold tracking-[0.4em] text-xs uppercase text-black disabled:opacity-60 transition-all"
+                style={{
+                  background: HUD_GOLD,
+                  boxShadow: `0 0 0 1px ${HUD_GOLD}, 0 0 30px ${HUD_GOLD}88`,
+                }}
+              >
+                <span className="inline-flex items-center justify-center gap-3">
+                  {submitting ? "Transmitting..." : "Authorize & Continue"}
+                  <ChevronRight className="w-4 h-4" />
+                </span>
+              </button>
+            </form>
+
+            <div className="mt-8 flex items-center justify-between font-mono text-[10px] tracking-[0.3em] uppercase">
+              <Link to="/" className="inline-flex items-center gap-2 text-bone/50 hover:text-bone transition-colors">
+                <ArrowLeft className="w-3 h-3" /> Abort
+              </Link>
+              <span style={{ color: HUD_GOLD }} className="opacity-70">STEP 01 / 02</span>
+            </div>
+          </div>
+        </HudFrame>
+
+        <p className="mt-6 text-center font-mono text-[10px] tracking-[0.4em] uppercase text-bone/35">
+          BWFMEDIA · Private &amp; Confidential · Do Not Distribute
+        </p>
+      </motion.div>
+    </main>
+  );
+}
+
+function DeckGate({ onUnlock }: { onUnlock: () => void }) {
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (pw === DECK_PASSWORD) {
+      sessionStorage.setItem("deck_unlocked", "1");
+      onUnlock();
+    } else {
+      setError("Incorrect password.");
+    }
+  };
+
+  return (
+    <main className="relative min-h-screen w-full overflow-hidden flex items-center justify-center py-20">
+      <HudAtmosphere />
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 w-full max-w-md mx-auto px-6"
+      >
+        <div className="flex items-center justify-between mb-4 font-mono text-[10px] tracking-[0.35em] uppercase" style={{ color: HUD_GOLD }}>
+          <div className="flex items-center gap-2">
+            <Lock className="w-3 h-3" />
+            <span>VAULT // SEALED</span>
+          </div>
+          <span className="text-bone/50">STEP 02 / 02</span>
+        </div>
+
+        <HudFrame>
+          <div className="p-8 md:p-10">
+            <div className="flex items-center justify-center mb-6">
+              <div
+                className="relative p-3"
+                style={{ border: `1px solid ${HUD_GOLD}66`, boxShadow: `0 0 30px ${HUD_GOLD}55` }}
+              >
+                <img src={bwfLogo} alt="BWF Media" className="w-10 h-10 object-contain" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Lock className="w-3.5 h-3.5" style={{ color: HUD_GOLD }} />
+              <span className="font-mono text-[10px] tracking-[0.5em] uppercase" style={{ color: HUD_GOLD }}>
+                Passphrase Required
+              </span>
+            </div>
+            <h1 className="text-center font-display text-3xl md:text-5xl text-bone leading-[0.95] uppercase">
+              Decrypt <span style={{ color: HUD_GOLD, textShadow: `0 0 20px ${HUD_GOLD}88` }}>Deck</span>
+            </h1>
+            <p className="mt-4 text-center font-mono text-[11px] tracking-[0.25em] uppercase text-bone/55">
+              {`> Enter access key to unlock transmission.`}
+            </p>
+
+            <form onSubmit={submit} className="mt-10 space-y-5">
+              <div>
+                <HudLabel code="KEY-01">Access Key</HudLabel>
+                <input
+                  type="password"
+                  autoFocus
+                  value={pw}
+                  onChange={(e) => { setPw(e.target.value); setError(""); }}
+                  placeholder="••••••••••••"
+                  className={`${hudFieldClass} tracking-[0.5em]`}
+                  style={hudFieldStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
+                />
+              </div>
+
+              {error && (
+                <div
+                  className="font-mono text-xs tracking-wider px-3 py-2 border"
+                  style={{ color: "var(--blood)", borderColor: "var(--blood)", background: "rgba(0,0,0,0.6)" }}
+                >
+                  {`!! ACCESS DENIED: ${error}`}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="group relative w-full px-6 py-4 font-mono font-bold tracking-[0.4em] text-xs uppercase text-black transition-all"
+                style={{
+                  background: HUD_GOLD,
+                  boxShadow: `0 0 0 1px ${HUD_GOLD}, 0 0 30px ${HUD_GOLD}88`,
+                }}
+              >
+                <span className="inline-flex items-center justify-center gap-3">
+                  Unlock Transmission
+                  <ChevronRight className="w-4 h-4" />
+                </span>
+              </button>
+            </form>
+
+            <div className="mt-8 flex items-center justify-between font-mono text-[10px] tracking-[0.3em] uppercase">
+              <Link to="/" className="inline-flex items-center gap-2 text-bone/50 hover:text-bone transition-colors">
+                <ArrowLeft className="w-3 h-3" /> Abort
+              </Link>
+              <span style={{ color: HUD_GOLD }} className="opacity-70 inline-flex items-center gap-1.5">
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full"
+                  style={{ background: HUD_GOLD, animation: "hud-pulse 1.6s ease-in-out infinite" }}
+                />
+                READY
+              </span>
+            </div>
+          </div>
+        </HudFrame>
+
+        <p className="mt-6 text-center font-mono text-[10px] tracking-[0.4em] uppercase text-bone/35">
+          BWFMEDIA · Private &amp; Confidential
+        </p>
+      </motion.div>
     </main>
   );
 }
