@@ -19,24 +19,52 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
-type Status = "pending" | "confirmed" | "cancelled";
+type Status =
+  | "pending"
+  | "awaiting_payment"
+  | "confirmed"
+  | "delivered"
+  | "cancelled";
 
-interface Booking {
+const STATUS_OPTIONS: Status[] = [
+  "pending",
+  "awaiting_payment",
+  "confirmed",
+  "delivered",
+  "cancelled",
+];
+
+type BookingTable = "studio_bookings" | "block_bookings";
+
+interface BaseBooking {
   id: string;
   created_at: string;
   full_name: string;
   email: string;
   phone: string | null;
-  session_type: string;
-  crew_size: string;
-  duration: string;
   preferred_date: string;
   preferred_time: string;
   notes: string | null;
   status: string;
+  package_id: string | null;
+  amount_cents: number | null;
+  amount_paid_cents: number | null;
+  paid_at: string | null;
+}
+
+interface StudioBooking extends BaseBooking {
+  session_type: string;
+  crew_size: string;
+  duration: string;
+}
+
+interface BlockBooking extends BaseBooking {
+  shoot_type: string;
+  location: string;
 }
 
 export const Route = createFileRoute("/admin/bookings")({
@@ -53,11 +81,13 @@ function AdminBookingsPage() {
   const navigate = useNavigate();
   const [authChecked, setAuthChecked] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [studio, setStudio] = useState<StudioBooking[]>([]);
+  const [block, setBlock] = useState<BlockBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [tab, setTab] = useState<BookingTable>("studio_bookings");
 
   useEffect(() => {
     let mounted = true;
@@ -78,7 +108,7 @@ function AdminBookingsPage() {
       if (!mounted) return;
       setIsAdmin(!!roleRow);
       setAuthChecked(true);
-      if (roleRow) loadBookings();
+      if (roleRow) loadAll();
       else setLoading(false);
     }
 
@@ -93,33 +123,39 @@ function AdminBookingsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function loadBookings() {
+  async function loadAll() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("studio_bookings")
-      .select("*")
-      .order("preferred_date", { ascending: false });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      setBookings((data ?? []) as Booking[]);
-    }
+    const [s, b] = await Promise.all([
+      supabase
+        .from("studio_bookings")
+        .select("*")
+        .order("preferred_date", { ascending: false }),
+      supabase
+        .from("block_bookings")
+        .select("*")
+        .order("preferred_date", { ascending: false }),
+    ]);
+    if (s.error) toast.error(s.error.message);
+    else setStudio((s.data ?? []) as StudioBooking[]);
+    if (b.error) toast.error(b.error.message);
+    else setBlock((b.data ?? []) as BlockBooking[]);
     setLoading(false);
   }
 
-  async function updateStatus(id: string, status: Status) {
+  async function updateStatus(table: BookingTable, id: string, status: Status) {
     setUpdatingId(id);
-    const { error } = await supabase
-      .from("studio_bookings")
-      .update({ status })
-      .eq("id", id);
+    const { error } = await supabase.from(table).update({ status }).eq("id", id);
     setUpdatingId(null);
     if (error) {
       toast.error(error.message);
-    } else {
-      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
-      toast.success(`Marked as ${status}`);
+      return;
     }
+    if (table === "studio_bookings") {
+      setStudio((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
+    } else {
+      setBlock((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
+    }
+    toast.success(`Marked as ${status}`);
   }
 
   async function signOut() {
@@ -127,30 +163,28 @@ function AdminBookingsPage() {
     navigate({ to: "/admin/login" });
   }
 
-  const filtered = useMemo(() => {
-    return bookings.filter((b) => {
-      if (statusFilter !== "all" && b.status !== statusFilter) return false;
-      if (search) {
-        const q = search.toLowerCase();
-        if (
-          !b.full_name.toLowerCase().includes(q) &&
-          !b.email.toLowerCase().includes(q) &&
-          !b.session_type.toLowerCase().includes(q)
-        )
-          return false;
-      }
-      return true;
-    });
-  }, [bookings, statusFilter, search]);
+  const activeRows: BaseBooking[] = tab === "studio_bookings" ? studio : block;
+
+  const filteredStudio = useMemo(
+    () => filterRows(studio, statusFilter, search, ["session_type"]),
+    [studio, statusFilter, search],
+  );
+  const filteredBlock = useMemo(
+    () => filterRows(block, statusFilter, search, ["shoot_type", "location"]),
+    [block, statusFilter, search],
+  );
 
   const counts = useMemo(() => {
+    const rows = activeRows;
     return {
-      all: bookings.length,
-      pending: bookings.filter((b) => b.status === "pending").length,
-      confirmed: bookings.filter((b) => b.status === "confirmed").length,
-      cancelled: bookings.filter((b) => b.status === "cancelled").length,
+      all: rows.length,
+      pending: rows.filter((b) => b.status === "pending").length,
+      awaiting_payment: rows.filter((b) => b.status === "awaiting_payment").length,
+      confirmed: rows.filter((b) => b.status === "confirmed").length,
+      delivered: rows.filter((b) => b.status === "delivered").length,
+      cancelled: rows.filter((b) => b.status === "cancelled").length,
     };
-  }, [bookings]);
+  }, [activeRows]);
 
   if (!authChecked) {
     return (
@@ -181,8 +215,10 @@ function AdminBookingsPage() {
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Studio Bookings</h1>
-            <p className="text-xs text-muted-foreground">Review, filter and update booking status</p>
+            <h1 className="text-xl font-semibold text-foreground">Bookings</h1>
+            <p className="text-xs text-muted-foreground">
+              Review, filter and update booking + payment status
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -194,7 +230,17 @@ function AdminBookingsPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        <div className="flex flex-wrap gap-3 items-center">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as BookingTable)}>
+          <TabsList>
+            <TabsTrigger value="studio_bookings">
+              Studio ({studio.length})
+            </TabsTrigger>
+            <TabsTrigger value="block_bookings">
+              Off The Block ({block.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex flex-wrap gap-3 items-center mt-6">
           <Input
             placeholder="Search name, email, session type…"
             value={search}
@@ -202,96 +248,89 @@ function AdminBookingsPage() {
             className="max-w-xs"
           />
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[220px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All ({counts.all})</SelectItem>
               <SelectItem value="pending">Pending ({counts.pending})</SelectItem>
+              <SelectItem value="awaiting_payment">
+                Awaiting payment ({counts.awaiting_payment})
+              </SelectItem>
               <SelectItem value="confirmed">Confirmed ({counts.confirmed})</SelectItem>
+              <SelectItem value="delivered">Delivered ({counts.delivered})</SelectItem>
               <SelectItem value="cancelled">Cancelled ({counts.cancelled})</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={loadBookings} disabled={loading}>
+          <Button variant="outline" size="sm" onClick={loadAll} disabled={loading}>
             {loading ? "Loading…" : "Refresh"}
           </Button>
-        </div>
+          </div>
 
-        <div className="border border-border rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Session</TableHead>
-                <TableHead>Date / Time</TableHead>
-                <TableHead>Crew · Duration</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    Loading bookings…
-                  </TableCell>
-                </TableRow>
-              ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    No bookings match your filters.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((b) => (
-                  <TableRow key={b.id}>
+          <TabsContent value="studio_bookings" className="mt-6">
+            <BookingsTable
+              loading={loading}
+              rows={filteredStudio}
+              updatingId={updatingId}
+              onStatusChange={(id, s) => updateStatus("studio_bookings", id, s)}
+              renderDetailHead={() => (
+                <>
+                  <TableHead>Session</TableHead>
+                  <TableHead>Crew · Duration</TableHead>
+                </>
+              )}
+              renderDetailCells={(row) => {
+                const r = row as StudioBooking;
+                return (
+                  <>
                     <TableCell>
-                      <div className="font-medium text-foreground">{b.full_name}</div>
-                      <div className="text-xs text-muted-foreground">{b.email}</div>
-                      {b.phone && <div className="text-xs text-muted-foreground">{b.phone}</div>}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{b.session_type}</div>
-                      {b.notes && (
+                      <div className="text-sm">{r.session_type}</div>
+                      {r.notes && (
                         <div className="text-xs text-muted-foreground line-clamp-2 max-w-xs mt-1">
-                          {b.notes}
+                          {r.notes}
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {format(new Date(b.preferred_date), "MMM d, yyyy")}
-                      </div>
-                      <div className="text-xs text-muted-foreground">{b.preferred_time}</div>
-                    </TableCell>
                     <TableCell className="text-sm">
-                      {b.crew_size} · {b.duration}
+                      {r.crew_size} · {r.duration}
                     </TableCell>
-                    <TableCell>
-                      <StatusBadge status={b.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Select
-                        value={b.status}
-                        onValueChange={(v) => updateStatus(b.id, v as Status)}
-                        disabled={updatingId === b.id}
-                      >
-                        <SelectTrigger className="w-[140px] ml-auto">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                  </TableRow>
-                ))
+                  </>
+                );
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="block_bookings" className="mt-6">
+            <BookingsTable
+              loading={loading}
+              rows={filteredBlock}
+              updatingId={updatingId}
+              onStatusChange={(id, s) => updateStatus("block_bookings", id, s)}
+              renderDetailHead={() => (
+                <>
+                  <TableHead>Shoot</TableHead>
+                  <TableHead>Location</TableHead>
+                </>
               )}
-            </TableBody>
-          </Table>
-        </div>
+              renderDetailCells={(row) => {
+                const r = row as BlockBooking;
+                return (
+                  <>
+                    <TableCell>
+                      <div className="text-sm">{r.shoot_type}</div>
+                      {r.notes && (
+                        <div className="text-xs text-muted-foreground line-clamp-2 max-w-xs mt-1">
+                          {r.notes}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm">{r.location}</TableCell>
+                  </>
+                );
+              }}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
@@ -299,10 +338,143 @@ function AdminBookingsPage() {
 
 function StatusBadge({ status }: { status: string }) {
   const variant =
-    status === "confirmed"
+    status === "confirmed" || status === "delivered"
       ? "default"
       : status === "cancelled"
         ? "destructive"
         : "secondary";
-  return <Badge variant={variant}>{status}</Badge>;
+  return <Badge variant={variant}>{status.replace(/_/g, " ")}</Badge>;
+}
+
+function PaymentCell({ row }: { row: BaseBooking }) {
+  const paid = !!row.paid_at;
+  const amount = row.amount_paid_cents ?? row.amount_cents ?? null;
+  const formatted =
+    amount != null ? `$${(amount / 100).toFixed(2)}` : "—";
+  return (
+    <div>
+      <Badge variant={paid ? "default" : "secondary"}>
+        {paid ? "Paid" : row.status === "awaiting_payment" ? "Awaiting" : "Unpaid"}
+      </Badge>
+      <div className="text-xs text-muted-foreground mt-1">
+        {formatted}
+        {row.package_id && <span className="ml-1">· {row.package_id}</span>}
+      </div>
+      {row.paid_at && (
+        <div className="text-[10px] text-muted-foreground">
+          {format(new Date(row.paid_at), "MMM d, yyyy")}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BookingsTable({
+  loading,
+  rows,
+  updatingId,
+  onStatusChange,
+  renderDetailHead,
+  renderDetailCells,
+}: {
+  loading: boolean;
+  rows: BaseBooking[];
+  updatingId: string | null;
+  onStatusChange: (id: string, status: Status) => void;
+  renderDetailHead: () => React.ReactNode;
+  renderDetailCells: (row: BaseBooking) => React.ReactNode;
+}) {
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            {renderDetailHead()}
+            <TableHead>Date / Time</TableHead>
+            <TableHead>Payment</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                Loading bookings…
+              </TableCell>
+            </TableRow>
+          ) : rows.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                No bookings match your filters.
+              </TableCell>
+            </TableRow>
+          ) : (
+            rows.map((b) => (
+              <TableRow key={b.id}>
+                <TableCell>
+                  <div className="font-medium text-foreground">{b.full_name}</div>
+                  <div className="text-xs text-muted-foreground">{b.email}</div>
+                  {b.phone && <div className="text-xs text-muted-foreground">{b.phone}</div>}
+                </TableCell>
+                {renderDetailCells(b)}
+                <TableCell>
+                  <div className="text-sm">
+                    {format(new Date(b.preferred_date), "MMM d, yyyy")}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{b.preferred_time}</div>
+                </TableCell>
+                <TableCell><PaymentCell row={b} /></TableCell>
+                <TableCell>
+                  <StatusBadge status={b.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <Select
+                    value={b.status}
+                    onValueChange={(v) => onStatusChange(b.id, v as Status)}
+                    disabled={updatingId === b.id}
+                  >
+                    <SelectTrigger className="w-[170px] ml-auto">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s.replace(/_/g, " ")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+function filterRows<T extends BaseBooking>(
+  rows: T[],
+  statusFilter: Status | "all",
+  search: string,
+  extraFields: (keyof T)[],
+): T[] {
+  return rows.filter((b) => {
+    if (statusFilter !== "all" && b.status !== statusFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const haystack = [
+        b.full_name,
+        b.email,
+        ...extraFields.map((f) => String(b[f] ?? "")),
+      ]
+        .join(" ")
+        .toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
 }

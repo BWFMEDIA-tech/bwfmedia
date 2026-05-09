@@ -27,6 +27,7 @@ import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
+import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -125,6 +126,11 @@ const ApiPublicCheckoutCancellationEmailRoute =
     path: '/api/public/checkout-cancellation-email',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicBlockBookingRoute = ApiPublicBlockBookingRouteImport.update({
+  id: '/api/public/block-booking',
+  path: '/api/public/block-booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
+  '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
+  '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
+  '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/videos/$id'
+    | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/videos/$id'
+    | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/videos/$id'
+    | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
@@ -335,6 +347,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
+  ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -474,6 +487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCheckoutCancellationEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/block-booking': {
+      id: '/api/public/block-booking'
+      path: '/api/public/block-booking'
+      fullPath: '/api/public/block-booking'
+      preLoaderRoute: typeof ApiPublicBlockBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -545,6 +565,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
+  ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
@@ -559,12 +580,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
