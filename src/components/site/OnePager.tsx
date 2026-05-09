@@ -1,65 +1,23 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
-import { useCart } from "@/contexts/CartContext";
 import {
-  Play,
-  Mic,
-  Film,
-  Smartphone,
-  Flame,
-  TrendingUp,
-  Users,
-  DollarSign,
-  Globe,
-  Handshake,
-  Trophy,
-  Sparkles,
-  Mail,
-  Instagram,
-  Youtube,
-  ArrowUpRight,
-  Share2,
-  Eye,
-  Heart,
-  Camera,
-  Video,
-  Megaphone,
-  BarChart3,
-  Menu,
-  X,
-  Facebook,
-  Twitter,
-  Music2,
-  ChevronDown,
+  Play, Mic, Film, Scissors, Camera, Share2, Globe, Handshake,
+  TrendingUp, DollarSign, ArrowRight, Menu, X, ChevronDown, Check, Youtube, Instagram,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import grunge from "@/assets/grunge-bg.jpg";
+import { useState, useEffect } from "react";
 import bwfLogo from "@/assets/bwf-logo.png";
-import camera from "@/assets/camera.png";
-import audience from "@/assets/audience.jpg";
-import viralThumbs from "@/assets/viral-thumbs.jpg";
-import musicVideo from "@/assets/music-video.jpg";
-import bwfIntroVideo from "@/assets/bwf-intro.mp4.asset.json";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
-/* ---------- shared bits ---------- */
+/* ---------- shared ---------- */
 
 function Reveal({
-  children,
-  delay = 0,
-  y = 24,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  y?: number;
-  className?: string;
-}) {
+  children, delay = 0, y = 24, className = "",
+}: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: "some" }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
@@ -73,76 +31,9 @@ function ScrollProgress() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-[3px] z-[60] origin-left pointer-events-none"
+      className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left pointer-events-none"
       style={{ scaleX, background: "var(--gradient-blood)" }}
     />
-  );
-}
-
-function Section({
-  id,
-  label,
-  number,
-  children,
-  className = "",
-}: {
-  id?: string;
-  label?: string;
-  number?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      id={id}
-      className={`relative w-full overflow-hidden grunge-overlay border-b border-border ${className}`}
-      style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.92)), url(${grunge})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div
-        className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full opacity-25 blur-3xl pointer-events-none"
-        style={{ backgroundColor: "var(--blood)" }}
-      />
-      <div
-        className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ backgroundColor: "var(--blood)" }}
-      />
-      {(label || number) && (
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 flex items-center justify-between">
-          {label && (
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.6 }}
-              className="flex items-center gap-3"
-            >
-              <span className="block h-px w-10 section-bar" style={{ backgroundColor: "var(--blood)" }} />
-              <span
-                className="font-cond font-bold tracking-[0.4em] text-xs uppercase"
-                style={{ color: "var(--blood)" }}
-              >
-                {number ? `${number}, ${label}` : label}
-              </span>
-            </motion.div>
-          )}
-        </div>
-      )}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20">{children}</div>
-      <div className="absolute bottom-0 left-0 right-0 h-1.5" style={{ background: "var(--gradient-blood)" }} />
-    </section>
-  );
-}
-
-function StatBlock({ big, label }: { big: string; label: string }) {
-  return (
-    <div className="text-left">
-      <div className="font-display text-4xl md:text-5xl leading-none font-light text-bone/90">{big}</div>
-      <div className="font-cond tracking-[0.35em] text-[10px] md:text-xs uppercase text-bone/50 mt-3">{label}</div>
-    </div>
   );
 }
 
@@ -150,15 +41,14 @@ function StatBlock({ big, label }: { big: string; label: string }) {
 
 function Nav() {
   const links = [
-    { href: "#reach", label: "Reach" },
-    { href: "#proof", label: "Proof" },
+    { href: "#services", label: "Services" },
+    { href: "#why", label: "Why BWF" },
     { href: "#audience", label: "Audience" },
     { href: "#pricing", label: "Pricing" },
+    { href: "#contact", label: "Contact" },
   ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -168,243 +58,54 @@ function Nav() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "backdrop-blur-xl bg-black/85 border-b border-blood/40"
-          : "backdrop-blur bg-black/40 border-b border-border"
+        scrolled ? "backdrop-blur-xl bg-black/85 border-b border-blood/40" : "backdrop-blur bg-black/40 border-b border-white/5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-16 h-16 md:w-20 md:h-20 object-contain" />
+          <img src={bwfLogo} alt="BWF Media" className="w-14 h-14 md:w-16 md:h-16 object-contain" />
         </a>
         <div className="hidden md:flex items-center gap-7">
           {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-            >
+            <a key={l.href} href={l.href}
+              className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
               {l.label}
             </a>
           ))}
-          <div
-            className="relative"
-            onMouseEnter={() => setServicesOpen(true)}
-            onMouseLeave={() => setServicesOpen(false)}
-          >
-            <a
-              href="#services"
-              className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors inline-flex items-center gap-1"
-              aria-haspopup="true"
-              aria-expanded={servicesOpen}
-            >
-              Services
-              <ChevronDown size={12} className={`transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
-            </a>
-            <AnimatePresence>
-              {servicesOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute left-1/2 -translate-x-1/2 top-full pt-3 min-w-[200px] z-50"
-                >
-                  <div className="bg-black/95 backdrop-blur-xl border border-blood/40 shadow-xl py-2">
-                    <a
-                      href="#services"
-                      onClick={() => setServicesOpen(false)}
-                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
-                    >
-                      All Services
-                    </a>
-                    <RouterLink
-                      to="/off-the-block"
-                      onClick={() => setServicesOpen(false)}
-                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
-                    >
-                      Off The Block
-                    </RouterLink>
-                    <RouterLink
-                      to="/studio"
-                      onClick={() => setServicesOpen(false)}
-                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
-                    >
-                      Studio Bookings
-                    </RouterLink>
-                    <div className="my-1 border-t border-blood/30" />
-                    <a
-                      href="#engine"
-                      onClick={() => setServicesOpen(false)}
-                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
-                    >
-                      How It Works
-                    </a>
-                    <a
-                      href="#partner"
-                      onClick={() => setServicesOpen(false)}
-                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
-                    >
-                      Partner
-                    </a>
-                    <a
-                      href="#contact"
-                      onClick={() => setServicesOpen(false)}
-                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
-                    >
-                      Contact
-                    </a>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <a
-            href="/deck"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase hover:text-bone transition-colors"
-            style={{ color: "var(--blood)" }}
-          >
-            Pitch Deck
-          </a>
-          <a
-            href="/blog"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-          >
-            Blog
-          </a>
-          <a
-            href="/videos"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-          >
-            Videos
+          <RouterLink to="/studio"
+            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
+            Studio
+          </RouterLink>
+          <a href="#book"
+            className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase px-4 py-2 bg-blood text-white hover:bg-blood-glow transition-colors">
+            Book a Shoot
           </a>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Toggle menu"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-            className="md:hidden p-2 text-bone hover:text-bone/80 transition-colors"
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
+        <button type="button" aria-label="Toggle menu" aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="md:hidden p-2 text-bone hover:text-bone/80 transition-colors">
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="md:hidden border-t border-border bg-black/95 backdrop-blur overflow-hidden"
-          >
-            <div className="px-6 py-4 flex flex-col gap-1 max-h-[80vh] overflow-y-auto">
+            className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur overflow-hidden">
+            <div className="px-6 py-4 flex flex-col gap-1">
               {links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-border/40"
-                >
+                <a key={l.href} href={l.href} onClick={() => setOpen(false)}
+                  className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
                   {l.label}
                 </a>
               ))}
-              <div className="border-b border-border/40">
-                <button
-                  type="button"
-                  onClick={() => setMobileServicesOpen((v) => !v)}
-                  aria-expanded={mobileServicesOpen}
-                  className="w-full flex items-center justify-between font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3"
-                >
-                  Services
-                  <ChevronDown size={14} className={`transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
-                </button>
-                <AnimatePresence initial={false}>
-                  {mobileServicesOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pl-4 pb-2 flex flex-col">
-                        <a
-                          href="#services"
-                          onClick={() => {
-                            setOpen(false);
-                            setMobileServicesOpen(false);
-                          }}
-                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                        >
-                          All Services
-                        </a>
-                        <RouterLink
-                          to="/off-the-block"
-                          onClick={() => {
-                            setOpen(false);
-                            setMobileServicesOpen(false);
-                          }}
-                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                        >
-                          Off The Block
-                        </RouterLink>
-                        <RouterLink
-                          to="/studio"
-                          onClick={() => {
-                            setOpen(false);
-                            setMobileServicesOpen(false);
-                          }}
-                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                        >
-                          Studio Bookings
-                        </RouterLink>
-                        <div className="my-1 border-t border-border/40" />
-                        <a
-                          href="#engine"
-                          onClick={() => {
-                            setOpen(false);
-                            setMobileServicesOpen(false);
-                          }}
-                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                        >
-                          How It Works
-                        </a>
-                        <a
-                          href="#partner"
-                          onClick={() => {
-                            setOpen(false);
-                            setMobileServicesOpen(false);
-                          }}
-                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                        >
-                          Partner
-                        </a>
-                        <a
-                          href="#contact"
-                          onClick={() => {
-                            setOpen(false);
-                            setMobileServicesOpen(false);
-                          }}
-                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
-                        >
-                          Contact
-                        </a>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <a
-                href="/deck"
-                onClick={() => setOpen(false)}
-                className="font-cond font-bold tracking-[0.25em] text-xs uppercase py-3"
-                style={{ color: "var(--blood)" }}
-              >
-                Pitch Deck
+              <RouterLink to="/studio" onClick={() => setOpen(false)}
+                className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
+                Studio
+              </RouterLink>
+              <a href="#book" onClick={() => setOpen(false)}
+                className="font-cond font-bold tracking-[0.2em] text-xs uppercase mt-3 px-4 py-3 bg-blood text-white text-center">
+                Book a Shoot
               </a>
             </div>
           </motion.div>
@@ -416,1756 +117,497 @@ function Nav() {
 
 /* ---------- HERO ---------- */
 
-function AnimatedCounter({
-  to,
-  suffix = "",
-  duration = 2.2,
-  className = "",
-}: {
-  to: number;
-  suffix?: string;
-  duration?: number;
-  className?: string;
-}) {
-  const [val, setVal] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const started = useRef(false);
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    const start = performance.now();
-    let raf = 0;
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / (duration * 1000), 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setVal(Math.floor(eased * to));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [to, duration]);
-  const formatted =
-    to >= 1_000_000
-      ? `${(val / 1_000_000).toFixed(val >= to ? 0 : 1)}M`
-      : to >= 1_000
-        ? `${(val / 1_000).toFixed(val >= to ? 0 : 1)}K`
-        : `${val}`;
-  return (
-    <span ref={ref} className={className}>
-      {formatted}
-      {suffix}
-    </span>
-  );
-}
-
 function Hero() {
-  const tickerItems = [
-    "686M+ TOTAL VIEWS",
-    "324K+ SUBSCRIBERS",
-    "18M+ LIKES",
-    "2.9M+ SHARES",
-    "WHERE CULTURE GOES VIRAL",
-    "REAL CONTENT • REAL PEOPLE • REAL VIEWS",
-    "BOOK A SHOOT",
-  ];
   return (
-    <section
-      id="top"
-      className="relative min-h-screen w-full overflow-hidden grunge-overlay scanlines flex flex-col pt-20"
-    >
-      {/* Background image with slow zoom */}
-      <div
-        className="absolute inset-0 animate-slow-zoom pointer-events-none"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.92)), url(${grunge})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      {/* Cinematic intro video layer */}
+    <section id="top" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
       <video
+        className="absolute inset-0 w-full h-full object-cover"
         src={heroRapperVideo.url}
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
+        autoPlay muted loop playsInline
       />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.85) 100%)",
-        }}
-      />
-      {/* Ambient blood glows */}
-      <div
-        className="absolute -top-40 -left-40 w-[560px] h-[560px] rounded-full blur-3xl pointer-events-none animate-pulse-glow"
-        style={{ backgroundColor: "var(--blood)" }}
-      />
-      <div
-        className="absolute -bottom-40 -right-40 w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none animate-pulse-glow-slow"
-        style={{ backgroundColor: "var(--blood)" }}
+        className="absolute inset-0 opacity-30 pointer-events-none"
+        style={{ background: "radial-gradient(60% 50% at 50% 40%, rgba(255,45,45,0.25), transparent 70%)" }}
       />
 
-      {/* Camera prop */}
-      <img
-        src={camera}
-        alt=""
-        className="absolute right-[-60px] bottom-[8%] w-[260px] md:w-[460px] opacity-20 mix-blend-screen pointer-events-none rotate-[-8deg]"
-      />
+      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 text-center pt-24 pb-16">
+        <Reveal delay={0}>
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-white/15 bg-white/5 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-blood animate-pulse" />
+            <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/80">BWF Media TV</span>
+          </div>
+        </Reveal>
 
-      {/* Crosshair grid lines */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, var(--bone) 1px, transparent 1px), linear-gradient(to bottom, var(--bone) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
-        }}
-      />
-
-      {/* Top meta bar */}
-      <div className="relative z-20 max-w-7xl w-full mx-auto px-6 md:px-12 mt-4 md:mt-6 flex items-center justify-between">
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 border border-border bg-black/60 backdrop-blur"
-        >
-          <span className="w-2 h-2 rounded-full animate-pulse-dot" style={{ backgroundColor: "var(--blood)" }} />
-          <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/80">
-            Now Streaming Worldwide
-          </span>
-        </motion.div>
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="hidden md:block font-cond font-bold tracking-[0.4em] text-[10px] uppercase text-bone/40"
-        >
-          EST., HIP-HOP / CULTURE / MEDIA
-        </motion.span>
-      </div>
-
-      {/* Main hero content */}
-      <div className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 md:px-12 py-10 md:py-16 grid md:grid-cols-12 gap-10 items-center">
-        {/* LEFT, typography column */}
-        <div className="md:col-span-12 text-center md:text-left flex flex-col items-center md:items-start">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center justify-center md:justify-start gap-3 mb-6"
-          >
-            <span
-              className="font-display tracking-[0.15em] text-2xl md:text-3xl lg:text-4xl text-bone"
-              style={{ textShadow: "0 0 24px var(--blood-glow)" }}
-            >
-              BWF <span style={{ color: "var(--blood)" }}>MEDIA</span> TV
+        <Reveal delay={0.1}>
+          <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] leading-[0.9] uppercase text-bone">
+            Where Culture
+            <br />
+            <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
+              Goes Viral
             </span>
-          </motion.div>
+          </h1>
+        </Reveal>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-display leading-[0.82] tracking-tight text-bone heavy-shadow"
-          >
-            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem]">WHERE</span>
-            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem]" style={{ color: "var(--blood)" }}>
-              CULTURE
-            </span>
-            <span className="block text-[18vw] md:text-[10rem] lg:text-[12rem] text-outline">GOES VIRAL.</span>
-          </motion.h1>
+        <Reveal delay={0.25}>
+          <p className="mt-6 max-w-2xl mx-auto text-base md:text-lg text-bone/70 leading-relaxed">
+            BWF™ turns artists, moments, and movements into global cultural events.
+          </p>
+        </Reveal>
 
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-8 max-w-xl mx-auto md:mx-0 text-bone/75 text-base md:text-lg leading-relaxed"
-          >
-            BWF™ is a media network turning artists, moments, and movements into{" "}
-            <span className="text-bone font-semibold">cultural events</span>. Interviews, music videos, viral clips,
-            distributed to a global audience that{" "}
-            <span style={{ color: "var(--blood)" }} className="font-semibold">
-              actually watches
-            </span>
-            .
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-4"
-          >
-            <a
-              href="#contact"
-              className="group relative inline-flex items-center gap-3 px-8 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone overflow-hidden"
-              style={{ backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }}
-            >
-              <span className="relative z-10">Book a Shoot</span>
-              <ArrowUpRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              <span className="absolute inset-0 bg-black/30 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+        <Reveal delay={0.4}>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#book"
+              className="group inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors">
+              Book a Shoot
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </a>
-            <a
-              href="https://youtube.com/@bwfmedia"
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-3 px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone border-2 border-border hover:border-blood transition-colors backdrop-blur bg-black/40"
-            >
-              <Play className="w-4 h-4 fill-bone" />
+            <a href="https://youtube.com/@bwfmediatv" target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors">
+              <Play size={14} fill="currentColor" />
               Watch on YouTube
             </a>
-          </motion.div>
+          </div>
+        </Reveal>
 
-          {/* Animated stats row */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.7, delay: 0.95 }}
-            className="mt-12 grid grid-cols-3 gap-4 md:gap-8 max-w-xl mx-auto md:mx-0 border-t border-border pt-8"
-          >
-            <div>
-              <div className="font-display text-3xl md:text-5xl leading-none text-bone">
-                <AnimatedCounter to={686} suffix="M+" />
-              </div>
-              <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50 mt-2">Views</div>
-            </div>
-            <div className="border-l border-border pl-4 md:pl-8">
-              <div className="font-display text-3xl md:text-5xl leading-none" style={{ color: "var(--blood)" }}>
-                <AnimatedCounter to={324} suffix="K+" />
-              </div>
-              <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50 mt-2">Subscribers</div>
-            </div>
-            <div className="border-l border-border pl-4 md:pl-8">
-              <div className="font-display text-3xl md:text-5xl leading-none text-bone">
-                <AnimatedCounter to={18} suffix="M+" />
-              </div>
-              <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50 mt-2">Likes</div>
-            </div>
-          </motion.div>
-        </div>
+        <Reveal delay={0.55}>
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 font-cond tracking-[0.25em] text-[11px] uppercase text-bone/70">
+            <span><span className="text-bone font-bold">686M+</span> Views</span>
+            <span className="opacity-40">•</span>
+            <span><span className="text-bone font-bold">324K+</span> Subscribers</span>
+            <span className="opacity-40">•</span>
+            <span><span className="text-bone font-bold">18M+</span> Likes</span>
+          </div>
+        </Reveal>
       </div>
-
-      {/* Scroll cue */}
-      <div className="relative z-10 hidden md:flex flex-col items-center pb-6">
-        <span className="font-cond tracking-[0.4em] text-[10px] uppercase text-bone/40 mb-2">Scroll</span>
-        <div className="w-px h-10 bg-bone/20 relative overflow-hidden">
-          <span
-            className="absolute top-0 left-0 w-full h-3 animate-scroll-cue"
-            style={{ backgroundColor: "var(--blood)" }}
-          />
-        </div>
-      </div>
-
-      {/* Marquee ticker */}
-      <div
-        className="relative z-10 border-y border-border overflow-hidden py-3"
-        style={{ backgroundColor: "var(--blood)" }}
-      >
-        <div className="flex animate-marquee whitespace-nowrap">
-          {[...tickerItems, ...tickerItems].map((item, i) => (
-            <span
-              key={i}
-              className="mx-8 font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone inline-flex items-center gap-8"
-            >
-              {item}
-              <span className="text-bone/60">★</span>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-1.5 z-20" style={{ background: "var(--gradient-blood)" }} />
     </section>
   );
 }
 
-/* ---------- ABOUT ---------- */
+/* ---------- SOCIAL PROOF STRIP ---------- */
 
-function About() {
-  const focus = [
-    "Live concert coverage",
-    "Artist interviews",
-    "Behind-the-scenes access",
-    "Viral short-form music clips",
-  ];
-  const perf = [
-    { big: "686M+", label: "Total Views" },
-    { big: "324K+", label: "Subscribers" },
-    { big: "18M+", label: "Total Likes" },
-    { big: "2.9M+", label: "Shares" },
-    { big: "4.2M+", label: "Weekly Views" },
+function ProofStrip() {
+  const items = [
+    { v: "686M+", l: "Total Views" },
+    { v: "324K+", l: "Subscribers" },
+    { v: "18M+", l: "Likes" },
+    { v: "2.9M+", l: "Shares" },
   ];
   return (
-    <Section id="about" label="About BWF™">
-      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
-        <div>
-          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            ABOUT{" "}
-            <span style={{ color: "var(--blood)" }}>
-              BWF<sup className="text-[0.4em] align-super">™</sup>
-            </span>
-          </h2>
-          <p className="text-bone text-base md:text-lg leading-relaxed mb-5">
-            BWF™ is a fast-growing digital media platform covering music, live events, interviews, and viral cultural
-            moments.
-          </p>
-          <p className="text-bone text-base md:text-lg leading-relaxed mb-8">
-            We specialize in turning live performances and artist moments into high-reach, high-engagement content
-            distributed across multiple platforms.
-          </p>
-          <div
-            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-4"
-            style={{ color: "var(--blood)" }}
-          >
-            Our content focuses on
-          </div>
-          <ul className="space-y-3">
-            {focus.map((t, i) => (
-              <li key={i} className="flex gap-4 items-start">
-                <span
-                  className="block w-2 h-2 mt-2.5 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: "var(--blood)" }}
-                />
-                <span className="text-bone/85">{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <div
-            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5"
-            style={{ color: "var(--blood)" }}
-          >
-            📊 Platform Reach & Performance
-          </div>
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            {perf.map((s, i) => (
-              <div
-                key={i}
-                className="border-l-4 pl-5 py-4"
-                style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
-              >
-                <div className="font-display text-3xl md:text-5xl leading-none" style={{ color: "var(--blood)" }}>
-                  {s.big}
-                </div>
-                <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/70 mt-2">
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div
-            className="card-tick p-6 border-2"
-            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-          >
-            <div
-              className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-3"
-              style={{ color: "var(--blood)" }}
-            >
-              Engagement Strength
-            </div>
-            <ul className="space-y-2 text-bone/80 text-sm md:text-base">
-              <li className="flex gap-3">
-                <Share2 className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> High share-to-view
-                ratio, content spreads beyond platform reach
-              </li>
-              <li className="flex gap-3">
-                <Flame className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Strong short-form
-                viral performance
-              </li>
-              <li className="flex gap-3">
-                <Eye className="w-4 h-4 mt-1 flex-shrink-0" style={{ color: "var(--blood)" }} /> Consistent weekly
-                audience activity
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-16 grid md:grid-cols-4 gap-5">
-        <div className="md:col-span-1">
-          <div
-            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-2"
-            style={{ color: "var(--blood)" }}
-          >
-            🎯 Audience Insight
-          </div>
-          <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone">
-            WHO'S
-            <br />
-            <span style={{ color: "var(--blood)" }}>WATCHING.</span>
-          </h3>
-        </div>
-        {[
-          { k: "Music-Driven", v: "Hip-hop / R&B / mainstream culture" },
-          { k: "Highly Active", v: "Sharing & resharing across platforms" },
-          { k: "Engaged", v: "Viral clips & interviews" },
-          { k: "Demo", v: "Primarily 16–34" },
-        ].map((row, i) => (
-          <div
-            key={i}
-            className="card-tick p-5 border-2"
-            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-          >
-            <div
-              className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase mb-2"
-              style={{ color: "var(--blood)" }}
-            >
-              {row.k}
-            </div>
-            <div className="font-display text-lg md:text-xl text-bone leading-tight tracking-tight">{row.v}</div>
+    <section className="border-y border-white/10 bg-black">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+        {items.map((it) => (
+          <div key={it.l} className="text-center">
+            <div className="font-display text-3xl md:text-5xl text-bone">{it.v}</div>
+            <div className="font-cond tracking-[0.3em] text-[10px] md:text-xs uppercase text-bone/50 mt-2">{it.l}</div>
           </div>
         ))}
       </div>
-    </Section>
+    </section>
   );
 }
 
-/* ---------- SERVICES ---------- */
+/* ---------- SECTION SHELL ---------- */
 
-/* ---------- GLOBAL AUDIENCE (analytics panel) ---------- */
-
-function GlobalAudience() {
-  const primary = {
-    flag: "🇺🇸",
-    country: "United States",
-    pct: "45.5%",
-    views: "312.7M views",
-    note: "Primary audience base and ticket-driving region",
-  };
-  const others = [
-    { flag: "🇬🇧", country: "United Kingdom", pct: "4.7%", views: "32.5M" },
-    { flag: "🇮🇳", country: "India", pct: "4.6%", views: "31.5M" },
-    { flag: "🇩🇪", country: "Germany", pct: "4.1%", views: "27.9M" },
-    { flag: "🇨🇦", country: "Canada", pct: "3.3%", views: "22.7M" },
-  ];
-  const additional = [
-    "Australia",
-    "France",
-    "Mexico",
-    "Brazil",
-    "South Africa",
-    "Philippines",
-    "Nigeria",
-    "Indonesia",
-    "Japan",
-    "UAE",
-  ];
-  const insights = [
-    "Strong U.S. audience base for live event promotion",
-    "Global distribution across major music markets",
-    "High engagement short-form viewing behavior",
-    "Content optimized for viral sharing and reposting",
-  ];
+function SectionHead({ kicker, title, sub }: { kicker?: string; title: string; sub?: string }) {
   return (
-    <Section id="reach" label="Global Audience Reach">
-      <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-12">
-        <div className="md:col-span-2">
-          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
-            GLOBAL <span style={{ color: "var(--blood)" }}>AUDIENCE</span>
-            <br />
-            REACH.
-          </h2>
-          <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl">
-            BWF™ Media Network reaches a highly engaged global audience across music, culture, and live event content.
-            Distribution is driven by strong U.S. viewership combined with international viral reach across key global
-            markets.
-          </p>
+    <div className="max-w-3xl mb-14">
+      {kicker && (
+        <div className="flex items-center gap-3 mb-5">
+          <span className="block h-px w-10" style={{ backgroundColor: "var(--blood)" }} />
+          <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">{kicker}</span>
         </div>
-        <div className="flex md:justify-end">
-          <div
-            className="inline-flex items-center gap-3 px-4 py-3 border-2"
-            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.6)" }}
-          >
-            <BarChart3 className="w-5 h-5" style={{ color: "var(--blood)" }} />
-            <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/80">
-              Live Network Analytics
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Primary US card, full width */}
-      <div
-        className="relative p-6 md:p-8 mb-5 border-2 overflow-hidden"
-        style={{ borderColor: "var(--blood)", backgroundColor: "rgba(10,10,15,0.85)" }}
-      >
-        <div className="absolute top-0 left-0 h-full w-1.5" style={{ backgroundColor: "var(--blood)" }} />
-        <div className="grid md:grid-cols-12 gap-6 items-center">
-          <div className="md:col-span-5 flex items-center gap-4">
-            <span className="text-5xl md:text-6xl leading-none">{primary.flag}</span>
-            <div>
-              <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-1">
-                Primary Market
-              </div>
-              <div className="font-display text-2xl md:text-3xl text-bone tracking-tight">{primary.country}</div>
-            </div>
-          </div>
-          <div className="md:col-span-3">
-            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>
-              {primary.pct}
-            </div>
-            <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/60 mt-2">{primary.views}</div>
-          </div>
-          <div className="md:col-span-4 text-bone/70 text-sm leading-snug border-l border-border pl-4">
-            {primary.note}
-          </div>
-        </div>
-      </div>
-
-      {/* Other countries grid */}
-      <div className="grid sm:grid-cols-2 gap-4 mb-10">
-        {others.map((c, i) => (
-          <div
-            key={i}
-            className="card-tick relative p-5 border-2 flex items-center justify-between gap-4"
-            style={{ borderColor: "var(--border)", backgroundColor: "rgba(10,10,15,0.7)" }}
-          >
-            <div className="flex items-center gap-4 min-w-0">
-              <span className="text-3xl leading-none flex-shrink-0">{c.flag}</span>
-              <div className="min-w-0">
-                <div className="font-display text-lg md:text-xl text-bone tracking-tight truncate">{c.country}</div>
-                <div className="font-cond tracking-[0.2em] text-[10px] uppercase text-bone/55 mt-0.5">
-                  {c.views} views
-                </div>
-              </div>
-            </div>
-            <div className="text-right flex-shrink-0">
-              <div className="font-display text-2xl md:text-3xl leading-none" style={{ color: "var(--blood)" }}>
-                {c.pct}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Additional reach */}
-      <div className="p-5 md:p-6 mb-10 border border-border" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-        <div className="flex items-center gap-3 mb-4">
-          <Globe className="w-4 h-4" style={{ color: "var(--blood)" }} />
-          <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/70">
-            Additional Global Reach
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {additional.map((c) => (
-            <span
-              key={c}
-              className="px-3 py-1.5 text-xs font-cond tracking-widest uppercase text-bone/80 border border-border"
-              style={{ backgroundColor: "rgba(255,255,255,0.03)" }}
-            >
-              {c}
-            </span>
-          ))}
-          <span
-            className="px-3 py-1.5 text-xs font-cond tracking-widest uppercase border"
-            style={{ color: "var(--blood)", borderColor: "var(--blood)" }}
-          >
-            + more
-          </span>
-        </div>
-      </div>
-
-      {/* Why this matters insight box */}
-      <div
-        className="relative p-6 md:p-8 border-2 overflow-hidden"
-        style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.7)" }}
-      >
-        <div
-          className="absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none"
-          style={{ backgroundColor: "var(--blood)" }}
-        />
-        <div className="relative grid md:grid-cols-3 gap-8">
-          <div>
-            <div
-              className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase mb-3"
-              style={{ color: "var(--blood)" }}
-            >
-              💡 Why This Matters
-            </div>
-            <h3 className="font-display text-3xl md:text-4xl leading-tight text-bone tracking-tight">
-              BUILT FOR
-              <br />
-              <span style={{ color: "var(--blood)" }}>TOUR PROMOTION.</span>
-            </h3>
-          </div>
-          <ul className="md:col-span-2 grid sm:grid-cols-2 gap-4">
-            {insights.map((t, i) => (
-              <li key={i} className="flex gap-3 items-start text-bone/85 text-sm md:text-base leading-snug">
-                <span
-                  className="block w-2 h-2 mt-2 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: "var(--blood)" }}
-                />
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="relative mt-8 pt-6 border-t border-border text-bone/90 text-sm md:text-base">
-          <span style={{ color: "var(--blood)" }}></span>
-        </div>
-      </div>
-    </Section>
+      )}
+      <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">{title}</h2>
+      {sub && <p className="mt-5 text-bone/60 text-base md:text-lg leading-relaxed">{sub}</p>}
+    </div>
   );
 }
 
 /* ---------- SERVICES ---------- */
 
 function Services() {
-  const services = [
-    {
-      icon: Mic,
-      tag: "🎤 Live Event Coverage",
-      title: "EVENT COVERAGE",
-      items: ["Performance highlights", "Crowd energy captures", "Viral clip editing (vertical + horizontal)"],
-    },
-    {
-      icon: Video,
-      tag: "🎙 Artist Interviews",
-      title: "INTERVIEWS",
-      items: ["Short-form interviews (5–15 min)", "Press-style conversations", "Promo for upcoming releases"],
-    },
-    {
-      icon: Camera,
-      tag: "🎬 Behind-the-Scenes",
-      title: "BTS ACCESS",
-      items: ["Tour moments", "Backstage coverage", "Venue + crowd storytelling"],
-    },
-    {
-      icon: Smartphone,
-      tag: "📱 Distribution",
-      title: "DISTRIBUTION",
-      items: ["YouTube", "Instagram Reels", "TikTok", "Short-form viral networks"],
-    },
-  ];
-  return (
-    <Section id="services" label="Content Services">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
-          WHAT WE <span style={{ color: "var(--blood)" }}>DELIVER.</span>
-        </h2>
-        <p className="text-bone max-w-md md:text-right">
-          When covering events, BWF™ delivers a full content stack, built for reach, engagement, and post-show momentum.
-        </p>
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {services.map((s, i) => (
-          <div
-            key={i}
-            className="card-tick relative flex flex-col p-6 border-2"
-            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-          >
-            <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
-            <div className="font-cond font-bold tracking-[0.2em] text-[10px] uppercase text-bone/60 mb-4">{s.tag}</div>
-            <s.icon className="w-8 h-8 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
-            <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-4 leading-tight">
-              {s.title}
-            </div>
-            <ul className="space-y-2 mt-auto">
-              {s.items.map((it, j) => (
-                <li key={j} className="flex gap-2 text-bone/75 text-sm leading-snug">
-                  <span
-                    className="block w-1.5 h-1.5 mt-1.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: "var(--blood)" }}
-                  />
-                  {it}
-                </li>
-              ))}
-            </ul>
-            <div className="absolute top-4 right-4 font-cond text-xs tracking-widest text-bone/30">0{i + 1}</div>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- PROMOTERS ---------- */
-
-function Promoters() {
-  const benefits = [
-    {
-      icon: Eye,
-      title: "INCREASED VISIBILITY",
-      body: "Boost online presence for your event before, during, and after the show.",
-    },
-    { icon: Share2, title: "VIRAL CIRCULATION", body: "Post-show content engineered for share-driven distribution." },
-    {
-      icon: Megaphone,
-      title: "PROMO REACH WITHOUT AD SPEND",
-      body: "Tap our existing audience instead of paying for impressions.",
-    },
-    {
-      icon: Heart,
-      title: "HIGH-ENGAGEMENT EXPOSURE",
-      body: "Reach a culture-driven audience that actually reacts and shares.",
-    },
-  ];
-  return (
-    <Section id="promoters" label="Why Promoters Work With BWF™">
-      <div className="grid md:grid-cols-5 gap-10 md:gap-16">
-        <div className="md:col-span-2">
-          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-6">
-            WE DON'T JUST
-            <br />
-            COVER EVENTS -<br />
-            <span style={{ color: "var(--blood)" }}>WE AMPLIFY THEM.</span>
-          </h2>
-          <p className="text-bone text-base md:text-lg leading-relaxed max-w-md">
-            Our goal is to help elevate event awareness before, during, and after the show, turning one night into weeks
-            of content circulation.
-          </p>
-          <div
-            className="mt-8 inline-block px-6 py-4 border-l-4"
-            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
-          >
-            <span className="font-display text-xl md:text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
-              ONE SHOW. WEEKS OF REACH.
-            </span>
-          </div>
-        </div>
-        <div className="md:col-span-3 grid sm:grid-cols-2 gap-5">
-          {benefits.map((b, i) => (
-            <div
-              key={i}
-              className="p-6 border-2"
-              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-            >
-              <div
-                className="w-11 h-11 rounded flex items-center justify-center mb-4"
-                style={{ backgroundColor: "var(--blood)" }}
-              >
-                <b.icon className="w-5 h-5 text-bone" strokeWidth={2.5} />
-              </div>
-              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">
-                {b.title}
-              </div>
-              <div className="text-bone/65 text-sm leading-relaxed">{b.body}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- THE SHIFT ---------- */
-
-function Shift() {
-  return (
-    <Section id="shift" label="The Shift">
-      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div>
-          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            HIP-HOP MEDIA
-            <br />
-            <span style={{ color: "var(--blood)" }}>IS CHANGING</span>
-          </h2>
-          <ul className="space-y-4 text-bone/85 text-base md:text-lg">
-            {[
-              "Culture moves faster than mainstream media",
-              "Viral moments break before major platforms catch on",
-              "Audiences want raw, unfiltered, real content",
-            ].map((t, i) => (
-              <li key={i} className="flex gap-4 items-start">
-                <span
-                  className="block w-2 h-2 mt-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: "var(--blood)" }}
-                />
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-          <div
-            className="mt-10 inline-block px-6 py-4 border-l-4"
-            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
-          >
-            <span className="font-display text-2xl md:text-3xl tracking-tight" style={{ color: "var(--blood)" }}>
-              BWF MEDIA IS ALREADY THERE.
-            </span>
-          </div>
-        </div>
-        <div className="relative aspect-[4/5] overflow-hidden">
-          <img src={audience} alt="" className="w-full h-full object-cover" loading="lazy" />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.85))" }}
-          />
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="font-brush text-xl md:text-2xl" style={{ color: "var(--blood)" }}>
-              The next generation
-            </div>
-            <div className="font-display text-4xl md:text-5xl text-bone leading-none mt-1">DOESN'T WAIT.</div>
-          </div>
-          <div
-            className="absolute top-4 right-4 w-3 h-3 rounded-full animate-pulse"
-            style={{ backgroundColor: "var(--blood)" }}
-          />
-          <div className="absolute top-3 right-10 font-cond font-bold tracking-widest text-[10px] uppercase text-bone">
-            LIVE
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- PRICING ---------- */
-
-function Pricing() {
-  const { addItem } = useCart();
-  const tiers = [
-    {
-      name: "BASIC PROMO",
-      price: "$400 – $600",
-      reach: "25K – 75K views",
-      tag: "Entry",
-      bullets: ["Good for new artists", "Low risk entry point", "Single-platform push"],
-      featured: false,
-      priceId: "promo_basic_price",
-      productId: "promo_basic",
-      unitAmount: 40000,
-      cartName: "Basic Promo",
-    },
-    {
-      name: "STANDARD PROMO",
-      price: "$700 – $1,000",
-      reach: "75K – 200K views",
-      tag: "Most Popular",
-      bullets: ["Stronger promotional push", "Includes Shorts cutdowns", "Where most artists land"],
-      featured: true,
-      priceId: "promo_standard_price",
-      productId: "promo_standard",
-      unitAmount: 70000,
-      cartName: "Standard Promo",
-    },
-    {
-      name: "PREMIUM PLACEMENT",
-      price: "$1,200 – $2,000",
-      reach: "150K – 500K+ views",
-      tag: "Priority",
-      bullets: ["Priority posting slot", "Strong promo push", "Possibly pinned or repeated exposure"],
-      featured: false,
-      priceId: "promo_premium_price",
-      productId: "promo_premium",
-      unitAmount: 120000,
-      cartName: "Premium Placement",
-    },
-    {
-      name: "INTERVIEW + PROMO COMBO",
-      price: "$1,500 – $3,000",
-      reach: "Multi-week exposure cycle",
-      tag: "Flagship",
-      bullets: ["Full interview content", "Clips + Shorts package", "Multiple posts & longer cycle"],
-      featured: false,
-      priceId: "promo_interview_combo_price",
-      productId: "promo_interview_combo",
-      unitAmount: 150000,
-      cartName: "Interview + Promo Combo",
-    },
-  ];
-  return (
-    <Section id="pricing" label="Pricing Tiers">
-      <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-4">
-        PICK YOUR <span style={{ color: "var(--blood)" }}>PUSH.</span>
-      </h2>
-      <p className="text-bone text-base md:text-lg leading-relaxed max-w-2xl mb-12">
-        Transparent tiers built for artists, labels, and promoters. Every package is engineered for reach, no smoke, no
-        inflated numbers.
-      </p>
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {tiers.map((t, i) => (
-          <div
-            key={i}
-            className="card-tick relative p-6 border-2 flex flex-col"
-            style={{
-              borderColor: t.featured ? "var(--blood)" : "var(--border)",
-              backgroundColor: t.featured ? "rgba(120,0,0,0.18)" : "rgba(0,0,0,0.55)",
-            }}
-          >
-            <div
-              className="absolute -top-3 left-4 px-3 py-1 font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone"
-              style={{ backgroundColor: t.featured ? "var(--blood)" : "#1a1a1a", border: "1px solid var(--border)" }}
-            >
-              {t.tag}
-            </div>
-            <div className="font-display text-xl md:text-2xl tracking-tight text-bone leading-tight mt-2 mb-4">
-              {t.name}
-            </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <DollarSign className="w-5 h-5" style={{ color: "var(--blood)" }} />
-              <span className="font-display text-3xl md:text-4xl leading-none" style={{ color: "var(--blood)" }}>
-                {t.price.replace("$", "")}
-              </span>
-            </div>
-            <div className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase text-bone/70 mb-5">
-              {t.reach}
-            </div>
-            <ul className="space-y-2 text-bone/80 text-sm leading-relaxed mb-6 flex-1">
-              {t.bullets.map((b, j) => (
-                <li key={j} className="flex gap-3 items-start">
-                  <span
-                    className="block w-1.5 h-1.5 mt-2 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: "var(--blood)" }}
-                  />
-                  <span>{b}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={() =>
-                addItem({
-                  priceId: t.priceId,
-                  productId: t.productId,
-                  name: t.cartName,
-                  unitAmount: t.unitAmount,
-                })
-              }
-              className="block w-full text-center px-4 py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone transition-opacity hover:opacity-90"
-              style={{ backgroundColor: t.featured ? "var(--blood)" : "transparent", border: "1px solid var(--blood)" }}
-            >
-              Add to Cart — Starts at ${(t.unitAmount / 100).toLocaleString()}
-            </button>
-          </div>
-        ))}
-      </div>
-      <div
-        className="mt-10 inline-block px-6 py-4 border-l-4"
-        style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.45)" }}
-      >
-        <span className="font-display text-xl md:text-2xl tracking-tight text-bone">
-          INTERVIEW + PROMO COMBO, <span style={{ color: "var(--blood)" }}>WHERE THE REAL MONEY IS.</span>
-        </span>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- PROOF ---------- */
-
-function Proof() {
-  const stats = [
-    { big: "686M+", label: "TOTAL VIEWS", sub: "Across all platforms" },
-    { big: "8M+", label: "MONTHLY VIEWS", sub: "Average reach" },
-    { big: "324K+", label: "SUBSCRIBERS", sub: "Active community" },
-  ];
-  return (
-    <Section id="proof" label="Track Record">
-      <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
-        WE DON'T CHASE VIRAL -<br />
-        <span style={{ color: "var(--blood)" }}>WE CREATE IT.</span>
-      </h2>
-      <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
-        {stats.map((s, i) => (
-          <div
-            key={i}
-            className="border-l-4 pl-6 py-4"
-            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
-          >
-            <div className="font-display text-5xl md:text-7xl leading-none" style={{ color: "var(--blood)" }}>
-              {s.big}
-            </div>
-            <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone mt-3">{s.label}</div>
-            <div className="text-bone/60 text-sm mt-1">{s.sub}</div>
-          </div>
-        ))}
-      </div>
-      <div className="bg-black rounded-2xl p-6 md:p-10">
-        <div className="flex items-end justify-between mb-8">
-          <h3 className="font-display text-3xl md:text-4xl text-bone">
-            Featured <span style={{ color: "var(--blood)" }}>Videos</span>
-          </h3>
-          <span className="font-brush text-xl hidden sm:block" style={{ color: "var(--blood)" }}>
-            + 200 more
-          </span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-          {["9vGoBJa1DnM", "2yIdA5Jp7vU", "LeMMMetmTT0", "xXBDvU2S9Es"].map((id) => (
-            <div
-              key={id}
-              className="group relative aspect-video overflow-hidden rounded-xl border border-border transition-all duration-300 hover:scale-[1.02] hover:border-[color:var(--blood)] hover:shadow-[0_0_40px_-5px_rgba(180,0,0,0.5)]"
-            >
-              <iframe
-                src={`https://www.youtube.com/embed/${id}`}
-                title={`BWF Media featured video ${id}`}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- ENGINE ---------- */
-
-function Engine() {
   const items = [
-    { icon: Mic, title: "Interviews", desc: "1-on-1 viral conversations with artists, athletes, and culture-shakers." },
-    { icon: Film, title: "Music Videos", desc: "HD productions that double as viral marketing assets." },
-    { icon: Smartphone, title: "Viral Clips", desc: "Short-form cuts engineered for TikTok, Reels & Shorts." },
-    { icon: Flame, title: "Street Content", desc: "Raw, unscripted moments straight from the culture." },
+    { icon: Mic, title: "Artist Interviews", desc: "Cinematic on-camera conversations engineered to clip and travel." },
+    { icon: Film, title: "Music Videos", desc: "Story-driven visuals shot for the algorithm and the timeline." },
+    { icon: Scissors, title: "Viral Clips", desc: "One shoot, dozens of vertical assets cut for TikTok, Reels, Shorts." },
+    { icon: Camera, title: "Event Coverage", desc: "Live moments captured, edited, and pushed before the night ends." },
+    { icon: Share2, title: "Distribution Engine", desc: "Multi-platform release across YouTube, TikTok, Instagram, and Shorts." },
   ];
   return (
-    <Section id="engine" label="How It Works">
-      <div className="grid md:grid-cols-5 gap-10 md:gap-12">
-        <div className="md:col-span-2">
-          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
-            ONE SHOOT.
-            <br />
-            <span style={{ color: "var(--blood)" }}>MULTIPLE</span>
-            <br />
-            VIRAL ASSETS.
-          </h2>
-          <p className="mt-6 text-bone text-base md:text-lg leading-relaxed max-w-sm">
-            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning
-            one shoot into a full media cycle.
-          </p>
-        </div>
-        <div className="md:col-span-3 grid sm:grid-cols-2 gap-5">
+    <section id="services" className="bg-black border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+        <Reveal><SectionHead kicker="What We Do" title="Built to Make You Seen." /></Reveal>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((it, i) => (
-            <div
-              key={i}
-              className="relative p-6 border-2 hover:border-blood transition-colors"
-              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.5)" }}
-            >
-              <div
-                className="w-12 h-12 flex items-center justify-center rounded mb-4"
-                style={{ backgroundColor: "var(--blood)" }}
-              >
-                <it.icon className="w-6 h-6 text-bone" strokeWidth={2.5} />
+            <Reveal key={it.title} delay={i * 0.06}>
+              <div className="group relative h-full p-7 bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-blood/60 hover:bg-white/[0.05] transition-all duration-300">
+                <div className="w-11 h-11 flex items-center justify-center bg-blood/10 border border-blood/30 mb-5 group-hover:bg-blood group-hover:border-blood transition-colors">
+                  <it.icon size={20} className="text-blood group-hover:text-white transition-colors" />
+                </div>
+                <h3 className="font-cond font-bold tracking-[0.15em] uppercase text-lg text-bone mb-2">{it.title}</h3>
+                <p className="text-sm text-bone/60 leading-relaxed">{it.desc}</p>
               </div>
-              <div className="font-display text-2xl md:text-3xl text-bone tracking-tight mb-2">
-                {it.title.toUpperCase()}
-              </div>
-              <div className="text-bone/60 text-sm leading-relaxed">{it.desc}</div>
-              <div className="absolute top-4 right-4 font-cond text-xs tracking-widest text-bone/30">0{i + 1}</div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
-    </Section>
+    </section>
+  );
+}
+
+/* ---------- WHY BWF ---------- */
+
+function Why() {
+  return (
+    <section id="why" className="relative bg-gradient-to-b from-black via-[#0a0000] to-black border-b border-white/10 overflow-hidden">
+      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
+        style={{ backgroundColor: "var(--blood)" }} />
+      <div className="relative max-w-5xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
+        <Reveal>
+          <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Why BWF</span>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <h2 className="mt-6 font-display text-4xl md:text-7xl uppercase text-bone leading-[0.95]">
+            We don't make content.
+            <br />
+            <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
+              We build visibility systems.
+            </span>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <p className="mt-8 max-w-2xl mx-auto text-bone/70 text-lg leading-relaxed">
+            One shoot becomes a full content cycle across YouTube, TikTok, Instagram, and Shorts.
+            Designed to compound, not disappear.
+          </p>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
 /* ---------- AUDIENCE ---------- */
 
 function Audience() {
-  const rows = [
-    { k: "AGE", v: "18 – 34", note: "Peak cultural buying power" },
-    { k: "REGION", v: "United States", note: "Strong Southern influence" },
-    { k: "INTEREST", v: "Hip-Hop & Street Culture", note: "Niche-deep, loyalty-high" },
-    { k: "ENGAGEMENT", v: "Above category average", note: "Comments, shares, repeat views" },
+  const regions = [
+    { country: "United States", pct: 38 },
+    { country: "United Kingdom", pct: 17 },
+    { country: "India", pct: 14 },
+    { country: "Germany", pct: 9 },
+    { country: "Canada", pct: 7 },
+    { country: "Rest of World", pct: 15 },
   ];
   return (
-    <Section id="audience" label="Demographics">
-      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div className="relative aspect-[4/5] md:aspect-auto md:h-[520px] overflow-hidden">
-          <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(135deg, transparent, rgba(0,0,0,0.85))" }}
+    <section id="audience" className="bg-black border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32 grid lg:grid-cols-2 gap-16 items-center">
+        <Reveal>
+          <SectionHead
+            kicker="Global Audience"
+            title="Built for Global Reach. Not Local Exposure."
+            sub="Our audience spans continents. When we publish, the world watches."
           />
-          <div className="absolute bottom-6 left-6">
-            <div className="font-brush text-2xl text-bone">Culture is</div>
-            <div className="font-display text-5xl md:text-6xl leading-none" style={{ color: "var(--blood)" }}>
-              WATCHING.
-            </div>
+          <div className="inline-flex items-center gap-2 text-bone/70">
+            <Globe size={18} className="text-blood" />
+            <span className="font-cond tracking-[0.25em] text-xs uppercase">Active in 90+ countries</span>
           </div>
-        </div>
-        <div>
-          <h2 className="font-display text-5xl md:text-6xl leading-[0.9] text-bone heavy-shadow mb-8">
-            REAL AUDIENCE.
-            <br />
-            <span style={{ color: "var(--blood)" }}>REAL ENGAGEMENT.</span>
-          </h2>
+        </Reveal>
+        <Reveal delay={0.15}>
           <div className="space-y-5">
-            {rows.map((row, i) => (
-              <div key={i} className="grid grid-cols-[100px_1fr] gap-5 items-baseline pb-4 border-b border-border">
-                <span
-                  className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase"
-                  style={{ color: "var(--blood)" }}
-                >
-                  {row.k}
-                </span>
-                <div>
-                  <div className="font-display text-xl md:text-2xl text-bone tracking-tight">{row.v}</div>
-                  <div className="text-bone/50 text-sm">{row.note}</div>
+            {regions.map((r, i) => (
+              <div key={r.country}>
+                <div className="flex justify-between items-baseline mb-2">
+                  <span className="font-cond tracking-[0.15em] text-sm uppercase text-bone">{r.country}</span>
+                  <span className="font-display text-xl text-blood">{r.pct}%</span>
+                </div>
+                <div className="h-1 bg-white/10 overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${r.pct * 2.5}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    className="h-full"
+                    style={{ background: "var(--gradient-blood)" }}
+                  />
                 </div>
               </div>
             ))}
           </div>
-          <div
-            className="mt-8 inline-block px-6 py-4 border-l-4"
-            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
-          >
-            <span className="font-display text-xl md:text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
-              THIS AUDIENCE DRIVES CULTURE.
-            </span>
-          </div>
-        </div>
+        </Reveal>
       </div>
-    </Section>
+    </section>
   );
 }
 
-/* ---------- REVENUE ---------- */
+/* ---------- CONTENT SYSTEM ---------- */
 
-function Revenue() {
-  const { addItem } = useCart();
-  const tiers = [
-    {
-      name: "LIVE INTERVIEW",
-      price: "$500",
-      deposit: "$250 deposit",
-      icon: Mic,
-      items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"],
-      priceId: "studio_live_interview_price",
-      productId: "studio_live_interview",
-      unitAmount: 50000,
-      cartName: "Live Interview",
-    },
-    {
-      name: "MUSIC VIDEO",
-      price: "$900",
-      deposit: "$400 deposit",
-      icon: Film,
-      items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"],
-      priceId: "studio_music_video_price",
-      productId: "studio_music_video",
-      unitAmount: 90000,
-      cartName: "Music Video",
-    },
-    {
-      name: "PROMO PACKAGE",
-      price: "$300",
-      deposit: "$150 deposit",
-      icon: TrendingUp,
-      items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"],
-      priceId: "studio_promo_package_price",
-      productId: "studio_promo_package",
-      unitAmount: 30000,
-      cartName: "Studio Promo Package",
-    },
-    {
-      name: "AD REVENUE",
-      price: "Recurring",
-      deposit: "YouTube Partner",
-      icon: DollarSign,
-      items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"],
-      priceId: null,
-      productId: null,
-      unitAmount: 0,
-      cartName: "",
-    },
+function ContentSystem() {
+  const steps = [
+    { n: "01", t: "Shoot", d: "One premium production day." },
+    { n: "02", t: "Edit", d: "Hero piece crafted for retention." },
+    { n: "03", t: "Clip", d: "Cut into vertical assets per platform." },
+    { n: "04", t: "Distribute", d: "Pushed across YouTube, TikTok, IG, Shorts." },
+    { n: "05", t: "Repeat", d: "Compound. Optimize. Scale." },
   ];
   return (
-    <Section id="revenue" label="Monetization">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
-        <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow">
-          PROVEN <span style={{ color: "var(--blood)" }}>REVENUE</span> MODEL
-        </h2>
-        <div className="md:text-right">
-          <div className="font-brush text-xl md:text-2xl text-bone/70">4 active streams</div>
-          <div
-            className="font-cond font-bold tracking-[0.3em] text-xs uppercase mt-1"
-            style={{ color: "var(--blood)" }}
-          >
-            Already generating
-          </div>
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {tiers.map((t, i) => (
-          <div
-            key={i}
-            className="card-tick relative flex flex-col p-6 border-2"
-            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-          >
-            <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
-            <t.icon className="w-7 h-7 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
-            <div className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/70 mb-2">{t.name}</div>
-            <div className="font-display text-4xl md:text-5xl leading-none mb-1" style={{ color: "var(--blood)" }}>
-              {t.price}
-            </div>
-            <div className="font-cond text-[10px] tracking-widest uppercase text-bone/50 mb-5">{t.deposit}</div>
-            <ul className="space-y-2 mt-auto">
-              {t.items.map((it, j) => (
-                <li key={j} className="flex gap-2 text-bone/75 text-xs leading-snug">
-                  <span
-                    className="block w-1 h-1 mt-1.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: "var(--blood)" }}
-                  />
-                  {it}
-                </li>
-              ))}
-            </ul>
-            {t.priceId && (
-              <button
-                type="button"
-                onClick={() =>
-                  addItem({
-                    priceId: t.priceId!,
-                    productId: t.productId!,
-                    name: t.cartName,
-                    unitAmount: t.unitAmount,
-                  })
-                }
-                className="mt-5 w-full py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: "var(--blood)" }}
-              >
-                Add to Cart
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- SCALE ---------- */
-
-function Scale() {
-  const items = [
-    "More high-profile interviews & exclusives",
-    "Higher production quality across the board",
-    "Consistent content series & franchise IP",
-    "Expanded reach into new regional markets",
-  ];
-  return (
-    <Section id="scale" label="The Opportunity">
-      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div>
-          <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-8">
-            WITH THE RIGHT
-            <br />
-            PARTNER,
-            <br />
-            <span style={{ color: "var(--blood)" }}>WE SCALE FAST.</span>
-          </h2>
-          <div className="space-y-2">
-            {items.map((t, i) => (
-              <div key={i} className="flex items-center gap-5 py-3 border-b border-border">
-                <span className="font-display text-2xl md:text-3xl w-10" style={{ color: "var(--blood)" }}>
-                  0{i + 1}
-                </span>
-                <span className="text-bone text-base md:text-lg">{t}</span>
-                <ArrowUpRight className="w-5 h-5 ml-auto text-bone/30" />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="relative aspect-square">
-          <img src={musicVideo} alt="" className="w-full h-full object-cover" loading="lazy" />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.85))" }}
+    <section className="bg-gradient-to-b from-black to-[#080808] border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+        <Reveal>
+          <SectionHead
+            kicker="The System"
+            title="One Shoot. Multiple Viral Assets."
+            sub="A content engine, not a one-off campaign."
           />
-          <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-            <div className="font-brush text-xl md:text-2xl text-bone/80">Ready for</div>
-            <div
-              className="font-display text-4xl md:text-6xl leading-none heavy-shadow"
-              style={{ color: "var(--blood)" }}
-            >
-              NATIONAL
-            </div>
-            <div className="font-display text-4xl md:text-6xl leading-none text-bone heavy-shadow">EXPOSURE.</div>
-          </div>
-          <div className="absolute top-6 left-6 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: "var(--blood)" }} />
-            <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone">REC • 4K</span>
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- PARTNERSHIP ---------- */
-
-function Partner() {
-  const opts = [
-    {
-      tag: "Option 01",
-      title: "CONTENT LICENSING",
-      body: "Pay per video for premium long-form content, interviews, and franchise series.",
-      icon: Film,
-    },
-    {
-      tag: "Option 02",
-      title: "DISTRIBUTION DEAL",
-      body: "Partner to expand BWF reach across networks, platforms, and new markets.",
-      icon: Globe,
-    },
-    {
-      tag: "Option 03",
-      title: "UPFRONT INVESTMENT",
-      body: "Capital injection to scale production, talent, and content velocity.",
-      icon: TrendingUp,
-    },
-  ];
-  return (
-    <Section id="partner" label="The Partnership">
-      <h2 className="font-display text-5xl md:text-7xl leading-[0.9] text-bone heavy-shadow mb-12">
-        THREE WAYS TO <span style={{ color: "var(--blood)" }}>RUN IT UP.</span>
-      </h2>
-      <div className="grid md:grid-cols-3 gap-6">
-        {opts.map((o, i) => (
-          <div
-            key={i}
-            className="card-tick relative flex flex-col p-7 border-2 overflow-hidden"
-            style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-          >
-            <div
-              className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-20 blur-2xl"
-              style={{ backgroundColor: "var(--blood)" }}
-            />
-            <div
-              className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-5"
-              style={{ color: "var(--blood)" }}
-            >
-              {o.tag}
-            </div>
-            <o.icon className="w-10 h-10 mb-5 text-bone" strokeWidth={2} />
-            <div className="font-display text-2xl md:text-3xl tracking-tight text-bone mb-3 leading-tight">
-              {o.title}
-            </div>
-            <p className="text-bone leading-relaxed text-sm md:text-base">{o.body}</p>
-            <div className="mt-auto pt-6 flex items-center gap-2">
-              <Handshake className="w-5 h-5" style={{ color: "var(--blood)" }} />
-              <span className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/60">
-                Open to discuss
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- WHY US ---------- */
-
-function Why() {
-  const reasons = [
-    { icon: Trophy, title: "PROVEN VIRAL SUCCESS", body: "686M+ views isn't theory, it's a track record." },
-    { icon: Users, title: "DIRECT ARTIST ACCESS", body: "Trusted relationships across the hip-hop ecosystem." },
-    { icon: Flame, title: "STRONG REGIONAL INFLUENCE", body: "Deep cultural roots in the South & beyond." },
-    { icon: Sparkles, title: "CONSISTENT OUTPUT", body: "We don't go quiet. New drops, every week." },
-  ];
-  return (
-    <Section id="why" label="The Edge">
-      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div>
-          <h2 className="font-display text-6xl md:text-8xl leading-[0.85] text-bone heavy-shadow mb-6">
-            WHY <span style={{ color: "var(--blood)" }}>US?</span>
-          </h2>
-          <p className="text-bone text-base md:text-lg leading-relaxed max-w-md mb-8">
-            Anyone can shoot video. Few can move culture. We've been doing it long enough to know exactly which lane we
-            own.
-          </p>
-          <div
-            className="inline-block px-6 py-4 border-l-4"
-            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.5)" }}
-          >
-            <span className="font-display text-2xl md:text-3xl tracking-tight" style={{ color: "var(--blood)" }}>
-              WE CONTROL A CULTURE LANE.
-            </span>
-          </div>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-5">
-          {reasons.map((r, i) => (
-            <div
-              key={i}
-              className="p-6 border-2"
-              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-            >
-              <div
-                className="w-11 h-11 rounded flex items-center justify-center mb-4"
-                style={{ backgroundColor: "var(--blood)" }}
-              >
-                <r.icon className="w-5 h-5 text-bone" strokeWidth={2.5} />
+        </Reveal>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-white/10 border border-white/10">
+          {steps.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.06}>
+              <div className="h-full p-6 md:p-8 bg-black hover:bg-white/[0.03] transition-colors">
+                <div className="font-display text-3xl text-blood mb-3">{s.n}</div>
+                <div className="font-cond font-bold tracking-[0.2em] text-sm uppercase text-bone">{s.t}</div>
+                <div className="text-sm text-bone/55 mt-2 leading-relaxed">{s.d}</div>
               </div>
-              <div className="font-display text-lg md:text-xl tracking-tight text-bone leading-tight mb-2">
-                {r.title}
-              </div>
-              <div className="text-bone/65 text-sm leading-relaxed">{r.body}</div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
-/* ---------- VISION ---------- */
+/* ---------- PRICING ---------- */
 
-function Vision() {
-  const pillars = [
-    { n: "01", h: "TOP HIP-HOP", s: "Media Platform" },
-    { n: "02", h: "ARTIST", s: "Discovery Hub" },
-    { n: "03", h: "CULTURAL", s: "Authority" },
+function Pricing() {
+  const plans = [
+    {
+      name: "Basic", price: "$400–$600", popular: false,
+      features: ["1 hour shoot", "1 hero edit", "3 vertical clips", "Single platform release"],
+    },
+    {
+      name: "Standard", price: "$700–$1,000", popular: true,
+      features: ["2 hour shoot", "1 hero edit", "6 vertical clips", "Multi-platform release", "Thumbnail design"],
+    },
+    {
+      name: "Premium", price: "$1,200–$2,000", popular: false,
+      features: ["Half-day shoot", "Cinematic hero edit", "10+ vertical clips", "Full distribution push", "Performance report"],
+    },
+    {
+      name: "Flagship", price: "$1,500–$3,000", popular: false,
+      features: ["Full-day production", "Director-led shoot", "15+ assets", "Featured BWF placement", "Strategy session"],
+    },
   ];
   return (
-    <Section id="vision" label="The Future">
-      <div className="text-center flex flex-col items-center">
-        <h2 className="font-display text-6xl md:text-[7rem] leading-[0.85] text-bone heavy-shadow max-w-5xl">
-          THE FUTURE OF
-          <br />
-          <span style={{ color: "var(--blood)" }}>BWF MEDIA.</span>
-        </h2>
-        <div className="mt-12 grid sm:grid-cols-3 gap-8 md:gap-10 max-w-5xl w-full">
-          {pillars.map((p, i) => (
-            <div key={i} className="border-t-2 pt-6 text-left" style={{ borderColor: "var(--blood)" }}>
-              <div className="font-display text-3xl md:text-4xl mb-2" style={{ color: "var(--blood)" }}>
-                {p.n}
+    <section id="pricing" className="bg-black border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+        <Reveal>
+          <SectionHead
+            kicker="Packages"
+            title="Pick Your Tier. Go Viral."
+            sub="Transparent pricing. No retainers. Production starts within 14 days of booking."
+          />
+        </Reveal>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {plans.map((p, i) => (
+            <Reveal key={p.name} delay={i * 0.06}>
+              <div className={`relative h-full flex flex-col p-7 border backdrop-blur-md transition-all duration-300 ${
+                p.popular
+                  ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(255,45,45,0.5)]"
+                  : "bg-white/[0.03] border-white/10 hover:border-white/30"
+              }`}>
+                {p.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blood text-white font-cond font-bold tracking-[0.2em] text-[10px] uppercase">
+                    Most Popular
+                  </div>
+                )}
+                <div className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/60">{p.name}</div>
+                <div className="mt-3 font-display text-3xl md:text-4xl text-bone">{p.price}</div>
+                <ul className="mt-6 space-y-3 flex-1">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-bone/75">
+                      <Check size={14} className="text-blood mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a href="#book"
+                  className={`mt-7 inline-flex items-center justify-center px-5 py-3 font-cond font-bold tracking-[0.2em] text-[11px] uppercase transition-colors ${
+                    p.popular
+                      ? "bg-blood text-white hover:bg-blood-glow"
+                      : "border border-white/20 text-bone hover:bg-white/10"
+                  }`}>
+                  Book {p.name}
+                </a>
               </div>
-              <div className="font-display text-2xl md:text-3xl text-bone tracking-tight leading-tight">{p.h}</div>
-              <div className="font-cond text-bone/60 tracking-widest text-sm uppercase mt-1">{p.s}</div>
-            </div>
+            </Reveal>
           ))}
         </div>
-        <p className="mt-12 font-brush text-3xl md:text-4xl text-bone">
-          A <span style={{ color: "var(--blood)" }}>next-generation</span> media company.
-        </p>
       </div>
-    </Section>
+    </section>
   );
 }
 
-/* ---------- CONTACT ---------- */
+/* ---------- PODCAST ---------- */
 
-function Contact() {
-  const contacts = [
-    {
-      icon: Mail,
-      label: "Email",
-      value: "bookbwfmediatv@mail.com",
-      href: "mailto:bookbwfmediatv@mail.com",
-      external: false,
-    },
-    {
-      icon: Instagram,
-      label: "Instagram",
-      value: "@bwfmediatv",
-      href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr",
-      external: true,
-    },
-    { icon: Youtube, label: "YouTube", value: "@bwfmedia", href: "https://youtube.com/@bwfmedia", external: true },
+function Podcast() {
+  return (
+    <section className="bg-gradient-to-br from-[#0c0000] via-black to-[#0a0a0a] border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-28 grid md:grid-cols-2 gap-12 items-center">
+        <Reveal>
+          <div className="flex items-center gap-3 mb-5">
+            <span className="block h-px w-10 bg-blood" />
+            <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Podcast</span>
+          </div>
+          <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">
+            BWF Red Mic
+          </h2>
+          <p className="mt-5 text-bone/65 text-lg leading-relaxed max-w-md">
+            Unfiltered conversations with the artists shaping culture. Streaming on iHeart and everywhere you listen.
+          </p>
+          <a href="https://www.iheart.com" target="_blank" rel="noreferrer"
+            className="mt-7 inline-flex items-center gap-2 px-6 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors">
+            <Play size={14} fill="currentColor" />
+            Listen on iHeart
+          </a>
+        </Reveal>
+        <Reveal delay={0.15}>
+          <div className="relative aspect-square max-w-md mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-br from-blood/40 to-transparent blur-2xl" />
+            <div className="relative h-full flex flex-col items-center justify-center bg-black border border-blood/30 backdrop-blur-md">
+              <div className="w-24 h-24 rounded-full bg-blood/20 border border-blood flex items-center justify-center mb-5">
+                <Mic size={40} className="text-blood" />
+              </div>
+              <div className="font-display text-3xl text-bone uppercase">Red Mic</div>
+              <div className="font-cond tracking-[0.3em] text-[11px] uppercase text-bone/50 mt-2">A BWF Production</div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- PARTNERSHIPS ---------- */
+
+function Partnerships() {
+  const items = [
+    { icon: Share2, t: "Content Licensing", d: "License our viral catalog for brand campaigns and platform deals." },
+    { icon: TrendingUp, t: "Distribution Deals", d: "Plug into our network and reach 686M+ views with your IP." },
+    { icon: DollarSign, t: "Strategic Investment", d: "Partner with BWF on the next era of culture media." },
   ];
   return (
-    <Section id="contact" label="Let's Talk">
-      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div>
-          <h2 className="font-display text-6xl md:text-[7rem] leading-[0.85] text-bone heavy-shadow">
-            LET'S BUILD
-            <br />
-            <span style={{ color: "var(--blood)" }}>SOMETHING</span>
-            <br />
-            BIG.
-          </h2>
-          <p className="mt-6 text-bone text-base md:text-lg max-w-md leading-relaxed">
-            The numbers are real. The audience is real. The opportunity is now. Lock it in.
-          </p>
+    <section id="partner" className="bg-black border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+        <Reveal>
+          <SectionHead kicker="Partnerships" title="Work With BWF." />
+        </Reveal>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {items.map((it, i) => (
+            <Reveal key={it.t} delay={i * 0.08}>
+              <div className="group h-full p-8 bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-blood/60 transition-all duration-300">
+                <div className="w-12 h-12 flex items-center justify-center bg-blood/10 border border-blood/30 mb-6 group-hover:bg-blood transition-colors">
+                  <it.icon size={22} className="text-blood group-hover:text-white transition-colors" />
+                </div>
+                <h3 className="font-cond font-bold tracking-[0.15em] uppercase text-xl text-bone mb-3">{it.t}</h3>
+                <p className="text-sm text-bone/60 leading-relaxed">{it.d}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
-        <div className="space-y-4">
-          {contacts.map((c, i) => (
-            <a
-              key={i}
-              href={c.href}
-              target={c.external ? "_blank" : undefined}
-              rel={c.external ? "noreferrer" : undefined}
-              className="card-tick flex items-center gap-5 p-5 border-2 group transition-all"
-              style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-            >
-              <div
-                className="w-12 h-12 rounded flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: "var(--blood)" }}
-              >
-                <c.icon className="w-6 h-6 text-bone" strokeWidth={2} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/60">{c.label}</div>
-                <div className="font-display text-lg md:text-2xl text-bone tracking-tight mt-1 truncate">{c.value}</div>
-              </div>
-              <ArrowUpRight className="w-5 h-5 text-bone/40 group-hover:text-blood transition-colors flex-shrink-0" />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- FINAL CTA ---------- */
+
+function FinalCTA() {
+  return (
+    <section id="book" className="relative bg-black overflow-hidden">
+      <div className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(255,45,45,0.4), transparent 70%)" }} />
+      <div className="relative max-w-4xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
+        <Reveal>
+          <h2 className="font-display text-5xl md:text-8xl uppercase text-bone leading-[0.95]">
+            Ready to <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>Go Viral?</span>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p className="mt-6 text-bone/70 text-lg max-w-xl mx-auto">
+            The audience is real. The opportunity is now.
+          </p>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <RouterLink to="/studio"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors">
+              Book a Shoot
+              <ArrowRight size={16} />
+            </RouterLink>
+            <a href="#contact"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors">
+              Contact Us
             </a>
-          ))}
-          <div
-            className="mt-6 p-6 text-center border-2"
-            style={{ borderColor: "var(--blood)", backgroundColor: "var(--blood)" }}
-          >
-            <div className="font-display text-2xl md:text-4xl tracking-tight text-bone heavy-shadow">
-              SERIOUS INQUIRIES ONLY.
-            </div>
           </div>
-        </div>
+        </Reveal>
       </div>
-    </Section>
+    </section>
   );
 }
 
 /* ---------- FOOTER ---------- */
 
 function Footer() {
-  const navLinks = [
-    { href: "#reach", label: "Reach" },
-    { href: "#proof", label: "Proof" },
-    { href: "#services", label: "Services" },
-    { href: "#audience", label: "Audience" },
-  ];
-  const moreLinks = [
-    { href: "#engine", label: "How It Works" },
-    { href: "#pricing", label: "Pricing" },
-    { href: "#partner", label: "Partner" },
-    { href: "#contact", label: "Contact" },
-  ];
   return (
-    <footer className="relative bg-black border-t border-border">
-      {/* CTA strip */}
-      <div className="relative overflow-hidden border-b border-border" style={{ background: "var(--gradient-blood)" }}>
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="font-display text-3xl md:text-5xl tracking-tight text-bone heavy-shadow text-center md:text-left leading-tight">
-            READY TO GO <span className="text-outline">VIRAL</span>?
+    <footer id="contact" className="bg-black border-t border-white/10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-14 grid md:grid-cols-3 gap-10 items-start">
+        <div>
+          <img src={bwfLogo} alt="BWF Media" className="w-16 h-16 object-contain" />
+          <p className="mt-4 text-sm text-bone/55 max-w-xs leading-relaxed">
+            Where culture goes viral. A premium media network for artists, brands, and the moments that matter.
+          </p>
+        </div>
+        <div>
+          <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Contact</div>
+          <a href="mailto:bookings@bwfmedia.company" className="text-bone hover:text-blood transition-colors block">bookings@bwfmedia.company</a>
+        </div>
+        <div>
+          <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Follow</div>
+          <div className="flex gap-3">
+            <a href="https://youtube.com/@bwfmediatv" target="_blank" rel="noreferrer"
+              className="w-10 h-10 flex items-center justify-center border border-white/15 text-bone hover:bg-blood hover:border-blood transition-colors">
+              <Youtube size={18} />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer"
+              className="w-10 h-10 flex items-center justify-center border border-white/15 text-bone hover:bg-blood hover:border-blood transition-colors">
+              <Instagram size={18} />
+            </a>
           </div>
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-3 px-7 py-4 bg-black text-bone font-cond font-bold tracking-[0.3em] text-xs uppercase border-2 border-black hover:bg-bone hover:text-black transition-colors"
-          >
-            Lock In Your Shoot
-            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </a>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-14">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
-          <div className="col-span-2 md:col-span-1">
-            <a href="#top" className="flex items-center gap-3">
-              <span className="font-display text-lg tracking-tight text-bone">
-                BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
-              </span>
-            </a>
-            <p className="mt-4 text-bone text-sm max-w-xs leading-relaxed">
-              Real content. Real people. Real reach. Where culture goes viral.
-            </p>
-            <div className="mt-5 flex items-center gap-3">
-              {[
-                { Icon: Youtube, href: "https://youtube.com/@bwfmediatv", label: "YouTube" },
-                {
-                  Icon: Instagram,
-                  href: "https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr",
-                  label: "Instagram",
-                },
-                { Icon: Music2, href: "https://www.tiktok.com/@bwfmedia?_r=1&_t=ZT-961GRjFEpdl", label: "TikTok" },
-                {
-                  Icon: Facebook,
-                  href: "https://www.facebook.com/share/1FmVHYjMfE/?mibextid=wwXIfr",
-                  label: "Facebook",
-                },
-                { Icon: Twitter, href: "https://x.com/bwfmediatv", label: "Twitter / X" },
-                { Icon: Mail, href: "#contact", label: "Email" },
-              ].map(({ Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noreferrer" : undefined}
-                  aria-label={label}
-                  className="w-9 h-9 inline-flex items-center justify-center border border-bone/20 text-bone/70 hover:text-bone hover:border-bone hover:bg-bone/5 transition-colors"
-                  style={{ borderRadius: 2 }}
-                >
-                  <Icon size={15} />
-                </a>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Explore</div>
-            <ul className="space-y-2">
-              {navLinks.map((l) => (
-                <li key={l.href}>
-                  <a
-                    href={l.href}
-                    className="font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Company</div>
-            <ul className="space-y-2">
-              {moreLinks.map((l) => (
-                <li key={l.href}>
-                  <a
-                    href={l.href}
-                    className="font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-              <li>
-                <a
-                  href="/deck"
-                  className="font-cond tracking-[0.2em] text-xs uppercase hover:text-bone transition-colors"
-                  style={{ color: "var(--blood)" }}
-                >
-                  Pitch Deck
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Connect</div>
-            <ul className="space-y-3">
-              <li>
-                <a
-                  href="https://youtube.com/@bwfmediatv"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
-                >
-                  <Youtube size={14} /> YouTube
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.instagram.com/bwfmediatv?igsh=MWl6ZXU2MHA4ZDZteQ%3D%3D&utm_source=qr"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
-                >
-                  <Instagram size={14} /> Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#contact"
-                  className="flex items-center gap-2 font-cond tracking-[0.2em] text-xs uppercase text-bone/70 hover:text-bone transition-colors"
-                >
-                  <Mail size={14} /> Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-12 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3">
-          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
-            © {new Date().getFullYear()} BWF Media TV, Where Culture Goes Viral
-          </div>
-          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/30">Founded by Dantavious Lee</div>
-        </div>
+      <div className="border-t border-white/10 py-5 text-center font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
+        © {new Date().getFullYear()} BWF Media TV — All rights reserved
       </div>
     </footer>
   );
 }
 
-/* ---------- PAGE ---------- */
-
-function RedMicPodcast() {
-  const links = [
-    {
-      label: "Listen on iHeart",
-      href: "https://www.iheart.com/podcast/269-bwfmedia-red-mic-podcast-235207492?app=listen",
-    },
-    { label: "Featured Episode", href: "https://podcasts.apple.com/us/podcast/bwfmedia-red-mic-podcast/id1777695203" },
-  ];
-  return (
-    <Section id="red-mic" number="06" label="BWF Media Red Mic Podcast | iHeart">
-      <div className="grid md:grid-cols-12 gap-10 items-center">
-        <Reveal className="md:col-span-7">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <span
-              className="inline-flex items-center justify-center w-12 h-12 rounded-full"
-              style={{ backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" }}
-            >
-              <Mic className="w-6 h-6 text-bone" />
-            </span>
-            <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/60">
-              On iHeartRadio • Something Else We Offer
-            </span>
-          </div>
-          <h2 className="font-display leading-[0.85] tracking-tight text-bone heavy-shadow text-6xl md:text-8xl">
-            BWF MEDIA <span style={{ color: "var(--blood)" }}>RED MIC</span>
-            <span className="block text-outline">PODCAST</span>
-            <span className="block font-cond tracking-[0.3em] text-base md:text-xl text-bone/60 mt-4">| iHeart</span>
-          </h2>
-          <p className="mt-8 max-w-xl text-bone/75 text-base md:text-lg leading-relaxed">
-            Unfiltered conversations from the front lines of hip-hop and culture. Long-form interviews, raw stories, and
-            the moments that don't fit a 30-second clip, straight from{" "}
-            <span style={{ color: "var(--blood)" }} className="font-semibold">
-              The Red Mic
-            </span>
-            .
-          </p>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            {links.map((l, i) => (
-              <a
-                key={l.href}
-                href={l.href}
-                target="_blank"
-                rel="noreferrer"
-                className={`group inline-flex items-center gap-3 px-7 py-4 font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone transition-colors ${
-                  i === 0 ? "" : "border-2 border-border hover:border-blood backdrop-blur bg-black/40"
-                }`}
-                style={i === 0 ? { backgroundColor: "var(--blood)", boxShadow: "var(--shadow-blood)" } : undefined}
-              >
-                {i === 0 ? <Play className="w-4 h-4 fill-bone" /> : <ArrowUpRight className="w-4 h-4" />}
-                {l.label}
-              </a>
-            ))}
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.15} className="md:col-span-5">
-          <div
-            className="relative w-full border-2 border-blood/60 bg-black/60 backdrop-blur overflow-hidden p-2"
-            style={{ boxShadow: "var(--shadow-blood)" }}
-          >
-            <iframe
-              title="BWFMEDIA Red Mic Podcast on Apple Podcasts"
-              allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
-              height={450}
-              style={{ width: "100%", maxWidth: 660, overflow: "hidden", borderRadius: 10 }}
-              sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
-              src="https://embed.podcasts.apple.com/us/podcast/bwfmedia-red-mic-podcast/id1777695203"
-            />
-          </div>
-        </Reveal>
-      </div>
-    </Section>
-  );
-}
+/* ---------- ROOT ---------- */
 
 export function OnePager() {
   return (
-    <div className="bg-black text-bone">
+    <div className="min-h-screen bg-black text-bone antialiased">
       <ScrollProgress />
       <Nav />
       <Hero />
-      <GlobalAudience />
-      <Proof />
+      <ProofStrip />
       <Services />
-      <RedMicPodcast />
+      <Why />
       <Audience />
-      <Engine />
+      <ContentSystem />
       <Pricing />
-      <Partner />
-      <Contact />
+      <Podcast />
+      <Partnerships />
+      <FinalCTA />
       <Footer />
     </div>
   );
