@@ -18,6 +18,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -71,6 +72,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin/bookings'
     | '/admin/login'
+    | '/checkout/return'
     | '/email/unsubscribe'
     | '/videos/$id'
     | '/api/public/studio-booking'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin/bookings'
     | '/admin/login'
+    | '/checkout/return'
     | '/email/unsubscribe'
     | '/videos/$id'
     | '/api/public/studio-booking'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/admin/bookings'
     | '/admin/login'
+    | '/checkout/return'
     | '/email/unsubscribe'
     | '/videos/$id'
     | '/api/public/studio-booking'
@@ -232,6 +244,7 @@ export interface RootRouteChildren {
   VideosRoute: typeof VideosRouteWithChildren
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -378,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideosRoute: VideosRouteWithChildren,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminLoginRoute: AdminLoginRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,

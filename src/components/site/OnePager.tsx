@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
+import { useCart } from "@/contexts/CartContext";
 import {
   Play,
   Mic,
@@ -1173,6 +1174,7 @@ function Shift() {
 /* ---------- PRICING ---------- */
 
 function Pricing() {
+  const { addItem } = useCart();
   const tiers = [
     {
       name: "BASIC PROMO",
@@ -1181,6 +1183,10 @@ function Pricing() {
       tag: "Entry",
       bullets: ["Good for new artists", "Low risk entry point", "Single-platform push"],
       featured: false,
+      priceId: "promo_basic_price",
+      productId: "promo_basic",
+      unitAmount: 40000,
+      cartName: "Basic Promo",
     },
     {
       name: "STANDARD PROMO",
@@ -1189,6 +1195,10 @@ function Pricing() {
       tag: "Most Popular",
       bullets: ["Stronger promotional push", "Includes Shorts cutdowns", "Where most artists land"],
       featured: true,
+      priceId: "promo_standard_price",
+      productId: "promo_standard",
+      unitAmount: 70000,
+      cartName: "Standard Promo",
     },
     {
       name: "PREMIUM PLACEMENT",
@@ -1197,6 +1207,10 @@ function Pricing() {
       tag: "Priority",
       bullets: ["Priority posting slot", "Strong promo push", "Possibly pinned or repeated exposure"],
       featured: false,
+      priceId: "promo_premium_price",
+      productId: "promo_premium",
+      unitAmount: 120000,
+      cartName: "Premium Placement",
     },
     {
       name: "INTERVIEW + PROMO COMBO",
@@ -1205,6 +1219,10 @@ function Pricing() {
       tag: "Flagship",
       bullets: ["Full interview content", "Clips + Shorts package", "Multiple posts & longer cycle"],
       featured: false,
+      priceId: "promo_interview_combo_price",
+      productId: "promo_interview_combo",
+      unitAmount: 150000,
+      cartName: "Interview + Promo Combo",
     },
   ];
   return (
@@ -1255,13 +1273,21 @@ function Pricing() {
                 </li>
               ))}
             </ul>
-            <a
-              href="#contact"
-              className="block text-center px-4 py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone transition-opacity hover:opacity-90"
+            <button
+              type="button"
+              onClick={() =>
+                addItem({
+                  priceId: t.priceId,
+                  productId: t.productId,
+                  name: t.cartName,
+                  unitAmount: t.unitAmount,
+                })
+              }
+              className="block w-full text-center px-4 py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone transition-opacity hover:opacity-90"
               style={{ backgroundColor: t.featured ? "var(--blood)" : "transparent", border: "1px solid var(--blood)" }}
             >
-              Book This Tier
-            </a>
+              Add to Cart — Starts at ${(t.unitAmount / 100).toLocaleString()}
+            </button>
           </div>
         ))}
       </div>
@@ -1452,6 +1478,7 @@ function Audience() {
 /* ---------- REVENUE ---------- */
 
 function Revenue() {
+  const { addItem } = useCart();
   const tiers = [
     {
       name: "LIVE INTERVIEW",
@@ -1459,6 +1486,10 @@ function Revenue() {
       deposit: "$250 deposit",
       icon: Mic,
       items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"],
+      priceId: "studio_live_interview_price",
+      productId: "studio_live_interview",
+      unitAmount: 50000,
+      cartName: "Live Interview",
     },
     {
       name: "MUSIC VIDEO",
@@ -1466,6 +1497,10 @@ function Revenue() {
       deposit: "$400 deposit",
       icon: Film,
       items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"],
+      priceId: "studio_music_video_price",
+      productId: "studio_music_video",
+      unitAmount: 90000,
+      cartName: "Music Video",
     },
     {
       name: "PROMO PACKAGE",
@@ -1473,6 +1508,10 @@ function Revenue() {
       deposit: "$150 deposit",
       icon: TrendingUp,
       items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"],
+      priceId: "studio_promo_package_price",
+      productId: "studio_promo_package",
+      unitAmount: 30000,
+      cartName: "Studio Promo Package",
     },
     {
       name: "AD REVENUE",
@@ -1480,6 +1519,10 @@ function Revenue() {
       deposit: "YouTube Partner",
       icon: DollarSign,
       items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"],
+      priceId: null,
+      productId: null,
+      unitAmount: 0,
+      cartName: "",
     },
   ];
   return (
@@ -1523,6 +1566,23 @@ function Revenue() {
                 </li>
               ))}
             </ul>
+            {t.priceId && (
+              <button
+                type="button"
+                onClick={() =>
+                  addItem({
+                    priceId: t.priceId!,
+                    productId: t.productId!,
+                    name: t.cartName,
+                    unitAmount: t.unitAmount,
+                  })
+                }
+                className="mt-5 w-full py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
+                Add to Cart
+              </button>
+            )}
           </div>
         ))}
       </div>
