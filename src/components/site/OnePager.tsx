@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
+import { useCart } from "@/contexts/CartContext";
 import {
   Play,
   Mic,
