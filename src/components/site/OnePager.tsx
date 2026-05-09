@@ -1173,6 +1173,7 @@ function Shift() {
 /* ---------- PRICING ---------- */
 
 function Pricing() {
+  const { addItem } = useCart();
   const tiers = [
     {
       name: "BASIC PROMO",
@@ -1181,6 +1182,10 @@ function Pricing() {
       tag: "Entry",
       bullets: ["Good for new artists", "Low risk entry point", "Single-platform push"],
       featured: false,
+      priceId: "promo_basic_price",
+      productId: "promo_basic",
+      unitAmount: 40000,
+      cartName: "Basic Promo",
     },
     {
       name: "STANDARD PROMO",
@@ -1189,6 +1194,10 @@ function Pricing() {
       tag: "Most Popular",
       bullets: ["Stronger promotional push", "Includes Shorts cutdowns", "Where most artists land"],
       featured: true,
+      priceId: "promo_standard_price",
+      productId: "promo_standard",
+      unitAmount: 70000,
+      cartName: "Standard Promo",
     },
     {
       name: "PREMIUM PLACEMENT",
@@ -1197,6 +1206,10 @@ function Pricing() {
       tag: "Priority",
       bullets: ["Priority posting slot", "Strong promo push", "Possibly pinned or repeated exposure"],
       featured: false,
+      priceId: "promo_premium_price",
+      productId: "promo_premium",
+      unitAmount: 120000,
+      cartName: "Premium Placement",
     },
     {
       name: "INTERVIEW + PROMO COMBO",
@@ -1205,6 +1218,10 @@ function Pricing() {
       tag: "Flagship",
       bullets: ["Full interview content", "Clips + Shorts package", "Multiple posts & longer cycle"],
       featured: false,
+      priceId: "promo_interview_combo_price",
+      productId: "promo_interview_combo",
+      unitAmount: 150000,
+      cartName: "Interview + Promo Combo",
     },
   ];
   return (
@@ -1255,13 +1272,21 @@ function Pricing() {
                 </li>
               ))}
             </ul>
-            <a
-              href="#contact"
-              className="block text-center px-4 py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone transition-opacity hover:opacity-90"
+            <button
+              type="button"
+              onClick={() =>
+                addItem({
+                  priceId: t.priceId,
+                  productId: t.productId,
+                  name: t.cartName,
+                  unitAmount: t.unitAmount,
+                })
+              }
+              className="block w-full text-center px-4 py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone transition-opacity hover:opacity-90"
               style={{ backgroundColor: t.featured ? "var(--blood)" : "transparent", border: "1px solid var(--blood)" }}
             >
-              Book This Tier
-            </a>
+              Add to Cart — Starts at ${(t.unitAmount / 100).toLocaleString()}
+            </button>
           </div>
         ))}
       </div>
