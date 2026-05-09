@@ -280,13 +280,6 @@ function Nav() {
           </a>
         </div>
         <div className="flex items-center gap-2">
-          <a
-            href="#contact"
-            className="px-4 py-2 font-cond font-bold tracking-[0.25em] text-[10px] md:text-[11px] uppercase text-bone"
-            style={{ backgroundColor: "var(--blood)" }}
-          >
-            Book Now
-          </a>
           <button
             type="button"
             aria-label="Toggle menu"
