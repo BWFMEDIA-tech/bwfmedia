@@ -778,7 +778,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
                     onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
                   >
-                    <option value="">— Select —</option>
+                    <option value="">- Select -</option>
                     {INVESTOR_TYPES.map((t) => (
                       <option key={t} value={t}>{t}</option>
                     ))}
@@ -795,7 +795,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
                     onFocus={(e) => (e.currentTarget.style.borderColor = HUD_GOLD)}
                     onBlur={(e) => (e.currentTarget.style.borderColor = `${HUD_GOLD}55`)}
                   >
-                    <option value="">— Select —</option>
+                    <option value="">- Select -</option>
                     {INVESTMENT_RANGES.map((r) => (
                       <option key={r} value={r}>{r}</option>
                     ))}

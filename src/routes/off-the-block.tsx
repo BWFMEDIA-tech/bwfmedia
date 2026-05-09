@@ -17,9 +17,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/off-the-block")({
   head: () => ({
     meta: [
-      { title: "BWF Off The Block — Street Interviews & Real Conversations" },
+      { title: "BWF Off The Block - Street Interviews & Real Conversations" },
       { name: "description", content: "BWF Off The Block: on-location street interviews where culture, community, and real voices meet. Book a pull-up shoot with BWF Media." },
-      { property: "og:title", content: "BWF Off The Block — The Streets. The People. The Real." },
+      { property: "og:title", content: "BWF Off The Block - The Streets. The People. The Real." },
       { property: "og:description", content: "Raw, on-location interviews from the block to the world. Tap in with BWF Media." },
     ],
   }),
@@ -184,7 +184,7 @@ function OffTheBlockPage() {
           <SectionTag>Mission // Why It Matters</SectionTag>
           <p className="mx-auto mt-8 max-w-2xl text-bone/85 text-base md:text-lg">
             We amplify real stories, real people, real situations. BWF Off The Block
-            gives a voice to the culture and keeps it authentic — frame by frame.
+            gives a voice to the culture and keeps it authentic - frame by frame.
           </p>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
@@ -278,7 +278,7 @@ function OffTheBlockPage() {
         </section>
 
         <div className="mt-16 pt-8 border-t border-bone/10 font-display text-2xl md:text-3xl tracking-wide text-center uppercase">
-          <span className="text-bone/80">We don't just interview people — </span>
+          <span className="text-bone/80">We don't just interview people - </span>
           <span style={{ color: GOLD }}>we tell real stories.</span>
         </div>
       </main>
@@ -512,7 +512,7 @@ function BookingCalendar() {
           >
             <span className="text-bone/50">Slot //</span>{" "}
             <span style={{ color: GOLD }}>
-              {date ? format(date, "MMM d, yyyy") : "—"} @ {time || "—"}
+              {date ? format(date, "MMM d, yyyy") : "-"} @ {time || "-"}
             </span>
           </div>
 

@@ -16,9 +16,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/studio")({
   head: () => ({
     meta: [
-      { title: "BWF Media Studio — Studio Bookings Only" },
+      { title: "BWF Media Studio - Studio Bookings Only" },
       { name: "description", content: "Premium media production hub for artists & creators. Book studio time at BWF Media for interviews, music video content, podcast recording, and press sessions." },
-      { property: "og:title", content: "BWF Media Studio — Where Culture, Content & Creators Meet" },
+      { property: "og:title", content: "BWF Media Studio - Where Culture, Content & Creators Meet" },
       { property: "og:description", content: "Premium studio bookings for artists & creators. Professional sound, lighting, and brand-ready delivery." },
     ],
   }),
@@ -102,7 +102,7 @@ function StudioPage() {
 
           <p className="mt-8 max-w-2xl text-bone/80 text-base md:text-lg leading-relaxed">
             A controlled creative environment for artists & creators. Calibrated sound,
-            cinematic lighting, and brand-ready delivery — every frame engineered.
+            cinematic lighting, and brand-ready delivery - every frame engineered.
           </p>
         </section>
 
@@ -353,7 +353,7 @@ function StudioBookingCalendar() {
       return;
     }
     setDone(true);
-    toast.success("Booking received — confirmation email sent.");
+    toast.success("Booking received - confirmation email sent.");
   }
 
   if (done) {
@@ -479,7 +479,7 @@ function StudioBookingCalendar() {
             >
               {SESSION_TYPES.map((s) => (
                 <option key={s.name} value={s.name} className="bg-black">
-                  {s.name} — {s.price}
+                  {s.name} - {s.price}
                 </option>
               ))}
             </select>
@@ -569,7 +569,7 @@ function StudioBookingCalendar() {
           >
             <span className="text-bone/50">Slot //</span>{" "}
             <span style={{ color: GOLD }}>
-              {date ? format(date, "MMM d, yyyy") : "—"} @ {time || "—"} · {duration}
+              {date ? format(date, "MMM d, yyyy") : "-"} @ {time || "-"} · {duration}
             </span>
           </div>
 
