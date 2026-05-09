@@ -36,7 +36,7 @@ function OffTheBlockPage() {
   const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   return (
-    <FutureShell label="LIVE / FIELD UNIT 01">
+    <FutureShell label="STREET INTERVIEWS">
       <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
         {/* HERO */}
         <section ref={heroRef} className="pt-10 md:pt-16 pb-20 relative">
@@ -63,7 +63,7 @@ function OffTheBlockPage() {
           </motion.div>
 
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
-            BWF Media <span style={{ color: GOLD }}>// transmission_001</span>
+            BWF Media TV <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
           </div>
 
           <motion.h1
@@ -92,17 +92,17 @@ function OffTheBlockPage() {
               className="font-cond font-bold tracking-[0.3em] text-[11px] uppercase px-4 py-2"
               style={{ background: GOLD, color: "#000" }}
             >
-              The Streets // The People // The Real
+              The Streets · The People · The Real
             </div>
             <div className="flex items-center gap-2 font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60">
               <Radio className="w-3 h-3" style={{ color: GOLD }} />
-              broadcasting from the field
+              filmed on location
             </div>
           </div>
 
           <p className="mt-10 max-w-2xl text-bone/80 text-base md:text-lg leading-relaxed">
             On-location street interviews tapping into culture, community, and the voices
-            that never get airtime. Cameras hot. No script. Pure signal.
+            that never get airtime. Cameras rolling. No script. Real stories.
           </p>
 
           {/* Stat HUD */}
@@ -223,7 +223,7 @@ function OffTheBlockPage() {
               BOOK <span style={{ color: GOLD }}>AN INTERVIEW</span>
             </h2>
             <p className="relative mt-3 text-bone/75 max-w-xl mx-auto">
-              Want us to pull up to your block, event, or location? Initiate transmission.
+              Want us to pull up to your block, event, or location? Send us a request.
             </p>
             <div className="relative mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <a
@@ -243,7 +243,7 @@ function OffTheBlockPage() {
               </a>
             </div>
             <div className="relative mt-6 font-cond tracking-[0.4em] text-[10px] uppercase" style={{ color: GOLD }}>
-              // Serious Inquiries Only
+              Serious Inquiries Only
             </div>
           </HUDFrame>
         </section>
@@ -256,7 +256,7 @@ function OffTheBlockPage() {
               <span className="text-bone">BWF</span><span style={{ color: GOLD }}>MEDIA</span>
             </div>
             <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
-              Visuals That Move Culture
+              Where Culture Goes Viral
             </div>
           </HUDFrame>
 
@@ -333,11 +333,11 @@ function BookingCalendar() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error("Transmission failed. Try again.");
+      toast.error("Submission failed. Please try again.");
       return;
     }
     setDone(true);
-    toast.success("Transmission received. We'll be in touch.");
+    toast.success("Request received. We'll be in touch.");
   }
 
   if (done) {
@@ -353,7 +353,7 @@ function BookingCalendar() {
           <span style={{ color: GOLD }}>{email}</span> to confirm.
         </p>
         <div className="mt-8 font-cond tracking-[0.4em] text-[10px] uppercase" style={{ color: GOLD }}>
-          // Transmission Complete
+          Request Confirmed
         </div>
       </HUDFrame>
     );
