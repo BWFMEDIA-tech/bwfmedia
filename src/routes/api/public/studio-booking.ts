@@ -7,6 +7,7 @@ import { TEMPLATES } from '@/lib/email-templates/registry'
 
 const SENDER_DOMAIN = 'notify.bwfmedia.company'
 const FROM_ADDRESS = `BWF Media <bookings@${SENDER_DOMAIN}>`
+const SITE_URL = 'https://bwfmedia.company'
 
 const Schema = z.object({
   full_name: z.string().min(1).max(120),
@@ -73,6 +74,7 @@ export const Route = createFileRoute('/api/public/studio-booking')({
             time: data.preferred_time,
             duration: data.duration,
             crewSize: data.crew_size,
+            payUrl: `${SITE_URL}/pay/${inserted.id}?table=studio_bookings`,
           }
           const html = await render(React.createElement(entry.component, templateData))
           const text = await render(React.createElement(entry.component, templateData), { plainText: true })
