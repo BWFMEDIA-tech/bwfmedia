@@ -131,6 +131,44 @@ function CheckoutCancel() {
           </div>
         </div>
 
+        {totalCount > 0 && (
+          <div className="border border-bone/15 bg-black/40 p-6 mb-10 text-left">
+            <h2 className="font-cond tracking-[0.25em] text-xs uppercase text-bone/60 mb-3">
+              Email me a link to my cart
+            </h2>
+            {emailStatus === "sent" ? (
+              <p className="text-bone/80 text-sm">
+                ✓ Sent. Check your inbox at <strong>{email || emailInput}</strong> for a link
+                back to your cart and instructions to retry checkout.
+              </p>
+            ) : (
+              <form onSubmit={handleSubmitEmail} className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  required
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="you@email.com"
+                  className="flex-1 bg-black/60 border border-bone/20 px-3 py-3 text-bone text-sm focus:outline-none focus:border-bone/60"
+                />
+                <button
+                  type="submit"
+                  disabled={emailStatus === "sending"}
+                  className="px-5 py-3 font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone hover:opacity-90 transition-opacity disabled:opacity-50"
+                  style={{ backgroundColor: "var(--blood)" }}
+                >
+                  {emailStatus === "sending" ? "Sending…" : "Send link"}
+                </button>
+              </form>
+            )}
+            {emailStatus === "error" && (
+              <p className="text-red-300 text-xs mt-2">
+                Couldn't send the email. Please try again or come back to the cart directly.
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {items.length > 0 ? (
             <button
