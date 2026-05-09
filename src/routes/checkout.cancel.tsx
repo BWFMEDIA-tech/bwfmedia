@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingCart, ArrowLeft, Mail, HelpCircle } from "lucide-react";
 
@@ -15,17 +15,67 @@ export const Route = createFileRoute("/checkout/cancel")({
 });
 
 function CheckoutCancel() {
-  const { items, totalCount, openCart } = useCart();
+  const { items, totalCount, totalCents, email, setEmail, openCart } = useCart();
   const navigate = useNavigate();
+  const [emailInput, setEmailInput] = useState(email);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const sentRef = useRef(false);
+
+  // Build a stable cart fingerprint so the same recipient + cart isn't emailed twice.
+  const cartFingerprint = items
+    .map((i) => `${i.priceId}:${i.quantity}`)
+    .sort()
+    .join("|") || "empty";
+
+  const sendCancellationEmail = async (recipient: string) => {
+    if (sentRef.current) return;
+    sentRef.current = true;
+    setEmailStatus("sending");
+    try {
+      const res = await fetch("/api/public/checkout-cancellation-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: recipient,
+          itemCount: totalCount,
+          totalCents,
+          cartFingerprint,
+          returnUrl: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setEmailStatus("sent");
+    } catch (err) {
+      console.error(err);
+      setEmailStatus("error");
+      sentRef.current = false;
+    }
+  };
 
   // Auto-open the cart drawer when the user lands here after cancelling.
   useEffect(() => {
     if (totalCount > 0) openCart();
   }, [totalCount, openCart]);
 
+  // Auto-send if we already have an email saved from the cart.
+  useEffect(() => {
+    if (email && totalCount > 0) {
+      void sendCancellationEmail(email);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleReturnToCart = () => {
     openCart();
     navigate({ to: "/" });
+  };
+
+  const handleSubmitEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    const v = emailInput.trim();
+    if (!v) return;
+    setEmail(v);
+    void sendCancellationEmail(v);
   };
 
   return (
