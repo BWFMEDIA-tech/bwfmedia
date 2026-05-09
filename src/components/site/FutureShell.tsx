@@ -80,7 +80,7 @@ export function FutureShell({
             <img src={bwfLogo} alt="BWF Media" className="relative w-11 h-11 object-contain" />
           </div>
           <span className="font-cond font-bold tracking-[0.35em] text-[11px] uppercase text-bone/80">
-            BWF / Media
+            BWF Media TV
           </span>
         </Link>
         <div className="flex items-center gap-5">
