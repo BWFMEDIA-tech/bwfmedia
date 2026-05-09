@@ -90,8 +90,7 @@ const StudioBookingConfirmation = ({
           Questions? Reach out at{' '}
           <a href="mailto:bookbwfmedia@gmail.com" style={link}>
             bookbwfmedia@gmail.com
-          </a>{' '}
-          or call (470) 333-6136.
+          </a>.
         </Text>
         <Text style={footerSmall}>
           Visuals That Move Culture · {SITE_NAME}
