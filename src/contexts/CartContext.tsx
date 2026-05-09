@@ -13,6 +13,8 @@ interface CartContextValue {
   isOpen: boolean;
   totalCount: number;
   totalCents: number;
+  email: string;
+  setEmail: (email: string) => void;
   addItem: (item: Omit<CartItem, "quantity">, qty?: number) => void;
   removeItem: (priceId: string) => void;
   setQuantity: (priceId: string, qty: number) => void;
@@ -23,15 +25,19 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "bwf_cart_v1";
+const EMAIL_KEY = "bwf_cart_email_v1";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [email, setEmailState] = useState<string>("");
 
   useEffect(() => {
     try {
       const raw = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
       if (raw) setItems(JSON.parse(raw));
+      const e = typeof window !== "undefined" ? localStorage.getItem(EMAIL_KEY) : null;
+      if (e) setEmailState(e);
     } catch {}
   }, []);
 
@@ -69,13 +75,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clear = useCallback(() => setItems([]), []);
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
+  const setEmail = useCallback((e: string) => {
+    setEmailState(e);
+    try {
+      if (typeof window !== "undefined") localStorage.setItem(EMAIL_KEY, e);
+    } catch {}
+  }, []);
 
   const totalCount = items.reduce((s, i) => s + i.quantity, 0);
   const totalCents = items.reduce((s, i) => s + i.unitAmount * i.quantity, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, isOpen, totalCount, totalCents, addItem, removeItem, setQuantity, clear, openCart, closeCart }}
+      value={{ items, isOpen, totalCount, totalCents, email, setEmail, addItem, removeItem, setQuantity, clear, openCart, closeCart }}
     >
       {children}
     </CartContext.Provider>
