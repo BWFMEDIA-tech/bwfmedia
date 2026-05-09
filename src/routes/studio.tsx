@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
 import { format } from "date-fns";
 import {
   Mail, Instagram, Phone, MapPin, Mic, Clapperboard, Camera, Smartphone,
@@ -34,13 +34,25 @@ const services = [
 ];
 
 function StudioPage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
+  const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   return (
     <FutureShell label="STUDIO / NODE 02">
       <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
         {/* HERO */}
-        <section className="relative pt-10 md:pt-16 pb-20">
-          <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-            <video
+        <section ref={heroRef} className="relative pt-10 md:pt-16 pb-20">
+          <motion.div
+            style={{ opacity: heroFade }}
+            className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+          >
+            <motion.video
+              style={{ y: videoY, scale: videoScale }}
               src={heroVideo.url}
               autoPlay
               muted
@@ -55,7 +67,7 @@ function StudioPage() {
                   "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 60%, #000 100%)",
               }}
             />
-          </div>
+          </motion.div>
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
             BWF / Media <span style={{ color: GOLD }}>// node_02_active</span>
           </div>
