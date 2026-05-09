@@ -16,43 +16,61 @@ export type Database = {
     Tables: {
       block_bookings: {
         Row: {
+          amount_cents: number | null
+          amount_paid_cents: number | null
           created_at: string
           email: string
           full_name: string
           id: string
           location: string
           notes: string | null
+          package_id: string | null
+          paid_at: string | null
           phone: string | null
           preferred_date: string
           preferred_time: string
           shoot_type: string
           status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
         }
         Insert: {
+          amount_cents?: number | null
+          amount_paid_cents?: number | null
           created_at?: string
           email: string
           full_name: string
           id?: string
           location: string
           notes?: string | null
+          package_id?: string | null
+          paid_at?: string | null
           phone?: string | null
           preferred_date: string
           preferred_time: string
           shoot_type: string
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
         }
         Update: {
+          amount_cents?: number | null
+          amount_paid_cents?: number | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
           location?: string
           notes?: string | null
+          package_id?: string | null
+          paid_at?: string | null
           phone?: string | null
           preferred_date?: string
           preferred_time?: string
           shoot_type?: string
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
         }
         Relationships: []
       }
@@ -178,6 +196,8 @@ export type Database = {
       }
       studio_bookings: {
         Row: {
+          amount_cents: number | null
+          amount_paid_cents: number | null
           created_at: string
           crew_size: string
           duration: string
@@ -185,13 +205,19 @@ export type Database = {
           full_name: string
           id: string
           notes: string | null
+          package_id: string | null
+          paid_at: string | null
           phone: string | null
           preferred_date: string
           preferred_time: string
           session_type: string
           status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
         }
         Insert: {
+          amount_cents?: number | null
+          amount_paid_cents?: number | null
           created_at?: string
           crew_size: string
           duration: string
@@ -199,13 +225,19 @@ export type Database = {
           full_name: string
           id?: string
           notes?: string | null
+          package_id?: string | null
+          paid_at?: string | null
           phone?: string | null
           preferred_date: string
           preferred_time: string
           session_type: string
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
         }
         Update: {
+          amount_cents?: number | null
+          amount_paid_cents?: number | null
           created_at?: string
           crew_size?: string
           duration?: string
@@ -213,11 +245,15 @@ export type Database = {
           full_name?: string
           id?: string
           notes?: string | null
+          package_id?: string | null
+          paid_at?: string | null
           phone?: string | null
           preferred_date?: string
           preferred_time?: string
           session_type?: string
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
         }
         Relationships: []
       }
