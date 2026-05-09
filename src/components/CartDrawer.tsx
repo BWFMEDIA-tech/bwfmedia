@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ShoppingCart, X, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { StripeEmbeddedCheckoutCart } from "@/components/StripeEmbeddedCheckout";
+import { useNavigate } from "@tanstack/react-router";
 
 function formatUSD(cents: number) {
   return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
@@ -35,6 +36,7 @@ export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, setQuantity, totalCents, clear } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -68,8 +70,21 @@ export function CartDrawer() {
         </header>
 
         {checkingOut ? (
-          <div className="flex-1 overflow-y-auto bg-white">
-            <StripeEmbeddedCheckoutCart items={checkoutItems} customerEmail={email || undefined} />
+          <div className="flex-1 overflow-y-auto bg-white flex flex-col">
+            <div className="flex-1">
+              <StripeEmbeddedCheckoutCart items={checkoutItems} customerEmail={email || undefined} />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setCheckingOut(false);
+                closeCart();
+                navigate({ to: "/checkout/cancel" });
+              }}
+              className="w-full py-3 bg-white border-t border-neutral-200 text-neutral-600 hover:text-neutral-900 font-cond tracking-widest text-[11px] uppercase"
+            >
+              Cancel checkout
+            </button>
           </div>
         ) : items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
