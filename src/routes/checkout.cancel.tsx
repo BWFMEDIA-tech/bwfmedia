@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingCart, ArrowLeft, Mail, HelpCircle } from "lucide-react";
 
@@ -15,17 +15,67 @@ export const Route = createFileRoute("/checkout/cancel")({
 });
 
 function CheckoutCancel() {
-  const { items, totalCount, openCart } = useCart();
+  const { items, totalCount, totalCents, email, setEmail, openCart } = useCart();
   const navigate = useNavigate();
+  const [emailInput, setEmailInput] = useState(email);
+  const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const sentRef = useRef(false);
+
+  // Build a stable cart fingerprint so the same recipient + cart isn't emailed twice.
+  const cartFingerprint = items
+    .map((i) => `${i.priceId}:${i.quantity}`)
+    .sort()
+    .join("|") || "empty";
+
+  const sendCancellationEmail = async (recipient: string) => {
+    if (sentRef.current) return;
+    sentRef.current = true;
+    setEmailStatus("sending");
+    try {
+      const res = await fetch("/api/public/checkout-cancellation-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: recipient,
+          itemCount: totalCount,
+          totalCents,
+          cartFingerprint,
+          returnUrl: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setEmailStatus("sent");
+    } catch (err) {
+      console.error(err);
+      setEmailStatus("error");
+      sentRef.current = false;
+    }
+  };
 
   // Auto-open the cart drawer when the user lands here after cancelling.
   useEffect(() => {
     if (totalCount > 0) openCart();
   }, [totalCount, openCart]);
 
+  // Auto-send if we already have an email saved from the cart.
+  useEffect(() => {
+    if (email && totalCount > 0) {
+      void sendCancellationEmail(email);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleReturnToCart = () => {
     openCart();
     navigate({ to: "/" });
+  };
+
+  const handleSubmitEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    const v = emailInput.trim();
+    if (!v) return;
+    setEmail(v);
+    void sendCancellationEmail(v);
   };
 
   return (
@@ -80,6 +130,44 @@ function CheckoutCancel() {
             </div>
           </div>
         </div>
+
+        {totalCount > 0 && (
+          <div className="border border-bone/15 bg-black/40 p-6 mb-10 text-left">
+            <h2 className="font-cond tracking-[0.25em] text-xs uppercase text-bone/60 mb-3">
+              Email me a link to my cart
+            </h2>
+            {emailStatus === "sent" ? (
+              <p className="text-bone/80 text-sm">
+                ✓ Sent. Check your inbox at <strong>{email || emailInput}</strong> for a link
+                back to your cart and instructions to retry checkout.
+              </p>
+            ) : (
+              <form onSubmit={handleSubmitEmail} className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  required
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="you@email.com"
+                  className="flex-1 bg-black/60 border border-bone/20 px-3 py-3 text-bone text-sm focus:outline-none focus:border-bone/60"
+                />
+                <button
+                  type="submit"
+                  disabled={emailStatus === "sending"}
+                  className="px-5 py-3 font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone hover:opacity-90 transition-opacity disabled:opacity-50"
+                  style={{ backgroundColor: "var(--blood)" }}
+                >
+                  {emailStatus === "sending" ? "Sending…" : "Send link"}
+                </button>
+              </form>
+            )}
+            {emailStatus === "error" && (
+              <p className="text-red-300 text-xs mt-2">
+                Couldn't send the email. Please try again or come back to the cart directly.
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {items.length > 0 ? (

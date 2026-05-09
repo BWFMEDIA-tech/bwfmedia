@@ -33,9 +33,8 @@ export function CartButton() {
 }
 
 export function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, setQuantity, totalCents, clear } = useCart();
+  const { items, isOpen, closeCart, removeItem, setQuantity, totalCents, clear, email, setEmail } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
   if (!isOpen) return null;
