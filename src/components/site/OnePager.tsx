@@ -549,6 +549,11 @@ function FinalCTA() {
               className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors">
               Contact Us
             </a>
+            <RouterLink to="/off-the-block"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors">
+              Off The Block
+              <ArrowRight size={16} />
+            </RouterLink>
           </div>
         </Reveal>
       </div>
