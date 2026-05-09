@@ -194,11 +194,11 @@ function ProofStrip() {
     { v: "763.6K", l: "Comments" },
     { v: "2.9M", l: "Shares" },
   ];
-  const loop = [...items, ...items, ...items];
+  const loop = [...items, ...items];
   return (
     <section className="border-y border-white/10 bg-black overflow-hidden">
       <div className="relative py-8 group">
-        <div className="flex gap-16 md:gap-24 animate-[marquee-rtl_40s_linear_infinite] group-hover:[animation-play-state:paused] whitespace-nowrap w-max">
+        <div className="flex gap-16 md:gap-24 animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap w-max">
           {loop.map((it, i) => (
             <div key={i} className="flex items-baseline gap-4 shrink-0">
               <div className="font-display text-3xl md:text-5xl text-bone">{it.v}</div>
