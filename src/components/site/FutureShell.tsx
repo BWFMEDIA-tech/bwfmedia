@@ -127,11 +127,16 @@ export function HUDFrame({
 }) {
   return (
     <div
-      className={`relative ${className}`}
+      className={`relative backdrop-blur-xl ${className}`}
       style={{
         border: `1px solid ${GOLD}55`,
-        background: "linear-gradient(180deg, rgba(212,162,76,0.06), rgba(0,0,0,0.4))",
-        boxShadow: glow ? `0 0 0 1px #00000040, 0 20px 50px -20px ${GOLD}55, inset 0 1px 0 ${GOLD}22` : undefined,
+        background:
+          "linear-gradient(180deg, rgba(212,162,76,0.08) 0%, rgba(255,255,255,0.03) 40%, rgba(0,0,0,0.25) 100%)",
+        boxShadow: glow
+          ? `0 0 0 1px rgba(0,0,0,0.35), 0 20px 60px -25px ${GOLD}55, inset 0 1px 0 ${GOLD}33, inset 0 -1px 0 rgba(255,255,255,0.04)`
+          : undefined,
+        WebkitBackdropFilter: "blur(20px) saturate(140%)",
+        backdropFilter: "blur(20px) saturate(140%)",
       }}
     >
       {/* corner ticks */}
