@@ -19,8 +19,10 @@ export interface TemplateEntry {
  */
 import { template as studioBookingConfirmation } from './studio-booking-confirmation'
 import { template as checkoutCancellation } from './checkout-cancellation'
+import { template as blockBookingConfirmation } from './block-booking-confirmation'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'studio-booking-confirmation': studioBookingConfirmation,
   'checkout-cancellation': checkoutCancellation,
+  'block-booking-confirmation': blockBookingConfirmation,
 }
