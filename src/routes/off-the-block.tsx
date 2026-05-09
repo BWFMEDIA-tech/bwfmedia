@@ -320,19 +320,29 @@ function BookingCalendar() {
     if (!time) return toast.error("Select a time slot");
     if (!name || !email || !location) return toast.error("Fill in all required fields");
     setSubmitting(true);
-    const { error } = await supabase.from("block_bookings").insert({
-      full_name: name,
-      email,
-      phone: phone || null,
-      shoot_type: shootType,
-      location,
-      preferred_date: format(date, "yyyy-MM-dd"),
-      preferred_time: time,
-      notes: notes || null,
-    });
+    let ok = false;
+    try {
+      const res = await fetch('/api/public/block-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: name,
+          email,
+          phone: phone || null,
+          shoot_type: shootType,
+          location,
+          preferred_date: format(date, 'yyyy-MM-dd'),
+          preferred_time: time,
+          notes: notes || null,
+        }),
+      });
+      ok = res.ok;
+    } catch {
+      ok = false;
+    }
     setSubmitting(false);
-    if (error) {
-      toast.error("Submission failed. Please try again.");
+    if (!ok) {
+      toast.error('Submission failed. Please try again.');
       return;
     }
     setDone(true);
