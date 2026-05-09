@@ -260,7 +260,7 @@ function StudioPage() {
         <section className="pt-10 grid md:grid-cols-2 gap-8">
           <HUDFrame className="p-7">
             <div className="font-display text-5xl md:text-6xl">
-              <span className="text-bone">BWF</span><span style={{ color: GOLD }}>MEDIA</span>
+              <span className="text-bone">BWF MEDIA </span><span style={{ color: GOLD }}>TV</span>
             </div>
             <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
               Where Culture Goes Viral
