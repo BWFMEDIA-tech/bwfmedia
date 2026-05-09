@@ -10,7 +10,6 @@ import {
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import heroVideo from "@/assets/off-the-block-hero.mp4.asset.json";
 import { Calendar } from "@/components/ui/calendar";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
