@@ -169,16 +169,6 @@ function Hero() {
             </a>
           </div>
         </Reveal>
-
-        <Reveal delay={0.55}>
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 font-cond tracking-[0.25em] text-[11px] uppercase text-bone/70">
-            <span><span className="text-bone font-bold">686M+</span> Views</span>
-            <span className="opacity-40">•</span>
-            <span><span className="text-bone font-bold">324K+</span> Subscribers</span>
-            <span className="opacity-40">•</span>
-            <span><span className="text-bone font-bold">18M+</span> Likes</span>
-          </div>
-        </Reveal>
       </div>
     </section>
   );
