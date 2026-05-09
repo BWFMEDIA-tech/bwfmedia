@@ -30,10 +30,10 @@ const StudioBookingConfirmation = ({
       <Container style={container}>
         <Section style={brandBar}>
           <Text style={brandText}>
-            <span style={{ color: '#000' }}>BWF</span>
-            <span style={{ color: GOLD }}>MEDIA</span>
+            <span style={{ color: '#000' }}>BWF MEDIA </span>
+            <span style={{ color: GOLD }}>TV</span>
           </Text>
-          <Text style={tagline}>// Studio Booking // Transmission Received</Text>
+          <Text style={tagline}>Studio Booking · Request Received</Text>
         </Section>
 
         <Heading style={h1}>

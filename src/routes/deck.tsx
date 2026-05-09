@@ -703,12 +703,10 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
         <div className="flex items-center justify-between mb-4 font-mono text-[10px] tracking-[0.35em] uppercase" style={{ color: HUD_GOLD }}>
           <div className="flex items-center gap-2">
             <Radio className="w-3 h-3" />
-            <span>BWFMEDIA // NODE-04</span>
+            <span>BWF MEDIA TV</span>
           </div>
           <div className="flex items-center gap-2 text-bone/50">
-            <span>SEC.LVL</span>
-            <span style={{ color: HUD_GOLD }}>03</span>
-            <span className="hidden sm:inline">/ ENCRYPTED</span>
+            <span className="hidden sm:inline">Private &amp; Confidential</span>
           </div>
         </div>
 
@@ -733,7 +731,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
               Investor <span style={{ color: HUD_GOLD, textShadow: `0 0 20px ${HUD_GOLD}88` }}>Access</span>
             </h1>
             <p className="mt-4 text-center font-mono text-[11px] tracking-[0.25em] uppercase text-bone/55">
-              {`> Provide credentials to authorize transmission of pitch deck.`}
+              Enter your details to access the pitch deck.
             </p>
 
             <form onSubmit={submit} className="mt-10 space-y-5">
@@ -927,7 +925,7 @@ function DeckGate({ onUnlock }: { onUnlock: () => void }) {
               Decrypt <span style={{ color: HUD_GOLD, textShadow: `0 0 20px ${HUD_GOLD}88` }}>Deck</span>
             </h1>
             <p className="mt-4 text-center font-mono text-[11px] tracking-[0.25em] uppercase text-bone/55">
-              {`> Enter access key to unlock transmission.`}
+              Enter your access key to view the deck.
             </p>
 
             <form onSubmit={submit} className="mt-10 space-y-5">
@@ -964,7 +962,7 @@ function DeckGate({ onUnlock }: { onUnlock: () => void }) {
                 }}
               >
                 <span className="inline-flex items-center justify-center gap-3">
-                  Unlock Transmission
+                  Unlock Deck
                   <ChevronRight className="w-4 h-4" />
                 </span>
               </button>
