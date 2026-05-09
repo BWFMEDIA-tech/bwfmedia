@@ -1,6 +1,9 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { CartProvider } from "@/contexts/CartContext";
+import { CartButton, CartDrawer } from "@/components/CartDrawer";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 function NotFoundComponent() {
   return (
@@ -85,5 +88,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <CartProvider>
+      <PaymentTestModeBanner />
+      <Outlet />
+      <CartButton />
+      <CartDrawer />
+    </CartProvider>
+  );
 }
