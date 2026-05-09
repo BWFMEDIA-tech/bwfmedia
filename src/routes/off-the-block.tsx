@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { format } from "date-fns";
@@ -298,6 +298,7 @@ const TIME_SLOTS = [
 ];
 
 function BookingCalendar() {
+  const navigate = useNavigate();
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState<string>("");
   const [shootType, setShootType] = useState<string>(SHOOT_TYPES[0]);
@@ -307,7 +308,6 @@ function BookingCalendar() {
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
 
   const inputClass =
     "w-full bg-black/60 px-4 py-3 font-cond tracking-[0.15em] text-sm text-bone placeholder:text-bone/30 focus:outline-none transition";
@@ -319,7 +319,7 @@ function BookingCalendar() {
     if (!time) return toast.error("Select a time slot");
     if (!name || !email || !location) return toast.error("Fill in all required fields");
     setSubmitting(true);
-    let ok = false;
+    let bookingId: string | null = null;
     try {
       const res = await fetch('/api/public/block-booking', {
         method: 'POST',
@@ -335,36 +335,20 @@ function BookingCalendar() {
           notes: notes || null,
         }),
       });
-      ok = res.ok;
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        bookingId = data?.id ?? null;
+      }
     } catch {
-      ok = false;
+      bookingId = null;
     }
-    setSubmitting(false);
-    if (!ok) {
+    if (!bookingId) {
+      setSubmitting(false);
       toast.error('Submission failed. Please try again.');
       return;
     }
-    setDone(true);
-    toast.success("Request received. We'll be in touch.");
-  }
-
-  if (done) {
-    return (
-      <HUDFrame className="mt-10 p-10 md:p-14 text-center">
-        <Check className="w-12 h-12 mx-auto" style={{ color: GOLD }} />
-        <h3 className="mt-6 font-display text-4xl md:text-5xl uppercase">
-          Booking <span style={{ color: GOLD }}>Locked In</span>
-        </h3>
-        <p className="mt-4 text-bone/75 max-w-md mx-auto">
-          Your request for <span style={{ color: GOLD }}>{date && format(date, "PPP")}</span> at{" "}
-          <span style={{ color: GOLD }}>{time}</span> has been received. The BWF crew will hit you back at{" "}
-          <span style={{ color: GOLD }}>{email}</span> to confirm.
-        </p>
-        <div className="mt-8 font-cond tracking-[0.4em] text-[10px] uppercase" style={{ color: GOLD }}>
-          Request Confirmed
-        </div>
-      </HUDFrame>
-    );
+    toast.success("Booking locked in. Redirecting to checkout…");
+    navigate({ to: "/pay/$bookingId", params: { bookingId }, search: { table: "block_bookings" } });
   }
 
   return (
