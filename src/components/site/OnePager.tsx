@@ -188,20 +188,27 @@ function Hero() {
 
 function ProofStrip() {
   const items = [
-    { v: "686M+", l: "Total Views" },
-    { v: "324K+", l: "Subscribers" },
-    { v: "18M+", l: "Likes" },
-    { v: "2.9M+", l: "Shares" },
+    { v: "325,915", l: "Subscribers" },
+    { v: "692.0M", l: "Views" },
+    { v: "18.1M", l: "Likes" },
+    { v: "763.6K", l: "Comments" },
+    { v: "2.9M", l: "Shares" },
   ];
+  const loop = [...items, ...items];
   return (
-    <section className="border-y border-white/10 bg-black">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-        {items.map((it) => (
-          <div key={it.l} className="text-center">
-            <div className="font-display text-3xl md:text-5xl text-bone">{it.v}</div>
-            <div className="font-cond tracking-[0.3em] text-[10px] md:text-xs uppercase text-bone/50 mt-2">{it.l}</div>
-          </div>
-        ))}
+    <section className="border-y border-white/10 bg-black overflow-hidden">
+      <div className="relative py-8 group">
+        <div className="flex gap-16 md:gap-24 animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap w-max">
+          {loop.map((it, i) => (
+            <div key={i} className="flex items-baseline gap-4 shrink-0">
+              <div className="font-display text-3xl md:text-5xl text-bone">{it.v}</div>
+              <div className="font-cond tracking-[0.3em] text-[10px] md:text-xs uppercase text-bone/50">{it.l}</div>
+              <span className="ml-16 md:ml-24 h-2 w-2 rounded-full bg-blood/70" aria-hidden />
+            </div>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent" />
       </div>
     </section>
   );
