@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { format } from "date-fns";
@@ -303,6 +303,7 @@ const DURATIONS = ["1 Hour", "2 Hours", "Half Day (4h)", "Full Day (8h)"];
 const TIME_SLOTS = ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM", "8:00 PM"];
 
 function StudioBookingCalendar() {
+  const navigate = useNavigate();
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState("");
   const [sessionType, setSessionType] = useState(SESSION_TYPES[0].name);
@@ -313,7 +314,6 @@ function StudioBookingCalendar() {
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
 
   const inputClass =
     "w-full bg-black/60 px-4 py-3 font-cond tracking-[0.15em] text-sm text-bone placeholder:text-bone/30 focus:outline-none transition";
@@ -325,7 +325,7 @@ function StudioBookingCalendar() {
     if (!time) return toast.error("Select a time slot");
     if (!name || !email) return toast.error("Fill in all required fields");
     setSubmitting(true);
-    let ok = false;
+    let bookingId: string | null = null;
     try {
       const res = await fetch("/api/public/studio-booking", {
         method: "POST",
@@ -342,38 +342,20 @@ function StudioBookingCalendar() {
           notes: notes || null,
         }),
       });
-      ok = res.ok;
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        bookingId = data?.id ?? null;
+      }
     } catch {
-      ok = false;
+      bookingId = null;
     }
-    setSubmitting(false);
-    if (!ok) {
+    if (!bookingId) {
+      setSubmitting(false);
       toast.error("Booking failed. Please try again.");
       return;
     }
-    setDone(true);
-    toast.success("Booking received. Confirmation email sent.");
-  }
-
-  if (done) {
-    return (
-      <HUDFrame className="mt-10 p-10 md:p-14 text-center">
-        <CheckCircle2 className="w-12 h-12 mx-auto" style={{ color: GOLD }} />
-        <h3 className="mt-6 font-display text-4xl md:text-5xl uppercase">
-          Session <span style={{ color: GOLD }}>Locked In</span>
-        </h3>
-        <p className="mt-4 text-bone/75 max-w-md mx-auto">
-          Your <span style={{ color: GOLD }}>{sessionType}</span> request for{" "}
-          <span style={{ color: GOLD }}>{date && format(date, "PPP")}</span> at{" "}
-          <span style={{ color: GOLD }}>{time}</span> has been received. We'll
-          reach you at <span style={{ color: GOLD }}>{email}</span> with deposit
-          + confirmation details.
-        </p>
-        <div className="mt-8 font-cond tracking-[0.4em] text-[10px] uppercase" style={{ color: GOLD }}>
-          Booking Confirmed
-        </div>
-      </HUDFrame>
-    );
+    toast.success("Session locked in. Redirecting to checkout…");
+    navigate({ to: "/pay/$bookingId", params: { bookingId }, search: { table: "studio_bookings" } });
   }
 
   return (
