@@ -1,0 +1,102 @@
+import { createServerFn } from '@tanstack/react-start';
+import { createClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+import { createStripeClient, type StripeEnv } from '@/lib/stripe.server';
+import { BOOKING_PACKAGES } from '@/lib/booking-packages';
+
+const Schema = z.object({
+  bookingId: z.string().uuid(),
+  packageId: z.string().min(1).max(60),
+  returnUrl: z.string().url(),
+  environment: z.enum(['sandbox', 'live']) as z.ZodType<StripeEnv>,
+});
+
+export const createBookingCheckout = createServerFn({ method: 'POST' })
+  .inputValidator((data) => Schema.parse(data))
+  .handler(async ({ data }) => {
+    const pkg = BOOKING_PACKAGES[data.packageId];
+    if (!pkg) throw new Error('Unknown package');
+
+    const supabaseUrl = process.env.SUPABASE_URL!;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    const { data: booking, error } = await supabase
+      .from(pkg.table)
+      .select('id, email, full_name, status')
+      .eq('id', data.bookingId)
+      .maybeSingle();
+    if (error || !booking) throw new Error('Booking not found');
+    if (booking.status === 'confirmed' || booking.status === 'delivered') {
+      throw new Error('Booking is already paid');
+    }
+
+    const stripe = createStripeClient(data.environment);
+    const prices = await stripe.prices.list({ lookup_keys: [pkg.id], limit: 1 });
+    if (!prices.data.length) throw new Error('Price not configured in Stripe');
+    const stripePrice = prices.data[0];
+
+    // Find or create a Customer keyed on email so repeat bookers don't duplicate.
+    let customerId: string | undefined;
+    const existing = await stripe.customers.list({ email: booking.email, limit: 1 });
+    if (existing.data.length) {
+      customerId = existing.data[0].id;
+    } else {
+      const created = await stripe.customers.create({
+        email: booking.email,
+        name: booking.full_name,
+        metadata: { bookingTable: pkg.table, bookingId: booking.id },
+      });
+      customerId = created.id;
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: [{ price: stripePrice.id, quantity: 1 }],
+      mode: 'payment',
+      ui_mode: 'embedded_page',
+      return_url: data.returnUrl,
+      customer: customerId,
+      metadata: {
+        bookingTable: pkg.table,
+        bookingId: booking.id,
+        packageId: pkg.id,
+      },
+      payment_intent_data: {
+        metadata: {
+          bookingTable: pkg.table,
+          bookingId: booking.id,
+          packageId: pkg.id,
+        },
+      },
+    });
+
+    await supabase
+      .from(pkg.table)
+      .update({
+        status: 'awaiting_payment',
+        package_id: pkg.id,
+        amount_cents: pkg.amountCents,
+        stripe_session_id: session.id,
+      })
+      .eq('id', booking.id);
+
+    return session.client_secret as string;
+  });
+
+export const getBookingByStripeSession = createServerFn({ method: 'GET' })
+  .inputValidator((data: { sessionId: string }) => {
+    if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(data.sessionId)) throw new Error('Invalid session id');
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    for (const table of ['studio_bookings', 'block_bookings'] as const) {
+      const { data: row } = await supabase
+        .from(table)
+        .select('id, full_name, email, status, package_id, amount_cents, amount_paid_cents, paid_at')
+        .eq('stripe_session_id', data.sessionId)
+        .maybeSingle();
+      if (row) return { table, booking: row };
+    }
+    return null;
+  });

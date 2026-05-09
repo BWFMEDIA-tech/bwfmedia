@@ -17,6 +17,8 @@ import { Route as DeckRouteImport } from './routes/deck'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
+import { Route as PayReturnRouteImport } from './routes/pay.return'
+import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
@@ -30,6 +32,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
@@ -70,6 +73,16 @@ const VideosIdRoute = VideosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => VideosRoute,
+} as any)
+const PayReturnRoute = PayReturnRouteImport.update({
+  id: '/pay/return',
+  path: '/pay/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayBookingIdRoute = PayBookingIdRouteImport.update({
+  id: '/pay/$bookingId',
+  path: '/pay/$bookingId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
@@ -140,6 +153,12 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -154,10 +173,13 @@ export interface FileRoutesByFullPath {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/pay/$bookingId': typeof PayBookingIdRoute
+  '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -177,10 +199,13 @@ export interface FileRoutesByTo {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/pay/$bookingId': typeof PayBookingIdRoute
+  '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -201,10 +226,13 @@ export interface FileRoutesById {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/pay/$bookingId': typeof PayBookingIdRoute
+  '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -226,10 +254,13 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/pay/$bookingId'
+    | '/pay/return'
     | '/videos/$id'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
+    | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -249,10 +280,13 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/pay/$bookingId'
+    | '/pay/return'
     | '/videos/$id'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
+    | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -272,10 +306,13 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/pay/$bookingId'
+    | '/pay/return'
     | '/videos/$id'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
+    | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -296,9 +333,12 @@ export interface RootRouteChildren {
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  PayBookingIdRoute: typeof PayBookingIdRoute
+  PayReturnRoute: typeof PayReturnRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -363,6 +403,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$id'
       preLoaderRoute: typeof VideosIdRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/pay/return': {
+      id: '/pay/return'
+      path: '/pay/return'
+      fullPath: '/pay/return'
+      preLoaderRoute: typeof PayReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay/$bookingId': {
+      id: '/pay/$bookingId'
+      path: '/pay/$bookingId'
+      fullPath: '/pay/$bookingId'
+      preLoaderRoute: typeof PayBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -455,6 +509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -482,10 +543,13 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  PayBookingIdRoute: PayBookingIdRoute,
+  PayReturnRoute: PayReturnRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
