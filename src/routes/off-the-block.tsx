@@ -234,7 +234,7 @@ function OffTheBlockPage() {
                 <Mail className="w-4 h-4" /> Email Us <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="https://instagram.com/bwf.media"
+                href="https://instagram.com/bwfmediatv"
                 target="_blank" rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone hover:bg-bone/5 transition"
                 style={{ border: `1px solid ${GOLD}` }}
@@ -262,8 +262,8 @@ function OffTheBlockPage() {
 
           <div className="space-y-3 font-cond tracking-[0.18em] text-sm uppercase self-center">
             {[
-              { Icon: Instagram, label: "@bwf.media", href: "https://instagram.com/bwf.media" },
-              { Icon: Youtube,   label: "BWF Media",  href: "https://youtube.com/@bwfmedia" },
+              { Icon: Instagram, label: "@bwfmediatv", href: "https://instagram.com/bwfmediatv" },
+              { Icon: Youtube,   label: "BWF Media TV",  href: "https://youtube.com/@bwfmediatvtv" },
               { Icon: Mail,      label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
               { Icon: Phone,     label: "(470) 333-6136", href: "tel:+14703336136" },
             ].map(({ Icon, label, href }) => (

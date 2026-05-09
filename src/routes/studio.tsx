@@ -269,7 +269,7 @@ function StudioPage() {
           <div className="space-y-3 font-cond tracking-[0.18em] text-sm self-center">
             {[
               { Icon: MapPin,    label: "Location Provided After Booking", href: "#" },
-              { Icon: Instagram, label: "@bwf.media", href: "https://instagram.com/bwf.media" },
+              { Icon: Instagram, label: "@bwfmediatv", href: "https://instagram.com/bwfmediatv" },
               { Icon: Mail,      label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
               { Icon: Phone,     label: "(470) 333-6136", href: "tel:+14703336136" },
             ].map(({ Icon, label, href }) => (

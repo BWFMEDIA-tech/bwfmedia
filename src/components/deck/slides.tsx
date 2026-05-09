@@ -43,7 +43,7 @@ export function Slide1() {
           />
           <img
             src={bwfLogo}
-            alt="BWF Media"
+            alt="BWF Media TV"
             className="w-[420px] h-[420px] object-contain mix-blend-screen drop-shadow-[0_0_40px_rgba(220,38,38,0.4)]"
           />
         </motion.div>
@@ -85,7 +85,7 @@ export function Slide1() {
           Where Culture <span style={{ color: "var(--blood)" }}>Goes Viral</span>
         </motion.p>
         <motion.a
-          href="https://youtube.com/@bwfmedia"
+          href="https://youtube.com/@bwfmediatvtv"
           target="_blank"
           rel="noreferrer"
           initial={{ opacity: 0 }}
@@ -93,7 +93,7 @@ export function Slide1() {
           transition={{ delay: 1.1 }}
           className="mt-4 font-cond tracking-[0.3em] text-xs uppercase text-bone/50 hover:text-bone transition-colors"
         >
-          youtube.com/@bwfmedia
+          youtube.com/@bwfmediatvtv
         </motion.a>
       </div>
 
@@ -614,7 +614,7 @@ export function Slide11() {
           {[
             { icon: Mail, label: "Email", value: "bookbwfmediatv@mail.com" },
             { icon: Instagram, label: "Instagram", value: "@bwfmediatv" },
-            { icon: Youtube, label: "YouTube", value: "@bwfmedia" },
+            { icon: Youtube, label: "YouTube", value: "@bwfmediatv" },
           ].map((c, i) => (
             <motion.a
               key={i}
@@ -623,7 +623,7 @@ export function Slide11() {
                   ? "mailto:bookbwfmediatv@mail.com"
                   : c.label === "Instagram"
                   ? "https://instagram.com/bwfmediatv"
-                  : "https://youtube.com/@bwfmedia"
+                  : "https://youtube.com/@bwfmediatvtv"
               }
               target={c.label === "Email" ? undefined : "_blank"}
               rel={c.label === "Email" ? undefined : "noreferrer"}
