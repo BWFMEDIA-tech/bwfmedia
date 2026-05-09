@@ -153,10 +153,7 @@ function Nav() {
     { href: "#reach", label: "Reach" },
     { href: "#proof", label: "Proof" },
     { href: "#audience", label: "Audience" },
-    { href: "#engine", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
-    { href: "#partner", label: "Partner" },
-    { href: "#contact", label: "Contact" },
   ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -235,6 +232,28 @@ function Nav() {
                     >
                       Studio Bookings
                     </RouterLink>
+                    <div className="my-1 border-t border-blood/30" />
+                    <a
+                      href="#engine"
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
+                    >
+                      How It Works
+                    </a>
+                    <a
+                      href="#partner"
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
+                    >
+                      Partner
+                    </a>
+                    <a
+                      href="#contact"
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/80 hover:text-bone hover:bg-blood/20 transition-colors"
+                    >
+                      Contact
+                    </a>
                   </div>
                 </motion.div>
               )}
@@ -350,6 +369,37 @@ function Nav() {
                         >
                           Studio Bookings
                         </RouterLink>
+                        <div className="my-1 border-t border-border/40" />
+                        <a
+                          href="#engine"
+                          onClick={() => {
+                            setOpen(false);
+                            setMobileServicesOpen(false);
+                          }}
+                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                        >
+                          How It Works
+                        </a>
+                        <a
+                          href="#partner"
+                          onClick={() => {
+                            setOpen(false);
+                            setMobileServicesOpen(false);
+                          }}
+                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                        >
+                          Partner
+                        </a>
+                        <a
+                          href="#contact"
+                          onClick={() => {
+                            setOpen(false);
+                            setMobileServicesOpen(false);
+                          }}
+                          className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/70 hover:text-bone py-2"
+                        >
+                          Contact
+                        </a>
                       </div>
                     </motion.div>
                   )}
