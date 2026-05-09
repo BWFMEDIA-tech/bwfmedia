@@ -15,7 +15,7 @@ export function CartButton() {
       type="button"
       onClick={openCart}
       aria-label={`Open cart, ${totalCount} item${totalCount === 1 ? "" : "s"}`}
-      className="fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 bg-black/80 backdrop-blur border border-bone/20 hover:border-bone/60 transition-colors text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase"
+      className="fixed top-4 right-16 md:right-4 z-50 flex items-center gap-2 px-4 py-3 bg-black/80 backdrop-blur border border-bone/20 hover:border-bone/60 transition-colors text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase"
       style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}
     >
       <ShoppingCart className="w-4 h-4" />
