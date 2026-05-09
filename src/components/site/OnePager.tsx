@@ -1,8 +1,8 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
 import {
-  Play, Mic, Film, Scissors, Camera, Share2, Globe, Handshake,
-  TrendingUp, DollarSign, ArrowRight, Menu, X, ChevronDown, Check, Youtube, Instagram,
+  Play, Mic, Film, Scissors, Camera, Share2, Globe,
+  TrendingUp, DollarSign, ArrowRight, Menu, X, Check, Youtube, Instagram,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import bwfLogo from "@/assets/bwf-logo.png";
