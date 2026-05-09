@@ -6,7 +6,7 @@ import { ShoppingCart, ArrowLeft, Mail, HelpCircle } from "lucide-react";
 export const Route = createFileRoute("/checkout/cancel")({
   head: () => ({
     meta: [
-      { title: "Checkout Cancelled — BWF Media" },
+      { title: "Checkout Cancelled - BWF Media" },
       { name: "description", content: "Your checkout was cancelled. Your cart is still saved." },
       { name: "robots", content: "noindex" },
     ],
@@ -90,7 +90,7 @@ function CheckoutCancel() {
 
         <h1 className="font-display text-5xl text-bone mb-4 tracking-tight">CHECKOUT CANCELLED</h1>
         <p className="text-bone/70 mb-2">
-          No worries — your payment was not processed and you have not been charged.
+          No worries - your payment was not processed and you have not been charged.
         </p>
         <p className="text-bone/70 mb-10">
           {totalCount > 0

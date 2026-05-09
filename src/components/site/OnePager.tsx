@@ -603,7 +603,7 @@ function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
-        © {new Date().getFullYear()} BWF Media TV — All rights reserved
+        © {new Date().getFullYear()} BWF Media TV - All rights reserved
       </div>
     </footer>
   );

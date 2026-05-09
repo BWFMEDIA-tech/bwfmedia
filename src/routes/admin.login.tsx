@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
     meta: [
-      { title: "Admin Login — BWF Media" },
+      { title: "Admin Login - BWF Media" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

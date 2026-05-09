@@ -42,7 +42,7 @@ interface Booking {
 export const Route = createFileRoute("/admin/bookings")({
   head: () => ({
     meta: [
-      { title: "Studio Bookings — Admin" },
+      { title: "Studio Bookings - Admin" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
