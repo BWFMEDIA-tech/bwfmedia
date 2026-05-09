@@ -2,7 +2,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
 import {
   Play, Mic, Film, Scissors, Camera, Share2, Globe,
-  TrendingUp, DollarSign, ArrowRight, Menu, X, Check, Youtube, Instagram,
+  TrendingUp, DollarSign, ArrowRight, Menu, X, Check, Youtube, Instagram, Facebook, Twitter, Music2, Linkedin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import bwfLogo from "@/assets/bwf-logo.png";
@@ -579,15 +579,26 @@ function Footer() {
         </div>
         <div>
           <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Follow</div>
-          <div className="flex gap-3">
-            <a href="https://youtube.com/@bwfmediatv" target="_blank" rel="noreferrer"
-              className="w-10 h-10 flex items-center justify-center border border-white/15 text-bone hover:bg-blood hover:border-blood transition-colors">
-              <Youtube size={18} />
-            </a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer"
-              className="w-10 h-10 flex items-center justify-center border border-white/15 text-bone hover:bg-blood hover:border-blood transition-colors">
-              <Instagram size={18} />
-            </a>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { href: "https://youtube.com/@bwfmediatv", label: "YouTube", Icon: Youtube },
+              { href: "https://instagram.com/bwfmediatv", label: "Instagram", Icon: Instagram },
+              { href: "https://tiktok.com/@bwfmediatv", label: "TikTok", Icon: Music2 },
+              { href: "https://x.com/bwfmediatv", label: "X / Twitter", Icon: Twitter },
+              { href: "https://facebook.com/bwfmediatv", label: "Facebook", Icon: Facebook },
+              { href: "https://linkedin.com/company/bwfmediatv", label: "LinkedIn", Icon: Linkedin },
+            ].map(({ href, label, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                className="w-10 h-10 flex items-center justify-center border border-white/15 text-bone hover:bg-blood hover:border-blood transition-colors"
+              >
+                <Icon size={18} />
+              </a>
+            ))}
           </div>
         </div>
       </div>
