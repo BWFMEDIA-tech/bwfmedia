@@ -44,7 +44,7 @@ export const createCartCheckoutSession = createServerFn({ method: "POST" })
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
-      managed_payments: { enabled: true },
+      automatic_tax: { enabled: true },
       ...(data.customerEmail && { customer_email: data.customerEmail }),
     } as any);
 
