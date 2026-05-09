@@ -1478,6 +1478,7 @@ function Audience() {
 /* ---------- REVENUE ---------- */
 
 function Revenue() {
+  const { addItem } = useCart();
   const tiers = [
     {
       name: "LIVE INTERVIEW",
@@ -1485,6 +1486,10 @@ function Revenue() {
       deposit: "$250 deposit",
       icon: Mic,
       items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"],
+      priceId: "studio_live_interview_price",
+      productId: "studio_live_interview",
+      unitAmount: 50000,
+      cartName: "Live Interview",
     },
     {
       name: "MUSIC VIDEO",
@@ -1492,6 +1497,10 @@ function Revenue() {
       deposit: "$400 deposit",
       icon: Film,
       items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"],
+      priceId: "studio_music_video_price",
+      productId: "studio_music_video",
+      unitAmount: 90000,
+      cartName: "Music Video",
     },
     {
       name: "PROMO PACKAGE",
@@ -1499,6 +1508,10 @@ function Revenue() {
       deposit: "$150 deposit",
       icon: TrendingUp,
       items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"],
+      priceId: "studio_promo_package_price",
+      productId: "studio_promo_package",
+      unitAmount: 30000,
+      cartName: "Studio Promo Package",
     },
     {
       name: "AD REVENUE",
@@ -1506,6 +1519,10 @@ function Revenue() {
       deposit: "YouTube Partner",
       icon: DollarSign,
       items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"],
+      priceId: null,
+      productId: null,
+      unitAmount: 0,
+      cartName: "",
     },
   ];
   return (
@@ -1549,6 +1566,23 @@ function Revenue() {
                 </li>
               ))}
             </ul>
+            {t.priceId && (
+              <button
+                type="button"
+                onClick={() =>
+                  addItem({
+                    priceId: t.priceId!,
+                    productId: t.productId!,
+                    name: t.cartName,
+                    unitAmount: t.unitAmount,
+                  })
+                }
+                className="mt-5 w-full py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
+                Add to Cart
+              </button>
+            )}
           </div>
         ))}
       </div>
