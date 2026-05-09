@@ -263,7 +263,7 @@ function StudioPage() {
               <span className="text-bone">BWF</span><span style={{ color: GOLD }}>MEDIA</span>
             </div>
             <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
-              Visuals That Move Culture
+              Where Culture Goes Viral
             </div>
           </HUDFrame>
           <div className="space-y-3 font-cond tracking-[0.18em] text-sm self-center">
