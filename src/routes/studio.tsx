@@ -280,12 +280,12 @@ function StudioPage() {
   );
 }
 
-const SESSION_TYPES = [
-  "Artist Interview",
-  "Music Video Content",
-  "Podcast Recording",
-  "Press + Media Session",
-  "Social Content Pack",
+const SESSION_TYPES: { name: string; price: string }[] = [
+  { name: "Artist Interview",      price: "$250" },
+  { name: "Music Video Content",   price: "$750" },
+  { name: "Podcast Recording",     price: "$200" },
+  { name: "Press + Media Session", price: "$350" },
+  { name: "Social Content Pack",   price: "$300" },
 ];
 const CREW_SIZES = ["Solo (1 Operator)", "Duo (2 Operators)", "Full Crew (3–4)"];
 const DURATIONS = ["1 Hour", "2 Hours", "Half Day (4h)", "Full Day (8h)"];
@@ -294,7 +294,7 @@ const TIME_SLOTS = ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM", "8:
 function StudioBookingCalendar() {
   const [date, setDate] = useState<Date | undefined>();
   const [time, setTime] = useState("");
-  const [sessionType, setSessionType] = useState(SESSION_TYPES[0]);
+  const [sessionType, setSessionType] = useState(SESSION_TYPES[0].name);
   const [crewSize, setCrewSize] = useState(CREW_SIZES[0]);
   const [duration, setDuration] = useState(DURATIONS[0]);
   const [name, setName] = useState("");
@@ -466,9 +466,32 @@ function StudioBookingCalendar() {
               onChange={(e) => setSessionType(e.target.value)}
             >
               {SESSION_TYPES.map((s) => (
-                <option key={s} value={s} className="bg-black">{s}</option>
+                <option key={s.name} value={s.name} className="bg-black">
+                  {s.name} — {s.price}
+                </option>
               ))}
             </select>
+            <div className="mt-3 grid gap-1.5">
+              {SESSION_TYPES.map((s) => {
+                const active = sessionType === s.name;
+                return (
+                  <button
+                    type="button"
+                    key={s.name}
+                    onClick={() => setSessionType(s.name)}
+                    className="flex items-center justify-between px-3 py-2 font-cond tracking-[0.15em] text-[11px] uppercase transition"
+                    style={{
+                      border: `1px solid ${active ? GOLD : GOLD + "33"}`,
+                      background: active ? "rgba(212,162,76,0.12)" : "transparent",
+                      color: active ? "#f5ebd2" : "rgba(245,235,210,0.75)",
+                    }}
+                  >
+                    <span>{s.name}</span>
+                    <span style={{ color: GOLD }}>{s.price}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div>
