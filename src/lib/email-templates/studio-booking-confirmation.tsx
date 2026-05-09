@@ -1,5 +1,5 @@
 import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Hr,
+  Body, Button, Container, Head, Heading, Html, Preview, Section, Text, Hr,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
@@ -13,6 +13,7 @@ interface StudioBookingProps {
   time?: string
   duration?: string
   crewSize?: string
+  payUrl?: string
 }
 
 const StudioBookingConfirmation = ({
@@ -22,6 +23,7 @@ const StudioBookingConfirmation = ({
   time,
   duration,
   crewSize,
+  payUrl,
 }: StudioBookingProps) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -69,15 +71,28 @@ const StudioBookingConfirmation = ({
         </Section>
 
         <Heading style={h2}>Next Steps</Heading>
+        {payUrl && (
+          <Section style={payBox}>
+            <Text style={payLead}>
+              Lock in your session now by completing payment:
+            </Text>
+            <Button href={payUrl} style={payButton}>
+              Complete Payment
+            </Button>
+            <Text style={payFallback}>
+              Or open this link: <a href={payUrl} style={link}>{payUrl}</a>
+            </Text>
+          </Section>
+        )}
         <Text style={text}>
           <strong style={{ color: GOLD }}>1. Confirmation —</strong> A BWF team
           member will email you within 24 hours to confirm the slot or propose
           alternatives if needed.
         </Text>
         <Text style={text}>
-          <strong style={{ color: GOLD }}>2. Deposit —</strong> A deposit is
-          required to lock in your session. Payment instructions and the
-          deposit amount will be included in your confirmation email.
+          <strong style={{ color: GOLD }}>2. Deposit —</strong> Use the payment
+          link above to choose your package and pay the deposit. Your slot is
+          locked in once payment is received.
         </Text>
         <Text style={text}>
           <strong style={{ color: GOLD }}>3. Studio Location —</strong> The
@@ -111,6 +126,7 @@ export const template = {
     time: '2:00 PM',
     duration: '2 Hours',
     crewSize: 'Duo (2 Operators)',
+    payUrl: 'https://bwfmedia.company/pay/example-id?table=studio_bookings',
   },
 } satisfies TemplateEntry
 
@@ -184,6 +200,36 @@ const hrLine = {
   margin: '12px 0',
 }
 const link = { color: GOLD, textDecoration: 'underline' }
+const payBox = {
+  border: `1px solid ${GOLD}`,
+  background: '#0a0a0a',
+  padding: '20px 22px',
+  margin: '8px 0 24px',
+  textAlign: 'center' as const,
+}
+const payLead = {
+  fontSize: '13px',
+  color: '#f5f5f5',
+  margin: '0 0 14px',
+}
+const payButton = {
+  background: GOLD,
+  color: '#0a0a0a',
+  fontSize: '14px',
+  fontWeight: 'bold' as const,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase' as const,
+  padding: '12px 24px',
+  borderRadius: '2px',
+  textDecoration: 'none',
+  display: 'inline-block',
+}
+const payFallback = {
+  fontSize: '11px',
+  color: '#bbb',
+  margin: '14px 0 0',
+  wordBreak: 'break-all' as const,
+}
 const footerText = {
   fontSize: '13px',
   color: '#555',
