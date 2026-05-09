@@ -43,7 +43,7 @@ function StudioPage() {
   const videoScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.15]);
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   return (
-    <FutureShell label="STUDIO / NODE 02">
+    <FutureShell label="STUDIO BOOKINGS">
       <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
         {/* HERO */}
         <section ref={heroRef} className="relative pt-10 md:pt-16 pb-20">
@@ -69,7 +69,7 @@ function StudioPage() {
             />
           </motion.div>
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
-            BWF / Media <span style={{ color: GOLD }}>// node_02_active</span>
+            BWF Media TV <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
           </div>
 
           <motion.h1
@@ -246,12 +246,12 @@ function StudioPage() {
 
         {/* CTA */}
         <section className="py-16">
-          <SectionTag>Schedule // Studio Session</SectionTag>
+          <SectionTag>Schedule Your Studio Session</SectionTag>
           <h2 className="mt-6 font-display text-5xl md:text-7xl uppercase">
             BOOK <span style={{ color: GOLD }}>YOUR SESSION</span>
           </h2>
           <p className="mt-3 text-bone/75 max-w-xl">
-            Limited weekly slots. Lock in your transmission window below.
+            Limited weekly slots. Reserve your studio time below.
           </p>
           <StudioBookingCalendar />
         </section>
@@ -349,11 +349,11 @@ function StudioBookingCalendar() {
     }
     setSubmitting(false);
     if (!ok) {
-      toast.error("Transmission failed. Try again.");
+      toast.error("Booking failed. Please try again.");
       return;
     }
     setDone(true);
-    toast.success("Booking received - confirmation email sent.");
+    toast.success("Booking received. Confirmation email sent.");
   }
 
   if (done) {
@@ -371,7 +371,7 @@ function StudioBookingCalendar() {
           + confirmation details.
         </p>
         <div className="mt-8 font-cond tracking-[0.4em] text-[10px] uppercase" style={{ color: GOLD }}>
-          // Transmission Complete
+          Booking Confirmed
         </div>
       </HUDFrame>
     );
