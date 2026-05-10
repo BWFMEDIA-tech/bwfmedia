@@ -40,12 +40,12 @@ function ScrollProgress() {
 /* ---------- nav ---------- */
 
 function Nav() {
-  const links = [
-    { href: "#services", label: "Services" },
-    { href: "#why", label: "Why BWF" },
-    { href: "#audience", label: "Audience" },
-    { href: "#pricing", label: "Pricing" },
-    { href: "#contact", label: "Contact" },
+  const links: Array<{ href?: string; to?: string; label: string }> = [
+    { href: "/#services", label: "Services" },
+    { href: "/#why", label: "Why BWF" },
+    { href: "/#audience", label: "Audience" },
+    { href: "/#pricing", label: "Pricing" },
+    { to: "/contact", label: "Contact" },
   ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -66,12 +66,19 @@ function Nav() {
           <img src={bwfLogo} alt="BWF Media" className="w-14 h-14 md:w-16 md:h-16 object-contain" />
         </a>
         <div className="hidden md:flex items-center gap-7">
-          {links.map((l) => (
-            <a key={l.href} href={l.href}
-              className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) =>
+            l.to ? (
+              <RouterLink key={l.label} to={l.to}
+                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
+                {l.label}
+              </RouterLink>
+            ) : (
+              <a key={l.label} href={l.href}
+                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
+                {l.label}
+              </a>
+            )
+          )}
           <RouterLink to="/studio"
             className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
             Studio
@@ -93,12 +100,19 @@ function Nav() {
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur overflow-hidden">
             <div className="px-6 py-4 flex flex-col gap-1">
-              {links.map((l) => (
-                <a key={l.href} href={l.href} onClick={() => setOpen(false)}
-                  className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
-                  {l.label}
-                </a>
-              ))}
+              {links.map((l) =>
+                l.to ? (
+                  <RouterLink key={l.label} to={l.to} onClick={() => setOpen(false)}
+                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
+                    {l.label}
+                  </RouterLink>
+                ) : (
+                  <a key={l.label} href={l.href} onClick={() => setOpen(false)}
+                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
+                    {l.label}
+                  </a>
+                )
+              )}
               <RouterLink to="/studio" onClick={() => setOpen(false)}
                 className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
                 Studio
@@ -545,10 +559,10 @@ function FinalCTA() {
               Book a Shoot
               <ArrowRight size={16} />
             </RouterLink>
-            <a href="#contact"
+            <RouterLink to="/contact"
               className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors">
               Contact Us
-            </a>
+            </RouterLink>
             <RouterLink to="/off-the-block"
               className="inline-flex items-center gap-2 px-8 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors">
               Off The Block
