@@ -132,6 +132,28 @@ function Nav() {
 
 /* ---------- HERO ---------- */
 
+function HeroVideoRotator() {
+  const clips = [heroRapperVideo.url, heroRapperFemaleVideo.url];
+  const [index, setIndex] = useState(0);
+
+  return (
+    <div className="absolute inset-0">
+      {clips.map((src, i) => (
+        <video
+          key={src}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+          style={{ opacity: i === index ? 1 : 0 }}
+          src={src}
+          autoPlay
+          muted
+          playsInline
+          onEnded={() => setIndex((i + 1) % clips.length)}
+        />
+      ))}
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section id="top" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
