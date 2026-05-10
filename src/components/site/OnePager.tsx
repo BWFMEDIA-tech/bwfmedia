@@ -147,7 +147,7 @@ function HeroVideoRotator() {
           autoPlay
           muted
           playsInline
-          onEnded={() => setIndex((i + 1) % clips.length)}
+          onEnded={() => { if (i === index) setIndex((i + 1) % clips.length); }}
         />
       ))}
     </div>
