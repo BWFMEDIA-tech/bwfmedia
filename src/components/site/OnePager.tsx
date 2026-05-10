@@ -7,6 +7,7 @@ import {
 import { useState, useEffect } from "react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import heroRapperFemaleVideo from "@/assets/hero-rapper-female.mp4.asset.json";
 
 /* ---------- shared ---------- */
 
@@ -134,11 +135,19 @@ function Nav() {
 function Hero() {
   return (
     <section id="top" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        src={heroRapperVideo.url}
-        autoPlay muted loop playsInline
-      />
+      <div className="absolute inset-0 grid grid-cols-2">
+        <video
+          className="w-full h-full object-cover"
+          src={heroRapperVideo.url}
+          autoPlay muted loop playsInline
+        />
+        <video
+          className="w-full h-full object-cover"
+          src={heroRapperFemaleVideo.url}
+          autoPlay muted loop playsInline
+        />
+      </div>
+      <div className="absolute inset-y-0 left-1/2 w-px bg-white/10 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
       <div
         className="absolute inset-0 opacity-30 pointer-events-none"
