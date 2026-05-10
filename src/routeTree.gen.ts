@@ -14,6 +14,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as DeckRouteImport } from './routes/deck'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
@@ -58,6 +59,11 @@ const OffTheBlockRoute = OffTheBlockRouteImport.update({
 const DeckRoute = DeckRouteImport.update({
   id: '/deck',
   path: '/deck',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogRoute = BlogRouteImport.update({
@@ -169,6 +175,7 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/studio': typeof StudioRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/studio': typeof StudioRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/studio': typeof StudioRoute
@@ -253,6 +262,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/blog'
+    | '/contact'
     | '/deck'
     | '/off-the-block'
     | '/studio'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/blog'
+    | '/contact'
     | '/deck'
     | '/off-the-block'
     | '/studio'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/blog'
+    | '/contact'
     | '/deck'
     | '/off-the-block'
     | '/studio'
@@ -335,6 +347,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BlogRoute: typeof BlogRoute
+  ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   StudioRoute: typeof StudioRoute
@@ -394,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/deck'
       fullPath: '/deck'
       preLoaderRoute: typeof DeckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog': {
@@ -553,6 +573,7 @@ const VideosRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BlogRoute: BlogRoute,
+  ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   StudioRoute: StudioRoute,
