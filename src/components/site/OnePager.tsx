@@ -7,7 +7,6 @@ import {
 import { useState, useEffect } from "react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
-import heroRapperFemaleVideo from "@/assets/hero-rapper-female.mp4.asset.json";
 
 /* ---------- shared ---------- */
 
@@ -132,32 +131,14 @@ function Nav() {
 
 /* ---------- HERO ---------- */
 
-function HeroVideoRotator() {
-  const clips = [heroRapperVideo.url, heroRapperFemaleVideo.url];
-  const [index, setIndex] = useState(0);
-
-  return (
-    <div className="absolute inset-0">
-      {clips.map((src, i) => (
-        <video
-          key={src}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-          style={{ opacity: i === index ? 1 : 0 }}
-          src={src}
-          autoPlay
-          muted
-          playsInline
-          onEnded={() => { if (i === index) setIndex((i + 1) % clips.length); }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function Hero() {
   return (
     <section id="top" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
-      <HeroVideoRotator />
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        src={heroRapperVideo.url}
+        autoPlay muted loop playsInline
+      />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
       <div
         className="absolute inset-0 opacity-30 pointer-events-none"
