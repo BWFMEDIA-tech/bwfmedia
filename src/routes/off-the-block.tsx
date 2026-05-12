@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import heroVideo from "@/assets/off-the-block-hero.mp4.asset.json";
-import { Calendar } from "@/components/ui/calendar";
+import { FuturisticCalendar } from "@/components/FuturisticCalendar";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -364,13 +364,11 @@ function BookingCalendar() {
             className="mt-4 p-3"
             style={{ background: "rgba(212,162,76,0.04)", border: `1px solid ${GOLD}33` }}
           >
-            <Calendar
-              mode="single"
+            <FuturisticCalendar
               selected={date}
               onSelect={setDate}
               disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-              initialFocus
-              className={cn("p-3 pointer-events-auto mx-auto")}
+              accent={GOLD}
             />
           </div>
 
