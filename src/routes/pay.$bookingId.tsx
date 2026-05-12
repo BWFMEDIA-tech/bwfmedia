@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { getStripe, getStripeEnvironment } from '@/lib/stripe';
 import { createBookingCheckout } from '@/lib/booking-checkout.functions';
@@ -43,6 +43,16 @@ function PayPage() {
       setLoading(false);
     }
   };
+
+  // Auto-start checkout when a package is preselected via search param
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStarted.current && pkg && BOOKING_PACKAGES[pkg] && !clientSecret && !loading) {
+      autoStarted.current = true;
+      void startCheckout(pkg);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pkg]);
 
   if (clientSecret) {
     return (

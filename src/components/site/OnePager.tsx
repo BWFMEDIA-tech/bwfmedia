@@ -44,7 +44,6 @@ function Nav() {
     { href: "/#services", label: "Services" },
     { href: "/#why", label: "Why BWF" },
     { href: "/#audience", label: "Audience" },
-    { href: "/#pricing", label: "Pricing" },
     { to: "/contact", label: "Contact" },
   ];
   const [open, setOpen] = useState(false);
@@ -636,7 +635,6 @@ export function OnePager() {
       <Why />
       <Audience />
       <ContentSystem />
-      <Pricing />
       <Podcast />
       <Partnerships />
       <FinalCTA />
