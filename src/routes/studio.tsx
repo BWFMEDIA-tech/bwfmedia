@@ -291,12 +291,17 @@ function StudioPage() {
   );
 }
 
-const SESSION_TYPES: { name: string; price: string }[] = [
+const SESSION_TYPES: { name: string; price: string; pkg?: string }[] = [
   { name: "Artist Interview",      price: "$250" },
   { name: "Music Video Content",   price: "$750" },
   { name: "Podcast Recording",     price: "$200" },
   { name: "Press + Media Session", price: "$350" },
   { name: "Social Content Pack",   price: "$300" },
+  // Production packages (trigger checkout with prefilled package)
+  { name: "Basic Package — 1hr Shoot",        price: "$150", pkg: "studio_1hr" },
+  { name: "Standard Package — 2hr Shoot",     price: "$275", pkg: "studio_2hr" },
+  { name: "Premium Package — Half Day (4h)",  price: "$500", pkg: "studio_4hr" },
+  { name: "Flagship Package — Full Day (8h)", price: "$900", pkg: "studio_8hr" },
 ];
 const CREW_SIZES = ["Solo (1 Operator)", "Duo (2 Operators)", "Full Crew (3–4)"];
 const DURATIONS = ["1 Hour", "2 Hours", "Half Day (4h)", "Full Day (8h)"];
@@ -355,7 +360,12 @@ function StudioBookingCalendar() {
       return;
     }
     toast.success("Session locked in. Redirecting to checkout…");
-    navigate({ to: "/pay/$bookingId", params: { bookingId }, search: { table: "studio_bookings" } });
+    const selected = SESSION_TYPES.find((s) => s.name === sessionType);
+    navigate({
+      to: "/pay/$bookingId",
+      params: { bookingId },
+      search: { table: "studio_bookings", ...(selected?.pkg ? { pkg: selected.pkg } : {}) },
+    });
   }
 
   return (
