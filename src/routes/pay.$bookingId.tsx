@@ -24,6 +24,21 @@ function PayPage() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const changePackage = () => {
+    autoStarted.current = true; // prevent re-trigger from preselected pkg
+    setClientSecret(null);
+    setSelected(null);
+    setError(null);
+    if (pkg) {
+      navigate({
+        to: '/pay/$bookingId',
+        params: { bookingId },
+        search: { table },
+        replace: true,
+      });
+    }
+  };
+
   const sessionTypeLabel = table === 'block_bookings' ? 'Off The Block Booking' : 'Studio Session';
   const selectedPackage = selected ? BOOKING_PACKAGES[selected] : null;
 
@@ -89,6 +104,9 @@ function PayPage() {
         <PaymentTestModeBanner />
         <div className="max-w-2xl mx-auto px-6 py-10">
           <SummaryPanel />
+          <div className="mb-4 flex justify-end">
+            <Button variant="outline" size="sm" onClick={changePackage}>Change package</Button>
+          </div>
           <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
