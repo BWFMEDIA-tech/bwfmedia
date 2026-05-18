@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
+import { SiteFooter } from "@/components/site/SiteFooter";
 
 export const GOLD = "#D4A24C";
 export const GOLD_GLOW = "#F5C56B";
@@ -107,9 +108,11 @@ export function FutureShell({
 
       <div className="relative z-10">{children}</div>
 
+      <SiteFooter />
+
       {/* Bottom gold strip */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[2px] z-20"
+        className="relative h-[2px] z-20"
         style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)` }}
       />
     </div>

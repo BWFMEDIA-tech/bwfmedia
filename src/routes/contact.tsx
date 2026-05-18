@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { z } from "zod";
 import { Mail, MapPin, ArrowRight, Youtube, Instagram, Facebook, Twitter, Music2, Linkedin, Send, Loader2 } from "lucide-react";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import bwfLogo from "@/assets/bwf-logo.png";
@@ -204,6 +205,9 @@ function ContactPage() {
           </button>
         </form>
       </section>
+
+      <div className="border-t border-white/10" />
+      <SiteFooter />
     </div>
   );
 }
