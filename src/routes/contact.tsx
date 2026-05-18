@@ -205,6 +205,9 @@ function ContactPage() {
           </button>
         </form>
       </section>
+
+      <div className="border-t border-white/10" />
+      <SiteFooter />
     </div>
   );
 }
