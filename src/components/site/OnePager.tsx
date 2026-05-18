@@ -576,51 +576,7 @@ function FinalCTA() {
 
 /* ---------- FOOTER ---------- */
 
-function Footer() {
-  return (
-    <footer id="contact" className="bg-black border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-14 grid md:grid-cols-3 gap-10 items-start">
-        <div>
-          <img src={bwfLogo} alt="BWF Media" className="w-16 h-16 object-contain" />
-          <p className="mt-4 text-sm text-bone/55 max-w-xs leading-relaxed">
-            Where culture goes viral. A premium media network for artists, brands, and the moments that matter.
-          </p>
-        </div>
-        <div>
-          <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Contact</div>
-          <a href="mailto:bookings@bwfmedia.company" className="text-bone hover:text-blood transition-colors block">bookings@bwfmedia.company</a>
-        </div>
-        <div>
-          <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">Follow</div>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { href: "https://youtube.com/@bwfmediatv", label: "YouTube", Icon: Youtube },
-              { href: "https://instagram.com/bwfmediatv", label: "Instagram", Icon: Instagram },
-              { href: "https://tiktok.com/@bwfmediatv", label: "TikTok", Icon: Music2 },
-              { href: "https://x.com/bwfmediatv", label: "X / Twitter", Icon: Twitter },
-              { href: "https://facebook.com/bwfmediatv", label: "Facebook", Icon: Facebook },
-              { href: "https://linkedin.com/company/bwfmediatv", label: "LinkedIn", Icon: Linkedin },
-            ].map(({ href, label, Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={label}
-                className="w-10 h-10 flex items-center justify-center border border-white/15 text-bone hover:bg-blood hover:border-blood transition-colors"
-              >
-                <Icon size={18} />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="border-t border-white/10 py-5 text-center font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40">
-        © {new Date().getFullYear()} BWF Media TV - All rights reserved
-      </div>
-    </footer>
-  );
-}
+import { SiteFooter } from "@/components/site/SiteFooter";
 
 /* ---------- ROOT ---------- */
 
@@ -638,7 +594,7 @@ export function OnePager() {
       <Podcast />
       <Partnerships />
       <FinalCTA />
-      <Footer />
+      <SiteFooter />
     </div>
   );
 }
