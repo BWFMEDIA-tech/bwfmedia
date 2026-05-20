@@ -44,30 +44,30 @@ function StudioPage() {
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   return (
     <FutureShell label="STUDIO BOOKINGS">
-      <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
-        {/* HERO */}
-        <section ref={heroRef} className="relative pt-10 md:pt-16 pb-20">
-          <motion.div
-            style={{ opacity: heroFade }}
-            className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
-          >
-            <motion.video
-              style={{ y: videoY, scale: videoScale }}
-              src={heroVideo.url}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover opacity-50"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 60%, #000 100%)",
-              }}
-            />
-          </motion.div>
+      {/* HERO */}
+      <section ref={heroRef} className="relative pt-10 md:pt-16 pb-20">
+        <motion.div
+          style={{ opacity: heroFade }}
+          className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+        >
+          <motion.video
+            style={{ y: videoY, scale: videoScale }}
+            src={heroVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover opacity-50"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 60%, #000 100%)",
+            }}
+          />
+        </motion.div>
+        <div className="max-w-6xl mx-auto px-6 md:px-12">
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
             BWF Media TV <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
           </div>
@@ -104,7 +104,10 @@ function StudioPage() {
             A controlled creative environment for artists & creators. Calibrated sound,
             cinematic lighting, and brand-ready delivery - every frame engineered.
           </p>
-        </section>
+        </div>
+      </section>
+
+      <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
 
         {/* LOCATION */}
         <section className="pb-16">
