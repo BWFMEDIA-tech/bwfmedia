@@ -6,8 +6,22 @@ import audience from "@/assets/audience.jpg";
 import musicVideo from "@/assets/music-video.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
 import {
-  Play, Mic, Film, Smartphone, Flame, TrendingUp, Users,
-  DollarSign, Globe, Handshake, Trophy, Sparkles, Mail, Instagram, Youtube, ArrowUpRight
+  Play,
+  Mic,
+  Film,
+  Smartphone,
+  Flame,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Globe,
+  Handshake,
+  Trophy,
+  Sparkles,
+  Mail,
+  Instagram,
+  Youtube,
+  ArrowUpRight,
 } from "lucide-react";
 
 const TOTAL = 11;
@@ -23,12 +37,13 @@ export function Slide1() {
           transition={{ duration: 0.7 }}
           className="flex items-center gap-4 mb-8"
         >
-          <div className="flex items-center justify-center w-14 h-10 rounded" style={{ backgroundColor: "var(--blood)" }}>
+          <div
+            className="flex items-center justify-center w-14 h-10 rounded"
+            style={{ backgroundColor: "var(--blood)" }}
+          >
             <Play className="w-5 h-5 fill-bone text-bone" />
           </div>
-          <span className="font-cond font-bold tracking-[0.4em] text-sm uppercase text-bone/70">
-            YouTube Channel
-          </span>
+          <span className="font-cond font-bold tracking-[0.4em] text-sm uppercase text-bone/70">YouTube Channel</span>
         </motion.div>
 
         <motion.div
@@ -37,10 +52,7 @@ export function Slide1() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative flex items-center justify-center"
         >
-          <div
-            className="absolute inset-0 blur-3xl opacity-40 -z-10"
-            style={{ backgroundColor: "var(--blood)" }}
-          />
+          <div className="absolute inset-0 blur-3xl opacity-40 -z-10" style={{ backgroundColor: "var(--blood)" }} />
           <img
             src={bwfLogo}
             alt="BWF Media TV"
@@ -85,7 +97,7 @@ export function Slide1() {
           Where Culture <span style={{ color: "var(--blood)" }}>Goes Viral</span>
         </motion.p>
         <motion.a
-          href="https://youtube.com/@bwfmediatvtv"
+          href="https://youtube.com/bwfmedia"
           target="_blank"
           rel="noreferrer"
           initial={{ opacity: 0 }}
@@ -110,7 +122,9 @@ export function Slide1() {
 function Stat({ big, label }: { big: string; label: string }) {
   return (
     <div className="text-left">
-      <div className="font-display text-7xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{big}</div>
+      <div className="font-display text-7xl leading-none red-shadow" style={{ color: "var(--blood)" }}>
+        {big}
+      </div>
       <div className="font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/70 mt-2">{label}</div>
     </div>
   );
@@ -131,7 +145,8 @@ export function Slide2() {
             01, The Attention
           </motion.div>
           <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow mb-10">
-            HIP-HOP MEDIA<br />
+            HIP-HOP MEDIA
+            <br />
             <span style={{ color: "var(--blood)" }}>IS CHANGING</span>
           </h2>
           <ul className="space-y-5 text-bone/85 text-lg">
@@ -153,7 +168,10 @@ export function Slide2() {
             ))}
           </ul>
 
-          <div className="mt-12 inline-block px-6 py-4 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}>
+          <div
+            className="mt-12 inline-block px-6 py-4 border-l-4"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
+          >
             <span className="font-display text-3xl tracking-tight" style={{ color: "var(--blood)" }}>
               BWF MEDIA IS ALREADY THERE.
             </span>
@@ -162,13 +180,23 @@ export function Slide2() {
 
         <div className="relative aspect-[4/5] overflow-hidden">
           <img src={audience} alt="" className="w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.85))" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.85))" }}
+          />
           <div className="absolute bottom-6 left-6 right-6">
-            <div className="font-brush text-2xl" style={{ color: "var(--blood)" }}>The next generation</div>
+            <div className="font-brush text-2xl" style={{ color: "var(--blood)" }}>
+              The next generation
+            </div>
             <div className="font-display text-5xl text-bone leading-none mt-1">DOESN'T WAIT.</div>
           </div>
-          <div className="absolute top-4 right-4 w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: "var(--blood)" }} />
-          <div className="absolute top-3 right-10 font-cond font-bold tracking-widest text-[10px] uppercase text-bone">LIVE</div>
+          <div
+            className="absolute top-4 right-4 w-3 h-3 rounded-full animate-pulse"
+            style={{ backgroundColor: "var(--blood)" }}
+          />
+          <div className="absolute top-3 right-10 font-cond font-bold tracking-widest text-[10px] uppercase text-bone">
+            LIVE
+          </div>
         </div>
       </div>
     </SlideShell>
@@ -202,7 +230,9 @@ export function Slide3() {
               className="relative border-l-4 pl-6 py-4"
               style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
             >
-              <div className="font-display text-7xl leading-none red-shadow" style={{ color: "var(--blood)" }}>{s.big}</div>
+              <div className="font-display text-7xl leading-none red-shadow" style={{ color: "var(--blood)" }}>
+                {s.big}
+              </div>
               <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone mt-3">{s.label}</div>
               <div className="text-bone/60 text-sm mt-1">{s.sub}</div>
             </motion.div>
@@ -211,10 +241,17 @@ export function Slide3() {
 
         <div className="relative flex-1 overflow-hidden border" style={{ borderColor: "var(--blood)" }}>
           <img src={viralThumbs} alt="Viral video stills" className="w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.85), transparent 40%)" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.85), transparent 40%)" }}
+          />
           <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-            <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/80">Featured viral hits</span>
-            <span className="font-brush text-xl" style={{ color: "var(--blood)" }}>+ 200 more</span>
+            <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/80">
+              Featured viral hits
+            </span>
+            <span className="font-brush text-xl" style={{ color: "var(--blood)" }}>
+              + 200 more
+            </span>
           </div>
         </div>
       </div>
@@ -234,16 +271,22 @@ export function Slide4() {
     <SlideShell number={3} total={TOTAL} label="Solution">
       <div className="flex-1 px-20 py-24 grid grid-cols-5 gap-12">
         <div className="col-span-2">
-          <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4"
+            style={{ color: "var(--blood)" }}
+          >
             03, Content Engine
           </div>
           <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow">
-            ONE SHOOT.<br />
-            <span style={{ color: "var(--blood)" }}>MULTIPLE</span><br />
+            ONE SHOOT.
+            <br />
+            <span style={{ color: "var(--blood)" }}>MULTIPLE</span>
+            <br />
             VIRAL ASSETS.
           </h2>
           <p className="mt-8 text-bone/70 text-lg leading-relaxed max-w-sm">
-            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning one shoot into a full media cycle.
+            Every piece of content is engineered for distribution across YouTube, Shorts, Reels, TikTok, and IG, turning
+            one shoot into a full media cycle.
           </p>
         </div>
 
@@ -257,7 +300,10 @@ export function Slide4() {
               className="relative p-7 border-2 group hover:border-blood transition-colors"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.5)" }}
             >
-              <div className="w-14 h-14 flex items-center justify-center rounded mb-5" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-14 h-14 flex items-center justify-center rounded mb-5"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <it.icon className="w-7 h-7 text-bone" strokeWidth={2.5} />
               </div>
               <div className="font-display text-3xl text-bone tracking-tight mb-2">{it.title.toUpperCase()}</div>
@@ -278,19 +324,28 @@ export function Slide5() {
       <div className="flex-1 grid grid-cols-2">
         <div className="relative">
           <img src={audience} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, transparent, rgba(0,0,0,0.95))" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(0,0,0,0.95))" }}
+          />
           <div className="absolute bottom-8 left-8">
             <div className="font-brush text-3xl text-bone">Culture is</div>
-            <div className="font-display text-6xl leading-none" style={{ color: "var(--blood)" }}>WATCHING.</div>
+            <div className="font-display text-6xl leading-none" style={{ color: "var(--blood)" }}>
+              WATCHING.
+            </div>
           </div>
         </div>
 
         <div className="px-16 py-24 flex flex-col justify-center">
-          <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4"
+            style={{ color: "var(--blood)" }}
+          >
             04, Demographics
           </div>
           <h2 className="font-display text-6xl leading-[0.9] text-bone heavy-shadow mb-10">
-            REAL AUDIENCE.<br />
+            REAL AUDIENCE.
+            <br />
             <span style={{ color: "var(--blood)" }}>REAL ENGAGEMENT.</span>
           </h2>
 
@@ -308,7 +363,12 @@ export function Slide5() {
                 transition={{ delay: i * 0.08 }}
                 className="grid grid-cols-[110px_1fr] gap-6 items-baseline pb-4 border-b border-border"
               >
-                <span className="font-cond font-bold tracking-[0.25em] text-xs uppercase" style={{ color: "var(--blood)" }}>{row.k}</span>
+                <span
+                  className="font-cond font-bold tracking-[0.25em] text-xs uppercase"
+                  style={{ color: "var(--blood)" }}
+                >
+                  {row.k}
+                </span>
                 <div>
                   <div className="font-display text-2xl text-bone tracking-tight">{row.v}</div>
                   <div className="text-bone/50 text-sm">{row.note}</div>
@@ -317,7 +377,10 @@ export function Slide5() {
             ))}
           </div>
 
-          <div className="mt-10 inline-block px-6 py-4 border-l-4 self-start" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}>
+          <div
+            className="mt-10 inline-block px-6 py-4 border-l-4 self-start"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.4)" }}
+          >
             <span className="font-display text-2xl tracking-tight" style={{ color: "var(--blood)" }}>
               THIS AUDIENCE DRIVES CULTURE.
             </span>
@@ -331,17 +394,44 @@ export function Slide5() {
 /* ================= SLIDE 6, MONETIZATION ================= */
 export function Slide6() {
   const tiers = [
-    { name: "LIVE INTERVIEW", price: "$500", deposit: "$250 deposit", icon: Mic, items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"] },
-    { name: "MUSIC VIDEO", price: "$900", deposit: "$400 deposit", icon: Film, items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"] },
-    { name: "PROMO PACKAGE", price: "$300", deposit: "$150 deposit", icon: TrendingUp, items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"] },
-    { name: "AD REVENUE", price: "Recurring", deposit: "YouTube Partner", icon: DollarSign, items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"] },
+    {
+      name: "LIVE INTERVIEW",
+      price: "$500",
+      deposit: "$250 deposit",
+      icon: Mic,
+      items: ["1-on-1 (up to 45 min)", "Promo on all platforms", "Live on YouTube", "Full edit + thumbnail"],
+    },
+    {
+      name: "MUSIC VIDEO",
+      price: "$900",
+      deposit: "$400 deposit",
+      icon: Film,
+      items: ["HD production", "Up to 4hr shoot", "Pro camera + edit", "YouTube upload + promo"],
+    },
+    {
+      name: "PROMO PACKAGE",
+      price: "$300",
+      deposit: "$150 deposit",
+      icon: TrendingUp,
+      items: ["Upload to BWF Media TV", "Shoutout in video", "Shorts clip 15-30s", "Title + thumbnail optimized"],
+    },
+    {
+      name: "AD REVENUE",
+      price: "Recurring",
+      deposit: "YouTube Partner",
+      icon: DollarSign,
+      items: ["Monthly ad payout", "Sponsor integrations", "Brand deal pipeline", "Channel memberships"],
+    },
   ];
   return (
     <SlideShell number={6} total={TOTAL} label="Model">
       <div className="flex-1 px-20 py-20 flex flex-col">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-3" style={{ color: "var(--blood)" }}>
+            <div
+              className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-3"
+              style={{ color: "var(--blood)" }}
+            >
               05, Monetization
             </div>
             <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow">
@@ -350,7 +440,10 @@ export function Slide6() {
           </div>
           <div className="text-right">
             <div className="font-brush text-2xl text-bone/70">4 active streams</div>
-            <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mt-1" style={{ color: "var(--blood)" }}>
+            <div
+              className="font-cond font-bold tracking-[0.3em] text-xs uppercase mt-1"
+              style={{ color: "var(--blood)" }}
+            >
               Already generating
             </div>
           </div>
@@ -369,12 +462,17 @@ export function Slide6() {
               <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
               <t.icon className="w-8 h-8 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
               <div className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/70 mb-2">{t.name}</div>
-              <div className="font-display text-5xl leading-none mb-1" style={{ color: "var(--blood)" }}>{t.price}</div>
+              <div className="font-display text-5xl leading-none mb-1" style={{ color: "var(--blood)" }}>
+                {t.price}
+              </div>
               <div className="font-cond text-[10px] tracking-widest uppercase text-bone/50 mb-5">{t.deposit}</div>
               <ul className="space-y-2 mt-auto">
                 {t.items.map((it, j) => (
                   <li key={j} className="flex gap-2 text-bone/75 text-xs leading-snug">
-                    <span className="block w-1 h-1 mt-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
+                    <span
+                      className="block w-1 h-1 mt-1.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: "var(--blood)" }}
+                    />
                     {it}
                   </li>
                 ))}
@@ -393,12 +491,17 @@ export function Slide7() {
     <SlideShell number={8} total={TOTAL} label="Growth">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
-          <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4"
+            style={{ color: "var(--blood)" }}
+          >
             06, Scale
           </div>
           <h2 className="font-display text-7xl leading-[0.9] text-bone heavy-shadow mb-10">
-            WITH THE RIGHT<br />
-            PARTNER,<br />
+            WITH THE RIGHT
+            <br />
+            PARTNER,
+            <br />
             <span style={{ color: "var(--blood)" }}>WE SCALE FAST.</span>
           </h2>
           <div className="space-y-4">
@@ -415,7 +518,9 @@ export function Slide7() {
                 transition={{ delay: 0.1 + i * 0.1 }}
                 className="flex items-center gap-5 py-3 border-b border-border"
               >
-                <span className="font-display text-3xl w-12" style={{ color: "var(--blood)" }}>0{i + 1}</span>
+                <span className="font-display text-3xl w-12" style={{ color: "var(--blood)" }}>
+                  0{i + 1}
+                </span>
                 <span className="text-bone text-lg">{t}</span>
                 <ArrowUpRight className="w-5 h-5 ml-auto text-bone/30" />
               </motion.div>
@@ -425,10 +530,15 @@ export function Slide7() {
 
         <div className="relative aspect-square">
           <img src={musicVideo} alt="" className="w-full h-full object-cover" loading="lazy" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.85))" }} />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.85))" }}
+          />
           <div className="absolute inset-x-0 bottom-0 p-8">
             <div className="font-brush text-2xl text-bone/80">Ready for</div>
-            <div className="font-display text-6xl leading-none heavy-shadow" style={{ color: "var(--blood)" }}>NATIONAL</div>
+            <div className="font-display text-6xl leading-none heavy-shadow" style={{ color: "var(--blood)" }}>
+              NATIONAL
+            </div>
             <div className="font-display text-6xl leading-none text-bone heavy-shadow">EXPOSURE.</div>
           </div>
           <div className="absolute top-6 left-6 flex items-center gap-2">
@@ -444,9 +554,24 @@ export function Slide7() {
 /* ================= SLIDE 8, PARTNERSHIP ================= */
 export function Slide8() {
   const opts = [
-    { tag: "Option 01", title: "CONTENT LICENSING", body: "Pay per video for premium long-form content, interviews, and franchise series.", icon: Film },
-    { tag: "Option 02", title: "DISTRIBUTION DEAL", body: "Partner to expand BWF reach across networks, platforms, and new markets.", icon: Globe },
-    { tag: "Option 03", title: "UPFRONT INVESTMENT", body: "Capital injection to scale production, talent, and content velocity.", icon: TrendingUp },
+    {
+      tag: "Option 01",
+      title: "CONTENT LICENSING",
+      body: "Pay per video for premium long-form content, interviews, and franchise series.",
+      icon: Film,
+    },
+    {
+      tag: "Option 02",
+      title: "DISTRIBUTION DEAL",
+      body: "Partner to expand BWF reach across networks, platforms, and new markets.",
+      icon: Globe,
+    },
+    {
+      tag: "Option 03",
+      title: "UPFRONT INVESTMENT",
+      body: "Capital injection to scale production, talent, and content velocity.",
+      icon: TrendingUp,
+    },
   ];
   return (
     <SlideShell number={9} total={TOTAL} label="Financials">
@@ -472,13 +597,20 @@ export function Slide8() {
                 className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-20 blur-2xl group-hover:opacity-40 transition-opacity"
                 style={{ backgroundColor: "var(--blood)" }}
               />
-              <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-6" style={{ color: "var(--blood)" }}>{o.tag}</div>
+              <div
+                className="font-cond font-bold tracking-[0.3em] text-xs uppercase mb-6"
+                style={{ color: "var(--blood)" }}
+              >
+                {o.tag}
+              </div>
               <o.icon className="w-12 h-12 mb-6 text-bone" strokeWidth={2} />
               <div className="font-display text-3xl tracking-tight text-bone mb-4 leading-tight">{o.title}</div>
               <p className="text-bone/70 leading-relaxed">{o.body}</p>
               <div className="mt-auto pt-8 flex items-center gap-2">
                 <Handshake className="w-5 h-5" style={{ color: "var(--blood)" }} />
-                <span className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/60">Open to discuss</span>
+                <span className="font-cond font-bold tracking-[0.2em] text-xs uppercase text-bone/60">
+                  Open to discuss
+                </span>
               </div>
             </motion.div>
           ))}
@@ -500,16 +632,23 @@ export function Slide9() {
     <SlideShell number={7} total={TOTAL} label="Advantage">
       <div className="flex-1 px-20 py-24 grid grid-cols-2 gap-16 items-center">
         <div>
-          <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-4"
+            style={{ color: "var(--blood)" }}
+          >
             08, The Edge
           </div>
           <h2 className="font-display text-8xl leading-[0.85] text-bone heavy-shadow mb-8">
             WHY <span style={{ color: "var(--blood)" }}>US?</span>
           </h2>
           <p className="text-bone/70 text-lg leading-relaxed max-w-md mb-10">
-            Anyone can shoot video. Few can move culture. We've been doing it long enough to know exactly which lane we own.
+            Anyone can shoot video. Few can move culture. We've been doing it long enough to know exactly which lane we
+            own.
           </p>
-          <div className="inline-block px-7 py-5 border-l-4" style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div
+            className="inline-block px-7 py-5 border-l-4"
+            style={{ borderColor: "var(--blood)", backgroundColor: "rgba(0,0,0,0.5)" }}
+          >
             <span className="font-display text-3xl tracking-tight" style={{ color: "var(--blood)" }}>
               WE CONTROL A CULTURE LANE.
             </span>
@@ -526,7 +665,10 @@ export function Slide9() {
               className="p-6 border-2"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
-              <div className="w-12 h-12 rounded flex items-center justify-center mb-4" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-12 h-12 rounded flex items-center justify-center mb-4"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <r.icon className="w-6 h-6 text-bone" strokeWidth={2.5} />
               </div>
               <div className="font-display text-xl tracking-tight text-bone leading-tight mb-2">{r.title}</div>
@@ -553,7 +695,8 @@ export function Slide10() {
           transition={{ duration: 0.7 }}
           className="font-display text-[7rem] leading-[0.85] text-bone heavy-shadow max-w-5xl"
         >
-          THE FUTURE OF<br />
+          THE FUTURE OF
+          <br />
           <span style={{ color: "var(--blood)" }}>BWF MEDIA.</span>
         </motion.h2>
 
@@ -571,7 +714,9 @@ export function Slide10() {
               className="border-t-2 pt-6"
               style={{ borderColor: "var(--blood)" }}
             >
-              <div className="font-display text-4xl mb-2" style={{ color: "var(--blood)" }}>{p.n}</div>
+              <div className="font-display text-4xl mb-2" style={{ color: "var(--blood)" }}>
+                {p.n}
+              </div>
               <div className="font-display text-3xl text-bone tracking-tight leading-tight">{p.h}</div>
               <div className="font-cond text-bone/60 tracking-widest text-sm uppercase mt-1">{p.s}</div>
             </motion.div>
@@ -597,12 +742,17 @@ export function Slide11() {
     <SlideShell number={10} total={TOTAL} label="Ask">
       <div className="flex-1 grid grid-cols-2 gap-16 px-20 py-24 items-center">
         <div>
-          <div className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6" style={{ color: "var(--blood)" }}>
+          <div
+            className="font-cond font-bold tracking-[0.4em] text-sm uppercase mb-6"
+            style={{ color: "var(--blood)" }}
+          >
             10, Contact
           </div>
           <h2 className="font-display text-[7rem] leading-[0.85] text-bone heavy-shadow">
-            LET'S BUILD<br />
-            <span style={{ color: "var(--blood)" }}>SOMETHING</span><br />
+            LET'S BUILD
+            <br />
+            <span style={{ color: "var(--blood)" }}>SOMETHING</span>
+            <br />
             BIG.
           </h2>
           <p className="mt-8 text-bone/70 text-lg max-w-md leading-relaxed">
@@ -622,8 +772,8 @@ export function Slide11() {
                 c.label === "Email"
                   ? "mailto:bookbwfmediatv@mail.com"
                   : c.label === "Instagram"
-                  ? "https://instagram.com/bwfmediatv"
-                  : "https://youtube.com/@bwfmediatvtv"
+                    ? "https://instagram.com/bwfmediatv"
+                    : "https://youtube.com/@bwfmediatvtv"
               }
               target={c.label === "Email" ? undefined : "_blank"}
               rel={c.label === "Email" ? undefined : "noreferrer"}
@@ -633,7 +783,10 @@ export function Slide11() {
               className="flex items-center gap-6 p-6 border-2 group hover:border-blood transition-all"
               style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
             >
-              <div className="w-14 h-14 rounded flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--blood)" }}>
+              <div
+                className="w-14 h-14 rounded flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: "var(--blood)" }}
+              >
                 <c.icon className="w-7 h-7 text-bone" strokeWidth={2} />
               </div>
               <div className="flex-1">
@@ -651,9 +804,7 @@ export function Slide11() {
             className="mt-10 p-6 text-center border-2"
             style={{ borderColor: "var(--blood)", backgroundColor: "var(--blood)" }}
           >
-            <div className="font-display text-4xl tracking-tight text-bone heavy-shadow">
-              SERIOUS INQUIRIES ONLY.
-            </div>
+            <div className="font-display text-4xl tracking-tight text-bone heavy-shadow">SERIOUS INQUIRIES ONLY.</div>
           </motion.div>
         </div>
       </div>
