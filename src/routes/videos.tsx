@@ -11,7 +11,12 @@ export const Route = createFileRoute("/videos")({
     meta: [
       { title: "Music Videos & Sponsored Content | BWF Media" },
       { name: "description", content: "Featured music videos and sponsored content from BWF Media artists and partners." },
+      { property: "og:title", content: "Music Videos & Sponsored Content | BWF Media TV" },
+      { property: "og:description", content: "Featured music videos and sponsored content from BWF Media artists and partners." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfmedia.company/videos" },
     ],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/videos" }],
   }),
 });
 
@@ -249,12 +254,12 @@ function AuthModal({ onClose }: { onClose: () => void }) {
     <Modal onClose={onClose} title={mode === "signin" ? "Admin Sign In" : "Create Admin Account"}>
       <form onSubmit={submit} className="space-y-4">
         <input
-          type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+          type="email" required aria-label="Email" value={email} onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none"
         />
         <input
-          type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
+          type="password" required minLength={6} aria-label="Password" value={password} onChange={(e) => setPassword(e.target.value)}
           placeholder="Password (min 6 chars)"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none"
         />
@@ -309,13 +314,13 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   return (
     <Modal onClose={onClose} title="Upload Video">
       <form onSubmit={submit} className="space-y-4">
-        <input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
+        <input required aria-label="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
-        <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artist / Sponsor"
+        <input aria-label="Artist or sponsor" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artist / Sponsor"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" rows={3}
+        <textarea aria-label="Description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" rows={3}
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
-        <input type="url" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)}
+        <input type="url" aria-label="External link" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)}
           placeholder="External link (YouTube, Spotify, sponsor URL…)"
           className="w-full bg-black/60 border border-bone/20 px-4 py-3 text-bone focus:border-blood outline-none" />
         <div className="flex gap-2">
@@ -329,7 +334,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
             </button>
           ))}
         </div>
-        <input ref={fileRef} type="file" accept="video/*" required
+        <input ref={fileRef} type="file" accept="video/*" required aria-label="Video file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           className="w-full text-bone/70 text-sm file:mr-3 file:py-2 file:px-4 file:border-0 file:bg-blood file:text-bone file:font-cond file:uppercase file:tracking-widest file:text-[10px]" />
         {err && <p className="text-blood text-sm">{err}</p>}

@@ -7,6 +7,52 @@ import grunge from "@/assets/grunge-bg.jpg";
 
 export const Route = createFileRoute("/videos/$id")({
   component: VideoDetailPage,
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("videos")
+      .select("id, title, artist, description, created_at")
+      .eq("id", params.id)
+      .maybeSingle();
+    return { video: data };
+  },
+  head: ({ params, loaderData }) => {
+    const v = loaderData?.video;
+    const title = v?.title ? `${v.title} | BWF Media TV` : "Video | BWF Media TV";
+    const desc =
+      v?.description?.slice(0, 155) ??
+      (v?.title
+        ? `${v.title}${v.artist ? ` by ${v.artist}` : ""} on BWF Media TV.`
+        : "Watch this video on BWF Media TV.");
+    const url = `https://bwfmedia.company/videos/${params.id}`;
+    const meta = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: v?.title ?? "BWF Media TV Video" },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "video.other" },
+      { property: "og:url", content: url },
+    ];
+    const scripts = v
+      ? [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              name: v.title,
+              description: desc,
+              uploadDate: v.created_at,
+              ...(v.artist ? { creator: { "@type": "Person", name: v.artist } } : {}),
+            }),
+          },
+        ]
+      : undefined;
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      ...(scripts ? { scripts } : {}),
+    };
+  },
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center text-bone bg-black p-6">
       <div className="text-center">

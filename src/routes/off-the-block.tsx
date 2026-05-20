@@ -20,7 +20,10 @@ export const Route = createFileRoute("/off-the-block")({
       { name: "description", content: "BWF Off The Block: on-location street interviews where culture, community, and real voices meet. Book a pull-up shoot with BWF Media." },
       { property: "og:title", content: "BWF Off The Block - The Streets. The People. The Real." },
       { property: "og:description", content: "Raw, on-location interviews from the block to the world. Tap in with BWF Media." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfmedia.company/off-the-block" },
     ],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/off-the-block" }],
   }),
   component: OffTheBlockPage,
 });
@@ -416,6 +419,7 @@ function BookingCalendar() {
             <input
               className={inputClass}
               style={inputStyle}
+              aria-label="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
@@ -432,6 +436,7 @@ function BookingCalendar() {
                 type="email"
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@domain.com"
@@ -445,6 +450,7 @@ function BookingCalendar() {
               <input
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 555-5555"
@@ -459,6 +465,7 @@ function BookingCalendar() {
             <select
               className={inputClass}
               style={inputStyle}
+              aria-label="Shoot Type"
               value={shootType}
               onChange={(e) => setShootType(e.target.value)}
             >
@@ -477,6 +484,7 @@ function BookingCalendar() {
             <input
               className={inputClass}
               style={inputStyle}
+              aria-label="Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="City, neighborhood, or address"
@@ -491,6 +499,7 @@ function BookingCalendar() {
             <textarea
               className={inputClass}
               style={inputStyle}
+              aria-label="Notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Tell us about the shoot..."

@@ -20,6 +20,29 @@ export const Route = createFileRoute("/studio")({
       { name: "description", content: "Premium media production hub for artists & creators. Book studio time at BWF Media for interviews, music video content, podcast recording, and press sessions." },
       { property: "og:title", content: "BWF Media Studio - Where Culture, Content & Creators Meet" },
       { property: "og:description", content: "Premium studio bookings for artists & creators. Professional sound, lighting, and brand-ready delivery." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfmedia.company/studio" },
+    ],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/studio" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          serviceType: "Media Production & Studio Bookings",
+          provider: {
+            "@type": "Organization",
+            name: "BWF Media TV",
+            url: "https://bwfmedia.company",
+          },
+          areaServed: "US",
+          name: "BWF Media Studio Bookings",
+          description:
+            "Premium studio sessions for artist interviews, music video content, podcast recording, press, and social content packs.",
+          url: "https://bwfmedia.company/studio",
+        }),
+      },
     ],
   }),
   component: StudioPage,
@@ -426,6 +449,7 @@ function StudioBookingCalendar() {
               <select
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Crew Size"
                 value={crewSize}
                 onChange={(e) => setCrewSize(e.target.value)}
               >
@@ -441,6 +465,7 @@ function StudioBookingCalendar() {
               <select
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Duration"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
               >
@@ -466,6 +491,7 @@ function StudioBookingCalendar() {
             <select
               className={inputClass}
               style={inputStyle}
+              aria-label="Session Type"
               value={sessionType}
               onChange={(e) => setSessionType(e.target.value)}
             >
@@ -505,6 +531,7 @@ function StudioBookingCalendar() {
             <input
               className={inputClass}
               style={inputStyle}
+              aria-label="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name / Artist name"
@@ -521,6 +548,7 @@ function StudioBookingCalendar() {
                 type="email"
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@domain.com"
@@ -534,6 +562,7 @@ function StudioBookingCalendar() {
               <input
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 555-5555"
@@ -548,6 +577,7 @@ function StudioBookingCalendar() {
             <textarea
               className={inputClass}
               style={inputStyle}
+              aria-label="Project Notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Tell us about your session..."

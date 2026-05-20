@@ -4,12 +4,14 @@ import { ArrowUpRight, Calendar, Clock, Mic, Video, Flame, TrendingUp, Camera, M
 export const Route = createFileRoute("/blog")({
   head: () => ({
     meta: [
-      { title: "Blog, BWF Media TV | Culture, Interviews & Industry Insights" },
+      { title: "Blog — BWF Media TV" },
       { name: "description", content: "Read the latest from BWF Media TV, interviews, behind-the-scenes stories, viral content breakdowns, and culture commentary from the heart of hip-hop." },
       { property: "og:title", content: "BWF Media TV Blog, Where Culture Speaks" },
       { property: "og:description", content: "Interviews, BTS, and culture commentary from BWF Media TV." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfmedia.company/blog" },
     ],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/blog" }],
   }),
   component: BlogPage,
 });
@@ -212,6 +214,7 @@ function BlogPage() {
             <input
               type="email"
               required
+              aria-label="Email address for newsletter"
               placeholder="your@email.com"
               className="flex-1 px-4 py-3 bg-background border-2 text-bone placeholder:text-bone/40 focus:outline-none focus:border-[var(--blood)]"
               style={{ borderColor: "var(--border)" }}
