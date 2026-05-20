@@ -419,6 +419,7 @@ function BookingCalendar() {
             <input
               className={inputClass}
               style={inputStyle}
+              aria-label="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
@@ -435,6 +436,7 @@ function BookingCalendar() {
                 type="email"
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@domain.com"
@@ -448,6 +450,7 @@ function BookingCalendar() {
               <input
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 555-5555"
@@ -462,6 +465,7 @@ function BookingCalendar() {
             <select
               className={inputClass}
               style={inputStyle}
+              aria-label="Shoot Type"
               value={shootType}
               onChange={(e) => setShootType(e.target.value)}
             >
@@ -480,6 +484,7 @@ function BookingCalendar() {
             <input
               className={inputClass}
               style={inputStyle}
+              aria-label="Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="City, neighborhood, or address"
@@ -494,6 +499,7 @@ function BookingCalendar() {
             <textarea
               className={inputClass}
               style={inputStyle}
+              aria-label="Notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Tell us about the shoot..."

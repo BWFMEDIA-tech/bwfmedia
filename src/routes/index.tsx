@@ -9,7 +9,9 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "BWF Media TV, Where Culture Goes Viral" },
       { property: "og:description", content: "Where culture goes viral. 686M+ views and counting." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfmedia.company/" },
     ],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/" }],
   }),
   component: Index,
 });

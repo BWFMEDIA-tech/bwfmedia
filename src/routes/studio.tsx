@@ -449,6 +449,7 @@ function StudioBookingCalendar() {
               <select
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Crew Size"
                 value={crewSize}
                 onChange={(e) => setCrewSize(e.target.value)}
               >
@@ -464,6 +465,7 @@ function StudioBookingCalendar() {
               <select
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Duration"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
               >
@@ -489,6 +491,7 @@ function StudioBookingCalendar() {
             <select
               className={inputClass}
               style={inputStyle}
+              aria-label="Session Type"
               value={sessionType}
               onChange={(e) => setSessionType(e.target.value)}
             >
@@ -528,6 +531,7 @@ function StudioBookingCalendar() {
             <input
               className={inputClass}
               style={inputStyle}
+              aria-label="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name / Artist name"
@@ -544,6 +548,7 @@ function StudioBookingCalendar() {
                 type="email"
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@domain.com"
@@ -557,6 +562,7 @@ function StudioBookingCalendar() {
               <input
                 className={inputClass}
                 style={inputStyle}
+                aria-label="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 555-5555"
@@ -571,6 +577,7 @@ function StudioBookingCalendar() {
             <textarea
               className={inputClass}
               style={inputStyle}
+              aria-label="Project Notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Tell us about your session..."
