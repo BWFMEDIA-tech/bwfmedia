@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -49,6 +50,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/deck'
     | '/off-the-block'
+    | '/sitemap.xml'
     | '/studio'
     | '/unsubscribe'
     | '/videos'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/deck'
     | '/off-the-block'
+    | '/sitemap.xml'
     | '/studio'
     | '/unsubscribe'
     | '/videos'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/deck'
     | '/off-the-block'
+    | '/sitemap.xml'
     | '/studio'
     | '/unsubscribe'
     | '/videos'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StudioRoute: typeof StudioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-the-block': {
@@ -576,6 +596,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StudioRoute: StudioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
@@ -601,12 +622,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
