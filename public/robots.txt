@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /lovable/
+
+Sitemap: https://bwfmedia.company/sitemap.xml

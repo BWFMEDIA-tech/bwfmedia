@@ -146,6 +146,7 @@ function Cover() {
           <h1 className="mt-8 font-display text-7xl md:text-[9rem] leading-[0.9] text-bone">
             BWF<span style={{ color: "var(--blood)" }}>MEDIA</span>
             <br />INC.
+            <span className="sr-only"> Investor Pitch Deck</span>
           </h1>
           <p className="mt-8 font-cond text-2xl md:text-3xl italic text-bone/80">
             "Real Content. Real People. Real Reach."
@@ -921,9 +922,9 @@ function DeckGate({ onUnlock }: { onUnlock: () => void }) {
                 Passphrase Required
               </span>
             </div>
-            <h1 className="text-center font-display text-3xl md:text-5xl text-bone leading-[0.95] uppercase">
+            <h2 className="text-center font-display text-3xl md:text-5xl text-bone leading-[0.95] uppercase">
               Decrypt <span style={{ color: HUD_GOLD, textShadow: `0 0 20px ${HUD_GOLD}88` }}>Deck</span>
-            </h1>
+            </h2>
             <p className="mt-4 text-center font-mono text-[11px] tracking-[0.25em] uppercase text-bone/55">
               Enter your access key to view the deck.
             </p>
