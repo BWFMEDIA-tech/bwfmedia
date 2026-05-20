@@ -1,19 +1,9 @@
 import { Link as RouterLink } from "@tanstack/react-router";
-import {
-  Youtube,
-  Instagram,
-  Facebook,
-  Twitter,
-  Music2,
-  Linkedin,
-  Mail,
-  MapPin,
-  ArrowRight,
-} from "lucide-react";
+import { Youtube, Instagram, Facebook, Twitter, Music2, Linkedin, Mail, MapPin, ArrowRight } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
 
 const socials = [
-  { href: "https://youtube.com/@bwfmediatv", label: "YouTube", Icon: Youtube },
+  { href: "https://youtube.com/@bwfmedia", label: "YouTube", Icon: Youtube },
   { href: "https://instagram.com/bwfmediatv", label: "Instagram", Icon: Instagram },
   { href: "https://tiktok.com/@bwfmediatv", label: "TikTok", Icon: Music2 },
   { href: "https://x.com/bwfmediatv", label: "X / Twitter", Icon: Twitter },
@@ -94,7 +84,10 @@ export function SiteFooter() {
                       to={link.to}
                       className="group inline-flex items-center gap-1.5 text-sm text-bone/70 hover:text-bone transition-colors"
                     >
-                      <ArrowRight size={12} className="text-blood opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+                      <ArrowRight
+                        size={12}
+                        className="text-blood opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all"
+                      />
                       {link.label}
                     </RouterLink>
                   </li>
@@ -104,11 +97,14 @@ export function SiteFooter() {
                       href={link.href}
                       className="group inline-flex items-center gap-1.5 text-sm text-bone/70 hover:text-bone transition-colors"
                     >
-                      <ArrowRight size={12} className="text-blood opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+                      <ArrowRight
+                        size={12}
+                        className="text-blood opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all"
+                      />
                       {link.label}
                     </a>
                   </li>
-                )
+                ),
               )}
             </ul>
           </div>

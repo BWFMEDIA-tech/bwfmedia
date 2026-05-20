@@ -33,18 +33,38 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "BWF Media TV" },
-      { name: "description", content: "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners." },
+      {
+        name: "description",
+        content:
+          "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners.",
+      },
       { name: "author", content: "BWF Media TV" },
       { property: "og:title", content: "BWF Media TV" },
-      { property: "og:description", content: "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners." },
+      {
+        property: "og:description",
+        content:
+          "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "BWF Media TV" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@bwfmediatv" },
       { name: "twitter:title", content: "BWF Media TV" },
-      { name: "twitter:description", content: "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png",
+      },
     ],
     scripts: [
       {
@@ -61,10 +81,7 @@ export const Route = createRootRoute({
               name: "BWF Media TV",
               url: "https://bwfmedia.company",
               logo: "https://bwfmedia.company/favicon.png",
-              sameAs: [
-                "https://youtube.com/@bwfmediatv",
-                "https://instagram.com/bwfmediatv",
-              ],
+              sameAs: ["https://youtube.com/@bwfmedia", "https://instagram.com/bwfmediatv"],
             },
             {
               "@type": "WebSite",

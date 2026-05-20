@@ -1,8 +1,25 @@
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
 import {
-  Play, Mic, Film, Scissors, Camera, Share2, Globe,
-  TrendingUp, DollarSign, ArrowRight, Menu, X, Check, Youtube, Instagram, Facebook, Twitter, Music2, Linkedin,
+  Play,
+  Mic,
+  Film,
+  Scissors,
+  Camera,
+  Share2,
+  Globe,
+  TrendingUp,
+  DollarSign,
+  ArrowRight,
+  Menu,
+  X,
+  Check,
+  Youtube,
+  Instagram,
+  Facebook,
+  Twitter,
+  Music2,
+  Linkedin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import bwfLogo from "@/assets/bwf-logo.png";
@@ -11,8 +28,16 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 /* ---------- shared ---------- */
 
 function Reveal({
-  children, delay = 0, y = 24, className = "",
-}: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
+  children,
+  delay = 0,
+  y = 24,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  y?: number;
+  className?: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y }}
@@ -57,7 +82,9 @@ function Nav() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "backdrop-blur-xl bg-black/85 border-b border-blood/40" : "backdrop-blur bg-black/40 border-b border-white/5"
+        scrolled
+          ? "backdrop-blur-xl bg-black/85 border-b border-blood/40"
+          : "backdrop-blur bg-black/40 border-b border-white/5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
@@ -67,57 +94,89 @@ function Nav() {
         <div className="hidden md:flex items-center gap-7">
           {links.map((l) =>
             l.to ? (
-              <RouterLink key={l.label} to={l.to}
-                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
+              <RouterLink
+                key={l.label}
+                to={l.to}
+                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+              >
                 {l.label}
               </RouterLink>
             ) : (
-              <a key={l.label} href={l.href}
-                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
+              <a
+                key={l.label}
+                href={l.href}
+                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+              >
                 {l.label}
               </a>
-            )
+            ),
           )}
-          <RouterLink to="/studio"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors">
+          <RouterLink
+            to="/studio"
+            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
+          >
             Studio
           </RouterLink>
-          <a href="#book"
-            className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase px-4 py-2 bg-blood text-white hover:bg-blood-glow transition-colors">
+          <a
+            href="#book"
+            className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase px-4 py-2 bg-blood text-white hover:bg-blood-glow transition-colors"
+          >
             Book a Shoot
           </a>
         </div>
-        <button type="button" aria-label="Toggle menu" aria-expanded={open}
+        <button
+          type="button"
+          aria-label="Toggle menu"
+          aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 text-bone hover:text-bone/80 transition-colors">
+          className="md:hidden p-2 text-bone hover:text-bone/80 transition-colors"
+        >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur overflow-hidden">
+            className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur overflow-hidden"
+          >
             <div className="px-6 py-4 flex flex-col gap-1">
               {links.map((l) =>
                 l.to ? (
-                  <RouterLink key={l.label} to={l.to} onClick={() => setOpen(false)}
-                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
+                  <RouterLink
+                    key={l.label}
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10"
+                  >
                     {l.label}
                   </RouterLink>
                 ) : (
-                  <a key={l.label} href={l.href} onClick={() => setOpen(false)}
-                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
+                  <a
+                    key={l.label}
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10"
+                  >
                     {l.label}
                   </a>
-                )
+                ),
               )}
-              <RouterLink to="/studio" onClick={() => setOpen(false)}
-                className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10">
+              <RouterLink
+                to="/studio"
+                onClick={() => setOpen(false)}
+                className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10"
+              >
                 Studio
               </RouterLink>
-              <a href="#book" onClick={() => setOpen(false)}
-                className="font-cond font-bold tracking-[0.2em] text-xs uppercase mt-3 px-4 py-3 bg-blood text-white text-center">
+              <a
+                href="#book"
+                onClick={() => setOpen(false)}
+                className="font-cond font-bold tracking-[0.2em] text-xs uppercase mt-3 px-4 py-3 bg-blood text-white text-center"
+              >
                 Book a Shoot
               </a>
             </div>
@@ -136,7 +195,10 @@ function Hero() {
       <video
         className="absolute inset-0 w-full h-full object-cover"
         src={heroRapperVideo.url}
-        autoPlay muted loop playsInline
+        autoPlay
+        muted
+        loop
+        playsInline
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
       <div
@@ -170,18 +232,26 @@ function Hero() {
 
         <Reveal delay={0.4}>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#book"
-              className="group inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors">
+            <a
+              href="#book"
+              className="group inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
+            >
               Book a Shoot
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </a>
-            <a href="https://youtube.com/@bwfmediatv" target="_blank" rel="noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors">
+            <a
+              href="https://youtube.com/@bwfmedia"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
+            >
               <Play size={14} fill="currentColor" />
               Watch on YouTube
             </a>
-            <RouterLink to="/off-the-block"
-              className="inline-flex items-center gap-2 px-7 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors">
+            <RouterLink
+              to="/off-the-block"
+              className="inline-flex items-center gap-2 px-7 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors"
+            >
               Off The Block
               <ArrowRight size={14} />
             </RouterLink>
@@ -245,14 +315,24 @@ function Services() {
   const items = [
     { icon: Mic, title: "Artist Interviews", desc: "Cinematic on-camera conversations engineered to clip and travel." },
     { icon: Film, title: "Music Videos", desc: "Story-driven visuals shot for the algorithm and the timeline." },
-    { icon: Scissors, title: "Viral Clips", desc: "One shoot, dozens of vertical assets cut for TikTok, Reels, Shorts." },
+    {
+      icon: Scissors,
+      title: "Viral Clips",
+      desc: "One shoot, dozens of vertical assets cut for TikTok, Reels, Shorts.",
+    },
     { icon: Camera, title: "Event Coverage", desc: "Live moments captured, edited, and pushed before the night ends." },
-    { icon: Share2, title: "Distribution Engine", desc: "Multi-platform release across YouTube, TikTok, Instagram, and Shorts." },
+    {
+      icon: Share2,
+      title: "Distribution Engine",
+      desc: "Multi-platform release across YouTube, TikTok, Instagram, and Shorts.",
+    },
   ];
   return (
     <section id="services" className="bg-black border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-        <Reveal><SectionHead kicker="What We Do" title="Built to Make You Seen." /></Reveal>
+        <Reveal>
+          <SectionHead kicker="What We Do" title="Built to Make You Seen." />
+        </Reveal>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((it, i) => (
             <Reveal key={it.title} delay={i * 0.06}>
@@ -275,9 +355,14 @@ function Services() {
 
 function Why() {
   return (
-    <section id="why" className="relative bg-gradient-to-b from-black via-[#0a0000] to-black border-b border-white/10 overflow-hidden">
-      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
-        style={{ backgroundColor: "var(--blood)" }} />
+    <section
+      id="why"
+      className="relative bg-gradient-to-b from-black via-[#0a0000] to-black border-b border-white/10 overflow-hidden"
+    >
+      <div
+        className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
+        style={{ backgroundColor: "var(--blood)" }}
+      />
       <div className="relative max-w-5xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
         <Reveal>
           <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Why BWF</span>
@@ -293,8 +378,8 @@ function Why() {
         </Reveal>
         <Reveal delay={0.2}>
           <p className="mt-8 max-w-2xl mx-auto text-bone/70 text-lg leading-relaxed">
-            One shoot becomes a full content cycle across YouTube, TikTok, Instagram, and Shorts.
-            Designed to compound, not disappear.
+            One shoot becomes a full content cycle across YouTube, TikTok, Instagram, and Shorts. Designed to compound,
+            not disappear.
           </p>
         </Reveal>
       </div>
@@ -395,20 +480,40 @@ function ContentSystem() {
 function Pricing() {
   const plans = [
     {
-      name: "Basic", price: "$400–$600", popular: false,
+      name: "Basic",
+      price: "$400–$600",
+      popular: false,
       features: ["1 hour shoot", "1 hero edit", "3 vertical clips", "Single platform release"],
     },
     {
-      name: "Standard", price: "$700–$1,000", popular: true,
+      name: "Standard",
+      price: "$700–$1,000",
+      popular: true,
       features: ["2 hour shoot", "1 hero edit", "6 vertical clips", "Multi-platform release", "Thumbnail design"],
     },
     {
-      name: "Premium", price: "$1,200–$2,000", popular: false,
-      features: ["Half-day shoot", "Cinematic hero edit", "10+ vertical clips", "Full distribution push", "Performance report"],
+      name: "Premium",
+      price: "$1,200–$2,000",
+      popular: false,
+      features: [
+        "Half-day shoot",
+        "Cinematic hero edit",
+        "10+ vertical clips",
+        "Full distribution push",
+        "Performance report",
+      ],
     },
     {
-      name: "Flagship", price: "$1,500–$3,000", popular: false,
-      features: ["Full-day production", "Director-led shoot", "15+ assets", "Featured BWF placement", "Strategy session"],
+      name: "Flagship",
+      price: "$1,500–$3,000",
+      popular: false,
+      features: [
+        "Full-day production",
+        "Director-led shoot",
+        "15+ assets",
+        "Featured BWF placement",
+        "Strategy session",
+      ],
     },
   ];
   return (
@@ -424,11 +529,13 @@ function Pricing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {plans.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.06}>
-              <div className={`relative h-full flex flex-col p-7 border backdrop-blur-md transition-all duration-300 ${
-                p.popular
-                  ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(255,45,45,0.5)]"
-                  : "bg-white/[0.03] border-white/10 hover:border-white/30"
-              }`}>
+              <div
+                className={`relative h-full flex flex-col p-7 border backdrop-blur-md transition-all duration-300 ${
+                  p.popular
+                    ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(255,45,45,0.5)]"
+                    : "bg-white/[0.03] border-white/10 hover:border-white/30"
+                }`}
+              >
                 {p.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blood text-white font-cond font-bold tracking-[0.2em] text-[10px] uppercase">
                     Most Popular
@@ -444,12 +551,14 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <a href="#book"
+                <a
+                  href="#book"
                   className={`mt-7 inline-flex items-center justify-center px-5 py-3 font-cond font-bold tracking-[0.2em] text-[11px] uppercase transition-colors ${
                     p.popular
                       ? "bg-blood text-white hover:bg-blood-glow"
                       : "border border-white/20 text-bone hover:bg-white/10"
-                  }`}>
+                  }`}
+                >
                   Book {p.name}
                 </a>
               </div>
@@ -472,14 +581,16 @@ function Podcast() {
             <span className="block h-px w-10 bg-blood" />
             <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Podcast</span>
           </div>
-          <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">
-            BWF Red Mic
-          </h2>
+          <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">BWF Red Mic</h2>
           <p className="mt-5 text-bone/65 text-lg leading-relaxed max-w-md">
             Unfiltered conversations with the artists shaping culture. Streaming on iHeart and everywhere you listen.
           </p>
-          <a href="https://www.iheart.com" target="_blank" rel="noreferrer"
-            className="mt-7 inline-flex items-center gap-2 px-6 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors">
+          <a
+            href="https://www.iheart.com"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-7 inline-flex items-center gap-2 px-6 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
+          >
             <Play size={14} fill="currentColor" />
             Listen on iHeart
           </a>
@@ -538,32 +649,41 @@ function Partnerships() {
 function FinalCTA() {
   return (
     <section id="book" className="relative bg-black overflow-hidden">
-      <div className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(255,45,45,0.4), transparent 70%)" }} />
+      <div
+        className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(255,45,45,0.4), transparent 70%)" }}
+      />
       <div className="relative max-w-4xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
         <Reveal>
           <h2 className="font-display text-5xl md:text-8xl uppercase text-bone leading-[0.95]">
-            Ready to <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>Go Viral?</span>
+            Ready to{" "}
+            <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
+              Go Viral?
+            </span>
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="mt-6 text-bone/70 text-lg max-w-xl mx-auto">
-            The audience is real. The opportunity is now.
-          </p>
+          <p className="mt-6 text-bone/70 text-lg max-w-xl mx-auto">The audience is real. The opportunity is now.</p>
         </Reveal>
         <Reveal delay={0.2}>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <RouterLink to="/studio"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors">
+            <RouterLink
+              to="/studio"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
+            >
               Book a Shoot
               <ArrowRight size={16} />
             </RouterLink>
-            <RouterLink to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors">
+            <RouterLink
+              to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
+            >
               Contact Us
             </RouterLink>
-            <RouterLink to="/off-the-block"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors">
+            <RouterLink
+              to="/off-the-block"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors"
+            >
               Off The Block
               <ArrowRight size={16} />
             </RouterLink>

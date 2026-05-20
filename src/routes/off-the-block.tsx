@@ -3,9 +3,24 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import { format } from "date-fns";
 import {
-  Mail, Instagram, Phone, Mic, Camera, Globe, PlayCircle,
-  Check, Users, Tv, Youtube, Radio, Zap, ArrowRight,
-  Calendar as CalendarIcon, Clock, MapPin, Loader2,
+  Mail,
+  Instagram,
+  Phone,
+  Mic,
+  Camera,
+  Globe,
+  PlayCircle,
+  Check,
+  Users,
+  Tv,
+  Youtube,
+  Radio,
+  Zap,
+  ArrowRight,
+  Calendar as CalendarIcon,
+  Clock,
+  MapPin,
+  Loader2,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import heroVideo from "@/assets/off-the-block-hero.mp4.asset.json";
@@ -17,9 +32,16 @@ export const Route = createFileRoute("/off-the-block")({
   head: () => ({
     meta: [
       { title: "BWF Off The Block - Street Interviews & Real Conversations" },
-      { name: "description", content: "BWF Off The Block: on-location street interviews where culture, community, and real voices meet. Book a pull-up shoot with BWF Media." },
+      {
+        name: "description",
+        content:
+          "BWF Off The Block: on-location street interviews where culture, community, and real voices meet. Book a pull-up shoot with BWF Media.",
+      },
       { property: "og:title", content: "BWF Off The Block - The Streets. The People. The Real." },
-      { property: "og:description", content: "Raw, on-location interviews from the block to the world. Tap in with BWF Media." },
+      {
+        property: "og:description",
+        content: "Raw, on-location interviews from the block to the world. Tap in with BWF Media.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://bwfmedia.company/off-the-block" },
     ],
@@ -75,7 +97,9 @@ function OffTheBlockPage() {
             className="mt-6 font-display leading-[0.82] text-7xl md:text-[10rem] uppercase"
           >
             <span className="block text-bone">OFF</span>
-            <span className="block text-bone/30" style={{ WebkitTextStroke: `2px ${GOLD}`, color: "transparent" }}>THE</span>
+            <span className="block text-bone/30" style={{ WebkitTextStroke: `2px ${GOLD}`, color: "transparent" }}>
+              THE
+            </span>
             <span
               className="block"
               style={{
@@ -103,8 +127,8 @@ function OffTheBlockPage() {
           </div>
 
           <p className="mt-10 max-w-2xl text-bone/80 text-base md:text-lg leading-relaxed">
-            On-location street interviews tapping into culture, community, and the voices
-            that never get airtime. Cameras rolling. No script. Real stories.
+            On-location street interviews tapping into culture, community, and the voices that never get airtime.
+            Cameras rolling. No script. Real stories.
           </p>
 
           {/* Stat HUD */}
@@ -115,7 +139,9 @@ function OffTheBlockPage() {
               { k: "24/7", v: "ON CALL" },
             ].map((s) => (
               <HUDFrame key={s.v} className="px-4 py-3 text-center">
-                <div className="font-display text-3xl md:text-4xl" style={{ color: GOLD }}>{s.k}</div>
+                <div className="font-display text-3xl md:text-4xl" style={{ color: GOLD }}>
+                  {s.k}
+                </div>
                 <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/60 mt-1">{s.v}</div>
               </HUDFrame>
             ))}
@@ -124,16 +150,25 @@ function OffTheBlockPage() {
       </section>
 
       <main className="max-w-6xl mx-auto px-6 md:px-10 pb-24">
-
         {/* PILLARS */}
         <section className="py-16">
           <SectionTag>System // Pillars</SectionTag>
           <div className="mt-10 grid md:grid-cols-2 gap-5">
             {[
-              { icon: Mic,        n: "01", title: "REAL CONVERSATIONS", desc: "Raw and uncut from the block to the world." },
-              { icon: Camera,     n: "02", title: "ON LOCATION",        desc: "We pull up where the culture is happening." },
-              { icon: Globe,      n: "03", title: "REAL STORIES",       desc: "Artists, entrepreneurs, everyday people making moves." },
-              { icon: PlayCircle, n: "04", title: "CONTENT THAT HITS",  desc: "Built for YouTube, Instagram, TikTok and beyond." },
+              { icon: Mic, n: "01", title: "REAL CONVERSATIONS", desc: "Raw and uncut from the block to the world." },
+              { icon: Camera, n: "02", title: "ON LOCATION", desc: "We pull up where the culture is happening." },
+              {
+                icon: Globe,
+                n: "03",
+                title: "REAL STORIES",
+                desc: "Artists, entrepreneurs, everyday people making moves.",
+              },
+              {
+                icon: PlayCircle,
+                n: "04",
+                title: "CONTENT THAT HITS",
+                desc: "Built for YouTube, Instagram, TikTok and beyond.",
+              },
             ].map(({ icon: Icon, n, title, desc }, i) => (
               <motion.div
                 key={title}
@@ -167,7 +202,14 @@ function OffTheBlockPage() {
           <SectionTag>Coverage Matrix</SectionTag>
           <HUDFrame className="mt-10 p-8 md:p-10">
             <div className="grid md:grid-cols-3 gap-4">
-              {["Artist Interviews","Street Talk","Upcoming Events","Local Businesses","Community Voices","& More"].map((item, i) => (
+              {[
+                "Artist Interviews",
+                "Street Talk",
+                "Upcoming Events",
+                "Local Businesses",
+                "Community Voices",
+                "& More",
+              ].map((item, i) => (
                 <div
                   key={item}
                   className="flex items-center gap-3 px-4 py-3"
@@ -188,15 +230,15 @@ function OffTheBlockPage() {
         <section className="py-16 text-center">
           <SectionTag>Mission // Why It Matters</SectionTag>
           <p className="mx-auto mt-8 max-w-2xl text-bone/85 text-base md:text-lg">
-            We amplify real stories, real people, real situations. BWF Off The Block
-            gives a voice to the culture and keeps it authentic - frame by frame.
+            We amplify real stories, real people, real situations. BWF Off The Block gives a voice to the culture and
+            keeps it authentic - frame by frame.
           </p>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             {[
-              { icon: Users,  label: "FOR THE CULTURE" },
+              { icon: Users, label: "FOR THE CULTURE" },
               { icon: Camera, label: "FOR THE COMMUNITY" },
-              { icon: Tv,     label: "FOR THE WORLD" },
+              { icon: Tv, label: "FOR THE WORLD" },
             ].map(({ icon: Icon, label }) => (
               <HUDFrame key={label} className="p-6">
                 <Icon className="w-9 h-9 mx-auto" style={{ color: GOLD }} />
@@ -240,7 +282,8 @@ function OffTheBlockPage() {
               </a>
               <a
                 href="https://instagram.com/bwfmediatv"
-                target="_blank" rel="noreferrer"
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone hover:bg-bone/5 transition"
                 style={{ border: `1px solid ${GOLD}` }}
               >
@@ -258,7 +301,8 @@ function OffTheBlockPage() {
           <HUDFrame className="p-7 text-center">
             <div className="font-cond tracking-[0.4em] text-[10px] uppercase text-bone/60">Powered By</div>
             <div className="mt-2 font-display text-5xl md:text-6xl">
-              <span className="text-bone">BWF MEDIA </span><span style={{ color: GOLD }}>TV</span>
+              <span className="text-bone">BWF MEDIA </span>
+              <span style={{ color: GOLD }}>TV</span>
             </div>
             <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
               Where Culture Goes Viral
@@ -268,10 +312,14 @@ function OffTheBlockPage() {
           <div className="space-y-3 font-cond tracking-[0.18em] text-sm uppercase self-center">
             {[
               { Icon: Instagram, label: "@bwfmediatv", href: "https://instagram.com/bwfmediatv" },
-              { Icon: Youtube,   label: "BWF Media TV",  href: "https://youtube.com/@bwfmediatvtv" },
-              { Icon: Mail,      label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
+              { Icon: Youtube, label: "BWF Media TV", href: "https://youtube.com/@bwfmediat" },
+              { Icon: Mail, label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
             ].map(({ Icon, label, href }) => (
-              <a key={label} href={href} className="flex items-center gap-3 text-bone/85 hover:text-bone transition group">
+              <a
+                key={label}
+                href={href}
+                className="flex items-center gap-3 text-bone/85 hover:text-bone transition group"
+              >
                 <span className="w-8 h-8 grid place-items-center" style={{ border: `1px solid ${GOLD}55` }}>
                   <Icon className="w-3.5 h-3.5" style={{ color: GOLD }} />
                 </span>
@@ -299,9 +347,7 @@ const SHOOT_TYPES = [
   "Other",
 ];
 
-const TIME_SLOTS = [
-  "10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM", "8:00 PM",
-];
+const TIME_SLOTS = ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM", "8:00 PM"];
 
 function BookingCalendar() {
   const navigate = useNavigate();
@@ -327,16 +373,16 @@ function BookingCalendar() {
     setSubmitting(true);
     let bookingId: string | null = null;
     try {
-      const res = await fetch('/api/public/block-booking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/public/block-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           full_name: name,
           email,
           phone: phone || null,
           shoot_type: shootType,
           location,
-          preferred_date: format(date, 'yyyy-MM-dd'),
+          preferred_date: format(date, "yyyy-MM-dd"),
           preferred_time: time,
           notes: notes || null,
         }),
@@ -350,7 +396,7 @@ function BookingCalendar() {
     }
     if (!bookingId) {
       setSubmitting(false);
-      toast.error('Submission failed. Please try again.');
+      toast.error("Submission failed. Please try again.");
       return;
     }
     toast.success("Booking locked in. Redirecting to checkout…");
@@ -366,10 +412,7 @@ function BookingCalendar() {
             <CalendarIcon className="w-3 h-3" style={{ color: GOLD }} />
             Step 01 // Select Date
           </div>
-          <div
-            className="mt-4 p-3"
-            style={{ background: "rgba(212,162,76,0.04)", border: `1px solid ${GOLD}33` }}
-          >
+          <div className="mt-4 p-3" style={{ background: "rgba(212,162,76,0.04)", border: `1px solid ${GOLD}33` }}>
             <FuturisticCalendar
               selected={date}
               onSelect={setDate}
@@ -444,9 +487,7 @@ function BookingCalendar() {
               />
             </div>
             <div>
-              <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
-                Phone
-              </label>
+              <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">Phone</label>
               <input
                 className={inputClass}
                 style={inputStyle}
@@ -493,9 +534,7 @@ function BookingCalendar() {
           </div>
 
           <div>
-            <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">
-              Notes
-            </label>
+            <label className="font-cond tracking-[0.25em] text-[10px] uppercase text-bone/60 block mb-2">Notes</label>
             <textarea
               className={inputClass}
               style={inputStyle}
@@ -510,7 +549,11 @@ function BookingCalendar() {
           {/* Summary */}
           <div
             className="px-4 py-3 font-cond tracking-[0.2em] text-[11px] uppercase"
-            style={{ background: "rgba(212,162,76,0.06)", border: `1px solid ${GOLD}33`, color: "rgba(245,235,210,0.85)" }}
+            style={{
+              background: "rgba(212,162,76,0.06)",
+              border: `1px solid ${GOLD}33`,
+              color: "rgba(245,235,210,0.85)",
+            }}
           >
             <span className="text-bone/50">Slot //</span>{" "}
             <span style={{ color: GOLD }}>
@@ -525,9 +568,13 @@ function BookingCalendar() {
             style={{ background: GOLD, color: "#000", boxShadow: `0 0 30px ${GOLD}66` }}
           >
             {submitting ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Transmitting...</>
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Transmitting...
+              </>
             ) : (
-              <><Zap className="w-4 h-4" /> Lock In Booking <ArrowRight className="w-4 h-4" /></>
+              <>
+                <Zap className="w-4 h-4" /> Lock In Booking <ArrowRight className="w-4 h-4" />
+              </>
             )}
           </button>
         </form>

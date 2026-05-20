@@ -105,7 +105,7 @@ export function Slide1() {
           transition={{ delay: 1.1 }}
           className="mt-4 font-cond tracking-[0.3em] text-xs uppercase text-bone/50 hover:text-bone transition-colors"
         >
-          youtube.com/@bwfmediatvtv
+          youtube.com/@bwfmedia
         </motion.a>
       </div>
 
@@ -764,7 +764,7 @@ export function Slide11() {
           {[
             { icon: Mail, label: "Email", value: "bookbwfmediatv@mail.com" },
             { icon: Instagram, label: "Instagram", value: "@bwfmediatv" },
-            { icon: Youtube, label: "YouTube", value: "@bwfmediatv" },
+            { icon: Youtube, label: "YouTube", value: "@bwfmedia" },
           ].map((c, i) => (
             <motion.a
               key={i}
@@ -773,7 +773,7 @@ export function Slide11() {
                   ? "mailto:bookbwfmediatv@mail.com"
                   : c.label === "Instagram"
                     ? "https://instagram.com/bwfmediatv"
-                    : "https://youtube.com/@bwfmediatvtv"
+                    : "https://youtube.com/@bwfmedia"
               }
               target={c.label === "Email" ? undefined : "_blank"}
               rel={c.label === "Email" ? undefined : "noreferrer"}

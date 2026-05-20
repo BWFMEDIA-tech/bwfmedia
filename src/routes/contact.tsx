@@ -2,7 +2,19 @@ import { createFileRoute, Link as RouterLink } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { z } from "zod";
-import { Mail, MapPin, ArrowRight, Youtube, Instagram, Facebook, Twitter, Music2, Linkedin, Send, Loader2 } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  ArrowRight,
+  Youtube,
+  Instagram,
+  Facebook,
+  Twitter,
+  Music2,
+  Linkedin,
+  Send,
+  Loader2,
+} from "lucide-react";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,7 +24,10 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact BWF Media — Bookings & Partnerships" },
-      { name: "description", content: "Get in touch with BWF Media TV. Studio bookings, partnerships, press, and brand collaborations." },
+      {
+        name: "description",
+        content: "Get in touch with BWF Media TV. Studio bookings, partnerships, press, and brand collaborations.",
+      },
       { property: "og:title", content: "Contact BWF Media — Bookings & Partnerships" },
       { property: "og:description", content: "Studio bookings, partnerships, press, and brand collaborations." },
     ],
@@ -28,7 +43,7 @@ const contactSchema = z.object({
 });
 
 const socials = [
-  { href: "https://youtube.com/@bwfmediatv", label: "YouTube", Icon: Youtube },
+  { href: "https://youtube.com/@bwfmedia", label: "YouTube", Icon: Youtube },
   { href: "https://instagram.com/bwfmediatv", label: "Instagram", Icon: Instagram },
   { href: "https://tiktok.com/@bwfmediatv", label: "TikTok", Icon: Music2 },
   { href: "https://x.com/bwfmediatv", label: "X / Twitter", Icon: Twitter },
@@ -50,7 +65,7 @@ function ContactPage() {
     setSubmitting(true);
     try {
       const mail = `mailto:bookings@bwfmedia.company?subject=${encodeURIComponent(parsed.data.subject)}&body=${encodeURIComponent(
-        `${parsed.data.message}\n\n— ${parsed.data.name}\n${parsed.data.email}`
+        `${parsed.data.message}\n\n— ${parsed.data.name}\n${parsed.data.email}`,
       )}`;
       window.location.href = mail;
       toast.success("Opening your email client…");
@@ -120,7 +135,11 @@ function ContactPage() {
             <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-3">Studio</div>
             <div className="inline-flex items-start gap-3 text-bone/80">
               <MapPin size={18} className="mt-0.5" />
-              <span>By appointment only<br />Book a session online</span>
+              <span>
+                By appointment only
+                <br />
+                Book a session online
+              </span>
             </div>
           </div>
           <div>
@@ -215,7 +234,9 @@ function ContactPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/50 mb-2 block">{label}</span>
+      <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/50 mb-2 block">
+        {label}
+      </span>
       {children}
     </label>
   );
