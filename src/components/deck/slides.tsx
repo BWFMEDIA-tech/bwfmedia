@@ -97,7 +97,7 @@ export function Slide1() {
           Where Culture <span style={{ color: "var(--blood)" }}>Goes Viral</span>
         </motion.p>
         <motion.a
-          href="https://youtube.com/bwfmedia"
+          href="https://youtube.com/@bwfmedia"
           target="_blank"
           rel="noreferrer"
           initial={{ opacity: 0 }}
