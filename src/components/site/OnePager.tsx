@@ -266,11 +266,12 @@ function Hero() {
 
 function ProofStrip() {
   const items = [
-    { v: "325,915", l: "Subscribers" },
-    { v: "692.0M", l: "Views" },
-    { v: "18.1M", l: "Likes" },
-    { v: "763.6K", l: "Comments" },
-    { v: "2.9M", l: "Shares" },
+    { v: "329,044", l: "Subscribers" },
+    { v: "703.9M", l: "Views" },
+    { v: "18.3M", l: "Likes" },
+    { v: "771,000K", l: "Comments" },
+    { v: "3.0M", l: "Shares" },
+    { v: "6.6M", l: "Recent Views" },
   ];
   const loop = [...items, ...items];
   return (
