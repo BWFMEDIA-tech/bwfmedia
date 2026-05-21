@@ -698,6 +698,7 @@ function FinalCTA() {
 /* ---------- FOOTER ---------- */
 
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { GrowthShowcase } from "@/components/site/GrowthShowcase";
 
 /* ---------- ROOT ---------- */
 
@@ -711,6 +712,7 @@ export function OnePager() {
       <Services />
       <Why />
       <Audience />
+      <GrowthShowcase />
       <ContentSystem />
       <Podcast />
       <Partnerships />
