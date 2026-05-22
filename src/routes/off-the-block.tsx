@@ -206,6 +206,10 @@ function OffTheBlockPage() {
               videos={[
                 { id: "nJYgIsDj0UQ", title: "Featured Interview", subtitle: "BWF Off The Block" },
                 { id: "-GDCCisa1cw", title: "Latest Drop", subtitle: "BWF Off The Block" },
+                { id: "2yIdA5Jp7vU", title: "Off The Block Session", subtitle: "BWF Off The Block" },
+                { id: "LeMMMetmTT0", title: "Street Talk", subtitle: "BWF Off The Block" },
+                { id: "xXBDvU2S9Es", title: "On The Mic", subtitle: "BWF Off The Block" },
+                { id: "41dClYGOS0s", title: "Traveling With DJ", subtitle: "BWF Off The Block" },
               ]}
             />
           </div>
