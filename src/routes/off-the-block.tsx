@@ -200,17 +200,30 @@ function OffTheBlockPage() {
         {/* FEATURED VIDEO */}
         <section className="py-16">
           <SectionTag>Featured // Latest Drop</SectionTag>
-          <HUDFrame className="mt-10 p-3 md:p-4">
-            <div className="relative w-full aspect-video overflow-hidden" style={{ border: `1px solid ${GOLD}33` }}>
-              <iframe
-                src="https://www.youtube.com/embed/nJYgIsDj0UQ"
-                title="BWF Off The Block - Featured Interview"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-              />
-            </div>
-          </HUDFrame>
+          <div className="mt-10 grid md:grid-cols-2 gap-4">
+            <HUDFrame className="p-3 md:p-4">
+              <div className="relative w-full aspect-video overflow-hidden" style={{ border: `1px solid ${GOLD}33` }}>
+                <iframe
+                  src="https://www.youtube.com/embed/nJYgIsDj0UQ"
+                  title="BWF Off The Block - Featured Interview"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </HUDFrame>
+            <HUDFrame className="p-3 md:p-4">
+              <div className="relative w-full aspect-video overflow-hidden" style={{ border: `1px solid ${GOLD}33` }}>
+                <iframe
+                  src="https://www.youtube.com/embed/-GDCCisa1cw"
+                  title="BWF Off The Block - Featured Drop"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </HUDFrame>
+          </div>
         </section>
 
         {/* WHAT WE COVER */}
