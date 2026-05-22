@@ -168,6 +168,10 @@ function StudioPage() {
             <VideoPlayer
               videos={[
                 { id: "TwEQ8rszojQ", title: "Inside The Studio", subtitle: "BWF Media Studio" },
+                { id: "2yIdA5Jp7vU", title: "Studio Session", subtitle: "BWF Media Studio" },
+                { id: "LeMMMetmTT0", title: "Live From The Booth", subtitle: "BWF Media Studio" },
+                { id: "xXBDvU2S9Es", title: "On The Mic", subtitle: "BWF Media Studio" },
+                { id: "41dClYGOS0s", title: "Traveling With DJ", subtitle: "BWF Media Studio" },
               ]}
             />
           </div>
