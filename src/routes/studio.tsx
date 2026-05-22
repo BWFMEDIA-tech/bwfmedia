@@ -163,7 +163,7 @@ function StudioPage() {
         {/* FEATURED VIDEO */}
         <section className="py-16">
           <SectionTag>Featured // Inside The Studio</SectionTag>
-          <HUDFrame className="mt-10 p-4 md:p-6" style={{ borderColor: `${GOLD}33` }}>
+          <HUDFrame className="mt-10 p-4 md:p-6">
             <div className="aspect-video w-full overflow-hidden rounded-md">
               <iframe
                 className="h-full w-full"
