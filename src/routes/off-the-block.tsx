@@ -23,6 +23,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
+import { VideoPlayer } from "@/components/site/VideoPlayer";
 import heroVideo from "@/assets/off-the-block-hero.mp4.asset.json";
 import { FuturisticCalendar } from "@/components/FuturisticCalendar";
 import { toast } from "sonner";
