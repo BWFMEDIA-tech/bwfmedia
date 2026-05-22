@@ -8,6 +8,7 @@ import {
   Clock, Loader2, Radio,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
+import { VideoPlayer } from "@/components/site/VideoPlayer";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { FuturisticCalendar } from "@/components/FuturisticCalendar";
 import { toast } from "sonner";
