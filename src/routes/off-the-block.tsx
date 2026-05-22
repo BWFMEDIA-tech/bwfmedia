@@ -201,29 +201,13 @@ function OffTheBlockPage() {
         {/* FEATURED VIDEO */}
         <section className="py-16">
           <SectionTag>Featured // Latest Drop</SectionTag>
-          <div className="mt-10 grid md:grid-cols-2 gap-4">
-            <HUDFrame className="p-3 md:p-4">
-              <div className="relative w-full aspect-video overflow-hidden" style={{ border: `1px solid ${GOLD}33` }}>
-                <iframe
-                  src="https://www.youtube.com/embed/nJYgIsDj0UQ"
-                  title="BWF Off The Block - Featured Interview"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
-            </HUDFrame>
-            <HUDFrame className="p-3 md:p-4">
-              <div className="relative w-full aspect-video overflow-hidden" style={{ border: `1px solid ${GOLD}33` }}>
-                <iframe
-                  src="https://www.youtube.com/embed/-GDCCisa1cw"
-                  title="BWF Off The Block - Featured Drop"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
-            </HUDFrame>
+          <div className="mt-10">
+            <VideoPlayer
+              videos={[
+                { id: "nJYgIsDj0UQ", title: "Featured Interview", subtitle: "BWF Off The Block" },
+                { id: "-GDCCisa1cw", title: "Latest Drop", subtitle: "BWF Off The Block" },
+              ]}
+            />
           </div>
         </section>
 
