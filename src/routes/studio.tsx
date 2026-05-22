@@ -8,6 +8,7 @@ import {
   Clock, Loader2, Radio,
 } from "lucide-react";
 import { FutureShell, HUDFrame, SectionTag, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
+import { VideoPlayer } from "@/components/site/VideoPlayer";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { FuturisticCalendar } from "@/components/FuturisticCalendar";
 import { toast } from "sonner";
@@ -163,17 +164,13 @@ function StudioPage() {
         {/* FEATURED VIDEO */}
         <section className="py-16">
           <SectionTag>Featured // Inside The Studio</SectionTag>
-          <HUDFrame className="mt-10 p-4 md:p-6">
-            <div className="aspect-video w-full overflow-hidden rounded-md">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/TwEQ8rszojQ"
-                title="BWF Media Studio - Featured Video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-          </HUDFrame>
+          <div className="mt-10">
+            <VideoPlayer
+              videos={[
+                { id: "TwEQ8rszojQ", title: "Inside The Studio", subtitle: "BWF Media Studio" },
+              ]}
+            />
+          </div>
         </section>
 
 
