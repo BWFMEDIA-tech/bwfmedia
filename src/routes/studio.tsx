@@ -167,11 +167,11 @@ function StudioPage() {
           <div className="mt-10">
             <VideoPlayer
               videos={[
-                { id: "TwEQ8rszojQ", title: "Inside The Studio", subtitle: "BWF Media Studio" },
-                { id: "2yIdA5Jp7vU", title: "Studio Session", subtitle: "BWF Media Studio" },
-                { id: "LeMMMetmTT0", title: "Live From The Booth", subtitle: "BWF Media Studio" },
-                { id: "xXBDvU2S9Es", title: "On The Mic", subtitle: "BWF Media Studio" },
-                { id: "41dClYGOS0s", title: "Traveling With DJ", subtitle: "BWF Media Studio" },
+                { id: "TwEQ8rszojQ", title: "Jay Murkk: 12 Years Inside Angola Prison (New Orleans Story You Need to Hear) Part1", subtitle: "BWF Media Studio" },
+                { id: "2yIdA5Jp7vU", title: "The Return of Freeway Rick Ross: From Kingpin to Redemption", subtitle: "BWF Media Studio" },
+                { id: "LeMMMetmTT0", title: "PTSD: Blurring the Line Between Sane and Insane – KAHREE 003's Powerful Story", subtitle: "BWF Media Studio" },
+                { id: "xXBDvU2S9Es", title: "The Dark Rise of ProblemChild9: Musical Young Thugs' Untold Story", subtitle: "BWF Media Studio" },
+                { id: "41dClYGOS0s", title: "Surviving the 9th Ward: Speedy's Harrowing Tale of Blood and Resilience", subtitle: "BWF Media Studio" },
               ]}
             />
           </div>
