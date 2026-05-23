@@ -275,7 +275,7 @@ function ProofStrip() {
   ];
   const loop = [...items, ...items];
   return (
-    <section className="border-y border-white/10 bg-black overflow-hidden">
+    <section className="border-y border-blood/20 bg-black/40 backdrop-blur-sm overflow-hidden">
       <div className="relative py-8 group">
         <div className="flex gap-16 md:gap-24 animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap w-max">
           {loop.map((it, i) => (
@@ -329,7 +329,7 @@ function Services() {
     },
   ];
   return (
-    <section id="services" className="bg-black border-b border-white/10">
+    <section id="services" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead kicker="What We Do" title="Built to Make You Seen." />
@@ -358,7 +358,7 @@ function Why() {
   return (
     <section
       id="why"
-      className="relative bg-gradient-to-b from-black via-[#0a0000] to-black border-b border-white/10 overflow-hidden"
+      className="relative bg-black/40 backdrop-blur-sm border-b border-blood/20 overflow-hidden"
     >
       <div
         className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
@@ -400,7 +400,7 @@ function Audience() {
     { country: "Rest of World", pct: 15 },
   ];
   return (
-    <section id="audience" className="bg-black border-b border-white/10">
+    <section id="audience" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32 grid lg:grid-cols-2 gap-16 items-center">
         <Reveal>
           <SectionHead
@@ -451,7 +451,7 @@ function ContentSystem() {
     { n: "05", t: "Repeat", d: "Compound. Optimize. Scale." },
   ];
   return (
-    <section className="bg-gradient-to-b from-black to-[#080808] border-b border-white/10">
+    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead
@@ -518,7 +518,7 @@ function Pricing() {
     },
   ];
   return (
-    <section id="pricing" className="bg-black border-b border-white/10">
+    <section id="pricing" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead
@@ -575,7 +575,7 @@ function Pricing() {
 
 function Podcast() {
   return (
-    <section className="bg-gradient-to-br from-[#0c0000] via-black to-[#0a0a0a] border-b border-white/10">
+    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-28 grid md:grid-cols-2 gap-12 items-center">
         <Reveal>
           <div className="flex items-center gap-3 mb-5">
@@ -622,7 +622,7 @@ function Partnerships() {
     { icon: DollarSign, t: "Strategic Investment", d: "Partner with BWF on the next era of culture media." },
   ];
   return (
-    <section id="partner" className="bg-black border-b border-white/10">
+    <section id="partner" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead kicker="Partnerships" title="Work With BWF." />
@@ -649,7 +649,7 @@ function Partnerships() {
 
 function FinalCTA() {
   return (
-    <section id="book" className="relative bg-black overflow-hidden">
+    <section id="book" className="relative bg-black/30 backdrop-blur-sm overflow-hidden">
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
         style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(255,45,45,0.4), transparent 70%)" }}
