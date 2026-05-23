@@ -811,6 +811,7 @@ export function OnePager() {
         <ScrollProgress />
         <Nav />
         <Hero />
+        <FeaturedVideo />
         <ProofStrip />
         <Services />
         <Why />
