@@ -262,6 +262,55 @@ function Hero() {
   );
 }
 
+/* ---------- FEATURED VIDEO ---------- */
+
+function FeaturedVideo() {
+  return (
+    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+        <Reveal>
+          <SectionHead
+            kicker="Latest Drop"
+            title="Finesse2Tymes SIGNED? The Exposed Truth Behind His 360 Deal (Full Breakdown)"
+            sub="Breaking down the industry rumors, contract details, and what a 360 deal really means for artists."
+          />
+        </Reveal>
+        <Reveal delay={0.15}>
+          <div className="relative aspect-video w-full max-w-5xl mx-auto border border-blood/30 backdrop-blur-md bg-black overflow-hidden group">
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/aqOppO_xvRs?rel=0"
+              title="Finesse2Tymes SIGNED? The Exposed Truth Behind His 360 Deal (Full Breakdown)"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </Reveal>
+        <Reveal delay={0.25}>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="https://www.youtube.com/watch?v=aqOppO_xvRs"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
+            >
+              <Youtube size={16} />
+              Watch on YouTube
+            </a>
+            <RouterLink
+              to="/off-the-block"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
+            >
+              More Videos
+              <ArrowRight size={14} />
+            </RouterLink>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- SOCIAL PROOF STRIP ---------- */
 
 function ProofStrip() {
