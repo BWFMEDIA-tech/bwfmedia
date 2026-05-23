@@ -704,20 +704,84 @@ import { GrowthShowcase } from "@/components/site/GrowthShowcase";
 
 export function OnePager() {
   return (
-    <div className="min-h-screen bg-black text-bone antialiased">
-      <ScrollProgress />
-      <Nav />
-      <Hero />
-      <ProofStrip />
-      <Services />
-      <Why />
-      <Audience />
-      <GrowthShowcase />
-      <ContentSystem />
-      <Podcast />
-      <Partnerships />
-      <FinalCTA />
-      <SiteFooter />
+    <div
+      className="relative min-h-screen text-bone antialiased overflow-hidden"
+      style={{
+        backgroundColor: "#05060a",
+        backgroundImage: [
+          "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(255,45,45,0.18), transparent 60%)",
+          "radial-gradient(ellipse 60% 50% at 90% 100%, oklch(0.30 0.15 280 / 0.30), transparent 60%)",
+          "linear-gradient(180deg, #05060a 0%, #0a0a14 50%, #05060a 100%)",
+        ].join(","),
+      }}
+    >
+      {/* Fixed futuristic grid */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.12] z-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,45,45,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,45,45,0.45) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          maskImage:
+            "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
+        }}
+      />
+      {/* Roving scan line */}
+      <motion.div
+        className="fixed left-0 right-0 h-[2px] pointer-events-none z-0"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,90,90,0.9), transparent)",
+          boxShadow: "0 0 24px rgba(255,45,45,0.8)",
+        }}
+        initial={{ top: "0%" }}
+        animate={{ top: ["0%", "100%", "0%"] }}
+        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+      />
+      {/* CRT scanlines */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.05] z-0"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent 0, transparent 2px, #fff 3px, transparent 4px)",
+        }}
+      />
+      {/* Glow blobs */}
+      <div
+        className="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-25 blur-3xl pointer-events-none z-0"
+        style={{ backgroundColor: "rgba(255,45,45,0.7)" }}
+      />
+      <div
+        className="fixed -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none z-0"
+        style={{ backgroundColor: "oklch(0.45 0.20 280)" }}
+      />
+
+      <div className="relative z-10">
+        <ScrollProgress />
+        <Nav />
+        <Hero />
+        <ProofStrip />
+        <Services />
+        <Why />
+        <Audience />
+        <GrowthShowcase />
+        <ContentSystem />
+        <Podcast />
+        <Partnerships />
+        <FinalCTA />
+        <SiteFooter />
+      </div>
+
+      {/* Bottom accent strip */}
+      <div
+        className="relative h-[2px] z-20"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,45,45,0.9), transparent)",
+        }}
+      />
     </div>
   );
 }
