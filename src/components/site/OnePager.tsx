@@ -707,11 +707,11 @@ export function OnePager() {
     <div
       className="relative min-h-screen text-bone antialiased overflow-hidden"
       style={{
-        backgroundColor: "#05060a",
+        backgroundColor: "#000000",
         backgroundImage: [
           "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(255,45,45,0.18), transparent 60%)",
-          "radial-gradient(ellipse 60% 50% at 90% 100%, oklch(0.30 0.15 280 / 0.30), transparent 60%)",
-          "linear-gradient(180deg, #05060a 0%, #0a0a14 50%, #05060a 100%)",
+          "radial-gradient(ellipse 60% 50% at 90% 100%, rgba(255,45,45,0.12), transparent 60%)",
+          "linear-gradient(180deg, #000 0%, #060000 50%, #000 100%)",
         ].join(","),
       }}
     >
@@ -755,7 +755,7 @@ export function OnePager() {
       />
       <div
         className="fixed -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none z-0"
-        style={{ backgroundColor: "oklch(0.45 0.20 280)" }}
+        style={{ backgroundColor: "rgba(255,45,45,0.6)" }}
       />
 
       <div className="relative z-10">
