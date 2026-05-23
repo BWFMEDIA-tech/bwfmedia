@@ -275,7 +275,7 @@ function ProofStrip() {
   ];
   const loop = [...items, ...items];
   return (
-    <section className="border-y border-white/10 bg-black overflow-hidden">
+    <section className="border-y border-blood/20 bg-black/40 backdrop-blur-sm overflow-hidden">
       <div className="relative py-8 group">
         <div className="flex gap-16 md:gap-24 animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap w-max">
           {loop.map((it, i) => (
@@ -329,7 +329,7 @@ function Services() {
     },
   ];
   return (
-    <section id="services" className="bg-black border-b border-white/10">
+    <section id="services" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead kicker="What We Do" title="Built to Make You Seen." />
@@ -358,7 +358,7 @@ function Why() {
   return (
     <section
       id="why"
-      className="relative bg-gradient-to-b from-black via-[#0a0000] to-black border-b border-white/10 overflow-hidden"
+      className="relative bg-black/40 backdrop-blur-sm border-b border-blood/20 overflow-hidden"
     >
       <div
         className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
@@ -400,7 +400,7 @@ function Audience() {
     { country: "Rest of World", pct: 15 },
   ];
   return (
-    <section id="audience" className="bg-black border-b border-white/10">
+    <section id="audience" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32 grid lg:grid-cols-2 gap-16 items-center">
         <Reveal>
           <SectionHead
@@ -451,7 +451,7 @@ function ContentSystem() {
     { n: "05", t: "Repeat", d: "Compound. Optimize. Scale." },
   ];
   return (
-    <section className="bg-gradient-to-b from-black to-[#080808] border-b border-white/10">
+    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead
@@ -518,7 +518,7 @@ function Pricing() {
     },
   ];
   return (
-    <section id="pricing" className="bg-black border-b border-white/10">
+    <section id="pricing" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead
@@ -575,7 +575,7 @@ function Pricing() {
 
 function Podcast() {
   return (
-    <section className="bg-gradient-to-br from-[#0c0000] via-black to-[#0a0a0a] border-b border-white/10">
+    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-28 grid md:grid-cols-2 gap-12 items-center">
         <Reveal>
           <div className="flex items-center gap-3 mb-5">
@@ -622,7 +622,7 @@ function Partnerships() {
     { icon: DollarSign, t: "Strategic Investment", d: "Partner with BWF on the next era of culture media." },
   ];
   return (
-    <section id="partner" className="bg-black border-b border-white/10">
+    <section id="partner" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         <Reveal>
           <SectionHead kicker="Partnerships" title="Work With BWF." />
@@ -649,7 +649,7 @@ function Partnerships() {
 
 function FinalCTA() {
   return (
-    <section id="book" className="relative bg-black overflow-hidden">
+    <section id="book" className="relative bg-black/30 backdrop-blur-sm overflow-hidden">
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
         style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(255,45,45,0.4), transparent 70%)" }}
@@ -704,20 +704,84 @@ import { GrowthShowcase } from "@/components/site/GrowthShowcase";
 
 export function OnePager() {
   return (
-    <div className="min-h-screen bg-black text-bone antialiased">
-      <ScrollProgress />
-      <Nav />
-      <Hero />
-      <ProofStrip />
-      <Services />
-      <Why />
-      <Audience />
-      <GrowthShowcase />
-      <ContentSystem />
-      <Podcast />
-      <Partnerships />
-      <FinalCTA />
-      <SiteFooter />
+    <div
+      className="relative min-h-screen text-bone antialiased overflow-hidden"
+      style={{
+        backgroundColor: "#05060a",
+        backgroundImage: [
+          "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(255,45,45,0.18), transparent 60%)",
+          "radial-gradient(ellipse 60% 50% at 90% 100%, oklch(0.30 0.15 280 / 0.30), transparent 60%)",
+          "linear-gradient(180deg, #05060a 0%, #0a0a14 50%, #05060a 100%)",
+        ].join(","),
+      }}
+    >
+      {/* Fixed futuristic grid */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.12] z-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,45,45,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,45,45,0.45) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          maskImage:
+            "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
+        }}
+      />
+      {/* Roving scan line */}
+      <motion.div
+        className="fixed left-0 right-0 h-[2px] pointer-events-none z-0"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,90,90,0.9), transparent)",
+          boxShadow: "0 0 24px rgba(255,45,45,0.8)",
+        }}
+        initial={{ top: "0%" }}
+        animate={{ top: ["0%", "100%", "0%"] }}
+        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+      />
+      {/* CRT scanlines */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.05] z-0"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent 0, transparent 2px, #fff 3px, transparent 4px)",
+        }}
+      />
+      {/* Glow blobs */}
+      <div
+        className="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-25 blur-3xl pointer-events-none z-0"
+        style={{ backgroundColor: "rgba(255,45,45,0.7)" }}
+      />
+      <div
+        className="fixed -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none z-0"
+        style={{ backgroundColor: "oklch(0.45 0.20 280)" }}
+      />
+
+      <div className="relative z-10">
+        <ScrollProgress />
+        <Nav />
+        <Hero />
+        <ProofStrip />
+        <Services />
+        <Why />
+        <Audience />
+        <GrowthShowcase />
+        <ContentSystem />
+        <Podcast />
+        <Partnerships />
+        <FinalCTA />
+        <SiteFooter />
+      </div>
+
+      {/* Bottom accent strip */}
+      <div
+        className="relative h-[2px] z-20"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,45,45,0.9), transparent)",
+        }}
+      />
     </div>
   );
 }
