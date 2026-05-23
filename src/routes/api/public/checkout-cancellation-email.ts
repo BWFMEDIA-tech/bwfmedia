@@ -4,6 +4,7 @@ import { z } from 'zod'
 import * as React from 'react'
 import { render } from '@react-email/components'
 import { TEMPLATES } from '@/lib/email-templates/registry'
+import { validateReturnUrl } from '@/lib/validate-return-url'
 
 const SENDER_DOMAIN = 'notify.bwfmedia.company'
 const FROM_ADDRESS = `BWF Media <checkout@${SENDER_DOMAIN}>`
@@ -14,7 +15,13 @@ const Schema = z.object({
   itemCount: z.number().int().min(0).max(100).optional(),
   totalCents: z.number().int().min(0).max(100_000_000).optional(),
   cartFingerprint: z.string().min(1).max(120),
-  returnUrl: z.string().url().max(500).optional(),
+  returnUrl: z.string().url().max(500).optional().refine(
+    (u) => {
+      if (!u) return true;
+      try { validateReturnUrl(u); return true; } catch { return false; }
+    },
+    { message: 'returnUrl must be on the application domain' },
+  ),
 })
 
 function formatUSD(cents: number) {
