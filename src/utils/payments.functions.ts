@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+import { validateReturnUrl } from "@/lib/validate-return-url";
 
 const PRICE_ID_RE = /^[a-zA-Z0-9_-]+$/;
 
@@ -20,7 +21,8 @@ export const createCartCheckoutSession = createServerFn({ method: "POST" })
         throw new Error("Invalid quantity");
       }
     }
-    return data;
+    const safeReturnUrl = validateReturnUrl(data.returnUrl);
+    return { ...data, returnUrl: safeReturnUrl };
   })
   .handler(async ({ data }) => {
     const stripe = createStripeClient(data.environment);

@@ -3,11 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { createStripeClient, type StripeEnv } from '@/lib/stripe.server';
 import { BOOKING_PACKAGES } from '@/lib/booking-packages';
+import { validateReturnUrl } from '@/lib/validate-return-url';
 
 const Schema = z.object({
   bookingId: z.string().uuid(),
   packageId: z.string().min(1).max(60),
-  returnUrl: z.string().url(),
+  returnUrl: z.string().url().refine((u) => {
+    try { validateReturnUrl(u); return true; } catch { return false; }
+  }, { message: 'returnUrl must be on the application domain' }),
   environment: z.enum(['sandbox', 'live']) as z.ZodType<StripeEnv>,
 });
 
