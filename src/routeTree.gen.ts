@@ -14,6 +14,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -60,6 +61,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
   id: '/off-the-block',
   path: '/off-the-block',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckRoute = DeckRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
     | '/studio'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
     | '/studio'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
     | '/studio'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
+  LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StudioRoute: typeof StudioRoute
@@ -420,6 +433,13 @@ declare module '@tanstack/react-router' {
       path: '/off-the-block'
       fullPath: '/off-the-block'
       preLoaderRoute: typeof OffTheBlockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck': {
@@ -595,6 +615,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
+  LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StudioRoute: StudioRoute,
@@ -622,12 +643,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
