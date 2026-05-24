@@ -19,6 +19,8 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createLiveSubmissionCheckout } from "@/lib/live-submission-checkout.functions";
 import { LIVE_TIER_LIST, LIVE_TIERS, type LiveTierId, type LiveTier } from "@/lib/live-review-tiers";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { Link } from "@tanstack/react-router";
+import { useLiveQueue, type LiveQueueRow } from "@/lib/useLiveQueue";
 
 const RED = "#ef2b2b";
 const RED_DEEP = "#c01616";
@@ -68,17 +70,12 @@ const SEED_COMMENTS: Comment[] = [
   { id: "c5", name: "NextUp203", text: "HOT all day! 🔥", at: Date.now() - 300_000 },
 ];
 
-const FEATURED_ARTISTS: {
-  name: string;
-  song: string;
-  tier: "premium" | "featured" | "basic";
-  status: string;
-}[] = [
-  { name: "Jay Mula", song: "No Rules", tier: "premium", status: "Now Featured Live" },
-  { name: "Lady Reign", song: "Better Days", tier: "featured", status: "In Review Queue" },
-  { name: "Yung Dice", song: "On My Way", tier: "featured", status: "Next Up" },
-  { name: "Lil Truth", song: "Pain Inside", tier: "basic", status: "In Queue" },
-];
+const STATUS_LABEL: Record<string, string> = {
+  live: "Now Reviewing Live",
+  next_up: "Up Next",
+  queued: "In Queue",
+  done: "Reviewed",
+};
 
 function LiveReviewPage() {
   // Review panel state
@@ -91,12 +88,23 @@ function LiveReviewPage() {
   // Submission form state
   const [submitting, setSubmitting] = useState(false);
   const [subArtist, setSubArtist] = useState("");
+  const [subSongTitle, setSubSongTitle] = useState("");
+  const [subPhoto, setSubPhoto] = useState("");
   const [subLink, setSubLink] = useState("");
   const [subEmail, setSubEmail] = useState("");
   const [subMsg, setSubMsg] = useState("");
   const [selectedTier, setSelectedTier] = useState<LiveTierId | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  // Real-time queue
+  const { rows: queue } = useLiveQueue();
+  const nowLive = queue.find((r) => r.queue_status === "live") ?? null;
+  const nextUp = queue.filter((r) => r.queue_status === "next_up").slice(0, 3);
+  const upcoming = queue.filter((r) => r.queue_status === "queued").slice(0, 8);
+  const spotlight = queue
+    .filter((r) => r.tier !== "basic" && r.queue_status !== "done")
+    .slice(0, 4);
 
   function handleSubmitFeedback(e: React.FormEvent) {
     e.preventDefault();
@@ -148,6 +156,8 @@ function LiveReviewPage() {
           artistName: subArtist.trim(),
           email: subEmail.trim(),
           songLink: subLink.trim(),
+          songTitle: subSongTitle.trim(),
+          photoUrl: subPhoto.trim(),
           message: subMsg.trim(),
           environment: getStripeEnvironment(),
           returnUrl: `${window.location.origin}/live-review/success?session_id={CHECKOUT_SESSION_ID}`,
