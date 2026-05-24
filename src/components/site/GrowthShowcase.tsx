@@ -257,7 +257,8 @@ export function GrowthShowcase() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {VIRAL.map((v, i) => (
+          {VIRAL.map((v, i) => {
+            const Card = (
               <motion.div
                 key={v.title}
                 initial={{ opacity: 0, y: 24 }}
@@ -289,7 +290,21 @@ export function GrowthShowcase() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+            );
+            return v.videoId ? (
+              <a
+                key={v.title}
+                href={`https://www.youtube.com/watch?v=${v.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                {Card}
+              </a>
+            ) : (
+              Card
+            );
+          })}
           </div>
         </div>
 
