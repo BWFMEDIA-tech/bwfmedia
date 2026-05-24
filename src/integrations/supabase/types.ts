@@ -198,6 +198,8 @@ export type Database = {
         Row: {
           amount_cents: number
           artist_name: string
+          audio_file_type: string | null
+          audio_uploaded_at: string | null
           created_at: string
           email: string
           id: string
@@ -211,10 +213,13 @@ export type Database = {
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           tier: string
+          uploaded_audio_url: string | null
         }
         Insert: {
           amount_cents: number
           artist_name: string
+          audio_file_type?: string | null
+          audio_uploaded_at?: string | null
           created_at?: string
           email: string
           id?: string
@@ -228,10 +233,13 @@ export type Database = {
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           tier: string
+          uploaded_audio_url?: string | null
         }
         Update: {
           amount_cents?: number
           artist_name?: string
+          audio_file_type?: string | null
+          audio_uploaded_at?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -245,6 +253,7 @@ export type Database = {
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           tier?: string
+          uploaded_audio_url?: string | null
         }
         Relationships: []
       }
@@ -400,6 +409,8 @@ export type Database = {
       live_queue_public: {
         Row: {
           artist_name: string | null
+          audio_file_type: string | null
+          audio_uploaded_at: string | null
           created_at: string | null
           id: string | null
           paid_at: string | null
@@ -408,9 +419,12 @@ export type Database = {
           song_link: string | null
           song_title: string | null
           tier: string | null
+          uploaded_audio_url: string | null
         }
         Insert: {
           artist_name?: string | null
+          audio_file_type?: string | null
+          audio_uploaded_at?: string | null
           created_at?: string | null
           id?: string | null
           paid_at?: string | null
@@ -419,9 +433,12 @@ export type Database = {
           song_link?: string | null
           song_title?: string | null
           tier?: string | null
+          uploaded_audio_url?: string | null
         }
         Update: {
           artist_name?: string | null
+          audio_file_type?: string | null
+          audio_uploaded_at?: string | null
           created_at?: string | null
           id?: string | null
           paid_at?: string | null
@@ -430,6 +447,7 @@ export type Database = {
           song_link?: string | null
           song_title?: string | null
           tier?: string | null
+          uploaded_audio_url?: string | null
         }
         Relationships: []
       }
