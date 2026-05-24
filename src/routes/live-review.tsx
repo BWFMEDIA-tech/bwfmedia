@@ -6,15 +6,12 @@ import {
   X,
   Star,
   Send,
-  Instagram,
-  Youtube,
-  Radio,
-  Music2,
-  Mic,
   Lock,
   Check,
+  Play,
+  ChevronRight,
 } from "lucide-react";
-import { FutureShell, HUDFrame, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
+import { FutureShell } from "@/components/site/FutureShell";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
@@ -22,6 +19,9 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createLiveSubmissionCheckout } from "@/lib/live-submission-checkout.functions";
 import { LIVE_TIER_LIST, LIVE_TIERS, type LiveTierId, type LiveTier } from "@/lib/live-review-tiers";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+
+const RED = "#ef2b2b";
+const RED_DEEP = "#c01616";
 
 export const Route = createFileRoute("/live-review")({
   head: () => ({
@@ -61,19 +61,32 @@ type Comment = {
 };
 
 const SEED_COMMENTS: Comment[] = [
-  { id: "c1", name: "DJ Prime", text: "That hook is undeniable 🔥", rating: 9, vote: "hot", at: Date.now() - 60_000 },
-  { id: "c2", name: "Mona", text: "Beat slaps but the mix is muddy", rating: 6, at: Date.now() - 120_000 },
-  { id: "c3", name: "Trey", text: "Replay value for daysss", vote: "hot", at: Date.now() - 180_000 },
-  { id: "c4", name: "Kara", text: "Verse 2 needs work imo", rating: 5, vote: "not", at: Date.now() - 240_000 },
+  { id: "c1", name: "RealOne88", text: "This track is fire! 🔥🔥", at: Date.now() - 60_000 },
+  { id: "c2", name: "MusicLover", text: "The flow is crazy on this!", at: Date.now() - 120_000 },
+  { id: "c3", name: "BWF_Fan", text: "8.5 from me 💯", at: Date.now() - 180_000 },
+  { id: "c4", name: "IndieArtist", text: "Keep pushing fam! 🙌", at: Date.now() - 240_000 },
+  { id: "c5", name: "NextUp203", text: "HOT all day! 🔥", at: Date.now() - 300_000 },
+];
+
+const FEATURED_ARTISTS: {
+  name: string;
+  song: string;
+  tier: "premium" | "featured" | "basic";
+  status: string;
+}[] = [
+  { name: "Jay Mula", song: "No Rules", tier: "premium", status: "Now Featured Live" },
+  { name: "Lady Reign", song: "Better Days", tier: "featured", status: "In Review Queue" },
+  { name: "Yung Dice", song: "On My Way", tier: "featured", status: "Next Up" },
+  { name: "Lil Truth", song: "Pain Inside", tier: "basic", status: "In Queue" },
 ];
 
 function LiveReviewPage() {
   // Review panel state
   const [rating, setRating] = useState<number | null>(null);
   const [vote, setVote] = useState<"hot" | "not" | null>(null);
-  const [name, setName] = useState("");
   const [opinion, setOpinion] = useState("");
   const [comments, setComments] = useState<Comment[]>(SEED_COMMENTS);
+  const [chatInput, setChatInput] = useState("");
 
   // Submission form state
   const [submitting, setSubmitting] = useState(false);
@@ -93,7 +106,7 @@ function LiveReviewPage() {
     }
     const c: Comment = {
       id: crypto.randomUUID(),
-      name: name.trim() || "Anonymous",
+      name: "You",
       text: opinion.trim() || (vote === "hot" ? "🔥 Hot" : vote === "not" ? "❌ Not" : "Rated"),
       rating: rating ?? undefined,
       vote: vote ?? undefined,
@@ -104,6 +117,16 @@ function LiveReviewPage() {
     setRating(null);
     setVote(null);
     toast.success("Locked in. Your take is live.");
+  }
+
+  function handleChatSend(e: React.FormEvent) {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    setComments((prev) => [
+      { id: crypto.randomUUID(), name: "You", text: chatInput.trim(), at: Date.now() },
+      ...prev,
+    ]);
+    setChatInput("");
   }
 
   async function handleSubmitMusic(e: React.FormEvent) {
@@ -145,45 +168,59 @@ function LiveReviewPage() {
     setCheckoutError(null);
   }
 
+  function scrollToTiers() {
+    document.getElementById("pricing-tiers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <FutureShell>
       <PaymentTestModeBanner />
-      <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-16">
-        {/* HERO */}
-        <section className="text-center mb-10 md:mb-14">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 text-[10px] uppercase tracking-[0.3em] border"
-            style={{ borderColor: `${GOLD}66`, color: GOLD }}
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
-            </span>
-            Live Now
+      <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6 py-8 md:py-12">
+        {/* HERO — left copy, right live video */}
+        <section className="grid lg:grid-cols-2 gap-6 lg:gap-10 mb-10 lg:mb-14 items-center">
+          <div>
+            <h1 className="font-anton text-4xl sm:text-5xl lg:text-6xl xl:text-7xl uppercase tracking-tight text-bone leading-[0.95]">
+              Live Reviews.
+              <br />
+              Real Feedback.
+              <br />
+              <span style={{ color: RED }}>Real Exposure.</span>
+            </h1>
+            <p className="mt-5 text-bone/70 text-sm md:text-base max-w-md">
+              Independent artists. Raw music.
+              <br />
+              Real reactions from a live audience.
+            </p>
+            <div className="mt-6 flex items-center gap-4 flex-wrap">
+              <a
+                href="#live-room"
+                className="inline-flex items-center gap-2 px-6 py-3 font-anton uppercase tracking-[0.15em] text-bone text-sm transition-all hover:brightness-110"
+                style={{
+                  background: RED,
+                  boxShadow: `0 0 28px ${RED}55`,
+                }}
+              >
+                Watch Live Now <Play className="w-4 h-4 fill-current" />
+              </a>
+              <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-bone/70">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping" style={{ background: RED }} />
+                  <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: RED }} />
+                </span>
+                Live on YouTube
+              </div>
+            </div>
           </div>
-          <h1 className="mt-4 font-anton text-4xl sm:text-5xl md:text-7xl uppercase tracking-tight text-bone">
-            BWFMEDIA{" "}
-            <span
-              style={{
-                background: `linear-gradient(135deg, ${GOLD_GLOW}, ${GOLD})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Live Review Room
-            </span>
-          </h1>
-          <p className="mt-4 text-bone/70 max-w-2xl mx-auto text-sm md:text-base">
-            Live music reviews, guest artists, and real-time audience ratings. Pull up, vote, and shape what gets the cosign.
-          </p>
-        </section>
-
-        {/* LIVE PLAYER */}
-        <HUDFrame className="p-3 md:p-4 mb-8 md:mb-12">
           <div
             className="relative w-full aspect-video overflow-hidden bg-black"
-            style={{ border: `1px solid ${GOLD}33` }}
+            style={{ border: `1px solid ${RED}55`, boxShadow: `0 0 40px ${RED}33` }}
           >
+            <span
+              className="absolute top-3 left-3 z-10 px-2.5 py-1 text-[10px] uppercase tracking-[0.25em] font-anton text-bone"
+              style={{ background: RED }}
+            >
+              ● Live
+            </span>
             <iframe
               src={YT_LIVE_EMBED}
               title="BWFMEDIA Live Review Room"
@@ -191,235 +228,252 @@ function LiveReviewPage() {
               allowFullScreen
               className="absolute inset-0 w-full h-full"
             />
+            <div
+              className="absolute bottom-0 left-0 right-0 px-3 py-2 text-xs text-bone/90 flex items-center gap-2"
+              style={{ background: "linear-gradient(180deg, transparent, rgba(0,0,0,0.85))" }}
+            >
+              <span className="w-2 h-2 rounded-full" style={{ background: RED }} />
+              <span className="font-anton uppercase tracking-wider">Live Now:</span>
+              <span>Reviewing new music and giving real feedback!</span>
+            </div>
           </div>
-        </HUDFrame>
+        </section>
 
-        {/* GUEST SPOTLIGHT */}
-        <section className="mb-8 md:mb-12">
-          <SectionHeader
-            eyebrow="Now Reviewing"
-            title="Guest Artist Spotlight"
-            icon={<Mic className="w-4 h-4" />}
-          />
-          <HUDFrame className="p-4 md:p-6 mt-4">
-            <div className="flex flex-col sm:flex-row gap-5">
+        {/* FEATURED ARTISTS */}
+        <section className="mb-10 lg:mb-14">
+          <div className="flex items-center justify-between mb-4">
+            <RailHeader title="Featured Artists" accent={<Star className="w-4 h-4 fill-current" style={{ color: RED }} />} />
+            <button
+              type="button"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-bone border border-bone/20 hover:border-bone/50 transition-colors"
+            >
+              View All Spotlight Artists <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {FEATURED_ARTISTS.map((a) => (
+              <FeaturedArtistCard key={a.name} artist={a} />
+            ))}
+          </div>
+        </section>
+
+        {/* LIVE REVIEW ROOM + LIVE CHAT */}
+        <section id="live-room" className="mb-10 lg:mb-14 grid lg:grid-cols-[1.6fr_1fr] gap-4 lg:gap-6">
+          {/* Review room */}
+          <div className="border bg-black/40 p-4 md:p-5" style={{ borderColor: `${RED}33` }}>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="block w-0.5 h-5" style={{ background: RED }} />
+              <h2 className="font-anton text-xl uppercase tracking-wide text-bone">Live Review Room</h2>
+              <span className="w-2 h-2 rounded-full ml-1" style={{ background: RED }} />
+            </div>
+
+            {/* Now reviewing track */}
+            <div className="flex gap-3 mb-5">
               <div
-                className="shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden grid place-items-center"
-                style={{
-                  border: `1px solid ${GOLD}66`,
-                  background: `radial-gradient(circle, ${GOLD}33, transparent 70%)`,
-                }}
+                className="shrink-0 w-16 h-16 grid place-items-center"
+                style={{ background: `radial-gradient(circle, ${RED}55, transparent 70%)`, border: `1px solid ${RED}55` }}
               >
-                <Music2 className="w-10 h-10" style={{ color: GOLD }} />
+                <Play className="w-6 h-6" style={{ color: RED }} />
               </div>
               <div className="flex-1 min-w-0">
-                <div
-                  className="inline-block px-2 py-0.5 text-[10px] uppercase tracking-[0.3em] mb-2"
-                  style={{ background: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}66` }}
-                >
+                <div className="text-[10px] uppercase tracking-[0.3em]" style={{ color: RED }}>
                   Now Reviewing
                 </div>
-                <h3 className="font-anton text-2xl md:text-3xl uppercase tracking-wide text-bone">
-                  TBA Artist
-                </h3>
-                <p className="text-bone/60 mt-1 text-sm">
-                  Song: <span className="text-bone/90">"Untitled Heat"</span>
-                </p>
-                <div className="flex gap-2 mt-4">
-                  <SocialPill icon={<Instagram className="w-3.5 h-3.5" />} label="Instagram" />
-                  <SocialPill icon={<Youtube className="w-3.5 h-3.5" />} label="YouTube" />
-                  <SocialPill icon={<Radio className="w-3.5 h-3.5" />} label="SoundCloud" />
+                <div className="font-anton text-lg uppercase tracking-wide text-bone leading-tight mt-0.5">
+                  Jay Mula
                 </div>
+                <div className="text-bone/60 text-xs">"No Rules"</div>
+                <FakeWaveform />
               </div>
             </div>
-          </HUDFrame>
-        </section>
 
-        {/* LIVE REVIEW PANEL */}
-        <section className="mb-8 md:mb-12">
-          <SectionHeader
-            eyebrow="Audience Verdict"
-            title="Live Review Panel"
-            icon={<Star className="w-4 h-4" />}
-          />
-          <HUDFrame className="p-4 md:p-6 mt-4">
-            <form onSubmit={handleSubmitFeedback} className="space-y-5">
-              {/* Rating */}
+            <form onSubmit={handleSubmitFeedback} className="space-y-4">
+              {/* Star rating */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60 mb-2">
+                    Rate This Track <span className="text-bone/40">(1-10)</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+                      const active = rating != null && n <= rating;
+                      return (
+                        <button
+                          type="button"
+                          key={n}
+                          onClick={() => setRating(n)}
+                          aria-label={`Rate ${n}`}
+                          className="p-0.5"
+                        >
+                          <Star
+                            className={cn("w-5 h-5 transition-colors", active ? "fill-current" : "")}
+                            style={{ color: active ? RED : "rgba(255,255,255,0.25)" }}
+                          />
+                        </button>
+                      );
+                    })}
+                    <span
+                      className="ml-2 px-2 py-1 text-xs font-anton border"
+                      style={{ borderColor: `${RED}55`, color: RED }}
+                    >
+                      {rating ?? "—"}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60 mb-2">
+                    Hot Or Not?
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setVote("hot")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-2 py-2.5 font-anton uppercase tracking-wide text-sm transition-all",
+                        vote === "hot" ? "text-bone" : "text-bone/80 border",
+                      )}
+                      style={{
+                        background: vote === "hot" ? RED : "transparent",
+                        borderColor: vote === "hot" ? RED : "rgba(255,255,255,0.15)",
+                        boxShadow: vote === "hot" ? `0 0 18px ${RED}66` : undefined,
+                      }}
+                    >
+                      <Flame className="w-4 h-4" />
+                      Hot
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVote("not")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-2 py-2.5 font-anton uppercase tracking-wide text-sm border transition-all",
+                      )}
+                      style={{
+                        borderColor: vote === "not" ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.15)",
+                        background: vote === "not" ? "rgba(255,255,255,0.08)" : "transparent",
+                        color: "var(--bone, #f6efe3)",
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                      Not
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60 mb-2">
-                  Rate the track (1–10)
+                  Drop Your Opinion
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
-                    const active = rating != null && n <= rating;
-                    return (
-                      <button
-                        type="button"
-                        key={n}
-                        onClick={() => setRating(n)}
-                        className={cn(
-                          "w-9 h-9 md:w-10 md:h-10 grid place-items-center border text-sm font-anton transition-all",
-                          active ? "text-black" : "text-bone/70 hover:text-bone"
-                        )}
-                        style={{
-                          borderColor: active ? GOLD : `${GOLD}33`,
-                          background: active ? GOLD : "transparent",
-                          boxShadow: active ? `0 0 12px ${GOLD}66` : undefined,
-                        }}
-                        aria-label={`Rate ${n}`}
-                      >
-                        {n}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Hot or Not */}
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60 mb-2">
-                  Hot or Not
-                </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={opinion}
+                    onChange={(e) => setOpinion(e.target.value)}
+                    placeholder="Type your feedback here..."
+                    maxLength={240}
+                    className="flex-1 bg-black/60 border px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                    style={{ borderColor: "rgba(255,255,255,0.12)" }}
+                  />
                   <button
-                    type="button"
-                    onClick={() => setVote("hot")}
-                    className={cn(
-                      "flex-1 flex items-center justify-center gap-2 py-3 border font-anton uppercase tracking-wide transition-all",
-                      vote === "hot" ? "text-black" : "text-bone/80"
-                    )}
-                    style={{
-                      borderColor: vote === "hot" ? "#ff5a1f" : `${GOLD}33`,
-                      background: vote === "hot" ? "#ff5a1f" : "transparent",
-                      boxShadow: vote === "hot" ? "0 0 18px #ff5a1f88" : undefined,
-                    }}
+                    type="submit"
+                    className="px-5 font-anton uppercase tracking-wide text-bone text-sm transition-all hover:brightness-110"
+                    style={{ background: RED, boxShadow: `0 0 16px ${RED}55` }}
                   >
-                    <Flame className="w-4 h-4" />
-                    Hot
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setVote("not")}
-                    className={cn(
-                      "flex-1 flex items-center justify-center gap-2 py-3 border font-anton uppercase tracking-wide transition-all",
-                      vote === "not" ? "text-black" : "text-bone/80"
-                    )}
-                    style={{
-                      borderColor: vote === "not" ? "#bbb" : `${GOLD}33`,
-                      background: vote === "not" ? "#ddd" : "transparent",
-                    }}
-                  >
-                    <X className="w-4 h-4" />
-                    Not
+                    Submit
                   </button>
                 </div>
               </div>
-
-              {/* Name + Opinion */}
-              <div className="grid sm:grid-cols-[180px_1fr] gap-3">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name (optional)"
-                  maxLength={40}
-                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                  style={{ borderColor: `${GOLD}33` }}
-                />
-                <input
-                  type="text"
-                  value={opinion}
-                  onChange={(e) => setOpinion(e.target.value)}
-                  placeholder="Drop your opinion on the track"
-                  maxLength={240}
-                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                  style={{ borderColor: `${GOLD}33` }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-black transition-all"
-                style={{
-                  background: `linear-gradient(135deg, ${GOLD_GLOW}, ${GOLD})`,
-                  boxShadow: `0 0 24px ${GOLD}55`,
-                }}
-              >
-                <Send className="w-4 h-4" />
-                Submit Verdict
-              </button>
             </form>
-          </HUDFrame>
-        </section>
+          </div>
 
-        {/* LIVE FEED */}
-        <section className="mb-8 md:mb-12">
-          <SectionHeader
-            eyebrow="In The Room"
-            title="Live Audience Feed"
-            icon={<Radio className="w-4 h-4" />}
-          />
-          <HUDFrame className="p-3 md:p-4 mt-4">
-            <div className="max-h-[420px] overflow-y-auto pr-1 flex flex-col gap-2">
+          {/* Live Chat */}
+          <div className="border bg-black/40 flex flex-col" style={{ borderColor: `${RED}33` }}>
+            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: `${RED}22` }}>
+              <div className="flex items-center gap-2">
+                <span className="block w-0.5 h-5" style={{ background: RED }} />
+                <h2 className="font-anton text-xl uppercase tracking-wide text-bone">Live Chat</h2>
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-bone/60">◉ 1.2K</span>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[280px] max-h-[420px]">
               <AnimatePresence initial={false}>
                 {comments.map((c) => (
                   <motion.div
                     key={c.id}
-                    initial={{ opacity: 0, y: -8 }}
+                    initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="p-3 border bg-bone/[0.02]"
-                    style={{ borderColor: `${GOLD}22` }}
+                    className="flex items-start gap-2.5"
                   >
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div
-                          className="w-7 h-7 rounded-full grid place-items-center text-[11px] font-anton text-black shrink-0"
-                          style={{ background: GOLD }}
-                        >
-                          {c.name[0]?.toUpperCase() ?? "?"}
-                        </div>
-                        <div className="font-anton uppercase tracking-wide text-sm text-bone truncate">
-                          {c.name}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {c.rating != null && (
-                          <span
-                            className="text-[10px] px-1.5 py-0.5 border"
-                            style={{ borderColor: `${GOLD}66`, color: GOLD }}
-                          >
-                            {c.rating}/10
-                          </span>
-                        )}
-                        {c.vote === "hot" && (
-                          <span className="text-[10px] px-1.5 py-0.5 border border-orange-500/60 text-orange-400 flex items-center gap-1">
-                            <Flame className="w-3 h-3" /> Hot
-                          </span>
-                        )}
-                        {c.vote === "not" && (
-                          <span className="text-[10px] px-1.5 py-0.5 border border-bone/30 text-bone/60 flex items-center gap-1">
-                            <X className="w-3 h-3" /> Not
-                          </span>
-                        )}
-                      </div>
+                    <div
+                      className="w-7 h-7 rounded-full grid place-items-center text-[11px] font-anton text-bone shrink-0"
+                      style={{ background: `${RED}55`, border: `1px solid ${RED}` }}
+                    >
+                      {c.name[0]?.toUpperCase() ?? "?"}
                     </div>
-                    <p className="text-sm text-bone/80 pl-9">{c.text}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="font-anton uppercase tracking-wide text-xs text-bone truncate">
+                          {c.name}
+                        </span>
+                        <span className="text-[10px] text-bone/40 shrink-0">just now</span>
+                      </div>
+                      <p className="text-xs text-bone/80 leading-snug">{c.text}</p>
+                    </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
-          </HUDFrame>
+            <form onSubmit={handleChatSend} className="p-3 border-t flex gap-2" style={{ borderColor: `${RED}22` }}>
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Say something..."
+                maxLength={200}
+                className="flex-1 bg-black/60 border px-3 py-2 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                style={{ borderColor: "rgba(255,255,255,0.12)" }}
+              />
+              <button
+                type="submit"
+                className="px-3 grid place-items-center text-bone transition-colors hover:brightness-110"
+                style={{ background: RED }}
+                aria-label="Send"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
         </section>
 
-        {/* PAYWALL — PICK A TIER */}
-        <section className="mb-8 md:mb-12">
-          <SectionHeader
-            eyebrow="Unlock Submission"
-            title="Choose Your Spotlight Tier"
-            icon={<Lock className="w-4 h-4" />}
-          />
-          <div className="grid md:grid-cols-3 gap-4 mt-4">
+        {/* HOW IT WORKS + PRICING */}
+        <section id="pricing-tiers" className="mb-10 lg:mb-14 grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-6">
+          <div className="border bg-black/40 p-5 md:p-6" style={{ borderColor: `${RED}33` }}>
+            <h2 className="font-anton text-xl uppercase tracking-wide text-bone mb-5">How It Works</h2>
+            <ol className="grid grid-cols-3 lg:grid-cols-1 gap-5">
+              {[
+                { n: 1, title: "Submit", desc: "Choose a plan and submit your music." },
+                { n: 2, title: "Get Reviewed", desc: "Your track gets played live on the show." },
+                { n: 3, title: "Get Exposed", desc: "Reach new fans and grow your audience." },
+              ].map((s) => (
+                <li key={s.n} className="text-center lg:text-left lg:flex lg:items-start lg:gap-3">
+                  <div
+                    className="mx-auto lg:mx-0 w-12 h-12 grid place-items-center shrink-0"
+                    style={{ border: `1px solid ${RED}66`, background: `${RED}11` }}
+                  >
+                    <span className="font-anton text-lg" style={{ color: RED }}>{s.n}</span>
+                  </div>
+                  <div className="mt-2 lg:mt-0">
+                    <div className="font-anton uppercase tracking-wide text-bone text-sm">{s.n}. {s.title}</div>
+                    <p className="text-bone/60 text-xs mt-1">{s.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-3 md:gap-4">
             {LIVE_TIER_LIST.map((tier) => (
               <TierCard
                 key={tier.id}
@@ -428,7 +482,6 @@ function LiveReviewPage() {
                 onSelect={() => {
                   setSelectedTier(tier.id);
                   resetCheckout();
-                  // Scroll the form into view on mobile
                   setTimeout(() => {
                     document
                       .getElementById("submission-form")
@@ -442,12 +495,17 @@ function LiveReviewPage() {
 
         {/* SUBMIT MUSIC (gated by tier selection) */}
         <section className="mb-6" id="submission-form">
-          <SectionHeader
-            eyebrow={selectedTier ? "Step 2" : "Locked"}
-            title="Submit Music For Live Review"
-            icon={selectedTier ? <Send className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-          />
-          <HUDFrame className="p-4 md:p-6 mt-4 relative">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="block w-0.5 h-5" style={{ background: RED }} />
+            <h2 className="font-anton text-xl uppercase tracking-wide text-bone">
+              Submit Music For Live Review
+            </h2>
+            {!selectedTier && <Lock className="w-4 h-4 text-bone/50" />}
+          </div>
+          <div
+            className="border bg-black/40 p-4 md:p-6 relative"
+            style={{ borderColor: `${RED}33` }}
+          >
             {!selectedTier && (
               <div
                 className="absolute inset-0 z-20 grid place-items-center backdrop-blur-md"
@@ -456,14 +514,22 @@ function LiveReviewPage() {
                 <div className="text-center px-6">
                   <div
                     className="mx-auto mb-3 w-12 h-12 grid place-items-center rounded-full"
-                    style={{ background: `${GOLD}22`, border: `1px solid ${GOLD}66` }}
+                    style={{ background: `${RED}22`, border: `1px solid ${RED}66` }}
                   >
-                    <Lock className="w-5 h-5" style={{ color: GOLD }} />
+                    <Lock className="w-5 h-5" style={{ color: RED }} />
                   </div>
                   <div className="font-anton text-xl uppercase text-bone">Locked</div>
                   <p className="text-bone/70 text-sm mt-1 max-w-xs">
-                    Pick a tier above to unlock the submission form.
+                    Pick a plan above to unlock the submission form.
                   </p>
+                  <button
+                    type="button"
+                    onClick={scrollToTiers}
+                    className="mt-4 px-5 py-2 font-anton uppercase tracking-[0.2em] text-xs text-bone"
+                    style={{ background: RED, boxShadow: `0 0 18px ${RED}55` }}
+                  >
+                    Choose A Plan
+                  </button>
                 </div>
               </div>
             )}
@@ -473,7 +539,7 @@ function LiveReviewPage() {
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60">
                     Paying for{" "}
-                    <span style={{ color: GOLD }}>
+                    <span style={{ color: RED }}>
                       {selectedTier ? LIVE_TIERS[selectedTier].name : ""}
                     </span>
                   </div>
@@ -507,7 +573,7 @@ function LiveReviewPage() {
                   placeholder="Artist name *"
                   maxLength={80}
                   className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                  style={{ borderColor: `${GOLD}33` }}
+                  style={{ borderColor: `${RED}33` }}
                 />
                 <input
                   type="email"
@@ -517,7 +583,7 @@ function LiveReviewPage() {
                   placeholder="Contact email *"
                   maxLength={120}
                   className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                  style={{ borderColor: `${GOLD}33` }}
+                  style={{ borderColor: `${RED}33` }}
                 />
                 <input
                   type="url"
@@ -527,7 +593,7 @@ function LiveReviewPage() {
                   placeholder="Song link (YouTube, SoundCloud, etc.) *"
                   maxLength={300}
                   className="sm:col-span-2 bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                  style={{ borderColor: `${GOLD}33` }}
+                  style={{ borderColor: `${RED}33` }}
                 />
                 <textarea
                   value={subMsg}
@@ -536,7 +602,7 @@ function LiveReviewPage() {
                   maxLength={500}
                   rows={4}
                   className="sm:col-span-2 bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none resize-none"
-                  style={{ borderColor: `${GOLD}33` }}
+                  style={{ borderColor: `${RED}33` }}
                 />
                 {checkoutError && (
                   <div className="sm:col-span-2 text-sm text-red-400 border border-red-500/40 bg-red-500/10 px-3 py-2">
@@ -546,10 +612,10 @@ function LiveReviewPage() {
                 <button
                   type="submit"
                   disabled={submitting || !selectedTier}
-                  className="sm:col-span-2 flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-black transition-all disabled:opacity-60"
+                  className="sm:col-span-2 flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-bone transition-all disabled:opacity-60 hover:brightness-110"
                   style={{
-                    background: `linear-gradient(135deg, ${GOLD_GLOW}, ${GOLD})`,
-                    boxShadow: `0 0 24px ${GOLD}55`,
+                    background: `linear-gradient(135deg, ${RED}, ${RED_DEEP})`,
+                    boxShadow: `0 0 24px ${RED}55`,
                   }}
                 >
                   <Lock className="w-4 h-4" />
@@ -561,47 +627,110 @@ function LiveReviewPage() {
                 </button>
               </form>
             )}
-          </HUDFrame>
+          </div>
+        </section>
+
+        {/* BOTTOM CTA */}
+        <section
+          className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 px-5 py-5 md:px-8 md:py-6"
+          style={{ background: `linear-gradient(90deg, ${RED_DEEP}, ${RED})` }}
+        >
+          <div className="flex items-center gap-4">
+            <span className="font-anton text-2xl uppercase tracking-tight text-bone leading-none">
+              BWF<span className="block text-xs tracking-[0.3em] mt-1">Media</span>
+            </span>
+            <p className="font-anton uppercase tracking-wide text-bone text-base md:text-xl leading-tight">
+              We don't just play music.
+              <br className="hidden md:block" />
+              <span className="md:hidden"> </span>We build careers.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={scrollToTiers}
+            className="px-6 py-3 font-anton uppercase tracking-[0.2em] text-sm text-bone border-2 border-bone hover:bg-bone hover:text-black transition-colors"
+          >
+            Join The Movement
+          </button>
         </section>
       </div>
     </FutureShell>
   );
 }
 
-function SectionHeader({
-  eyebrow,
-  title,
-  icon,
-}: {
-  eyebrow: string;
-  title: string;
-  icon?: React.ReactNode;
-}) {
+function RailHeader({ title, accent }: { title: string; accent?: React.ReactNode }) {
   return (
-    <div>
-      <div
-        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em]"
-        style={{ color: GOLD }}
-      >
-        {icon}
-        {eyebrow}
-      </div>
-      <h2 className="mt-1 font-anton text-2xl md:text-3xl uppercase tracking-wide text-bone">
+    <div className="flex items-center gap-2">
+      <span className="block w-0.5 h-5" style={{ background: RED }} />
+      <h2 className="font-anton text-xl uppercase tracking-wide text-bone flex items-center gap-2">
         {title}
+        {accent}
       </h2>
     </div>
   );
 }
 
-function SocialPill({ icon, label }: { icon: React.ReactNode; label: string }) {
+function FakeWaveform() {
+  // Static-looking SVG waveform, animated subtly
+  const bars = Array.from({ length: 60 }, (_, i) => {
+    const h = 6 + Math.abs(Math.sin(i * 0.7) * 18) + Math.abs(Math.sin(i * 0.25) * 6);
+    return h;
+  });
   return (
-    <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-bone/70 border"
-      style={{ borderColor: `${GOLD}33` }}
-    >
-      {icon}
-      {label}
-    </span>
+    <div className="mt-2 flex items-end gap-[2px] h-7" aria-hidden="true">
+      {bars.map((h, i) => (
+        <span
+          key={i}
+          className="w-[3px] block"
+          style={{
+            height: `${h}px`,
+            background: i < bars.length * 0.6 ? RED : `${RED}55`,
+          }}
+        />
+      ))}
+      <span className="ml-2 text-[10px] text-bone/50 self-center font-mono">04:35 / 06:12</span>
+    </div>
+  );
+}
+
+function FeaturedArtistCard({
+  artist,
+}: {
+  artist: { name: string; song: string; tier: "premium" | "featured" | "basic"; status: string };
+}) {
+  const badge =
+    artist.tier === "premium"
+      ? { label: "Premium Spotlight", bg: RED, color: "#fff" }
+      : artist.tier === "featured"
+        ? { label: "Featured Spotlight", bg: "#f5a623", color: "#1a0606" }
+        : { label: "Basic Submission", bg: "rgba(255,255,255,0.15)", color: "#fff" };
+  return (
+    <div className="relative group overflow-hidden border bg-black/40" style={{ borderColor: `${RED}22` }}>
+      <div
+        className="relative aspect-[4/5] w-full overflow-hidden"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${RED}33, #000 70%)`,
+        }}
+      >
+        <div className="absolute inset-0 grid place-items-center text-bone/20 font-anton text-5xl">
+          {artist.name.split(" ").map((p) => p[0]).join("")}
+        </div>
+        <span
+          className="absolute top-2 left-2 px-2 py-1 text-[9px] uppercase tracking-[0.2em] font-anton"
+          style={{ background: badge.bg, color: badge.color }}
+        >
+          {badge.label}
+        </span>
+      </div>
+      <div className="p-3">
+        <div className="font-anton uppercase tracking-wide text-bone text-sm">{artist.name}</div>
+        <div className="text-bone/60 text-xs">"{artist.song}"</div>
+        <div className="mt-2 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em]" style={{ color: RED }}>
+          <Play className="w-3 h-3 fill-current" />
+          {artist.status}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -614,60 +743,63 @@ function TierCard({
   selected: boolean;
   onSelect: () => void;
 }) {
+  const isFeatured = tier.shortId === "featured";
   return (
     <button
       type="button"
       onClick={onSelect}
       className={cn(
-        "relative text-left p-5 border transition-all flex flex-col h-full",
+        "relative text-left p-5 border transition-all flex flex-col h-full bg-black/40",
         selected ? "scale-[1.01]" : "hover:scale-[1.01]",
       )}
       style={{
-        borderColor: selected ? GOLD : `${GOLD}33`,
-        background: selected
-          ? `linear-gradient(180deg, ${GOLD}1a, transparent 70%)`
-          : "rgba(0,0,0,0.35)",
-        boxShadow: selected ? `0 0 28px ${GOLD}44` : undefined,
+        borderColor: selected || isFeatured ? RED : "rgba(255,255,255,0.1)",
+        boxShadow: selected ? `0 0 28px ${RED}55` : isFeatured ? `0 0 20px ${RED}33` : undefined,
       }}
     >
-      {tier.badge && (
+      {isFeatured && (
         <span
-          className="absolute -top-2 right-3 text-[9px] uppercase tracking-[0.25em] px-2 py-0.5 text-black font-anton"
-          style={{ background: GOLD }}
+          className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.25em] px-3 py-1 text-bone font-anton whitespace-nowrap"
+          style={{ background: RED }}
         >
-          {tier.badge}
+          Most Popular
         </span>
       )}
-      <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60">
-        {tier.shortId === "premium" ? "Top Tier" : tier.shortId === "featured" ? "Spotlight" : "Standard"}
+      <div className="text-center">
+        {tier.shortId === "premium" && (
+          <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60 mb-1">Top Tier</div>
+        )}
+        <div className="font-anton text-lg uppercase tracking-wide text-bone">
+          {tier.name}
+        </div>
       </div>
-      <div className="font-anton text-2xl uppercase tracking-wide text-bone mt-1">
-        {tier.name}
-      </div>
-      <div className="mt-3 flex items-baseline gap-1">
-        <span className="font-anton text-4xl" style={{ color: GOLD }}>
+      <div className="mt-3 flex items-baseline gap-1 justify-center">
+        <span className="font-anton text-4xl text-bone">
           ${(tier.amountCents / 100).toFixed(0)}
         </span>
-        <span className="text-bone/50 text-xs">one-time</span>
       </div>
-      <p className="text-bone/70 text-sm mt-2">{tier.tagline}</p>
-      <ul className="mt-4 space-y-2 flex-1">
+      <div className="text-bone/50 text-xs text-center">one-time</div>
+      {isFeatured && (
+        <p className="text-bone/80 text-xs mt-3 text-center">
+          Priority placement +<br />Artist Spotlight listing.
+        </p>
+      )}
+      <ul className="mt-4 space-y-2 flex-1 text-left">
         {tier.perks.map((p) => (
-          <li key={p} className="flex items-start gap-2 text-sm text-bone/80">
-            <Check className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: GOLD }} />
+          <li key={p} className="flex items-start gap-2 text-xs text-bone/80">
+            <Check className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: RED }} />
             <span>{p}</span>
           </li>
         ))}
       </ul>
       <div
-        className="mt-5 py-2.5 text-center text-xs font-anton uppercase tracking-[0.25em] border transition-colors"
+        className="mt-5 py-2.5 text-center text-[11px] font-anton uppercase tracking-[0.25em] transition-colors"
         style={{
-          borderColor: selected ? GOLD : `${GOLD}55`,
-          color: selected ? "#000" : GOLD,
-          background: selected ? GOLD : "transparent",
+          background: selected ? RED : isFeatured ? RED : "rgba(255,255,255,0.08)",
+          color: "#fff",
         }}
       >
-        {selected ? "Selected" : "Unlock with Stripe"}
+        {selected ? "Selected" : "Unlock With Stripe"}
       </div>
     </button>
   );
