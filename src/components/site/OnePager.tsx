@@ -70,6 +70,7 @@ function Nav() {
     { href: "/#why", label: "Why BWF" },
     { href: "/#audience", label: "Audience" },
     { to: "/contact", label: "Contact" },
+    { to: "/live-review", label: "Live Review" },
   ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -254,6 +255,13 @@ function Hero() {
             >
               Off The Block
               <ArrowRight size={14} />
+            </RouterLink>
+            <RouterLink
+              to="/live-review"
+              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
+            >
+              <Mic size={14} />
+              Live Review
             </RouterLink>
           </div>
         </Reveal>
