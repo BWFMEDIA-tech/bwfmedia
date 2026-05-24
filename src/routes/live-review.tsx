@@ -103,14 +103,25 @@ function LiveReviewPage() {
       return;
     }
     setSubmitting(true);
-    // TODO: wire to backend submission (e.g. createServerFn -> Supabase insert)
-    await new Promise((r) => setTimeout(r, 600));
+    const subject = `Live Review Submission — ${subArtist.trim()}`;
+    const body = [
+      `Artist: ${subArtist.trim()}`,
+      `Contact Email: ${subEmail.trim()}`,
+      `Song Link: ${subLink.trim()}`,
+      "",
+      "Message:",
+      subMsg.trim() || "(none)",
+    ].join("\n");
+    const mailto = `mailto:submit2bwf@gmail.com?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
     setSubmitting(false);
     setSubArtist("");
     setSubLink("");
     setSubEmail("");
     setSubMsg("");
-    toast.success("Submitted. We'll holler if you're up next.");
+    toast.success("Opening your email app to send to submit2bwf@gmail.com.");
   }
 
   return (
