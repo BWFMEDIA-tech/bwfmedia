@@ -249,22 +249,105 @@ function LiveReviewPage() {
           </div>
         </section>
 
-        {/* FEATURED ARTISTS */}
-        <section className="mb-10 lg:mb-14">
-          <div className="flex items-center justify-between mb-4">
-            <RailHeader title="Featured Artists" accent={<Star className="w-4 h-4 fill-current" style={{ color: RED }} />} />
-            <button
-              type="button"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-bone border border-bone/20 hover:border-bone/50 transition-colors"
+        {/* LIVE LINEUP — auto-updating broadcast board */}
+        <section className="mb-10 lg:mb-14 space-y-6">
+          <div className="flex items-center justify-between">
+            <RailHeader
+              title="Live Lineup"
+              accent={<Star className="w-4 h-4 fill-current" style={{ color: RED }} />}
+            />
+            <span className="text-[10px] uppercase tracking-[0.25em] text-bone/50">
+              Auto-updates in real time
+            </span>
+          </div>
+
+          {/* NOW LIVE banner */}
+          {nowLive ? (
+            <NowLiveBanner artist={nowLive} />
+          ) : (
+            <div
+              className="border bg-black/40 p-5 text-center text-bone/60 text-sm"
+              style={{ borderColor: `${RED}22` }}
             >
-              View All Spotlight Artists <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {FEATURED_ARTISTS.map((a) => (
-              <FeaturedArtistCard key={a.name} artist={a} />
-            ))}
-          </div>
+              No artist is being reviewed right now. Check back when the stream goes live.
+            </div>
+          )}
+
+          {/* NEXT UP */}
+          {nextUp.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="block w-0.5 h-4" style={{ background: RED }} />
+                <h3 className="font-anton uppercase tracking-wide text-bone text-sm">
+                  Next Up
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                {nextUp.map((a) => (
+                  <QueueArtistCard key={a.id} artist={a} highlight />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SPOTLIGHT */}
+          {spotlight.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="block w-0.5 h-4" style={{ background: RED }} />
+                  <h3 className="font-anton uppercase tracking-wide text-bone text-sm">
+                    Featured Spotlight
+                  </h3>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {spotlight.map((a) => (
+                  <QueueArtistCard key={a.id} artist={a} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* QUEUE LIST */}
+          {upcoming.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="block w-0.5 h-4" style={{ background: RED }} />
+                <h3 className="font-anton uppercase tracking-wide text-bone text-sm">
+                  In Queue ({upcoming.length})
+                </h3>
+              </div>
+              <ol
+                className="border bg-black/40 divide-y"
+                style={{ borderColor: `${RED}22`, borderColor: `${RED}22` as string }}
+              >
+                {upcoming.map((a, i) => (
+                  <li key={a.id} className="flex items-center gap-3 p-3">
+                    <span
+                      className="w-7 h-7 grid place-items-center font-anton text-xs"
+                      style={{ color: RED, border: `1px solid ${RED}55` }}
+                    >
+                      {i + 1}
+                    </span>
+                    <Link
+                      to="/artist/$id"
+                      params={{ id: a.id }}
+                      className="flex-1 min-w-0 flex items-center gap-3 hover:underline-offset-4 hover:underline"
+                    >
+                      <span className="font-anton uppercase tracking-wide text-bone text-sm truncate">
+                        {a.artist_name}
+                      </span>
+                      {a.song_title && (
+                        <span className="text-bone/50 text-xs truncate">"{a.song_title}"</span>
+                      )}
+                    </Link>
+                    <TierTag tier={a.tier} />
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </section>
 
         {/* LIVE REVIEW ROOM + LIVE CHAT */}
