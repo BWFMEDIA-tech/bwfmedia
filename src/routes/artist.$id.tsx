@@ -4,6 +4,7 @@ import { ExternalLink, Play, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FutureShell } from "@/components/site/FutureShell";
 import type { LiveQueueRow, LiveQueueTier, LiveQueueStatus } from "@/lib/useLiveQueue";
+import { AudioPlayer } from "@/components/AudioUploader";
 
 const RED = "#ef2b2b";
 
@@ -152,6 +153,32 @@ function ArtistProfilePage() {
                 <Play className="w-4 h-4 fill-current" /> Listen to Submission
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
+
+              {artist.uploaded_audio_url && (
+                <div className="mt-6">
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/50 mb-2">
+                    Uploaded Track
+                  </div>
+                  <div
+                    className="border bg-black/40 p-3"
+                    style={{ borderColor: `${RED}44` }}
+                  >
+                    <AudioPlayer src={artist.uploaded_audio_url} />
+                    <div className="mt-2 h-8 w-full bg-gradient-to-r from-transparent via-white/5 to-transparent flex items-end gap-0.5 px-1">
+                      {Array.from({ length: 48 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className="flex-1"
+                          style={{
+                            height: `${20 + Math.abs(Math.sin(i * 0.6)) * 80}%`,
+                            background: `${RED}55`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <dl className="mt-8 grid grid-cols-2 gap-4 text-xs">
                 <div>
