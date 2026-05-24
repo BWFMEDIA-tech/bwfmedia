@@ -35,6 +35,30 @@ async function markBookingPaid(session: any) {
   if (error) console.error('Webhook: failed to mark booking paid', error);
 }
 
+async function markLiveSubmissionPaid(session: any) {
+  const meta = session.metadata || {};
+  const submissionId = meta.submissionId as string | undefined;
+  if (!submissionId) return;
+  const supabase = getSupabase();
+  const { error } = await supabase
+    .from('live_submissions')
+    .update({
+      status: 'paid',
+      stripe_payment_intent_id: session.payment_intent ?? null,
+      paid_at: new Date().toISOString(),
+    })
+    .eq('id', submissionId);
+  if (error) console.error('Webhook: failed to mark live submission paid', error);
+}
+
+function routeSessionPaid(session: any) {
+  const meta = session.metadata || {};
+  if (meta.submissionType === 'live_review') return markLiveSubmissionPaid(session);
+  if (meta.bookingTable) return markBookingPaid(session);
+  console.warn('Webhook: session has no recognized metadata', session.id);
+  return Promise.resolve();
+}
+
 export const Route = createFileRoute('/api/public/payments/webhook')({
   server: {
     handlers: {
@@ -50,7 +74,7 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
           switch (event.type) {
             case 'checkout.session.completed':
             case 'checkout.session.async_payment_succeeded':
-              await markBookingPaid(event.data.object);
+              await routeSessionPaid(event.data.object);
               break;
             default:
               console.log('Unhandled Stripe event', event.type);

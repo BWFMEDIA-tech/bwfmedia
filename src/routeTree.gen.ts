@@ -23,10 +23,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
+import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
@@ -109,6 +111,11 @@ const PayBookingIdRoute = PayBookingIdRouteImport.update({
   path: '/pay/$bookingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LiveReviewSuccessRoute = LiveReviewSuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => LiveReviewRoute,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -127,6 +134,11 @@ const CheckoutCancelRoute = CheckoutCancelRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLiveQueueRoute = AdminLiveQueueRouteImport.update({
+  id: '/admin/live-queue',
+  path: '/admin/live-queue',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
@@ -195,7 +207,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
-  '/live-review': typeof LiveReviewRoute
+  '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -203,10 +215,12 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
@@ -226,7 +240,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
-  '/live-review': typeof LiveReviewRoute
+  '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -234,10 +248,12 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
@@ -258,7 +274,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
-  '/live-review': typeof LiveReviewRoute
+  '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -266,10 +282,12 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/videos/$id': typeof VideosIdRoute
@@ -299,10 +317,12 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/bookings'
+    | '/admin/live-queue'
     | '/admin/login'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/videos/$id'
@@ -330,10 +350,12 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/bookings'
+    | '/admin/live-queue'
     | '/admin/login'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/videos/$id'
@@ -361,10 +383,12 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/bookings'
+    | '/admin/live-queue'
     | '/admin/login'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/videos/$id'
@@ -385,7 +409,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
-  LiveReviewRoute: typeof LiveReviewRoute
+  LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -393,6 +417,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
   AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -511,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayBookingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/live-review/success': {
+      id: '/live-review/success'
+      path: '/success'
+      fullPath: '/live-review/success'
+      preLoaderRoute: typeof LiveReviewSuccessRouteImport
+      parentRoute: typeof LiveReviewRoute
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -537,6 +569,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/live-queue': {
+      id: '/admin/live-queue'
+      path: '/admin/live-queue'
+      fullPath: '/admin/live-queue'
+      preLoaderRoute: typeof AdminLiveQueueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/bookings': {
@@ -619,6 +658,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface LiveReviewRouteChildren {
+  LiveReviewSuccessRoute: typeof LiveReviewSuccessRoute
+}
+
+const LiveReviewRouteChildren: LiveReviewRouteChildren = {
+  LiveReviewSuccessRoute: LiveReviewSuccessRoute,
+}
+
+const LiveReviewRouteWithChildren = LiveReviewRoute._addFileChildren(
+  LiveReviewRouteChildren,
+)
+
 interface VideosRouteChildren {
   VideosIdRoute: typeof VideosIdRoute
 }
@@ -635,7 +686,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
-  LiveReviewRoute: LiveReviewRoute,
+  LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -643,6 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
   AdminBookingsRoute: AdminBookingsRoute,
+  AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
