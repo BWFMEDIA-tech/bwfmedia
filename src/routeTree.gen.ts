@@ -15,6 +15,7 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LiveReviewRouteImport } from './routes/live-review'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -66,6 +67,11 @@ const OffTheBlockRoute = OffTheBlockRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveReviewRoute = LiveReviewRouteImport.update({
+  id: '/live-review',
+  path: '/live-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckRoute = DeckRouteImport.update({
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/live-review': typeof LiveReviewRoute
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/live-review': typeof LiveReviewRoute
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/live-review': typeof LiveReviewRoute
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/live-review'
     | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/live-review'
     | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
@@ -342,6 +353,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/live-review'
     | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
@@ -373,6 +385,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
+  LiveReviewRoute: typeof LiveReviewRoute
   LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live-review': {
+      id: '/live-review'
+      path: '/live-review'
+      fullPath: '/live-review'
+      preLoaderRoute: typeof LiveReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck': {
@@ -615,6 +635,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
+  LiveReviewRoute: LiveReviewRoute,
   LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
