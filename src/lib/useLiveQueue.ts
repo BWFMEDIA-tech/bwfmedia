@@ -14,6 +14,9 @@ export interface LiveQueueRow {
   queue_status: LiveQueueStatus;
   created_at: string;
   paid_at: string | null;
+  uploaded_audio_url: string | null;
+  audio_file_type: string | null;
+  audio_uploaded_at: string | null;
 }
 
 const TIER_RANK: Record<LiveQueueTier, number> = { premium: 0, featured: 1, basic: 2 };
