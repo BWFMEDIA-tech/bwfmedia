@@ -320,7 +320,7 @@ function LiveReviewPage() {
               </div>
               <ol
                 className="border bg-black/40 divide-y"
-                style={{ borderColor: `${RED}22`, borderColor: `${RED}22` as string }}
+                style={{ borderColor: `${RED}22` }}
               >
                 {upcoming.map((a, i) => (
                   <li key={a.id} className="flex items-center gap-3 p-3">
@@ -675,6 +675,24 @@ function LiveReviewPage() {
                   onChange={(e) => setSubEmail(e.target.value)}
                   placeholder="Contact email *"
                   maxLength={120}
+                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  style={{ borderColor: `${RED}33` }}
+                />
+                <input
+                  type="text"
+                  value={subSongTitle}
+                  onChange={(e) => setSubSongTitle(e.target.value)}
+                  placeholder="Song title"
+                  maxLength={120}
+                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  style={{ borderColor: `${RED}33` }}
+                />
+                <input
+                  type="url"
+                  value={subPhoto}
+                  onChange={(e) => setSubPhoto(e.target.value)}
+                  placeholder="Profile photo URL (optional)"
+                  maxLength={400}
                   className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
                   style={{ borderColor: `${RED}33` }}
                 />
