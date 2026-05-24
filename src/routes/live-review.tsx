@@ -11,10 +11,17 @@ import {
   Radio,
   Music2,
   Mic,
+  Lock,
+  Check,
 } from "lucide-react";
 import { FutureShell, HUDFrame, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { createLiveSubmissionCheckout } from "@/lib/live-submission-checkout.functions";
+import { LIVE_TIER_LIST, LIVE_TIERS, type LiveTierId, type LiveTier } from "@/lib/live-review-tiers";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 export const Route = createFileRoute("/live-review")({
   head: () => ({
@@ -74,6 +81,9 @@ function LiveReviewPage() {
   const [subLink, setSubLink] = useState("");
   const [subEmail, setSubEmail] = useState("");
   const [subMsg, setSubMsg] = useState("");
+  const [selectedTier, setSelectedTier] = useState<LiveTierId | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   function handleSubmitFeedback(e: React.FormEvent) {
     e.preventDefault();
@@ -98,34 +108,46 @@ function LiveReviewPage() {
 
   async function handleSubmitMusic(e: React.FormEvent) {
     e.preventDefault();
+    if (!selectedTier) {
+      toast.error("Pick a tier to unlock submission.");
+      return;
+    }
     if (!subArtist.trim() || !subLink.trim() || !subEmail.trim()) {
       toast.error("Artist, link, and email are required.");
       return;
     }
     setSubmitting(true);
-    const subject = `Live Review Submission — ${subArtist.trim()}`;
-    const body = [
-      `Artist: ${subArtist.trim()}`,
-      `Contact Email: ${subEmail.trim()}`,
-      `Song Link: ${subLink.trim()}`,
-      "",
-      "Message:",
-      subMsg.trim() || "(none)",
-    ].join("\n");
-    const mailto = `mailto:submit2bwf@gmail.com?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    setSubmitting(false);
-    setSubArtist("");
-    setSubLink("");
-    setSubEmail("");
-    setSubMsg("");
-    toast.success("Opening your email app to send to submit2bwf@gmail.com.");
+    setCheckoutError(null);
+    try {
+      const { clientSecret } = await createLiveSubmissionCheckout({
+        data: {
+          tier: selectedTier,
+          artistName: subArtist.trim(),
+          email: subEmail.trim(),
+          songLink: subLink.trim(),
+          message: subMsg.trim(),
+          environment: getStripeEnvironment(),
+          returnUrl: `${window.location.origin}/live-review/success?session_id={CHECKOUT_SESSION_ID}`,
+        },
+      });
+      setClientSecret(clientSecret);
+    } catch (err: any) {
+      const msg = err?.message ?? "Failed to start checkout";
+      setCheckoutError(msg);
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function resetCheckout() {
+    setClientSecret(null);
+    setCheckoutError(null);
   }
 
   return (
     <FutureShell>
+      <PaymentTestModeBanner />
       <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-16">
         {/* HERO */}
         <section className="text-center mb-10 md:mb-14">
