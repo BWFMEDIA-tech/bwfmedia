@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { AudioPlayer } from "@/components/AudioUploader";
 
 type QueueStatus = "queued" | "next_up" | "live" | "done";
 type Tier = "basic" | "featured" | "premium";
@@ -39,6 +40,8 @@ interface Submission {
   paid_at: string | null;
   photo_url: string | null;
   song_title: string | null;
+  uploaded_audio_url: string | null;
+  audio_file_type: string | null;
 }
 
 export const Route = createFileRoute("/admin/live-queue")({
@@ -329,6 +332,14 @@ function AdminLiveQueuePage() {
                       {r.message && (
                         <div className="text-xs text-muted-foreground line-clamp-2 mt-1">
                           {r.message}
+                        </div>
+                      )}
+                      {r.uploaded_audio_url && (
+                        <div className="mt-2">
+                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                            Uploaded Track
+                          </div>
+                          <AudioPlayer src={r.uploaded_audio_url} />
                         </div>
                       )}
                     </TableCell>
