@@ -42,6 +42,7 @@ export const Route = createFileRoute("/live-review")({
 // Replace with the actual live stream / channel embed. `live_stream` channel
 // embed auto-loads the currently live broadcast.
 const YT_CHANNEL_ID = "UC8_wxX0GLhTWNPXgv06YbUw";
+const YT_LIVE_EMBED = `https://www.youtube.com/embed/live_stream?channel=${YT_CHANNEL_ID}&autoplay=0`;
 
 type Comment = {
   id: string;
