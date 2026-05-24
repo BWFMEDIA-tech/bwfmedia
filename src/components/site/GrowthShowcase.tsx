@@ -94,7 +94,7 @@ const PARTNERS = [
 ];
 
 const VIRAL = [
-  { tag: "Interview", title: "Studio Sit-Down", views: "12.4M", hue: "from-blood/60 to-blood/10" },
+  { tag: "Interview", title: "Studio Sit-Down", views: "12.4M", hue: "from-blood/60 to-blood/10", videoId: "-fOf638pglk" },
   { tag: "Music Video", title: "Off The Block, Vol. 7", views: "8.9M", hue: "from-blood-glow/50 to-black" },
   { tag: "Short", title: "Behind The Mic", views: "6.1M", hue: "from-blood/40 to-black" },
   { tag: "Live", title: "Red Mic, Ep. 042", views: "4.7M", hue: "from-blood-glow/40 to-black" },
@@ -257,9 +257,9 @@ export function GrowthShowcase() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {VIRAL.map((v, i) => (
+          {VIRAL.map((v, i) => {
+            const card = (
               <motion.div
-                key={v.title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -289,7 +289,21 @@ export function GrowthShowcase() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+            );
+            return v.videoId ? (
+              <a
+                key={v.title}
+                href={`https://www.youtube.com/watch?v=${v.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                {card}
+              </a>
+            ) : (
+              <div key={v.title} className="block">{card}</div>
+            );
+          })}
           </div>
         </div>
 
