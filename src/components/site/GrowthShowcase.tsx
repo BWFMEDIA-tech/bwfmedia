@@ -93,12 +93,6 @@ const PARTNERS = [
   "Shorts",
 ];
 
-const VIRAL = [
-  { tag: "Interview", title: "Studio Sit-Down", views: "12.4M", hue: "from-blood/60 to-blood/10", videoId: "-fOf638pglk" },
-  { tag: "Music Video", title: "Off The Block, Vol. 7", views: "8.9M", hue: "from-blood-glow/50 to-black" },
-  { tag: "Short", title: "Behind The Mic", views: "6.1M", hue: "from-blood/40 to-black" },
-  { tag: "Live", title: "Red Mic, Ep. 042", views: "4.7M", hue: "from-blood-glow/40 to-black" },
-];
 
 /* ---------- Section ---------- */
 
