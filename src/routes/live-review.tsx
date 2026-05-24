@@ -604,3 +604,71 @@ function SocialPill({ icon, label }: { icon: React.ReactNode; label: string }) {
     </span>
   );
 }
+
+function TierCard({
+  tier,
+  selected,
+  onSelect,
+}: {
+  tier: LiveTier;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "relative text-left p-5 border transition-all flex flex-col h-full",
+        selected ? "scale-[1.01]" : "hover:scale-[1.01]",
+      )}
+      style={{
+        borderColor: selected ? GOLD : `${GOLD}33`,
+        background: selected
+          ? `linear-gradient(180deg, ${GOLD}1a, transparent 70%)`
+          : "rgba(0,0,0,0.35)",
+        boxShadow: selected ? `0 0 28px ${GOLD}44` : undefined,
+      }}
+    >
+      {tier.badge && (
+        <span
+          className="absolute -top-2 right-3 text-[9px] uppercase tracking-[0.25em] px-2 py-0.5 text-black font-anton"
+          style={{ background: GOLD }}
+        >
+          {tier.badge}
+        </span>
+      )}
+      <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60">
+        {tier.shortId === "premium" ? "Top Tier" : tier.shortId === "featured" ? "Spotlight" : "Standard"}
+      </div>
+      <div className="font-anton text-2xl uppercase tracking-wide text-bone mt-1">
+        {tier.name}
+      </div>
+      <div className="mt-3 flex items-baseline gap-1">
+        <span className="font-anton text-4xl" style={{ color: GOLD }}>
+          ${(tier.amountCents / 100).toFixed(0)}
+        </span>
+        <span className="text-bone/50 text-xs">one-time</span>
+      </div>
+      <p className="text-bone/70 text-sm mt-2">{tier.tagline}</p>
+      <ul className="mt-4 space-y-2 flex-1">
+        {tier.perks.map((p) => (
+          <li key={p} className="flex items-start gap-2 text-sm text-bone/80">
+            <Check className="w-3.5 h-3.5 mt-0.5 shrink-0" style={{ color: GOLD }} />
+            <span>{p}</span>
+          </li>
+        ))}
+      </ul>
+      <div
+        className="mt-5 py-2.5 text-center text-xs font-anton uppercase tracking-[0.25em] border transition-colors"
+        style={{
+          borderColor: selected ? GOLD : `${GOLD}55`,
+          color: selected ? "#000" : GOLD,
+          background: selected ? GOLD : "transparent",
+        }}
+      >
+        {selected ? "Selected" : "Unlock with Stripe"}
+      </div>
+    </button>
+  );
+}
