@@ -9,7 +9,6 @@ import {
   MessageCircle,
   Share2,
   ArrowRight,
-  Play,
   Sparkles,
   Radio,
 } from "lucide-react";
@@ -93,12 +92,6 @@ const PARTNERS = [
   "Shorts",
 ];
 
-const VIRAL = [
-  { tag: "Interview", title: "Studio Sit-Down", views: "12.4M", hue: "from-blood/60 to-blood/10", videoId: "-fOf638pglk" },
-  { tag: "Music Video", title: "Off The Block, Vol. 7", views: "8.9M", hue: "from-blood-glow/50 to-black" },
-  { tag: "Short", title: "Behind The Mic", views: "6.1M", hue: "from-blood/40 to-black" },
-  { tag: "Live", title: "Red Mic, Ep. 042", views: "4.7M", hue: "from-blood-glow/40 to-black" },
-];
 
 /* ---------- Section ---------- */
 
@@ -241,71 +234,6 @@ export function GrowthShowcase() {
           </div>
         </div>
 
-        {/* Viral content */}
-        <div className="mt-20">
-          <div className="flex items-end justify-between mb-8 gap-6 flex-wrap">
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="block h-px w-10 bg-blood" />
-                <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">
-                  Featured Viral Content
-                </span>
-              </div>
-              <h3 className="font-display text-3xl md:text-5xl uppercase text-bone leading-[0.95]">
-                Moments that moved the culture.
-              </h3>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {VIRAL.map((v, i) => {
-            const card = (
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.6, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative aspect-[4/5] overflow-hidden border border-white/10 hover:border-blood/60 transition-all duration-500"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${v.hue}`} />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.08),transparent_60%)]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                <div className="absolute top-4 left-4 px-2 py-1 bg-black/60 backdrop-blur-md border border-white/15">
-                  <span className="font-cond font-bold tracking-[0.25em] text-[9px] uppercase text-bone">
-                    {v.tag}
-                  </span>
-                </div>
-                <div className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-blood/20 border border-blood/50 backdrop-blur-md group-hover:bg-blood group-hover:scale-110 transition-all duration-300">
-                  <Play size={14} className="text-white" fill="currentColor" />
-                </div>
-                <div className="absolute inset-x-0 bottom-0 p-5">
-                  <div className="font-display text-2xl md:text-3xl uppercase text-bone leading-tight">
-                    {v.title}
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <Eye size={12} className="text-blood" />
-                    <span className="font-cond tracking-[0.2em] text-[11px] uppercase text-bone/70">
-                      {v.views} views
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            );
-            return v.videoId ? (
-              <a
-                key={v.title}
-                href={`https://www.youtube.com/watch?v=${v.videoId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
-                {card}
-              </a>
-            ) : (
-              <div key={v.title} className="block">{card}</div>
-            );
-          })}
-          </div>
-        </div>
 
         {/* Brands & Partnerships */}
         <div className="mt-20">
