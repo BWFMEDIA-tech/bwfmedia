@@ -9,6 +9,7 @@ import {
   Lock,
   Check,
   Play,
+  Music,
 } from "lucide-react";
 import { FutureShell } from "@/components/site/FutureShell";
 import { cn } from "@/lib/utils";
@@ -862,6 +863,15 @@ function QueueArtistCard({
         >
           {b.label}
         </span>
+        {artist.uploaded_audio_url && (
+          <span
+            className="absolute top-2 right-2 grid place-items-center w-6 h-6"
+            style={{ background: RED, color: "#fff" }}
+            title="Track uploaded"
+          >
+            <Music className="w-3 h-3" />
+          </span>
+        )}
       </div>
       <div className="p-3">
         <div className="font-anton uppercase tracking-wide text-bone text-sm truncate">
