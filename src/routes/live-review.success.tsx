@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { FutureShell, HUDFrame, GOLD, GOLD_GLOW } from "@/components/site/FutureShell";
 import { getLiveSubmissionBySession } from "@/lib/live-submission-checkout.functions";
 import { LIVE_TIERS } from "@/lib/live-review-tiers";
+import { AudioUploader } from "@/components/AudioUploader";
 
 export const Route = createFileRoute("/live-review/success")({
   head: () => ({
@@ -114,6 +115,18 @@ function SuccessPage() {
                 >
                   Back to Live Room
                 </Link>
+              </div>
+              <div className="mt-10 pt-8 border-t border-white/10 text-left">
+                <div className="text-[10px] uppercase tracking-[0.3em] text-bone/50 mb-1">
+                  Optional · Upload Your Track
+                </div>
+                <h2 className="font-anton text-xl uppercase text-bone mb-2">
+                  Send us your MP3 or WAV
+                </h2>
+                <p className="text-bone/60 text-xs mb-4">
+                  Upload the actual audio file so we can play it directly on the live show.
+                </p>
+                <AudioUploader submissionId={submission.id} />
               </div>
             </>
           ) : (
