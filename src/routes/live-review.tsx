@@ -804,44 +804,139 @@ function FakeWaveform() {
   );
 }
 
-function FeaturedArtistCard({
-  artist,
-}: {
-  artist: { name: string; song: string; tier: "premium" | "featured" | "basic"; status: string };
-}) {
-  const badge =
-    artist.tier === "premium"
-      ? { label: "Premium Spotlight", bg: RED, color: "#fff" }
-      : artist.tier === "featured"
-        ? { label: "Featured Spotlight", bg: "#f5a623", color: "#1a0606" }
-        : { label: "Basic Submission", bg: "rgba(255,255,255,0.15)", color: "#fff" };
+function tierBadge(tier: LiveQueueRow["tier"]) {
+  if (tier === "premium") return { label: "Premium", bg: RED, color: "#fff" };
+  if (tier === "featured") return { label: "Featured", bg: "#f5a623", color: "#1a0606" };
+  return { label: "Basic", bg: "rgba(255,255,255,0.15)", color: "#fff" };
+}
+
+function TierTag({ tier }: { tier: LiveQueueRow["tier"] }) {
+  const b = tierBadge(tier);
   return (
-    <div className="relative group overflow-hidden border bg-black/40" style={{ borderColor: `${RED}22` }}>
+    <span
+      className="px-2 py-1 text-[9px] uppercase tracking-[0.2em] font-anton shrink-0"
+      style={{ background: b.bg, color: b.color }}
+    >
+      {b.label}
+    </span>
+  );
+}
+
+function QueueArtistCard({
+  artist,
+  highlight = false,
+}: {
+  artist: LiveQueueRow;
+  highlight?: boolean;
+}) {
+  const b = tierBadge(artist.tier);
+  const status = STATUS_LABEL[artist.queue_status] ?? "";
+  return (
+    <Link
+      to="/artist/$id"
+      params={{ id: artist.id }}
+      className="relative group overflow-hidden border bg-black/40 transition-all hover:scale-[1.01]"
+      style={{
+        borderColor: highlight ? RED : `${RED}22`,
+        boxShadow: highlight ? `0 0 18px ${RED}33` : undefined,
+      }}
+    >
       <div
         className="relative aspect-[4/5] w-full overflow-hidden"
-        style={{
-          background: `radial-gradient(circle at 50% 30%, ${RED}33, #000 70%)`,
-        }}
+        style={{ background: `radial-gradient(circle at 50% 30%, ${RED}33, #000 70%)` }}
       >
-        <div className="absolute inset-0 grid place-items-center text-bone/20 font-anton text-5xl">
-          {artist.name.split(" ").map((p) => p[0]).join("")}
-        </div>
+        {artist.photo_url ? (
+          <img
+            src={artist.photo_url}
+            alt={artist.artist_name}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="absolute inset-0 grid place-items-center text-bone/20 font-anton text-5xl">
+            {artist.artist_name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
+          </div>
+        )}
         <span
           className="absolute top-2 left-2 px-2 py-1 text-[9px] uppercase tracking-[0.2em] font-anton"
-          style={{ background: badge.bg, color: badge.color }}
+          style={{ background: b.bg, color: b.color }}
         >
-          {badge.label}
+          {b.label}
         </span>
       </div>
       <div className="p-3">
-        <div className="font-anton uppercase tracking-wide text-bone text-sm">{artist.name}</div>
-        <div className="text-bone/60 text-xs">"{artist.song}"</div>
-        <div className="mt-2 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em]" style={{ color: RED }}>
+        <div className="font-anton uppercase tracking-wide text-bone text-sm truncate">
+          {artist.artist_name}
+        </div>
+        <div className="text-bone/60 text-xs truncate">
+          {artist.song_title ? `"${artist.song_title}"` : artist.song_link}
+        </div>
+        <div
+          className="mt-2 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em]"
+          style={{ color: RED }}
+        >
           <Play className="w-3 h-3 fill-current" />
-          {artist.status}
+          {status}
         </div>
       </div>
-    </div>
+    </Link>
+  );
+}
+
+function NowLiveBanner({ artist }: { artist: LiveQueueRow }) {
+  return (
+    <Link
+      to="/artist/$id"
+      params={{ id: artist.id }}
+      className="block border bg-black/60 overflow-hidden group"
+      style={{
+        borderColor: RED,
+        boxShadow: `0 0 36px ${RED}44`,
+      }}
+    >
+      <div className="grid md:grid-cols-[180px_1fr] gap-4 p-4 md:p-5 items-center">
+        <div
+          className="relative w-full aspect-square md:aspect-[4/5] overflow-hidden"
+          style={{ background: `radial-gradient(circle, ${RED}55, #000 70%)` }}
+        >
+          {artist.photo_url ? (
+            <img
+              src={artist.photo_url}
+              alt={artist.artist_name}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-bone/20 font-anton text-4xl">
+              {artist.artist_name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
+            </div>
+          )}
+        </div>
+        <div>
+          <div
+            className="inline-flex items-center gap-2 px-2 py-1 text-[10px] uppercase tracking-[0.3em] text-bone mb-2"
+            style={{ background: RED }}
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+            </span>
+            Now Reviewing Live
+          </div>
+          <h3 className="font-anton text-3xl md:text-4xl uppercase tracking-tight text-bone leading-none">
+            {artist.artist_name}
+          </h3>
+          {artist.song_title && (
+            <p className="text-bone/70 mt-1 text-sm">"{artist.song_title}"</p>
+          )}
+          <div className="mt-3 flex items-center gap-3">
+            <TierTag tier={artist.tier} />
+            <span className="text-[10px] uppercase tracking-[0.25em] text-bone/60 group-hover:text-bone">
+              View artist profile →
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
 
