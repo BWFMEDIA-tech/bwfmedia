@@ -7,6 +7,10 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const GOLD = "#D4A24C";
 export const GOLD_GLOW = "#F5C56B";
 
+// Red/black/white theme accents (live-review + sibling pages)
+const RED = "#FF2D2D";
+const RED_GLOW = "#FF4D4D";
+
 export function FutureShell({
   children,
   label,
@@ -18,11 +22,11 @@ export function FutureShell({
     <div
       className="relative min-h-screen w-full overflow-hidden text-bone"
       style={{
-        backgroundColor: "#05060a",
+        backgroundColor: "#000000",
         backgroundImage: [
-          `radial-gradient(ellipse 70% 50% at 15% 0%, ${GOLD}26, transparent 60%)`,
-          "radial-gradient(ellipse 60% 50% at 90% 100%, oklch(0.30 0.15 280 / 0.35), transparent 60%)",
-          "linear-gradient(180deg, #05060a 0%, #0a0a14 50%, #05060a 100%)",
+          `radial-gradient(ellipse 70% 50% at 15% 0%, ${RED}33, transparent 60%)`,
+          `radial-gradient(ellipse 60% 50% at 90% 100%, ${RED}22, transparent 65%)`,
+          "linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)",
         ].join(","),
       }}
     >
@@ -30,7 +34,7 @@ export function FutureShell({
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.18]"
         style={{
-          backgroundImage: `linear-gradient(${GOLD}66 1px, transparent 1px), linear-gradient(90deg, ${GOLD}66 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(${RED}55 1px, transparent 1px), linear-gradient(90deg, ${RED}55 1px, transparent 1px)`,
           backgroundSize: "64px 64px",
           maskImage:
             "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
@@ -43,8 +47,8 @@ export function FutureShell({
       <motion.div
         className="absolute left-0 right-0 h-[2px] pointer-events-none z-[1]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${GOLD_GLOW}, transparent)`,
-          boxShadow: `0 0 24px ${GOLD}cc`,
+          background: `linear-gradient(90deg, transparent, ${RED_GLOW}, transparent)`,
+          boxShadow: `0 0 24px ${RED}cc`,
         }}
         initial={{ top: "0%" }}
         animate={{ top: ["0%", "100%", "0%"] }}
@@ -63,11 +67,11 @@ export function FutureShell({
       {/* Glow blobs */}
       <div
         className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-30 blur-3xl pointer-events-none"
-        style={{ backgroundColor: GOLD }}
+        style={{ backgroundColor: RED }}
       />
       <div
         className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl pointer-events-none"
-        style={{ backgroundColor: "oklch(0.45 0.20 280)" }}
+        style={{ backgroundColor: RED_GLOW }}
       />
 
       {/* Header */}
@@ -76,7 +80,7 @@ export function FutureShell({
           <div className="relative">
             <div
               className="absolute inset-0 rounded-full blur-md opacity-60 group-hover:opacity-100 transition"
-              style={{ background: GOLD }}
+              style={{ background: RED }}
             />
             <img src={bwfLogo} alt="BWF Media" className="relative w-11 h-11 object-contain" />
           </div>
@@ -88,11 +92,11 @@ export function FutureShell({
           {label && (
             <span
               className="hidden md:inline-flex items-center gap-2 font-cond font-bold tracking-[0.4em] text-[10px] uppercase px-3 py-1.5"
-              style={{ border: `1px solid ${GOLD}66`, color: GOLD }}
+              style={{ border: `1px solid ${RED}88`, color: RED_GLOW }}
             >
               <span
                 className="w-1.5 h-1.5 rounded-full animate-pulse-dot"
-                style={{ background: GOLD, boxShadow: `0 0 8px ${GOLD}` }}
+                style={{ background: RED, boxShadow: `0 0 8px ${RED}` }}
               />
               {label}
             </span>
@@ -110,10 +114,10 @@ export function FutureShell({
 
       <SiteFooter />
 
-      {/* Bottom gold strip */}
+      {/* Bottom accent strip */}
       <div
         className="relative h-[2px] z-20"
-        style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${RED}, transparent)` }}
       />
     </div>
   );
