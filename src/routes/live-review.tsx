@@ -21,6 +21,7 @@ import { LIVE_TIER_LIST, LIVE_TIERS, type LiveTierId, type LiveTier } from "@/li
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { Link } from "@tanstack/react-router";
 import { useLiveQueue, type LiveQueueRow } from "@/lib/useLiveQueue";
+import { ModeToggle, PodcastStudio, type LiveMode } from "@/components/PodcastMode";
 
 const RED = "#ef2b2b";
 const RED_DEEP = "#c01616";
@@ -78,6 +79,9 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 function LiveReviewPage() {
+  // Mode: existing live review vs. additive podcast overlay.
+  const [mode, setMode] = useState<LiveMode>("review");
+
   // Review panel state
   const [rating, setRating] = useState<number | null>(null);
   const [vote, setVote] = useState<"hot" | "not" | null>(null);
@@ -186,6 +190,14 @@ function LiveReviewPage() {
     <FutureShell>
       <PaymentTestModeBanner />
       <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-6 py-8 md:py-12">
+        {/* MODE SWITCH — Live Review (existing) / Live Podcast (overlay) */}
+        <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
+          <ModeToggle mode={mode} onChange={setMode} />
+          <span className="text-[10px] uppercase tracking-[0.3em] text-bone/50">
+            {mode === "podcast" ? "Broadcasting podcast" : "Broadcasting live reviews"}
+          </span>
+        </div>
+
         {/* HERO — left copy, right live video */}
         <section className="grid lg:grid-cols-2 gap-6 lg:gap-10 mb-10 lg:mb-14 items-center">
           <div>
@@ -217,7 +229,7 @@ function LiveReviewPage() {
                   <span className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping" style={{ background: RED }} />
                   <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: RED }} />
                 </span>
-                Live on YouTube
+                {mode === "podcast" ? "Live on Podcast" : "Live on YouTube"}
               </div>
             </div>
           </div>
@@ -229,7 +241,7 @@ function LiveReviewPage() {
               className="absolute top-3 left-3 z-10 px-2.5 py-1 text-[10px] uppercase tracking-[0.25em] font-anton text-bone"
               style={{ background: RED }}
             >
-              ● Live
+              {mode === "podcast" ? "● On Air" : "● Live"}
             </span>
             <iframe
               src={YT_LIVE_EMBED}
@@ -243,11 +255,20 @@ function LiveReviewPage() {
               style={{ background: "linear-gradient(180deg, transparent, rgba(0,0,0,0.85))" }}
             >
               <span className="w-2 h-2 rounded-full" style={{ background: RED }} />
-              <span className="font-anton uppercase tracking-wider">Live Now:</span>
-              <span>Reviewing new music and giving real feedback!</span>
+              <span className="font-anton uppercase tracking-wider">
+                {mode === "podcast" ? "On Air:" : "Live Now:"}
+              </span>
+              <span>
+                {mode === "podcast"
+                  ? "Live podcast session with featured guests."
+                  : "Reviewing new music and giving real feedback!"}
+              </span>
             </div>
           </div>
         </section>
+
+        {/* PODCAST MODE OVERLAY — additive, does not change review flow */}
+        {mode === "podcast" && <PodcastStudio queue={queue} />}
 
         {/* LIVE LINEUP — auto-updating broadcast board */}
         <section className="mb-10 lg:mb-14 space-y-6">
