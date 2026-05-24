@@ -37,6 +37,8 @@ interface Submission {
   status: string;
   queue_status: QueueStatus;
   paid_at: string | null;
+  photo_url: string | null;
+  song_title: string | null;
 }
 
 export const Route = createFileRoute("/admin/live-queue")({
@@ -93,6 +95,22 @@ function AdminLiveQueuePage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Realtime: refresh whenever a submission row changes.
+  useEffect(() => {
+    if (!isAdmin) return;
+    const channel = supabase
+      .channel("admin-live-queue")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "live_submissions" },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin]);
 
   async function load() {
     setLoading(true);
@@ -262,8 +280,31 @@ function AdminLiveQueuePage() {
                 filtered.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell>
-                      <div className="font-medium text-foreground">{r.artist_name}</div>
-                      <div className="text-xs text-muted-foreground">{r.email}</div>
+                      <div className="flex items-center gap-3">
+                        {r.photo_url ? (
+                          <img
+                            src={r.photo_url}
+                            alt=""
+                            className="w-10 h-10 rounded object-cover bg-muted"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded bg-muted grid place-items-center text-xs font-medium text-muted-foreground">
+                            {r.artist_name.slice(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-medium text-foreground">
+                            <Link
+                              to="/artist/$id"
+                              params={{ id: r.id }}
+                              className="hover:underline"
+                            >
+                              {r.artist_name}
+                            </Link>
+                          </div>
+                          <div className="text-xs text-muted-foreground">{r.email}</div>
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <TierBadge tier={r.tier} />
@@ -272,6 +313,11 @@ function AdminLiveQueuePage() {
                       </div>
                     </TableCell>
                     <TableCell className="max-w-xs">
+                      {r.song_title && (
+                        <div className="text-sm text-foreground font-medium">
+                          "{r.song_title}"
+                        </div>
+                      )}
                       <a
                         href={r.song_link}
                         target="_blank"

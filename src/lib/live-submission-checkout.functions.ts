@@ -12,6 +12,8 @@ const CreateSchema = z.object({
   artistName: z.string().min(1).max(120),
   email: z.string().email().max(180),
   songLink: z.string().url().max(500),
+  songTitle: z.string().max(160).optional().default(''),
+  photoUrl: z.string().url().max(500).optional().or(z.literal('')).default(''),
   message: z.string().max(1000).optional().default(''),
   returnUrl: z.string().url().refine((u) => {
     try { validateReturnUrl(u); return true; } catch { return false; }
@@ -37,6 +39,8 @@ export const createLiveSubmissionCheckout = createServerFn({ method: 'POST' })
         artist_name: data.artistName,
         email: data.email,
         song_link: data.songLink,
+        song_title: data.songTitle || null,
+        photo_url: data.photoUrl || null,
         message: data.message || null,
         tier: tier.shortId,
         amount_cents: tier.amountCents,

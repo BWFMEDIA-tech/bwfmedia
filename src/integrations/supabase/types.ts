@@ -203,8 +203,10 @@ export type Database = {
           id: string
           message: string | null
           paid_at: string | null
+          photo_url: string | null
           queue_status: string
           song_link: string
+          song_title: string | null
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
@@ -218,8 +220,10 @@ export type Database = {
           id?: string
           message?: string | null
           paid_at?: string | null
+          photo_url?: string | null
           queue_status?: string
           song_link: string
+          song_title?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -233,8 +237,10 @@ export type Database = {
           id?: string
           message?: string | null
           paid_at?: string | null
+          photo_url?: string | null
           queue_status?: string
           song_link?: string
+          song_title?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -391,7 +397,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      live_queue_public: {
+        Row: {
+          artist_name: string | null
+          created_at: string | null
+          id: string | null
+          paid_at: string | null
+          photo_url: string | null
+          queue_status: string | null
+          song_link: string | null
+          song_title: string | null
+          tier: string | null
+        }
+        Insert: {
+          artist_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          paid_at?: string | null
+          photo_url?: string | null
+          queue_status?: string | null
+          song_link?: string | null
+          song_title?: string | null
+          tier?: string | null
+        }
+        Update: {
+          artist_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          paid_at?: string | null
+          photo_url?: string | null
+          queue_status?: string | null
+          song_link?: string | null
+          song_title?: string | null
+          tier?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_email: {
