@@ -136,7 +136,6 @@ function RootComponent() {
     <CartProvider>
       <PaymentTestModeBanner />
       <Outlet />
-      <CartButton />
       <CartDrawer />
     </CartProvider>
   );

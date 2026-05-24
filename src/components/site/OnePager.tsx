@@ -748,6 +748,7 @@ function FinalCTA() {
 
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { GrowthShowcase } from "@/components/site/GrowthShowcase";
+import { CartButton } from "@/components/CartDrawer";
 
 /* ---------- ROOT ---------- */
 
