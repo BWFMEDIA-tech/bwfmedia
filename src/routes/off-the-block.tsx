@@ -99,7 +99,7 @@ function OffTheBlockPage() {
           >
             <span className="block text-bone">OFF</span>
             <span className="block text-bone/30" style={{ WebkitTextStroke: `2px ${GOLD}`, color: "transparent" }}>
-              THE
+              DA
             </span>
             <span
               className="block"
