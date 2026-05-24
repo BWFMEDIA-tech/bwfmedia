@@ -16,7 +16,7 @@ const menuGroups = [
     title: "Services",
     links: [
       { label: "Studio Bookings", to: "/studio" },
-      { label: "Off The Block", to: "/off-the-block" },
+      { label: "Off Da Block", to: "/off-the-block" },
       { label: "Artist Interviews", href: "/#services" },
       { label: "Music Videos", href: "/#services" },
       { label: "Viral Clips", href: "/#services" },
