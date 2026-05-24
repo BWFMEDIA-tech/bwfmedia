@@ -3,19 +3,23 @@ import { ShoppingCart, X, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { StripeEmbeddedCheckoutCart } from "@/components/StripeEmbeddedCheckout";
 import { useNavigate } from "@tanstack/react-router";
+import { cn } from "@/lib/utils";
 
 function formatUSD(cents: number) {
   return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
 
-export function CartButton() {
+export function CartButton({ className = "fixed top-4 right-16 md:right-4 z-50" }: { className?: string }) {
   const { totalCount, openCart } = useCart();
   return (
     <button
       type="button"
       onClick={openCart}
       aria-label={`Open cart, ${totalCount} item${totalCount === 1 ? "" : "s"}`}
-      className="fixed top-4 right-16 md:right-4 z-50 flex items-center gap-2 px-4 py-3 bg-black/80 backdrop-blur border border-bone/20 hover:border-bone/60 transition-colors text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase"
+      className={cn(
+        "flex items-center gap-2 px-4 py-3 bg-black/80 backdrop-blur border border-bone/20 hover:border-bone/60 transition-colors text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase",
+        className
+      )}
       style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}
     >
       <ShoppingCart className="w-4 h-4" />
