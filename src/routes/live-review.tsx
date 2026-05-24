@@ -412,67 +412,155 @@ function LiveReviewPage() {
           </HUDFrame>
         </section>
 
-        {/* SUBMIT MUSIC */}
-        <section className="mb-6">
+        {/* PAYWALL — PICK A TIER */}
+        <section className="mb-8 md:mb-12">
           <SectionHeader
-            eyebrow="Next Up"
-            title="Submit Music For Live Review"
-            icon={<Send className="w-4 h-4" />}
+            eyebrow="Unlock Submission"
+            title="Choose Your Spotlight Tier"
+            icon={<Lock className="w-4 h-4" />}
           />
-          <HUDFrame className="p-4 md:p-6 mt-4">
-            <form onSubmit={handleSubmitMusic} className="grid sm:grid-cols-2 gap-3">
-              <input
-                type="text"
-                required
-                value={subArtist}
-                onChange={(e) => setSubArtist(e.target.value)}
-                placeholder="Artist name *"
-                maxLength={80}
-                className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                style={{ borderColor: `${GOLD}33` }}
-              />
-              <input
-                type="email"
-                required
-                value={subEmail}
-                onChange={(e) => setSubEmail(e.target.value)}
-                placeholder="Contact email *"
-                maxLength={120}
-                className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                style={{ borderColor: `${GOLD}33` }}
-              />
-              <input
-                type="url"
-                required
-                value={subLink}
-                onChange={(e) => setSubLink(e.target.value)}
-                placeholder="Song link (YouTube, SoundCloud, etc.) *"
-                maxLength={300}
-                className="sm:col-span-2 bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
-                style={{ borderColor: `${GOLD}33` }}
-              />
-              <textarea
-                value={subMsg}
-                onChange={(e) => setSubMsg(e.target.value)}
-                placeholder="Short message"
-                maxLength={500}
-                rows={4}
-                className="sm:col-span-2 bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none resize-none"
-                style={{ borderColor: `${GOLD}33` }}
-              />
-              <button
-                type="submit"
-                disabled={submitting}
-                className="sm:col-span-2 flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-black transition-all disabled:opacity-60"
-                style={{
-                  background: `linear-gradient(135deg, ${GOLD_GLOW}, ${GOLD})`,
-                  boxShadow: `0 0 24px ${GOLD}55`,
+          <div className="grid md:grid-cols-3 gap-4 mt-4">
+            {LIVE_TIER_LIST.map((tier) => (
+              <TierCard
+                key={tier.id}
+                tier={tier}
+                selected={selectedTier === tier.id}
+                onSelect={() => {
+                  setSelectedTier(tier.id);
+                  resetCheckout();
+                  // Scroll the form into view on mobile
+                  setTimeout(() => {
+                    document
+                      .getElementById("submission-form")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 50);
                 }}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* SUBMIT MUSIC (gated by tier selection) */}
+        <section className="mb-6" id="submission-form">
+          <SectionHeader
+            eyebrow={selectedTier ? "Step 2" : "Locked"}
+            title="Submit Music For Live Review"
+            icon={selectedTier ? <Send className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+          />
+          <HUDFrame className="p-4 md:p-6 mt-4 relative">
+            {!selectedTier && (
+              <div
+                className="absolute inset-0 z-20 grid place-items-center backdrop-blur-md"
+                style={{ background: "rgba(0,0,0,0.55)" }}
               >
-                <Send className="w-4 h-4" />
-                {submitting ? "Sending…" : "Submit for Live Review"}
-              </button>
-            </form>
+                <div className="text-center px-6">
+                  <div
+                    className="mx-auto mb-3 w-12 h-12 grid place-items-center rounded-full"
+                    style={{ background: `${GOLD}22`, border: `1px solid ${GOLD}66` }}
+                  >
+                    <Lock className="w-5 h-5" style={{ color: GOLD }} />
+                  </div>
+                  <div className="font-anton text-xl uppercase text-bone">Locked</div>
+                  <p className="text-bone/70 text-sm mt-1 max-w-xs">
+                    Pick a tier above to unlock the submission form.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {clientSecret ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-bone/60">
+                    Paying for{" "}
+                    <span style={{ color: GOLD }}>
+                      {selectedTier ? LIVE_TIERS[selectedTier].name : ""}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={resetCheckout}
+                    className="text-[11px] uppercase tracking-[0.2em] text-bone/70 hover:text-bone underline-offset-4 hover:underline"
+                  >
+                    Change details
+                  </button>
+                </div>
+                <div className="rounded bg-white">
+                  <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+                    <EmbeddedCheckout />
+                  </EmbeddedCheckoutProvider>
+                </div>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmitMusic}
+                className={cn(
+                  "grid sm:grid-cols-2 gap-3",
+                  !selectedTier && "pointer-events-none select-none opacity-60",
+                )}
+              >
+                <input
+                  type="text"
+                  required
+                  value={subArtist}
+                  onChange={(e) => setSubArtist(e.target.value)}
+                  placeholder="Artist name *"
+                  maxLength={80}
+                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  style={{ borderColor: `${GOLD}33` }}
+                />
+                <input
+                  type="email"
+                  required
+                  value={subEmail}
+                  onChange={(e) => setSubEmail(e.target.value)}
+                  placeholder="Contact email *"
+                  maxLength={120}
+                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  style={{ borderColor: `${GOLD}33` }}
+                />
+                <input
+                  type="url"
+                  required
+                  value={subLink}
+                  onChange={(e) => setSubLink(e.target.value)}
+                  placeholder="Song link (YouTube, SoundCloud, etc.) *"
+                  maxLength={300}
+                  className="sm:col-span-2 bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  style={{ borderColor: `${GOLD}33` }}
+                />
+                <textarea
+                  value={subMsg}
+                  onChange={(e) => setSubMsg(e.target.value)}
+                  placeholder="Short message (song title, release info, etc.)"
+                  maxLength={500}
+                  rows={4}
+                  className="sm:col-span-2 bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none resize-none"
+                  style={{ borderColor: `${GOLD}33` }}
+                />
+                {checkoutError && (
+                  <div className="sm:col-span-2 text-sm text-red-400 border border-red-500/40 bg-red-500/10 px-3 py-2">
+                    {checkoutError}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={submitting || !selectedTier}
+                  className="sm:col-span-2 flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-black transition-all disabled:opacity-60"
+                  style={{
+                    background: `linear-gradient(135deg, ${GOLD_GLOW}, ${GOLD})`,
+                    boxShadow: `0 0 24px ${GOLD}55`,
+                  }}
+                >
+                  <Lock className="w-4 h-4" />
+                  {submitting
+                    ? "Loading checkout…"
+                    : selectedTier
+                      ? `Pay $${(LIVE_TIERS[selectedTier].amountCents / 100).toFixed(0)} & Submit`
+                      : "Pick a tier above"}
+                </button>
+              </form>
+            )}
           </HUDFrame>
         </section>
       </div>
