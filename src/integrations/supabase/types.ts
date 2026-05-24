@@ -194,6 +194,54 @@ export type Database = {
         }
         Relationships: []
       }
+      live_submissions: {
+        Row: {
+          amount_cents: number
+          artist_name: string
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          paid_at: string | null
+          queue_status: string
+          song_link: string
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          tier: string
+        }
+        Insert: {
+          amount_cents: number
+          artist_name: string
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          paid_at?: string | null
+          queue_status?: string
+          song_link: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tier: string
+        }
+        Update: {
+          amount_cents?: number
+          artist_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          paid_at?: string | null
+          queue_status?: string
+          song_link?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tier?: string
+        }
+        Relationships: []
+      }
       studio_bookings: {
         Row: {
           amount_cents: number | null
