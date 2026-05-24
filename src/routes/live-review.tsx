@@ -9,7 +9,6 @@ import {
   Lock,
   Check,
   Play,
-  ChevronRight,
 } from "lucide-react";
 import { FutureShell } from "@/components/site/FutureShell";
 import { cn } from "@/lib/utils";
