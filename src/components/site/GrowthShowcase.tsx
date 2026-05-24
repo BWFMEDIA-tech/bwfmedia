@@ -9,7 +9,6 @@ import {
   MessageCircle,
   Share2,
   ArrowRight,
-  Play,
   Sparkles,
   Radio,
 } from "lucide-react";
