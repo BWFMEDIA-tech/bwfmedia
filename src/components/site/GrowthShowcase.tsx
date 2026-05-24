@@ -258,9 +258,8 @@ export function GrowthShowcase() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {VIRAL.map((v, i) => {
-            const Card = (
+            const card = (
               <motion.div
-                key={v.title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -299,10 +298,10 @@ export function GrowthShowcase() {
                 rel="noopener noreferrer"
                 className="block"
               >
-                {Card}
+                {card}
               </a>
             ) : (
-              Card
+              <div key={v.title} className="block">{card}</div>
             );
           })}
           </div>
