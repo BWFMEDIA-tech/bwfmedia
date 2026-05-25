@@ -1,0 +1,602 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Radio, LayoutDashboard, Video, Users, Compass, Calendar, MessageSquare,
+  Bell, BarChart3, DollarSign, Settings, Mic, MicOff, Camera, CameraOff,
+  MonitorUp, UserPlus, Share2, MoreHorizontal, Eye, Circle, Send, Smile,
+  Heart, Flame, Music2, PartyPopper, Sparkles, Crown, Copy, Check,
+  CheckCircle2, X as XIcon, Instagram, Facebook, MessageCircle, Mail,
+  Headphones, Wifi, PhoneOff, ChevronRight, GripVertical,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useLiveQueue } from "@/lib/useLiveQueue";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/stream-studio")({
+  head: () => ({
+    meta: [
+      { title: "BWF Live Studio — Stream Music Reviews & Podcasts" },
+      { name: "description", content: "Premium live streaming studio for BWF Network. Host music reviews and podcasts with LiveKit-powered video, live chat, tips, and real-time analytics." },
+      { property: "og:title", content: "BWF Live Studio" },
+      { property: "og:description", content: "Cinematic dark-themed live streaming dashboard built for artists and creators." },
+    ],
+  }),
+  component: StreamStudio,
+});
+
+/* ---------- Theme tokens ---------- */
+const PURPLE = "#8b5cf6";
+const PURPLE_GLOW = "rgba(139,92,246,0.45)";
+const BLUE = "#3b82f6";
+
+/* ---------- Sidebar ---------- */
+const NAV = [
+  { icon: LayoutDashboard, label: "Dashboard" },
+  { icon: Video, label: "Stream Now", active: true },
+  { icon: Users, label: "Artists" },
+  { icon: Compass, label: "Discover" },
+  { icon: Calendar, label: "Events" },
+  { icon: MessageSquare, label: "Messages", badge: 12 },
+  { icon: Bell, label: "Notifications", badge: 24 },
+  { icon: BarChart3, label: "Insights" },
+  { icon: DollarSign, label: "Earnings" },
+  { icon: Settings, label: "Settings" },
+];
+
+function Sidebar() {
+  return (
+    <aside className="hidden lg:flex w-[240px] shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] p-4">
+      <Link to="/" className="flex items-center gap-2 px-2 py-3">
+        <div className="text-2xl font-black tracking-tight">
+          <span className="text-white">BWF</span>
+        </div>
+        <span className="text-[10px] tracking-[0.3em] text-white/50">NETWORK</span>
+      </Link>
+
+      <button
+        className="mt-2 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02] active:scale-95"
+        style={{
+          background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})`,
+          boxShadow: `0 8px 32px ${PURPLE_GLOW}`,
+        }}
+      >
+        <Radio className="h-4 w-4 animate-pulse" />
+        Go Live
+      </button>
+
+      <nav className="mt-4 flex flex-col gap-1">
+        {NAV.map((item) => (
+          <button
+            key={item.label}
+            className={cn(
+              "group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition",
+              item.active
+                ? "bg-white/5 text-white"
+                : "text-white/60 hover:bg-white/5 hover:text-white"
+            )}
+          >
+            <span className="flex items-center gap-3">
+              <item.icon className="h-4 w-4" style={item.active ? { color: PURPLE } : undefined} />
+              {item.label}
+            </span>
+            {item.badge ? (
+              <span
+                className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                style={{ background: PURPLE }}
+              >
+                {item.badge}
+              </span>
+            ) : null}
+          </button>
+        ))}
+      </nav>
+
+      <div className="mt-auto rounded-xl border border-white/5 bg-white/[0.02] p-4">
+        <div className="mb-2 flex items-center gap-2">
+          <Crown className="h-4 w-4" style={{ color: PURPLE }} />
+          <span className="text-sm font-bold text-white">BWF PRO</span>
+        </div>
+        <p className="mb-3 text-xs text-white/50">Upgrade to unlock more tools and features.</p>
+        <button
+          className="w-full rounded-lg py-2 text-xs font-semibold text-white transition hover:opacity-90"
+          style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+        >
+          Upgrade Now
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-white/30">
+        Powered by <span className="font-bold text-white/70">LiveKit</span>
+      </div>
+    </aside>
+  );
+}
+
+/* ---------- Video tile ---------- */
+function VideoTile({ label, name, handle, gradient }: { label: string; name: string; handle: string; gradient: string }) {
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
+      <div className="absolute inset-0" style={{ background: gradient }} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      <div className="absolute left-3 top-3">
+        <span className="rounded-md bg-black/60 px-2 py-1 text-[10px] font-bold tracking-widest text-white backdrop-blur">
+          {label}
+        </span>
+      </div>
+      <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+        <div className="flex items-center gap-2 rounded-xl bg-black/50 px-3 py-2 backdrop-blur">
+          <div
+            className="h-8 w-8 rounded-full"
+            style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+          />
+          <div>
+            <div className="flex items-center gap-1 text-sm font-bold text-white">
+              {name} <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />
+            </div>
+            <div className="text-[10px] text-white/60">{handle}</div>
+          </div>
+        </div>
+        <div className="flex items-end gap-0.5">
+          {[3, 5, 7, 9, 6].map((h, i) => (
+            <div
+              key={i}
+              className="w-1 rounded-full"
+              style={{ height: `${h * 3}px`, background: `linear-gradient(to top, ${PURPLE}, ${BLUE})` }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Stream controls ---------- */
+function StreamControls() {
+  const [muted, setMuted] = useState(false);
+  const [camOff, setCamOff] = useState(false);
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+      <div className="mr-2 flex items-center gap-2 px-2">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ background: "#22c55e" }} />
+          <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "#22c55e" }} />
+        </span>
+        <div className="text-xs">
+          <div className="font-semibold text-white">LiveKit</div>
+          <div className="text-[10px] text-white/50">Excellent connection</div>
+        </div>
+      </div>
+      <CtrlBtn icon={muted ? MicOff : Mic} label={muted ? "Unmute" : "Mute"} onClick={() => setMuted((v) => !v)} active={muted} />
+      <CtrlBtn icon={camOff ? CameraOff : Camera} label={camOff ? "Start Cam" : "Stop Cam"} onClick={() => setCamOff((v) => !v)} active={camOff} />
+      <CtrlBtn icon={MonitorUp} label="Share Screen" />
+      <CtrlBtn icon={UserPlus} label="Invite Guest" />
+      <CtrlBtn icon={Settings} label="Settings" />
+      <button
+        onClick={() => toast.success("Stream ended")}
+        className="ml-auto flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-500"
+      >
+        <PhoneOff className="h-3.5 w-3.5" />
+        End Stream
+      </button>
+    </div>
+  );
+}
+
+function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: string; onClick?: () => void; active?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2 rounded-lg border border-white/5 px-3 py-2 text-xs font-medium transition hover:bg-white/5",
+        active ? "bg-white/10 text-white" : "text-white/80"
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </button>
+  );
+}
+
+/* ---------- Join requests / On deck / Invite ---------- */
+const JOIN_REQUESTS = [
+  { name: "Luna Luv", handle: "@itslunaluv", genre: "R&B / Soul", grad: "linear-gradient(135deg,#f472b6,#a855f7)" },
+  { name: "Yung Maze", handle: "@yungmaze_", genre: "Hip Hop / Trap", grad: "linear-gradient(135deg,#3b82f6,#1e3a8a)" },
+  { name: "Spade Sixx", handle: "@spadesixx", genre: "Hip Hop / Rap", grad: "linear-gradient(135deg,#10b981,#0f766e)" },
+];
+
+function JoinRequests() {
+  return (
+    <Panel title="JOIN REQUESTS" count={3} dismissible>
+      <div className="flex flex-col gap-3">
+        {JOIN_REQUESTS.map((r) => (
+          <div key={r.handle} className="flex items-center gap-3">
+            <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: r.grad }} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1 text-sm font-semibold text-white">
+                {r.name}
+                <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />
+              </div>
+              <div className="truncate text-[10px] text-white/50">
+                {r.handle} · 🎵 {r.genre}
+              </div>
+            </div>
+            <button className="rounded-md px-2.5 py-1 text-[11px] font-semibold text-white" style={{ background: PURPLE }}>
+              Accept
+            </button>
+            <button className="rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/70 hover:bg-white/5">
+              Decline
+            </button>
+          </div>
+        ))}
+      </div>
+      <button className="mt-3 flex w-full items-center justify-between rounded-lg py-2 text-xs font-medium text-white/70 hover:text-white">
+        View all requests <ChevronRight className="h-3 w-3" />
+      </button>
+    </Panel>
+  );
+}
+
+function OnDeck() {
+  const { rows } = useLiveQueue();
+  const queue = rows.filter((r) => r.queue_status === "queued" || r.queue_status === "next_up").slice(0, 4);
+  const fallback = [
+    { id: "1", artist_name: "Kairo", handle: "@kairo.wav", genre: "Alternative" },
+    { id: "2", artist_name: "Jae Moné", handle: "@jaemone.music", genre: "R&B" },
+    { id: "3", artist_name: "Treyvon", handle: "@treyvonofficial", genre: "Hip Hop" },
+    { id: "4", artist_name: "Dolla Dreamz", handle: "@dolladreamzmusic", genre: "Trap / Rap" },
+  ];
+  const list = queue.length ? queue.map((q, i) => ({ id: q.id, artist_name: q.artist_name, handle: `@${q.artist_name.toLowerCase().replace(/\s+/g, "")}`, genre: q.song_title ?? "Track" })) : fallback;
+
+  return (
+    <Panel title="ON DECK" count={list.length} dismissible>
+      <div className="flex flex-col gap-2.5">
+        {list.map((a, i) => (
+          <div key={a.id} className="flex items-center gap-3 rounded-lg px-1">
+            <span className="w-4 text-xs font-bold text-white/40">{i + 1}</span>
+            <div className="h-9 w-9 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-white">{a.artist_name}</div>
+              <div className="truncate text-[10px] text-white/50">{a.handle} · 🎵 {a.genre}</div>
+            </div>
+            <GripVertical className="h-4 w-4 text-white/30" />
+          </div>
+        ))}
+      </div>
+      <button className="mt-3 flex w-full items-center justify-between text-xs text-white/70 hover:text-white">
+        View full queue <ChevronRight className="h-3 w-3" />
+      </button>
+    </Panel>
+  );
+}
+
+function InviteGuest() {
+  const [copied, setCopied] = useState(false);
+  const link = "https://live.bwfnetwork.com/invite/bwf-host";
+  const copy = () => {
+    navigator.clipboard.writeText(link);
+    setCopied(true);
+    toast.success("Invite link copied");
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <Panel title="INVITE GUEST">
+      <p className="mb-3 text-xs text-white/60">Invite an artist to join your stream. Share the link below.</p>
+      <div className="mb-3 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 p-1.5">
+        <span className="flex-1 truncate px-2 text-[11px] text-white/80">{link}</span>
+        <button onClick={copy} className="flex items-center gap-1 rounded-md bg-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-white/20">
+          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <div className="mb-3 text-[11px] text-white/50">Share via</div>
+      <div className="mb-4 flex gap-2">
+        {[
+          { Icon: XIcon, bg: "#000" },
+          { Icon: Instagram, bg: "linear-gradient(135deg,#f472b6,#a855f7)" },
+          { Icon: MessageCircle, bg: "#22c55e" },
+          { Icon: Facebook, bg: "#1877f2" },
+          { Icon: MoreHorizontal, bg: "#374151" },
+        ].map((s, i) => (
+          <button key={i} className="flex h-9 w-9 items-center justify-center rounded-full text-white" style={{ background: s.bg }}>
+            <s.Icon className="h-4 w-4" />
+          </button>
+        ))}
+      </div>
+      <div className="mb-1 text-[11px] text-white/50">Add via Email</div>
+      <div className="flex gap-2">
+        <input
+          type="email"
+          placeholder="artist@email.com"
+          className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none"
+        />
+        <button
+          onClick={() => toast.success("Invite sent")}
+          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white"
+          style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+        >
+          <Send className="h-3 w-3" /> Send Invite
+        </button>
+      </div>
+    </Panel>
+  );
+}
+
+function Panel({ title, count, dismissible, children }: { title: string; count?: number; dismissible?: boolean; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold tracking-widest text-white">{title}</span>
+          {count !== undefined && (
+            <span className="rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white" style={{ background: PURPLE }}>
+              {count}
+            </span>
+          )}
+        </div>
+        {dismissible && <XIcon className="h-3.5 w-3.5 cursor-pointer text-white/40 hover:text-white" />}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* ---------- Chat ---------- */
+const CHAT_SEED = [
+  { name: "BeatKing", verified: true, msg: "This is 🔥🔥🔥", time: "now", likes: 12 },
+  { name: "Nina Strings", msg: "Love the vibe! JXHNNY coming with that real talk 💯", time: "now", likes: 0 },
+  { name: "ProdByTee", verified: true, msg: "The beat selection is crazy!", time: "now", likes: 7 },
+  { name: "Lyrik_Lee", msg: "He needs to drop this one ASAP!!! 🚀", time: "now", likes: 0 },
+  { name: "QueenVee", tip: 20, msg: "Keep shining king! BWF showing real love! 💜", time: "now", isTip: true },
+  { name: "JXHNNY RICH", artist: true, msg: "Appreciate y'all! Means everything 🙏💯", time: "now", likes: 15 },
+];
+
+function ChatPanel() {
+  const [msg, setMsg] = useState("");
+  const [chat, setChat] = useState(CHAT_SEED);
+  const send = () => {
+    if (!msg.trim()) return;
+    setChat((c) => [...c, { name: "You", msg, time: "now", likes: 0 }]);
+    setMsg("");
+  };
+  return (
+    <aside className="flex w-full flex-col overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18] lg:w-[320px]">
+      <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
+        <span className="text-xs font-bold tracking-widest text-white">LIVE CHAT</span>
+        <div className="flex items-center gap-2 text-[11px] text-white/60">
+          <Users className="h-3 w-3" /> 1.2K
+        </div>
+      </div>
+      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+        {chat.map((c, i) => (
+          <div
+            key={i}
+            className={cn(
+              "flex gap-2 rounded-lg p-2",
+              c.isTip && "border border-purple-500/30 bg-purple-500/10"
+            )}
+          >
+            <div className="h-7 w-7 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                <span className="font-bold text-white">{c.name}</span>
+                {c.verified && <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />}
+                {c.artist && <span className="rounded bg-purple-500/30 px-1 text-[9px] font-bold text-purple-200">Artist</span>}
+                {c.isTip && <span className="text-[10px] text-purple-300">just donated <span className="font-bold">${c.tip}</span></span>}
+                <span className="ml-auto text-[10px] text-white/40">{c.time}</span>
+              </div>
+              <div className="mt-0.5 text-xs text-white/80">{c.msg}</div>
+            </div>
+            <button className="self-start">
+              <Heart className={cn("h-3.5 w-3.5", c.likes ? "fill-pink-500 text-pink-500" : "text-white/30")} />
+              {c.likes ? <div className="text-[9px] text-white/60">{c.likes}</div> : null}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-white/5 p-3">
+        <div className="mb-2 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-2">
+          <input
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder="Say something..."
+            className="flex-1 bg-transparent py-2 text-xs text-white placeholder:text-white/30 focus:outline-none"
+          />
+          <Smile className="h-4 w-4 text-white/40" />
+          <button onClick={send} className="rounded-md p-1.5" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+            <Send className="h-3 w-3 text-white" />
+          </button>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex gap-1.5 text-base">
+            {["🔥", "💯", "👏", "🎵", "❤️", "😂"].map((e) => (
+              <button key={e} className="rounded-md p-1 hover:bg-white/10">{e}</button>
+            ))}
+          </div>
+          <button
+            className="flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white"
+            style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+          >
+            <Sparkles className="h-3 w-3" /> Tip
+          </button>
+        </div>
+      </div>
+
+      {/* Analytics */}
+      <div className="border-t border-white/5 p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-xs font-bold tracking-widest text-white">STREAM ANALYTICS</span>
+          <BarChart3 className="h-3.5 w-3.5 text-white/40" />
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <Stat icon={Eye} label="Viewers" value="1,245" color={BLUE} />
+          <Stat icon={Heart} label="Likes" value="3,482" color="#ec4899" />
+          <Stat icon={DollarSign} label="Donations" value="$245" color="#22c55e" />
+          <Stat icon={Share2} label="Shares" value="127" color={PURPLE} />
+          <Stat icon={Circle} label="Stream Time" value="01:23:47" color="#f59e0b" small />
+        </div>
+        <Sparkline />
+      </div>
+    </aside>
+  );
+}
+
+function Stat({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string; small?: boolean }) {
+  return (
+    <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2">
+      <Icon className="mb-1 h-3 w-3" style={{ color }} />
+      <div className="text-sm font-bold text-white">{value}</div>
+      <div className="text-[9px] text-white/50">{label}</div>
+    </div>
+  );
+}
+
+function Sparkline() {
+  const pts = Array.from({ length: 40 }, (_, i) =>
+    50 - Math.sin(i / 4) * 15 - (i / 40) * 25
+  );
+  const d = pts.map((y, i) => `${i === 0 ? "M" : "L"}${(i / 39) * 100},${y}`).join(" ");
+  return (
+    <div className="mt-3">
+      <svg viewBox="0 0 100 60" className="h-16 w-full">
+        <defs>
+          <linearGradient id="spark" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={PURPLE} stopOpacity="0.6" />
+            <stop offset="100%" stopColor={PURPLE} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={`${d} L100,60 L0,60 Z`} fill="url(#spark)" />
+        <path d={d} fill="none" stroke={PURPLE} strokeWidth="1.5" />
+      </svg>
+      <div className="flex justify-between text-[9px] text-white/40">
+        <span>00:00</span><span>00:20</span><span>00:40</span><span>01:00</span><span>01:20</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Bottom on-air bar ---------- */
+function OnAirBar() {
+  return (
+    <div className="flex flex-wrap items-center gap-4 border-t border-white/5 bg-[#0a0a12] px-4 py-3 text-xs">
+      <span className="flex items-center gap-2 rounded-md bg-red-600 px-2 py-1 font-bold text-white">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
+      </span>
+      <div>
+        <div className="font-bold text-white">BWF Live: Unsigned Artist Review</div>
+        <div className="text-[10px] text-white/50">Music Review Podcast</div>
+      </div>
+      <div className="hidden items-center gap-2 sm:flex">
+        <div className="h-8 w-8 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+        <div>
+          <div className="text-[10px] text-white/50">Current Guest</div>
+          <div className="font-semibold text-white">JXHNNY RICH</div>
+        </div>
+      </div>
+      <div className="hidden items-center gap-2 md:flex">
+        <div className="h-8 w-8 rounded-full" style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)" }} />
+        <div>
+          <div className="text-[10px] text-white/50">Next Up</div>
+          <div className="font-semibold text-white">Kairo</div>
+        </div>
+      </div>
+      <div className="ml-auto flex items-center gap-4">
+        <Meter label="Mic" color="#22c55e" />
+        <Meter label="Cam" color="#22c55e" />
+        <div className="flex items-center gap-1.5">
+          <Wifi className="h-3.5 w-3.5" style={{ color: "#22c55e" }} />
+          <div>
+            <div className="text-[10px] text-white/50">Network</div>
+            <div className="font-semibold text-green-400">Good</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Meter({ label, color }: { label: string; color: string }) {
+  return (
+    <div>
+      <div className="text-[10px] text-white/50">{label}</div>
+      <div className="flex items-end gap-0.5">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="w-1 rounded-sm" style={{ height: `${6 + (i % 4) * 2}px`, background: i < 9 ? color : "rgba(255,255,255,0.1)" }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Main ---------- */
+function StreamStudio() {
+  const [mode, setMode] = useState<"review" | "podcast">("review");
+  return (
+    <div className="min-h-screen bg-[#050509] text-white">
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <main className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 lg:flex-row">
+            {/* Center column */}
+            <div className="flex flex-1 flex-col gap-4">
+              {/* Header */}
+              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+                <span className="flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-widest text-white">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE
+                </span>
+                <div className="flex items-center gap-1.5 text-base font-bold text-white">
+                  BWF Live: Unsigned Artist Review
+                  <CheckCircle2 className="h-4 w-4" style={{ color: BLUE }} />
+                </div>
+                <div className="flex gap-1 rounded-lg bg-white/5 p-1">
+                  <button
+                    onClick={() => setMode("review")}
+                    className={cn("rounded px-2 py-1 text-[11px] font-medium", mode === "review" ? "bg-white/15 text-white" : "text-white/60")}
+                  >
+                    <Music2 className="mr-1 inline h-3 w-3" /> Music Review
+                  </button>
+                  <button
+                    onClick={() => setMode("podcast")}
+                    className={cn("rounded px-2 py-1 text-[11px] font-medium", mode === "podcast" ? "bg-white/15 text-white" : "text-white/60")}
+                  >
+                    <Headphones className="mr-1 inline h-3 w-3" /> Podcast
+                  </button>
+                </div>
+                <div className="ml-auto flex items-center gap-3 text-xs text-white/70">
+                  <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> 1,245</span>
+                  <span className="flex items-center gap-1"><Circle className="h-2 w-2 fill-red-500 text-red-500" /> 01:23:47</span>
+                  <button className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5">
+                    <Share2 className="h-3 w-3" /> Share
+                  </button>
+                  <button className="rounded-md border border-white/10 p-1.5 hover:bg-white/5">
+                    <MoreHorizontal className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Split video */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" />
+                <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" />
+              </div>
+
+              <StreamControls />
+
+              {/* Three panels */}
+              <div className="grid gap-4 lg:grid-cols-3">
+                <JoinRequests />
+                <OnDeck />
+                <InviteGuest />
+              </div>
+            </div>
+
+            {/* Chat */}
+            <ChatPanel />
+          </div>
+
+          <OnAirBar />
+        </main>
+      </div>
+    </div>
+  );
+}
