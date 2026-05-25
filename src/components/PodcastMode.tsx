@@ -15,6 +15,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import type { LiveQueueRow } from "@/lib/useLiveQueue";
 import { cn } from "@/lib/utils";
+import { usePodcastState } from "@/lib/usePodcastState";
 
 const RED = "#ef2b2b";
 
@@ -117,15 +118,16 @@ function PodcastWaveform({ active }: { active: boolean }) {
 }
 
 export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
-  // Local UI state only — does not alter backend queue.
+  // Shared realtime state — all viewers stay in sync via Supabase Realtime.
+  const { state, update } = usePodcastState();
   const liveFromQueue = queue.find((r) => r.queue_status === "live") ?? null;
   const upcoming = queue.filter(
     (r) => r.queue_status === "next_up" || r.queue_status === "queued",
   );
 
-  const [pinnedId, setPinnedId] = useState<string | null>(null);
-  const [sessionLive, setSessionLive] = useState(true);
-  const [cursor, setCursor] = useState(0); // index within upcoming for "next"
+  const pinnedId = state.pinned_id;
+  const sessionLive = state.session_live;
+  const cursor = state.cursor;
 
   const pinned = pinnedId ? queue.find((r) => r.id === pinnedId) ?? null : null;
   const onAir = pinned ?? liveFromQueue ?? upcoming[0] ?? null;
@@ -158,9 +160,9 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
 
   function advanceSpeaker() {
     if (upcoming.length === 0) return;
-    setCursor((c) => (c + 1) % Math.max(upcoming.length, 1));
-    const next = upcoming[(cursor + 1) % upcoming.length];
-    if (next) setPinnedId(next.id);
+    const nextCursor = (cursor + 1) % upcoming.length;
+    const next = upcoming[nextCursor];
+    void update({ cursor: nextCursor, pinned_id: next?.id ?? null });
   }
 
   const status: "ON AIR" | "WAITING" | "UPCOMING" = !sessionLive
@@ -358,7 +360,7 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
             <HostBtn
               icon={<Power className="w-3.5 h-3.5" />}
               label={sessionLive ? "Pause Session" : "Start Session"}
-              onClick={() => setSessionLive((s) => !s)}
+              onClick={() => void update({ session_live: !sessionLive })}
               primary={!sessionLive}
             />
             <HostBtn
@@ -374,7 +376,7 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
             <HostBtn
               icon={<Pin className="w-3.5 h-3.5" />}
               label={pinnedId ? "Unpin Guest" : "Pin On Air"}
-              onClick={() => setPinnedId((p) => (p ? null : onAir?.id ?? null))}
+              onClick={() => void update({ pinned_id: pinnedId ? null : onAir?.id ?? null })}
             />
           </div>
           <p className="mt-3 text-[10px] uppercase tracking-[0.25em] text-bone/40">
