@@ -257,6 +257,30 @@ export type Database = {
         }
         Relationships: []
       }
+      podcast_state: {
+        Row: {
+          cursor: number
+          id: number
+          pinned_id: string | null
+          session_live: boolean
+          updated_at: string
+        }
+        Insert: {
+          cursor?: number
+          id?: number
+          pinned_id?: string | null
+          session_live?: boolean
+          updated_at?: string
+        }
+        Update: {
+          cursor?: number
+          id?: number
+          pinned_id?: string | null
+          session_live?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       studio_bookings: {
         Row: {
           amount_cents: number | null
