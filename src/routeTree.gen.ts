@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as LoginRouteImport } from './routes/login'
@@ -55,6 +56,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StreamStudioRoute = StreamStudioRouteImport.update({
+  id: '/stream-studio',
+  path: '/stream-studio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
@@ -322,6 +331,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
+    | '/stream-studio'
     | '/studio'
     | '/unsubscribe'
     | '/videos'
@@ -356,6 +366,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
+    | '/stream-studio'
     | '/studio'
     | '/unsubscribe'
     | '/videos'
@@ -390,6 +401,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/off-the-block'
     | '/sitemap.xml'
+    | '/stream-studio'
     | '/studio'
     | '/unsubscribe'
     | '/videos'
@@ -425,6 +437,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stream-studio': {
+      id: '/stream-studio'
+      path: '/stream-studio'
+      fullPath: '/stream-studio'
+      preLoaderRoute: typeof StreamStudioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -710,6 +730,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
@@ -737,12 +758,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
