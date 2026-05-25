@@ -331,7 +331,7 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => setPinnedId(g.id)}
+                      onClick={() => void update({ pinned_id: g.id })}
                       className="p-1.5 text-bone/60 hover:text-bone transition-colors"
                       title="Pin to On Air"
                       aria-label={`Pin ${g.artist_name} to On Air`}
