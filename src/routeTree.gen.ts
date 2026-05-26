@@ -14,14 +14,18 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveReviewRouteImport } from './routes/live-review'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
+import { Route as StreamRoomRouteImport } from './routes/stream.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
@@ -68,6 +72,16 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
   id: '/off-the-block',
   path: '/off-the-block',
@@ -81,6 +95,11 @@ const LoginRoute = LoginRouteImport.update({
 const LiveReviewRoute = LiveReviewRouteImport.update({
   id: '/live-review',
   path: '/live-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckRoute = DeckRouteImport.update({
@@ -107,6 +126,11 @@ const VideosIdRoute = VideosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => VideosRoute,
+} as any)
+const StreamRoomRoute = StreamRoomRouteImport.update({
+  id: '/stream/$room',
+  path: '/stream/$room',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PayReturnRoute = PayReturnRouteImport.update({
   id: '/pay/return',
@@ -219,9 +243,12 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -237,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/stream/$room': typeof StreamRoomRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -254,9 +282,12 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -272,6 +303,7 @@ export interface FileRoutesByTo {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/stream/$room': typeof StreamRoomRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -290,9 +322,12 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -308,6 +343,7 @@ export interface FileRoutesById {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/stream/$room': typeof StreamRoomRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -327,9 +363,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/forgot-password'
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/reset-password'
+    | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
@@ -345,6 +384,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/stream/$room'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -362,9 +402,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/forgot-password'
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/reset-password'
+    | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
@@ -380,6 +423,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/stream/$room'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -397,9 +441,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/forgot-password'
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/reset-password'
+    | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
@@ -415,6 +462,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/stream/$room'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -433,9 +481,12 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
@@ -450,6 +501,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
+  StreamRoomRoute: typeof StreamRoomRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -499,6 +551,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/off-the-block': {
       id: '/off-the-block'
       path: '/off-the-block'
@@ -518,6 +584,13 @@ declare module '@tanstack/react-router' {
       path: '/live-review'
       fullPath: '/live-review'
       preLoaderRoute: typeof LiveReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck': {
@@ -554,6 +627,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$id'
       preLoaderRoute: typeof VideosIdRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/stream/$room': {
+      id: '/stream/$room'
+      path: '/stream/$room'
+      fullPath: '/stream/$room'
+      preLoaderRoute: typeof StreamRoomRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/pay/return': {
       id: '/pay/return'
@@ -726,9 +806,12 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
@@ -743,6 +826,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
+  StreamRoomRoute: StreamRoomRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
@@ -758,12 +842,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
