@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, LayoutDashboard, Video, Users, Compass, Calendar, MessageSquare,
@@ -14,6 +15,12 @@ import { useLiveQueue } from "@/lib/useLiveQueue";
 import { toast } from "sonner";
 import hostImg from "@/assets/stream-host.jpg";
 import guestImg from "@/assets/stream-guest.jpg";
+import { useAuth } from "@/lib/auth-context";
+import { useServerFn } from "@tanstack/react-start";
+import { startOrResumeStream, endStream } from "@/lib/streams.functions";
+import { getLiveKitToken } from "@/lib/livekit.functions";
+import { LiveStage } from "@/components/stream/LiveStage";
+import { LiveChat } from "@/components/stream/LiveChat";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({

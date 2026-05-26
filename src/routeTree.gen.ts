@@ -14,9 +14,12 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveReviewRouteImport } from './routes/live-review'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -68,6 +71,16 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
   id: '/off-the-block',
   path: '/off-the-block',
@@ -81,6 +94,11 @@ const LoginRoute = LoginRouteImport.update({
 const LiveReviewRoute = LiveReviewRouteImport.update({
   id: '/live-review',
   path: '/live-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckRoute = DeckRouteImport.update({
@@ -219,9 +237,12 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -254,9 +275,12 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -290,9 +314,12 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -327,9 +354,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/forgot-password'
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/reset-password'
+    | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
@@ -362,9 +392,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/forgot-password'
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/reset-password'
+    | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
@@ -397,9 +430,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/forgot-password'
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/reset-password'
+    | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
@@ -433,9 +469,12 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
@@ -499,6 +538,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/off-the-block': {
       id: '/off-the-block'
       path: '/off-the-block'
@@ -518,6 +571,13 @@ declare module '@tanstack/react-router' {
       path: '/live-review'
       fullPath: '/live-review'
       preLoaderRoute: typeof LiveReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck': {
@@ -726,9 +786,12 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
