@@ -25,6 +25,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
+import { Route as StreamRoomRouteImport } from './routes/stream.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
@@ -125,6 +126,11 @@ const VideosIdRoute = VideosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => VideosRoute,
+} as any)
+const StreamRoomRoute = StreamRoomRouteImport.update({
+  id: '/stream/$room',
+  path: '/stream/$room',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PayReturnRoute = PayReturnRouteImport.update({
   id: '/pay/return',
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/stream/$room': typeof StreamRoomRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/stream/$room': typeof StreamRoomRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -335,6 +343,7 @@ export interface FileRoutesById {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/stream/$room': typeof StreamRoomRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -375,6 +384,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/stream/$room'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -413,6 +423,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/stream/$room'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -451,6 +462,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/stream/$room'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -489,6 +501,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
+  StreamRoomRoute: typeof StreamRoomRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -614,6 +627,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$id'
       preLoaderRoute: typeof VideosIdRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/stream/$room': {
+      id: '/stream/$room'
+      path: '/stream/$room'
+      fullPath: '/stream/$room'
+      preLoaderRoute: typeof StreamRoomRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/pay/return': {
       id: '/pay/return'
@@ -806,6 +826,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
+  StreamRoomRoute: StreamRoomRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
