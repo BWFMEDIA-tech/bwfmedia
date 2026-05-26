@@ -12,6 +12,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useLiveQueue } from "@/lib/useLiveQueue";
 import { toast } from "sonner";
+import hostImg from "@/assets/stream-host.jpg";
+import guestImg from "@/assets/stream-guest.jpg";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -114,10 +116,14 @@ function Sidebar() {
 }
 
 /* ---------- Video tile ---------- */
-function VideoTile({ label, name, handle, gradient }: { label: string; name: string; handle: string; gradient: string }) {
+function VideoTile({ label, name, handle, gradient, image }: { label: string; name: string; handle: string; gradient: string; image?: string }) {
   return (
     <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
-      <div className="absolute inset-0" style={{ background: gradient }} />
+      {image ? (
+        <img src={image} alt={name} className="absolute inset-0 h-full w-full object-cover" loading="lazy" width={1024} height={1024} />
+      ) : (
+        <div className="absolute inset-0" style={{ background: gradient }} />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
       <div className="absolute left-3 top-3">
         <span className="rounded-md bg-black/60 px-2 py-1 text-[10px] font-bold tracking-widest text-white backdrop-blur">
@@ -576,8 +582,8 @@ function StreamStudio() {
 
               {/* Split video */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" />
-                <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" />
+                <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" image={hostImg} />
+                <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" image={guestImg} />
               </div>
 
               <StreamControls />
