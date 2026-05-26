@@ -1,67 +1,68 @@
-## BWFMEDIA Live Review Paywall — Build Plan
+# Phase 1 — Make BWF Network functional
 
-This plan adds a paid submission system to `/live-review` using the project's existing Stripe integration (gateway-routed, embedded checkout). It mirrors the patterns already used by `studio_bookings` / `block_bookings`.
+LiveKit credentials are saved. Stripe tips, queue persistence, donations, analytics, admin moderation, notifications, storage, and recordings are deferred to later phases.
 
-### 1. Pricing tiers
+## What ships now
 
-Three one-time Stripe products will be created:
+### 1. Auth + Roles
+- New routes: `/login`, `/signup`, `/forgot-password`, `/reset-password`
+- Email/password + Google sign-in (via Lovable broker)
+- `profiles` table (display_name, avatar_url, bio) auto-created on signup via trigger
+- Extend `app_role` enum: add `host`, `artist`, `moderator`, `member` (keeps existing `admin`)
+- Router context `auth` state, `_authenticated` layout route, `onAuthStateChange` cache invalidation at root
+- Default new signups → `member` role
 
-| Tier | Price | What it unlocks |
-|---|---|---|
-| Basic Submission | $50 | Submit music for standard review |
-| Featured Spotlight | $150 | Spotlight listing + priority placement |
-| Premium Spotlight | $300 | Guaranteed live segment + top of queue |
+### 2. Database (one migration)
+- `profiles` (id = auth.users.id, display_name, avatar_url, bio)
+- `streams` (id, host_id, title, room_name, status: idle/live/ended, started_at, ended_at)
+- `stream_messages` (id, stream_id, user_id, body, created_at) — realtime enabled
+- Trigger to auto-create profile on `auth.users` insert
+- Extend `app_role` enum
+- RLS:
+  - `profiles`: public read, self-update
+  - `streams`: public read, host/admin write
+  - `stream_messages`: authenticated read+insert, author/moderator/admin delete
 
-Created via `payments--create_product` with `tax_code: txcd_10000000` (digital goods) so they're eligible if you ever turn on Stripe tax handling.
+### 3. LiveKit
+- `src/lib/livekit.functions.ts` — `createLiveKitToken({ roomName, identity, isHost })` server fn (uses `livekit-server-sdk`)
+- Install `livekit-client` + `@livekit/components-react` + `livekit-server-sdk`
+- Wire `/stream-studio` controls to real LiveKit room:
+  - "Go Live" → creates `streams` row + joins room as publisher
+  - Mic / Camera / Screen Share / End Stream → real LiveKit toggles
+  - Participant tiles render real video tracks (replace static images)
+  - Network quality indicator from LiveKit connection stats
+- Invite link: `/stream/:roomName?token=<guest-token>` — guest joins as subscriber+publisher
 
-### 2. Database
+### 4. Realtime Chat
+- Replace static ChatPanel messages with `stream_messages` for the current stream
+- Send via authenticated insert; subscribe via Supabase Realtime
+- Show display_name + role badge
 
-New table `live_submissions`:
-- artist_name, email, song_link, message
-- tier (`basic` | `featured` | `premium`)
-- amount_cents, status (`pending` | `paid` | `cancelled`)
-- queue_status (`queued` | `next_up` | `live` | `done`) — defaults `queued` once paid
-- stripe_session_id, stripe_payment_intent_id, paid_at
-- created_at
+## Files
 
-RLS:
-- anon + authenticated can INSERT (anyone can start a submission)
-- only admins (`has_role`) can SELECT / UPDATE (queue management)
-- no DELETE
+**Created**
+- `supabase/migrations/<ts>_phase1.sql`
+- `src/routes/login.tsx`, `signup.tsx`, `forgot-password.tsx`, `reset-password.tsx`
+- `src/routes/_authenticated.tsx`
+- `src/routes/stream.$room.tsx` (guest viewer/joiner)
+- `src/lib/auth-context.tsx` (hook + provider context)
+- `src/lib/livekit.functions.ts`
+- `src/lib/streams.functions.ts` (start/end stream, send message)
+- `src/components/stream/LiveKitRoom.tsx` (wraps `@livekit/components-react`)
+- `src/components/stream/LiveChat.tsx` (realtime)
 
-### 3. Checkout flow (embedded, same pattern as bookings)
+**Edited**
+- `src/routes/__root.tsx` — auth context + onAuthStateChange invalidation
+- `src/router.tsx` — context typing
+- `src/routes/stream-studio.tsx` — move under `_authenticated`, wire controls to LiveKit + chat
+- `src/start.ts` — verify `attachSupabaseAuth` present
 
-- New server fn `createLiveSubmissionCheckout` in `src/lib/live-submission-checkout.functions.ts`:
-  1. Insert row into `live_submissions` with `status='pending'`.
-  2. Create Stripe Checkout Session (`ui_mode: embedded_page`, `mode: payment`) using the tier's `lookup_key`, with `metadata.submission_id`.
-  3. Return `clientSecret` + `submissionId`.
-- New server fn `getLiveSubmissionStatus` to poll status after return.
-- Webhook: extend the existing `src/routes/api/public/payments/webhook.ts` to handle `checkout.session.completed` for `live_submissions` (match on `metadata.submission_id`) → mark `paid`, store `paid_at`, payment_intent.
+## Out of scope (Phase 2+)
+Stripe tips, on-deck queue persistence + drag/drop, analytics aggregation, admin moderation panel, notifications, storage uploads, recordings, ban/timeout, super chats.
 
-### 4. UI — `/live-review`
-
-Replace the current "Submit Music For Live Review" section with a paywall flow:
-
-1. **Locked state (default):** Three tier cards (Basic / Featured / Premium) with feature lists and a "Unlock with Stripe" button. The submission form is rendered blurred with a lock overlay below.
-2. **Tier selected:** Inline embedded Stripe checkout opens (reuse `StripeEmbeddedCheckout` pattern, with a new `createLiveSubmissionCheckout` server fn). The artist captures email + song details first, *then* pays — fields submitted alongside the checkout session creation.
-3. **After payment:** Return URL is `/live-review/success?submission_id=…`. That page polls `getLiveSubmissionStatus`; on `paid` it shows a success card with the tier badge and confirms the artist is in the queue.
-
-### 5. Admin queue — `/admin/live-queue`
-
-Protected by existing `_authenticated` + `has_role('admin')` pattern (same as `/admin/bookings`):
-- Table of paid submissions, filter by tier.
-- Buttons per row: **Next Up**, **Now Live**, **Done**.
-- Updates `queue_status` via a `updateSubmissionQueueStatus` server fn (admin-only middleware).
-
-### Out of scope (call out, not building this turn)
-- Cover image upload for Featured/Premium spotlights (would need Storage + a separate upload UI). Can add next turn — say the word.
-- Live "Now Featured" overlay on the public live player driven by the admin queue. Easy follow-up once the queue exists.
-- Refunds / cancellation UI.
-
-### Technical notes
-
-- All Stripe calls go through `createStripeClient` (already in `src/lib/stripe.server.ts`).
-- Reuses the existing `STRIPE_SANDBOX_API_KEY` / `STRIPE_LIVE_API_KEY` and webhook secrets — no new secrets needed.
-- Test cards in sandbox: `4242 4242 4242 4242`.
-
-Reply **approve** and I'll build it end to end.
+## Acceptance
+- Sign up → land logged in on `/stream-studio`
+- Click "Go Live" → camera/mic publish, badge shows LIVE, row in `streams`
+- Open invite link in a second browser → see/hear the host, can publish own video
+- Chat messages appear on both sides instantly
+- All existing pages (`/live-review`, `/studio`, `/admin.*`, etc.) untouched
