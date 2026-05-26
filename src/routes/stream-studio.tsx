@@ -544,6 +544,53 @@ function Meter({ label, color }: { label: string; color: string }) {
 /* ---------- Main ---------- */
 function StreamStudio() {
   const [mode, setMode] = useState<"review" | "podcast">("review");
+  const auth = useAuth();
+  const nav = useNavigate();
+  const startFn = useServerFn(startOrResumeStream);
+  const endFn = useServerFn(endStream);
+  const tokenFn = useServerFn(getLiveKitToken);
+  const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
+  const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
+  const [going, setGoing] = useState(false);
+
+  useEffect(() => {
+    if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
+  }, [auth.loading, auth.isAuthenticated, nav]);
+
+  const goLive = async () => {
+    if (going) return;
+    setGoing(true);
+    try {
+      const s = await startFn({ data: { title: "BWF Live: Unsigned Artist Review" } });
+      const t = await tokenFn({ data: { roomName: s.room_name, isHost: true } });
+      setStream(s);
+      setLk({ token: t.token, wsUrl: t.wsUrl });
+      toast.success("You're live");
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to go live");
+    } finally {
+      setGoing(false);
+    }
+  };
+
+  const stop = async () => {
+    if (stream) {
+      try { await endFn({ data: { streamId: stream.id } }); } catch {}
+    }
+    setLk(null);
+    setStream(null);
+    toast.success("Stream ended");
+  };
+
+  const copyInvite = () => {
+    if (!stream) return toast.error("Go live first");
+    const url = `${window.location.origin}/stream/${stream.room_name}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Invite link copied");
+  };
+
+  if (auth.loading) return <div className="min-h-screen bg-[#050509]" />;
+
   return (
     <div className="min-h-screen bg-[#050509] text-white">
       <div className="flex min-h-screen">
@@ -555,10 +602,10 @@ function StreamStudio() {
               {/* Header */}
               <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
                 <span className="flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-widest text-white">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> {lk ? "LIVE" : "OFFLINE"}
                 </span>
                 <div className="flex items-center gap-1.5 text-base font-bold text-white">
-                  BWF Live: Unsigned Artist Review
+                  {stream?.title || "BWF Live: Unsigned Artist Review"}
                   <CheckCircle2 className="h-4 w-4" style={{ color: BLUE }} />
                 </div>
                 <div className="flex gap-1 rounded-lg bg-white/5 p-1">
@@ -576,9 +623,12 @@ function StreamStudio() {
                   </button>
                 </div>
                 <div className="ml-auto flex items-center gap-3 text-xs text-white/70">
-                  <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> 1,245</span>
-                  <span className="flex items-center gap-1"><Circle className="h-2 w-2 fill-red-500 text-red-500" /> 01:23:47</span>
-                  <button className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5">
+                  {!lk && (
+                    <button onClick={goLive} disabled={going} className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+                      <Radio className="h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live"}
+                    </button>
+                  )}
+                  <button onClick={copyInvite} className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5">
                     <Share2 className="h-3 w-3" /> Share
                   </button>
                   <button className="rounded-md border border-white/10 p-1.5 hover:bg-white/5">
@@ -587,13 +637,19 @@ function StreamStudio() {
                 </div>
               </div>
 
-              {/* Split video */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" image={hostImg} />
-                <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" image={guestImg} />
-              </div>
-
-              <StreamControls />
+              {lk ? (
+                <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} />
+              ) : (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" image={hostImg} />
+                    <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" image={guestImg} />
+                  </div>
+                  <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
+                    Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
+                  </div>
+                </>
+              )}
 
               {/* Three panels */}
               <div className="grid gap-4 lg:grid-cols-3">
@@ -603,8 +659,7 @@ function StreamStudio() {
               </div>
             </div>
 
-            {/* Chat */}
-            <ChatPanel />
+            <LiveChat streamId={stream?.id ?? null} auth={auth} />
           </div>
 
           <OnAirBar />
