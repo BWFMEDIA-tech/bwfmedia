@@ -51,8 +51,54 @@ async function markLiveSubmissionPaid(session: any) {
   if (error) console.error('Webhook: failed to mark live submission paid', error);
 }
 
+async function recordTip(session: any) {
+  const meta = session.metadata || {};
+  const streamId = meta.streamId as string | undefined;
+  if (!streamId) {
+    console.warn('Tip webhook missing streamId metadata', session.id);
+    return;
+  }
+  const userId = (meta.tipUserId as string) || null;
+  const displayName = (meta.tipDisplayName as string) || 'Anonymous';
+  const message = (meta.tipMessage as string) || '';
+  const amount = session.amount_total ?? 0;
+  const supabase = getSupabase();
+
+  const { data: tipRow, error: tipErr } = await supabase
+    .from('tips')
+    .upsert({
+      stream_id: streamId,
+      user_id: userId,
+      display_name: displayName,
+      amount_cents: amount,
+      message,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: session.payment_intent ?? null,
+      status: 'paid',
+      paid_at: new Date().toISOString(),
+    }, { onConflict: 'stripe_session_id' })
+    .select('id')
+    .maybeSingle();
+  if (tipErr) {
+    console.error('Tip insert failed', tipErr);
+    return;
+  }
+
+  // Post a system super-chat message in the stream chat so viewers see it.
+  if (userId) {
+    const dollars = (amount / 100).toFixed(2);
+    const body = `💎 TIP $${dollars}${message ? ` — ${message}` : ''}`;
+    await supabase.from('stream_messages').insert({
+      stream_id: streamId,
+      user_id: userId,
+      body,
+    });
+  }
+}
+
 function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
+  if (meta.kind === 'tip') return recordTip(session);
   if (meta.submissionType === 'live_review') return markLiveSubmissionPaid(session);
   if (meta.bookingTable) return markBookingPaid(session);
   console.warn('Webhook: session has no recognized metadata', session.id);

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
+import { TipModal } from "@/components/stream/TipModal";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -16,10 +17,24 @@ type ChatRow = {
   display_name: string | null;
 };
 
-export function LiveChat({ streamId, auth }: { streamId: string | null; auth: AuthState }) {
+export function LiveChat({
+  streamId,
+  auth,
+  viewerCount = 0,
+  startedAt = null,
+}: {
+  streamId: string | null;
+  auth: AuthState;
+  viewerCount?: number;
+  startedAt?: string | null;
+}) {
   const [messages, setMessages] = useState<ChatRow[]>([]);
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
+  const [tipsTotalCents, setTipsTotalCents] = useState(0);
+  const [tipsCount, setTipsCount] = useState(0);
+  const [showTip, setShowTip] = useState(false);
+  const [durationLabel, setDurationLabel] = useState("00:00");
   const profileCache = useRef<Record<string, string>>({});
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +75,55 @@ export function LiveChat({ streamId, auth }: { streamId: string | null; auth: Au
     return () => { cancelled = true; supabase.removeChannel(channel); };
   }, [streamId]);
 
+  // Tips: initial load + realtime
+  useEffect(() => {
+    if (!streamId) { setTipsTotalCents(0); setTipsCount(0); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("tips")
+        .select("amount_cents")
+        .eq("stream_id", streamId)
+        .eq("status", "paid");
+      if (cancelled || !data) return;
+      setTipsCount(data.length);
+      setTipsTotalCents(data.reduce((s: number, r: any) => s + (r.amount_cents || 0), 0));
+    })();
+    const ch = supabase
+      .channel(`stream-tips-${streamId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tips", filter: `stream_id=eq.${streamId}` },
+        (payload) => {
+          const row = (payload.new || payload.old) as any;
+          if (!row || row.status !== "paid") return;
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            setTipsCount((c) => c + (payload.eventType === "INSERT" ? 1 : 0));
+            setTipsTotalCents((s) => s + (payload.eventType === "INSERT" ? row.amount_cents : 0));
+          }
+        })
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [streamId]);
+
+  // Live duration ticker
+  useEffect(() => {
+    if (!startedAt) { setDurationLabel("00:00"); return; }
+    const tick = () => {
+      const ms = Date.now() - new Date(startedAt).getTime();
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const hh = Math.floor(s / 3600);
+      const mm = Math.floor((s % 3600) / 60);
+      const ss = s % 60;
+      setDurationLabel(
+        hh > 0
+          ? `${hh}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`
+          : `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`,
+      );
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [startedAt]);
+
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages.length]);
@@ -84,7 +148,7 @@ export function LiveChat({ streamId, auth }: { streamId: string | null; auth: Au
       <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
         <span className="text-xs font-bold tracking-widest text-white">LIVE CHAT</span>
         <div className="flex items-center gap-2 text-[11px] text-white/60">
-          <Users className="h-3 w-3" /> {messages.length}
+          <Users className="h-3 w-3" /> {viewerCount || 0}
         </div>
       </div>
       <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto p-4 max-h-[420px]">
@@ -94,22 +158,30 @@ export function LiveChat({ streamId, auth }: { streamId: string | null; auth: Au
         {streamId && messages.length === 0 && (
           <div className="text-center text-xs text-white/40">Say hi to kick off the conversation 👋</div>
         )}
-        {messages.map((c) => (
-          <div key={c.id} className="flex gap-2 rounded-lg p-2">
+        {messages.map((c) => {
+          const isTip = c.body.startsWith("💎 TIP");
+          return (
+          <div
+            key={c.id}
+            className={cn("flex gap-2 rounded-lg p-2", isTip && "border border-white/10")}
+            style={isTip ? { background: `linear-gradient(135deg, ${PURPLE}33, ${BLUE}33)` } : undefined}
+          >
             <div className="h-7 w-7 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1 text-[11px]">
                 <span className="font-bold text-white">{c.display_name || "Anon"}</span>
                 {c.user_id === auth.user?.id && <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />}
+                {isTip && <Sparkles className="h-3 w-3" style={{ color: PURPLE }} />}
                 <span className="ml-auto text-[10px] text-white/40">
                   {new Date(c.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
-              <div className="mt-0.5 break-words text-xs text-white/80">{c.body}</div>
+              <div className={cn("mt-0.5 break-words text-xs", isTip ? "font-semibold text-white" : "text-white/80")}>{c.body}</div>
             </div>
             <button className="self-start"><Heart className="h-3.5 w-3.5 text-white/30" /></button>
           </div>
-        ))}
+          );
+        })}
       </div>
       <div className="border-t border-white/5 p-3">
         <div className="mb-2 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-2">
@@ -133,7 +205,10 @@ export function LiveChat({ streamId, auth }: { streamId: string | null; auth: Au
             ))}
           </div>
           <button
-            onClick={() => toast.info("Tips coming soon")}
+            onClick={() => {
+              if (!streamId) { toast.error("Stream not live yet"); return; }
+              setShowTip(true);
+            }}
             className="flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white"
             style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
           >
@@ -148,13 +223,18 @@ export function LiveChat({ streamId, auth }: { streamId: string | null; auth: Au
           <BarChart3 className="h-3.5 w-3.5 text-white/40" />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <Stat icon={Eye} label="Viewers" value="—" color={BLUE} />
+          <Stat icon={Eye} label="Viewers" value={String(viewerCount || 0)} color={BLUE} />
           <Stat icon={Heart} label="Messages" value={String(messages.length)} color="#ec4899" />
-          <Stat icon={DollarSign} label="Tips" value="$0" color="#22c55e" />
-          <Stat icon={Share2} label="Shares" value="—" color={PURPLE} />
-          <Stat icon={Circle} label="Status" value={streamId ? "LIVE" : "OFF"} color="#f59e0b" />
+          <Stat icon={DollarSign} label="Tips" value={`$${(tipsTotalCents / 100).toFixed(0)}`} color="#22c55e" />
+          <Stat icon={Sparkles} label="Tip Count" value={String(tipsCount)} color={PURPLE} />
+          <Stat icon={Circle} label="Duration" value={durationLabel} color="#f59e0b" />
+          <Stat icon={Circle} label="Status" value={streamId ? "LIVE" : "OFF"} color="#22c55e" />
         </div>
       </div>
+
+      {showTip && streamId && (
+        <TipModal streamId={streamId} auth={auth} onClose={() => setShowTip(false)} />
+      )}
     </aside>
   );
 }

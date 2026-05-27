@@ -340,6 +340,50 @@ export type Database = {
           },
         ]
       }
+      stream_recordings: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          host_id: string
+          id: string
+          public_url: string | null
+          size_bytes: number | null
+          status: string
+          storage_path: string
+          stream_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          host_id: string
+          id?: string
+          public_url?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path: string
+          stream_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          host_id?: string
+          id?: string
+          public_url?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path?: string
+          stream_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_recordings_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       streams: {
         Row: {
           created_at: string
@@ -462,6 +506,56 @@ export type Database = {
           reason?: string
         }
         Relationships: []
+      }
+      tips: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          display_name: string | null
+          id: string
+          message: string | null
+          paid_at: string | null
+          status: string
+          stream_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          message?: string | null
+          paid_at?: string | null
+          status?: string
+          stream_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          message?: string | null
+          paid_at?: string | null
+          status?: string
+          stream_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tips_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
