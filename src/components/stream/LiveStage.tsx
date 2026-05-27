@@ -24,9 +24,10 @@ interface LiveStageProps {
   onInvite: () => void;
   hostImage?: string;
   guestImage?: string;
+  onViewerCount?: (n: number) => void;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount }: LiveStageProps) {
   return (
     <LiveKitRoom
       token={token}
@@ -37,12 +38,12 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       onError={(e) => toast.error(`Stream error: ${e.message}`)}
       className="contents"
     >
-      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} />
+      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} />
     </LiveKitRoom>
   );
 }
 
-function StageInner({ onEnd, onInvite, hostImage, guestImage }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string }) {
+function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -52,6 +53,10 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage }: { onEnd: () => v
   );
   const participants = useParticipants();
   const cameraTracks = tracks.filter((t) => t.source === Track.Source.Camera);
+
+  useEffect(() => {
+    onViewerCount?.(participants.length);
+  }, [participants.length, onViewerCount]);
 
   // Pick the first two for the two-up layout (host + guest)
   const slots = [0, 1].map((i) => cameraTracks[i] ?? null);
