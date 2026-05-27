@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { createStripeClient, getStripeErrorMessage, type StripeEnv } from '@/lib/stripe.server';
+import { createStripeClient, type StripeEnv } from '@/lib/stripe.server';
 import { validateReturnUrl } from '@/lib/validate-return-url';
 
 const Schema = z.object({
@@ -45,6 +45,7 @@ export const createTipCheckout = createServerFn({ method: 'POST' })
       });
       return { clientSecret: session.client_secret ?? '' };
     } catch (err) {
-      return { error: getStripeErrorMessage(err) };
+      const msg = err instanceof Error ? err.message : 'Stripe request failed';
+      return { error: msg };
     }
   });
