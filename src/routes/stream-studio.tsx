@@ -552,6 +552,8 @@ function StreamStudio() {
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [going, setGoing] = useState(false);
+  const [viewerCount, setViewerCount] = useState(0);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
@@ -565,6 +567,7 @@ function StreamStudio() {
       const t = await tokenFn({ data: { roomName: s.room_name, isHost: true } });
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
+      setStartedAt(new Date().toISOString());
       toast.success("You're live");
     } catch (e: any) {
       toast.error(e?.message || "Failed to go live");
@@ -579,6 +582,8 @@ function StreamStudio() {
     }
     setLk(null);
     setStream(null);
+    setStartedAt(null);
+    setViewerCount(0);
     toast.success("Stream ended");
   };
 
@@ -638,7 +643,7 @@ function StreamStudio() {
               </div>
 
               {lk ? (
-                <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} />
+                <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} />
               ) : (
                 <>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -659,7 +664,7 @@ function StreamStudio() {
               </div>
             </div>
 
-            <LiveChat streamId={stream?.id ?? null} auth={auth} />
+            <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} />
           </div>
 
           <OnAirBar />
