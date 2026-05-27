@@ -1,11 +1,10 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listMyRecordings, deleteRecording } from '@/lib/recordings.functions';
 import { useAuth } from '@/lib/auth-context';
 import { Trash2, Radio, ArrowLeft, Film } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 
 export const Route = createFileRoute('/recordings')({
   head: () => ({

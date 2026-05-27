@@ -16,6 +16,7 @@ import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveReviewRouteImport } from './routes/live-review'
@@ -80,6 +81,11 @@ const SignupRoute = SignupRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecordingsRoute = RecordingsRouteImport.update({
+  id: '/recordings',
+  path: '/recordings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -326,6 +334,7 @@ export interface FileRoutesById {
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/recordings'
     | '/reset-password'
     | '/signup'
     | '/sitemap.xml'
@@ -406,6 +416,7 @@ export interface FileRouteTypes {
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/recordings'
     | '/reset-password'
     | '/signup'
     | '/sitemap.xml'
@@ -445,6 +456,7 @@ export interface FileRouteTypes {
     | '/live-review'
     | '/login'
     | '/off-the-block'
+    | '/recordings'
     | '/reset-password'
     | '/signup'
     | '/sitemap.xml'
@@ -485,6 +497,7 @@ export interface RootRouteChildren {
   LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  RecordingsRoute: typeof RecordingsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recordings': {
+      id: '/recordings'
+      path: '/recordings'
+      fullPath: '/recordings'
+      preLoaderRoute: typeof RecordingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-the-block': {
@@ -810,6 +830,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  RecordingsRoute: RecordingsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
