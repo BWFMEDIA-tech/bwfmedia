@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { RecordButton } from "./RecordButton";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -25,9 +26,10 @@ interface LiveStageProps {
   hostImage?: string;
   guestImage?: string;
   onViewerCount?: (n: number) => void;
+  streamId?: string;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId }: LiveStageProps) {
   return (
     <LiveKitRoom
       token={token}
@@ -38,12 +40,12 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       onError={(e) => toast.error(`Stream error: ${e.message}`)}
       className="contents"
     >
-      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} />
+      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} />
     </LiveKitRoom>
   );
 }
 
-function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void }) {
+function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -67,7 +69,7 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount }: {
         <StageTile track={slots[0]} label="HOST" fallbackImage={hostImage} />
         <StageTile track={slots[1]} label="GUEST" fallbackImage={guestImage} placeholder={`Waiting for guest (${Math.max(0, participants.length - 1)} in room)`} />
       </div>
-      <StreamControlBar onEnd={onEnd} onInvite={onInvite} />
+      <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />
     </>
   );
 }
@@ -112,7 +114,7 @@ function StageTile({ track, label, fallbackImage, placeholder }: { track: any; l
   );
 }
 
-function StreamControlBar({ onEnd, onInvite }: { onEnd: () => void; onInvite: () => void }) {
+function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; onInvite: () => void; streamId?: string }) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
   const [micOn, setMicOn] = useState(true);
@@ -167,6 +169,7 @@ function StreamControlBar({ onEnd, onInvite }: { onEnd: () => void; onInvite: ()
       <CtrlBtn icon={camOn ? Camera : CameraOff} label={camOn ? "Stop Cam" : "Start Cam"} onClick={toggleCam} active={!camOn} />
       <CtrlBtn icon={MonitorUp} label={sharing ? "Stop Share" : "Share Screen"} onClick={toggleShare} active={sharing} />
       <CtrlBtn icon={UserPlus} label="Invite Guest" onClick={onInvite} />
+      {streamId && <RecordButton streamId={streamId} />}
       <CtrlBtn icon={Settings} label="Settings" onClick={() => toast.info("Device settings coming soon")} />
       <button
         onClick={async () => { await room?.disconnect(); onEnd(); }}
