@@ -643,7 +643,7 @@ function StreamStudio() {
               </div>
 
               {lk ? (
-                <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} />
+                <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
               ) : (
                 <>
                   <div className="grid gap-4 sm:grid-cols-2">
