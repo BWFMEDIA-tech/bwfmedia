@@ -40,7 +40,7 @@ export function TipModal({
         streamId,
         amountCents: Math.round(finalAmount * 100),
         message: message || undefined,
-        displayName: auth.profile?.display_name || auth.user?.email || "Anonymous",
+        displayName: auth.displayName || auth.user?.email || "Anonymous",
         userId: auth.user?.id,
         returnUrl: `${window.location.origin}/stream-studio?tip=success`,
         environment: getStripeEnvironment(),
