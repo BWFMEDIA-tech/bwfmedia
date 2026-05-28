@@ -21,6 +21,13 @@ import { startOrResumeStream, endStream } from "@/lib/streams.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { useStageState } from "@/lib/useStageState";
+import { ModeToggle } from "@/components/stream/ModeToggle";
+import { StageRoom } from "@/components/stream/StageRoom";
+import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
+import { BackstageQueue } from "@/components/stream/BackstageQueue";
+import { GreenRoom } from "@/components/stream/GreenRoom";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -554,6 +561,24 @@ function StreamStudio() {
   const [going, setGoing] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
   const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
+  const [stageLocked, setStageLocked] = useState(false);
+  const { participants, hands, queue } = useStageState(stream?.id ?? null);
+
+  // Subscribe to stream row to track mode/lock changes
+  useEffect(() => {
+    if (!stream?.id) return;
+    const ch = supabase
+      .channel(`stream-row-${stream.id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${stream.id}` },
+        (p) => {
+          const r = p.new as any;
+          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
+          setStageLocked(!!r.stage_locked);
+        })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [stream?.id]);
 
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
@@ -568,6 +593,13 @@ function StreamStudio() {
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
       setStartedAt(new Date().toISOString());
+      // Register host as stage participant
+      if (auth.user) {
+        await supabase.from("stage_participants").upsert(
+          { stream_id: s.id, user_id: auth.user.id, stage_role: "host" },
+          { onConflict: "stream_id,user_id" },
+        );
+      }
       toast.success("You're live");
     } catch (e: any) {
       toast.error(e?.message || "Failed to go live");
@@ -656,12 +688,21 @@ function StreamStudio() {
                 </>
               )}
 
-              {/* Three panels */}
+              {/* Mode toggle */}
+              <ModeToggle streamId={stream?.id ?? null} mode={streamMode} stageLocked={stageLocked} />
+
+              {/* Stage room (shows always; richer in stage mode) */}
+              {stream?.id && <StageRoom streamId={stream.id} participants={participants} canManage />}
+
+              {/* Three live panels */}
               <div className="grid gap-4 lg:grid-cols-3">
-                <JoinRequests />
-                <OnDeck />
-                <InviteGuest />
+                <RaiseHandPanel hands={hands} />
+                <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />
+                <GreenRoom streamId={stream?.id ?? null} participants={participants} />
               </div>
+
+              {/* Invite link */}
+              <InviteGuest />
             </div>
 
             <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} />

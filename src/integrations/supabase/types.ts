@@ -74,6 +74,62 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_timeouts: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          issued_by: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          issued_by: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          issued_by?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_timeouts_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_word_filter: {
+        Row: {
+          added_by: string
+          created_at: string
+          id: string
+          word: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          id?: string
+          word: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          id?: string
+          word?: string
+        }
+        Relationships: []
+      }
       deck_leads: {
         Row: {
           company: string | null
@@ -308,6 +364,70 @@ export type Database = {
         }
         Relationships: []
       }
+      raise_hand_requests: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raise_hand_requests_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stage_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          stage_role: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          stage_role?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          stage_role?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stage_participants_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_messages: {
         Row: {
           body: string
@@ -333,6 +453,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "stream_messages_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stream_queue: {
+        Row: {
+          created_at: string
+          genre: string | null
+          id: string
+          position: number
+          status: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          genre?: string | null
+          id?: string
+          position?: number
+          status?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          genre?: string | null
+          id?: string
+          position?: number
+          status?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_queue_stream_id_fkey"
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
@@ -390,7 +548,9 @@ export type Database = {
           ended_at: string | null
           host_id: string
           id: string
+          mode: string
           room_name: string
+          stage_locked: boolean
           started_at: string | null
           status: string
           title: string
@@ -401,7 +561,9 @@ export type Database = {
           ended_at?: string | null
           host_id: string
           id?: string
+          mode?: string
           room_name: string
+          stage_locked?: boolean
           started_at?: string | null
           status?: string
           title?: string
@@ -412,7 +574,9 @@ export type Database = {
           ended_at?: string | null
           host_id?: string
           id?: string
+          mode?: string
           room_name?: string
+          stage_locked?: boolean
           started_at?: string | null
           status?: string
           title?: string
@@ -556,6 +720,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_bans: {
+        Row: {
+          banned_by: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          banned_by: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          banned_by?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
