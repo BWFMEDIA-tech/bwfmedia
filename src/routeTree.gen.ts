@@ -15,6 +15,7 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
@@ -82,6 +83,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/off-the-block': typeof OffTheBlockRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/off-the-block': typeof OffTheBlockRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -389,6 +397,7 @@ export interface FileRoutesById {
   '/off-the-block': typeof OffTheBlockRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -437,6 +446,7 @@ export interface FileRouteTypes {
     | '/off-the-block'
     | '/recordings'
     | '/reset-password'
+    | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/off-the-block'
     | '/recordings'
     | '/reset-password'
+    | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
@@ -529,6 +540,7 @@ export interface FileRouteTypes {
     | '/off-the-block'
     | '/recordings'
     | '/reset-password'
+    | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
@@ -576,6 +588,7 @@ export interface RootRouteChildren {
   OffTheBlockRoute: typeof OffTheBlockRoute
   RecordingsRoute: typeof RecordingsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StreamStudioRoute: typeof StreamStudioRoute
@@ -647,6 +660,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -957,6 +977,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffTheBlockRoute: OffTheBlockRoute,
   RecordingsRoute: RecordingsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StreamStudioRoute: StreamStudioRoute,
