@@ -297,12 +297,57 @@ function OnDeck() {
 
 function InviteGuest() {
   const [copied, setCopied] = useState(false);
-  const link = "https://live.bwfnetwork.com/invite/bwf-host";
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const { user } = useAuth();
+  const link = typeof window !== "undefined" ? window.location.origin + "/stream-studio" : "https://bwfmedia.company/stream-studio";
   const copy = () => {
     navigator.clipboard.writeText(link);
     setCopied(true);
     toast.success("Invite link copied");
     setTimeout(() => setCopied(false), 2000);
+  };
+  const sendInvite = async () => {
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+    setSending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Please sign in to send invites");
+        return;
+      }
+      const res = await fetch("/lovable/email/transactional/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          templateName: "stream-invite",
+          recipientEmail: trimmed,
+          templateData: {
+            hostName: user?.user_metadata?.display_name || user?.email?.split("@")[0] || "A BWF host",
+            inviteUrl: link,
+          },
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json?.error) {
+        toast.error(json?.error || "Failed to send invite");
+        return;
+      }
+      toast.success("Invite sent");
+      setEmail("");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send invite");
+    } finally {
+      setSending(false);
+    }
   };
   return (
     <Panel title="INVITE GUEST">
@@ -332,14 +377,17 @@ function InviteGuest() {
         <input
           type="email"
           placeholder="artist@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none"
         />
         <button
-          onClick={() => toast.success("Invite sent")}
+          onClick={sendInvite}
+          disabled={sending}
           className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white"
           style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
         >
-          <Send className="h-3 w-3" /> Send Invite
+          <Send className="h-3 w-3" /> {sending ? "Sending..." : "Send Invite"}
         </button>
       </div>
     </Panel>
