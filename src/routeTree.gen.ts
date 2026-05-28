@@ -36,6 +36,7 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
@@ -183,6 +184,11 @@ const AdminLiveQueueRoute = AdminLiveQueueRouteImport.update({
   path: '/admin/live-queue',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin/bookings',
   path: '/admin/bookings',
@@ -262,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -302,6 +309,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -343,6 +351,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/bookings'
+    | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
     | '/artist/$id'
@@ -425,6 +435,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/bookings'
+    | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
     | '/artist/$id'
@@ -465,6 +476,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/bookings'
+    | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
     | '/artist/$id'
@@ -506,6 +518,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
   AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ArtistIdRoute: typeof ArtistIdRoute
@@ -718,6 +731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLiveQueueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/bookings': {
       id: '/admin/bookings'
       path: '/admin/bookings'
@@ -839,6 +859,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
   AdminBookingsRoute: AdminBookingsRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
   AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
   ArtistIdRoute: ArtistIdRoute,
