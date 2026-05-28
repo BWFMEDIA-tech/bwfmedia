@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { OnePager } from "@/components/site/OnePager";
-import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -12,11 +11,7 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://bwfmedia.company/" },
     ],
-    links: [
-      { rel: "canonical", href: "https://bwfmedia.company/" },
-      // Preload the hero video so the LCP candidate starts fetching with high priority.
-      { rel: "preload", as: "video", href: heroRapperVideo.url, fetchpriority: "high" },
-    ],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/" }],
   }),
   component: Index,
 });
