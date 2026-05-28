@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Save, Loader2, MessageSquare, DollarSign, Video, Hand, Mic, Film } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Save, Loader2, MessageSquare, DollarSign, Video, Hand, Mic, Film, Camera, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
@@ -35,6 +35,10 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [stats, setStats] = useState<Stats | null>(null);
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -81,17 +85,69 @@ function ProfilePage() {
     return src.split(/[\s@]+/).filter(Boolean).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
   }, [displayName, user?.email]);
 
+  const currentPhotoUrl = previewUrl || avatarUrl;
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error("Photo must be under 5MB");
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+  }
+
+  function removePreview() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function uploadPhoto(file: File): Promise<string | null> {
+    if (!user) return null;
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${user.id}/avatar.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (uploadError) {
+      toast.error(uploadError.message);
+      return null;
+    }
+    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
   async function save() {
     if (!user) return;
     setSaving(true);
+
+    let finalAvatarUrl = avatarUrl;
+
+    if (previewUrl && fileInputRef.current?.files?.[0]) {
+      setUploadingPhoto(true);
+      const uploaded = await uploadPhoto(fileInputRef.current.files[0]);
+      setUploadingPhoto(false);
+      if (uploaded) {
+        finalAvatarUrl = uploaded;
+        setAvatarUrl(uploaded);
+        removePreview();
+      }
+    }
+
     const { error } = await supabase
       .from("profiles")
       .upsert({
         id: user.id,
         display_name: displayName.trim() || null,
-        avatar_url: avatarUrl.trim() || null,
+        avatar_url: finalAvatarUrl.trim() || null,
         bio: bio.trim() || null,
       });
+
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -118,13 +174,39 @@ function ProfilePage() {
         <div className="grid md:grid-cols-[260px_1fr] gap-8">
           {/* Avatar + identity */}
           <div className="space-y-4">
-            <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-600/30 to-blue-600/30">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={displayName} className="absolute inset-0 h-full w-full object-cover" />
+            <div
+              className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-600/30 to-blue-600/30 group cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {currentPhotoUrl ? (
+                <img src={currentPhotoUrl} alt={displayName} className="absolute inset-0 h-full w-full object-cover" />
               ) : (
                 <div className="absolute inset-0 grid place-items-center text-5xl font-black text-white/30">{initials || "?"}</div>
               )}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center">
+                <Camera className="h-8 w-8 text-white" />
+              </div>
+              {uploadingPhoto && (
+                <div className="absolute inset-0 bg-black/60 grid place-items-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                </div>
+              )}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            {previewUrl && (
+              <button
+                onClick={removePreview}
+                className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-white/50 hover:text-white"
+              >
+                <X className="h-3 w-3" /> Remove preview
+              </button>
+            )}
             <div>
               <h1 className="text-2xl font-black tracking-tight">{displayName || "Unnamed"}</h1>
               <p className="text-xs text-white/50 mt-1 break-all">{user?.email}</p>
@@ -143,16 +225,24 @@ function ProfilePage() {
           {/* Edit form + stats */}
           <div className="space-y-8">
             <section>
-              <h2 className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Profile</h2>
+              <h2 className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Edit Profile</h2>
               <div className="space-y-3">
-                <Field label="Display name">
-                  <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30" />
-                </Field>
-                <Field label="Avatar URL">
-                  <input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30" />
+                <Field label="Username">
+                  <input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Your display name"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  />
                 </Field>
                 <Field label="Bio">
-                  <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="Tell people who you are…" className="w-full resize-none bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30" />
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    rows={4}
+                    placeholder="Tell people who you are…"
+                    className="w-full resize-none bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-white/30"
+                  />
                 </Field>
                 <button
                   onClick={save}
