@@ -1,6 +1,4 @@
 import { motion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
-import bwfLogo from "@/assets/bwf-logo.png";
 
 export const GOLD = "#D4A24C";
 export const GOLD_GLOW = "#F5C56B";
