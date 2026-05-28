@@ -11,8 +11,6 @@ import {
   TrendingUp,
   DollarSign,
   ArrowRight,
-  Menu,
-  X,
   Check,
   Youtube,
   Instagram,
@@ -22,7 +20,6 @@ import {
   Linkedin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import bwfLogo from "@/assets/bwf-logo.png";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 /* ---------- shared ---------- */
