@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,20 +47,21 @@ const PURPLE_GLOW = "rgba(139,92,246,0.45)";
 const BLUE = "#3b82f6";
 
 /* ---------- Sidebar ---------- */
-const NAV = [
-  { icon: LayoutDashboard, label: "Dashboard" },
-  { icon: Video, label: "Stream Now", active: true },
-  { icon: Users, label: "Artists" },
-  { icon: Compass, label: "Discover" },
-  { icon: Calendar, label: "Events" },
-  { icon: MessageSquare, label: "Messages", badge: 12 },
-  { icon: Bell, label: "Notifications", badge: 24 },
-  { icon: BarChart3, label: "Insights" },
-  { icon: DollarSign, label: "Earnings" },
-  { icon: Settings, label: "Settings" },
+const NAV: Array<{ icon: any; label: string; to: string; badge?: number }> = [
+  { icon: LayoutDashboard, label: "Dashboard", to: "/admin/dashboard" },
+  { icon: Video, label: "Stream Now", to: "/stream-studio" },
+  { icon: Users, label: "Artists", to: "/artists" },
+  { icon: Compass, label: "Discover", to: "/videos" },
+  { icon: Calendar, label: "Events", to: "/events" },
+  { icon: MessageSquare, label: "Messages", to: "/messages", badge: 12 },
+  { icon: Bell, label: "Notifications", to: "/notifications", badge: 24 },
+  { icon: BarChart3, label: "Insights", to: "/admin/dashboard" },
+  { icon: DollarSign, label: "Earnings", to: "/earnings" },
+  { icon: Settings, label: "Settings", to: "/settings" },
 ];
 
 function Sidebar() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <aside className="hidden lg:flex w-[240px] shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] p-4">
       <Link to="/" className="flex items-center gap-2 px-2 py-3">
@@ -82,30 +83,34 @@ function Sidebar() {
       </button>
 
       <nav className="mt-4 flex flex-col gap-1">
-        {NAV.map((item) => (
-          <button
-            key={item.label}
-            className={cn(
-              "group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition",
-              item.active
-                ? "bg-white/5 text-white"
-                : "text-white/60 hover:bg-white/5 hover:text-white"
-            )}
-          >
-            <span className="flex items-center gap-3">
-              <item.icon className="h-4 w-4" style={item.active ? { color: PURPLE } : undefined} />
-              {item.label}
-            </span>
-            {item.badge ? (
-              <span
-                className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-                style={{ background: PURPLE }}
-              >
-                {item.badge}
+        {NAV.map((item) => {
+          const active = pathname === item.to;
+          return (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={cn(
+                "group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition",
+                active
+                  ? "bg-white/5 text-white"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
+              )}
+            >
+              <span className="flex items-center gap-3">
+                <item.icon className="h-4 w-4" style={active ? { color: PURPLE } : undefined} />
+                {item.label}
               </span>
-            ) : null}
-          </button>
-        ))}
+              {item.badge ? (
+                <span
+                  className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
+                  style={{ background: PURPLE }}
+                >
+                  {item.badge}
+                </span>
+              ) : null}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="mt-auto rounded-xl border border-white/5 bg-white/[0.02] p-4">
