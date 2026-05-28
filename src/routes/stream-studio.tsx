@@ -705,7 +705,7 @@ function StreamStudio() {
               <InviteGuest />
             </div>
 
-            <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} />
+            <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} />
           </div>
 
           <OnAirBar />
