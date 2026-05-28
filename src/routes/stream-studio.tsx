@@ -23,7 +23,7 @@ import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
-import { StageRoom } from "@/components/stream/StageRoom";
+import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
@@ -727,7 +727,10 @@ function StreamStudio() {
               <InviteGuest />
             </div>
 
-            <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} />
+            <div className="flex flex-col gap-4">
+              <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} />
+              <AudienceRow participants={participants} />
+            </div>
           </div>
 
           <OnAirBar />
