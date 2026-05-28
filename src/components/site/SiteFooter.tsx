@@ -42,6 +42,14 @@ const menuGroups = [
       { label: "Packages", href: "/#pricing" },
     ],
   },
+  {
+    title: "Account",
+    links: [
+      { label: "Sign In", to: "/login" },
+      { label: "Sign Up", to: "/signup" },
+      { label: "Profile", to: "/profile" },
+    ],
+  },
 ];
 
 export function SiteFooter() {
