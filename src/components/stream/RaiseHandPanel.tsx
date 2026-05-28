@@ -1,4 +1,5 @@
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { respondHand } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import { CheckCircle2, ChevronRight, X as XIcon } from "lucide-react";
@@ -34,11 +35,13 @@ export function RaiseHandPanel({ hands }: { hands: HandRequest[] }) {
         <div className="flex flex-col gap-3">
           {hands.slice(0, 5).map((r) => (
             <div key={r.id} className="flex items-center gap-3">
-              {r.avatar_url ? (
-                <img src={r.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
-              ) : (
-                <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
-              )}
+              <Link to="/user/$id" params={{ id: r.user_id }} className="shrink-0">
+                {r.avatar_url ? (
+                  <img src={r.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                ) : (
+                  <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+                )}
+              </Link>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1 text-sm font-semibold text-white">
                   {r.display_name ?? "Listener"}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Send, Smile, Heart, Users, BarChart3, Eye, DollarSign, Share2, Circle, Sparkles, CheckCircle2, Shield, Trash2, Clock, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +18,7 @@ type ChatRow = {
   body: string;
   created_at: string;
   display_name: string | null;
+  avatar_url: string | null;
 };
 
 export function LiveChat({
@@ -61,7 +63,7 @@ export function LiveChat({
   const [tipsCount, setTipsCount] = useState(0);
   const [showTip, setShowTip] = useState(false);
   const [durationLabel, setDurationLabel] = useState("00:00");
-  const profileCache = useRef<Record<string, string>>({});
+  const profileCache = useRef<Record<string, { display_name: string; avatar_url: string | null }>>({});
   const listRef = useRef<HTMLDivElement>(null);
 
   // Load history + realtime
@@ -78,10 +80,10 @@ export function LiveChat({
       if (cancelled || !data) return;
       const userIds = [...new Set(data.map((r: any) => r.user_id))];
       if (userIds.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, display_name").in("id", userIds);
-        profs?.forEach((p: any) => { profileCache.current[p.id] = p.display_name; });
+        const { data: profs } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
+        profs?.forEach((p: any) => { profileCache.current[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url }; });
       }
-      setMessages(data.map((r: any) => ({ ...r, display_name: profileCache.current[r.user_id] ?? "Anon" })));
+      setMessages(data.map((r: any) => ({ ...r, display_name: profileCache.current[r.user_id]?.display_name ?? "Anon", avatar_url: profileCache.current[r.user_id]?.avatar_url ?? null })));
     })();
 
     const channel = supabase
@@ -89,13 +91,13 @@ export function LiveChat({
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "stream_messages", filter: `stream_id=eq.${streamId}` },
         async (payload) => {
           const row = payload.new as any;
-          let name = profileCache.current[row.user_id];
-          if (!name) {
-            const { data } = await supabase.from("profiles").select("display_name").eq("id", row.user_id).maybeSingle();
-            name = data?.display_name ?? "Anon";
-            profileCache.current[row.user_id] = name as string;
+          let cached = profileCache.current[row.user_id];
+          if (!cached) {
+            const { data } = await supabase.from("profiles").select("display_name, avatar_url").eq("id", row.user_id).maybeSingle();
+            cached = { display_name: data?.display_name ?? "Anon", avatar_url: data?.avatar_url ?? null };
+            profileCache.current[row.user_id] = cached;
           }
-          setMessages((cur) => [...cur, { ...row, display_name: name }]);
+          setMessages((cur) => [...cur, { ...row, display_name: cached.display_name, avatar_url: cached.avatar_url }]);
         })
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(channel); };
@@ -192,7 +194,13 @@ export function LiveChat({
             className={cn("flex gap-2 rounded-lg p-2", isTip && "border border-white/10")}
             style={isTip ? { background: `linear-gradient(135deg, ${PURPLE}33, ${BLUE}33)` } : undefined}
           >
-            <div className="h-7 w-7 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+            <Link to="/user/$id" params={{ id: c.user_id }} className="shrink-0">
+              {c.avatar_url ? (
+                <img src={c.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+              ) : (
+                <div className="h-7 w-7 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+              )}
+            </Link>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1 text-[11px]">
                 <span className="font-bold text-white">{c.display_name || "Anon"}</span>
