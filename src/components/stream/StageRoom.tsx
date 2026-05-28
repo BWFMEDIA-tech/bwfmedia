@@ -69,6 +69,7 @@ export function StageRoom({
         color={PURPLE}
         canInvite={canManage && hosts.length < MAX_HOSTS}
         onInvite={() => setInvite("host")}
+        inviteLabel="Invite Host"
       />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         {hosts.map((p) => (
