@@ -4,6 +4,8 @@ import appCss from "../styles.css?url";
 import { CartProvider } from "@/contexts/CartContext";
 import { CartButton, CartDrawer } from "@/components/CartDrawer";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
 
 function NotFoundComponent() {
   return (
