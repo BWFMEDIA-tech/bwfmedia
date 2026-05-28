@@ -137,7 +137,9 @@ function RootComponent() {
   return (
     <CartProvider>
       <PaymentTestModeBanner />
+      <SiteHeader />
       <Outlet />
+      <SiteFooter />
       <CartDrawer />
     </CartProvider>
   );
