@@ -83,7 +83,7 @@ export function SiteFooter() {
         {/* Menu columns */}
         {menuGroups.map((group) => (
           <div key={group.title}>
-            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
+            <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/70 mb-4">
               {group.title}
             </div>
             <ul className="space-y-2.5">
@@ -138,7 +138,7 @@ export function SiteFooter() {
               </a>
             ))}
           </div>
-          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40 text-center sm:text-right">
+          <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/70 text-center sm:text-right">
             © {new Date().getFullYear()} BWF Media TV — All rights reserved
           </div>
         </div>

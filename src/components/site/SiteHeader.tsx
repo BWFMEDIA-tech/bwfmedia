@@ -95,7 +95,7 @@ export function SiteHeader() {
                 <span className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase text-bone/80">
                   {auth.displayName}
                 </span>
-                <ChevronDown size={14} className="text-bone/50" />
+                <ChevronDown size={14} className="text-bone/70" />
               </button>
 
               <AnimatePresence>
