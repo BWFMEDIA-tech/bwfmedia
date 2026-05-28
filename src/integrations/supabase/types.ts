@@ -343,7 +343,10 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          genre: string | null
           id: string
+          interests: string[] | null
+          stage_name: string | null
           updated_at: string
         }
         Insert: {
@@ -351,7 +354,10 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          genre?: string | null
           id: string
+          interests?: string[] | null
+          stage_name?: string | null
           updated_at?: string
         }
         Update: {
@@ -359,7 +365,10 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          genre?: string | null
           id?: string
+          interests?: string[] | null
+          stage_name?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -891,7 +900,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "host" | "artist" | "moderator" | "member"
+      app_role:
+        | "admin"
+        | "user"
+        | "host"
+        | "artist"
+        | "moderator"
+        | "member"
+        | "listener"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1019,7 +1035,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "host", "artist", "moderator", "member"],
+      app_role: [
+        "admin",
+        "user",
+        "host",
+        "artist",
+        "moderator",
+        "member",
+        "listener",
+      ],
     },
   },
 } as const

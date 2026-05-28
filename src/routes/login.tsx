@@ -18,11 +18,18 @@ function LoginPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Signed in");
-    nav({ to: "/stream-studio" });
+    const uid = data.user?.id;
+    let dest: "/stream-studio" | "/" = "/stream-studio";
+    if (uid) {
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+      const list = (roles ?? []).map((r: any) => r.role);
+      if (list.includes("listener") && !list.includes("artist")) dest = "/";
+    }
+    nav({ to: dest });
   };
 
   const google = async () => {
