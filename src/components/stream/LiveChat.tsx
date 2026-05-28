@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Send, Smile, Heart, Users, BarChart3, Eye, DollarSign, Share2, Circle, Sparkles, CheckCircle2 } from "lucide-react";
+import { Send, Smile, Heart, Users, BarChart3, Eye, DollarSign, Share2, Circle, Sparkles, CheckCircle2, Shield, Trash2, Clock, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
 import { TipModal } from "@/components/stream/TipModal";
+import { useServerFn } from "@tanstack/react-start";
+import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -22,12 +24,36 @@ export function LiveChat({
   auth,
   viewerCount = 0,
   startedAt = null,
+  hostId = null,
 }: {
   streamId: string | null;
   auth: AuthState;
   viewerCount?: number;
   startedAt?: string | null;
+  hostId?: string | null;
 }) {
+  const delFn = useServerFn(deleteMessage);
+  const toFn = useServerFn(timeoutUser);
+  const banFn = useServerFn(banUser);
+  const canMod =
+    auth.roles.includes("admin") || auth.roles.includes("moderator") ||
+    (!!hostId && auth.user?.id === hostId);
+
+  const onDelete = async (id: string) => {
+    if (!streamId) return;
+    try { await delFn({ data: { messageId: id, streamId } }); toast.success("Message removed"); }
+    catch (e: any) { toast.error(e?.message || "Failed"); }
+  };
+  const onTimeout = async (uid: string) => {
+    if (!streamId) return;
+    try { await toFn({ data: { streamId, targetUserId: uid, minutes: 10 } }); toast.success("User timed out 10m"); }
+    catch (e: any) { toast.error(e?.message || "Failed"); }
+  };
+  const onBan = async (uid: string) => {
+    if (!confirm("Ban this user from the platform?")) return;
+    try { await banFn({ data: { targetUserId: uid, reason: "chat abuse" } }); toast.success("User banned"); }
+    catch (e: any) { toast.error(e?.message || "Failed"); }
+  };
   const [messages, setMessages] = useState<ChatRow[]>([]);
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
@@ -177,6 +203,14 @@ export function LiveChat({
                 </span>
               </div>
               <div className={cn("mt-0.5 break-words text-xs", isTip ? "font-semibold text-white" : "text-white/80")}>{c.body}</div>
+              {canMod && c.user_id !== auth.user?.id && (
+                <div className="mt-1 flex items-center gap-2 text-[10px] text-white/40">
+                  <Shield className="h-3 w-3" />
+                  <button onClick={() => onDelete(c.id)} className="hover:text-white inline-flex items-center gap-0.5"><Trash2 className="h-3 w-3" />Delete</button>
+                  <button onClick={() => onTimeout(c.user_id)} className="hover:text-white inline-flex items-center gap-0.5"><Clock className="h-3 w-3" />Timeout</button>
+                  <button onClick={() => onBan(c.user_id)} className="hover:text-red-400 inline-flex items-center gap-0.5"><Ban className="h-3 w-3" />Ban</button>
+                </div>
+              )}
             </div>
             <button className="self-start"><Heart className="h-3.5 w-3.5 text-white/30" /></button>
           </div>

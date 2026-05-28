@@ -2,7 +2,10 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getGuestLiveKitToken } from "@/lib/livekit.functions";
+import { getStreamByRoom } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
+import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
+import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/stream/$room")({
@@ -13,9 +16,16 @@ export const Route = createFileRoute("/stream/$room")({
 function GuestPage() {
   const { room } = useParams({ from: "/stream/$room" });
   const tokenFn = useServerFn(getGuestLiveKitToken);
+  const streamFn = useServerFn(getStreamByRoom);
+  const auth = useAuth();
   const [name, setName] = useState("");
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
+  const [streamId, setStreamId] = useState<string | null>(null);
+
+  useEffect(() => {
+    streamFn({ data: { roomName: room } }).then((s) => setStreamId(s?.id ?? null)).catch(() => {});
+  }, [room]);
 
   const join = async () => {
     if (!name.trim()) return;
@@ -48,6 +58,11 @@ function GuestPage() {
     <div className="min-h-screen bg-[#050509] text-white p-4">
       <div className="mx-auto max-w-5xl flex flex-col gap-4">
         <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} />
+        {streamId && (
+          <div className="flex justify-center">
+            <RaiseHandButton streamId={streamId} auth={auth} />
+          </div>
+        )}
       </div>
     </div>
   );
