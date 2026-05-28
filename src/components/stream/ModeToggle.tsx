@@ -11,14 +11,19 @@ export function ModeToggle({
   streamId,
   mode,
   stageLocked,
+  onLocalChange,
 }: {
   streamId: string | null;
   mode: "broadcast" | "stage";
   stageLocked: boolean;
+  onLocalChange?: (mode: "broadcast" | "stage") => void;
 }) {
   const update = useServerFn(updateStreamMode);
 
   const set = async (next: "broadcast" | "stage") => {
+    if (next === mode) return;
+    // Allow local switching before going live
+    onLocalChange?.(next);
     if (!streamId) return;
     try { await update({ data: { streamId, mode: next } }); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
@@ -33,7 +38,6 @@ export function ModeToggle({
     <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/5 bg-[#0d0d18] p-2">
       <button
         onClick={() => set("broadcast")}
-        disabled={!streamId}
         className={cn(
           "flex-1 rounded-xl px-4 py-3 text-xs font-bold tracking-widest text-white transition disabled:opacity-50",
           mode === "broadcast" ? "" : "bg-white/5 text-white/60 hover:bg-white/10",
@@ -45,7 +49,6 @@ export function ModeToggle({
       </button>
       <button
         onClick={() => set("stage")}
-        disabled={!streamId}
         className={cn(
           "flex-1 rounded-xl px-4 py-3 text-xs font-bold tracking-widest text-white transition disabled:opacity-50",
           mode === "stage" ? "" : "bg-white/5 text-white/60 hover:bg-white/10",
