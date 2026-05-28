@@ -1,4 +1,5 @@
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { setStageRole, removeStageParticipant } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import type { StageParticipant } from "@/lib/useStageState";
@@ -36,11 +37,13 @@ export function GreenRoom({ streamId, participants }: { streamId: string | null;
         <div className="flex flex-col gap-3">
           {green.map((p) => (
             <div key={p.id} className="flex items-center gap-3">
-              {p.avatar_url ? (
-                <img src={p.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
-              ) : (
-                <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
-              )}
+              <Link to="/user/$id" params={{ id: p.user_id }} className="shrink-0">
+                {p.avatar_url ? (
+                  <img src={p.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                ) : (
+                  <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+                )}
+              </Link>
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold text-white">{p.display_name ?? "Guest"}</div>
                 <div className="truncate text-[10px] text-white/50">waiting backstage</div>
