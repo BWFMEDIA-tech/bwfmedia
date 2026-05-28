@@ -679,25 +679,42 @@ function StreamStudio() {
                 </div>
               </div>
 
-              {lk ? (
-                <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
+              {/* Mode toggle — always available, switches the central view */}
+              <ModeToggle
+                streamId={stream?.id ?? null}
+                mode={streamMode}
+                stageLocked={stageLocked}
+                onLocalChange={setStreamMode}
+              />
+
+              {streamMode === "broadcast" ? (
+                lk ? (
+                  <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
+                ) : (
+                  <>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" image={hostImg} />
+                      <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" image={guestImg} />
+                    </div>
+                    <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
+                      Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
+                    </div>
+                  </>
+                )
               ) : (
-                <>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" image={hostImg} />
-                    <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" image={guestImg} />
+                stream?.id ? (
+                  <StageRoom streamId={stream.id} participants={participants} canManage />
+                ) : (
+                  <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
+                    <Mic className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />
+                    <div className="mb-1 text-sm font-bold text-white">Stage Mode (Audio)</div>
+                    <p className="mb-4 text-xs text-white/60">Audio-only rooms with speakers, listeners, raise-hand, and a backstage queue.</p>
+                    <button onClick={goLive} disabled={going} className="rounded-md px-4 py-2 text-xs font-semibold text-white disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+                      <Radio className="mr-1 inline h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live to open Stage"}
+                    </button>
                   </div>
-                  <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
-                    Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
-                  </div>
-                </>
+                )
               )}
-
-              {/* Mode toggle */}
-              <ModeToggle streamId={stream?.id ?? null} mode={streamMode} stageLocked={stageLocked} />
-
-              {/* Stage room (shows always; richer in stage mode) */}
-              {stream?.id && <StageRoom streamId={stream.id} participants={participants} canManage />}
 
               {/* Three live panels */}
               <div className="grid gap-4 lg:grid-cols-3">
