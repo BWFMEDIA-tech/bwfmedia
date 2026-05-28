@@ -186,11 +186,13 @@ function InviteModal({
                   onClick={() => onPick(p.user_id)}
                   className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-white/5"
                 >
-                  {p.avatar_url ? (
-                    <img src={p.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
-                  ) : (
-                    <div className="h-8 w-8 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
-                  )}
+                  <Link to="/user/$id" params={{ id: p.user_id }} onClick={(e) => e.stopPropagation()} className="shrink-0">
+                    {p.avatar_url ? (
+                      <img src={p.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+                    )}
+                  </Link>
                   <span className="flex-1 text-sm text-white">{p.display_name ?? "Listener"}</span>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
                     Invite
@@ -233,11 +235,13 @@ function SpeakerBubble({
         className={cn("relative rounded-full p-1", "shadow-[0_0_24px]")}
         style={{ boxShadow: `0 0 24px ${ringColor}66`, background: `conic-gradient(${ringColor}, transparent 70%, ${ringColor})` }}
       >
-        {p.avatar_url ? (
-          <img src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
-        ) : (
-          <div className="h-20 w-20 rounded-full border-2 border-[#0d0d18]" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
-        )}
+        <Link to="/user/$id" params={{ id: p.user_id }}>
+          {p.avatar_url ? (
+            <img src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
+          ) : (
+            <div className="h-20 w-20 rounded-full border-2 border-[#0d0d18]" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+          )}
+        </Link>
         <div className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0d0d18]" style={{ background: ringColor }}>
           <Mic className="h-3 w-3 text-white" />
         </div>
@@ -262,7 +266,7 @@ function SpeakerBubble({
 function ListenerBubble({ p }: { p: StageParticipant }) {
   return (
     <Link
-      to="/artist/$id"
+      to="/user/$id"
       params={{ id: p.user_id }}
       className="group flex flex-col items-center gap-1"
       title={`View ${p.display_name ?? "listener"}'s page`}
