@@ -33,6 +33,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
+import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
@@ -175,6 +176,11 @@ const VideosIdRoute = VideosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => VideosRoute,
+} as any)
+const UserIdRoute = UserIdRouteImport.update({
+  id: '/user/$id',
+  path: '/user/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StreamRoomRoute = StreamRoomRouteImport.update({
   id: '/stream/$room',
@@ -328,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/stream/$room': typeof StreamRoomRoute
+  '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -376,6 +383,7 @@ export interface FileRoutesByTo {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/stream/$room': typeof StreamRoomRoute
+  '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/stream/$room': typeof StreamRoomRoute
+  '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -475,6 +484,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/stream/$room'
+    | '/user/$id'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -523,6 +533,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/stream/$room'
+    | '/user/$id'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -571,6 +582,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/stream/$room'
+    | '/user/$id'
     | '/videos/$id'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -619,6 +631,7 @@ export interface RootRouteChildren {
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   StreamRoomRoute: typeof StreamRoomRoute
+  UserIdRoute: typeof UserIdRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -800,6 +813,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos/$id'
       preLoaderRoute: typeof VideosIdRouteImport
       parentRoute: typeof VideosRoute
+    }
+    '/user/$id': {
+      id: '/user/$id'
+      path: '/user/$id'
+      fullPath: '/user/$id'
+      preLoaderRoute: typeof UserIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/stream/$room': {
       id: '/stream/$room'
@@ -1016,6 +1036,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   StreamRoomRoute: StreamRoomRoute,
+  UserIdRoute: UserIdRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
@@ -1031,13 +1052,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
