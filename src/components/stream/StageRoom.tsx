@@ -259,24 +259,43 @@ function SpeakerBubble({
   );
 }
 
-function ListenerBubble({ p, canManage, onPromote }: { p: StageParticipant; canManage: boolean; onPromote: () => void }) {
+function ListenerBubble({ p }: { p: StageParticipant }) {
   return (
-    <button
-      onClick={canManage ? onPromote : undefined}
-      disabled={!canManage}
-      className="group flex flex-col items-center gap-1 disabled:cursor-default"
-      title={canManage ? "Promote to speaker" : undefined}
+    <Link
+      to="/artist/$id"
+      params={{ id: p.user_id }}
+      className="group flex flex-col items-center gap-1"
+      title={`View ${p.display_name ?? "listener"}'s page`}
     >
-      <div className="rounded-full p-0.5" style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}>
+      <div className="rounded-full p-0.5 transition group-hover:scale-105" style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}>
         {p.avatar_url ? (
-          <img src={p.avatar_url} alt="" className="h-12 w-12 rounded-full border border-[#0d0d18] object-cover" />
+          <img src={p.avatar_url} alt={p.display_name ?? "Listener"} className="h-12 w-12 rounded-full border border-[#0d0d18] object-cover" />
         ) : (
           <div className="h-12 w-12 rounded-full border border-[#0d0d18]" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
         )}
       </div>
       <div className="text-[10px] font-medium text-white truncate max-w-[80px]">{p.display_name ?? "Listener"}</div>
       <div className="text-[9px] text-white/40">Listener</div>
-    </button>
+    </Link>
+  );
+}
+
+export function AudienceRow({ participants }: { participants: StageParticipant[] }) {
+  const audience = participants.filter(
+    (p) => p.stage_role === "listener" || p.stage_role === "green_room",
+  );
+  if (audience.length === 0) return null;
+  return (
+    <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-5">
+      <div className="mb-3 text-[11px] font-bold tracking-widest text-white/60">
+        AUDIENCE · {audience.length}
+      </div>
+      <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8">
+        {audience.map((p) => (
+          <ListenerBubble key={p.id} p={p} />
+        ))}
+      </div>
+    </div>
   );
 }
 
