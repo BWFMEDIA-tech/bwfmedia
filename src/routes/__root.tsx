@@ -67,6 +67,11 @@ export const Route = createRootRoute({
         content:
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png",
       },
+      { name: "description", content: "BWFNETWORK is a production-ready livestream platform for BWF Media TV's viral content." },
+      { property: "og:description", content: "BWFNETWORK is a production-ready livestream platform for BWF Media TV's viral content." },
+      { name: "twitter:description", content: "BWFNETWORK is a production-ready livestream platform for BWF Media TV's viral content." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png" },
     ],
     scripts: [
       {
