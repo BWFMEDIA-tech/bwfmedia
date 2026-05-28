@@ -95,6 +95,7 @@ export function StageRoom({
           color="#22c55e"
           canInvite={canManage && guests.length < MAX_GUESTS}
           onInvite={() => setInvite("speaker")}
+          inviteLabel="Invite Guest"
         />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
           {guests.map((p) => (
@@ -143,8 +144,8 @@ export function StageRoom({
 }
 
 function SectionHeader({
-  label, count, color, canInvite, onInvite,
-}: { label: string; count: string; color: string; canInvite: boolean; onInvite: () => void }) {
+  label, count, color, canInvite, onInvite, inviteLabel,
+}: { label: string; count: string; color: string; canInvite: boolean; onInvite: () => void; inviteLabel?: string }) {
   return (
     <div className="mb-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -157,7 +158,7 @@ function SectionHeader({
           onClick={onInvite}
           className="flex items-center gap-1 rounded-full border border-white/15 px-2.5 py-1 text-[10px] font-semibold text-white/80 hover:bg-white/5"
         >
-          <UserPlus className="h-3 w-3" /> Invite
+          <UserPlus className="h-3 w-3" /> {inviteLabel ?? "Invite"}
         </button>
       )}
     </div>
