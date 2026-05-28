@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { setStageRole, removeStageParticipant } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import { Mic, UserPlus, Crown, X } from "lucide-react";
@@ -113,23 +114,6 @@ export function StageRoom({
           ))}
         </div>
       </div>
-
-      {/* Audience */}
-      {audience.length > 0 && (
-        <div className="mt-6">
-          <div className="mb-2 text-[11px] font-bold tracking-widest text-white/60">AUDIENCE</div>
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-            {audience.slice(0, 12).map((p) => (
-              <ListenerBubble
-                key={p.id}
-                p={p}
-                canManage={canManage}
-                onPromote={() => promote(p.user_id, "speaker")}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       {invite && (
         <InviteModal
