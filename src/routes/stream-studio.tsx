@@ -128,7 +128,7 @@ function Sidebar() {
       </div>
 
       <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-white/30">
-        Powered by <span className="font-bold text-white/70">LiveKit</span>
+        Powered by <span className="font-bold text-white/70">BWFNETWORK</span>
       </div>
     </aside>
   );
