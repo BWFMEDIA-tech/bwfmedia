@@ -209,7 +209,7 @@ function ProofStrip() {
           {loop.map((it, i) => (
             <div key={i} className="flex items-baseline gap-4 shrink-0">
               <div className="font-display text-3xl md:text-5xl text-bone">{it.v}</div>
-              <div className="font-cond tracking-[0.3em] text-[10px] md:text-xs uppercase text-bone/50">{it.l}</div>
+              <div className="font-cond tracking-[0.3em] text-[10px] md:text-xs uppercase text-bone/70">{it.l}</div>
               <span className="ml-16 md:ml-24 h-2 w-2 rounded-full bg-blood/70" aria-hidden />
             </div>
           ))}
@@ -532,7 +532,7 @@ function Podcast() {
                 <Mic size={40} className="text-blood" />
               </div>
               <div className="font-display text-3xl text-bone uppercase">Red Mic</div>
-              <div className="font-cond tracking-[0.3em] text-[11px] uppercase text-bone/50 mt-2">A BWF Production</div>
+              <div className="font-cond tracking-[0.3em] text-[11px] uppercase text-bone/70 mt-2">A BWF Production</div>
             </div>
           </div>
         </Reveal>
