@@ -56,7 +56,7 @@ export function SiteFooter() {
   return (
     <footer className="bg-black border-t border-white/10">
       {/* Main footer grid */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10">
         {/* Brand column */}
         <div className="lg:col-span-2">
           <RouterLink to="/" className="inline-flex items-center gap-3">
