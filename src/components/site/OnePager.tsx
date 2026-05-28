@@ -71,6 +71,7 @@ function Nav() {
     { href: "/#audience", label: "Audience" },
     { to: "/contact", label: "Contact" },
     { to: "/live-review", label: "Live Review" },
+    { to: "/stream-studio", label: "Stream Studio" },
   ];
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
