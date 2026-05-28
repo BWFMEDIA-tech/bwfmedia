@@ -18,6 +18,8 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveReviewRouteImport } from './routes/live-review'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -94,6 +96,16 @@ const RecordingsRoute = RecordingsRouteImport.update({
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
   id: '/off-the-block',
   path: '/off-the-block',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -272,6 +284,8 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -315,6 +329,8 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -359,6 +375,8 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -404,6 +422,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/live-review'
     | '/login'
+    | '/messages'
+    | '/notifications'
     | '/off-the-block'
     | '/recordings'
     | '/reset-password'
@@ -447,6 +467,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/live-review'
     | '/login'
+    | '/messages'
+    | '/notifications'
     | '/off-the-block'
     | '/recordings'
     | '/reset-password'
@@ -490,6 +512,8 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/live-review'
     | '/login'
+    | '/messages'
+    | '/notifications'
     | '/off-the-block'
     | '/recordings'
     | '/reset-password'
@@ -534,6 +558,8 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MessagesRoute: typeof MessagesRoute
+  NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   RecordingsRoute: typeof RecordingsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -629,6 +655,20 @@ declare module '@tanstack/react-router' {
       path: '/off-the-block'
       fullPath: '/off-the-block'
       preLoaderRoute: typeof OffTheBlockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -891,6 +931,8 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
+  MessagesRoute: MessagesRoute,
+  NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   RecordingsRoute: RecordingsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -926,3 +968,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
