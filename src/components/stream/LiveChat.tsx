@@ -194,7 +194,13 @@ export function LiveChat({
             className={cn("flex gap-2 rounded-lg p-2", isTip && "border border-white/10")}
             style={isTip ? { background: `linear-gradient(135deg, ${PURPLE}33, ${BLUE}33)` } : undefined}
           >
-            <div className="h-7 w-7 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+            <Link to="/user/$id" params={{ id: c.user_id }} className="shrink-0">
+              {c.avatar_url ? (
+                <img src={c.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+              ) : (
+                <div className="h-7 w-7 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+              )}
+            </Link>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1 text-[11px]">
                 <span className="font-bold text-white">{c.display_name || "Anon"}</span>
