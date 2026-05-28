@@ -21,9 +21,11 @@ import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveReviewRouteImport } from './routes/live-review'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
@@ -109,6 +111,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DeckRoute = DeckRouteImport.update({
   id: '/deck',
   path: '/deck',
@@ -122,6 +129,11 @@ const ContactRoute = ContactRouteImport.update({
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtistsRoute = ArtistsRouteImport.update({
+  id: '/artists',
+  path: '/artists',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -252,9 +264,11 @@ const ApiPublicPaymentsWebhookRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
@@ -293,9 +307,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
@@ -335,9 +351,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/deck': typeof DeckRoute
+  '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
@@ -378,9 +396,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/artists'
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/events'
     | '/forgot-password'
     | '/live-review'
     | '/login'
@@ -419,9 +439,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/artists'
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/events'
     | '/forgot-password'
     | '/live-review'
     | '/login'
@@ -460,9 +482,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/artists'
     | '/blog'
     | '/contact'
     | '/deck'
+    | '/events'
     | '/forgot-password'
     | '/live-review'
     | '/login'
@@ -502,9 +526,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   DeckRoute: typeof DeckRoute
+  EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -626,6 +652,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deck': {
       id: '/deck'
       path: '/deck'
@@ -645,6 +678,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artists': {
+      id: '/artists'
+      path: '/artists'
+      fullPath: '/artists'
+      preLoaderRoute: typeof ArtistsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -843,9 +883,11 @@ const VideosRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   DeckRoute: DeckRoute,
+  EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
@@ -884,3 +926,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
