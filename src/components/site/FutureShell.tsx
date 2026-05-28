@@ -1,8 +1,4 @@
 import { motion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import bwfLogo from "@/assets/bwf-logo.png";
-import { SiteFooter } from "@/components/site/SiteFooter";
 
 export const GOLD = "#D4A24C";
 export const GOLD_GLOW = "#F5C56B";
@@ -74,45 +70,7 @@ export function FutureShell({
         style={{ backgroundColor: RED_GLOW }}
       />
 
-      {/* Header */}
-      <header className="relative z-20 max-w-6xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative">
-            <div
-              className="absolute inset-0 rounded-full blur-md opacity-60 group-hover:opacity-100 transition"
-              style={{ background: RED }}
-            />
-            <img src={bwfLogo} alt="BWF Media" className="relative w-11 h-11 object-contain" />
-          </div>
-          <span className="font-cond font-bold tracking-[0.35em] text-[11px] uppercase text-bone/80">
-            BWF Media TV
-          </span>
-        </Link>
-        <div className="flex items-center gap-5">
-          {label && (
-            <span
-              className="hidden md:inline-flex items-center gap-2 font-cond font-bold tracking-[0.4em] text-[10px] uppercase px-3 py-1.5"
-              style={{ border: `1px solid ${RED}88`, color: RED_GLOW }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full animate-pulse-dot"
-                style={{ background: RED, boxShadow: `0 0 8px ${RED}` }}
-              />
-              {label}
-            </span>
-          )}
-          <Link
-            to="/"
-            className="font-cond font-bold tracking-[0.3em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors inline-flex items-center gap-2"
-          >
-            <ArrowLeft className="w-3 h-3" /> Home
-          </Link>
-        </div>
-      </header>
-
       <div className="relative z-10">{children}</div>
-
-      <SiteFooter />
 
       {/* Bottom accent strip */}
       <div

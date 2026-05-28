@@ -11,8 +11,6 @@ import {
   TrendingUp,
   DollarSign,
   ArrowRight,
-  Menu,
-  X,
   Check,
   Youtube,
   Instagram,
@@ -22,7 +20,6 @@ import {
   Linkedin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import bwfLogo from "@/assets/bwf-logo.png";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 /* ---------- shared ---------- */
@@ -59,133 +56,6 @@ function ScrollProgress() {
       className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left pointer-events-none"
       style={{ scaleX, background: "var(--gradient-blood)" }}
     />
-  );
-}
-
-/* ---------- nav ---------- */
-
-function Nav() {
-  const links: Array<{ href?: string; to?: string; label: string }> = [
-    { href: "/#services", label: "Services" },
-    { href: "/#why", label: "Why BWF" },
-    { href: "/#audience", label: "Audience" },
-    { to: "/contact", label: "Contact" },
-    { to: "/live-review", label: "Live Review" },
-    { to: "/stream-studio", label: "Stream Studio" },
-  ];
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "backdrop-blur-xl bg-black/85 border-b border-blood/40"
-          : "backdrop-blur bg-black/40 border-b border-white/5"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
-        <a href="#top" className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-14 h-14 md:w-16 md:h-16 object-contain" />
-        </a>
-        <div className="hidden md:flex items-center gap-7">
-          {links.map((l) =>
-            l.to ? (
-              <RouterLink
-                key={l.label}
-                to={l.to}
-                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-              >
-                {l.label}
-              </RouterLink>
-            ) : (
-              <a
-                key={l.label}
-                href={l.href}
-                className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-              >
-                {l.label}
-              </a>
-            ),
-          )}
-          <RouterLink
-            to="/studio"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-          >
-            Studio
-          </RouterLink>
-          <a
-            href="#book"
-            className="font-cond font-bold tracking-[0.2em] text-[11px] uppercase px-4 py-2 bg-blood text-white hover:bg-blood-glow transition-colors"
-          >
-            Book a Shoot
-          </a>
-        </div>
-        <button
-          type="button"
-          aria-label="Toggle menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 text-bone hover:text-bone/80 transition-colors"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur overflow-hidden"
-          >
-            <div className="px-6 py-4 flex flex-col gap-1">
-              {links.map((l) =>
-                l.to ? (
-                  <RouterLink
-                    key={l.label}
-                    to={l.to}
-                    onClick={() => setOpen(false)}
-                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10"
-                  >
-                    {l.label}
-                  </RouterLink>
-                ) : (
-                  <a
-                    key={l.label}
-                    href={l.href}
-                    onClick={() => setOpen(false)}
-                    className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10"
-                  >
-                    {l.label}
-                  </a>
-                ),
-              )}
-              <RouterLink
-                to="/studio"
-                onClick={() => setOpen(false)}
-                className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/80 hover:text-bone py-3 border-b border-white/10"
-              >
-                Studio
-              </RouterLink>
-              <a
-                href="#book"
-                onClick={() => setOpen(false)}
-                className="font-cond font-bold tracking-[0.2em] text-xs uppercase mt-3 px-4 py-3 bg-blood text-white text-center"
-              >
-                Book a Shoot
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
   );
 }
 
@@ -755,7 +625,7 @@ function FinalCTA() {
 
 /* ---------- FOOTER ---------- */
 
-import { SiteFooter } from "@/components/site/SiteFooter";
+
 import { GrowthShowcase } from "@/components/site/GrowthShowcase";
 import { CartButton } from "@/components/CartDrawer";
 
@@ -819,7 +689,6 @@ export function OnePager() {
 
       <div className="relative z-10">
         <ScrollProgress />
-        <Nav />
         <div className="flex justify-end pt-20 md:pt-24 pb-2 px-6 md:px-12 max-w-7xl mx-auto">
           <CartButton className="relative top-auto right-auto" />
         </div>
@@ -834,7 +703,6 @@ export function OnePager() {
         <Podcast />
         <Partnerships />
         <FinalCTA />
-        <SiteFooter />
       </div>
 
       {/* Bottom accent strip */}

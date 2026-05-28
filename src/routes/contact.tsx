@@ -15,10 +15,8 @@ import {
   Send,
   Loader2,
 } from "lucide-react";
-import { SiteFooter } from "@/components/site/SiteFooter";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import bwfLogo from "@/assets/bwf-logo.png";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -77,19 +75,6 @@ function ContactPage() {
   return (
     <div className="min-h-screen bg-black text-bone antialiased">
       <Toaster />
-      <header className="border-b border-white/10 bg-black/85 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-          <RouterLink to="/" className="flex items-center gap-3">
-            <img src={bwfLogo} alt="BWF Media" className="w-12 h-12 object-contain" />
-          </RouterLink>
-          <RouterLink
-            to="/"
-            className="font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone/70 hover:text-bone transition-colors"
-          >
-            ← Home
-          </RouterLink>
-        </div>
-      </header>
 
       <section className="relative overflow-hidden border-b border-white/10">
         <div
@@ -226,7 +211,6 @@ function ContactPage() {
       </section>
 
       <div className="border-t border-white/10" />
-      <SiteFooter />
     </div>
   );
 }
