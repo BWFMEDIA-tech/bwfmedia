@@ -75,6 +75,7 @@ export function StageAudioShell({
 function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
   const { localParticipant } = useLocalParticipant();
   const [role, setRole] = useState<string | null>(null);
+  const [prevCanSpeak, setPrevCanSpeak] = useState<boolean | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -106,7 +107,12 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     if (!localParticipant) return;
     const canSpeak = role === "host" || role === "speaker";
     localParticipant.setMicrophoneEnabled(canSpeak).catch(() => {});
-    if (canSpeak) toast.success("You're on stage — mic enabled");
+    if (prevCanSpeak === false && canSpeak) {
+      toast.success("You're on stage — mic enabled");
+    } else if (prevCanSpeak === true && !canSpeak) {
+      toast.info("You're back in the audience");
+    }
+    setPrevCanSpeak(canSpeak);
   }, [role, localParticipant]);
 
   return null;
