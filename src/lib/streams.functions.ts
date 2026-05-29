@@ -72,7 +72,7 @@ export const getStreamByRoom = createServerFn({ method: "POST" })
     const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!);
     const { data: row, error } = await client
       .from("streams")
-      .select("id, title, room_name, status, host_id")
+      .select("id, title, room_name, status, host_id, mode, stage_locked")
       .eq("room_name", data.roomName)
       .maybeSingle();
     if (error) throw new Error(error.message);
