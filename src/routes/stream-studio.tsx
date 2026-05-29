@@ -24,6 +24,7 @@ import { LiveChat } from "@/components/stream/LiveChat";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
+import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
@@ -703,7 +704,20 @@ function StreamStudio() {
                 )
               ) : (
                 stream?.id ? (
-                  <StageRoom streamId={stream.id} participants={participants} canManage />
+                  lk && auth.user ? (
+                    <StageAudioShell
+                      token={lk.token}
+                      serverUrl={lk.wsUrl}
+                      streamId={stream.id}
+                      userId={auth.user.id}
+                      isHost
+                      onLeave={stop}
+                    >
+                      <StageRoom streamId={stream.id} participants={participants} canManage />
+                    </StageAudioShell>
+                  ) : (
+                    <StageRoom streamId={stream.id} participants={participants} canManage />
+                  )
                 ) : (
                   <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
                     <Mic className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />
