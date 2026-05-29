@@ -47,7 +47,7 @@ export function RaiseHandPanel({ hands }: { hands: HandRequest[] }) {
                   {r.display_name ?? "Listener"}
                   <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />
                 </div>
-                <div className="truncate text-[10px] text-white/50">wants to join the stage</div>
+                <div className="truncate text-[10px] text-white/50">wants to join as guest</div>
               </div>
               <button onClick={() => act(r.id, "accept_stage")} className="rounded-md px-2.5 py-1 text-[11px] font-semibold text-white" style={{ background: PURPLE }}>
                 Allow
