@@ -1,68 +1,52 @@
-# Phase 1 — Make BWF Network functional
+## What already exists (will be reused, not rebuilt)
 
-LiveKit credentials are saved. Stripe tips, queue persistence, donations, analytics, admin moderation, notifications, storage, and recordings are deferred to later phases.
+The Listener → Guest promotion system is ~80% in place. Confirmed live:
 
-## What ships now
+- **Raise-hand request:** `RaiseHandButton` calls `raiseHand` server fn → inserts into `raise_hand_requests` (status `pending`).
+- **Host approval UI:** `RaiseHandPanel` shows avatar, name, Allow / Green / Decline buttons, calls `respondHand`.
+- **Session role table:** `stage_participants` already tracks per-room roles (`host | speaker | listener | green_room`) — exactly the session-scoped role model requested.
+- **Promote / demote / remove:** `setStageRole` and `removeStageParticipant` server fns with 5-host / 5-guest caps.
+- **Realtime:** `useStageState` subscribes to postgres_changes on `stage_participants`, `raise_hand_requests`, `stream_queue`.
+- **Stage UI:** `StageRoom` renders HOSTS / GUESTS rows with mic indicator, "Demote" + "Remove" host controls. `AudienceRow` renders listeners.
+- **LiveKit audio:** `LiveStage` already handles mic permissions for the room.
 
-### 1. Auth + Roles
-- New routes: `/login`, `/signup`, `/forgot-password`, `/reset-password`
-- Email/password + Google sign-in (via Lovable broker)
-- `profiles` table (display_name, avatar_url, bio) auto-created on signup via trigger
-- Extend `app_role` enum: add `host`, `artist`, `moderator`, `member` (keeps existing `admin`)
-- Router context `auth` state, `_authenticated` layout route, `onAuthStateChange` cache invalidation at root
-- Default new signups → `member` role
+Per the rules, none of this gets duplicated. Only the gaps below are filled.
 
-### 2. Database (one migration)
-- `profiles` (id = auth.users.id, display_name, avatar_url, bio)
-- `streams` (id, host_id, title, room_name, status: idle/live/ended, started_at, ended_at)
-- `stream_messages` (id, stream_id, user_id, body, created_at) — realtime enabled
-- Trigger to auto-create profile on `auth.users` insert
-- Extend `app_role` enum
-- RLS:
-  - `profiles`: public read, self-update
-  - `streams`: public read, host/admin write
-  - `stream_messages`: authenticated read+insert, author/moderator/admin delete
+## Gaps to close
 
-### 3. LiveKit
-- `src/lib/livekit.functions.ts` — `createLiveKitToken({ roomName, identity, isHost })` server fn (uses `livekit-server-sdk`)
-- Install `livekit-client` + `@livekit/components-react` + `livekit-server-sdk`
-- Wire `/stream-studio` controls to real LiveKit room:
-  - "Go Live" → creates `streams` row + joins room as publisher
-  - Mic / Camera / Screen Share / End Stream → real LiveKit toggles
-  - Participant tiles render real video tracks (replace static images)
-  - Network quality indicator from LiveKit connection stats
-- Invite link: `/stream/:roomName?token=<guest-token>` — guest joins as subscriber+publisher
+1. **Listeners never appear in the audience / invite list.** On `/stream/$room`, viewers join LiveKit but no row is written to `stage_participants` with role `listener`. Result: hosts can't see who to promote, and `AudienceRow` is empty.
+2. **No self "Leave Stage" button for guests.** Today only the host can demote. Spec requires the guest to be able to return themselves to listener state.
+3. **`AudienceRow` is not rendered on the guest stream page** (`src/routes/stream.$room.tsx`).
 
-### 4. Realtime Chat
-- Replace static ChatPanel messages with `stream_messages` for the current stream
-- Send via authenticated insert; subscribe via Supabase Realtime
-- Show display_name + role badge
+## Changes
 
-## Files
+### 1. Auto-join as listener (client-side, RLS already allows it)
+In `src/routes/stream.$room.tsx`, after LiveKit join succeeds and we have `streamId` + `auth.user`, upsert `{ stream_id, user_id, stage_role: 'listener' }` into `stage_participants`. On unmount / `onEnd`, delete the row. The existing INSERT policy "Users can join stage as listener" already permits this; the DELETE policy permits self-removal. No migration needed.
 
-**Created**
-- `supabase/migrations/<ts>_phase1.sql`
-- `src/routes/login.tsx`, `signup.tsx`, `forgot-password.tsx`, `reset-password.tsx`
-- `src/routes/_authenticated.tsx`
-- `src/routes/stream.$room.tsx` (guest viewer/joiner)
-- `src/lib/auth-context.tsx` (hook + provider context)
-- `src/lib/livekit.functions.ts`
-- `src/lib/streams.functions.ts` (start/end stream, send message)
-- `src/components/stream/LiveKitRoom.tsx` (wraps `@livekit/components-react`)
-- `src/components/stream/LiveChat.tsx` (realtime)
+### 2. Self "Leave Stage" for guests
+- Add a new server fn `leaveStage(streamId)` in `src/lib/stage.functions.ts` that downgrades the caller's own `stage_participants.stage_role` from `speaker` back to `listener` (no host check; scoped to `auth.uid() = user_id`).
+- Render a "Leave Stage" button in `RaiseHandButton.tsx` (or a small sibling component) whenever the current user's row in `stage_participants` has role `speaker`. Reuse the existing realtime subscription pattern already in that file.
 
-**Edited**
-- `src/routes/__root.tsx` — auth context + onAuthStateChange invalidation
-- `src/router.tsx` — context typing
-- `src/routes/stream-studio.tsx` — move under `_authenticated`, wire controls to LiveKit + chat
-- `src/start.ts` — verify `attachSupabaseAuth` present
+### 3. Show audience on the live stream page
+In `src/routes/stream.$room.tsx`, mount `useStageState(streamId)` and render `<AudienceRow participants={...} />` below `LiveStage`. This also surfaces the new auto-joined listeners to the host's invite modal in `StageRoom` (host page already uses the same hook).
 
-## Out of scope (Phase 2+)
-Stripe tips, on-deck queue persistence + drag/drop, analytics aggregation, admin moderation panel, notifications, storage uploads, recordings, ban/timeout, super chats.
+### 4. Terminology polish (cosmetic only)
+In `RaiseHandPanel` and `StageRoom`, change visible "SPEAKER" label to "GUEST" to match the spec wording. Internal `stage_role = 'speaker'` enum value stays the same to avoid a migration and to keep `setStageRole` / RLS untouched.
 
-## Acceptance
-- Sign up → land logged in on `/stream-studio`
-- Click "Go Live" → camera/mic publish, badge shows LIVE, row in `streams`
-- Open invite link in a second browser → see/hear the host, can publish own video
-- Chat messages appear on both sides instantly
-- All existing pages (`/live-review`, `/studio`, `/admin.*`, etc.) untouched
+## Out of scope (explicitly NOT touched)
+
+- Auth, signup, role table, profiles
+- LiveKit token issuance / mic permission logic
+- `respondHand`, `setStageRole`, `removeStageParticipant`, host controls
+- Database schema / RLS — all changes work within existing policies
+- `stream_queue` (separate live-review queue, unrelated to raise-hand)
+
+## Files to edit
+
+- `src/routes/stream.$room.tsx` — auto-join + auto-leave listener row, render `AudienceRow`
+- `src/lib/stage.functions.ts` — add `leaveStage` server fn
+- `src/components/stream/RaiseHandButton.tsx` — show "Leave Stage" when current user is a `speaker`
+- `src/components/stream/StageRoom.tsx` — rename visible "SPEAKER" → "GUEST"
+- `src/components/stream/RaiseHandPanel.tsx` — copy tweak to "wants to join as guest"
+
+No new tables, no new packages, no auth changes.

@@ -7,6 +7,9 @@ import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useStageState, type StageParticipant } from "@/lib/useStageState";
+import { AudienceRow } from "@/components/stream/StageRoom";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -22,10 +25,36 @@ function GuestPage() {
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
+  const { participants } = useStageState(lk ? streamId : null);
 
   useEffect(() => {
     streamFn({ data: { roomName: room } }).then((s) => setStreamId(s?.id ?? null)).catch(() => {});
   }, [room]);
+
+  // Auto-join as listener while in the room; remove on leave.
+  useEffect(() => {
+    if (!lk || !streamId || !auth.user) return;
+    const uid = auth.user.id;
+    supabase
+      .from("stage_participants")
+      .upsert(
+        { stream_id: streamId, user_id: uid, stage_role: "listener" },
+        { onConflict: "stream_id,user_id" },
+      )
+      .then(() => {});
+    const handleUnload = () => {
+      supabase
+        .from("stage_participants")
+        .delete()
+        .eq("stream_id", streamId)
+        .eq("user_id", uid);
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+      handleUnload();
+    };
+  }, [lk, streamId, auth.user?.id]);
 
   const join = async () => {
     if (!name.trim()) return;
@@ -63,6 +92,7 @@ function GuestPage() {
             <RaiseHandButton streamId={streamId} auth={auth} />
           </div>
         )}
+        <AudienceRow participants={participants as StageParticipant[]} />
       </div>
     </div>
   );

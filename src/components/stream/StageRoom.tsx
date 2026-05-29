@@ -228,7 +228,7 @@ function SpeakerBubble({
           className="rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white"
           style={{ background: kind === "host" ? PURPLE : "#16a34a" }}
         >
-          {kind === "host" ? "HOST" : "SPEAKER"}
+          {kind === "host" ? "HOST" : "GUEST"}
         </span>
       </div>
       <div
@@ -249,9 +249,9 @@ function SpeakerBubble({
       <div className="text-center">
         <div className="flex items-center justify-center gap-1 text-xs font-bold text-white">
           {kind === "host" && <Crown className="h-3 w-3" style={{ color: PURPLE }} />}
-          {p.display_name ?? "Speaker"}
+          {p.display_name ?? "Guest"}
         </div>
-        <div className="text-[10px] text-white/50">{kind === "host" ? "Host" : "Speaker"}</div>
+        <div className="text-[10px] text-white/50">{kind === "host" ? "Host" : "Guest"}</div>
       </div>
       {canManage && kind === "speaker" && (
         <div className="flex gap-1">

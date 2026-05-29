@@ -140,3 +140,19 @@ export const removeStageParticipant = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Guest leaves the stage and returns to listener */
+export const leaveStage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("stage_participants")
+      .upsert(
+        { stream_id: data.streamId, user_id: userId, stage_role: "listener" },
+        { onConflict: "stream_id,user_id" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
