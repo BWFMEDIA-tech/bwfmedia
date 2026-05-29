@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
+import { StageRoom } from "@/components/stream/StageRoom";
+import { StageAudioShell } from "@/components/stream/StageAudioShell";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -25,11 +27,34 @@ function GuestPage() {
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
+  const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
   const { participants } = useStageState(lk ? streamId : null);
 
   useEffect(() => {
-    streamFn({ data: { roomName: room } }).then((s) => setStreamId(s?.id ?? null)).catch(() => {});
+    streamFn({ data: { roomName: room } })
+      .then((s: any) => {
+        setStreamId(s?.id ?? null);
+        if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage");
+      })
+      .catch(() => {});
   }, [room]);
+
+  // Track host-side mode/lock changes
+  useEffect(() => {
+    if (!streamId) return;
+    const ch = supabase
+      .channel(`stream-mode-${streamId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
+        (p) => {
+          const r = p.new as any;
+          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [streamId]);
 
   // Auto-join as listener while in the room; remove on leave.
   useEffect(() => {
@@ -86,13 +111,31 @@ function GuestPage() {
   return (
     <div className="min-h-screen bg-[#050509] text-white p-4">
       <div className="mx-auto max-w-5xl flex flex-col gap-4">
-        <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} />
-        {streamId && (
-          <div className="flex justify-center">
-            <RaiseHandButton streamId={streamId} auth={auth} />
-          </div>
+        {streamMode === "stage" && streamId && auth.user ? (
+          <StageAudioShell
+            token={lk.token}
+            serverUrl={lk.wsUrl}
+            streamId={streamId}
+            userId={auth.user.id}
+            onLeave={() => setLk(null)}
+          >
+            <StageRoom streamId={streamId} participants={participants as StageParticipant[]} canManage={false} />
+            <div className="flex justify-center">
+              <RaiseHandButton streamId={streamId} auth={auth} />
+            </div>
+            <AudienceRow participants={participants as StageParticipant[]} />
+          </StageAudioShell>
+        ) : (
+          <>
+            <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} />
+            {streamId && (
+              <div className="flex justify-center">
+                <RaiseHandButton streamId={streamId} auth={auth} />
+              </div>
+            )}
+            <AudienceRow participants={participants as StageParticipant[]} />
+          </>
         )}
-        <AudienceRow participants={participants as StageParticipant[]} />
       </div>
     </div>
   );
