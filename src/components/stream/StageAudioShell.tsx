@@ -1,0 +1,150 @@
+import { LiveKitRoom, useLocalParticipant, useRoomContext } from "@livekit/components-react";
+import "@livekit/components-styles";
+import { useEffect, useState } from "react";
+import { Mic, MicOff, Radio, PhoneOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+/**
+ * Wraps stage-mode (audio-only) UI in a LiveKit room.
+ * Shows a "Join audio" prompt first so the browser captures the user gesture
+ * required to open the microphone. Once connected, the mic is automatically
+ * enabled for hosts/speakers and muted for listeners, based on
+ * `stage_participants.stage_role`.
+ */
+export function StageAudioShell({
+  token,
+  serverUrl,
+  streamId,
+  userId,
+  isHost,
+  children,
+  onLeave,
+}: {
+  token: string;
+  serverUrl: string;
+  streamId: string;
+  userId: string;
+  isHost?: boolean;
+  children: React.ReactNode;
+  onLeave?: () => void;
+}) {
+  const [connect, setConnect] = useState(false);
+
+  if (!connect) {
+    return (
+      <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
+        <Mic className="mx-auto mb-3 h-8 w-8 text-[#8b5cf6]" />
+        <div className="mb-1 text-sm font-bold text-white">
+          {isHost ? "Join as host" : "Join the stage room"}
+        </div>
+        <p className="mb-4 text-xs text-white/60">
+          {isHost
+            ? "Click to connect your microphone and start hosting."
+            : "Click to connect. You'll be muted until the host promotes you."}
+        </p>
+        <button
+          onClick={() => setConnect(true)}
+          className="rounded-md px-4 py-2 text-xs font-semibold text-white"
+          style={{ background: "linear-gradient(135deg,#8b5cf6,#3b82f6)" }}
+        >
+          <Radio className="mr-1 inline h-3.5 w-3.5" />
+          {isHost ? "Join as host" : "Join audio"}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <LiveKitRoom
+      token={token}
+      serverUrl={serverUrl}
+      connect
+      audio
+      video={false}
+      onError={(e) => toast.error(`Stage audio: ${e.message}`)}
+      className="contents"
+    >
+      <StageMicSync streamId={streamId} userId={userId} />
+      {children}
+      <StageMicBar onLeave={onLeave} />
+    </LiveKitRoom>
+  );
+}
+
+function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
+  const { localParticipant } = useLocalParticipant();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const fetchRole = async () => {
+      const { data } = await supabase
+        .from("stage_participants")
+        .select("stage_role")
+        .eq("stream_id", streamId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (active) setRole((data?.stage_role as string | undefined) ?? null);
+    };
+    fetchRole();
+    const ch = supabase
+      .channel(`stage-mic-${streamId}-${userId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` },
+        fetchRole,
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(ch);
+    };
+  }, [streamId, userId]);
+
+  useEffect(() => {
+    if (!localParticipant) return;
+    const canSpeak = role === "host" || role === "speaker";
+    localParticipant.setMicrophoneEnabled(canSpeak).catch(() => {});
+    if (canSpeak) toast.success("You're on stage — mic enabled");
+  }, [role, localParticipant]);
+
+  return null;
+}
+
+function StageMicBar({ onLeave }: { onLeave?: () => void }) {
+  const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
+  const room = useRoomContext();
+
+  const toggleMic = async () => {
+    if (!localParticipant) return;
+    try {
+      await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+    } catch (e: any) {
+      toast.error(e?.message || "Could not toggle mic");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+      <button
+        onClick={toggleMic}
+        className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold text-white hover:bg-white/5"
+      >
+        {isMicrophoneEnabled ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5 text-red-400" />}
+        {isMicrophoneEnabled ? "Mute" : "Unmute"}
+      </button>
+      {onLeave && (
+        <button
+          onClick={async () => {
+            await room?.disconnect();
+            onLeave();
+          }}
+          className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-500"
+        >
+          <PhoneOff className="h-3.5 w-3.5" /> Leave
+        </button>
+      )}
+    </div>
+  );
+}
