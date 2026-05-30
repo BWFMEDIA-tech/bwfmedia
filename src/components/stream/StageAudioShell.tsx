@@ -30,13 +30,40 @@ export function StageAudioShell({
   onLeave?: () => void;
 }) {
   const [connect, setConnect] = useState(false);
+  const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name, avatar_url")
+        .eq("id", userId)
+        .maybeSingle();
+      if (active) setMe((data as any) ?? null);
+    })();
+    return () => { active = false; };
+  }, [userId]);
 
   if (!connect) {
     return (
       <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
-        <Mic className="mx-auto mb-3 h-8 w-8 text-[#8b5cf6]" />
+        {me?.avatar_url ? (
+          <img
+            src={me.avatar_url}
+            alt=""
+            className="mx-auto mb-3 h-16 w-16 rounded-full border-2 border-[#8b5cf6] object-cover shadow-[0_0_24px_rgba(139,92,246,0.4)]"
+          />
+        ) : (
+          <div
+            className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#8b5cf6]"
+            style={{ background: "linear-gradient(135deg,#8b5cf6,#3b82f6)" }}
+          >
+            <Mic className="h-6 w-6 text-white" />
+          </div>
+        )}
         <div className="mb-1 text-sm font-bold text-white">
-          {isHost ? "Join as host" : "Join the stage room"}
+          {isHost ? `Join as host${me?.display_name ? ` — ${me.display_name}` : ""}` : `Join the stage room${me?.display_name ? ` as ${me.display_name}` : ""}`}
         </div>
         <p className="mb-4 text-xs text-white/60">
           {isHost
