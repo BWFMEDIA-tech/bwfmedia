@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { createStripeClient, type StripeEnv } from '@/lib/stripe.server';
 import { LIVE_TIERS, type LiveTierId } from '@/lib/live-review-tiers';
 import { validateReturnUrl } from '@/lib/validate-return-url';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 
 const TIER_IDS = ['live_review_basic', 'live_review_featured', 'live_review_premium'] as const;
 
@@ -103,13 +104,33 @@ const StatusSchema = z.object({
 });
 
 export const getLiveSubmissionBySession = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data) => StatusSchema.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const supabase = admin();
     const { data: row } = await supabase
       .from('live_submissions')
       .select('id, artist_name, email, tier, status, amount_cents, paid_at')
       .eq('stripe_session_id', data.sessionId)
       .maybeSingle();
-    return row ?? null;
+    if (!row) return null;
+    const { data: userRow } = await context.supabase.auth.getUser();
+    const userEmail = userRow.user?.email?.toLowerCase() ?? null;
+    const userId = userRow.user?.id ?? null;
+    const { data: adminRow } = userId
+      ? await supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
+      : { data: null };
+    const isAdmin = !!adminRow;
+    const owns = isAdmin || (userEmail && row.email && row.email.toLowerCase() === userEmail);
+    if (!owns) {
+      // Strip PII for non-owners.
+      return {
+        id: row.id,
+        tier: row.tier,
+        status: row.status,
+        amount_cents: row.amount_cents,
+        paid_at: row.paid_at,
+      };
+    }
+    return row;
   });
