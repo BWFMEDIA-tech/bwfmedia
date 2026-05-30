@@ -17,10 +17,12 @@ export function StageRoom({
   streamId,
   participants,
   canManage,
+  selfProfile,
 }: {
   streamId: string | null;
   participants: StageParticipant[];
   canManage: boolean;
+  selfProfile?: { user_id: string; display_name?: string | null; avatar_url?: string | null } | null;
 }) {
   const setRole = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
@@ -28,6 +30,13 @@ export function StageRoom({
 
   const hosts = participants.filter((p) => p.stage_role === "host").slice(0, MAX_HOSTS);
   const guests = participants.filter((p) => p.stage_role === "speaker").slice(0, MAX_GUESTS);
+  // If the local host hasn't been registered in stage_participants yet,
+  // show their profile in the first host slot as a placeholder.
+  const showSelfHostPlaceholder =
+    !!selfProfile &&
+    canManage &&
+    !hosts.some((p) => p.user_id === selfProfile.user_id);
+  const hostSlotsTaken = hosts.length + (showSelfHostPlaceholder ? 1 : 0);
   const audience = participants.filter(
     (p) => p.stage_role === "listener" || p.stage_role === "green_room",
   );
@@ -83,7 +92,23 @@ export function StageRoom({
             onKick={() => kick(p.user_id)}
           />
         ))}
-        {Array.from({ length: Math.max(0, MAX_HOSTS - hosts.length) }).map((_, i) => (
+        {showSelfHostPlaceholder && (
+          <SpeakerBubble
+            key="self-host-placeholder"
+            p={{
+              id: "self-host-placeholder",
+              stream_id: streamId ?? "",
+              user_id: selfProfile!.user_id,
+              stage_role: "host",
+              joined_at: new Date().toISOString(),
+              display_name: selfProfile!.display_name ?? null,
+              avatar_url: selfProfile!.avatar_url ?? null,
+            }}
+            kind="host"
+            canManage={false}
+          />
+        )}
+        {Array.from({ length: Math.max(0, MAX_HOSTS - hostSlotsTaken) }).map((_, i) => (
           <EmptySlot key={`h-${i}`} label="Host slot" />
         ))}
       </div>
