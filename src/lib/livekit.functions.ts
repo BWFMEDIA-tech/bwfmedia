@@ -5,7 +5,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const tokenInput = z.object({
   roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/),
-  isHost: z.boolean().default(false),
 });
 
 export const getLiveKitToken = createServerFn({ method: "POST" })
@@ -24,6 +23,21 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
 
+    // Server-side host check: only the actual stream host (or an admin) gets
+    // LiveKit room admin/create grants. Never trust a client-supplied flag.
+    const { data: stream } = await supabase
+      .from("streams")
+      .select("host_id")
+      .eq("room_name", data.roomName)
+      .maybeSingle();
+    const { data: adminRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    const isHost = (stream?.host_id === userId) || !!adminRow;
+
     const at = new AccessToken(apiKey, apiSecret, {
       identity: userId,
       name: profile?.display_name || "Guest",
@@ -35,8 +49,8 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       canPublish: true,
       canSubscribe: true,
       canPublishData: true,
-      roomAdmin: data.isHost,
-      roomCreate: data.isHost,
+      roomAdmin: isHost,
+      roomCreate: isHost,
     });
 
     const token = await at.toJwt();
@@ -66,9 +80,12 @@ export const getGuestLiveKitToken = createServerFn({ method: "POST" })
     at.addGrant({
       room: data.roomName,
       roomJoin: true,
-      canPublish: true,
+      // Unauthenticated guests are view-only by default. Publishing is
+      // gated by host promotion via stage_participants and a separately
+      // issued authenticated token.
+      canPublish: false,
       canSubscribe: true,
-      canPublishData: true,
+      canPublishData: false,
     });
     const token = await at.toJwt();
     return { token, wsUrl, identity };

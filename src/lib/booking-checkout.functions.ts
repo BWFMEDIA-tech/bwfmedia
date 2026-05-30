@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { createStripeClient, type StripeEnv } from '@/lib/stripe.server';
 import { BOOKING_PACKAGES } from '@/lib/booking-packages';
 import { validateReturnUrl } from '@/lib/validate-return-url';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 
 const Schema = z.object({
   bookingId: z.string().uuid(),
@@ -87,19 +88,44 @@ export const createBookingCheckout = createServerFn({ method: 'POST' })
   });
 
 export const getBookingByStripeSession = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: { sessionId: string }) => {
     if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(data.sessionId)) throw new Error('Invalid session id');
     return data;
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    const { data: userRow } = await context.supabase.auth.getUser();
+    const userEmail = userRow.user?.email?.toLowerCase() ?? null;
+    const userId = userRow.user?.id ?? null;
+    const { data: adminRow } = userId
+      ? await supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
+      : { data: null };
+    const isAdmin = !!adminRow;
     for (const table of ['studio_bookings', 'block_bookings'] as const) {
       const { data: row } = await supabase
         .from(table)
         .select('id, full_name, email, status, package_id, amount_cents, amount_paid_cents, paid_at')
         .eq('stripe_session_id', data.sessionId)
         .maybeSingle();
-      if (row) return { table, booking: row };
+      if (row) {
+        const owns = isAdmin || (userEmail && row.email && row.email.toLowerCase() === userEmail);
+        if (!owns) {
+          // Return only non-PII status info
+          return {
+            table,
+            booking: {
+              id: row.id,
+              status: row.status,
+              package_id: row.package_id,
+              amount_cents: row.amount_cents,
+              amount_paid_cents: row.amount_paid_cents,
+              paid_at: row.paid_at,
+            },
+          };
+        }
+        return { table, booking: row };
+      }
     }
     return null;
   });

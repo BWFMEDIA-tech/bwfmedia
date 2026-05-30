@@ -86,6 +86,19 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
             return Response.json({ ok: true, sent: false, reason: 'suppressed' })
           }
 
+          // Per-recipient rate limit to prevent abuse via rotating cart fingerprints.
+          // Max 3 cancellation emails per recipient per 24 hours.
+          const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+          const { count: recentCount } = await supabase
+            .from('email_send_log')
+            .select('id', { count: 'exact', head: true })
+            .eq('recipient_email', data.email)
+            .eq('template_name', 'checkout-cancellation')
+            .gte('created_at', since)
+          if ((recentCount ?? 0) >= 3) {
+            return Response.json({ ok: true, sent: false, reason: 'rate_limited' })
+          }
+
           // Unsubscribe token (one per email)
           let unsubscribeToken: string | null = null
           const { data: existingTok } = await supabase
