@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Schema = z.object({
   submissionId: z.string().uuid(),
@@ -13,6 +14,7 @@ function admin() {
 }
 
 export const attachAudioToSubmission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data) => Schema.parse(data))
   .handler(async ({ data }) => {
     const supabase = admin();

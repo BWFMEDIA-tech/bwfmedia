@@ -595,7 +595,7 @@ function StreamStudio() {
     setGoing(true);
     try {
       const s = await startFn({ data: { title: "BWF Live: Unsigned Artist Review" } });
-      const t = await tokenFn({ data: { roomName: s.room_name, isHost: true } });
+      const t = await tokenFn({ data: { roomName: s.room_name } });
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
       setStartedAt(new Date().toISOString());
