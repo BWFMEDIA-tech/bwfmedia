@@ -14,6 +14,7 @@ import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { RecordButton } from "./RecordButton";
+import { supabase } from "@/integrations/supabase/client";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -62,28 +63,57 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
 
   // Pick the first two for the two-up layout (host + guest)
   const slots = [0, 1].map((i) => cameraTracks[i] ?? null);
+  const slotIdentities = [0, 1].map((i) => participants[i]?.identity ?? null);
+  const profiles = useParticipantProfiles(participants.map((p) => p.identity));
 
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
-        <StageTile track={slots[0]} label="HOST" fallbackImage={hostImage} />
-        <StageTile track={slots[1]} label="GUEST" fallbackImage={guestImage} placeholder={`Waiting for guest (${Math.max(0, participants.length - 1)} in room)`} />
+        <StageTile track={slots[0]} label="HOST" fallbackImage={hostImage} profile={slotIdentities[0] ? profiles[slotIdentities[0]] : undefined} />
+        <StageTile track={slots[1]} label="GUEST" fallbackImage={guestImage} profile={slotIdentities[1] ? profiles[slotIdentities[1]] : undefined} placeholder={`Waiting for guest (${Math.max(0, participants.length - 1)} in room)`} />
       </div>
       <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />
     </>
   );
 }
 
-function StageTile({ track, label, fallbackImage, placeholder }: { track: any; label: string; fallbackImage?: string; placeholder?: string }) {
+type ProfileLite = { display_name: string | null; avatar_url: string | null };
+
+function useParticipantProfiles(identities: string[]): Record<string, ProfileLite> {
+  const [map, setMap] = useState<Record<string, ProfileLite>>({});
+  const key = [...new Set(identities)].sort().join(",");
+  useEffect(() => {
+    const ids = [...new Set(identities)].filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+    if (!ids.length) { setMap({}); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", ids);
+      if (cancelled) return;
+      const next: Record<string, ProfileLite> = {};
+      (data ?? []).forEach((p: any) => { next[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url }; });
+      setMap(next);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return map;
+}
+
+function StageTile({ track, label, fallbackImage, placeholder, profile }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite }) {
+  const avatar = profile?.avatar_url ?? fallbackImage;
+  const name = track?.participant?.name || profile?.display_name || track?.participant?.identity;
   return (
     <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
       {track ? (
         <TrackRefContext.Provider value={track}>
           <ParticipantTile className="!h-full !w-full" />
         </TrackRefContext.Provider>
-      ) : fallbackImage ? (
+      ) : avatar ? (
         <>
-          <img src={fallbackImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+          <img src={avatar} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs text-white/70">
             {placeholder ?? "Connecting…"}
           </div>
@@ -100,10 +130,14 @@ function StageTile({ track, label, fallbackImage, placeholder }: { track: any; l
       </div>
       {track?.participant && (
         <div className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-2 rounded-xl bg-black/50 px-3 py-2 backdrop-blur">
-          <div className="h-8 w-8 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+          ) : (
+            <div className="h-8 w-8 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+          )}
           <div>
             <div className="flex items-center gap-1 text-sm font-bold text-white">
-              {track.participant.name || track.participant.identity}
+              {name}
               <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />
             </div>
             <div className="text-[10px] text-white/60">{track.participant.isLocal ? "you" : "live"}</div>
