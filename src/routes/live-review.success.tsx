@@ -100,9 +100,15 @@ function SuccessPage() {
                 </span>
               </h1>
               <p className="text-bone/70 mt-3 text-sm md:text-base">
-                Thanks, <span className="text-bone">{submission.artist_name}</span>. We'll reach
-                out at <span className="text-bone">{submission.email}</span> with your live
-                review slot.
+                Thanks
+                {"artist_name" in submission && submission.artist_name ? (
+                  <>, <span className="text-bone">{submission.artist_name}</span></>
+                ) : null}
+                . We'll reach out
+                {"email" in submission && submission.email ? (
+                  <> at <span className="text-bone">{submission.email}</span></>
+                ) : null}
+                {" "}with your live review slot.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
