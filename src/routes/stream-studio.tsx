@@ -713,10 +713,20 @@ function StreamStudio() {
                       isHost
                       onLeave={stop}
                     >
-                      <StageRoom streamId={stream.id} participants={participants} canManage />
+                      <StageRoom
+                        streamId={stream.id}
+                        participants={participants}
+                        canManage
+                        selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
+                      />
                     </StageAudioShell>
                   ) : (
-                    <StageRoom streamId={stream.id} participants={participants} canManage />
+                    <StageRoom
+                      streamId={stream.id}
+                      participants={participants}
+                      canManage
+                      selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
+                    />
                   )
                 ) : (
                   <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
