@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Mic, MicOff, Radio, PhoneOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { StageConnectionProvider } from "@/lib/stage-connection-context";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -92,9 +93,11 @@ export function StageAudioShell({
       onError={(e) => toast.error(`Stage audio: ${e.message}`)}
       className="contents"
     >
-      <StageMicSync streamId={streamId} userId={userId} />
-      {children}
-      <StageMicBar onLeave={onLeave} />
+      <StageConnectionProvider>
+        <StageMicSync streamId={streamId} userId={userId} />
+        {children}
+        <StageMicBar onLeave={onLeave} />
+      </StageConnectionProvider>
     </LiveKitRoom>
   );
 }
