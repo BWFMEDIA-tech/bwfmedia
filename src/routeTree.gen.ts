@@ -38,6 +38,7 @@ import { Route as StreamRoomRouteImport } from './routes/stream.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
+import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
@@ -202,6 +203,11 @@ const LiveReviewSuccessRoute = LiveReviewSuccessRouteImport.update({
   path: '/success',
   getParentRoute: () => LiveReviewRoute,
 } as any)
+const InviteCodeRoute = InviteCodeRouteImport.update({
+  id: '/invite/$code',
+  path: '/invite/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -330,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -429,6 +437,7 @@ export interface FileRoutesById {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/invite/$code': typeof InviteCodeRoute
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -480,6 +489,7 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/invite/$code'
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -529,6 +539,7 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/invite/$code'
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -578,6 +589,7 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/invite/$code'
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -628,6 +640,7 @@ export interface RootRouteChildren {
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  InviteCodeRoute: typeof InviteCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   StreamRoomRoute: typeof StreamRoomRoute
@@ -849,6 +862,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LiveReviewSuccessRouteImport
       parentRoute: typeof LiveReviewRoute
     }
+    '/invite/$code': {
+      id: '/invite/$code'
+      path: '/invite/$code'
+      fullPath: '/invite/$code'
+      preLoaderRoute: typeof InviteCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -1033,6 +1053,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  InviteCodeRoute: InviteCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   StreamRoomRoute: StreamRoomRoute,
