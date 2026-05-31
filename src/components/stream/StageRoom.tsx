@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Mic, UserPlus, Crown, X } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
+import { useConnectedIdentities } from "@/lib/stage-connection-context";
 
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 5;
@@ -246,6 +247,9 @@ function SpeakerBubble({
   onKick?: () => void;
 }) {
   const ringColor = kind === "host" ? PURPLE : "#22c55e";
+  const connected = useConnectedIdentities();
+  const isConnected = connected.has(p.user_id);
+  const isPlaceholder = p.id === "self-host-placeholder";
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="absolute -mt-3 self-center">
@@ -276,7 +280,21 @@ function SpeakerBubble({
           {kind === "host" && <Crown className="h-3 w-3" style={{ color: PURPLE }} />}
           {p.display_name ?? "Guest"}
         </div>
-        <div className="text-[10px] text-white/50">{kind === "host" ? "Host" : "Guest"}</div>
+        <div className="mt-0.5 flex items-center justify-center gap-1">
+          <span
+            className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              isConnected ? "bg-emerald-400" : "bg-amber-400 animate-pulse",
+            )}
+          />
+          <span className="text-[10px] text-white/60">
+            {isPlaceholder && !isConnected
+              ? "Not joined"
+              : isConnected
+                ? "Connected"
+                : "Connecting…"}
+          </span>
+        </div>
       </div>
       {canManage && kind === "speaker" && (
         <div className="flex gap-1">
