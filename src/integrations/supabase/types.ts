@@ -250,6 +250,47 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_codes: {
+        Row: {
+          allowed_role: string
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          max_uses: number | null
+          stream_id: string | null
+          uses: number
+        }
+        Insert: {
+          allowed_role?: string
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          max_uses?: number | null
+          stream_id?: string | null
+          uses?: number
+        }
+        Update: {
+          allowed_role?: string
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          max_uses?: number | null
+          stream_id?: string | null
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_codes_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       live_submissions: {
         Row: {
           amount_cents: number
