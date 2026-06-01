@@ -38,6 +38,20 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
           return Response.json({ error: 'Server config error' }, { status: 500 })
         }
 
+        // Require an authenticated caller. The endpoint sends BWF-branded
+        // email from a verified domain, so anonymous use would enable spam
+        // and social-engineering campaigns.
+        const authHeader = request.headers.get('Authorization')
+        if (!authHeader?.startsWith('Bearer ')) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        const token = authHeader.slice('Bearer '.length).trim()
+        const supabase = createClient(supabaseUrl, serviceKey)
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+        if (authError || !user?.email) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
         let body: unknown
         try { body = await request.json() } catch {
           return Response.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -47,7 +61,12 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
           return Response.json({ error: 'Invalid input' }, { status: 400 })
         }
         const data = parsed.data
-        const supabase = createClient(supabaseUrl, serviceKey)
+
+        // The cancellation email can only be sent to the caller's own
+        // verified email address.
+        if (data.email.toLowerCase() !== user.email.toLowerCase()) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
 
         try {
           const entry = TEMPLATES['checkout-cancellation']
