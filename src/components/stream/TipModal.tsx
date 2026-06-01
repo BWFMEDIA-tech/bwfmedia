@@ -41,7 +41,6 @@ export function TipModal({
         amountCents: Math.round(finalAmount * 100),
         message: message || undefined,
         displayName: auth.displayName || auth.user?.email || "Anonymous",
-        userId: auth.user?.id,
         returnUrl: `${window.location.origin}/stream-studio?tip=success`,
         environment: getStripeEnvironment(),
       },

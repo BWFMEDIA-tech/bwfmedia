@@ -49,6 +49,23 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
         const data = parsed.data
         const supabase = createClient(supabaseUrl, serviceKey)
 
+        // Per-IP rate limit (defense against many-recipient spam from a
+        // single attacker). Max 5 cancellation sends per IP per hour.
+        const ip =
+          request.headers.get('cf-connecting-ip') ||
+          request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          'unknown'
+        const ipSince = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+        const { count: ipCount } = await supabase
+          .from('email_send_log')
+          .select('id', { count: 'exact', head: true })
+          .eq('template_name', 'checkout-cancellation')
+          .gte('created_at', ipSince)
+          .contains('metadata', { ip })
+        if ((ipCount ?? 0) >= 5) {
+          return Response.json({ ok: true, sent: false, reason: 'rate_limited' })
+        }
+
         try {
           const entry = TEMPLATES['checkout-cancellation']
           const templateData = {
@@ -87,7 +104,7 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
           }
 
           // Per-recipient rate limit to prevent abuse via rotating cart fingerprints.
-          // Max 3 cancellation emails per recipient per 24 hours.
+          // Max 1 cancellation email per recipient per 24 hours.
           const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
           const { count: recentCount } = await supabase
             .from('email_send_log')
@@ -95,7 +112,7 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
             .eq('recipient_email', data.email)
             .eq('template_name', 'checkout-cancellation')
             .gte('created_at', since)
-          if ((recentCount ?? 0) >= 3) {
+          if ((recentCount ?? 0) >= 1) {
             return Response.json({ ok: true, sent: false, reason: 'rate_limited' })
           }
 
@@ -146,6 +163,7 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
             template_name: 'checkout-cancellation',
             recipient_email: data.email,
             status: 'pending',
+            metadata: { ip },
           })
 
           return Response.json({ ok: true, sent: true })
