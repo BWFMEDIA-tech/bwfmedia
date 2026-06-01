@@ -2,13 +2,13 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { createStripeClient, type StripeEnv } from '@/lib/stripe.server';
 import { validateReturnUrl } from '@/lib/validate-return-url';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 
 const Schema = z.object({
   streamId: z.string().uuid(),
   amountCents: z.number().int().min(100).max(50000),
   message: z.string().max(200).optional(),
   displayName: z.string().max(80).optional(),
-  userId: z.string().uuid().optional(),
   returnUrl: z.string().url().refine((u) => {
     try { validateReturnUrl(u); return true; } catch { return false; }
   }, { message: 'returnUrl must be on the application domain' }),
@@ -18,10 +18,14 @@ const Schema = z.object({
 type Result = { clientSecret: string } | { error: string };
 
 export const createTipCheckout = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data) => Schema.parse(data))
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data, context }): Promise<Result> => {
     try {
       const stripe = createStripeClient(data.environment);
+      // Always derive the tipping user from the verified session — never
+      // trust a client-supplied user id.
+      const tipUserId = context.userId ?? '';
       const session = await stripe.checkout.sessions.create({
         line_items: [{
           price_data: {
@@ -38,7 +42,7 @@ export const createTipCheckout = createServerFn({ method: 'POST' })
         metadata: {
           kind: 'tip',
           streamId: data.streamId,
-          tipUserId: data.userId ?? '',
+          tipUserId,
           tipDisplayName: data.displayName ?? '',
           tipMessage: data.message ?? '',
         },
