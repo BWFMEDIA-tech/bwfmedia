@@ -38,20 +38,6 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
           return Response.json({ error: 'Server config error' }, { status: 500 })
         }
 
-        // Require an authenticated caller. The endpoint sends BWF-branded
-        // email from a verified domain, so anonymous use would enable spam
-        // and social-engineering campaigns.
-        const authHeader = request.headers.get('Authorization')
-        if (!authHeader?.startsWith('Bearer ')) {
-          return Response.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-        const token = authHeader.slice('Bearer '.length).trim()
-        const supabase = createClient(supabaseUrl, serviceKey)
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-        if (authError || !user?.email) {
-          return Response.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
         let body: unknown
         try { body = await request.json() } catch {
           return Response.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -61,11 +47,23 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
           return Response.json({ error: 'Invalid input' }, { status: 400 })
         }
         const data = parsed.data
+        const supabase = createClient(supabaseUrl, serviceKey)
 
-        // The cancellation email can only be sent to the caller's own
-        // verified email address.
-        if (data.email.toLowerCase() !== user.email.toLowerCase()) {
-          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        // Per-IP rate limit (defense against many-recipient spam from a
+        // single attacker). Max 5 cancellation sends per IP per hour.
+        const ip =
+          request.headers.get('cf-connecting-ip') ||
+          request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          'unknown'
+        const ipSince = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+        const { count: ipCount } = await supabase
+          .from('email_send_log')
+          .select('id', { count: 'exact', head: true })
+          .eq('template_name', 'checkout-cancellation')
+          .gte('created_at', ipSince)
+          .contains('metadata', { ip })
+        if ((ipCount ?? 0) >= 5) {
+          return Response.json({ ok: true, sent: false, reason: 'rate_limited' })
         }
 
         try {
@@ -106,7 +104,7 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
           }
 
           // Per-recipient rate limit to prevent abuse via rotating cart fingerprints.
-          // Max 3 cancellation emails per recipient per 24 hours.
+          // Max 1 cancellation email per recipient per 24 hours.
           const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
           const { count: recentCount } = await supabase
             .from('email_send_log')
@@ -114,7 +112,7 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
             .eq('recipient_email', data.email)
             .eq('template_name', 'checkout-cancellation')
             .gte('created_at', since)
-          if ((recentCount ?? 0) >= 3) {
+          if ((recentCount ?? 0) >= 1) {
             return Response.json({ ok: true, sent: false, reason: 'rate_limited' })
           }
 
@@ -165,6 +163,7 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
             template_name: 'checkout-cancellation',
             recipient_email: data.email,
             status: 'pending',
+            metadata: { ip },
           })
 
           return Response.json({ ok: true, sent: true })
