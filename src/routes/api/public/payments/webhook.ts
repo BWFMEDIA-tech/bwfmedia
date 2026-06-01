@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createClient } from '@supabase/supabase-js';
+import * as React from 'react';
+import { render } from '@react-email/components';
 import { type StripeEnv, verifyWebhook } from '@/lib/stripe.server';
+import { TEMPLATES } from '@/lib/email-templates/registry';
 
 let _supabase: any = null;
 function getSupabase(): any {
@@ -8,6 +11,87 @@ function getSupabase(): any {
     _supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   }
   return _supabase;
+}
+
+const SENDER_DOMAIN = 'notify.bwfmedia.company';
+const FROM_ADDRESS = `BWF Media <checkout@${SENDER_DOMAIN}>`;
+
+// Triggered by Stripe webhook events ONLY (checkout.session.expired,
+// payment_intent.payment_failed). The signature has already been verified
+// upstream — never expose this side-effect to client callers.
+async function sendStripeCancellationEmail(email: string | null | undefined, refId: string) {
+  if (!email || !refId) return;
+  const normalizedEmail = email.toLowerCase();
+  const supabase = getSupabase();
+  const messageId = `stripe-cancel-${refId}`;
+
+  // Idempotency: Stripe retries webhooks; one email per session/intent.
+  const { data: prior } = await supabase
+    .from('email_send_log')
+    .select('message_id')
+    .eq('message_id', messageId)
+    .maybeSingle();
+  if (prior) return;
+
+  // Honor suppression list.
+  const { data: suppressed } = await supabase
+    .from('suppressed_emails')
+    .select('email')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+  if (suppressed) return;
+
+  const entry = TEMPLATES['checkout-cancellation'];
+  const templateData = {};
+  const html = await render(React.createElement(entry.component, templateData));
+  const text = await render(React.createElement(entry.component, templateData), { plainText: true });
+  const subject = typeof entry.subject === 'function' ? entry.subject(templateData) : entry.subject;
+
+  // One unsubscribe token per recipient.
+  let unsubscribeToken: string | null = null;
+  const { data: existingTok } = await supabase
+    .from('email_unsubscribe_tokens')
+    .select('token')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+  if (existingTok?.token) {
+    unsubscribeToken = existingTok.token;
+  } else {
+    const newToken = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
+    const { error: tokErr } = await supabase
+      .from('email_unsubscribe_tokens')
+      .insert({ email: normalizedEmail, token: newToken });
+    if (!tokErr) unsubscribeToken = newToken;
+  }
+
+  const { error: enqueueError } = await supabase.rpc('enqueue_email', {
+    queue_name: 'transactional_emails',
+    payload: {
+      to: email,
+      from: FROM_ADDRESS,
+      sender_domain: SENDER_DOMAIN,
+      subject,
+      html,
+      text,
+      purpose: 'transactional',
+      label: 'checkout-cancellation',
+      idempotency_key: messageId,
+      unsubscribe_token: unsubscribeToken,
+      message_id: messageId,
+      queued_at: new Date().toISOString(),
+    },
+  });
+  if (enqueueError) {
+    console.error('Webhook: failed to enqueue cancellation email', enqueueError);
+    return;
+  }
+  await supabase.from('email_send_log').insert({
+    message_id: messageId,
+    template_name: 'checkout-cancellation',
+    recipient_email: email,
+    status: 'pending',
+    metadata: { source: 'stripe_webhook', ref: refId },
+  });
 }
 
 async function markBookingPaid(session: any) {
@@ -122,6 +206,16 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
             case 'checkout.session.async_payment_succeeded':
               await routeSessionPaid(event.data.object);
               break;
+            case 'checkout.session.expired': {
+              const s: any = event.data.object;
+              await sendStripeCancellationEmail(s.customer_email ?? s.customer_details?.email, s.id);
+              break;
+            }
+            case 'payment_intent.payment_failed': {
+              const intent: any = event.data.object;
+              await sendStripeCancellationEmail(intent.receipt_email ?? intent.charges?.data?.[0]?.billing_details?.email, intent.id);
+              break;
+            }
             default:
               console.log('Unhandled Stripe event', event.type);
           }
