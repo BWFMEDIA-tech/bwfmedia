@@ -37,10 +37,44 @@ export const Route = createFileRoute("/stream-studio")({
       { name: "description", content: "Premium live streaming studio for BWF Network. Host music reviews and podcasts with LiveKit-powered video, live chat, tips, and real-time analytics." },
       { property: "og:title", content: "BWF Live Studio" },
       { property: "og:description", content: "Cinematic dark-themed live streaming dashboard built for artists and creators." },
+      { name: "robots", content: "noindex" },
     ],
   }),
-  component: StreamStudio,
+  component: StreamStudioGuard,
 });
+
+function StreamStudioGuard() {
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const isAdmin = auth.roles.includes("admin");
+
+  useEffect(() => {
+    if (auth.loading) return;
+    if (!auth.isAuthenticated) {
+      navigate({ to: "/login", replace: true });
+      return;
+    }
+    if (!isAdmin) {
+      // Best-effort audit log of the blocked client-side access attempt.
+      void supabase.from("stream_studio_access_log" as any).insert({
+        user_id: auth.user?.id ?? null,
+        reason: "non_admin_client_route_access",
+        route: "/stream-studio",
+      } as any);
+      navigate({ to: "/access-denied", replace: true });
+    }
+  }, [auth.loading, auth.isAuthenticated, isAdmin, auth.user?.id, navigate]);
+
+  if (auth.loading || !auth.isAuthenticated || !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#07070d] text-white/60 text-sm">
+        Checking permissions…
+      </div>
+    );
+  }
+
+  return <StreamStudio />;
+}
 
 /* ---------- Theme tokens ---------- */
 const PURPLE = "#8b5cf6";

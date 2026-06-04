@@ -5,14 +5,14 @@ import { Menu, X, User, LogOut, Settings, ChevronDown } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import { useAuth } from "@/lib/auth-context";
 
-const links: Array<{ href?: string; to?: string; label: string }> = [
+const baseLinks: Array<{ href?: string; to?: string; label: string; adminOnly?: boolean }> = [
   { to: "/", label: "Home" },
   { href: "/#services", label: "Services" },
   { href: "/#why", label: "Why BWF" },
   { href: "/#audience", label: "Audience" },
   { to: "/contact", label: "Contact" },
   { to: "/live-review", label: "Live Review" },
-  { to: "/stream-studio", label: "Stream Studio" },
+  { to: "/stream-studio", label: "Stream Studio", adminOnly: true },
   { to: "/studio", label: "Studio" },
 ];
 
@@ -22,6 +22,8 @@ export function SiteHeader() {
   const [profileOpen, setProfileOpen] = useState(false);
   const auth = useAuth();
   const navigate = useNavigate();
+  const isAdmin = auth.roles.includes("admin");
+  const links = baseLinks.filter((l) => !l.adminOnly || isAdmin);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
