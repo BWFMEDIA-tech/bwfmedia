@@ -592,6 +592,36 @@ export type Database = {
           },
         ]
       }
+      stream_studio_access_log: {
+        Row: {
+          action: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string
+          route: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason: string
+          route?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string
+          route?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       streams: {
         Row: {
           created_at: string
