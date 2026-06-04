@@ -44,14 +44,45 @@ export function useAuth(): AuthState {
     if (!session?.user) return;
     const uid = session.user.id;
     setRolesLoading(true);
-    Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("display_name, avatar_url").eq("id", uid).maybeSingle(),
-    ]).then(([rolesRes, profileRes]) => {
-      if (rolesRes.data) setRoles(rolesRes.data.map((r: any) => r.role as AppRole));
-      if (profileRes.data) setProfile(profileRes.data as any);
-      setRolesLoading(false);
-    });
+    let cancelled = false;
+    const MAX_ATTEMPTS = 5;
+
+    const fetchRoles = async () => {
+      let lastRoles: AppRole[] = [];
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        if (cancelled) return;
+        const [rolesRes, profileRes] = await Promise.all([
+          supabase.from("user_roles").select("role").eq("user_id", uid),
+          supabase.from("profiles").select("display_name, avatar_url").eq("id", uid).maybeSingle(),
+        ]);
+        if (cancelled) return;
+
+        if (profileRes.data) setProfile(profileRes.data as any);
+
+        if (!rolesRes.error && rolesRes.data) {
+          lastRoles = rolesRes.data.map((r: any) => r.role as AppRole);
+          if (lastRoles.length > 0 || attempt === MAX_ATTEMPTS) {
+            setRoles(lastRoles);
+            setRolesLoading(false);
+            return;
+          }
+        } else if (attempt === MAX_ATTEMPTS) {
+          console.warn("[auth] role fetch failed after retries", rolesRes.error);
+          setRoles(lastRoles);
+          setRolesLoading(false);
+          return;
+        }
+
+        // exponential backoff: 150, 300, 600, 1200ms
+        const delay = 150 * 2 ** (attempt - 1);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    };
+
+    void fetchRoles();
+    return () => {
+      cancelled = true;
+    };
   }, [session?.user?.id]);
 
   const user = session?.user ?? null;
