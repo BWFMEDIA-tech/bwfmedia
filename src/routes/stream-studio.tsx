@@ -49,7 +49,7 @@ function StreamStudioGuard() {
   const isAdmin = auth.roles.includes("admin");
 
   useEffect(() => {
-    if (auth.loading) return;
+    if (auth.loading || auth.rolesLoading) return;
     if (!auth.isAuthenticated) {
       navigate({ to: "/login", replace: true });
       return;
@@ -63,9 +63,9 @@ function StreamStudioGuard() {
       } as any);
       navigate({ to: "/access-denied", replace: true });
     }
-  }, [auth.loading, auth.isAuthenticated, isAdmin, auth.user?.id, navigate]);
+  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, isAdmin, auth.user?.id, navigate]);
 
-  if (auth.loading || !auth.isAuthenticated || !isAdmin) {
+  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#07070d] text-white/60 text-sm">
         Checking permissions…

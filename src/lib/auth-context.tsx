@@ -6,6 +6,7 @@ export type AppRole = "admin" | "host" | "artist" | "moderator" | "member";
 
 export interface AuthState {
   loading: boolean;
+  rolesLoading: boolean;
   session: Session | null;
   user: User | null;
   displayName: string;
@@ -19,6 +20,7 @@ export function useAuth(): AuthState {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<AppRole[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
 
   useEffect(() => {
@@ -27,11 +29,13 @@ export function useAuth(): AuthState {
       if (!s) {
         setRoles([]);
         setProfile(null);
+        setRolesLoading(false);
       }
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
+      if (!data.session) setRolesLoading(false);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -39,18 +43,21 @@ export function useAuth(): AuthState {
   useEffect(() => {
     if (!session?.user) return;
     const uid = session.user.id;
+    setRolesLoading(true);
     Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
       supabase.from("profiles").select("display_name, avatar_url").eq("id", uid).maybeSingle(),
     ]).then(([rolesRes, profileRes]) => {
       if (rolesRes.data) setRoles(rolesRes.data.map((r: any) => r.role as AppRole));
       if (profileRes.data) setProfile(profileRes.data as any);
+      setRolesLoading(false);
     });
   }, [session?.user?.id]);
 
   const user = session?.user ?? null;
   return {
     loading,
+    rolesLoading,
     session,
     user,
     displayName: profile?.display_name || user?.email?.split("@")[0] || "Guest",
