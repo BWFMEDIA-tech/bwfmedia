@@ -2,14 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AccessToken } from "livekit-server-sdk";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireAdmin } from "@/lib/admin-guard";
 
 const tokenInput = z.object({
   roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/),
 });
 
 export const getLiveKitToken = createServerFn({ method: "POST" })
-  .middleware([requireAdmin])
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) => tokenInput.parse(input))
   .handler(async ({ data, context }) => {
     const apiKey = process.env.LIVEKIT_API_KEY;
