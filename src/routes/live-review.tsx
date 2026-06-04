@@ -22,6 +22,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { Link } from "@tanstack/react-router";
 import { useLiveQueue, type LiveQueueRow } from "@/lib/useLiveQueue";
 import { ModeToggle, PodcastStudio, type LiveMode } from "@/components/PodcastMode";
+import { useAuth } from "@/lib/auth-context";
 
 const RED = "#ef2b2b";
 const RED_DEEP = "#c01616";
