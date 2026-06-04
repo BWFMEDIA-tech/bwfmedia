@@ -59,9 +59,24 @@ function AdminUsersPage() {
   useEffect(() => { if (isAdmin) load(); }, [isAdmin]);
 
   const onAssign = async (userId: string, role: typeof ROLES[number]) => {
+    const target = rows.find((r) => r.id === userId);
+    const label = target?.display_name || target?.email || userId.slice(0, 8);
+    const confirmText =
+      role === "admin"
+        ? `Grant FULL ADMIN to ${label}? They will gain unrestricted Control Center access. Type "GRANT ADMIN" to confirm.`
+        : `Grant role "${role}" to ${label}?`;
+    if (role === "admin") {
+      const answer = prompt(confirmText, "");
+      if (answer !== "GRANT ADMIN") {
+        toast.message("Cancelled — confirmation phrase didn't match.");
+        return;
+      }
+    } else if (!confirm(confirmText)) {
+      return;
+    }
     try {
       await assign({ data: { userId, role } });
-      toast.success(`Granted ${role}`);
+      toast.success(`Granted ${role} (audit logged)`);
       load();
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
@@ -69,10 +84,23 @@ function AdminUsersPage() {
   };
 
   const onRemove = async (userId: string, role: string) => {
-    if (!confirm(`Remove role "${role}"?`)) return;
+    const target = rows.find((r) => r.id === userId);
+    const label = target?.display_name || target?.email || userId.slice(0, 8);
+    if (role === "admin") {
+      const answer = prompt(
+        `Revoke ADMIN from ${label}? This removes Control Center access. Type "REVOKE ADMIN" to confirm.`,
+        "",
+      );
+      if (answer !== "REVOKE ADMIN") {
+        toast.message("Cancelled — confirmation phrase didn't match.");
+        return;
+      }
+    } else if (!confirm(`Remove role "${role}" from ${label}?`)) {
+      return;
+    }
     try {
       await remove({ data: { userId, role: role as typeof ROLES[number] } });
-      toast.success(`Removed ${role}`);
+      toast.success(`Removed ${role} (audit logged)`);
       load();
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");

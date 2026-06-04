@@ -11,6 +11,8 @@ import {
   Mail,
   ListOrdered,
   Video,
+  Activity,
+  ScrollText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
@@ -25,10 +27,12 @@ export const Route = createFileRoute("/admin/")({
 
 const tiles = [
   { to: "/admin/dashboard", icon: LayoutDashboard, title: "Live Dashboard", desc: "Real-time streams, tips, bans, word filter." },
+  { to: "/admin/ops", icon: Activity, title: "Live Ops Feed", desc: "Realtime activity + global stream kill switch." },
   { to: "/stream-studio", icon: Video, title: "Stream Studio", desc: "Launch and control live broadcasts." },
   { to: "/admin/streams", icon: Radio, title: "Network Streams", desc: "Manage every stream across the network." },
   { to: "/admin/users", icon: Users, title: "User Management", desc: "Assign roles, view accounts, manage talent." },
   { to: "/admin/analytics", icon: BarChart3, title: "Global Analytics", desc: "Network-wide revenue, content, engagement." },
+  { to: "/admin/audit", icon: ScrollText, title: "Audit Log", desc: "Every admin action across the platform." },
   { to: "/admin/live-queue", icon: ListOrdered, title: "Live Review Queue", desc: "Approve submissions for live shows." },
   { to: "/admin/bookings", icon: Calendar, title: "Bookings", desc: "Studio and block booking requests." },
   { to: "/admin/cancellation-emails", icon: Mail, title: "Email Health", desc: "Cancellation emails & dedupe outcomes." },

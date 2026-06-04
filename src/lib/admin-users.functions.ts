@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-guard";
+import { logAudit } from "@/lib/audit.server";
 
 const APP_ROLES = ["admin", "host", "artist", "moderator", "member"] as const;
 
@@ -67,12 +68,21 @@ export const assignRole = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await (supabaseAdmin as any)
       .from("user_roles")
       .upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id,role" });
     if (error) throw new Error(error.message);
+    await logAudit({
+      actorId: (context as any).userId,
+      action: "role.assign",
+      category: "role",
+      targetType: "user",
+      targetId: data.userId,
+      summary: `Granted role "${data.role}"`,
+      metadata: { role: data.role },
+    });
     return { ok: true };
   });
 
@@ -97,5 +107,14 @@ export const removeRole = createServerFn({ method: "POST" })
       .eq("user_id", data.userId)
       .eq("role", data.role);
     if (error) throw new Error(error.message);
+    await logAudit({
+      actorId: (context as any).userId,
+      action: "role.remove",
+      category: "role",
+      targetType: "user",
+      targetId: data.userId,
+      summary: `Removed role "${data.role}"`,
+      metadata: { role: data.role },
+    });
     return { ok: true };
   });

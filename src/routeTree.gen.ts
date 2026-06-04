@@ -47,11 +47,13 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
+import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.cancellation-emails'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
@@ -254,6 +256,11 @@ const AdminStreamsRoute = AdminStreamsRouteImport.update({
   path: '/admin/streams',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminOpsRoute = AdminOpsRouteImport.update({
+  id: '/admin/ops',
+  path: '/admin/ops',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -277,6 +284,11 @@ const AdminCancellationEmailsRoute = AdminCancellationEmailsRouteImport.update({
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin/bookings',
   path: '/admin/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
@@ -366,11 +378,13 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/ops': typeof AdminOpsRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -422,11 +436,13 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/ops': typeof AdminOpsRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -479,11 +495,13 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/ops': typeof AdminOpsRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -537,11 +555,13 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/ops'
     | '/admin/streams'
     | '/admin/users'
     | '/artist/$id'
@@ -593,11 +613,13 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/ops'
     | '/admin/streams'
     | '/admin/users'
     | '/artist/$id'
@@ -649,11 +671,13 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/ops'
     | '/admin/streams'
     | '/admin/users'
     | '/artist/$id'
@@ -706,11 +730,13 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminOpsRoute: typeof AdminOpsRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   ArtistIdRoute: typeof ArtistIdRoute
@@ -1003,6 +1029,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStreamsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/ops': {
+      id: '/admin/ops'
+      path: '/admin/ops'
+      fullPath: '/admin/ops'
+      preLoaderRoute: typeof AdminOpsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -1036,6 +1069,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/bookings'
       fullPath: '/admin/bookings'
       preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/analytics': {
@@ -1167,11 +1207,13 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAuditRoute: AdminAuditRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminOpsRoute: AdminOpsRoute,
   AdminStreamsRoute: AdminStreamsRoute,
   AdminUsersRoute: AdminUsersRoute,
   ArtistIdRoute: ArtistIdRoute,

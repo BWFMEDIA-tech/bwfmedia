@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { logAudit } from "@/lib/audit.server";
 
 async function assertModOrHost(supabase: any, userId: string, streamId?: string) {
   const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
@@ -117,5 +118,13 @@ export const endStreamAdmin = createServerFn({ method: "POST" })
       .update({ status: "ended", ended_at: new Date().toISOString() })
       .eq("id", data.streamId);
     if (error) throw new Error(error.message);
+    await logAudit({
+      actorId: userId,
+      action: "stream.end",
+      category: "stream",
+      targetType: "stream",
+      targetId: data.streamId,
+      summary: "Stream ended by admin",
+    });
     return { ok: true };
   });
