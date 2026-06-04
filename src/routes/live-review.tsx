@@ -22,6 +22,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { Link } from "@tanstack/react-router";
 import { useLiveQueue, type LiveQueueRow } from "@/lib/useLiveQueue";
 import { ModeToggle, PodcastStudio, type LiveMode } from "@/components/PodcastMode";
+import { useAuth } from "@/lib/auth-context";
 
 const RED = "#ef2b2b";
 const RED_DEEP = "#c01616";
@@ -95,11 +96,12 @@ function LiveReviewPage() {
   const [subSongTitle, setSubSongTitle] = useState("");
   const [subPhoto, setSubPhoto] = useState("");
   const [subLink, setSubLink] = useState("");
-  const [subEmail, setSubEmail] = useState("");
   const [subMsg, setSubMsg] = useState("");
   const [selectedTier, setSelectedTier] = useState<LiveTierId | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const auth = useAuth();
+  const subEmail = auth.user?.email ?? "";
 
   // Real-time queue
   const { rows: queue } = useLiveQueue();
@@ -143,12 +145,16 @@ function LiveReviewPage() {
 
   async function handleSubmitMusic(e: React.FormEvent) {
     e.preventDefault();
+    if (!auth.isAuthenticated || !subEmail) {
+      toast.error("Sign in to submit your music.");
+      return;
+    }
     if (!selectedTier) {
       toast.error("Pick a tier to unlock submission.");
       return;
     }
-    if (!subArtist.trim() || !subLink.trim() || !subEmail.trim()) {
-      toast.error("Artist, link, and email are required.");
+    if (!subArtist.trim() || !subLink.trim()) {
+      toast.error("Artist and link are required.");
       return;
     }
     setSubmitting(true);
@@ -158,7 +164,6 @@ function LiveReviewPage() {
         data: {
           tier: selectedTier,
           artistName: subArtist.trim(),
-          email: subEmail.trim(),
           songLink: subLink.trim(),
           songTitle: subSongTitle.trim(),
           photoUrl: subPhoto.trim(),
@@ -691,12 +696,11 @@ function LiveReviewPage() {
                 />
                 <input
                   type="email"
-                  required
                   value={subEmail}
-                  onChange={(e) => setSubEmail(e.target.value)}
-                  placeholder="Contact email *"
+                  readOnly
+                  placeholder={auth.isAuthenticated ? "" : "Sign in to submit"}
                   maxLength={120}
-                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none opacity-70 cursor-not-allowed"
                   style={{ borderColor: `${RED}33` }}
                 />
                 <input
@@ -743,7 +747,7 @@ function LiveReviewPage() {
                 )}
                 <button
                   type="submit"
-                  disabled={submitting || !selectedTier}
+                  disabled={submitting || !selectedTier || !auth.isAuthenticated}
                   className="sm:col-span-2 flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-bone transition-all disabled:opacity-60 hover:brightness-110"
                   style={{
                     background: `linear-gradient(135deg, ${RED}, ${RED_DEEP})`,
@@ -753,10 +757,20 @@ function LiveReviewPage() {
                   <Lock className="w-4 h-4" />
                   {submitting
                     ? "Loading checkout…"
-                    : selectedTier
+                    : !auth.isAuthenticated
+                      ? "Sign in to submit"
+                      : selectedTier
                       ? `Pay $${(LIVE_TIERS[selectedTier].amountCents / 100).toFixed(0)} & Submit`
                       : "Pick a tier above"}
                 </button>
+                {!auth.isAuthenticated && (
+                  <div className="sm:col-span-2 text-center text-xs text-bone/70">
+                    <Link to="/login" className="underline hover:text-bone">Sign in</Link>
+                    {" "}or{" "}
+                    <Link to="/signup" className="underline hover:text-bone">create an account</Link>
+                    {" "}to submit your music.
+                  </div>
+                )}
               </form>
             )}
           </div>

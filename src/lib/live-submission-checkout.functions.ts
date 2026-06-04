@@ -11,7 +11,6 @@ const TIER_IDS = ['live_review_basic', 'live_review_featured', 'live_review_prem
 const CreateSchema = z.object({
   tier: z.enum(TIER_IDS),
   artistName: z.string().min(1).max(120),
-  email: z.string().email().max(180),
   songLink: z.string().url().max(500),
   songTitle: z.string().max(160).optional().default(''),
   photoUrl: z.string().url().max(500).optional().or(z.literal('')).default(''),
@@ -27,18 +26,24 @@ function admin() {
 }
 
 export const createLiveSubmissionCheckout = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data) => CreateSchema.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const tier = LIVE_TIERS[data.tier as LiveTierId];
     if (!tier) throw new Error('Unknown tier');
 
     const supabase = admin();
 
+    // Email is taken from the authenticated user, never trusted from input.
+    const { data: userRes } = await context.supabase.auth.getUser();
+    const userEmail = userRes.user?.email?.toLowerCase();
+    if (!userEmail) throw new Error('Sign-in required to submit');
+
     const { data: row, error: insertErr } = await supabase
       .from('live_submissions')
       .insert({
         artist_name: data.artistName,
-        email: data.email,
+        email: userEmail,
         song_link: data.songLink,
         song_title: data.songTitle || null,
         photo_url: data.photoUrl || null,
@@ -58,12 +63,12 @@ export const createLiveSubmissionCheckout = createServerFn({ method: 'POST' })
 
     // Customer dedupe by email so repeat submitters land on same Customer.
     let customerId: string | undefined;
-    const existing = await stripe.customers.list({ email: data.email, limit: 1 });
+    const existing = await stripe.customers.list({ email: userEmail, limit: 1 });
     if (existing.data.length) {
       customerId = existing.data[0].id;
     } else {
       const created = await stripe.customers.create({
-        email: data.email,
+        email: userEmail,
         name: data.artistName,
         metadata: { source: 'live_submission' },
       });
