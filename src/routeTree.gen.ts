@@ -33,6 +33,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
@@ -44,11 +45,14 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.cancellation-emails'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
@@ -180,6 +184,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideosIdRoute = VideosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -235,6 +244,16 @@ const ArtistIdRoute = ArtistIdRouteImport.update({
   path: '/artist/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminStreamsRoute = AdminStreamsRouteImport.update({
+  id: '/admin/streams',
+  path: '/admin/streams',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -258,6 +277,11 @@ const AdminCancellationEmailsRoute = AdminCancellationEmailsRouteImport.update({
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin/bookings',
   path: '/admin/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
@@ -341,11 +365,14 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/streams': typeof AdminStreamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -357,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -393,11 +421,14 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/streams': typeof AdminStreamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -409,6 +440,7 @@ export interface FileRoutesByTo {
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
+  '/admin': typeof AdminIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -446,11 +478,14 @@ export interface FileRoutesById {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/streams': typeof AdminStreamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -462,6 +497,7 @@ export interface FileRoutesById {
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -500,11 +536,14 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/analytics'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/streams'
+    | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -516,6 +555,7 @@ export interface FileRouteTypes {
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
+    | '/admin/'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -552,11 +592,14 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/analytics'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/streams'
+    | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -568,6 +611,7 @@ export interface FileRouteTypes {
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
+    | '/admin'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -604,11 +648,14 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/analytics'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/streams'
+    | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -620,6 +667,7 @@ export interface FileRouteTypes {
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
+    | '/admin/'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -657,11 +705,14 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminStreamsRoute: typeof AdminStreamsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   ArtistIdRoute: typeof ArtistIdRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -671,6 +722,7 @@ export interface RootRouteChildren {
   PayReturnRoute: typeof PayReturnRoute
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -853,6 +905,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/videos/$id': {
       id: '/videos/$id'
       path: '/$id'
@@ -930,6 +989,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/streams': {
+      id: '/admin/streams'
+      path: '/admin/streams'
+      fullPath: '/admin/streams'
+      preLoaderRoute: typeof AdminStreamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -963,6 +1036,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/bookings'
       fullPath: '/admin/bookings'
       preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
@@ -1086,11 +1166,14 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminStreamsRoute: AdminStreamsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   ArtistIdRoute: ArtistIdRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
@@ -1100,6 +1183,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayReturnRoute: PayReturnRoute,
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
