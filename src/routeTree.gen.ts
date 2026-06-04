@@ -52,6 +52,7 @@ import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.cancellation-emails'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
@@ -278,6 +279,11 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
   path: '/admin/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -414,6 +421,7 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -470,6 +478,7 @@ export interface FileRoutesById {
   '/studio': typeof StudioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -527,6 +536,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/analytics'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
@@ -582,6 +592,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/analytics'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
@@ -637,6 +648,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/unsubscribe'
     | '/videos'
+    | '/admin/analytics'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/dashboard'
@@ -693,6 +705,7 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -1025,6 +1038,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -1146,6 +1166,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
