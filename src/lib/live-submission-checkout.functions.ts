@@ -63,7 +63,7 @@ export const createLiveSubmissionCheckout = createServerFn({ method: 'POST' })
 
     // Customer dedupe by email so repeat submitters land on same Customer.
     let customerId: string | undefined;
-    const existing = await stripe.customers.list({ email: data.email, limit: 1 });
+    const existing = await stripe.customers.list({ email: userEmail, limit: 1 });
     if (existing.data.length) {
       customerId = existing.data[0].id;
     } else {
