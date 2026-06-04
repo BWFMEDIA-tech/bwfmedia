@@ -696,12 +696,11 @@ function LiveReviewPage() {
                 />
                 <input
                   type="email"
-                  required
                   value={subEmail}
-                  onChange={(e) => setSubEmail(e.target.value)}
-                  placeholder="Contact email *"
+                  readOnly
+                  placeholder={auth.isAuthenticated ? "" : "Sign in to submit"}
                   maxLength={120}
-                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none"
+                  className="bg-black/40 border px-3 py-3 text-sm text-bone placeholder:text-bone/40 focus:outline-none opacity-70 cursor-not-allowed"
                   style={{ borderColor: `${RED}33` }}
                 />
                 <input
