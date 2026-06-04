@@ -1,6 +1,7 @@
 import { Link as RouterLink } from "@tanstack/react-router";
 import { Youtube, Instagram, Facebook, Twitter, Music2, Linkedin, Mail, MapPin, ArrowRight } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
+import { useAuth } from "@/lib/auth-context";
 
 const socials = [
   { href: "https://youtube.com/@bwfmedia", label: "YouTube", Icon: Youtube },
@@ -11,12 +12,15 @@ const socials = [
   { href: "https://linkedin.com/company/bwfmediatv", label: "LinkedIn", Icon: Linkedin },
 ];
 
-const menuGroups = [
+const menuGroups: Array<{
+  title: string;
+  links: Array<{ label: string; to?: string; href?: string; adminOnly?: boolean }>;
+}> = [
   {
     title: "Services",
     links: [
       { label: "Studio Bookings", to: "/studio" },
-      { label: "Stream Studio", to: "/stream-studio" },
+      { label: "Stream Studio", to: "/stream-studio", adminOnly: true },
       { label: "Off Da Block", to: "/off-the-block" },
       { label: "Live Review", to: "/live-review" },
       { label: "Artist Interviews", href: "/#services" },
@@ -53,6 +57,12 @@ const menuGroups = [
 ];
 
 export function SiteFooter() {
+  const auth = useAuth();
+  const isAdmin = auth.roles.includes("admin");
+  const visibleGroups = menuGroups.map((g) => ({
+    ...g,
+    links: g.links.filter((l) => !l.adminOnly || isAdmin),
+  }));
   return (
     <footer className="bg-black border-t border-white/10">
       {/* Main footer grid */}
@@ -81,7 +91,7 @@ export function SiteFooter() {
         </div>
 
         {/* Menu columns */}
-        {menuGroups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.title}>
             <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-4">
               {group.title}
