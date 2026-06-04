@@ -747,7 +747,7 @@ function LiveReviewPage() {
                 )}
                 <button
                   type="submit"
-                  disabled={submitting || !selectedTier}
+                  disabled={submitting || !selectedTier || !auth.isAuthenticated}
                   className="sm:col-span-2 flex items-center justify-center gap-2 py-3 font-anton uppercase tracking-wide text-bone transition-all disabled:opacity-60 hover:brightness-110"
                   style={{
                     background: `linear-gradient(135deg, ${RED}, ${RED_DEEP})`,
@@ -757,10 +757,20 @@ function LiveReviewPage() {
                   <Lock className="w-4 h-4" />
                   {submitting
                     ? "Loading checkout…"
-                    : selectedTier
+                    : !auth.isAuthenticated
+                      ? "Sign in to submit"
+                      : selectedTier
                       ? `Pay $${(LIVE_TIERS[selectedTier].amountCents / 100).toFixed(0)} & Submit`
                       : "Pick a tier above"}
                 </button>
+                {!auth.isAuthenticated && (
+                  <div className="sm:col-span-2 text-center text-xs text-bone/70">
+                    <Link to="/login" className="underline hover:text-bone">Sign in</Link>
+                    {" "}or{" "}
+                    <Link to="/signup" className="underline hover:text-bone">create an account</Link>
+                    {" "}to submit your music.
+                  </div>
+                )}
               </form>
             )}
           </div>
