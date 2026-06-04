@@ -43,6 +43,7 @@ function VideosPage() {
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
+  const [canUpload, setCanUpload] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
@@ -51,6 +52,16 @@ function VideosPage() {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!userId) { setCanUpload(false); return; }
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .in("role", ["artist", "admin"])
+      .then(({ data }) => setCanUpload(!!data && data.length > 0));
+  }, [userId]);
 
   const load = async () => {
     setLoading(true);
@@ -87,13 +98,15 @@ function VideosPage() {
           <div className="flex items-center gap-3">
             {userId ? (
               <>
-                <button
-                  onClick={() => setShowUpload(true)}
-                  className="px-4 py-2 font-cond font-bold tracking-[0.2em] text-[11px] uppercase text-bone flex items-center gap-2"
-                  style={{ backgroundColor: "var(--blood)" }}
-                >
-                  <Upload size={14} /> Upload
-                </button>
+                {canUpload && (
+                  <button
+                    onClick={() => setShowUpload(true)}
+                    className="px-4 py-2 font-cond font-bold tracking-[0.2em] text-[11px] uppercase text-bone flex items-center gap-2"
+                    style={{ backgroundColor: "var(--blood)" }}
+                  >
+                    <Upload size={14} /> Upload
+                  </button>
+                )}
                 <button
                   onClick={() => supabase.auth.signOut()}
                   className="px-3 py-2 font-cond font-bold tracking-[0.2em] text-[11px] uppercase text-bone/70 hover:text-bone flex items-center gap-2"
