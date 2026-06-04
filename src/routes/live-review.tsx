@@ -96,11 +96,12 @@ function LiveReviewPage() {
   const [subSongTitle, setSubSongTitle] = useState("");
   const [subPhoto, setSubPhoto] = useState("");
   const [subLink, setSubLink] = useState("");
-  const [subEmail, setSubEmail] = useState("");
   const [subMsg, setSubMsg] = useState("");
   const [selectedTier, setSelectedTier] = useState<LiveTierId | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const auth = useAuth();
+  const subEmail = auth.user?.email ?? "";
 
   // Real-time queue
   const { rows: queue } = useLiveQueue();
