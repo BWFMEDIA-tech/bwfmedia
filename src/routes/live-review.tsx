@@ -145,12 +145,16 @@ function LiveReviewPage() {
 
   async function handleSubmitMusic(e: React.FormEvent) {
     e.preventDefault();
+    if (!auth.isAuthenticated || !subEmail) {
+      toast.error("Sign in to submit your music.");
+      return;
+    }
     if (!selectedTier) {
       toast.error("Pick a tier to unlock submission.");
       return;
     }
-    if (!subArtist.trim() || !subLink.trim() || !subEmail.trim()) {
-      toast.error("Artist, link, and email are required.");
+    if (!subArtist.trim() || !subLink.trim()) {
+      toast.error("Artist and link are required.");
       return;
     }
     setSubmitting(true);
@@ -160,7 +164,6 @@ function LiveReviewPage() {
         data: {
           tier: selectedTier,
           artistName: subArtist.trim(),
-          email: subEmail.trim(),
           songLink: subLink.trim(),
           songTitle: subSongTitle.trim(),
           photoUrl: subPhoto.trim(),
