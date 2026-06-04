@@ -45,6 +45,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
@@ -242,6 +243,11 @@ const ArtistIdRoute = ArtistIdRouteImport.update({
   path: '/artist/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminStreamsRoute = AdminStreamsRouteImport.update({
   id: '/admin/streams',
   path: '/admin/streams',
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -413,6 +420,7 @@ export interface FileRoutesByTo {
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -468,6 +476,7 @@ export interface FileRoutesById {
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -524,6 +533,7 @@ export interface FileRouteTypes {
     | '/admin/live-queue'
     | '/admin/login'
     | '/admin/streams'
+    | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -578,6 +588,7 @@ export interface FileRouteTypes {
     | '/admin/live-queue'
     | '/admin/login'
     | '/admin/streams'
+    | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -632,6 +643,7 @@ export interface FileRouteTypes {
     | '/admin/live-queue'
     | '/admin/login'
     | '/admin/streams'
+    | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -687,6 +699,7 @@ export interface RootRouteChildren {
   AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   ArtistIdRoute: typeof ArtistIdRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -963,6 +976,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/streams': {
       id: '/admin/streams'
       path: '/admin/streams'
@@ -1132,6 +1152,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminStreamsRoute: AdminStreamsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   ArtistIdRoute: ArtistIdRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
