@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.live_submissions_block_payment_field_writes() FROM PUBLIC, anon, authenticated;
