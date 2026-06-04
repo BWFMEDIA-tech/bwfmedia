@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createClient } from '@supabase/supabase-js';
-import * as React from 'react';
-import { render } from '@react-email/components';
 import { type StripeEnv, verifyWebhook } from '@/lib/stripe.server';
-import { TEMPLATES } from '@/lib/email-templates/registry';
+import { sendStripeCancellationEmail } from '@/lib/cancellation-email';
 
 let _supabase: any = null;
 function getSupabase(): any {
@@ -11,100 +9,6 @@ function getSupabase(): any {
     _supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   }
   return _supabase;
-}
-
-const SENDER_DOMAIN = 'notify.bwfmedia.company';
-const FROM_ADDRESS = `BWF Media <checkout@${SENDER_DOMAIN}>`;
-
-// Triggered by Stripe webhook events ONLY (checkout.session.expired,
-// payment_intent.payment_failed). The signature has already been verified
-// upstream — never expose this side-effect to client callers.
-async function sendStripeCancellationEmail(email: string | null | undefined, refId: string) {
-  if (!email || !refId) return;
-  const normalizedEmail = email.toLowerCase();
-  const supabase = getSupabase();
-  const messageId = `stripe-cancel-${refId}`;
-
-  // Honor suppression list.
-  const { data: suppressed } = await supabase
-    .from('suppressed_emails')
-    .select('email')
-    .eq('email', normalizedEmail)
-    .maybeSingle();
-  if (suppressed) return;
-
-  // Race-safe idempotency claim: insert the log row BEFORE enqueueing.
-  // A partial unique index on (message_id) WHERE status='pending' plus the
-  // existing unique index WHERE status='sent' guarantees that concurrent
-  // Stripe webhook retries collide here — only one insert wins, the rest
-  // hit a unique-violation and exit without enqueueing a second email.
-  const { error: claimError } = await supabase
-    .from('email_send_log')
-    .insert({
-      message_id: messageId,
-      template_name: 'checkout-cancellation',
-      recipient_email: email,
-      status: 'pending',
-      metadata: { source: 'stripe_webhook', ref: refId },
-    });
-  if (claimError) {
-    // 23505 = unique_violation → duplicate webhook delivery, already handled.
-    if ((claimError as any).code === '23505') return;
-    console.error('Webhook: failed to claim cancellation email log row', claimError);
-    return;
-  }
-
-  const entry = TEMPLATES['checkout-cancellation'];
-  const templateData = {};
-  const html = await render(React.createElement(entry.component, templateData));
-  const text = await render(React.createElement(entry.component, templateData), { plainText: true });
-  const subject = typeof entry.subject === 'function' ? entry.subject(templateData) : entry.subject;
-
-  // One unsubscribe token per recipient.
-  let unsubscribeToken: string | null = null;
-  const { data: existingTok } = await supabase
-    .from('email_unsubscribe_tokens')
-    .select('token')
-    .eq('email', normalizedEmail)
-    .maybeSingle();
-  if (existingTok?.token) {
-    unsubscribeToken = existingTok.token;
-  } else {
-    const newToken = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
-    const { error: tokErr } = await supabase
-      .from('email_unsubscribe_tokens')
-      .insert({ email: normalizedEmail, token: newToken });
-    if (!tokErr) unsubscribeToken = newToken;
-  }
-
-  const { error: enqueueError } = await supabase.rpc('enqueue_email', {
-    queue_name: 'transactional_emails',
-    payload: {
-      to: email,
-      from: FROM_ADDRESS,
-      sender_domain: SENDER_DOMAIN,
-      subject,
-      html,
-      text,
-      purpose: 'transactional',
-      label: 'checkout-cancellation',
-      idempotency_key: messageId,
-      unsubscribe_token: unsubscribeToken,
-      message_id: messageId,
-      queued_at: new Date().toISOString(),
-    },
-  });
-  if (enqueueError) {
-    console.error('Webhook: failed to enqueue cancellation email', enqueueError);
-    // Roll the claim back so a future Stripe retry can try again instead
-    // of being silently suppressed by the pending-row idempotency guard.
-    await supabase
-      .from('email_send_log')
-      .delete()
-      .eq('message_id', messageId)
-      .eq('status', 'pending');
-    return;
-  }
 }
 
 async function markBookingPaid(session: any) {
@@ -221,12 +125,12 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
               break;
             case 'checkout.session.expired': {
               const s: any = event.data.object;
-              await sendStripeCancellationEmail(s.customer_email ?? s.customer_details?.email, s.id);
+              await sendStripeCancellationEmail(getSupabase(), s.customer_email ?? s.customer_details?.email, s.id);
               break;
             }
             case 'payment_intent.payment_failed': {
               const intent: any = event.data.object;
-              await sendStripeCancellationEmail(intent.receipt_email ?? intent.charges?.data?.[0]?.billing_details?.email, intent.id);
+              await sendStripeCancellationEmail(getSupabase(), intent.receipt_email ?? intent.charges?.data?.[0]?.billing_details?.email, intent.id);
               break;
             }
             default:
