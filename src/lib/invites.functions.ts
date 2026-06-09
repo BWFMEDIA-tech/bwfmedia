@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const codeSchema = z.string().min(1).max(64).regex(/^[a-zA-Z0-9_-]+$/);
 
@@ -96,6 +97,7 @@ export const resolveInvite = createServerFn({ method: "POST" })
 
 /** Track invite consumption. Fire-and-forget from the client. */
 export const recordInviteJoin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z
       .object({
@@ -105,9 +107,9 @@ export const recordInviteJoin = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const client = adminClient();
-    console.log("[invite] join", { code: data.code, role: data.role, userId: data.userId ?? null });
+    console.log("[invite] join", { code: data.code, role: data.role, userId: context.userId });
     // Atomic increment via RPC would be nicer; quick read-modify-write is fine
     // for low-contention invite codes.
     const { data: row } = await client
