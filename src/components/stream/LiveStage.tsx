@@ -28,16 +28,18 @@ interface LiveStageProps {
   guestImage?: string;
   onViewerCount?: (n: number) => void;
   streamId?: string;
+  /** Whether to auto-publish the local camera/mic. Default true (host/guest on stage). Pass false for crowd viewers. */
+  publish?: boolean;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true }: LiveStageProps) {
   return (
     <LiveKitRoom
       token={token}
       serverUrl={serverUrl}
       connect
-      video
-      audio
+      video={publish}
+      audio={publish}
       onError={(e) => toast.error(`Stream error: ${e.message}`)}
       className="contents"
     >
