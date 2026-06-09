@@ -9,6 +9,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { verifyDeckPassword } from "@/lib/deck-gate.functions";
 
 export const Route = createFileRoute("/deck")({
   head: () => ({
