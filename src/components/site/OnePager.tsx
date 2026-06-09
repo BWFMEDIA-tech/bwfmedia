@@ -75,7 +75,7 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
       <div
         className="absolute inset-0 opacity-30 pointer-events-none"
-        style={{ background: "radial-gradient(60% 50% at 50% 40%, rgba(255,45,45,0.25), transparent 70%)" }}
+        style={{ background: "radial-gradient(60% 50% at 50% 40%, rgba(139,92,246,0.25), transparent 70%)" }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 text-center pt-24 pb-16">
@@ -461,7 +461,7 @@ function Pricing() {
               <div
                 className={`relative h-full flex flex-col p-7 border backdrop-blur-md transition-all duration-300 ${
                   p.popular
-                    ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(255,45,45,0.5)]"
+                    ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(139,92,246,0.5)]"
                     : "bg-white/[0.03] border-white/10 hover:border-white/30"
                 }`}
               >
@@ -580,7 +580,7 @@ function FinalCTA() {
     <section id="book" className="relative bg-black/30 backdrop-blur-sm overflow-hidden">
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(255,45,45,0.4), transparent 70%)" }}
+        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(139,92,246,0.4), transparent 70%)" }}
       />
       <div className="relative max-w-4xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
         <Reveal>
@@ -638,8 +638,8 @@ export function OnePager() {
       style={{
         backgroundColor: "#000000",
         backgroundImage: [
-          "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(255,45,45,0.18), transparent 60%)",
-          "radial-gradient(ellipse 60% 50% at 90% 100%, rgba(255,45,45,0.12), transparent 60%)",
+          "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(139,92,246,0.18), transparent 60%)",
+          "radial-gradient(ellipse 60% 50% at 90% 100%, rgba(139,92,246,0.12), transparent 60%)",
           "linear-gradient(180deg, #000 0%, #060000 50%, #000 100%)",
         ].join(","),
       }}
@@ -649,7 +649,7 @@ export function OnePager() {
         className="fixed inset-0 pointer-events-none opacity-[0.12] z-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,45,45,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,45,45,0.45) 1px, transparent 1px)",
+            "linear-gradient(rgba(139,92,246,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.45) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
           maskImage:
             "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
@@ -662,8 +662,8 @@ export function OnePager() {
         className="fixed left-0 right-0 h-[2px] pointer-events-none z-0"
         style={{
           background:
-            "linear-gradient(90deg, transparent, rgba(255,90,90,0.9), transparent)",
-          boxShadow: "0 0 24px rgba(255,45,45,0.8)",
+            "linear-gradient(90deg, transparent, rgba(167,139,250,0.9), transparent)",
+          boxShadow: "0 0 24px rgba(139,92,246,0.8)",
         }}
         initial={{ top: "0%" }}
         animate={{ top: ["0%", "100%", "0%"] }}
@@ -680,11 +680,11 @@ export function OnePager() {
       {/* Glow blobs */}
       <div
         className="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-25 blur-3xl pointer-events-none z-0"
-        style={{ backgroundColor: "rgba(255,45,45,0.7)" }}
+        style={{ backgroundColor: "rgba(139,92,246,0.7)" }}
       />
       <div
         className="fixed -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none z-0"
-        style={{ backgroundColor: "rgba(255,45,45,0.6)" }}
+        style={{ backgroundColor: "rgba(139,92,246,0.6)" }}
       />
 
       <div className="relative z-10">
@@ -710,7 +710,7 @@ export function OnePager() {
         className="relative h-[2px] z-20"
         style={{
           background:
-            "linear-gradient(90deg, transparent, rgba(255,45,45,0.9), transparent)",
+            "linear-gradient(90deg, transparent, rgba(139,92,246,0.9), transparent)",
         }}
       />
     </div>

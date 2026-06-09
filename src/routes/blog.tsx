@@ -131,7 +131,7 @@ function BlogPage() {
             <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "var(--blood)" }} />
             <div
               className="md:col-span-2 aspect-[4/3] flex items-center justify-center border"
-              style={{ borderColor: "var(--border)", background: "linear-gradient(135deg, rgba(255,45,45,0.18), rgba(0,0,0,0.6))" }}
+              style={{ borderColor: "var(--border)", background: "linear-gradient(135deg, rgba(139,92,246,0.18), rgba(0,0,0,0.6))" }}
             >
               <featured.Icon className="w-20 h-20" style={{ color: "var(--blood)" }} strokeWidth={1.5} />
             </div>

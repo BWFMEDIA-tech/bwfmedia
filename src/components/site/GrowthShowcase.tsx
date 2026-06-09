@@ -180,7 +180,7 @@ export function GrowthShowcase() {
                 className="absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                 style={{
                   background:
-                    "radial-gradient(400px circle at 50% 0%, rgba(255,45,45,0.18), transparent 60%)",
+                    "radial-gradient(400px circle at 50% 0%, rgba(139,92,246,0.18), transparent 60%)",
                 }}
               />
               <div className="relative flex items-center justify-between mb-5">
@@ -288,7 +288,7 @@ export function GrowthShowcase() {
             </div>
             <RouterLink
               to="/contact"
-              className="group inline-flex items-center gap-3 px-8 py-5 bg-blood text-white font-cond font-bold tracking-[0.25em] text-xs uppercase hover:bg-blood-glow transition-colors shadow-[0_20px_60px_-20px_rgba(255,45,45,0.7)]"
+              className="group inline-flex items-center gap-3 px-8 py-5 bg-blood text-white font-cond font-bold tracking-[0.25em] text-xs uppercase hover:bg-blood-glow transition-colors shadow-[0_20px_60px_-20px_rgba(139,92,246,0.7)]"
             >
               Work With BWFMedia
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
