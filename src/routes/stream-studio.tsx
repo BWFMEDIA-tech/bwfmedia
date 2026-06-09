@@ -841,7 +841,7 @@ function StreamStudio() {
 
               {/* Three live panels */}
               <div className="grid gap-4 lg:grid-cols-3">
-                <RaiseHandPanel hands={hands} />
+                <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />
                 <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />
                 <GreenRoom streamId={stream?.id ?? null} participants={participants} />
               </div>
