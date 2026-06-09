@@ -1,19 +1,34 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireAdmin } from "@/lib/admin-guard";
 
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "stream";
 }
 
+async function assertCanBroadcast(supabase: any, userId: string) {
+  const { data: roles } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId);
+  const ok = (roles ?? []).some((r: any) =>
+    r.role === "admin" || r.role === "host" || r.role === "artist",
+  );
+  if (!ok) throw new Error("Not authorized to start streams");
+}
+
 export const startOrResumeStream = createServerFn({ method: "POST" })
-  .middleware([requireAdmin])
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({ title: z.string().min(1).max(120).default("BWF Live") }).parse(input),
+    z.object({
+      title: z.string().min(1).max(120).default("BWF Live"),
+      category: z.string().min(1).max(80).optional(),
+      description: z.string().max(500).optional(),
+    }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    await assertCanBroadcast(supabase, userId);
 
     // Reuse an existing live stream for this host if any
     const { data: existing } = await supabase
@@ -28,7 +43,13 @@ export const startOrResumeStream = createServerFn({ method: "POST" })
     if (existing) {
       if (existing.status !== "live") {
         await supabase.from("streams")
-          .update({ status: "live", started_at: new Date().toISOString(), title: data.title })
+          .update({
+            status: "live",
+            started_at: new Date().toISOString(),
+            title: data.title,
+            category: data.category ?? existing.category ?? null,
+            description: data.description ?? existing.description ?? null,
+          })
           .eq("id", existing.id);
       }
       return { id: existing.id, room_name: existing.room_name, title: data.title };
@@ -43,6 +64,8 @@ export const startOrResumeStream = createServerFn({ method: "POST" })
         room_name: roomName,
         status: "live",
         started_at: new Date().toISOString(),
+        category: data.category ?? null,
+        description: data.description ?? null,
       })
       .select("id, room_name, title")
       .single();
@@ -51,10 +74,19 @@ export const startOrResumeStream = createServerFn({ method: "POST" })
   });
 
 export const endStream = createServerFn({ method: "POST" })
-  .middleware([requireAdmin])
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    // Only host or admin can end a stream.
+    const { data: row } = await supabase
+      .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
+    if (!row) throw new Error("Stream not found");
+    if (row.host_id !== userId) {
+      const { data: adm } = await supabase
+        .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+      if (!adm) throw new Error("Not authorized");
+    }
     const { error } = await supabase
       .from("streams")
       .update({ status: "ended", ended_at: new Date().toISOString() })
