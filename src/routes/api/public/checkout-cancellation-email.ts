@@ -11,9 +11,6 @@ const FROM_ADDRESS = `BWF Media <checkout@${SENDER_DOMAIN}>`
 
 const Schema = z.object({
   email: z.string().email().max(200),
-  name: z.string().max(120).optional().nullable(),
-  itemCount: z.number().int().min(0).max(100).optional(),
-  totalCents: z.number().int().min(0).max(100_000_000).optional(),
   cartFingerprint: z.string().min(1).max(120),
   returnUrl: z.string().url().max(500).optional().refine(
     (u) => {
@@ -23,10 +20,6 @@ const Schema = z.object({
     { message: 'returnUrl must be on the application domain' },
   ),
 })
-
-function formatUSD(cents: number) {
-  return `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
-}
 
 export const Route = createFileRoute('/api/public/checkout-cancellation-email')({
   server: {
@@ -69,9 +62,8 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
         try {
           const entry = TEMPLATES['checkout-cancellation']
           const templateData = {
-            name: data.name ?? undefined,
-            itemCount: data.itemCount,
-            totalFormatted: typeof data.totalCents === 'number' ? formatUSD(data.totalCents) : undefined,
+            // Recipient-facing template fields are intentionally not accepted
+            // from the public client; only the generic body is sent.
             returnUrl: data.returnUrl,
           }
           const html = await render(React.createElement(entry.component, templateData))

@@ -107,29 +107,16 @@ export function LiveChat({
   useEffect(() => {
     if (!streamId) { setTipsTotalCents(0); setTipsCount(0); return; }
     let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("tips")
-        .select("amount_cents")
-        .eq("stream_id", streamId)
-        .eq("status", "paid");
+    const refresh = async () => {
+      const { data } = await supabase.rpc("get_stream_tip_totals", { p_stream_id: streamId });
       if (cancelled || !data) return;
-      setTipsCount(data.length);
-      setTipsTotalCents(data.reduce((s: number, r: any) => s + (r.amount_cents || 0), 0));
-    })();
-    const ch = supabase
-      .channel(`stream-tips-${streamId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "tips", filter: `stream_id=eq.${streamId}` },
-        (payload) => {
-          const row = (payload.new || payload.old) as any;
-          if (!row || row.status !== "paid") return;
-          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-            setTipsCount((c) => c + (payload.eventType === "INSERT" ? 1 : 0));
-            setTipsTotalCents((s) => s + (payload.eventType === "INSERT" ? row.amount_cents : 0));
-          }
-        })
-      .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(ch); };
+      const row = Array.isArray(data) ? data[0] : data;
+      setTipsCount(Number(row?.tip_count ?? 0));
+      setTipsTotalCents(Number(row?.total_cents ?? 0));
+    };
+    void refresh();
+    const interval = setInterval(() => { void refresh(); }, 15000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, [streamId]);
 
   // Live duration ticker

@@ -1141,6 +1141,13 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_stream_tip_totals: {
+        Args: { p_stream_id: string }
+        Returns: {
+          tip_count: number
+          total_cents: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
