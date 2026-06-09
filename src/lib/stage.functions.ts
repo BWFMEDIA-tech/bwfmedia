@@ -156,3 +156,30 @@ export const leaveStage = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Host mutes/unmutes a stage participant. Mute writes a future timestamp;
+ *  unmute clears it. Clients enforce by checking muted_until > now. */
+export const setParticipantMute = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      streamId: z.string().uuid(),
+      targetUserId: z.string().uuid(),
+      mute: z.boolean(),
+      durationMinutes: z.number().int().min(1).max(360).default(60),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertHostOrMod(supabase, userId, data.streamId);
+    const mutedUntil = data.mute
+      ? new Date(Date.now() + data.durationMinutes * 60_000).toISOString()
+      : null;
+    const { error } = await supabase
+      .from("stage_participants")
+      .update({ muted_until: mutedUntil })
+      .eq("stream_id", data.streamId)
+      .eq("user_id", data.targetUserId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
