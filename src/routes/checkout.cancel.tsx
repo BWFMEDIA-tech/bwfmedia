@@ -37,8 +37,6 @@ function CheckoutCancel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: recipient,
-          itemCount: totalCount,
-          totalCents,
           cartFingerprint,
           returnUrl: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
         }),
