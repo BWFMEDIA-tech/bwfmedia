@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Users, Crown, Mic, Headphones, Shield, Sparkles } from "lucide-react";
+import { Users, Crown, Mic, Headphones, Shield, Sparkles, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { StageParticipant } from "@/lib/useStageState";
 
@@ -33,6 +33,8 @@ export function CrowdPanel({
   viewerCount?: number;
 }) {
   const [roleMap, setRoleMap] = useState<Map<string, AppRole[]>>(new Map());
+  const [filter, setFilter] = useState<"all" | "host" | "artist" | "moderator" | "listener">("all");
+  const [query, setQuery] = useState("");
 
   // Hydrate user roles for everyone in the crowd.
   useEffect(() => {
@@ -68,6 +70,39 @@ export function CrowdPanel({
 
   const total = viewerCount ?? participants.length;
   const onStage = participants.filter((p) => p.stage_role === "host" || p.stage_role === "speaker").length;
+
+  const counts = useMemo(() => {
+    const c = { all: sorted.length, host: 0, artist: 0, moderator: 0, listener: 0 };
+    sorted.forEach((p) => {
+      const primary = pickPrimaryRole(roleMap.get(p.user_id) ?? []);
+      if (primary === "admin" || primary === "host") c.host += 1;
+      else if (primary === "moderator") c.moderator += 1;
+      else if (primary === "artist") c.artist += 1;
+      else c.listener += 1;
+    });
+    return c;
+  }, [sorted, roleMap]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return sorted.filter((p) => {
+      if (q && !(p.display_name ?? "").toLowerCase().includes(q)) return false;
+      if (filter === "all") return true;
+      const primary = pickPrimaryRole(roleMap.get(p.user_id) ?? []);
+      if (filter === "host") return primary === "host" || primary === "admin";
+      if (filter === "moderator") return primary === "moderator";
+      if (filter === "artist") return primary === "artist";
+      return primary === "member" || primary === "listener";
+    });
+  }, [sorted, roleMap, filter, query]);
+
+  const chips: Array<{ id: typeof filter; label: string; n: number }> = [
+    { id: "all", label: "All", n: counts.all },
+    { id: "host", label: "Hosts", n: counts.host },
+    { id: "artist", label: "Artists", n: counts.artist },
+    { id: "moderator", label: "Mods", n: counts.moderator },
+    { id: "listener", label: "Listeners", n: counts.listener },
+  ];
 
   return (
     <aside className="rounded-2xl border border-white/10 bg-[#0d0d18]/80 backdrop-blur p-4 flex flex-col gap-3 min-h-[200px]">
