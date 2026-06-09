@@ -343,6 +343,58 @@ function InviteGuest() {
     toast.success("Invite link copied");
     setTimeout(() => setCopied(false), 2000);
   };
+  const shareText = "Join me live on BWF Network";
+  const encodedLink = encodeURIComponent(link);
+  const encodedText = encodeURIComponent(shareText);
+  const openShare = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer,width=600,height=600");
+  };
+  const shareTargets = [
+    {
+      Icon: XIcon,
+      bg: "#000",
+      label: "Share on X",
+      onClick: () => openShare(`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedLink}`),
+    },
+    {
+      Icon: Instagram,
+      bg: "linear-gradient(135deg,#f472b6,#a855f7)",
+      label: "Copy link for Instagram",
+      onClick: async () => {
+        await navigator.clipboard.writeText(link);
+        toast.success("Link copied — paste it into Instagram");
+      },
+    },
+    {
+      Icon: MessageCircle,
+      bg: "#22c55e",
+      label: "Share on WhatsApp",
+      onClick: () => openShare(`https://wa.me/?text=${encodedText}%20${encodedLink}`),
+    },
+    {
+      Icon: Facebook,
+      bg: "#1877f2",
+      label: "Share on Facebook",
+      onClick: () => openShare(`https://www.facebook.com/sharer/sharer.php?u=${encodedLink}`),
+    },
+    {
+      Icon: MoreHorizontal,
+      bg: "#374151",
+      label: "More share options",
+      onClick: async () => {
+        if (typeof navigator !== "undefined" && (navigator as any).share) {
+          try {
+            await (navigator as any).share({ title: "BWF Network", text: shareText, url: link });
+            return;
+          } catch (e: any) {
+            if (e?.name === "AbortError") return;
+          }
+        }
+        await navigator.clipboard.writeText(link);
+        toast.success("Link copied to clipboard");
+      },
+    },
+  ];
   return (
     <Panel title="INVITE GUEST">
       <p className="mb-3 text-xs text-white/60">Invite an artist to join your stream. Share the link below.</p>
@@ -354,14 +406,16 @@ function InviteGuest() {
       </div>
       <div className="mb-3 text-[11px] text-white/50">Share via</div>
       <div className="mb-4 flex gap-2">
-        {[
-          { Icon: XIcon, bg: "#000" },
-          { Icon: Instagram, bg: "linear-gradient(135deg,#f472b6,#a855f7)" },
-          { Icon: MessageCircle, bg: "#22c55e" },
-          { Icon: Facebook, bg: "#1877f2" },
-          { Icon: MoreHorizontal, bg: "#374151" },
-        ].map((s, i) => (
-          <button key={i} className="flex h-9 w-9 items-center justify-center rounded-full text-white" style={{ background: s.bg }}>
+        {shareTargets.map((s, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={s.onClick}
+            aria-label={s.label}
+            title={s.label}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-white transition hover:opacity-90 hover:scale-105"
+            style={{ background: s.bg }}
+          >
             <s.Icon className="h-4 w-4" />
           </button>
         ))}
