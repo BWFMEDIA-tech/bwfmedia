@@ -43,12 +43,36 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       onError={(e) => toast.error(`Stream error: ${e.message}`)}
       className="contents"
     >
-      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} />
+      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} />
+      <PublishSync publish={publish} />
     </LiveKitRoom>
   );
 }
 
-function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string }) {
+function PublishSync({ publish }: { publish: boolean }) {
+  const { localParticipant } = useLocalParticipant();
+  const prev = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (!localParticipant) return;
+    (async () => {
+      try {
+        await localParticipant.setMicrophoneEnabled(publish);
+        await localParticipant.setCameraEnabled(publish);
+        if (prev.current === false && publish) {
+          toast.success("You're on stage — mic and camera enabled");
+        } else if (prev.current === true && !publish) {
+          toast.info("You're back in the crowd");
+        }
+        prev.current = publish;
+      } catch (e: any) {
+        if (publish) toast.error(e?.message || "Could not enable mic/camera");
+      }
+    })();
+  }, [publish, localParticipant]);
+  return null;
+}
+
+function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
