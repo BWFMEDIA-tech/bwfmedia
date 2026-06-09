@@ -44,8 +44,16 @@ function SignupPage() {
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Check your email to confirm");
+    if (error) {
+      const msg = error.message?.toLowerCase() ?? "";
+      if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+        toast.error("This email is already registered. Please sign in instead.");
+        nav({ to: "/login" });
+        return;
+      }
+      return toast.error(error.message);
+    }
+    toast.success("Check your email to confirm your account");
     nav({ to: "/login" });
   };
 
