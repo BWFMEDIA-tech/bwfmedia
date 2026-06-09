@@ -49,6 +49,22 @@ export const raiseHand = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Viewer cancels their own pending raise-hand request. */
+export const cancelHand = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("raise_hand_requests")
+      .update({ status: "cancelled" })
+      .eq("stream_id", data.streamId)
+      .eq("user_id", userId)
+      .eq("status", "pending");
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 /** Host responds to a raise-hand: accept moves to green_room or speaker, decline rejects */
 export const respondHand = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
