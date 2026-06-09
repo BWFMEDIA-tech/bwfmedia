@@ -15,7 +15,7 @@ export const Route = createFileRoute("/checkout/cancel")({
 });
 
 function CheckoutCancel() {
-  const { items, totalCount, totalCents, email, setEmail, openCart } = useCart();
+  const { items, totalCount, email, setEmail, openCart } = useCart();
   const navigate = useNavigate();
   const [emailInput, setEmailInput] = useState(email);
   const [emailStatus, setEmailStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
