@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Users, Crown, Mic, Headphones, Shield, Sparkles } from "lucide-react";
+import { Users, Crown, Mic, Headphones, Shield, Sparkles, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { StageParticipant } from "@/lib/useStageState";
 
@@ -33,6 +33,8 @@ export function CrowdPanel({
   viewerCount?: number;
 }) {
   const [roleMap, setRoleMap] = useState<Map<string, AppRole[]>>(new Map());
+  const [filter, setFilter] = useState<"all" | "host" | "artist" | "moderator" | "listener">("all");
+  const [query, setQuery] = useState("");
 
   // Hydrate user roles for everyone in the crowd.
   useEffect(() => {
@@ -69,6 +71,39 @@ export function CrowdPanel({
   const total = viewerCount ?? participants.length;
   const onStage = participants.filter((p) => p.stage_role === "host" || p.stage_role === "speaker").length;
 
+  const counts = useMemo(() => {
+    const c = { all: sorted.length, host: 0, artist: 0, moderator: 0, listener: 0 };
+    sorted.forEach((p) => {
+      const primary = pickPrimaryRole(roleMap.get(p.user_id) ?? []);
+      if (primary === "admin" || primary === "host") c.host += 1;
+      else if (primary === "moderator") c.moderator += 1;
+      else if (primary === "artist") c.artist += 1;
+      else c.listener += 1;
+    });
+    return c;
+  }, [sorted, roleMap]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return sorted.filter((p) => {
+      if (q && !(p.display_name ?? "").toLowerCase().includes(q)) return false;
+      if (filter === "all") return true;
+      const primary = pickPrimaryRole(roleMap.get(p.user_id) ?? []);
+      if (filter === "host") return primary === "host" || primary === "admin";
+      if (filter === "moderator") return primary === "moderator";
+      if (filter === "artist") return primary === "artist";
+      return primary === "member" || primary === "listener";
+    });
+  }, [sorted, roleMap, filter, query]);
+
+  const chips: Array<{ id: typeof filter; label: string; n: number }> = [
+    { id: "all", label: "All", n: counts.all },
+    { id: "host", label: "Hosts", n: counts.host },
+    { id: "artist", label: "Artists", n: counts.artist },
+    { id: "moderator", label: "Mods", n: counts.moderator },
+    { id: "listener", label: "Listeners", n: counts.listener },
+  ];
+
   return (
     <aside className="rounded-2xl border border-white/10 bg-[#0d0d18]/80 backdrop-blur p-4 flex flex-col gap-3 min-h-[200px]">
       <header className="flex items-center justify-between">
@@ -83,11 +118,52 @@ export function CrowdPanel({
         </div>
       </header>
 
-      {sorted.length === 0 ? (
-        <p className="text-sm text-white/40 py-6 text-center">No one in the crowd yet.</p>
+      <div className="relative">
+        <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/40" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search crowd"
+          className="w-full rounded-lg border border-white/10 bg-black/40 pl-7 pr-7 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400/40"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            aria-label="Clear search"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+          >
+            <X size={12} />
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {chips.map((c) => {
+          const active = filter === c.id;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setFilter(c.id)}
+              className={`text-[10px] uppercase tracking-wider font-semibold rounded-full px-2.5 py-1 border transition ${
+                active
+                  ? "bg-violet-500/25 border-violet-400/50 text-white"
+                  : "bg-white/[0.03] border-white/10 text-white/60 hover:text-white hover:border-white/25"
+              }`}
+            >
+              {c.label}
+              <span className={`ml-1 ${active ? "text-violet-200" : "text-white/40"}`}>{c.n}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {visible.length === 0 ? (
+        <p className="text-sm text-white/40 py-6 text-center">
+          {sorted.length === 0 ? "No one in the crowd yet." : "No one matches that filter."}
+        </p>
       ) : (
         <ul className="flex flex-col gap-1.5 max-h-[420px] overflow-y-auto pr-1">
-          {sorted.map((p) => {
+          {visible.map((p) => {
             const roles = roleMap.get(p.user_id) ?? [];
             const primary = pickPrimaryRole(roles);
             const RoleMeta = ROLE_STYLE[primary];
