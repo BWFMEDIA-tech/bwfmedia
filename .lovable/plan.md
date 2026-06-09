@@ -1,52 +1,122 @@
-## What already exists (will be reused, not rebuilt)
 
-The Listener → Guest promotion system is ~80% in place. Confirmed live:
+## Goal
 
-- **Raise-hand request:** `RaiseHandButton` calls `raiseHand` server fn → inserts into `raise_hand_requests` (status `pending`).
-- **Host approval UI:** `RaiseHandPanel` shows avatar, name, Allow / Green / Decline buttons, calls `respondHand`.
-- **Session role table:** `stage_participants` already tracks per-room roles (`host | speaker | listener | green_room`) — exactly the session-scoped role model requested.
-- **Promote / demote / remove:** `setStageRole` and `removeStageParticipant` server fns with 5-host / 5-guest caps.
-- **Realtime:** `useStageState` subscribes to postgres_changes on `stage_participants`, `raise_hand_requests`, `stream_queue`.
-- **Stage UI:** `StageRoom` renders HOSTS / GUESTS rows with mic indicator, "Demote" + "Remove" host controls. `AudienceRow` renders listeners.
-- **LiveKit audio:** `LiveStage` already handles mic permissions for the room.
+Wire BWFNetwork end-to-end for live: when a host/admin/artist goes live, everyone gets notified; anyone can discover and join active streams; the audience is visible in real time; users can request the stage and the host can approve, decline, mute, or remove them.
 
-Per the rules, none of this gets duplicated. Only the gaps below are filled.
+## Scope (all in one pass)
 
-## Gaps to close
+1. Notifications (in-app + email + web push)
+2. Live Now discovery section
+3. Audience presence (Crowd panel)
+4. Join requests + host stage controls
+5. Realtime everywhere via Supabase channels
+6. Permissions: Admin / Host / Artist can start streams; everyone can join + request stage
 
-1. **Listeners never appear in the audience / invite list.** On `/stream/$room`, viewers join LiveKit but no row is written to `stage_participants` with role `listener`. Result: hosts can't see who to promote, and `AudienceRow` is empty.
-2. **No self "Leave Stage" button for guests.** Today only the host can demote. Spec requires the guest to be able to return themselves to listener state.
-3. **`AudienceRow` is not rendered on the guest stream page** (`src/routes/stream.$room.tsx`).
+## Database (new migration)
 
-## Changes
+- `notifications` — `id, user_id, type, title, body, link, stream_id?, actor_id?, read_at?, created_at`. RLS: user sees their own. Realtime enabled. GRANTs to authenticated + service_role.
+- `notification_preferences` — `user_id PK, in_app bool, email bool, push bool, live_alerts bool`. Defaults on. RLS: owner.
+- `web_push_subscriptions` — `id, user_id, endpoint UNIQUE, p256dh, auth, user_agent, created_at`. RLS: owner.
+- `streams.viewer_count` (int default 0), `streams.started_at` already exists. Make sure `live` boolean / status is queryable; add index on `(status, started_at desc)`.
+- `stage_participants` (exists): already supports listener/speaker/host/green_room. Add realtime publication.
+- `raise_hand_requests` (exists): already covers join requests.
+- `chat_timeouts` reused for mute (already exists for chat; add `muted_until` on `stage_participants` for stage mute).
 
-### 1. Auto-join as listener (client-side, RLS already allows it)
-In `src/routes/stream.$room.tsx`, after LiveKit join succeeds and we have `streamId` + `auth.user`, upsert `{ stream_id, user_id, stage_role: 'listener' }` into `stage_participants`. On unmount / `onEnd`, delete the row. The existing INSERT policy "Users can join stage as listener" already permits this; the DELETE policy permits self-removal. No migration needed.
+All new tables: GRANTs for authenticated + service_role; service_role insert for system-generated notifications.
 
-### 2. Self "Leave Stage" for guests
-- Add a new server fn `leaveStage(streamId)` in `src/lib/stage.functions.ts` that downgrades the caller's own `stage_participants.stage_role` from `speaker` back to `listener` (no host check; scoped to `auth.uid() = user_id`).
-- Render a "Leave Stage" button in `RaiseHandButton.tsx` (or a small sibling component) whenever the current user's row in `stage_participants` has role `speaker`. Reuse the existing realtime subscription pattern already in that file.
+## Server functions (`src/lib/*.functions.ts`)
 
-### 3. Show audience on the live stream page
-In `src/routes/stream.$room.tsx`, mount `useStageState(streamId)` and render `<AudienceRow participants={...} />` below `LiveStage`. This also surfaces the new auto-joined listeners to the host's invite modal in `StageRoom` (host page already uses the same hook).
+- `notifications.functions.ts`
+  - `listNotifications`, `markRead`, `markAllRead`
+  - `getUnreadCount`
+  - `getPreferences`, `updatePreferences`
+  - `subscribePush({endpoint,p256dh,auth})`, `unsubscribePush`
+- `live-broadcast.functions.ts` (server, admin client)
+  - `broadcastStreamStarted({streamId})` — called from host "Go Live" flow; inserts a notification row per active user (`profiles`) honoring `notification_preferences.live_alerts`; enqueues an email via existing transactional email infra for opt-in users; sends web push via VAPID for opt-in users.
+- `stage.functions.ts` (extend existing)
+  - `muteParticipant`, `unmuteParticipant`, `removeFromStage`, `promoteToSpeaker`, `endGuestParticipation` (host/admin only via server-side role check).
+- `streams.functions.ts` (extend)
+  - `listLiveStreams()` — returns active streams + host profile + viewer count.
+  - `incrementViewer / decrementViewer` (heartbeat via stage_participants is enough; use count there).
 
-### 4. Terminology polish (cosmetic only)
-In `RaiseHandPanel` and `StageRoom`, change visible "SPEAKER" label to "GUEST" to match the spec wording. Internal `stage_role = 'speaker'` enum value stays the same to avoid a migration and to keep `setStageRole` / RLS untouched.
+## Frontend
 
-## Out of scope (explicitly NOT touched)
+- `src/routes/live.tsx` — "Live Now" public page. Cards: thumbnail, title, host avatar+name, viewer count, category. Realtime subscribe to `streams` updates. Link to `/stream/$room`.
+- Add "Live Now" rail to home `index.tsx` showing up to 4 active streams.
+- Nav: add Live link in `SiteHeader`.
+- `src/routes/notifications.tsx` — replace stub with real feed: list, mark read, filter unread. Realtime subscribed.
+- `NotificationBell` component in `SiteHeader` showing unread count badge with realtime updates.
+- Settings page: notification preferences (in-app/email/push toggles) + "Enable browser push" button that registers a service worker and subscribes via VAPID.
+- Stream Studio `/stream-studio`:
+  - On "Start Stream" success → call `broadcastStreamStarted`.
+  - New "Audience" panel (next to RaiseHandPanel) listing `stage_participants` with role `listener`. Shows avatars, names, count, "recently joined" sort.
+  - Existing RaiseHandPanel already covers approve/decline; add "decline" toast + mute/remove controls on stage tiles.
+- `/stream/$room` guest view:
+  - Already auto-joins as listener. Add visible "Crowd" panel below stage with avatars + names + count.
+  - "Request to Join" button (exists as RaiseHandButton).
+  - When promoted, automatically re-fetch a publishing LiveKit token and mount as speaker.
+  - Show role badge (Artist/Host/Admin/Member) on every avatar in stage + crowd.
 
-- Auth, signup, role table, profiles
-- LiveKit token issuance / mic permission logic
-- `respondHand`, `setStageRole`, `removeStageParticipant`, host controls
-- Database schema / RLS — all changes work within existing policies
-- `stream_queue` (separate live-review queue, unrelated to raise-hand)
+## Web push
 
-## Files to edit
+- Service worker `public/sw.js` handling `push` and `notificationclick`.
+- VAPID keys: request `VAPID_PUBLIC_KEY` (public, ok in client) and `VAPID_PRIVATE_KEY` (secret) via add_secret. Server uses `web-push` npm package inside `broadcastStreamStarted`.
+- Subscriptions stored in `web_push_subscriptions`; failures (410/404) prune the row.
 
-- `src/routes/stream.$room.tsx` — auto-join + auto-leave listener row, render `AudienceRow`
-- `src/lib/stage.functions.ts` — add `leaveStage` server fn
-- `src/components/stream/RaiseHandButton.tsx` — show "Leave Stage" when current user is a `speaker`
-- `src/components/stream/StageRoom.tsx` — rename visible "SPEAKER" → "GUEST"
-- `src/components/stream/RaiseHandPanel.tsx` — copy tweak to "wants to join as guest"
+## Email
 
-No new tables, no new packages, no auth changes.
+Use existing Lovable Email infra. New template `live-stream-started.tsx` with host name, stream title, CTA link. Sent via `/lovable/email/transactional/send` for users with `email=true` AND `live_alerts=true` AND not suppressed.
+
+## Permissions matrix (enforced server-side)
+
+- Start/end stream: admin OR host OR artist (checked in `streams.functions.ts`).
+- Approve/decline/mute/remove on stage: only the stream's `host_id` OR admin.
+- Request stage: any authenticated user.
+- Join stream / view crowd: any authenticated user (guest token allows view-only).
+
+## Realtime
+
+Channels per stream id for `stage_participants`, `raise_hand_requests`, `streams` (viewer count + status). Global channel per user for `notifications`.
+
+## Files to add / edit
+
+Add:
+- `supabase/migrations/<ts>_live_notifications_presence.sql`
+- `src/lib/notifications.functions.ts`
+- `src/lib/live-broadcast.functions.ts`
+- `src/lib/web-push.server.ts`
+- `src/lib/email-templates/live-stream-started.tsx` (+ registry update)
+- `src/components/NotificationBell.tsx`
+- `src/components/stream/AudiencePanel.tsx`
+- `src/components/stream/HostStageControls.tsx`
+- `src/routes/live.tsx`
+- `public/sw.js`
+
+Edit:
+- `src/routes/notifications.tsx`, `src/routes/settings.tsx`, `src/routes/index.tsx`, `src/routes/stream-studio.tsx`, `src/routes/stream.$room.tsx`
+- `src/components/site/SiteHeader.tsx`
+- `src/lib/stage.functions.ts`, `src/lib/streams.functions.ts`
+- `src/lib/email-templates/registry.ts`
+
+## Order of execution
+
+1. Migration (new tables + GRANTs + realtime publication + indexes).
+2. After migration approval: server functions + email template + web-push helper.
+3. UI: NotificationBell + notifications page + settings preferences + service worker.
+4. Live Now route + home rail + header link.
+5. Stream Studio audience panel + host controls + broadcast trigger.
+6. Guest /stream/$room crowd panel + auto-promote.
+7. Request VAPID secrets, wire push.
+8. Smoke test: console + network.
+
+## Secrets needed (will request after plan approval)
+
+- `VAPID_PUBLIC_KEY` (publishable, also written as `VITE_VAPID_PUBLIC_KEY` for the SW subscribe call)
+- `VAPID_PRIVATE_KEY` (secret)
+- `VAPID_SUBJECT` (mailto:admin@bwfmedia.company)
+
+## Out of scope (intentionally deferred)
+
+- Followers-only notifications (you chose "everyone").
+- Mobile native push (no native app).
+- Notification digest/batching beyond rate-limit (single broadcast row per stream start).
