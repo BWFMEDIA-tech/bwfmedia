@@ -16,9 +16,8 @@ const Schema = z.object({
 });
 
 export const createBookingCheckout = createServerFn({ method: 'POST' })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data) => Schema.parse(data))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const pkg = BOOKING_PACKAGES[data.packageId];
     if (!pkg) throw new Error('Unknown package');
 
@@ -35,23 +34,6 @@ export const createBookingCheckout = createServerFn({ method: 'POST' })
     if (booking.status === 'confirmed' || booking.status === 'delivered') {
       throw new Error('Booking is already paid');
     }
-
-    // Verify caller owns the booking (email match) or is admin.
-    const { data: userRes } = await context.supabase.auth.getUser();
-    const callerEmail = userRes.user?.email?.toLowerCase() ?? null;
-    const callerId = userRes.user?.id ?? null;
-    const { data: adminRow } = callerId
-      ? await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', callerId)
-          .eq('role', 'admin')
-          .maybeSingle()
-      : { data: null };
-    const isAdmin = !!adminRow;
-    const owns =
-      isAdmin || (callerEmail && booking.email && booking.email.toLowerCase() === callerEmail);
-    if (!owns) throw new Error('Not authorized for this booking');
 
     const stripe = createStripeClient(data.environment);
     const prices = await stripe.prices.list({ lookup_keys: [pkg.id], limit: 1 });
