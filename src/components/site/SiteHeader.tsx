@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User, LogOut, Settings, ChevronDown } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import { useAuth } from "@/lib/auth-context";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const baseLinks: Array<{ href?: string; to?: string; label: string; adminOnly?: boolean }> = [
   { to: "/", label: "Home" },
@@ -11,6 +12,7 @@ const baseLinks: Array<{ href?: string; to?: string; label: string; adminOnly?: 
   { href: "/#why", label: "Why BWF" },
   { href: "/#audience", label: "Audience" },
   { to: "/contact", label: "Contact" },
+  { to: "/live", label: "Live Now" },
   { to: "/live-review", label: "Live Review" },
   { to: "/stream-studio", label: "Stream Studio", adminOnly: true },
   { to: "/studio", label: "Studio" },
@@ -78,6 +80,8 @@ export function SiteHeader() {
         {/* Desktop auth */}
         <div className="hidden lg:flex items-center gap-3">
           {auth.isAuthenticated ? (
+            <>
+            <NotificationBell />
             <div className="relative">
               <button
                 onClick={() => setProfileOpen((v) => !v)}
@@ -136,6 +140,7 @@ export function SiteHeader() {
                 )}
               </AnimatePresence>
             </div>
+            </>
           ) : (
             <>
               <RouterLink
