@@ -18,6 +18,7 @@ import guestImg from "@/assets/stream-guest.jpg";
 import { useAuth } from "@/lib/auth-context";
 import { useServerFn } from "@tanstack/react-start";
 import { startOrResumeStream, endStream } from "@/lib/streams.functions";
+import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
@@ -46,7 +47,10 @@ export const Route = createFileRoute("/stream-studio")({
 function StreamStudioGuard() {
   const auth = useAuth();
   const navigate = useNavigate();
-  const isAdmin = auth.roles.includes("admin");
+  const canBroadcast =
+    auth.roles.includes("admin") ||
+    auth.roles.includes("host") ||
+    auth.roles.includes("artist");
 
   useEffect(() => {
     if (auth.loading || auth.rolesLoading) return;
@@ -54,18 +58,18 @@ function StreamStudioGuard() {
       navigate({ to: "/login", replace: true });
       return;
     }
-    if (!isAdmin) {
+    if (!canBroadcast) {
       // Best-effort audit log of the blocked client-side access attempt.
       void supabase.from("stream_studio_access_log" as any).insert({
         user_id: auth.user?.id ?? null,
-        reason: "non_admin_client_route_access",
+        reason: "non_broadcaster_client_route_access",
         route: "/stream-studio",
       } as any);
       navigate({ to: "/access-denied", replace: true });
     }
-  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, isAdmin, auth.user?.id, navigate]);
+  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, canBroadcast, auth.user?.id, navigate]);
 
-  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !isAdmin) {
+  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !canBroadcast) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#07070d] text-white/60 text-sm">
         Checking permissions…
@@ -595,6 +599,7 @@ function StreamStudio() {
   const nav = useNavigate();
   const startFn = useServerFn(startOrResumeStream);
   const endFn = useServerFn(endStream);
+  const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
@@ -641,6 +646,12 @@ function StreamStudio() {
         );
       }
       toast.success("You're live");
+      // Fan-out notifications to all members + artists (non-blocking).
+      broadcastFn({ data: { streamId: s.id } })
+        .then((r: any) => {
+          if (r?.notified) toast.message(`Notified ${r.notified} listeners`);
+        })
+        .catch((err: any) => console.error("broadcast failed", err));
     } catch (e: any) {
       toast.error(e?.message || "Failed to go live");
     } finally {
