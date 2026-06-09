@@ -12,6 +12,7 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
+import { CrowdPanel } from "@/components/stream/CrowdPanel";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -28,6 +29,7 @@ function GuestPage() {
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
+  const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
   useEffect(() => {
@@ -50,9 +52,12 @@ function GuestPage() {
         (p) => {
           const r = p.new as any;
           setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
+          if (typeof r.viewer_count === "number") setViewerCount(r.viewer_count);
         },
       )
       .subscribe();
+    supabase.from("streams").select("viewer_count").eq("id", streamId).maybeSingle()
+      .then(({ data }) => { if (data && typeof (data as any).viewer_count === "number") setViewerCount((data as any).viewer_count); });
     return () => { supabase.removeChannel(ch); };
   }, [streamId]);
 
@@ -110,32 +115,39 @@ function GuestPage() {
 
   return (
     <div className="min-h-screen bg-[#050509] text-white p-4">
-      <div className="mx-auto max-w-5xl flex flex-col gap-4">
-        {streamMode === "stage" && streamId && auth.user ? (
-          <StageAudioShell
-            token={lk.token}
-            serverUrl={lk.wsUrl}
-            streamId={streamId}
-            userId={auth.user.id}
-            onLeave={() => setLk(null)}
-          >
-            <StageRoom streamId={streamId} participants={participants as StageParticipant[]} canManage={false} />
-            <div className="flex justify-center">
-              <RaiseHandButton streamId={streamId} auth={auth} />
-            </div>
-            <AudienceRow participants={participants as StageParticipant[]} />
-          </StageAudioShell>
-        ) : (
-          <>
-            <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} />
-            {streamId && (
+      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px]">
+        <div className="flex flex-col gap-4 min-w-0">
+          {streamMode === "stage" && streamId && auth.user ? (
+            <StageAudioShell
+              token={lk.token}
+              serverUrl={lk.wsUrl}
+              streamId={streamId}
+              userId={auth.user.id}
+              onLeave={() => setLk(null)}
+            >
+              <StageRoom streamId={streamId} participants={participants as StageParticipant[]} canManage={false} />
               <div className="flex justify-center">
                 <RaiseHandButton streamId={streamId} auth={auth} />
               </div>
-            )}
-            <AudienceRow participants={participants as StageParticipant[]} />
-          </>
-        )}
+              <AudienceRow participants={participants as StageParticipant[]} />
+            </StageAudioShell>
+          ) : (
+            <>
+              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} />
+              {streamId && (
+                <div className="flex justify-center">
+                  <RaiseHandButton streamId={streamId} auth={auth} />
+                </div>
+              )}
+              <AudienceRow participants={participants as StageParticipant[]} />
+            </>
+          )}
+        </div>
+        <CrowdPanel
+          participants={participants as StageParticipant[]}
+          streamId={streamId}
+          viewerCount={viewerCount || participants.length}
+        />
       </div>
     </div>
   );
