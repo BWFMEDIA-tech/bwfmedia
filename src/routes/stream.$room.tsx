@@ -1,7 +1,7 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getGuestLiveKitToken } from "@/lib/livekit.functions";
+import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/stream/$room")({
 function GuestPage() {
   const { room } = useParams({ from: "/stream/$room" });
   const tokenFn = useServerFn(getGuestLiveKitToken);
+  const authTokenFn = useServerFn(getLiveKitToken);
   const streamFn = useServerFn(getStreamByRoom);
   const auth = useAuth();
   const [name, setName] = useState("");
@@ -96,7 +97,9 @@ function GuestPage() {
     if (!name.trim()) return;
     setJoining(true);
     try {
-      const t = await tokenFn({ data: { roomName: room, displayName: name.trim() } });
+      const t = auth.user
+        ? await authTokenFn({ data: { roomName: room } })
+        : await tokenFn({ data: { roomName: room, displayName: name.trim() } });
       setLk({ token: t.token, wsUrl: t.wsUrl });
     } catch (e: any) {
       toast.error(e?.message || "Failed to join");
@@ -144,7 +147,7 @@ function GuestPage() {
             </StageAudioShell>
           ) : (
             <>
-              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={false} />
+              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} />
               {streamId && inCrowd && (
                 <InCrowdBanner streamId={streamId} auth={auth} mode="broadcast" />
               )}
