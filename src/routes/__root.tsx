@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/contexts/CartContext";
@@ -139,12 +139,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isChrome = !pathname.startsWith("/stream-studio");
   return (
     <CartProvider>
       <PaymentTestModeBanner />
-      <SiteHeader />
+      {isChrome && <SiteHeader />}
       <Outlet />
-      <SiteFooter />
+      {isChrome && <SiteFooter />}
       <CartDrawer />
     </CartProvider>
   );
