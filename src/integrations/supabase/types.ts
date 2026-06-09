@@ -1093,6 +1093,44 @@ export type Database = {
         }
         Relationships: []
       }
+      tips_public: {
+        Row: {
+          amount_cents: number | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          message: string | null
+          stream_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          message?: string | null
+          stream_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          message?: string | null
+          stream_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tips_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       delete_email: {
