@@ -599,6 +599,7 @@ function StreamStudio() {
   const nav = useNavigate();
   const startFn = useServerFn(startOrResumeStream);
   const endFn = useServerFn(endStream);
+  const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
@@ -645,6 +646,12 @@ function StreamStudio() {
         );
       }
       toast.success("You're live");
+      // Fan-out notifications to all members + artists (non-blocking).
+      broadcastFn({ data: { streamId: s.id } })
+        .then((r: any) => {
+          if (r?.notified) toast.message(`Notified ${r.notified} listeners`);
+        })
+        .catch((err: any) => console.error("broadcast failed", err));
     } catch (e: any) {
       toast.error(e?.message || "Failed to go live");
     } finally {
