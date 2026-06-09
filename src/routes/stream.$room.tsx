@@ -12,6 +12,7 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
+import { CrowdPanel } from "@/components/stream/CrowdPanel";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -28,6 +29,7 @@ function GuestPage() {
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
+  const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
   useEffect(() => {
@@ -50,9 +52,12 @@ function GuestPage() {
         (p) => {
           const r = p.new as any;
           setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
+          if (typeof r.viewer_count === "number") setViewerCount(r.viewer_count);
         },
       )
       .subscribe();
+    supabase.from("streams").select("viewer_count").eq("id", streamId).maybeSingle()
+      .then(({ data }) => { if (data && typeof (data as any).viewer_count === "number") setViewerCount((data as any).viewer_count); });
     return () => { supabase.removeChannel(ch); };
   }, [streamId]);
 
