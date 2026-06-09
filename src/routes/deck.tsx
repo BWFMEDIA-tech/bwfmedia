@@ -9,6 +9,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/bwf-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { verifyDeckPassword } from "@/lib/deck-gate.functions";
 
 export const Route = createFileRoute("/deck")({
   head: () => ({
@@ -512,7 +514,6 @@ function DeckPage() {
   );
 }
 
-const DECK_PASSWORD = "#1SMARTINVESTMENT";
 
 const INVESTOR_TYPES = [
   "Angel investor",
@@ -877,14 +878,26 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
 function DeckGate({ onUnlock }: { onUnlock: () => void }) {
   const [pw, setPw] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const verify = useServerFn(verifyDeckPassword);
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (pw === DECK_PASSWORD) {
-      sessionStorage.setItem("deck_unlocked", "1");
-      onUnlock();
-    } else {
-      setError("Incorrect password.");
+    if (submitting) return;
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await verify({ data: { password: pw } });
+      if (res.ok) {
+        sessionStorage.setItem("deck_unlocked", "1");
+        onUnlock();
+      } else {
+        setError("Incorrect password.");
+      }
+    } catch {
+      setError("Could not verify. Try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
