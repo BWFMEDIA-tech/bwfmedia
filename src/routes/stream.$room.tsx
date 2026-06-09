@@ -13,6 +13,7 @@ import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { CrowdPanel } from "@/components/stream/CrowdPanel";
+import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -31,6 +32,11 @@ function GuestPage() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
+
+  const myStageRole = auth.user
+    ? participants.find((p) => p.user_id === auth.user!.id)?.stage_role ?? "listener"
+    : "listener";
+  const inCrowd = myStageRole !== "host" && myStageRole !== "speaker";
 
   useEffect(() => {
     streamFn({ data: { roomName: room } })
@@ -126,15 +132,23 @@ function GuestPage() {
               onLeave={() => setLk(null)}
             >
               <StageRoom streamId={streamId} participants={participants as StageParticipant[]} canManage={false} />
-              <div className="flex justify-center">
-                <RaiseHandButton streamId={streamId} auth={auth} />
-              </div>
+              {inCrowd && (
+                <InCrowdBanner streamId={streamId} auth={auth} mode="stage" />
+              )}
+              {!inCrowd && (
+                <div className="flex justify-center">
+                  <RaiseHandButton streamId={streamId} auth={auth} />
+                </div>
+              )}
               <AudienceRow participants={participants as StageParticipant[]} />
             </StageAudioShell>
           ) : (
             <>
               <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={false} />
-              {streamId && (
+              {streamId && inCrowd && (
+                <InCrowdBanner streamId={streamId} auth={auth} mode="broadcast" />
+              )}
+              {streamId && !inCrowd && (
                 <div className="flex justify-center">
                   <RaiseHandButton streamId={streamId} auth={auth} />
                 </div>
