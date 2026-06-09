@@ -4,8 +4,8 @@ export const GOLD = "#D4A24C";
 export const GOLD_GLOW = "#F5C56B";
 
 // Red/black/white theme accents (live-review + sibling pages)
-const RED = "#FF2D2D";
-const RED_GLOW = "#FF4D4D";
+const RED = "#8B5CF6";
+const RED_GLOW = "#A78BFA";
 
 export function FutureShell({
   children,
