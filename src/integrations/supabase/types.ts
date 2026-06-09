@@ -393,6 +393,80 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          email: boolean
+          in_app: boolean
+          live_alerts: boolean
+          push: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email?: boolean
+          in_app?: boolean
+          live_alerts?: boolean
+          push?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email?: boolean
+          in_app?: boolean
+          live_alerts?: boolean
+          push?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          stream_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          stream_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          stream_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       podcast_state: {
         Row: {
           cursor: number
@@ -489,6 +563,7 @@ export type Database = {
         Row: {
           id: string
           joined_at: string
+          muted_until: string | null
           stage_role: string
           stream_id: string
           user_id: string
@@ -496,6 +571,7 @@ export type Database = {
         Insert: {
           id?: string
           joined_at?: string
+          muted_until?: string | null
           stage_role?: string
           stream_id: string
           user_id: string
@@ -503,6 +579,7 @@ export type Database = {
         Update: {
           id?: string
           joined_at?: string
+          muted_until?: string | null
           stage_role?: string
           stream_id?: string
           user_id?: string
@@ -663,7 +740,9 @@ export type Database = {
       }
       streams: {
         Row: {
+          category: string | null
           created_at: string
+          description: string | null
           ended_at: string | null
           host_id: string
           id: string
@@ -672,11 +751,15 @@ export type Database = {
           stage_locked: boolean
           started_at: string | null
           status: string
+          thumbnail_url: string | null
           title: string
           updated_at: string
+          viewer_count: number
         }
         Insert: {
+          category?: string | null
           created_at?: string
+          description?: string | null
           ended_at?: string | null
           host_id: string
           id?: string
@@ -685,11 +768,15 @@ export type Database = {
           stage_locked?: boolean
           started_at?: string | null
           status?: string
+          thumbnail_url?: string | null
           title?: string
           updated_at?: string
+          viewer_count?: number
         }
         Update: {
+          category?: string | null
           created_at?: string
+          description?: string | null
           ended_at?: string | null
           host_id?: string
           id?: string
@@ -698,8 +785,10 @@ export type Database = {
           stage_locked?: boolean
           started_at?: string | null
           status?: string
+          thumbnail_url?: string | null
           title?: string
           updated_at?: string
+          viewer_count?: number
         }
         Relationships: []
       }
@@ -923,6 +1012,36 @@ export type Database = {
           storage_path?: string
           thumbnail_path?: string | null
           title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      web_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
