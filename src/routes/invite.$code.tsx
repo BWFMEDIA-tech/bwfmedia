@@ -313,7 +313,7 @@ function InviteRoom({
   }
   return (
     <>
-      <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={onLeave} onInvite={() => {}} />
+      <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={onLeave} onInvite={() => {}} publish={role === "host" || role === "speaker"} />
       {auth.user && (
         <div className="flex justify-center">
           <RaiseHandButton streamId={stream.id} auth={auth} />

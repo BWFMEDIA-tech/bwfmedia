@@ -133,7 +133,7 @@ function GuestPage() {
             </StageAudioShell>
           ) : (
             <>
-              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} />
+              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={false} />
               {streamId && (
                 <div className="flex justify-center">
                   <RaiseHandButton streamId={streamId} auth={auth} />
