@@ -79,7 +79,7 @@ function ContactPage() {
       <section className="relative overflow-hidden border-b border-white/10">
         <div
           className="absolute inset-0 opacity-40 pointer-events-none"
-          style={{ background: "radial-gradient(60% 50% at 50% 30%, rgba(255,45,45,0.25), transparent 70%)" }}
+          style={{ background: "radial-gradient(60% 50% at 50% 30%, rgba(139,92,246,0.25), transparent 70%)" }}
         />
         <div className="relative max-w-6xl mx-auto px-6 md:px-12 pt-24 pb-16 text-center">
           <motion.div
