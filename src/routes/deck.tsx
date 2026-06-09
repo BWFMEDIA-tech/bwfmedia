@@ -514,7 +514,6 @@ function DeckPage() {
   );
 }
 
-const DECK_PASSWORD = "#1SMARTINVESTMENT";
 
 const INVESTOR_TYPES = [
   "Angel investor",
