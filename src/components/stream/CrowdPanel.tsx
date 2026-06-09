@@ -118,11 +118,52 @@ export function CrowdPanel({
         </div>
       </header>
 
-      {sorted.length === 0 ? (
-        <p className="text-sm text-white/40 py-6 text-center">No one in the crowd yet.</p>
+      <div className="relative">
+        <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/40" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search crowd"
+          className="w-full rounded-lg border border-white/10 bg-black/40 pl-7 pr-7 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400/40"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            aria-label="Clear search"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+          >
+            <X size={12} />
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-1">
+        {chips.map((c) => {
+          const active = filter === c.id;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setFilter(c.id)}
+              className={`text-[10px] uppercase tracking-wider font-semibold rounded-full px-2.5 py-1 border transition ${
+                active
+                  ? "bg-violet-500/25 border-violet-400/50 text-white"
+                  : "bg-white/[0.03] border-white/10 text-white/60 hover:text-white hover:border-white/25"
+              }`}
+            >
+              {c.label}
+              <span className={`ml-1 ${active ? "text-violet-200" : "text-white/40"}`}>{c.n}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {visible.length === 0 ? (
+        <p className="text-sm text-white/40 py-6 text-center">
+          {sorted.length === 0 ? "No one in the crowd yet." : "No one matches that filter."}
+        </p>
       ) : (
         <ul className="flex flex-col gap-1.5 max-h-[420px] overflow-y-auto pr-1">
-          {sorted.map((p) => {
+          {visible.map((p) => {
             const roles = roleMap.get(p.user_id) ?? [];
             const primary = pickPrimaryRole(roles);
             const RoleMeta = ROLE_STYLE[primary];
