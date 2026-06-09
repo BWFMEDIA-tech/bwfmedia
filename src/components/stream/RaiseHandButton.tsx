@@ -101,13 +101,17 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
 
   const label =
     status === "pending" ? "Hand raised…" :
-    status === "declined" ? "Raise again" : "Raise hand";
+    status === "declined" ? "Request again" : "Request to Join Stage";
 
   return (
     <button
       onClick={onClick}
       disabled={busy || status === "pending"}
-      className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white hover:bg-white/10 disabled:opacity-60"
+      className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition disabled:opacity-60 ${
+        status === "pending"
+          ? "border border-amber-400/30 bg-amber-500/10 text-amber-100"
+          : "border border-violet-400/30 bg-gradient-to-r from-violet-500/90 to-blue-500/90 hover:from-violet-500 hover:to-blue-500"
+      }`}
     >
       <Hand className="h-4 w-4" /> {label}
     </button>
