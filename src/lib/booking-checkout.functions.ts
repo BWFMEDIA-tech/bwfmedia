@@ -27,12 +27,19 @@ export const createBookingCheckout = createServerFn({ method: 'POST' })
 
     const { data: booking, error } = await supabase
       .from(pkg.table)
-      .select('id, email, full_name, status')
+      .select('id, email, full_name, status, stripe_session_id')
       .eq('id', data.bookingId)
       .maybeSingle();
     if (error || !booking) throw new Error('Booking not found');
     if (booking.status === 'confirmed' || booking.status === 'delivered') {
       throw new Error('Booking is already paid');
+    }
+    // Ownership/idempotency guard: only allow checkout creation for fresh,
+    // unpaid bookings. Prevents an attacker who guesses a booking UUID from
+    // overwriting an in-progress legitimate Stripe session or mutating
+    // package/amount fields on an existing booking.
+    if (booking.status !== 'pending' || booking.stripe_session_id) {
+      throw new Error('Checkout already started for this booking. Please use the original payment link or contact support.');
     }
 
     const stripe = createStripeClient(data.environment);
