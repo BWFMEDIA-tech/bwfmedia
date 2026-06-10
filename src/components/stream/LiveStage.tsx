@@ -81,7 +81,12 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
     { onlySubscribed: false },
   );
   const participants = useParticipants();
-  const cameraTracks = tracks.filter((t) => t.source === Track.Source.Camera);
+  // Only keep camera tracks that are actually published (drop placeholders for
+  // listeners/crowd viewers who have no camera). Otherwise the first slot can
+  // become the local viewer's empty placeholder and hide the real guest.
+  const cameraTracks = tracks.filter(
+    (t) => t.source === Track.Source.Camera && (t as any).publication?.track,
+  );
 
   useEffect(() => {
     onViewerCount?.(participants.length);
@@ -89,7 +94,9 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
 
   // Pick the first two for the two-up layout (host + guest)
   const slots = [0, 1].map((i) => cameraTracks[i] ?? null);
-  const slotIdentities = [0, 1].map((i) => participants[i]?.identity ?? null);
+  const slotIdentities = [0, 1].map(
+    (i) => cameraTracks[i]?.participant?.identity ?? null,
+  );
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
 
   return (
