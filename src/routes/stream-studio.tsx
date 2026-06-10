@@ -665,6 +665,7 @@ function StreamStudio() {
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
+  const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
 
   // Keep the host's presence row fresh while the studio tab is open.
@@ -686,6 +687,7 @@ function StreamStudio() {
         setStartedAt(existing.started_at ?? new Date().toISOString());
         setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage");
         setStageLocked(!!existing.stage_locked);
+        setHostTransferMode(((existing as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
         // Re-register stage participant. If ownership was transferred while we
         // were away, preserve the existing role (e.g. co_host) instead of
         // forcing back to host.
@@ -719,6 +721,7 @@ function StreamStudio() {
           const r = p.new as any;
           setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
           setStageLocked(!!r.stage_locked);
+          setHostTransferMode(((r as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
         })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
