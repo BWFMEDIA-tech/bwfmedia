@@ -180,7 +180,8 @@ function Sidebar() {
 /* ---------- Video tile ---------- */
 function VideoTile({ label, name, handle, gradient, image }: { label: string; name: string; handle: string; gradient: string; image?: string }) {
   return (
-    <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
+    <div className="stage-tile-glow relative aspect-video rounded-2xl p-[2px]">
+      <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#0d0d18]">
       {image ? (
         <img src={image} alt={name} className="absolute inset-0 h-full w-full object-cover" loading="lazy" width={1024} height={1024} />
       ) : (
@@ -214,6 +215,7 @@ function VideoTile({ label, name, handle, gradient, image }: { label: string; na
             />
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
