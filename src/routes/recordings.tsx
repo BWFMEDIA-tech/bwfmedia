@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listMyRecordings, deleteRecording } from '@/lib/recordings.functions';
+import { listMyRecordings, deleteRecording, getRecordingSignedUrl } from '@/lib/recordings.functions';
 import { useAuth } from '@/lib/auth-context';
 import { Trash2, Radio, ArrowLeft, Film } from 'lucide-react';
 import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 export const Route = createFileRoute('/recordings')({
   head: () => ({
@@ -20,6 +21,7 @@ function RecordingsPage() {
   const { user, loading } = useAuth();
   const fetchList = useServerFn(listMyRecordings);
   const del = useServerFn(deleteRecording);
+  const signUrl = useServerFn(getRecordingSignedUrl);
   const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -72,9 +74,7 @@ function RecordingsPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {recs.map((r) => (
               <div key={r.id} className="overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
-                {r.public_url && (
-                  <video src={r.public_url} controls className="aspect-video w-full bg-black" preload="metadata" />
-                )}
+                <RecordingPlayer id={r.id} signUrl={signUrl} />
                 <div className="flex items-center justify-between p-3 text-xs text-white/70">
                   <div>
                     <div className="text-white">{fmtDuration(r.duration_seconds ?? 0)}</div>
