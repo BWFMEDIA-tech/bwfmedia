@@ -109,3 +109,14 @@ function fmtSize(b: number) {
   if (b < 1024 * 1024 * 1024) return `${(b / 1024 / 1024).toFixed(1)} MB`;
   return `${(b / 1024 / 1024 / 1024).toFixed(2)} GB`;
 }
+
+function RecordingPlayer({ id, signUrl }: { id: string; signUrl: (args: { data: { id: string } }) => Promise<{ url: string }> }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancel = false;
+    signUrl({ data: { id } }).then((r) => { if (!cancel) setUrl(r.url); }).catch(() => {});
+    return () => { cancel = true; };
+  }, [id, signUrl]);
+  if (!url) return <div className="aspect-video w-full bg-black" />;
+  return <video src={url} controls className="aspect-video w-full bg-black" preload="metadata" />;
+}
