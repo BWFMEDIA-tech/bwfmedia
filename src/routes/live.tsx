@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Radio, Eye, Users } from "lucide-react";
+import { Radio, Eye, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
+import { deleteStream } from "@/lib/streams.functions";
+import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 type LiveStream = {
@@ -13,6 +16,7 @@ type LiveStream = {
   thumbnail_url: string | null;
   viewer_count: number;
   started_at: string | null;
+  host_id: string;
   host: { display_name: string | null; avatar_url: string | null; stage_name: string | null } | null;
 };
 
@@ -30,6 +34,9 @@ export const Route = createFileRoute("/live")({
 
 function LivePage() {
   const fetchLive = useServerFn(listLiveStreams);
+  const delFn = useServerFn(deleteStream);
+  const auth = useAuth();
+  const isAdmin = auth.roles?.includes("admin");
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,6 +54,19 @@ function LivePage() {
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, []);
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Delete this live stream? This cannot be undone.")) return;
+    try {
+      await delFn({ data: { streamId: id } });
+      setStreams((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Stream deleted");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to delete");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#050509] text-white pt-24 pb-12 px-4">
@@ -87,6 +107,15 @@ function LivePage() {
                   <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
                     <Eye className="h-3 w-3" /> {s.viewer_count ?? 0}
                   </span>
+                  {(isAdmin || auth.user?.id === s.host_id) && (
+                    <button
+                      onClick={(e) => handleDelete(e, s.id)}
+                      title="Delete stream"
+                      className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded bg-red-600/90 px-2 py-1 text-[10px] font-semibold text-white hover:bg-red-500"
+                    >
+                      <Trash2 className="h-3 w-3" /> Delete
+                    </button>
+                  )}
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-white line-clamp-2">{s.title}</h3>
