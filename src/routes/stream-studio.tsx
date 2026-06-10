@@ -33,6 +33,7 @@ import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
+import { PlayArenaView } from "@/routes/play.$room";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
