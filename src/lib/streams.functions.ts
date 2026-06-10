@@ -95,6 +95,26 @@ export const endStream = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Permanently delete a stream. Host or admin only. */
+export const deleteStream = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row } = await supabase
+      .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
+    if (!row) throw new Error("Stream not found");
+    if (row.host_id !== userId) {
+      const { data: adm } = await supabase
+        .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+      if (!adm) throw new Error("Not authorized");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("streams").delete().eq("id", data.streamId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const getStreamByRoom = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({ roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/) }).parse(input),
