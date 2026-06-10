@@ -29,6 +29,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EarningsRouteImport } from './routes/earnings'
 import { Route as DeckRouteImport } from './routes/deck'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
@@ -165,6 +166,11 @@ const EarningsRoute = EarningsRouteImport.update({
 const DeckRoute = DeckRouteImport.update({
   id: '/deck',
   path: '/deck',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -364,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
@@ -423,6 +430,7 @@ export interface FileRoutesByTo {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
@@ -483,6 +491,7 @@ export interface FileRoutesById {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
@@ -544,6 +553,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/dashboard'
     | '/deck'
     | '/earnings'
     | '/events'
@@ -603,6 +613,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/dashboard'
     | '/deck'
     | '/earnings'
     | '/events'
@@ -662,6 +673,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/dashboard'
     | '/deck'
     | '/earnings'
     | '/events'
@@ -722,6 +734,7 @@ export interface RootRouteChildren {
   ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
@@ -914,6 +927,13 @@ declare module '@tanstack/react-router' {
       path: '/deck'
       fullPath: '/deck'
       preLoaderRoute: typeof DeckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1207,6 +1227,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
