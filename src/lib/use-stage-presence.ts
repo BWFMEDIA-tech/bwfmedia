@@ -12,7 +12,7 @@ export function useStagePresence(streamId: string | null, userId: string | null)
     if (!streamId || !userId) return;
     let cancelled = false;
 
-    const update = (patch: Record<string, unknown>) =>
+    const update = (patch: { last_seen_at?: string; connection_status?: string }) =>
       supabase
         .from("stage_participants")
         .update(patch)
