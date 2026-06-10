@@ -1,5 +1,4 @@
 import { useServerFn } from "@tanstack/react-start";
-import { Link } from "@tanstack/react-router";
 import { updateStreamMode } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import { Lock, Unlock, Video, Mic, Music2 } from "lucide-react";
@@ -15,17 +14,16 @@ export function ModeToggle({
   onLocalChange,
 }: {
   streamId: string | null;
-  mode: "broadcast" | "stage";
+  mode: "broadcast" | "stage" | "play";
   stageLocked: boolean;
-  onLocalChange?: (mode: "broadcast" | "stage") => void;
+  onLocalChange?: (mode: "broadcast" | "stage" | "play") => void;
 }) {
   const update = useServerFn(updateStreamMode);
 
-  const set = async (next: "broadcast" | "stage") => {
+  const set = async (next: "broadcast" | "stage" | "play") => {
     if (next === mode) return;
-    // Allow local switching before going live
     onLocalChange?.(next);
-    if (!streamId) return;
+    if (!streamId || next === "play") return;
     try { await update({ data: { streamId, mode: next } }); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
@@ -48,16 +46,17 @@ export function ModeToggle({
         <Video className="mr-1 inline h-3.5 w-3.5" />
         BROADCAST MODE (Video)
       </button>
-      <Link
-        to={streamId ? "/play/$room" : "/play"}
-        params={streamId ? { room: streamId } : undefined as any}
-        className="flex-1 rounded-xl px-4 py-3 text-center text-xs font-bold tracking-widest text-white transition hover:opacity-90"
-        style={{ background: `linear-gradient(135deg, #ec4899, ${PURPLE})` }}
-        title="Open BWFPLAY Live Arena"
+      <button
+        onClick={() => set("play")}
+        className={cn(
+          "flex-1 rounded-xl px-4 py-3 text-xs font-bold tracking-widest text-white transition",
+          mode === "play" ? "" : "bg-white/5 text-white/60 hover:bg-white/10",
+        )}
+        style={mode === "play" ? { background: `linear-gradient(135deg, #ec4899, ${PURPLE})` } : undefined}
       >
         <Music2 className="mr-1 inline h-3.5 w-3.5" />
         PLAY ARENA
-      </Link>
+      </button>
       <button
         onClick={() => set("stage")}
         className={cn(

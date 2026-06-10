@@ -33,6 +33,7 @@ import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
+import { PlayArenaView } from "@/routes/play.$room";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -664,7 +665,7 @@ function StreamStudio() {
   const [going, setGoing] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
   const [startedAt, setStartedAt] = useState<string | null>(null);
-  const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
+  const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
@@ -686,7 +687,7 @@ function StreamStudio() {
         setStream({ id: existing.id, room_name: existing.room_name, title: existing.title });
         setLk({ token: t.token, wsUrl: t.wsUrl });
         setStartedAt(existing.started_at ?? new Date().toISOString());
-        setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage");
+        setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage" | "play");
         setStageLocked(!!existing.stage_locked);
         setHostTransferMode(((existing as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
         // Re-register stage participant. If ownership was transferred while we
@@ -720,7 +721,7 @@ function StreamStudio() {
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${stream.id}` },
         (p) => {
           const r = p.new as any;
-          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
+          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage" | "play");
           setStageLocked(!!r.stage_locked);
           setHostTransferMode(((r as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
         })
@@ -857,7 +858,9 @@ function StreamStudio() {
                 </div>
               )}
 
-              {streamMode === "broadcast" ? (
+              {streamMode === "play" ? (
+                <PlayArenaView stream={stream ? { id: stream.id, title: stream.title, host_id: auth.user?.id ?? "" } : null} />
+              ) : streamMode === "broadcast" ? (
                 lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
                 ) : (
