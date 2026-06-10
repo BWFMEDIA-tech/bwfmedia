@@ -859,7 +859,18 @@ function StreamStudio() {
               )}
 
               {streamMode === "play" ? (
-                <PlayArenaView stream={stream ? { id: stream.id, title: stream.title, host_id: auth.user?.id ?? "" } : null} />
+                stream?.id && auth.user ? (
+                  <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} />
+                ) : (
+                  <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
+                    <Music2 className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />
+                    <div className="mb-1 text-sm font-bold text-white">BWFPLAY Live Arena</div>
+                    <p className="mb-4 text-xs text-white/60">Go live to open the arena — artists submit, fans vote, boosted tracks skip the line.</p>
+                    <button onClick={goLive} disabled={going} className="rounded-md px-4 py-2 text-xs font-semibold text-white disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+                      <Radio className="mr-1 inline h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live to open Arena"}
+                    </button>
+                  </div>
+                )
               ) : streamMode === "broadcast" ? (
                 lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
