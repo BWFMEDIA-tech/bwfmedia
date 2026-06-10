@@ -21,10 +21,12 @@ import { template as studioBookingConfirmation } from './studio-booking-confirma
 import { template as checkoutCancellation } from './checkout-cancellation'
 import { template as blockBookingConfirmation } from './block-booking-confirmation'
 import { template as liveStreamStarted } from './live-stream-started'
+import { template as directMessage } from './direct-message'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'studio-booking-confirmation': studioBookingConfirmation,
   'checkout-cancellation': checkoutCancellation,
   'block-booking-confirmation': blockBookingConfirmation,
   'live-stream-started': liveStreamStarted,
+  'direct-message': directMessage,
 }

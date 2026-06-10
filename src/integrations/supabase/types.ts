@@ -202,6 +202,33 @@ export type Database = {
         }
         Relationships: []
       }
+      direct_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -698,6 +725,7 @@ export type Database = {
           genre: string | null
           id: string
           interests: string[] | null
+          last_seen_at: string | null
           stage_name: string | null
           updated_at: string
         }
@@ -709,6 +737,7 @@ export type Database = {
           genre?: string | null
           id: string
           interests?: string[] | null
+          last_seen_at?: string | null
           stage_name?: string | null
           updated_at?: string
         }
@@ -720,6 +749,7 @@ export type Database = {
           genre?: string | null
           id?: string
           interests?: string[] | null
+          last_seen_at?: string | null
           stage_name?: string | null
           updated_at?: string
         }
