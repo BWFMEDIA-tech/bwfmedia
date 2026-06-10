@@ -1,14 +1,16 @@
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, X, UploadCloud, Loader2, Music, CheckCircle2 } from "lucide-react";
+import { Crown, X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { submitPlayTrack } from "@/lib/play.functions";
 import { signPlayAudioUrl } from "@/lib/play-audio.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 const MAX_BYTES = 50 * 1024 * 1024; // 50 MB
+const MAX_COVER_BYTES = 8 * 1024 * 1024; // 8 MB
 const ACCEPT_ATTR =
   ".mp3,.wav,.m4a,.aac,.ogg,.oga,.flac,.webm,audio/*";
+const COVER_ACCEPT = "image/png,image/jpeg,image/webp,image/gif,image/*";
 
 export function SubmitTrackDialog({
   streamId, defaultArtistName, boostCredits, onClose, onSubmitted,
@@ -31,6 +33,9 @@ export function SubmitTrackDialog({
   const [progress, setProgress] = useState(0);
   const [uploadedName, setUploadedName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const coverRef = useRef<HTMLInputElement>(null);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [coverProgress, setCoverProgress] = useState(0);
 
   async function handleUpload(file: File) {
     if (!file.type.startsWith("audio/") && !/\.(mp3|wav|m4a|aac|ogg|oga|flac|webm)$/i.test(file.name)) {
@@ -70,6 +75,46 @@ export function SubmitTrackDialog({
       setProgress(0);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleCoverUpload(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      return;
+    }
+    if (file.size > MAX_COVER_BYTES) {
+      toast.error("Image is too large. Max 8MB.");
+      return;
+    }
+    setCoverUploading(true);
+    setCoverProgress(10);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("Sign in to upload");
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      // Path MUST start with `{uid}/` to satisfy the avatars bucket RLS policy.
+      const path = `${uid}/play-covers/${Date.now()}.${ext || "jpg"}`;
+      const tick = setInterval(() => setCoverProgress((p) => (p < 85 ? p + 8 : p)), 200);
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, {
+          contentType: file.type || "image/jpeg",
+          upsert: false,
+          cacheControl: "3600",
+        });
+      clearInterval(tick);
+      if (upErr) throw new Error(upErr.message);
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      setCoverUrl(pub.publicUrl);
+      setCoverProgress(100);
+      toast.success("Cover art uploaded");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Cover upload failed");
+      setCoverProgress(0);
+    } finally {
+      setCoverUploading(false);
     }
   }
 
@@ -146,8 +191,54 @@ export function SubmitTrackDialog({
             placeholder="Audio URL (SoundCloud, mp3, etc.)"
             className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm" />
 
-          <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="Cover image URL (optional)"
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm" />
+          {/* Cover art upload */}
+          <div
+            onClick={() => !coverUploading && coverRef.current?.click()}
+            className={`flex items-center gap-3 rounded-lg border-2 border-dashed p-3 cursor-pointer transition ${
+              coverUploading ? "border-violet-400/60 bg-violet-500/5 pointer-events-none" :
+              coverUrl ? "border-green-500/50 bg-green-500/5" :
+              "border-white/15 bg-black/40 hover:border-violet-400/60"
+            }`}
+          >
+            <input
+              ref={coverRef}
+              type="file"
+              accept={COVER_ACCEPT}
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleCoverUpload(f); }}
+            />
+            <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-md bg-black/50 flex items-center justify-center">
+              {coverUrl ? (
+                <img src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
+              ) : (
+                <ImageIcon className="h-5 w-5 text-white/40" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1 text-left">
+              {coverUploading ? (
+                <>
+                  <div className="flex items-center gap-2 text-xs text-white/70">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-violet-300" /> Uploading… {coverProgress}%
+                  </div>
+                  <div className="mt-1.5 h-1 w-full overflow-hidden rounded bg-white/10">
+                    <div className="h-full bg-violet-400 transition-all" style={{ width: `${coverProgress}%` }} />
+                  </div>
+                </>
+              ) : coverUrl ? (
+                <div className="flex items-center gap-2 text-xs text-green-300">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Cover uploaded · tap to replace
+                </div>
+              ) : (
+                <>
+                  <div className="text-sm font-semibold">Upload cover art</div>
+                  <div className="text-[11px] text-white/50">JPG, PNG, WebP · max 8MB · square works best</div>
+                </>
+              )}
+            </div>
+          </div>
+          <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="…or paste a cover image URL"
+            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/70" />
+
           {boostCredits > 0 && (
             <label className="flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2.5 text-sm cursor-pointer">
               <input type="checkbox" checked={useBoost} onChange={(e) => setUseBoost(e.target.checked)} />
@@ -155,7 +246,7 @@ export function SubmitTrackDialog({
               Use 1 boost credit ({boostCredits} left) — jump the line
             </label>
           )}
-          <button onClick={submit} disabled={busy || uploading || !title.trim() || !artistName.trim()}
+          <button onClick={submit} disabled={busy || uploading || coverUploading || !title.trim() || !artistName.trim()}
             className="w-full rounded-lg bg-gradient-to-r from-violet-500 to-blue-500 py-2.5 text-sm font-semibold disabled:opacity-50">
             {busy ? "Submitting…" : "Submit to live queue"}
           </button>
