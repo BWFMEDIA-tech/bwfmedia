@@ -12,8 +12,8 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       streamId: z.string().uuid(),
       title: z.string().min(1).max(120),
       artistName: z.string().min(1).max(120),
-      audioUrl: z.string().url().max(500).optional().or(z.literal("")).default(""),
-      coverUrl: z.string().url().max(500).optional().or(z.literal("")).default(""),
+      audioUrl: z.string().url().max(2000).optional().or(z.literal("")).default(""),
+      coverUrl: z.string().url().max(2000).optional().or(z.literal("")).default(""),
       useBoost: z.boolean().optional().default(false),
     }).parse(input),
   )
