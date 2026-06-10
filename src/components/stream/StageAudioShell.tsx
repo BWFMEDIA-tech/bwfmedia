@@ -15,6 +15,7 @@ import {
   type RemoteParticipant,
   type RemoteTrackPublication,
 } from "livekit-client";
+import type { LocalAudioTrack } from "livekit-client";
 import { Mic, MicOff, Radio, PhoneOff, Activity, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -496,6 +497,7 @@ function StageMicBar({ onLeave }: { onLeave?: () => void }) {
         {isMicrophoneEnabled ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5 text-red-400" />}
         {isMicrophoneEnabled ? "Mute" : "Unmute"}
       </button>
+      <MicLevelMeter />
       <DeviceSelector compact />
       {onLeave && (
         <button
@@ -508,6 +510,84 @@ function StageMicBar({ onLeave }: { onLeave?: () => void }) {
           <PhoneOff className="h-3.5 w-3.5" /> Leave
         </button>
       )}
+    </div>
+  );
+}
+
+/**
+ * Local mic input level meter. LiveKit intentionally does NOT play your own
+ * mic back to you (that would cause echo). This meter confirms the mic is
+ * actually capturing audio.
+ */
+function MicLevelMeter() {
+  const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
+  const [level, setLevel] = useState(0);
+
+  useEffect(() => {
+    if (!localParticipant || !isMicrophoneEnabled) {
+      setLevel(0);
+      return;
+    }
+    const pub = Array.from(localParticipant.trackPublications.values()).find(
+      (p) => p.kind === Track.Kind.Audio,
+    );
+    const track = pub?.track as LocalAudioTrack | undefined;
+    const mediaStreamTrack = track?.mediaStreamTrack;
+    if (!mediaStreamTrack) return;
+
+    let raf = 0;
+    let ctx: AudioContext | null = null;
+    let analyser: AnalyserNode | null = null;
+    let source: MediaStreamAudioSourceNode | null = null;
+    try {
+      ctx = new AudioContext();
+      const stream = new MediaStream([mediaStreamTrack]);
+      source = ctx.createMediaStreamSource(stream);
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 512;
+      source.connect(analyser);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        if (!analyser) return;
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+          const v = (data[i] - 128) / 128;
+          sum += v * v;
+        }
+        const rms = Math.sqrt(sum / data.length);
+        setLevel(Math.min(1, rms * 2.5));
+        raf = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) {
+      console.warn("[stage-audio] Mic meter init failed", e);
+    }
+    return () => {
+      cancelAnimationFrame(raf);
+      try { source?.disconnect(); } catch {}
+      try { analyser?.disconnect(); } catch {}
+      try { ctx?.close(); } catch {}
+    };
+  }, [localParticipant, isMicrophoneEnabled]);
+
+  const bars = 12;
+  const lit = Math.round(level * bars);
+  return (
+    <div
+      className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 px-2 py-2"
+      title="Your mic input level — you won't hear yourself (would cause echo)"
+    >
+      {Array.from({ length: bars }).map((_, i) => {
+        const active = i < lit;
+        const color = i < 7 ? "bg-emerald-400" : i < 10 ? "bg-amber-400" : "bg-red-400";
+        return (
+          <span
+            key={i}
+            className={`h-3 w-1 rounded-sm ${active ? color : "bg-white/10"}`}
+          />
+        );
+      })}
     </div>
   );
 }
