@@ -76,11 +76,9 @@ export function RecordButton({ streamId }: Props) {
         .from('stream-recordings')
         .upload(path, blob, { contentType: 'video/webm', upsert: false });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from('stream-recordings').getPublicUrl(path);
       await save({ data: {
         streamId,
         storagePath: path,
-        publicUrl: pub.publicUrl,
         durationSeconds: duration,
         sizeBytes: blob.size,
       }});
