@@ -9,6 +9,7 @@ export type StageParticipant = {
   joined_at: string;
   connection_status?: "connected" | "reconnecting" | "disconnected";
   last_seen_at?: string;
+  muted_until?: string | null;
   display_name?: string | null;
   avatar_url?: string | null;
 };

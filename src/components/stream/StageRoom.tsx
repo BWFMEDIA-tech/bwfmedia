@@ -7,9 +7,10 @@ import {
   promoteToHost,
   revokeHostPrivileges,
   demoteToAudience,
+  setParticipantMute,
 } from "@/lib/stage.functions";
 import { toast } from "sonner";
-import { Mic, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck, UserX } from "lucide-react";
+import { Mic, MicOff, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck, UserX } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
@@ -40,6 +41,7 @@ export function StageRoom({
   const promote = useServerFn(promoteToHost);
   const revoke = useServerFn(revokeHostPrivileges);
   const demoteSrv = useServerFn(demoteToAudience);
+  const muteFn = useServerFn(setParticipantMute);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
   const [confirm, setConfirm] = useState<null | {
     title: string;
@@ -144,6 +146,24 @@ export function StageRoom({
     });
   };
 
+  const doToggleMute = async (p: StageParticipant) => {
+    if (!streamId) return;
+    const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
+    try {
+      await muteFn({
+        data: {
+          streamId,
+          targetUserId: p.user_id,
+          mute: !isMuted,
+          durationMinutes: 60,
+        },
+      });
+      toast.success(isMuted ? "Mic unmuted" : "Mic muted");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-5">
       <div className="mb-4 flex items-center justify-between">
@@ -179,6 +199,7 @@ export function StageRoom({
             onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
             onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
             onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "This user")}
+            onToggleMute={() => doToggleMute(p)}
           />
         ))}
         {showSelfHostPlaceholder && (
@@ -226,6 +247,7 @@ export function StageRoom({
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
               onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "Guest")}
+              onToggleMute={() => doToggleMute(p)}
             />
           ))}
           {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
@@ -344,6 +366,7 @@ function SpeakerBubble({
   onRevoke,
   onKick,
   onDemoteToAudience,
+  onToggleMute,
 }: {
   p: StageParticipant;
   kind: "host" | "co_host" | "speaker";
@@ -356,6 +379,7 @@ function SpeakerBubble({
   onRevoke?: () => void;
   onKick?: () => void;
   onDemoteToAudience?: () => void;
+  onToggleMute?: () => void;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#60a5fa" : "#22c55e";
   const connected = useConnectedIdentities();
@@ -378,6 +402,7 @@ function SpeakerBubble({
   }, [menuOpen]);
   const badgeLabel = kind === "host" ? "HOST" : kind === "co_host" ? "CO-HOST" : "GUEST";
   const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#2563eb" : "#16a34a";
+  const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="absolute -mt-3 self-center">
@@ -469,6 +494,14 @@ function SpeakerBubble({
                     </MenuItem>
                   )}
                   <MenuDivider />
+                  {onToggleMute && !isSelf && (
+                    <MenuItem
+                      icon={isMuted ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
+                      onClick={() => { setMenuOpen(false); onToggleMute(); }}
+                    >
+                      {isMuted ? "Unmute mic" : "Mute mic"}
+                    </MenuItem>
+                  )}
                   {onDemoteToAudience && !isSelf && (
                     <MenuItem icon={<UserX className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onDemoteToAudience(); }}>
                       Demote to Audience
@@ -494,6 +527,14 @@ function SpeakerBubble({
                   {!isPrimaryHost && onRevoke && (
                     <MenuItem icon={<Shield className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onRevoke(); }}>
                       Remove Host Privileges
+                    </MenuItem>
+                  )}
+                  {!isPrimaryHost && onToggleMute && !isSelf && (
+                    <MenuItem
+                      icon={isMuted ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
+                      onClick={() => { setMenuOpen(false); onToggleMute(); }}
+                    >
+                      {isMuted ? "Unmute mic" : "Mute mic"}
                     </MenuItem>
                   )}
                   {!isPrimaryHost && (
