@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { getStreamByRoom } from "@/lib/streams.functions";
-import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus } from "@/lib/play.functions";
+import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
 import { usePlayQueue, useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
 import { useAuth } from "@/lib/auth-context";
 import { BoostCheckoutModal } from "@/components/play/BoostCheckoutModal";
@@ -103,7 +103,7 @@ export function PlayArenaView({ stream, showChat = true }: { stream: { id: strin
 
             {/* Leaderboard + How it works */}
             <div className="grid md:grid-cols-2 gap-4">
-              <Leaderboard items={leaderboard} />
+              <Leaderboard items={leaderboard} isHost={isHost} streamId={stream?.id ?? null} />
               <HowItWorks />
             </div>
 
@@ -246,7 +246,18 @@ function LiveQueue({ queued }: { queued: PlayTrack[] }) {
   );
 }
 
-function Leaderboard({ items }: { items: PlayTrack[] }) {
+function Leaderboard({ items, isHost, streamId }: { items: PlayTrack[]; isHost: boolean; streamId: string | null }) {
+  const deleteFn = useServerFn(deletePlayTrack);
+  const handleDelete = async (t: PlayTrack) => {
+    if (!streamId) return;
+    if (!confirm(`Delete "${t.title}" by ${t.artist_name}?`)) return;
+    try {
+      await deleteFn({ data: { streamId, trackId: t.id } });
+      toast.success("Track deleted");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Delete failed");
+    }
+  };
   return (
     <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-4">
       <div className="flex items-center gap-2 text-sm font-bold mb-3">
@@ -266,6 +277,15 @@ function Leaderboard({ items }: { items: PlayTrack[] }) {
                 <div className="text-xs text-white/50 truncate">{t.artist_name}</div>
               </div>
               <span className="font-bold text-violet-300">{t.score}</span>
+              {isHost && (
+                <button
+                  onClick={() => handleDelete(t)}
+                  aria-label={`Delete ${t.title}`}
+                  className="ml-1 rounded-md p-1.5 text-white/40 hover:bg-red-500/15 hover:text-red-300 transition"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
             </li>
           ))}
         </ol>
