@@ -18,6 +18,7 @@ import guestImg from "@/assets/stream-guest.jpg";
 import { useAuth } from "@/lib/auth-context";
 import { useServerFn } from "@tanstack/react-start";
 import { startOrResumeStream, endStream } from "@/lib/streams.functions";
+import { getMyActiveStream } from "@/lib/streams.functions";
 import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
@@ -30,6 +31,7 @@ import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
+import { useStagePresence } from "@/lib/use-stage-presence";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -653,6 +655,7 @@ function StreamStudio() {
   const nav = useNavigate();
   const startFn = useServerFn(startOrResumeStream);
   const endFn = useServerFn(endStream);
+  const resumeFn = useServerFn(getMyActiveStream);
   const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
@@ -663,6 +666,38 @@ function StreamStudio() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
+
+  // Keep the host's presence row fresh while the studio tab is open.
+  useStagePresence(stream?.id ?? null, auth.user?.id ?? null);
+
+  // Auto-resume an in-progress stream after a page refresh. No notification
+  // broadcast is sent on resume — only when starting a new stream.
+  useEffect(() => {
+    if (!auth.user || stream || lk) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const existing = await resumeFn();
+        if (cancelled || !existing) return;
+        const t = await tokenFn({ data: { roomName: existing.room_name } });
+        if (cancelled) return;
+        setStream({ id: existing.id, room_name: existing.room_name, title: existing.title });
+        setLk({ token: t.token, wsUrl: t.wsUrl });
+        setStartedAt(existing.started_at ?? new Date().toISOString());
+        setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage");
+        setStageLocked(!!existing.stage_locked);
+        // Re-register host as stage participant (idempotent).
+        await supabase.from("stage_participants").upsert(
+          { stream_id: existing.id, user_id: auth.user!.id, stage_role: "host" },
+          { onConflict: "stream_id,user_id" },
+        );
+        toast.success("Reconnected to your live stream");
+      } catch (e: any) {
+        console.warn("Could not auto-resume stream", e?.message);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [auth.user?.id]);
 
   // Subscribe to stream row to track mode/lock changes
   useEffect(() => {

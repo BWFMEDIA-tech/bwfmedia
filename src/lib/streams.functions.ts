@@ -111,3 +111,20 @@ export const getStreamByRoom = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+/** Returns the current user's active (idle/live) stream if any. Used to
+ *  auto-resume a host's session after a page refresh. */
+export const getMyActiveStream = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data } = await supabase
+      .from("streams")
+      .select("id, room_name, title, status, mode, stage_locked, started_at")
+      .eq("host_id", userId)
+      .in("status", ["idle", "live"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data ?? null;
+  });

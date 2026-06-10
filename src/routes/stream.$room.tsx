@@ -14,6 +14,7 @@ import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
+import { useStagePresence } from "@/lib/use-stage-presence";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -33,6 +34,9 @@ function GuestPage() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
+
+  // Heartbeat presence while connected.
+  useStagePresence(lk ? streamId : null, auth.user?.id ?? null);
 
   const myStageRole = auth.user
     ? participants.find((p) => p.user_id === auth.user!.id)?.stage_role ?? "listener"
@@ -68,30 +72,53 @@ function GuestPage() {
     return () => { supabase.removeChannel(ch); };
   }, [streamId]);
 
-  // Auto-join as listener while in the room; remove on leave.
+  // Register presence on join. Preserve any existing stage_role (host/speaker/
+  // green_room) — only insert as listener if there's no row yet. Do NOT delete
+  // on unload: the cron cleanup removes rows after 2 minutes of inactivity, so
+  // refreshes keep guest status intact without re-approval.
   useEffect(() => {
     if (!lk || !streamId || !auth.user) return;
     const uid = auth.user.id;
-    supabase
-      .from("stage_participants")
-      .upsert(
-        { stream_id: streamId, user_id: uid, stage_role: "listener" },
-        { onConflict: "stream_id,user_id" },
-      )
-      .then(() => {});
-    const handleUnload = () => {
-      supabase
+    (async () => {
+      const { data: existing } = await supabase
         .from("stage_participants")
-        .delete()
+        .select("stage_role")
         .eq("stream_id", streamId)
-        .eq("user_id", uid);
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-      handleUnload();
-    };
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (!existing) {
+        await supabase
+          .from("stage_participants")
+          .insert({ stream_id: streamId, user_id: uid, stage_role: "listener" });
+      }
+    })();
   }, [lk, streamId, auth.user?.id]);
+
+  // Auto-rejoin: if the signed-in user already has a stage row for this
+  // stream (i.e. they were on stage before refreshing), connect to LiveKit
+  // immediately without re-prompting for a name.
+  useEffect(() => {
+    if (lk || !streamId || !auth.user) return;
+    let cancelled = false;
+    (async () => {
+      const { data: existing } = await supabase
+        .from("stage_participants")
+        .select("stage_role")
+        .eq("stream_id", streamId)
+        .eq("user_id", auth.user!.id)
+        .maybeSingle();
+      if (cancelled || !existing) return;
+      try {
+        const t = await authTokenFn({ data: { roomName: room } });
+        if (cancelled) return;
+        setLk({ token: t.token, wsUrl: t.wsUrl });
+        toast.success("Reconnected to the stream");
+      } catch (e: any) {
+        console.warn("Auto-rejoin failed", e?.message);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [streamId, auth.user?.id]);
 
   const join = async () => {
     if (!name.trim()) return;
