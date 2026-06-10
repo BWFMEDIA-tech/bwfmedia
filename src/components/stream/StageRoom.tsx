@@ -337,21 +337,25 @@ function SpeakerBubble({
   kind,
   canManage,
   isPrimaryHost = false,
+  isSelf = false,
   hostTransferMode = "co_host",
   onPromote,
   onDemote,
   onRevoke,
   onKick,
+  onDemoteToAudience,
 }: {
   p: StageParticipant;
   kind: "host" | "co_host" | "speaker";
   canManage: boolean;
   isPrimaryHost?: boolean;
+  isSelf?: boolean;
   hostTransferMode?: "co_host" | "transfer";
   onPromote?: (mode: "host" | "co_host" | "transfer") => void;
   onDemote?: () => void;
   onRevoke?: () => void;
   onKick?: () => void;
+  onDemoteToAudience?: () => void;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#60a5fa" : "#22c55e";
   const connected = useConnectedIdentities();
