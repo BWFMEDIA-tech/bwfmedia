@@ -45,7 +45,7 @@ function PlayArena() {
   );
 }
 
-export function PlayArenaView({ stream }: { stream: { id: string; title: string; host_id: string } | null }) {
+export function PlayArenaView({ stream, showChat = true }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean }) {
   const statusFn = useServerFn(getMyPlayStatus);
   const auth = useAuth();
   const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
@@ -116,7 +116,7 @@ export function PlayArenaView({ stream }: { stream: { id: string; title: string;
           {/* Right column */}
           <div className="space-y-5">
             <LiveQueue queued={queued} />
-            <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />
+            {showChat && <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />}
             <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
       </div>
