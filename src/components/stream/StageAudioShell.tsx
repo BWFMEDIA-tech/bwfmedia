@@ -374,14 +374,14 @@ function ReconnectAudioGuard() {
 
     room.on(RoomEvent.Reconnecting, onReconnecting);
     room.on(RoomEvent.Reconnected, onReconnected);
-    room.on(RoomEvent.SignalReconnected, onReconnected);
+    room.on(RoomEvent.SignalConnected, onReconnected);
     room.on(RoomEvent.ParticipantConnected, onParticipantConnected);
     room.on(RoomEvent.TrackPublished, onTrackPublished as any);
     room.on(RoomEvent.MediaDevicesError, onMediaFailure as any);
     return () => {
       room.off(RoomEvent.Reconnecting, onReconnecting);
       room.off(RoomEvent.Reconnected, onReconnected);
-      room.off(RoomEvent.SignalReconnected, onReconnected);
+    room.off(RoomEvent.SignalConnected, onReconnected);
       room.off(RoomEvent.ParticipantConnected, onParticipantConnected);
       room.off(RoomEvent.TrackPublished, onTrackPublished as any);
       room.off(RoomEvent.MediaDevicesError, onMediaFailure as any);
