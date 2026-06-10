@@ -5,6 +5,7 @@ import { Menu, X, User, LogOut, Settings, ChevronDown } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import { useAuth } from "@/lib/auth-context";
 import { NotificationBell } from "@/components/NotificationBell";
+import { MessageBell } from "@/components/MessageBell";
 
 const baseLinks: Array<{ href?: string; to?: string; label: string; adminOnly?: boolean }> = [
   { to: "/", label: "Home" },
@@ -82,6 +83,7 @@ export function SiteHeader() {
           {auth.isAuthenticated ? (
             <>
             <NotificationBell />
+            <MessageBell />
             <div className="relative">
               <button
                 onClick={() => setProfileOpen((v) => !v)}
