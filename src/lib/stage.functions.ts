@@ -142,7 +142,7 @@ export const setStageRole = createServerFn({ method: "POST" })
     z.object({
       streamId: z.string().uuid(),
       targetUserId: z.string().uuid(),
-      stageRole: z.enum(["host", "speaker", "listener", "green_room"]),
+      stageRole: z.enum(["host", "co_host", "speaker", "listener", "green_room"]),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
