@@ -366,6 +366,7 @@ function SpeakerBubble({
   onRevoke,
   onKick,
   onDemoteToAudience,
+  onToggleMute,
 }: {
   p: StageParticipant;
   kind: "host" | "co_host" | "speaker";
@@ -378,6 +379,7 @@ function SpeakerBubble({
   onRevoke?: () => void;
   onKick?: () => void;
   onDemoteToAudience?: () => void;
+  onToggleMute?: () => void;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#60a5fa" : "#22c55e";
   const connected = useConnectedIdentities();
