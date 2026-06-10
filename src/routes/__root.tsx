@@ -145,7 +145,9 @@ function RootComponent() {
     <CartProvider>
       <PaymentTestModeBanner />
       {isChrome && <SiteHeader />}
-      <Outlet />
+      <div className={isChrome ? "pt-24 md:pt-28" : ""}>
+        <Outlet />
+      </div>
       {isChrome && <SiteFooter />}
       <CartDrawer />
     </CartProvider>
