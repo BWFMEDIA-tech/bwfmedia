@@ -362,3 +362,43 @@ export const revokeHostPrivileges = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+/** Demote any stage participant (host, co_host, speaker, green_room) back to
+ *  audience (listener). Removes mic/camera publish rights via stage_role.
+ *  Cannot self-demote. Cannot demote the primary stream host — transfer
+ *  ownership first. */
+export const demoteToAudience = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ streamId: z.string().uuid(), targetUserId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.targetUserId === userId) throw new Error("You cannot demote yourself");
+    const { data: stream } = await supabase
+      .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
+    if (!stream) throw new Error("Stream not found");
+    if (data.targetUserId === stream.host_id)
+      throw new Error("Cannot demote the primary host. Transfer ownership first.");
+
+    await assertHostOrMod(supabase, userId, data.streamId);
+
+    const { data: existing } = await supabase
+      .from("stage_participants").select("stage_role")
+      .eq("stream_id", data.streamId).eq("user_id", data.targetUserId).maybeSingle();
+    const previousRole = existing?.stage_role ?? null;
+
+    const { error } = await supabase.from("stage_participants").upsert(
+      { stream_id: data.streamId, user_id: data.targetUserId, stage_role: "listener" },
+      { onConflict: "stream_id,user_id" },
+    );
+    if (error) throw new Error(error.message);
+
+    await logHostAction(supabase, {
+      actorId: userId, action: "demote_to_audience",
+      streamId: data.streamId, targetUserId: data.targetUserId,
+      previousRole, newRole: "listener",
+      summary: `Demoted ${data.targetUserId} to audience`,
+    });
+    return { ok: true };
+  });
