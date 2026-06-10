@@ -15,7 +15,7 @@ const ROLE_STYLE: Record<AppRole, { label: string; cls: string; Icon: any }> = {
 };
 
 const STAGE_RANK: Record<StageParticipant["stage_role"], number> = {
-  host: 0, speaker: 1, green_room: 2, listener: 3,
+  host: 0, co_host: 1, speaker: 2, green_room: 3, listener: 4,
 };
 
 function pickPrimaryRole(roles: AppRole[]): AppRole {
