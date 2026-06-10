@@ -6,6 +6,7 @@ import {
   ParticipantTile,
   TrackRefContext,
   useRoomContext,
+  RoomAudioRenderer,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Track, ConnectionQuality } from "livekit-client";
@@ -43,6 +44,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       onError={(e) => toast.error(`Stream error: ${e.message}`)}
       className="contents"
     >
+      <RoomAudioRenderer />
       <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} />
       <PublishSync publish={publish} />
     </LiveKitRoom>
