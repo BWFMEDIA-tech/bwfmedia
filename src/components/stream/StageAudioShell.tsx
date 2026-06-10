@@ -125,6 +125,7 @@ export function StageAudioShell({
 function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
   const { localParticipant } = useLocalParticipant();
   const [role, setRole] = useState<string | null>(null);
+  const [mutedUntil, setMutedUntil] = useState<string | null>(null);
   const [prevCanSpeak, setPrevCanSpeak] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -132,11 +133,13 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     const fetchRole = async () => {
       const { data } = await supabase
         .from("stage_participants")
-        .select("stage_role")
+        .select("stage_role, muted_until")
         .eq("stream_id", streamId)
         .eq("user_id", userId)
         .maybeSingle();
-      if (active) setRole((data?.stage_role as string | undefined) ?? null);
+      if (!active) return;
+      setRole((data?.stage_role as string | undefined) ?? null);
+      setMutedUntil(((data as any)?.muted_until as string | null | undefined) ?? null);
     };
     fetchRole();
     const ch = supabase
@@ -155,7 +158,9 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
 
   useEffect(() => {
     if (!localParticipant) return;
-    const canSpeak = role === "host" || role === "co_host" || role === "speaker";
+    const isHostMuted = !!mutedUntil && new Date(mutedUntil).getTime() > Date.now();
+    const hasStageRole = role === "host" || role === "co_host" || role === "speaker";
+    const canSpeak = hasStageRole && !isHostMuted;
     localParticipant
       .setMicrophoneEnabled(canSpeak)
       .then(() => {
@@ -168,7 +173,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
             identity: localParticipant.identity,
           });
         } else {
-          console.log("[stage-audio] Microphone disabled (listener role)", { role });
+          console.log("[stage-audio] Microphone disabled", { role, isHostMuted });
         }
       })
       .catch((err) => {
@@ -178,10 +183,10 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     if (prevCanSpeak === false && canSpeak) {
       toast.success("You're on stage — mic enabled");
     } else if (prevCanSpeak === true && !canSpeak) {
-      toast.info("You're back in the audience");
+      toast.info(isHostMuted ? "You've been muted by the host" : "You're back in the audience");
     }
     setPrevCanSpeak(canSpeak);
-  }, [role, localParticipant]);
+  }, [role, mutedUntil, localParticipant]);
 
   return null;
 }
