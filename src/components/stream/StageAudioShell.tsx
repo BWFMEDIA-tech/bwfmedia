@@ -1,7 +1,21 @@
-import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, useRoomContext } from "@livekit/components-react";
+import {
+  LiveKitRoom,
+  RoomAudioRenderer,
+  useLocalParticipant,
+  useRemoteParticipants,
+  useRoomContext,
+} from "@livekit/components-react";
 import "@livekit/components-styles";
-import { useEffect, useState } from "react";
-import { Mic, MicOff, Radio, PhoneOff } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  RoomEvent,
+  Track,
+  ConnectionState,
+  type Participant,
+  type RemoteParticipant,
+  type RemoteTrackPublication,
+} from "livekit-client";
+import { Mic, MicOff, Radio, PhoneOff, Activity, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StageConnectionProvider } from "@/lib/stage-connection-context";
@@ -97,7 +111,10 @@ export function StageAudioShell({
       <StageConnectionProvider>
         <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
+        <AudioPlaybackUnblocker />
+        <ParticipantAudioLogger />
         {children}
+        <StageDiagnostics />
         <StageMicBar onLeave={onLeave} />
       </StageConnectionProvider>
     </LiveKitRoom>
@@ -138,7 +155,25 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
   useEffect(() => {
     if (!localParticipant) return;
     const canSpeak = role === "host" || role === "co_host" || role === "speaker";
-    localParticipant.setMicrophoneEnabled(canSpeak).catch(() => {});
+    localParticipant
+      .setMicrophoneEnabled(canSpeak)
+      .then(() => {
+        if (canSpeak) {
+          console.log("[stage-audio] Microphone permission granted / track enabled", {
+            role,
+            identity: localParticipant.identity,
+          });
+          console.log("[stage-audio] Audio track published", {
+            identity: localParticipant.identity,
+          });
+        } else {
+          console.log("[stage-audio] Microphone disabled (listener role)", { role });
+        }
+      })
+      .catch((err) => {
+        console.error("[stage-audio] Audio device error", err);
+        if (canSpeak) toast.error(err?.message || "Microphone unavailable");
+      });
     if (prevCanSpeak === false && canSpeak) {
       toast.success("You're on stage — mic enabled");
     } else if (prevCanSpeak === true && !canSpeak) {
@@ -148,6 +183,170 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
   }, [role, localParticipant]);
 
   return null;
+}
+
+/**
+ * Surfaces an "Enable audio" prompt when the browser blocks autoplay so the
+ * user can satisfy the gesture requirement without refreshing.
+ */
+function AudioPlaybackUnblocker() {
+  const room = useRoomContext();
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    if (!room) return;
+    const update = () => setBlocked(!room.canPlaybackAudio);
+    update();
+    room.on(RoomEvent.AudioPlaybackStatusChanged, update);
+    return () => {
+      room.off(RoomEvent.AudioPlaybackStatusChanged, update);
+    };
+  }, [room]);
+
+  if (!blocked) return null;
+  return (
+    <button
+      onClick={async () => {
+        try {
+          await room?.startAudio();
+          toast.success("Audio enabled");
+        } catch (e: any) {
+          toast.error(e?.message || "Couldn't start audio");
+        }
+      }}
+      className="flex w-full items-center justify-center gap-2 rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
+    >
+      <VolumeX className="h-3.5 w-3.5" /> Browser blocked audio — click to enable
+    </button>
+  );
+}
+
+/** Console-logs participant + track lifecycle so the audio pipeline is debuggable. */
+function ParticipantAudioLogger() {
+  const room = useRoomContext();
+  useEffect(() => {
+    if (!room) return;
+    const onConnected = (p: Participant) => {
+      console.log("[stage-audio] Participant connected", p.identity);
+    };
+    const onDisconnected = (p: Participant) => {
+      console.log("[stage-audio] Participant disconnected", p.identity);
+    };
+    const onSubscribed = (
+      _track: unknown,
+      pub: RemoteTrackPublication,
+      participant: RemoteParticipant,
+    ) => {
+      if (pub.kind === Track.Kind.Audio) {
+        console.log("[stage-audio] Audio track subscribed", {
+          from: participant.identity,
+          trackSid: pub.trackSid,
+        });
+      }
+    };
+    const onState = (state: ConnectionState) => {
+      console.log("[stage-audio] Connection state:", state);
+    };
+    const onSpeakers = (speakers: Participant[]) => {
+      if (speakers.length) {
+        console.log(
+          "[stage-audio] Participant speaking",
+          speakers.map((s) => s.identity),
+        );
+      }
+    };
+    room.on(RoomEvent.ParticipantConnected, onConnected);
+    room.on(RoomEvent.ParticipantDisconnected, onDisconnected);
+    room.on(RoomEvent.TrackSubscribed, onSubscribed as any);
+    room.on(RoomEvent.ConnectionStateChanged, onState);
+    room.on(RoomEvent.ActiveSpeakersChanged, onSpeakers);
+    return () => {
+      room.off(RoomEvent.ParticipantConnected, onConnected);
+      room.off(RoomEvent.ParticipantDisconnected, onDisconnected);
+      room.off(RoomEvent.TrackSubscribed, onSubscribed as any);
+      room.off(RoomEvent.ConnectionStateChanged, onState);
+      room.off(RoomEvent.ActiveSpeakersChanged, onSpeakers);
+    };
+  }, [room]);
+  return null;
+}
+
+/** Compact diagnostics chip-row: mic, publish status, subscriptions, state. */
+function StageDiagnostics() {
+  const room = useRoomContext();
+  const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
+  const remotes = useRemoteParticipants();
+  const [state, setState] = useState<ConnectionState>(
+    room?.state ?? ConnectionState.Disconnected,
+  );
+  const [hasMicDevice, setHasMicDevice] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!room) return;
+    const onState = (s: ConnectionState) => setState(s);
+    room.on(RoomEvent.ConnectionStateChanged, onState);
+    setState(room.state);
+    return () => {
+      room.off(RoomEvent.ConnectionStateChanged, onState);
+    };
+  }, [room]);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.enumerateDevices) return;
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then((devs) => setHasMicDevice(devs.some((d) => d.kind === "audioinput")))
+      .catch(() => setHasMicDevice(null));
+  }, []);
+
+  const publishedAudio = useMemo(() => {
+    if (!localParticipant) return false;
+    return Array.from(localParticipant.trackPublications.values()).some(
+      (p) => p.kind === Track.Kind.Audio && !p.isMuted,
+    );
+  }, [localParticipant, isMicrophoneEnabled]);
+
+  const subscribedAudio = useMemo(() => {
+    let n = 0;
+    remotes?.forEach((r) => {
+      r.trackPublications.forEach((p) => {
+        if (p.kind === Track.Kind.Audio && p.isSubscribed) n++;
+      });
+    });
+    return n;
+  }, [remotes]);
+
+  const stateLabel = String(state);
+  const stateColor =
+    state === ConnectionState.Connected
+      ? "text-emerald-300"
+      : state === ConnectionState.Reconnecting
+        ? "text-amber-300"
+        : "text-red-300";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/70">
+      <span className="flex items-center gap-1 font-semibold text-white/90">
+        <Activity className="h-3 w-3" /> Audio diagnostics
+      </span>
+      <Chip ok={hasMicDevice !== false} label={hasMicDevice === false ? "No mic detected" : "Mic detected"} />
+      <Chip ok={publishedAudio} label={publishedAudio ? "Publishing audio" : "Not publishing"} />
+      <Chip ok={subscribedAudio > 0} neutral={subscribedAudio === 0 && remotes.length === 0} label={`Subscribed: ${subscribedAudio}`} />
+      <span className={`flex items-center gap-1 ${stateColor}`}>
+        <Volume2 className="h-3 w-3" /> {stateLabel}
+      </span>
+    </div>
+  );
+}
+
+function Chip({ ok, label, neutral }: { ok: boolean; label: string; neutral?: boolean }) {
+  const color = neutral ? "bg-white/30" : ok ? "bg-emerald-400" : "bg-red-400";
+  return (
+    <span className="flex items-center gap-1 rounded-md border border-white/5 bg-black/30 px-1.5 py-0.5">
+      <span className={`h-1.5 w-1.5 rounded-full ${color}`} />
+      {label}
+    </span>
+  );
 }
 
 function StageMicBar({ onLeave }: { onLeave?: () => void }) {
