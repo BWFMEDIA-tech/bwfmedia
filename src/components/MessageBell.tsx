@@ -17,7 +17,7 @@ export function MessageBell() {
     let cancelled = false;
     const ping = () => {
       if (cancelled || document.hidden) return;
-      touch({}).catch(() => {});
+      touch().catch(() => {});
     };
     ping();
     const interval = setInterval(ping, 60_000);
