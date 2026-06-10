@@ -3,13 +3,50 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertHostOrMod(supabase: any, userId: string, streamId: string) {
-  const [{ data: stream }, { data: roles }] = await Promise.all([
+  const [{ data: stream }, { data: roles }, { data: sp }] = await Promise.all([
     supabase.from("streams").select("host_id").eq("id", streamId).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
+    supabase.from("stage_participants").select("stage_role")
+      .eq("stream_id", streamId).eq("user_id", userId).maybeSingle(),
   ]);
   const isHost = stream?.host_id === userId;
+  const isCoHost = sp?.stage_role === "co_host" || sp?.stage_role === "host";
   const isMod = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");
-  if (!isHost && !isMod) throw new Error("Not authorized");
+  if (!isHost && !isCoHost && !isMod) throw new Error("Not authorized");
+  return { isPrimaryHost: isHost, isMod };
+}
+
+async function logHostAction(
+  supabase: any,
+  args: {
+    actorId: string;
+    action: string;
+    streamId: string;
+    targetUserId: string;
+    previousRole: string | null;
+    newRole: string | null;
+    summary: string;
+  },
+) {
+  try {
+    const { data: actor } = await supabase.auth.getUser();
+    await supabase.from("admin_audit_log").insert({
+      actor_id: args.actorId,
+      actor_email: actor?.user?.email ?? null,
+      action: args.action,
+      category: "stream_host",
+      target_type: "stage_participant",
+      target_id: args.targetUserId,
+      summary: args.summary,
+      metadata: {
+        stream_id: args.streamId,
+        previous_role: args.previousRole,
+        new_role: args.newRole,
+      },
+    });
+  } catch (e) {
+    console.warn("audit log failed", e);
+  }
 }
 
 /** Set stream mode (broadcast/stage) and stage lock */
