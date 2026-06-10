@@ -1,122 +1,74 @@
+Build the **BWFPLAY Live Arena** on top of your existing BWF stream/live infrastructure. All four pieces, adapted to your current dark BWF theme (not the screenshot's neon sidebar).
 
-## Goal
+## What gets built
 
-Wire BWFNetwork end-to-end for live: when a host/admin/artist goes live, everyone gets notified; anyone can discover and join active streams; the audience is visible in real time; users can request the stage and the host can approve, decline, mute, or remove them.
+### 1. Live Arena page — `/play/$room`
+New route layered on top of the existing `streams` + LiveKit infrastructure. Layout from the mockup, styled with your current tokens:
 
-## Scope (all in one pass)
+- **Now Playing** card — current track cover art, title, artist, progress bar, glow accent
+- **Like / Dislike** buttons with animated live score (+1/−1)
+- **"You and N others voted"** social proof
+- **Live Queue** panel — upcoming songs, Boosted tracks highlighted with crown badge
+- **Live Leaderboard** — top 5 by score this session
+- **Live Chat** — reuses existing `LiveChat` component
+- **"Skip the Line / Boost Now"** CTA → Stripe checkout
+- **How It Works** strip — 4 steps (Upload → Play → Vote → Win)
 
-1. Notifications (in-app + email + web push)
-2. Live Now discovery section
-3. Audience presence (Crowd panel)
-4. Join requests + host stage controls
-5. Realtime everywhere via Supabase channels
-6. Permissions: Admin / Host / Artist can start streams; everyone can join + request stage
+### 2. Voting + Leaderboard backend
+New tables + realtime:
+- `play_tracks` — songs in the queue (artist, title, audio_url, cover_url, boosted flag, position, status: queued / playing / done)
+- `play_votes` — one row per user per track, value +1 or −1 (unique on `(track_id, user_id)`)
+- `play_sessions` — per-stream session, current playing track, winner at end
 
-## Database (new migration)
+Server functions: `submitVote`, `getLeaderboard`, `advanceTrack` (host), `endSession` (declares winner). Realtime channels for vote score, queue order, current track.
 
-- `notifications` — `id, user_id, type, title, body, link, stream_id?, actor_id?, read_at?, created_at`. RLS: user sees their own. Realtime enabled. GRANTs to authenticated + service_role.
-- `notification_preferences` — `user_id PK, in_app bool, email bool, push bool, live_alerts bool`. Defaults on. RLS: owner.
-- `web_push_subscriptions` — `id, user_id, endpoint UNIQUE, p256dh, auth, user_agent, created_at`. RLS: owner.
-- `streams.viewer_count` (int default 0), `streams.started_at` already exists. Make sure `live` boolean / status is queryable; add index on `(status, started_at desc)`.
-- `stage_participants` (exists): already supports listener/speaker/host/green_room. Add realtime publication.
-- `raise_hand_requests` (exists): already covers join requests.
-- `chat_timeouts` reused for mute (already exists for chat; add `muted_until` on `stage_participants` for stage mute).
+### 3. Boost — $25 / 2 submissions
+- Stripe product `play_boost` ($25, one-time, qty 1)
+- Embedded checkout from "Boost Now" button → on success, grants 2 boost credits stored in `play_boost_credits` table
+- Submitting a song while you have credits → consumes one credit and marks `boosted=true`, jumps to top of queue
+- Boosted tracks rendered with crown + amber border in the queue
 
-All new tables: GRANTs for authenticated + service_role; service_role insert for system-generated notifications.
+### 4. Artist Membership — $6.99/mo
+- Stripe product `bwf_artist_membership` ($6.99, recurring monthly, qty 1)
+- Subscription gating: only members can submit songs to the queue
+- "Upgrade" CTA on submission form when not subscribed
+- Reuses the existing `subscriptions` table + webhook (already wired)
+- Membership perks card on the Arena page (Submit, Join Queue, Analytics, Priority Support)
 
-## Server functions (`src/lib/*.functions.ts`)
+## Technical details (for reference)
 
-- `notifications.functions.ts`
-  - `listNotifications`, `markRead`, `markAllRead`
-  - `getUnreadCount`
-  - `getPreferences`, `updatePreferences`
-  - `subscribePush({endpoint,p256dh,auth})`, `unsubscribePush`
-- `live-broadcast.functions.ts` (server, admin client)
-  - `broadcastStreamStarted({streamId})` — called from host "Go Live" flow; inserts a notification row per active user (`profiles`) honoring `notification_preferences.live_alerts`; enqueues an email via existing transactional email infra for opt-in users; sends web push via VAPID for opt-in users.
-- `stage.functions.ts` (extend existing)
-  - `muteParticipant`, `unmuteParticipant`, `removeFromStage`, `promoteToSpeaker`, `endGuestParticipation` (host/admin only via server-side role check).
-- `streams.functions.ts` (extend)
-  - `listLiveStreams()` — returns active streams + host profile + viewer count.
-  - `incrementViewer / decrementViewer` (heartbeat via stage_participants is enough; use count there).
+```text
+src/routes/play.$room.tsx        # new Live Arena page
+src/routes/play.index.tsx        # list of live arenas (reuses listLiveStreams)
+src/components/play/
+  NowPlayingCard.tsx
+  VoteButtons.tsx
+  LiveQueue.tsx
+  Leaderboard.tsx
+  BoostButton.tsx
+  MembershipCard.tsx
+  SubmitTrackDialog.tsx
+src/lib/play.functions.ts        # vote, queue, leaderboard, advance, submit
+src/lib/play-checkout.functions.ts  # boost + membership checkout
+src/lib/usePlaySession.ts        # realtime hook
+supabase/migrations/<ts>_play_arena.sql
+```
 
-## Frontend
+Tax: Stripe managed_payments enabled (digital memberships, US-eligible) — +3.5% per txn for full tax/dispute/support handling. Tell me if you'd rather only calculate tax (+0.5%) and handle filing yourself.
 
-- `src/routes/live.tsx` — "Live Now" public page. Cards: thumbnail, title, host avatar+name, viewer count, category. Realtime subscribe to `streams` updates. Link to `/stream/$room`.
-- Add "Live Now" rail to home `index.tsx` showing up to 4 active streams.
-- Nav: add Live link in `SiteHeader`.
-- `src/routes/notifications.tsx` — replace stub with real feed: list, mark read, filter unread. Realtime subscribed.
-- `NotificationBell` component in `SiteHeader` showing unread count badge with realtime updates.
-- Settings page: notification preferences (in-app/email/push toggles) + "Enable browser push" button that registers a service worker and subscribes via VAPID.
-- Stream Studio `/stream-studio`:
-  - On "Start Stream" success → call `broadcastStreamStarted`.
-  - New "Audience" panel (next to RaiseHandPanel) listing `stage_participants` with role `listener`. Shows avatars, names, count, "recently joined" sort.
-  - Existing RaiseHandPanel already covers approve/decline; add "decline" toast + mute/remove controls on stage tiles.
-- `/stream/$room` guest view:
-  - Already auto-joins as listener. Add visible "Crowd" panel below stage with avatars + names + count.
-  - "Request to Join" button (exists as RaiseHandButton).
-  - When promoted, automatically re-fetch a publishing LiveKit token and mount as speaker.
-  - Show role badge (Artist/Host/Admin/Member) on every avatar in stage + crowd.
+Stripe products created via tools, no manual dashboard work.
 
-## Web push
+## Build order (one turn each)
+1. DB migration (tables, RLS, realtime)
+2. Stripe products + checkout fns
+3. Server functions (vote/queue/leaderboard)
+4. UI page + components, wired to current BWF theme
 
-- Service worker `public/sw.js` handling `push` and `notificationclick`.
-- VAPID keys: request `VAPID_PUBLIC_KEY` (public, ok in client) and `VAPID_PRIVATE_KEY` (secret) via add_secret. Server uses `web-push` npm package inside `broadcastStreamStarted`.
-- Subscriptions stored in `web_push_subscriptions`; failures (410/404) prune the row.
+## Out of scope (flag for later)
+- AI song scoring
+- Genre rooms
+- Mobile native apps
+- Label A&R tools
+- Redis (your Postgres + realtime is fine at current scale; revisit when concurrency demands it)
 
-## Email
-
-Use existing Lovable Email infra. New template `live-stream-started.tsx` with host name, stream title, CTA link. Sent via `/lovable/email/transactional/send` for users with `email=true` AND `live_alerts=true` AND not suppressed.
-
-## Permissions matrix (enforced server-side)
-
-- Start/end stream: admin OR host OR artist (checked in `streams.functions.ts`).
-- Approve/decline/mute/remove on stage: only the stream's `host_id` OR admin.
-- Request stage: any authenticated user.
-- Join stream / view crowd: any authenticated user (guest token allows view-only).
-
-## Realtime
-
-Channels per stream id for `stage_participants`, `raise_hand_requests`, `streams` (viewer count + status). Global channel per user for `notifications`.
-
-## Files to add / edit
-
-Add:
-- `supabase/migrations/<ts>_live_notifications_presence.sql`
-- `src/lib/notifications.functions.ts`
-- `src/lib/live-broadcast.functions.ts`
-- `src/lib/web-push.server.ts`
-- `src/lib/email-templates/live-stream-started.tsx` (+ registry update)
-- `src/components/NotificationBell.tsx`
-- `src/components/stream/AudiencePanel.tsx`
-- `src/components/stream/HostStageControls.tsx`
-- `src/routes/live.tsx`
-- `public/sw.js`
-
-Edit:
-- `src/routes/notifications.tsx`, `src/routes/settings.tsx`, `src/routes/index.tsx`, `src/routes/stream-studio.tsx`, `src/routes/stream.$room.tsx`
-- `src/components/site/SiteHeader.tsx`
-- `src/lib/stage.functions.ts`, `src/lib/streams.functions.ts`
-- `src/lib/email-templates/registry.ts`
-
-## Order of execution
-
-1. Migration (new tables + GRANTs + realtime publication + indexes).
-2. After migration approval: server functions + email template + web-push helper.
-3. UI: NotificationBell + notifications page + settings preferences + service worker.
-4. Live Now route + home rail + header link.
-5. Stream Studio audience panel + host controls + broadcast trigger.
-6. Guest /stream/$room crowd panel + auto-promote.
-7. Request VAPID secrets, wire push.
-8. Smoke test: console + network.
-
-## Secrets needed (will request after plan approval)
-
-- `VAPID_PUBLIC_KEY` (publishable, also written as `VITE_VAPID_PUBLIC_KEY` for the SW subscribe call)
-- `VAPID_PRIVATE_KEY` (secret)
-- `VAPID_SUBJECT` (mailto:admin@bwfmedia.company)
-
-## Out of scope (intentionally deferred)
-
-- Followers-only notifications (you chose "everyone").
-- Mobile native push (no native app).
-- Notification digest/batching beyond rate-limit (single broadcast row per stream start).
+I'll start with step 1 (DB migration) when you approve.
