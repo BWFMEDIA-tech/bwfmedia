@@ -350,6 +350,7 @@ export type Database = {
           stripe_session_id: string | null
           tier: string
           uploaded_audio_url: string | null
+          user_id: string | null
         }
         Insert: {
           amount_cents: number
@@ -370,6 +371,7 @@ export type Database = {
           stripe_session_id?: string | null
           tier: string
           uploaded_audio_url?: string | null
+          user_id?: string | null
         }
         Update: {
           amount_cents?: number
@@ -390,6 +392,7 @@ export type Database = {
           stripe_session_id?: string | null
           tier?: string
           uploaded_audio_url?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
