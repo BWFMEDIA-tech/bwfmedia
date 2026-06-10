@@ -95,18 +95,45 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
     onViewerCount?.(participants.length);
   }, [participants.length, onViewerCount]);
 
-  // Pick the first two for the two-up layout (host + guest)
-  const slots = [0, 1].map((i) => cameraTracks[i] ?? null);
-  const slotIdentities = [0, 1].map(
-    (i) => cameraTracks[i]?.participant?.identity ?? null,
-  );
+  // Host = first camera track; everyone else = guests. Always show a guest slot
+  // even when empty so the host can invite more guests on the fly.
+  const hostTrack = cameraTracks[0] ?? null;
+  const guestTracks = cameraTracks.slice(1);
+  const guestSlotCount = Math.max(1, guestTracks.length);
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
+
+  // Responsive column count: 1 tile = 1 col, 2 = 2 cols, 3-4 = 2 cols, 5+ = 3 cols
+  const totalTiles = 1 + guestSlotCount;
+  const gridCols =
+    totalTiles <= 1
+      ? "grid-cols-1"
+      : totalTiles <= 4
+        ? "grid-cols-1 sm:grid-cols-2"
+        : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <StageTile track={slots[0]} label="HOST" fallbackImage={hostImage} profile={slotIdentities[0] ? profiles[slotIdentities[0]] : undefined} />
-        <StageTile track={slots[1]} label="GUEST" fallbackImage={guestImage} profile={slotIdentities[1] ? profiles[slotIdentities[1]] : undefined} placeholder={`Waiting for guest (${Math.max(0, participants.length - 1)} in room)`} />
+      <div className={`grid gap-4 ${gridCols}`}>
+        <StageTile
+          track={hostTrack}
+          label="HOST"
+          fallbackImage={hostImage}
+          profile={hostTrack?.participant?.identity ? profiles[hostTrack.participant.identity] : undefined}
+        />
+        {Array.from({ length: guestSlotCount }).map((_, i) => {
+          const t = guestTracks[i] ?? null;
+          const id = t?.participant?.identity ?? null;
+          return (
+            <StageTile
+              key={id ?? `guest-empty-${i}`}
+              track={t}
+              label={guestSlotCount > 1 ? `GUEST ${i + 1}` : "GUEST"}
+              fallbackImage={i === 0 ? guestImage : undefined}
+              profile={id ? profiles[id] : undefined}
+              placeholder={`Waiting for guest (${Math.max(0, participants.length - 1)} in room)`}
+            />
+          );
+        })}
       </div>
       <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />
     </>
