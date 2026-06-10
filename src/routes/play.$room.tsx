@@ -22,25 +22,10 @@ export const Route = createFileRoute("/play/$room")({
 function PlayArena() {
   const { room } = Route.useParams();
   const streamFn = useServerFn(getStreamByRoom);
-  const statusFn = useServerFn(getMyPlayStatus);
-  const auth = useAuth();
-
   const [stream, setStream] = useState<{ id: string; title: string; host_id: string } | null>(null);
-  const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
-  const [modal, setModal] = useState<null | "boost" | "membership" | "submit">(null);
-
   useEffect(() => {
     streamFn({ data: { roomName: room } }).then((s: any) => s && setStream(s));
   }, [room]);
-
-  const refreshStatus = () => {
-    if (auth.user) statusFn({}).then(setStatus).catch(() => {});
-  };
-  useEffect(() => { refreshStatus(); }, [auth.user?.id]);
-
-  const { playing, queued, leaderboard } = usePlayQueue(stream?.id ?? null);
-  const isHost = !!stream && auth.user?.id === stream.host_id;
-
   return (
     <div className="min-h-screen bg-[#050509] text-white pt-24 pb-12 px-4">
       <div className="mx-auto max-w-7xl">
@@ -54,8 +39,29 @@ function PlayArena() {
           </div>
           <Link to="/live" className="text-sm text-white/60 hover:text-white">← All live</Link>
         </div>
+        <PlayArenaView stream={stream} />
+      </div>
+    </div>
+  );
+}
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+export function PlayArenaView({ stream }: { stream: { id: string; title: string; host_id: string } | null }) {
+  const statusFn = useServerFn(getMyPlayStatus);
+  const auth = useAuth();
+  const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
+  const [modal, setModal] = useState<null | "boost" | "membership" | "submit">(null);
+
+  const refreshStatus = () => {
+    if (auth.user) statusFn({}).then(setStatus).catch(() => {});
+  };
+  useEffect(() => { refreshStatus(); }, [auth.user?.id]);
+
+  const { playing, queued, leaderboard } = usePlayQueue(stream?.id ?? null);
+  const isHost = !!stream && auth.user?.id === stream.host_id;
+
+  return (
+    <>
+      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
           {/* Main column */}
           <div className="space-y-5">
             <NowPlayingCard track={playing} userId={auth.user?.id ?? null} />
@@ -113,7 +119,6 @@ function PlayArena() {
             <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />
             <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
-        </div>
       </div>
 
       {modal === "boost" && <BoostCheckoutModal kind="boost" onClose={() => { setModal(null); refreshStatus(); }} />}
@@ -127,7 +132,7 @@ function PlayArena() {
           onSubmitted={refreshStatus}
         />
       )}
-    </div>
+    </>
   );
 }
 
