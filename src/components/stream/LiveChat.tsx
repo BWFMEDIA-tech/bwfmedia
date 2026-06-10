@@ -86,8 +86,10 @@ export function LiveChat({
       setMessages(data.map((r: any) => ({ ...r, display_name: profileCache.current[r.user_id]?.display_name ?? "Anon", avatar_url: profileCache.current[r.user_id]?.avatar_url ?? null })));
     })();
 
+    const channelName = `stream-chat-${streamId}-${Math.random().toString(36).slice(2, 10)}`;
+    console.log(`[LiveChat] MOUNT streamId=${streamId} channel=${channelName}`);
     const channel = supabase
-      .channel(`stream-chat-${streamId}-${Math.random().toString(36).slice(2, 10)}`)
+      .channel(channelName)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "stream_messages", filter: `stream_id=eq.${streamId}` },
         async (payload) => {
           const row = payload.new as any;
@@ -100,7 +102,11 @@ export function LiveChat({
           setMessages((cur) => [...cur, { ...row, display_name: cached.display_name, avatar_url: cached.avatar_url }]);
         })
       .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(channel); };
+    return () => {
+      console.log(`[LiveChat] UNMOUNT streamId=${streamId} channel=${channelName}`);
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, [streamId]);
 
   // Tips: initial load + realtime
