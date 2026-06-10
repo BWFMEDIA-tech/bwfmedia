@@ -235,3 +235,26 @@
 .stage-tile .lk-participant-metadata-item {
   display: none !important;
 }
+
+/* Vibrant animated gradient border for host/guest video tiles */
+@keyframes stage-tile-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.stage-tile-glow {
+  background: linear-gradient(
+    120deg,
+    #ec4899,
+    #a855f7,
+    #6366f1,
+    #22d3ee,
+    #a855f7,
+    #ec4899
+  );
+  background-size: 300% 300%;
+  animation: stage-tile-spin 7s ease infinite;
+  box-shadow:
+    0 0 28px -6px rgba(168, 85, 247, 0.55),
+    0 0 40px -10px rgba(236, 72, 153, 0.35);
+}
