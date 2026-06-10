@@ -41,7 +41,8 @@ function GuestPage() {
   const myStageRole = auth.user
     ? participants.find((p) => p.user_id === auth.user!.id)?.stage_role ?? "listener"
     : "listener";
-  const inCrowd = myStageRole !== "host" && myStageRole !== "speaker";
+  const isHostLike = myStageRole === "host" || myStageRole === "co_host";
+  const inCrowd = !isHostLike && myStageRole !== "speaker";
 
   useEffect(() => {
     streamFn({ data: { roomName: room } })
@@ -161,7 +162,11 @@ function GuestPage() {
               userId={auth.user.id}
               onLeave={() => setLk(null)}
             >
-              <StageRoom streamId={streamId} participants={participants as StageParticipant[]} canManage={false} />
+              <StageRoom
+                streamId={streamId}
+                participants={participants as StageParticipant[]}
+                canManage={isHostLike}
+              />
               {inCrowd && (
                 <InCrowdBanner streamId={streamId} auth={auth} mode="stage" />
               )}
