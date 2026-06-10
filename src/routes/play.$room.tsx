@@ -165,7 +165,14 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
           <h2 className="mt-4 text-center text-2xl font-bold">{track.title}</h2>
           <p className="text-center text-white/60">{track.artist_name}</p>
           {track.audio_url && (
-            <audio src={track.audio_url} controls className="mt-3 w-full" style={{ colorScheme: "dark" }} />
+            <audio
+              key={track.id}
+              src={track.audio_url}
+              controls
+              autoPlay
+              className="mt-3 w-full"
+              style={{ colorScheme: "dark" }}
+            />
           )}
           <div className="mt-5 flex items-center justify-center gap-6">
             <button onClick={() => cast(1)}
