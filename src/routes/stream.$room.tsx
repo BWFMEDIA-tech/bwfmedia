@@ -35,8 +35,8 @@ function GuestPage() {
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
-  // Heartbeat presence while connected.
-  useStagePresence(lk ? streamId : null, auth.user?.id ?? null);
+  // Heartbeat presence while watching (chat access requires a stage_participants row).
+  useStagePresence(streamId, auth.user?.id ?? null);
 
   const myStageRole = auth.user
     ? participants.find((p) => p.user_id === auth.user!.id)?.stage_role ?? "listener"
