@@ -5,6 +5,7 @@ import { Mic, MicOff, Radio, PhoneOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StageConnectionProvider } from "@/lib/stage-connection-context";
+import { DeviceSelector } from "./DeviceSelector";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -171,6 +172,7 @@ function StageMicBar({ onLeave }: { onLeave?: () => void }) {
         {isMicrophoneEnabled ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5 text-red-400" />}
         {isMicrophoneEnabled ? "Mute" : "Unmute"}
       </button>
+      <DeviceSelector compact />
       {onLeave && (
         <button
           onClick={async () => {
