@@ -108,18 +108,9 @@ export function WaveformBackground({
       intensityRef.current += (target - intensityRef.current) * 0.08;
       const intensity = intensityRef.current;
 
-      // Bright horizontal glow behind the album.
+      // No background fill — bars render on a transparent canvas.
       const cx = w / 2;
       const cy = h / 2;
-      const glow = c.createLinearGradient(0, cy, w, cy);
-      const ga = 0.4 + intensity * 0.55;
-      glow.addColorStop(0, "rgba(0,0,0,0)");
-      glow.addColorStop(0.15, `rgba(236, 72, 153, ${ga * 0.8})`);
-      glow.addColorStop(0.5, `rgba(139, 92, 246, ${ga})`);
-      glow.addColorStop(0.85, `rgba(34, 211, 238, ${ga * 0.85})`);
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      c.fillStyle = glow;
-      c.fillRect(0, cy - h * 0.22, w, h * 0.44);
 
       // Horizontal mirrored waveform bars extending left & right from album.
       // Album sits in the center; bars fan out to both sides like an EQ.
