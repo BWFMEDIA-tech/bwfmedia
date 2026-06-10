@@ -141,7 +141,8 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
 function StageTile({ track, label, fallbackImage, placeholder, profile }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite }) {
   const avatar = profile?.avatar_url ?? fallbackImage;
   return (
-    <div className="stage-tile relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
+    <div className="stage-tile-glow relative aspect-video rounded-2xl p-[2px]">
+      <div className="stage-tile relative h-full w-full overflow-hidden rounded-[14px] bg-[#0d0d18]">
       {track ? (
         <TrackRefContext.Provider value={track}>
           <ParticipantTile className="!h-full !w-full" />
@@ -162,6 +163,7 @@ function StageTile({ track, label, fallbackImage, placeholder, profile }: { trac
         <span className="rounded-md bg-black/60 px-2 py-1 text-[10px] font-bold tracking-widest text-white backdrop-blur">
           {label}
         </span>
+      </div>
       </div>
     </div>
   );
