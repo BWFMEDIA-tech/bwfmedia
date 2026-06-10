@@ -108,45 +108,67 @@ export function WaveformBackground({
       intensityRef.current += (target - intensityRef.current) * 0.08;
       const intensity = intensityRef.current;
 
-      // Radial gradient background pulse.
+      // Soft horizontal glow behind the album.
       const cx = w / 2;
       const cy = h / 2;
-      const baseR = Math.min(w, h) * 0.35;
-      const pulseR = baseR * (1 + intensity * 0.6);
-      const grad = c.createRadialGradient(cx, cy, baseR * 0.2, cx, cy, pulseR);
-      grad.addColorStop(0, `rgba(139, 92, 246, ${0.35 * (0.4 + intensity)})`);
-      grad.addColorStop(0.6, `rgba(59, 130, 246, ${0.18 * (0.4 + intensity)})`);
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      c.fillStyle = grad;
-      c.fillRect(0, 0, w, h);
+      const glow = c.createLinearGradient(0, cy, w, cy);
+      const ga = 0.18 + intensity * 0.35;
+      glow.addColorStop(0, "rgba(0,0,0,0)");
+      glow.addColorStop(0.2, `rgba(168, 85, 247, ${ga * 0.6})`);
+      glow.addColorStop(0.5, `rgba(99, 102, 241, ${ga})`);
+      glow.addColorStop(0.8, `rgba(236, 72, 153, ${ga * 0.6})`);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      c.fillStyle = glow;
+      c.fillRect(0, cy - h * 0.18, w, h * 0.36);
 
-      // Bar ring around the album.
-      const bars = 72;
-      const ringR = Math.min(w, h) * 0.42;
-      const maxBar = Math.min(w, h) * 0.18;
-      c.save();
-      c.translate(cx, cy);
+      // Horizontal mirrored waveform bars extending left & right from album.
+      // Album sits in the center; bars fan out to both sides like an EQ.
+      const albumHalf = h * 0.5 * 0.62; // ≈ album half-width inside the canvas
+      const sideGap = h * 0.04;
+      const sideStart = cx + albumHalf + sideGap;
+      const sideAvail = w / 2 - (albumHalf + sideGap);
+      const bars = 56;
+      const barGap = sideAvail / bars;
+      const barWidth = Math.max(2, barGap * 0.45);
+      const maxBar = h * 0.42;
+      const samples = analyser ? data.length : 64;
+
+      c.lineCap = "round";
       for (let i = 0; i < bars; i++) {
-        const idx = Math.floor((i / bars) * (analyser ? data.length : 64));
-        const v = analyser
-          ? data[idx] / 255
-          : 0.3 + Math.sin(t * 2 + i * 0.25) * 0.2;
-        const len = (0.15 + (isPlaying ? v : 0) * 0.85) * maxBar;
-        const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
-        const x1 = Math.cos(angle) * ringR;
-        const y1 = Math.sin(angle) * ringR;
-        const x2 = Math.cos(angle) * (ringR + len);
-        const y2 = Math.sin(angle) * (ringR + len);
-        const alpha = 0.25 + intensity * 0.5;
-        c.strokeStyle = `rgba(167, 139, 250, ${alpha})`;
-        c.lineWidth = Math.max(2, (Math.min(w, h) / 240) * dpr);
-        c.lineCap = "round";
+        // Sample from low → high freq as bars move outward; nicer EQ shape.
+        const freqIdx = Math.floor(((i + 2) / (bars + 4)) * (samples * 0.7));
+        const raw = analyser
+          ? data[freqIdx] / 255
+          : 0.35 + Math.sin(t * 3 + i * 0.35) * 0.25 + Math.sin(t * 1.1 + i * 0.18) * 0.15;
+        // Falloff toward outer edges so the shape tapers off naturally.
+        const falloff = 1 - Math.pow(i / bars, 1.6) * 0.7;
+        const amp = (0.08 + (isPlaying ? Math.max(0, raw) : 0) * 0.95) * falloff;
+        const barH = Math.max(barWidth, amp * maxBar);
+
+        // Color shifts across the spectrum: violet → indigo → pink.
+        const hue = 270 + Math.sin(t * 0.6 + i * 0.12) * 25 + i * 0.6;
+        const alpha = 0.55 + intensity * 0.35;
+        const stroke = `hsla(${hue}, 90%, 65%, ${alpha})`;
+        c.strokeStyle = stroke;
+        c.lineWidth = barWidth;
+        c.shadowColor = stroke;
+        c.shadowBlur = 12 * dpr;
+
+        // Right side
+        const xR = sideStart + i * barGap;
         c.beginPath();
-        c.moveTo(x1, y1);
-        c.lineTo(x2, y2);
+        c.moveTo(xR, cy - barH / 2);
+        c.lineTo(xR, cy + barH / 2);
+        c.stroke();
+
+        // Mirrored left side
+        const xL = cx - albumHalf - sideGap - i * barGap;
+        c.beginPath();
+        c.moveTo(xL, cy - barH / 2);
+        c.lineTo(xL, cy + barH / 2);
         c.stroke();
       }
-      c.restore();
+      c.shadowBlur = 0;
 
       rafRef.current = requestAnimationFrame(draw);
     };
