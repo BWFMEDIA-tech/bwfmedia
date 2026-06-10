@@ -5,6 +5,8 @@ export interface PodcastState {
   session_live: boolean;
   pinned_id: string | null;
   cursor: number;
+  playing: boolean;
+  audio_idx: number;
   updated_at: string;
 }
 
@@ -12,6 +14,8 @@ const DEFAULT_STATE: PodcastState = {
   session_live: true,
   pinned_id: null,
   cursor: 0,
+  playing: false,
+  audio_idx: 0,
   updated_at: new Date(0).toISOString(),
 };
 
@@ -30,7 +34,7 @@ export function usePodcastState() {
     async function load() {
       const { data } = await supabase
         .from("podcast_state")
-        .select("session_live, pinned_id, cursor, updated_at")
+        .select("session_live, pinned_id, cursor, playing, audio_idx, updated_at")
         .eq("id", 1)
         .maybeSingle();
       if (!mounted) return;
