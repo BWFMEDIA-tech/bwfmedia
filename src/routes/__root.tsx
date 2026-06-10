@@ -140,7 +140,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isChrome = !pathname.startsWith("/stream-studio");
+  const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/");
   return (
     <CartProvider>
       <PaymentTestModeBanner />
