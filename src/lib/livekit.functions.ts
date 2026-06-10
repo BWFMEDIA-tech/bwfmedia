@@ -38,6 +38,30 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       .maybeSingle();
     const isHost = (stream?.host_id === userId) || !!adminRow;
 
+    // Determine if this participant is allowed to publish audio. Only the
+    // stream host, admins, and approved stage roles (co_host / speaker) may
+    // publish — audience listeners get a subscribe-only token so the server
+    // refuses any audio they try to push, even if a client tries to bypass
+    // the UI mute.
+    let canPublish = isHost;
+    if (!canPublish && stream?.host_id) {
+      const { data: streamRow2 } = await supabase
+        .from("streams")
+        .select("id")
+        .eq("room_name", data.roomName)
+        .maybeSingle();
+      if (streamRow2?.id) {
+        const { data: spRow } = await supabase
+          .from("stage_participants")
+          .select("stage_role")
+          .eq("stream_id", streamRow2.id)
+          .eq("user_id", userId)
+          .maybeSingle();
+        const role = (spRow?.stage_role as string | undefined) ?? null;
+        canPublish = role === "host" || role === "co_host" || role === "speaker";
+      }
+    }
+
     const at = new AccessToken(apiKey, apiSecret, {
       identity: userId,
       name: profile?.display_name || "Guest",
@@ -46,7 +70,7 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
     at.addGrant({
       room: data.roomName,
       roomJoin: true,
-      canPublish: true,
+      canPublish,
       canSubscribe: true,
       canPublishData: true,
       roomAdmin: isHost,
