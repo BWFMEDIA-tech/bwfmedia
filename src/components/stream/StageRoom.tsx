@@ -469,6 +469,11 @@ function SpeakerBubble({
                     </MenuItem>
                   )}
                   <MenuDivider />
+                  {onDemoteToAudience && !isSelf && (
+                    <MenuItem icon={<UserX className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onDemoteToAudience(); }}>
+                      Demote to Audience
+                    </MenuItem>
+                  )}
                   <MenuItem icon={<UserMinus className="h-3.5 w-3.5" />} danger onClick={() => { setMenuOpen(false); onKick?.(); }}>
                     Remove From Stage
                   </MenuItem>
@@ -494,6 +499,11 @@ function SpeakerBubble({
                   {!isPrimaryHost && (
                     <>
                       <MenuDivider />
+                      {onDemoteToAudience && !isSelf && (
+                        <MenuItem icon={<UserX className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onDemoteToAudience(); }}>
+                          Demote to Audience
+                        </MenuItem>
+                      )}
                       <MenuItem icon={<UserMinus className="h-3.5 w-3.5" />} danger onClick={() => { setMenuOpen(false); onKick?.(); }}>
                         Remove From Stage
                       </MenuItem>
