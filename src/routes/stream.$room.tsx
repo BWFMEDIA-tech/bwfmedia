@@ -124,7 +124,7 @@ function GuestPage() {
 
   return (
     <div className="min-h-screen bg-[#050509] text-white p-4">
-      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="flex flex-col gap-4 min-w-0">
           {streamMode === "stage" && streamId && auth.user ? (
             <StageAudioShell
@@ -160,11 +160,13 @@ function GuestPage() {
             </>
           )}
         </div>
-        <CrowdPanel
-          participants={participants as StageParticipant[]}
-          streamId={streamId}
-          viewerCount={viewerCount || participants.length}
-        />
+        <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+          <CrowdPanel
+            participants={participants as StageParticipant[]}
+            streamId={streamId}
+            viewerCount={viewerCount || participants.length}
+          />
+        </div>
       </div>
     </div>
   );
