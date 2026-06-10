@@ -78,7 +78,7 @@ function GuestPage() {
   // on unload: the cron cleanup removes rows after 2 minutes of inactivity, so
   // refreshes keep guest status intact without re-approval.
   useEffect(() => {
-    if (!lk || !streamId || !auth.user) return;
+    if (!streamId || !auth.user) return;
     const uid = auth.user.id;
     (async () => {
       const { data: existing } = await supabase
