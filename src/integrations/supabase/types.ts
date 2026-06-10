@@ -694,23 +694,29 @@ export type Database = {
       }
       podcast_state: {
         Row: {
+          audio_idx: number
           cursor: number
           id: number
           pinned_id: string | null
+          playing: boolean
           session_live: boolean
           updated_at: string
         }
         Insert: {
+          audio_idx?: number
           cursor?: number
           id?: number
           pinned_id?: string | null
+          playing?: boolean
           session_live?: boolean
           updated_at?: string
         }
         Update: {
+          audio_idx?: number
           cursor?: number
           id?: number
           pinned_id?: string | null
+          playing?: boolean
           session_live?: boolean
           updated_at?: string
         }
