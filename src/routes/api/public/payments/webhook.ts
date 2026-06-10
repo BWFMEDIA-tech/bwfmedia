@@ -97,9 +97,44 @@ async function recordTip(session: any) {
   }
 }
 
+async function grantPlayBoost(session: any) {
+  const meta = session.metadata || {};
+  const userId = meta.userId as string | undefined;
+  const credits = parseInt((meta.credits as string) || '2', 10);
+  if (!userId) { console.warn('play_boost webhook missing userId', session.id); return; }
+  const supabase = getSupabase();
+  const { error } = await supabase.rpc('grant_play_boost_credits', {
+    _user_id: userId, _credits: Number.isFinite(credits) ? credits : 2,
+  });
+  if (error) console.error('grant_play_boost_credits failed', error);
+}
+
+async function upsertPlayMembershipFromSubscription(sub: any) {
+  const userId = sub?.metadata?.userId as string | undefined;
+  if (!userId) { console.warn('play_membership sub missing userId', sub?.id); return; }
+  const periodEnd = sub.current_period_end
+    ? new Date(sub.current_period_end * 1000).toISOString()
+    : (sub.items?.data?.[0]?.current_period_end
+        ? new Date(sub.items.data[0].current_period_end * 1000).toISOString()
+        : null);
+  const supabase = getSupabase();
+  const { error } = await supabase.from('play_memberships').upsert({
+    user_id: userId,
+    status: sub.status ?? 'inactive',
+    stripe_customer_id: sub.customer ?? null,
+    stripe_subscription_id: sub.id ?? null,
+    current_period_end: periodEnd,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id' });
+  if (error) console.error('play_memberships upsert failed', error);
+}
+
 function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
   if (meta.kind === 'tip') return recordTip(session);
+  if (meta.kind === 'play_boost') return grantPlayBoost(session);
+  if (meta.kind === 'play_membership') return Promise.resolve(); // handled via subscription events
   if (meta.submissionType === 'live_review') return markLiveSubmissionPaid(session);
   if (meta.bookingTable) return markBookingPaid(session);
   console.warn('Webhook: session has no recognized metadata', session.id);
@@ -123,6 +158,15 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
             case 'checkout.session.async_payment_succeeded':
               await routeSessionPaid(event.data.object);
               break;
+            case 'customer.subscription.created':
+            case 'customer.subscription.updated':
+            case 'customer.subscription.deleted': {
+              const sub: any = event.data.object;
+              if (sub?.metadata?.kind === 'play_membership') {
+                await upsertPlayMembershipFromSubscription(sub);
+              }
+              break;
+            }
             case 'checkout.session.expired': {
               const s: any = event.data.object;
               await sendStripeCancellationEmail(getSupabase(), s.customer_email ?? s.customer_details?.email, s.id);

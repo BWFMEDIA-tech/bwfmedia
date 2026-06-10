@@ -488,6 +488,39 @@ export type Database = {
         }
         Relationships: []
       }
+      play_memberships: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       play_sessions: {
         Row: {
           created_at: string
@@ -1307,6 +1340,7 @@ export type Database = {
       }
     }
     Functions: {
+      consume_play_boost_credit: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -1321,6 +1355,10 @@ export type Database = {
           tip_count: number
           total_cents: number
         }[]
+      }
+      grant_play_boost_credits: {
+        Args: { _credits: number; _user_id: string }
+        Returns: number
       }
       has_role: {
         Args: {

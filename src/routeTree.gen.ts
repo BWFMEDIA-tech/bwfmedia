@@ -35,10 +35,12 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
+import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
@@ -198,6 +200,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayIndexRoute = PlayIndexRouteImport.update({
+  id: '/play/',
+  path: '/play/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -216,6 +223,11 @@ const UserIdRoute = UserIdRouteImport.update({
 const StreamRoomRoute = StreamRoomRouteImport.update({
   id: '/stream/$room',
   path: '/stream/$room',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayRoomRoute = PlayRoomRouteImport.update({
+  id: '/play/$room',
+  path: '/play/$room',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayReturnRoute = PayReturnRouteImport.update({
@@ -409,10 +421,12 @@ export interface FileRoutesByFullPath {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/play/$room': typeof PlayRoomRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/play/': typeof PlayIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -469,10 +483,12 @@ export interface FileRoutesByTo {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/play/$room': typeof PlayRoomRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
+  '/play': typeof PlayIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -530,10 +546,12 @@ export interface FileRoutesById {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/play/$room': typeof PlayRoomRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/play/': typeof PlayIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -592,10 +610,12 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/play/$room'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
+    | '/play/'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -652,10 +672,12 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/play/$room'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
     | '/admin'
+    | '/play'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -712,10 +734,12 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/play/$room'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
+    | '/play/'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -772,9 +796,11 @@ export interface RootRouteChildren {
   InviteCodeRoute: typeof InviteCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
+  PlayRoomRoute: typeof PlayRoomRoute
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  PlayIndexRoute: typeof PlayIndexRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -971,6 +997,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/play/': {
+      id: '/play/'
+      path: '/play'
+      fullPath: '/play/'
+      preLoaderRoute: typeof PlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -997,6 +1030,13 @@ declare module '@tanstack/react-router' {
       path: '/stream/$room'
       fullPath: '/stream/$room'
       preLoaderRoute: typeof StreamRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play/$room': {
+      id: '/play/$room'
+      path: '/play/$room'
+      fullPath: '/play/$room'
+      preLoaderRoute: typeof PlayRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay/return': {
@@ -1265,9 +1305,11 @@ const rootRouteChildren: RootRouteChildren = {
   InviteCodeRoute: InviteCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
+  PlayRoomRoute: PlayRoomRoute,
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
   AdminIndexRoute: AdminIndexRoute,
+  PlayIndexRoute: PlayIndexRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
