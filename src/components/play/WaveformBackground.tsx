@@ -108,18 +108,18 @@ export function WaveformBackground({
       intensityRef.current += (target - intensityRef.current) * 0.08;
       const intensity = intensityRef.current;
 
-      // Soft horizontal glow behind the album.
+      // Bright horizontal glow behind the album.
       const cx = w / 2;
       const cy = h / 2;
       const glow = c.createLinearGradient(0, cy, w, cy);
-      const ga = 0.18 + intensity * 0.35;
+      const ga = 0.4 + intensity * 0.55;
       glow.addColorStop(0, "rgba(0,0,0,0)");
-      glow.addColorStop(0.2, `rgba(168, 85, 247, ${ga * 0.6})`);
-      glow.addColorStop(0.5, `rgba(99, 102, 241, ${ga})`);
-      glow.addColorStop(0.8, `rgba(236, 72, 153, ${ga * 0.6})`);
+      glow.addColorStop(0.15, `rgba(236, 72, 153, ${ga * 0.8})`);
+      glow.addColorStop(0.5, `rgba(139, 92, 246, ${ga})`);
+      glow.addColorStop(0.85, `rgba(34, 211, 238, ${ga * 0.85})`);
       glow.addColorStop(1, "rgba(0,0,0,0)");
       c.fillStyle = glow;
-      c.fillRect(0, cy - h * 0.18, w, h * 0.36);
+      c.fillRect(0, cy - h * 0.22, w, h * 0.44);
 
       // Horizontal mirrored waveform bars extending left & right from album.
       // Album sits in the center; bars fan out to both sides like an EQ.
@@ -145,14 +145,14 @@ export function WaveformBackground({
         const amp = (0.08 + (isPlaying ? Math.max(0, raw) : 0) * 0.95) * falloff;
         const barH = Math.max(barWidth, amp * maxBar);
 
-        // Color shifts across the spectrum: violet → indigo → pink.
-        const hue = 270 + Math.sin(t * 0.6 + i * 0.12) * 25 + i * 0.6;
-        const alpha = 0.55 + intensity * 0.35;
-        const stroke = `hsla(${hue}, 90%, 65%, ${alpha})`;
+        // Vivid spectrum: pink → magenta → violet → indigo → cyan.
+        const hue = 300 + Math.sin(t * 0.8 + i * 0.18) * 60 + i * 1.4;
+        const alpha = Math.min(1, 0.85 + intensity * 0.25);
+        const stroke = `hsla(${hue}, 100%, 70%, ${alpha})`;
         c.strokeStyle = stroke;
         c.lineWidth = barWidth;
-        c.shadowColor = stroke;
-        c.shadowBlur = 12 * dpr;
+        c.shadowColor = `hsla(${hue}, 100%, 65%, 1)`;
+        c.shadowBlur = 22 * dpr;
 
         // Right side
         const xR = sideStart + i * barGap;
