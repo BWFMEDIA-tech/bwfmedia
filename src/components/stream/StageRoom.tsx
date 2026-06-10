@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { setStageRole, removeStageParticipant } from "@/lib/stage.functions";
+import {
+  setStageRole,
+  removeStageParticipant,
+  promoteToHost,
+  revokeHostPrivileges,
+} from "@/lib/stage.functions";
 import { toast } from "sonner";
-import { Mic, UserPlus, Crown, X } from "lucide-react";
+import { Mic, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
@@ -19,17 +24,31 @@ export function StageRoom({
   participants,
   canManage,
   selfProfile,
+  primaryHostId,
+  hostTransferMode = "co_host",
 }: {
   streamId: string | null;
   participants: StageParticipant[];
   canManage: boolean;
   selfProfile?: { user_id: string; display_name?: string | null; avatar_url?: string | null } | null;
+  primaryHostId?: string | null;
+  hostTransferMode?: "co_host" | "transfer";
 }) {
   const setRole = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
+  const promote = useServerFn(promoteToHost);
+  const revoke = useServerFn(revokeHostPrivileges);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
+  const [confirm, setConfirm] = useState<null | {
+    title: string;
+    description: string;
+    confirmLabel: string;
+    run: () => Promise<void>;
+  }>(null);
 
-  const hosts = participants.filter((p) => p.stage_role === "host").slice(0, MAX_HOSTS);
+  const hosts = participants
+    .filter((p) => p.stage_role === "host" || p.stage_role === "co_host")
+    .slice(0, MAX_HOSTS);
   const guests = participants.filter((p) => p.stage_role === "speaker").slice(0, MAX_GUESTS);
   // If the local host hasn't been registered in stage_participants yet,
   // show their profile in the first host slot as a placeholder.
@@ -52,13 +71,62 @@ export function StageRoom({
     try { await remove({ data: { streamId, targetUserId: uid } }); toast.success("Removed"); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
-  const promote = async (uid: string, role: "host" | "speaker") => {
+  const inviteAs = async (uid: string, role: "host" | "speaker") => {
     if (!streamId) return;
     try {
       await setRole({ data: { streamId, targetUserId: uid, stageRole: role } });
       toast.success(role === "host" ? "Invited as host" : "Invited as guest");
       setInvite(null);
     } catch (e: any) { toast.error(e?.message ?? "Failed"); }
+  };
+
+  const doPromote = (uid: string, name: string, mode: "host" | "co_host" | "transfer") => {
+    if (!streamId) return;
+    const titles = {
+      host: "Promote to Host",
+      co_host: "Promote to Co-Host",
+      transfer: "Transfer Ownership",
+    } as const;
+    const descs = {
+      host: `${name} will become a Host with full stage management privileges.`,
+      co_host: `${name} will become a Co-Host. You'll keep your host role.`,
+      transfer: `${name} will become the primary Host. You'll be demoted to Co-Host. This can be reversed only by the new host.`,
+    } as const;
+    setConfirm({
+      title: titles[mode],
+      description: descs[mode],
+      confirmLabel: titles[mode],
+      run: async () => {
+        await promote({ data: { streamId, targetUserId: uid, mode } });
+        toast.success(titles[mode] + " · done");
+      },
+    });
+  };
+
+  const doRevoke = (uid: string, name: string) => {
+    if (!streamId) return;
+    setConfirm({
+      title: "Remove Host Privileges",
+      description: `${name} will return to Guest. They can still speak on stage.`,
+      confirmLabel: "Remove Privileges",
+      run: async () => {
+        await revoke({ data: { streamId, targetUserId: uid } });
+        toast.success("Host privileges removed");
+      },
+    });
+  };
+
+  const doKick = (uid: string, name: string) => {
+    if (!streamId) return;
+    setConfirm({
+      title: "Remove From Stage",
+      description: `${name} will be removed from the stage entirely.`,
+      confirmLabel: "Remove",
+      run: async () => {
+        await remove({ data: { streamId, targetUserId: uid } });
+        toast.success("Removed");
+      },
+    });
   };
 
   return (
@@ -87,10 +155,13 @@ export function StageRoom({
           <SpeakerBubble
             key={p.id}
             p={p}
-            kind="host"
+            kind={p.stage_role === "co_host" ? "co_host" : "host"}
             canManage={canManage}
-            onDemote={() => demote(p.user_id)}
-            onKick={() => kick(p.user_id)}
+            isPrimaryHost={!!primaryHostId && p.user_id === primaryHostId}
+            hostTransferMode={hostTransferMode}
+            onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "This user", mode)}
+            onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
+            onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
           />
         ))}
         {showSelfHostPlaceholder && (
@@ -131,8 +202,11 @@ export function StageRoom({
               p={p}
               kind="speaker"
               canManage={canManage}
+              isPrimaryHost={false}
+              hostTransferMode={hostTransferMode}
+              onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Guest", mode)}
               onDemote={() => demote(p.user_id)}
-              onKick={() => kick(p.user_id)}
+              onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
             />
           ))}
           {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
@@ -146,7 +220,13 @@ export function StageRoom({
           kind={invite}
           audience={audience}
           onClose={() => setInvite(null)}
-          onPick={(uid) => promote(uid, invite)}
+          onPick={(uid) => inviteAs(uid, invite)}
+        />
+      )}
+      {confirm && (
+        <ConfirmDialog
+          {...confirm}
+          onClose={() => setConfirm(null)}
         />
       )}
     </div>
@@ -237,16 +317,24 @@ function SpeakerBubble({
   p,
   kind,
   canManage,
+  isPrimaryHost = false,
+  hostTransferMode = "co_host",
+  onPromote,
   onDemote,
+  onRevoke,
   onKick,
 }: {
   p: StageParticipant;
-  kind: "host" | "speaker";
+  kind: "host" | "co_host" | "speaker";
   canManage: boolean;
+  isPrimaryHost?: boolean;
+  hostTransferMode?: "co_host" | "transfer";
+  onPromote?: (mode: "host" | "co_host" | "transfer") => void;
   onDemote?: () => void;
+  onRevoke?: () => void;
   onKick?: () => void;
 }) {
-  const ringColor = kind === "host" ? PURPLE : "#22c55e";
+  const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#60a5fa" : "#22c55e";
   const connected = useConnectedIdentities();
   const isConnected = connected.has(p.user_id);
   const speaking = useSpeakingIdentities();
@@ -255,14 +343,26 @@ function SpeakerBubble({
   const dbStatus = p.connection_status ?? "connected";
   const isReconnecting = !isPlaceholder && (dbStatus === "reconnecting" || (dbStatus === "connected" && !isConnected));
   const isDisconnected = dbStatus === "disconnected";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [menuOpen]);
+  const badgeLabel = kind === "host" ? "HOST" : kind === "co_host" ? "CO-HOST" : "GUEST";
+  const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#2563eb" : "#16a34a";
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="absolute -mt-3 self-center">
         <span
           className="rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white"
-          style={{ background: kind === "host" ? PURPLE : "#16a34a" }}
+          style={{ background: badgeBg }}
         >
-          {kind === "host" ? "HOST" : "GUEST"}
+          {badgeLabel}
         </span>
       </div>
       <div
@@ -297,6 +397,7 @@ function SpeakerBubble({
       <div className="text-center">
         <div className="flex items-center justify-center gap-1 text-xs font-bold text-white">
           {kind === "host" && <Crown className="h-3 w-3" style={{ color: PURPLE }} />}
+          {kind === "co_host" && <Star className="h-3 w-3" style={{ color: "#60a5fa" }} />}
           {p.display_name ?? "Guest"}
         </div>
         <div className="mt-0.5 flex items-center justify-center gap-1">
@@ -321,12 +422,128 @@ function SpeakerBubble({
           </span>
         </div>
       </div>
-      {canManage && kind === "speaker" && (
-        <div className="flex gap-1">
-          <button onClick={onDemote} className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-white/70 hover:bg-white/5">Demote</button>
-          <button onClick={onKick} className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-white/70 hover:bg-white/5">Remove</button>
+      {canManage && !isPlaceholder && (
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="flex items-center gap-1 rounded-full border border-white/15 px-2 py-0.5 text-[10px] font-semibold text-white/80 hover:bg-white/5"
+          >
+            <MoreVertical className="h-3 w-3" /> Manage
+          </button>
+          {menuOpen && (
+            <div className="absolute left-1/2 z-30 mt-1 w-56 -translate-x-1/2 overflow-hidden rounded-lg border border-white/10 bg-[#13131f] shadow-xl">
+              {kind === "speaker" && onPromote && (
+                <>
+                  <MenuItem icon={<Crown className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onPromote("host"); }}>
+                    Promote to Host
+                  </MenuItem>
+                  <MenuItem icon={<Star className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onPromote("co_host"); }}>
+                    Promote to Co-Host
+                  </MenuItem>
+                  {hostTransferMode === "transfer" && (
+                    <MenuItem icon={<ArrowRightLeft className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onPromote("transfer"); }}>
+                      Transfer Ownership
+                    </MenuItem>
+                  )}
+                  <MenuDivider />
+                  <MenuItem icon={<UserMinus className="h-3.5 w-3.5" />} danger onClick={() => { setMenuOpen(false); onKick?.(); }}>
+                    Remove From Stage
+                  </MenuItem>
+                </>
+              )}
+              {(kind === "host" || kind === "co_host") && (
+                <>
+                  {kind === "co_host" && onPromote && (
+                    <MenuItem icon={<Crown className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onPromote("host"); }}>
+                      Promote to Host
+                    </MenuItem>
+                  )}
+                  {!isPrimaryHost && hostTransferMode === "transfer" && onPromote && (
+                    <MenuItem icon={<ArrowRightLeft className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onPromote("transfer"); }}>
+                      Transfer Ownership
+                    </MenuItem>
+                  )}
+                  {!isPrimaryHost && onRevoke && (
+                    <MenuItem icon={<Shield className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onRevoke(); }}>
+                      Remove Host Privileges
+                    </MenuItem>
+                  )}
+                  {!isPrimaryHost && (
+                    <>
+                      <MenuDivider />
+                      <MenuItem icon={<UserMinus className="h-3.5 w-3.5" />} danger onClick={() => { setMenuOpen(false); onKick?.(); }}>
+                        Remove From Stage
+                      </MenuItem>
+                    </>
+                  )}
+                  {isPrimaryHost && (
+                    <div className="px-3 py-2 text-[10px] text-white/40">
+                      <UserCheck className="mr-1 inline h-3 w-3" />
+                      Primary host
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
+      {!canManage && false && onDemote && <button onClick={onDemote} />}
+    </div>
+  );
+}
+
+function MenuItem({
+  icon, children, onClick, danger,
+}: { icon: React.ReactNode; children: React.ReactNode; onClick: () => void; danger?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-white/5",
+        danger ? "text-red-300" : "text-white/80",
+      )}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+function MenuDivider() {
+  return <div className="my-1 h-px bg-white/5" />;
+}
+
+function ConfirmDialog({
+  title, description, confirmLabel, run, onClose,
+}: {
+  title: string; description: string; confirmLabel: string;
+  run: () => Promise<void>; onClose: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18] p-5" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-2 text-sm font-bold text-white">{title}</div>
+        <p className="mb-4 text-xs text-white/70">{description}</p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/80 hover:bg-white/5">
+            Cancel
+          </button>
+          <button
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try { await run(); onClose(); }
+              catch (e: any) { toast.error(e?.message ?? "Failed"); }
+              finally { setBusy(false); }
+            }}
+            className="rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+            style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+          >
+            {busy ? "Working…" : confirmLabel}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

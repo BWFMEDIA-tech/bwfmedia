@@ -26,6 +26,7 @@ import { LiveChat } from "@/components/stream/LiveChat";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
+import { setHostTransferMode as setHostTransferModeFn } from "@/lib/stage.functions";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
@@ -665,6 +666,7 @@ function StreamStudio() {
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
+  const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
 
   // Keep the host's presence row fresh while the studio tab is open.
@@ -686,9 +688,20 @@ function StreamStudio() {
         setStartedAt(existing.started_at ?? new Date().toISOString());
         setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage");
         setStageLocked(!!existing.stage_locked);
-        // Re-register host as stage participant (idempotent).
+        setHostTransferMode(((existing as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
+        // Re-register stage participant. If ownership was transferred while we
+        // were away, preserve the existing role (e.g. co_host) instead of
+        // forcing back to host.
+        const { data: existingRow } = await supabase
+          .from("stage_participants")
+          .select("stage_role")
+          .eq("stream_id", existing.id)
+          .eq("user_id", auth.user!.id)
+          .maybeSingle();
+        const resumeRole = existingRow?.stage_role
+          ?? ((existing as any).host_id === auth.user!.id ? "host" : "co_host");
         await supabase.from("stage_participants").upsert(
-          { stream_id: existing.id, user_id: auth.user!.id, stage_role: "host" },
+          { stream_id: existing.id, user_id: auth.user!.id, stage_role: resumeRole },
           { onConflict: "stream_id,user_id" },
         );
         toast.success("Reconnected to your live stream");
@@ -709,6 +722,7 @@ function StreamStudio() {
           const r = p.new as any;
           setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
           setStageLocked(!!r.stage_locked);
+          setHostTransferMode(((r as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
         })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
@@ -822,6 +836,27 @@ function StreamStudio() {
                 onLocalChange={setStreamMode}
               />
 
+              {stream?.id && (
+                <div className="flex items-center justify-end gap-2 px-1 text-[11px] text-white/60">
+                  <span>Promotion mode:</span>
+                  <select
+                    value={hostTransferMode}
+                    onChange={async (e) => {
+                      const v = e.target.value as "co_host" | "transfer";
+                      setHostTransferMode(v);
+                      try {
+                        await setHostTransferModeFn({ data: { streamId: stream.id, mode: v } });
+                        toast.success(v === "transfer" ? "Ownership transfer enabled" : "Co-host mode enabled");
+                      } catch (err: any) { toast.error(err?.message ?? "Failed"); }
+                    }}
+                    className="rounded-md border border-white/10 bg-[#0d0d18] px-2 py-1 text-white/80"
+                  >
+                    <option value="co_host">Co-Host (host stays)</option>
+                    <option value="transfer">Transfer Ownership</option>
+                  </select>
+                </div>
+              )}
+
               {streamMode === "broadcast" ? (
                 lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
@@ -851,6 +886,8 @@ function StreamStudio() {
                         streamId={stream.id}
                         participants={participants}
                         canManage
+                        primaryHostId={auth.user?.id ?? null}
+                        hostTransferMode={hostTransferMode}
                         selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
                       />
                     </StageAudioShell>
@@ -859,6 +896,8 @@ function StreamStudio() {
                       streamId={stream.id}
                       participants={participants}
                       canManage
+                      primaryHostId={auth.user?.id ?? null}
+                      hostTransferMode={hostTransferMode}
                       selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
                     />
                   )
