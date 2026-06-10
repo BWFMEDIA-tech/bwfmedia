@@ -626,8 +626,8 @@ function FinalCTA() {
 /* ---------- FOOTER ---------- */
 
 
-import { GrowthShowcase } from "@/components/site/GrowthShowcase";
 import { CartButton } from "@/components/CartDrawer";
+import { Link } from "@tanstack/react-router";
 
 /* ---------- ROOT ---------- */
 
@@ -698,7 +698,23 @@ export function OnePager() {
         <Services />
         <Why />
         <Audience />
-        <GrowthShowcase />
+        <section className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
+          <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28 text-center">
+            <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">By The Numbers</span>
+            <h2 className="mt-4 font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">
+              See Our Growth Dashboard
+            </h2>
+            <p className="mt-5 max-w-2xl mx-auto text-bone/60 text-base md:text-lg leading-relaxed">
+              Live platform stats, audience reach, and partner network — all in one place.
+            </p>
+            <Link
+              to="/dashboard"
+              className="mt-8 inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
+            >
+              Open Dashboard
+            </Link>
+          </div>
+        </section>
         <ContentSystem />
         <Podcast />
         <Partnerships />
