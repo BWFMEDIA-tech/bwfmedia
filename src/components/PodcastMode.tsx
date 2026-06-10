@@ -135,10 +135,10 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
 
   // Audio playback for guest tracks (reuses uploaded_audio_url).
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playing, setPlaying] = useState(false);
+  const playing = state.playing;
   const [muted, setMuted] = useState(false);
   const guestsWithAudio = queue.filter((r) => r.uploaded_audio_url);
-  const [audioIdx, setAudioIdx] = useState(0);
+  const audioIdx = state.audio_idx;
   const currentAudio = guestsWithAudio[audioIdx] ?? null;
 
   useEffect(() => {
@@ -146,7 +146,7 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
     if (!el) return;
     el.muted = muted;
     if (playing && currentAudio?.uploaded_audio_url) {
-      el.play().catch(() => setPlaying(false));
+      el.play().catch(() => void update({ playing: false }));
     } else {
       el.pause();
     }
@@ -154,8 +154,8 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
 
   function playNextAudio() {
     if (guestsWithAudio.length === 0) return;
-    setAudioIdx((i) => (i + 1) % guestsWithAudio.length);
-    setPlaying(true);
+    const next = (audioIdx + 1) % guestsWithAudio.length;
+    void update({ audio_idx: next, playing: true });
   }
 
   function advanceSpeaker() {
@@ -242,7 +242,7 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setPlaying((p) => !p)}
+                  onClick={() => void update({ playing: !playing })}
                   className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] uppercase tracking-[0.2em] font-anton text-bone"
                   style={{ background: RED }}
                 >
