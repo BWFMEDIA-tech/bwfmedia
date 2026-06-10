@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { RecordButton } from "./RecordButton";
 import { supabase } from "@/integrations/supabase/client";
+import { DeviceSelector } from "./DeviceSelector";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -239,7 +240,7 @@ function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; on
       <CtrlBtn icon={MonitorUp} label={sharing ? "Stop Share" : "Share Screen"} onClick={toggleShare} active={sharing} />
       <CtrlBtn icon={UserPlus} label="Invite Guest" onClick={onInvite} />
       {streamId && <RecordButton streamId={streamId} />}
-      <CtrlBtn icon={Settings} label="Settings" onClick={() => toast.info("Device settings coming soon")} />
+      <DeviceSelector compact />
       <button
         onClick={async () => { await room?.disconnect(); onEnd(); }}
         className="ml-auto flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-500"
