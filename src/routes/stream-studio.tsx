@@ -858,7 +858,9 @@ function StreamStudio() {
                 </div>
               )}
 
-              {streamMode === "broadcast" ? (
+              {streamMode === "play" ? (
+                <PlayArenaView stream={stream ? { id: stream.id, title: stream.title, host_id: auth.user?.id ?? "" } : null} />
+              ) : streamMode === "broadcast" ? (
                 lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
                 ) : (
