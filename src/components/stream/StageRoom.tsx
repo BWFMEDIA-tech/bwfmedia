@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Mic, UserPlus, Crown, X } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
-import { useConnectedIdentities } from "@/lib/stage-connection-context";
+import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 5;
@@ -249,6 +249,8 @@ function SpeakerBubble({
   const ringColor = kind === "host" ? PURPLE : "#22c55e";
   const connected = useConnectedIdentities();
   const isConnected = connected.has(p.user_id);
+  const speaking = useSpeakingIdentities();
+  const isSpeaking = speaking.has(p.user_id);
   const isPlaceholder = p.id === "self-host-placeholder";
   return (
     <div className="flex flex-col items-center gap-2">
@@ -261,8 +263,16 @@ function SpeakerBubble({
         </span>
       </div>
       <div
-        className={cn("relative rounded-full p-1", "shadow-[0_0_24px]")}
-        style={{ boxShadow: `0 0 24px ${ringColor}66`, background: `conic-gradient(${ringColor}, transparent 70%, ${ringColor})` }}
+        className={cn(
+          "relative rounded-full p-1 transition-transform duration-150",
+          isSpeaking && "scale-110 animate-pulse",
+        )}
+        style={{
+          boxShadow: isSpeaking
+            ? `0 0 40px ${ringColor}, 0 0 80px ${ringColor}aa`
+            : `0 0 24px ${ringColor}66`,
+          background: `conic-gradient(${ringColor}, transparent 70%, ${ringColor})`,
+        }}
       >
         <Link to="/user/$id" params={{ id: p.user_id }}>
           {p.avatar_url ? (
@@ -271,7 +281,13 @@ function SpeakerBubble({
             <div className="h-20 w-20 rounded-full border-2 border-[#0d0d18]" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
           )}
         </Link>
-        <div className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0d0d18]" style={{ background: ringColor }}>
+        <div
+          className={cn(
+            "absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0d0d18] transition-transform",
+            isSpeaking && "scale-125 animate-bounce",
+          )}
+          style={{ background: ringColor }}
+        >
           <Mic className="h-3 w-3 text-white" />
         </div>
       </div>
