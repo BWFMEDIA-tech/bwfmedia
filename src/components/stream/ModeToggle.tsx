@@ -69,16 +69,6 @@ export function ModeToggle({
         <Mic className="mr-1 inline h-3.5 w-3.5" />
         STAGE MODE (Audio)
       </button>
-      <Link
-        to={streamId ? "/play/$room" : "/play"}
-        params={streamId ? { room: streamId } : undefined as any}
-        className="flex-1 rounded-xl px-4 py-3 text-center text-xs font-bold tracking-widest text-white transition hover:opacity-90"
-        style={{ background: `linear-gradient(135deg, #ec4899, ${PURPLE})` }}
-        title="Open BWFPLAY Live Arena"
-      >
-        <Music2 className="mr-1 inline h-3.5 w-3.5" />
-        PLAY ARENA
-      </Link>
       <button
         onClick={toggleLock}
         disabled={!streamId}
