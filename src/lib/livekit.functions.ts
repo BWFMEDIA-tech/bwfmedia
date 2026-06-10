@@ -54,6 +54,30 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
     });
 
     const token = await at.toJwt();
+
+    // Bind participant state to a successful token issuance. This guarantees
+    // RLS-visible "joined" status before the client subscribes to chat /
+    // realtime, and prevents clients from registering for streams they
+    // haven't actually joined via LiveKit.
+    if (stream?.host_id && stream.host_id !== userId) {
+      const role = isHost ? "host" : "listener";
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // resolve stream id from room_name
+      const { data: streamRow } = await supabaseAdmin
+        .from("streams")
+        .select("id, status")
+        .eq("room_name", data.roomName)
+        .maybeSingle();
+      if (streamRow?.id && streamRow.status === "live") {
+        await supabaseAdmin
+          .from("stage_participants")
+          .upsert(
+            { stream_id: streamRow.id, user_id: userId, stage_role: role },
+            { onConflict: "stream_id,user_id" },
+          );
+      }
+    }
+
     return { token, wsUrl, identity: userId };
   });
 
