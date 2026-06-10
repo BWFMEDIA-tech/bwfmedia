@@ -7,9 +7,10 @@ import {
   promoteToHost,
   revokeHostPrivileges,
   demoteToAudience,
+  setParticipantMute,
 } from "@/lib/stage.functions";
 import { toast } from "sonner";
-import { Mic, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck, UserX } from "lucide-react";
+import { Mic, MicOff, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck, UserX } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
@@ -40,6 +41,7 @@ export function StageRoom({
   const promote = useServerFn(promoteToHost);
   const revoke = useServerFn(revokeHostPrivileges);
   const demoteSrv = useServerFn(demoteToAudience);
+  const muteFn = useServerFn(setParticipantMute);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
   const [confirm, setConfirm] = useState<null | {
     title: string;
@@ -144,6 +146,24 @@ export function StageRoom({
     });
   };
 
+  const doToggleMute = async (p: StageParticipant) => {
+    if (!streamId) return;
+    const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
+    try {
+      await muteFn({
+        data: {
+          streamId,
+          targetUserId: p.user_id,
+          mute: !isMuted,
+          durationMinutes: 60,
+        },
+      });
+      toast.success(isMuted ? "Mic unmuted" : "Mic muted");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-5">
       <div className="mb-4 flex items-center justify-between">
@@ -179,6 +199,7 @@ export function StageRoom({
             onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
             onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
             onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "This user")}
+            onToggleMute={() => doToggleMute(p)}
           />
         ))}
         {showSelfHostPlaceholder && (
@@ -226,6 +247,7 @@ export function StageRoom({
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
               onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "Guest")}
+              onToggleMute={() => doToggleMute(p)}
             />
           ))}
           {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
