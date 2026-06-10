@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { setStageRole, removeStageParticipant } from "@/lib/stage.functions";
+import {
+  setStageRole,
+  removeStageParticipant,
+  promoteToHost,
+  revokeHostPrivileges,
+} from "@/lib/stage.functions";
 import { toast } from "sonner";
-import { Mic, UserPlus, Crown, X } from "lucide-react";
+import { Mic, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
@@ -19,17 +24,31 @@ export function StageRoom({
   participants,
   canManage,
   selfProfile,
+  primaryHostId,
+  hostTransferMode = "co_host",
 }: {
   streamId: string | null;
   participants: StageParticipant[];
   canManage: boolean;
   selfProfile?: { user_id: string; display_name?: string | null; avatar_url?: string | null } | null;
+  primaryHostId?: string | null;
+  hostTransferMode?: "co_host" | "transfer";
 }) {
   const setRole = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
+  const promote = useServerFn(promoteToHost);
+  const revoke = useServerFn(revokeHostPrivileges);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
+  const [confirm, setConfirm] = useState<null | {
+    title: string;
+    description: string;
+    confirmLabel: string;
+    run: () => Promise<void>;
+  }>(null);
 
-  const hosts = participants.filter((p) => p.stage_role === "host").slice(0, MAX_HOSTS);
+  const hosts = participants
+    .filter((p) => p.stage_role === "host" || p.stage_role === "co_host")
+    .slice(0, MAX_HOSTS);
   const guests = participants.filter((p) => p.stage_role === "speaker").slice(0, MAX_GUESTS);
   // If the local host hasn't been registered in stage_participants yet,
   // show their profile in the first host slot as a placeholder.
@@ -52,13 +71,62 @@ export function StageRoom({
     try { await remove({ data: { streamId, targetUserId: uid } }); toast.success("Removed"); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
-  const promote = async (uid: string, role: "host" | "speaker") => {
+  const inviteAs = async (uid: string, role: "host" | "speaker") => {
     if (!streamId) return;
     try {
       await setRole({ data: { streamId, targetUserId: uid, stageRole: role } });
       toast.success(role === "host" ? "Invited as host" : "Invited as guest");
       setInvite(null);
     } catch (e: any) { toast.error(e?.message ?? "Failed"); }
+  };
+
+  const doPromote = (uid: string, name: string, mode: "host" | "co_host" | "transfer") => {
+    if (!streamId) return;
+    const titles = {
+      host: "Promote to Host",
+      co_host: "Promote to Co-Host",
+      transfer: "Transfer Ownership",
+    } as const;
+    const descs = {
+      host: `${name} will become a Host with full stage management privileges.`,
+      co_host: `${name} will become a Co-Host. You'll keep your host role.`,
+      transfer: `${name} will become the primary Host. You'll be demoted to Co-Host. This can be reversed only by the new host.`,
+    } as const;
+    setConfirm({
+      title: titles[mode],
+      description: descs[mode],
+      confirmLabel: titles[mode],
+      run: async () => {
+        await promote({ data: { streamId, targetUserId: uid, mode } });
+        toast.success(titles[mode] + " · done");
+      },
+    });
+  };
+
+  const doRevoke = (uid: string, name: string) => {
+    if (!streamId) return;
+    setConfirm({
+      title: "Remove Host Privileges",
+      description: `${name} will return to Guest. They can still speak on stage.`,
+      confirmLabel: "Remove Privileges",
+      run: async () => {
+        await revoke({ data: { streamId, targetUserId: uid } });
+        toast.success("Host privileges removed");
+      },
+    });
+  };
+
+  const doKick = (uid: string, name: string) => {
+    if (!streamId) return;
+    setConfirm({
+      title: "Remove From Stage",
+      description: `${name} will be removed from the stage entirely.`,
+      confirmLabel: "Remove",
+      run: async () => {
+        await remove({ data: { streamId, targetUserId: uid } });
+        toast.success("Removed");
+      },
+    });
   };
 
   return (
@@ -87,10 +155,13 @@ export function StageRoom({
           <SpeakerBubble
             key={p.id}
             p={p}
-            kind="host"
+            kind={p.stage_role === "co_host" ? "co_host" : "host"}
             canManage={canManage}
-            onDemote={() => demote(p.user_id)}
-            onKick={() => kick(p.user_id)}
+            isPrimaryHost={!!primaryHostId && p.user_id === primaryHostId}
+            hostTransferMode={hostTransferMode}
+            onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "This user", mode)}
+            onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
+            onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
           />
         ))}
         {showSelfHostPlaceholder && (
@@ -131,8 +202,11 @@ export function StageRoom({
               p={p}
               kind="speaker"
               canManage={canManage}
+              isPrimaryHost={false}
+              hostTransferMode={hostTransferMode}
+              onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Guest", mode)}
               onDemote={() => demote(p.user_id)}
-              onKick={() => kick(p.user_id)}
+              onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
             />
           ))}
           {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
@@ -146,7 +220,13 @@ export function StageRoom({
           kind={invite}
           audience={audience}
           onClose={() => setInvite(null)}
-          onPick={(uid) => promote(uid, invite)}
+          onPick={(uid) => inviteAs(uid, invite)}
+        />
+      )}
+      {confirm && (
+        <ConfirmDialog
+          {...confirm}
+          onClose={() => setConfirm(null)}
         />
       )}
     </div>
