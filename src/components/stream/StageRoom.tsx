@@ -252,6 +252,9 @@ function SpeakerBubble({
   const speaking = useSpeakingIdentities();
   const isSpeaking = speaking.has(p.user_id);
   const isPlaceholder = p.id === "self-host-placeholder";
+  const dbStatus = p.connection_status ?? "connected";
+  const isReconnecting = !isPlaceholder && (dbStatus === "reconnecting" || (dbStatus === "connected" && !isConnected));
+  const isDisconnected = dbStatus === "disconnected";
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="absolute -mt-3 self-center">
@@ -300,15 +303,21 @@ function SpeakerBubble({
           <span
             className={cn(
               "h-1.5 w-1.5 rounded-full",
-              isConnected ? "bg-emerald-400" : "bg-amber-400 animate-pulse",
+              isConnected && !isReconnecting
+                ? "bg-emerald-400"
+                : isDisconnected
+                  ? "bg-red-400"
+                  : "bg-amber-400 animate-pulse",
             )}
           />
           <span className="text-[10px] text-white/60">
             {isPlaceholder && !isConnected
               ? "Not joined"
-              : isConnected
+              : isConnected && !isReconnecting
                 ? "Connected"
-                : "Connecting…"}
+                : isDisconnected
+                  ? "Disconnected"
+                  : "Reconnecting…"}
           </span>
         </div>
       </div>
