@@ -137,7 +137,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
 
   useEffect(() => {
     if (!localParticipant) return;
-    const canSpeak = role === "host" || role === "speaker";
+    const canSpeak = role === "host" || role === "co_host" || role === "speaker";
     localParticipant.setMicrophoneEnabled(canSpeak).catch(() => {});
     if (prevCanSpeak === false && canSpeak) {
       toast.success("You're on stage — mic enabled");
