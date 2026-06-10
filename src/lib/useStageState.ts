@@ -5,7 +5,7 @@ export type StageParticipant = {
   id: string;
   stream_id: string;
   user_id: string;
-  stage_role: "host" | "speaker" | "listener" | "green_room";
+  stage_role: "host" | "co_host" | "speaker" | "listener" | "green_room";
   joined_at: string;
   connection_status?: "connected" | "reconnecting" | "disconnected";
   last_seen_at?: string;

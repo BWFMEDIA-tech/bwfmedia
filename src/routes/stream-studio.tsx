@@ -686,9 +686,19 @@ function StreamStudio() {
         setStartedAt(existing.started_at ?? new Date().toISOString());
         setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage");
         setStageLocked(!!existing.stage_locked);
-        // Re-register host as stage participant (idempotent).
+        // Re-register stage participant. If ownership was transferred while we
+        // were away, preserve the existing role (e.g. co_host) instead of
+        // forcing back to host.
+        const { data: existingRow } = await supabase
+          .from("stage_participants")
+          .select("stage_role")
+          .eq("stream_id", existing.id)
+          .eq("user_id", auth.user!.id)
+          .maybeSingle();
+        const resumeRole = existingRow?.stage_role
+          ?? ((existing as any).host_id === auth.user!.id ? "host" : "co_host");
         await supabase.from("stage_participants").upsert(
-          { stream_id: existing.id, user_id: auth.user!.id, stage_role: "host" },
+          { stream_id: existing.id, user_id: auth.user!.id, stage_role: resumeRole },
           { onConflict: "stream_id,user_id" },
         );
         toast.success("Reconnected to your live stream");
