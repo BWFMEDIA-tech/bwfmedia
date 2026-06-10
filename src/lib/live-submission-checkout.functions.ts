@@ -44,6 +44,7 @@ export const createLiveSubmissionCheckout = createServerFn({ method: 'POST' })
       .insert({
         artist_name: data.artistName,
         email: userEmail,
+        user_id: context.userId ?? null,
         song_link: data.songLink,
         song_title: data.songTitle || null,
         photo_url: data.photoUrl || null,
