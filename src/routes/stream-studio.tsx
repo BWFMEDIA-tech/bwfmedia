@@ -858,10 +858,20 @@ function StreamStudio() {
                 </div>
               )}
 
-              {streamMode === "play" ? (
-                stream?.id && auth.user ? (
+              {/*
+                Keep PlayArenaView mounted whenever the stream + user exist so the
+                <audio> element survives mode switches and music keeps playing
+                in the background until the user pauses. We just hide it visually
+                when another mode is active.
+              */}
+              {stream?.id && auth.user && (
+                <div className={streamMode === "play" ? "" : "hidden"}>
                   <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
-                ) : (
+                </div>
+              )}
+
+              {streamMode === "play" ? (
+                !(stream?.id && auth.user) && (
                   <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
                     <Music2 className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />
                     <div className="mb-1 text-sm font-bold text-white">BWFPLAY Live Arena</div>
