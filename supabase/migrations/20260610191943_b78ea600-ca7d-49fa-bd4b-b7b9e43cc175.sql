@@ -1,0 +1,1 @@
+CREATE POLICY "Authenticated can upload play audio" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'artist-audio' AND (storage.foldername(name))[1] = 'play' AND (storage.foldername(name))[2] = auth.uid()::text);
