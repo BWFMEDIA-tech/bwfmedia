@@ -497,6 +497,7 @@ function StageMicBar({ onLeave }: { onLeave?: () => void }) {
         {isMicrophoneEnabled ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5 text-red-400" />}
         {isMicrophoneEnabled ? "Mute" : "Unmute"}
       </button>
+      <MicLevelMeter />
       <DeviceSelector compact />
       {onLeave && (
         <button
