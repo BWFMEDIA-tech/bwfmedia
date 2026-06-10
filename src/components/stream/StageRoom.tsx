@@ -494,6 +494,14 @@ function SpeakerBubble({
                     </MenuItem>
                   )}
                   <MenuDivider />
+                  {onToggleMute && !isSelf && (
+                    <MenuItem
+                      icon={isMuted ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
+                      onClick={() => { setMenuOpen(false); onToggleMute(); }}
+                    >
+                      {isMuted ? "Unmute mic" : "Mute mic"}
+                    </MenuItem>
+                  )}
                   {onDemoteToAudience && !isSelf && (
                     <MenuItem icon={<UserX className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onDemoteToAudience(); }}>
                       Demote to Audience
@@ -519,6 +527,14 @@ function SpeakerBubble({
                   {!isPrimaryHost && onRevoke && (
                     <MenuItem icon={<Shield className="h-3.5 w-3.5" />} onClick={() => { setMenuOpen(false); onRevoke(); }}>
                       Remove Host Privileges
+                    </MenuItem>
+                  )}
+                  {!isPrimaryHost && onToggleMute && !isSelf && (
+                    <MenuItem
+                      icon={isMuted ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
+                      onClick={() => { setMenuOpen(false); onToggleMute(); }}
+                    >
+                      {isMuted ? "Unmute mic" : "Mute mic"}
                     </MenuItem>
                   )}
                   {!isPrimaryHost && (
