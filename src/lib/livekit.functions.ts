@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AccessToken } from "livekit-server-sdk";
+import { TrackSource } from "@livekit/protocol";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const tokenInput = z.object({
@@ -38,29 +39,11 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       .maybeSingle();
     const isHost = (stream?.host_id === userId) || !!adminRow;
 
-    // Determine if this participant is allowed to publish audio. Only the
-    // stream host, admins, and approved stage roles (co_host / speaker) may
-    // publish — audience listeners get a subscribe-only token so the server
-    // refuses any audio they try to push, even if a client tries to bypass
-    // the UI mute.
-    let canPublish = isHost;
-    if (!canPublish && stream?.host_id) {
-      const { data: streamRow2 } = await supabase
-        .from("streams")
-        .select("id")
-        .eq("room_name", data.roomName)
-        .maybeSingle();
-      if (streamRow2?.id) {
-        const { data: spRow } = await supabase
-          .from("stage_participants")
-          .select("stage_role")
-          .eq("stream_id", streamRow2.id)
-          .eq("user_id", userId)
-          .maybeSingle();
-        const role = (spRow?.stage_role as string | undefined) ?? null;
-        canPublish = role === "host" || role === "co_host" || role === "speaker";
-      }
-    }
+    // Allow every authenticated participant to publish audio so guests can
+    // unmute themselves on any device (desktop, iPad, iPhone, etc.). The
+    // UI and StageMicSync still default listeners to muted; the host can
+    // mute via `muted_until`.
+    const canPublish = true;
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity: userId,
@@ -71,6 +54,7 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       room: data.roomName,
       roomJoin: true,
       canPublish,
+      canPublishSources: [TrackSource.MICROPHONE],
       canSubscribe: true,
       canPublishData: true,
       roomAdmin: isHost,
@@ -128,12 +112,12 @@ export const getGuestLiveKitToken = createServerFn({ method: "POST" })
     at.addGrant({
       room: data.roomName,
       roomJoin: true,
-      // Unauthenticated guests are view-only by default. Publishing is
-      // gated by host promotion via stage_participants and a separately
-      // issued authenticated token.
-      canPublish: false,
+      // Unauthenticated guests may publish their mic so they can speak from
+      // any device after tapping unmute. Audio is muted by default in the UI.
+      canPublish: true,
+      canPublishSources: [TrackSource.MICROPHONE],
       canSubscribe: true,
-      canPublishData: false,
+      canPublishData: true,
     });
     const token = await at.toJwt();
     return { token, wsUrl, identity };

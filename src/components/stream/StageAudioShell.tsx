@@ -162,25 +162,22 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     const isHostMuted = !!mutedUntil && new Date(mutedUntil).getTime() > Date.now();
     const hasStageRole = role === "host" || role === "co_host" || role === "speaker";
     const canSpeak = hasStageRole && !isHostMuted;
-    localParticipant
-      .setMicrophoneEnabled(canSpeak)
-      .then(() => {
-        if (canSpeak) {
-          console.log("[stage-audio] Microphone permission granted / track enabled", {
-            role,
-            identity: localParticipant.identity,
-          });
-          console.log("[stage-audio] Audio track published", {
-            identity: localParticipant.identity,
-          });
-        } else {
-          console.log("[stage-audio] Microphone disabled", { role, isHostMuted });
-        }
-      })
-      .catch((err) => {
-        console.error("[stage-audio] Audio device error", err);
-        if (canSpeak) toast.error(err?.message || "Microphone unavailable");
-      });
+    // Auto-enable mic for stage roles. For listeners/guests we do NOT
+    // force-disable here — that would override their manual Unmute tap on
+    // iOS / iPad / desktop. The host can still mute them via `muted_until`.
+    if (canSpeak) {
+      localParticipant
+        .setMicrophoneEnabled(true)
+        .then(() => {
+          console.log("[stage-audio] Mic enabled for stage role", { role });
+        })
+        .catch((err) => {
+          console.error("[stage-audio] Audio device error", err);
+          toast.error(err?.message || "Microphone unavailable");
+        });
+    } else if (isHostMuted) {
+      localParticipant.setMicrophoneEnabled(false).catch(() => {});
+    }
     if (prevCanSpeak === false && canSpeak) {
       toast.success("You're on stage — mic enabled");
     } else if (prevCanSpeak === true && !canSpeak) {
