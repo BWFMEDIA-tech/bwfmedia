@@ -402,6 +402,7 @@ function SpeakerBubble({
   }, [menuOpen]);
   const badgeLabel = kind === "host" ? "HOST" : kind === "co_host" ? "CO-HOST" : "GUEST";
   const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#2563eb" : "#16a34a";
+  const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="absolute -mt-3 self-center">
