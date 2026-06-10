@@ -156,16 +156,16 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
       <div className="text-center text-xs font-bold tracking-widest text-violet-300 mb-3">♪ NOW PLAYING ♪</div>
       {track ? (
         <>
-          <div className="relative mx-auto aspect-square w-full max-w-sm">
-            {/* Live waveform sits BEHIND the artwork */}
-            <div className="absolute -inset-8 sm:-inset-10">
+          <div className="relative mx-auto w-full">
+            {/* Full-width waveform stretches across the card, behind the album */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 -my-2">
               <WaveformBackground
                 audioRef={audioRef}
                 isPlaying={isPlaying}
                 trackKey={track.id}
               />
             </div>
-            <div className="relative h-full w-full rounded-2xl overflow-hidden border-2 border-violet-500/60 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] bg-gradient-to-br from-violet-700 to-blue-700">
+            <div className="relative mx-auto aspect-square w-full max-w-[260px] sm:max-w-[280px] rounded-2xl overflow-hidden border-2 border-violet-500/60 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] bg-gradient-to-br from-violet-700 to-blue-700">
               {track.cover_url ? (
                 <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
               ) : (
