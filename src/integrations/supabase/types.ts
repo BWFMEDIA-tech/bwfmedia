@@ -470,6 +470,168 @@ export type Database = {
           },
         ]
       }
+      play_boost_credits: {
+        Row: {
+          credits: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          credits?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          credits?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      play_sessions: {
+        Row: {
+          created_at: string
+          current_track_id: string | null
+          ended_at: string | null
+          id: string
+          started_at: string
+          status: string
+          stream_id: string
+          updated_at: string
+          winner_track_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_track_id?: string | null
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          stream_id: string
+          updated_at?: string
+          winner_track_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_track_id?: string | null
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          status?: string
+          stream_id?: string
+          updated_at?: string
+          winner_track_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_sessions_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: true
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_tracks: {
+        Row: {
+          artist_name: string
+          artist_user_id: string | null
+          audio_url: string | null
+          boosted: boolean
+          cover_url: string | null
+          created_at: string
+          dislike_count: number
+          duration_seconds: number | null
+          id: string
+          like_count: number
+          position: number
+          score: number
+          status: string
+          stream_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artist_name: string
+          artist_user_id?: string | null
+          audio_url?: string | null
+          boosted?: boolean
+          cover_url?: string | null
+          created_at?: string
+          dislike_count?: number
+          duration_seconds?: number | null
+          id?: string
+          like_count?: number
+          position?: number
+          score?: number
+          status?: string
+          stream_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artist_name?: string
+          artist_user_id?: string | null
+          audio_url?: string | null
+          boosted?: boolean
+          cover_url?: string | null
+          created_at?: string
+          dislike_count?: number
+          duration_seconds?: number | null
+          id?: string
+          like_count?: number
+          position?: number
+          score?: number
+          status?: string
+          stream_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_tracks_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_votes: {
+        Row: {
+          created_at: string
+          id: string
+          track_id: string
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          track_id: string
+          updated_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_votes_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       podcast_state: {
         Row: {
           cursor: number
