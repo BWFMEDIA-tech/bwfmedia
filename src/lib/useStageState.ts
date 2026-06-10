@@ -7,6 +7,8 @@ export type StageParticipant = {
   user_id: string;
   stage_role: "host" | "speaker" | "listener" | "green_room";
   joined_at: string;
+  connection_status?: "connected" | "reconnecting" | "disconnected";
+  last_seen_at?: string;
   display_name?: string | null;
   avatar_url?: string | null;
 };
