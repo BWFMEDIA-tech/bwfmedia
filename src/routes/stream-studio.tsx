@@ -836,6 +836,27 @@ function StreamStudio() {
                 onLocalChange={setStreamMode}
               />
 
+              {stream?.id && (
+                <div className="flex items-center justify-end gap-2 px-1 text-[11px] text-white/60">
+                  <span>Promotion mode:</span>
+                  <select
+                    value={hostTransferMode}
+                    onChange={async (e) => {
+                      const v = e.target.value as "co_host" | "transfer";
+                      setHostTransferMode(v);
+                      try {
+                        await setHostTransferModeFn({ data: { streamId: stream.id, mode: v } });
+                        toast.success(v === "transfer" ? "Ownership transfer enabled" : "Co-host mode enabled");
+                      } catch (err: any) { toast.error(err?.message ?? "Failed"); }
+                    }}
+                    className="rounded-md border border-white/10 bg-[#0d0d18] px-2 py-1 text-white/80"
+                  >
+                    <option value="co_host">Co-Host (host stays)</option>
+                    <option value="transfer">Transfer Ownership</option>
+                  </select>
+                </div>
+              )}
+
               {streamMode === "broadcast" ? (
                 lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
