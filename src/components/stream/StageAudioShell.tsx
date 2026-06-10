@@ -113,6 +113,7 @@ export function StageAudioShell({
         <StageMicSync streamId={streamId} userId={userId} />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
+        <ReconnectAudioGuard />
         {children}
         <StageDiagnostics />
         <StageMicBar onLeave={onLeave} />
