@@ -54,7 +54,7 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       room: data.roomName,
       roomJoin: true,
       canPublish,
-      canPublishSources: ["microphone"],
+      canPublishSources: [TrackSource.MICROPHONE],
       canSubscribe: true,
       canPublishData: true,
       roomAdmin: isHost,
@@ -115,7 +115,7 @@ export const getGuestLiveKitToken = createServerFn({ method: "POST" })
       // Unauthenticated guests may publish their mic so they can speak from
       // any device after tapping unmute. Audio is muted by default in the UI.
       canPublish: true,
-      canPublishSources: ["microphone"],
+      canPublishSources: [TrackSource.MICROPHONE],
       canSubscribe: true,
       canPublishData: true,
     });
