@@ -110,12 +110,7 @@ function PlayArena() {
           {/* Right column */}
           <div className="space-y-5">
             <LiveQueue queued={queued} />
-            <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-4">
-              <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-white/60 mb-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" /> LIVE CHAT
-              </div>
-              <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />
-            </div>
+            <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />
             <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
         </div>
