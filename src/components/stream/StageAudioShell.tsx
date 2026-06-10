@@ -1,4 +1,4 @@
-import { LiveKitRoom, useLocalParticipant, useRoomContext } from "@livekit/components-react";
+import { LiveKitRoom, RoomAudioRenderer, useLocalParticipant, useRoomContext } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useEffect, useState } from "react";
 import { Mic, MicOff, Radio, PhoneOff } from "lucide-react";
@@ -94,6 +94,7 @@ export function StageAudioShell({
       className="contents"
     >
       <StageConnectionProvider>
+        <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
         {children}
         <StageMicBar onLeave={onLeave} />
