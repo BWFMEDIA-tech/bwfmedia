@@ -860,7 +860,7 @@ function StreamStudio() {
 
               {streamMode === "play" ? (
                 stream?.id && auth.user ? (
-                  <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} />
+                  <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                 ) : (
                   <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
                     <Music2 className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />

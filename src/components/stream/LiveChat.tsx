@@ -87,7 +87,7 @@ export function LiveChat({
     })();
 
     const channel = supabase
-      .channel(`stream-chat-${streamId}`)
+      .channel(`stream-chat-${streamId}-${Math.random().toString(36).slice(2, 10)}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "stream_messages", filter: `stream_id=eq.${streamId}` },
         async (payload) => {
           const row = payload.new as any;
