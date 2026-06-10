@@ -864,6 +864,8 @@ function StreamStudio() {
                         streamId={stream.id}
                         participants={participants}
                         canManage
+                        primaryHostId={auth.user?.id ?? null}
+                        hostTransferMode={hostTransferMode}
                         selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
                       />
                     </StageAudioShell>
@@ -872,6 +874,8 @@ function StreamStudio() {
                       streamId={stream.id}
                       participants={participants}
                       canManage
+                      primaryHostId={auth.user?.id ?? null}
+                      hostTransferMode={hostTransferMode}
                       selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
                     />
                   )
