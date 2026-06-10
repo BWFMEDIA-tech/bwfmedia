@@ -113,6 +113,7 @@ export function StageAudioShell({
         <StageMicSync streamId={streamId} userId={userId} />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
+        <ReconnectAudioGuard />
         {children}
         <StageDiagnostics />
         <StageMicBar onLeave={onLeave} />
@@ -268,6 +269,125 @@ function ParticipantAudioLogger() {
       room.off(RoomEvent.ActiveSpeakersChanged, onSpeakers);
     };
   }, [room]);
+  return null;
+}
+
+/**
+ * Hardens audio across temporary disconnects, network blips, and refreshes:
+ *  - Re-subscribes to every remote audio publication on Reconnected /
+ *    ParticipantConnected / TrackPublished events (in case the SFU dropped
+ *    or unsubscribed the renderer mid-flight).
+ *  - Re-publishes the local mic if it was enabled before the disconnect but
+ *    the track was torn down during reconnect.
+ *  - Retries once on a transient mic failure.
+ */
+function ReconnectAudioGuard() {
+  const room = useRoomContext();
+  const { localParticipant } = useLocalParticipant();
+
+  useEffect(() => {
+    if (!room) return;
+
+    const wantsMic = { current: false };
+
+    const resubscribeAllRemoteAudio = () => {
+      room.remoteParticipants.forEach((p) => {
+        p.trackPublications.forEach((pub) => {
+          if (pub.kind === Track.Kind.Audio && !pub.isSubscribed) {
+            try {
+              (pub as RemoteTrackPublication).setSubscribed(true);
+              console.log("[stage-audio] Re-subscribed audio track", {
+                from: p.identity,
+                trackSid: pub.trackSid,
+              });
+            } catch (err) {
+              console.warn("[stage-audio] Failed to re-subscribe", err);
+            }
+          }
+        });
+      });
+    };
+
+    const republishMicIfNeeded = async () => {
+      const lp = room.localParticipant;
+      if (!lp) return;
+      if (!wantsMic.current) return;
+      const hasLiveAudio = Array.from(lp.trackPublications.values()).some(
+        (p) => p.kind === Track.Kind.Audio && p.track && !(p.track as any).isMuted,
+      );
+      if (hasLiveAudio) return;
+      try {
+        await lp.setMicrophoneEnabled(false);
+        await lp.setMicrophoneEnabled(true);
+        console.log("[stage-audio] Re-published mic after reconnect");
+      } catch (err) {
+        console.warn("[stage-audio] Mic republish failed, retrying", err);
+        setTimeout(() => {
+          lp.setMicrophoneEnabled(true).catch((e) =>
+            console.error("[stage-audio] Mic republish retry failed", e),
+          );
+        }, 1500);
+      }
+    };
+
+    const onReconnected = async () => {
+      console.log("[stage-audio] Room reconnected — restoring audio");
+      resubscribeAllRemoteAudio();
+      await republishMicIfNeeded();
+    };
+    const onReconnecting = () => {
+      console.log("[stage-audio] Room reconnecting…");
+      const lp = room.localParticipant;
+      if (lp) {
+        wantsMic.current = Array.from(lp.trackPublications.values()).some(
+          (p) => p.kind === Track.Kind.Audio,
+        );
+      }
+    };
+    const onParticipantConnected = () => resubscribeAllRemoteAudio();
+    const onTrackPublished = (
+      pub: RemoteTrackPublication,
+      participant: RemoteParticipant,
+    ) => {
+      if (pub.kind === Track.Kind.Audio && !pub.isSubscribed) {
+        try {
+          pub.setSubscribed(true);
+          console.log("[stage-audio] Auto-subscribed newly published audio", {
+            from: participant.identity,
+          });
+        } catch (err) {
+          console.warn("[stage-audio] Auto-subscribe failed", err);
+        }
+      }
+    };
+    const onMediaFailure = (failure: unknown) => {
+      console.warn("[stage-audio] Media device failure", failure);
+      setTimeout(() => {
+        room.localParticipant
+          ?.setMicrophoneEnabled(true)
+          .catch((e) => console.error("[stage-audio] Mic retry failed", e));
+      }, 1000);
+    };
+
+    // Initial sweep in case we mounted after tracks were already published.
+    resubscribeAllRemoteAudio();
+
+    room.on(RoomEvent.Reconnecting, onReconnecting);
+    room.on(RoomEvent.Reconnected, onReconnected);
+    room.on(RoomEvent.SignalConnected, onReconnected);
+    room.on(RoomEvent.ParticipantConnected, onParticipantConnected);
+    room.on(RoomEvent.TrackPublished, onTrackPublished as any);
+    room.on(RoomEvent.MediaDevicesError, onMediaFailure as any);
+    return () => {
+      room.off(RoomEvent.Reconnecting, onReconnecting);
+      room.off(RoomEvent.Reconnected, onReconnected);
+    room.off(RoomEvent.SignalConnected, onReconnected);
+      room.off(RoomEvent.ParticipantConnected, onParticipantConnected);
+      room.off(RoomEvent.TrackPublished, onTrackPublished as any);
+      room.off(RoomEvent.MediaDevicesError, onMediaFailure as any);
+    };
+  }, [room, localParticipant]);
+
   return null;
 }
 
