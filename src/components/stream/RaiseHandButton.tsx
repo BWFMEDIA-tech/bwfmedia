@@ -172,8 +172,20 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
   const label =
     status === "declined" ? "Request again" : "Request to Join Stage";
 
+  if (!auth.isAuthenticated) {
+    return (
+      <a
+        href="/auth"
+        className="flex items-center gap-2 rounded-lg border border-violet-400/30 bg-gradient-to-r from-violet-500/90 to-blue-500/90 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:from-violet-500 hover:to-blue-500"
+      >
+        <Hand className="h-4 w-4" /> Sign in to request stage
+      </a>
+    );
+  }
+
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={busy}
       className="flex items-center gap-2 rounded-lg border border-violet-400/30 bg-gradient-to-r from-violet-500/90 to-blue-500/90 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:from-violet-500 hover:to-blue-500 disabled:opacity-60"
