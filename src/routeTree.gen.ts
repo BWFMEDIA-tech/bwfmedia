@@ -39,6 +39,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
+import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
@@ -216,6 +217,11 @@ const UserIdRoute = UserIdRouteImport.update({
 const StreamRoomRoute = StreamRoomRouteImport.update({
   id: '/stream/$room',
   path: '/stream/$room',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayRoomRoute = PlayRoomRouteImport.update({
+  id: '/play/$room',
+  path: '/play/$room',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayReturnRoute = PayReturnRouteImport.update({
@@ -409,6 +415,7 @@ export interface FileRoutesByFullPath {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/play/$room': typeof PlayRoomRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -469,6 +476,7 @@ export interface FileRoutesByTo {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/play/$room': typeof PlayRoomRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -530,6 +538,7 @@ export interface FileRoutesById {
   '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
+  '/play/$room': typeof PlayRoomRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -592,6 +601,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/play/$room'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -652,6 +662,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/play/$room'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -712,6 +723,7 @@ export interface FileRouteTypes {
     | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
+    | '/play/$room'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -772,6 +784,7 @@ export interface RootRouteChildren {
   InviteCodeRoute: typeof InviteCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
+  PlayRoomRoute: typeof PlayRoomRoute
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -997,6 +1010,13 @@ declare module '@tanstack/react-router' {
       path: '/stream/$room'
       fullPath: '/stream/$room'
       preLoaderRoute: typeof StreamRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play/$room': {
+      id: '/play/$room'
+      path: '/play/$room'
+      fullPath: '/play/$room'
+      preLoaderRoute: typeof PlayRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay/return': {
@@ -1265,6 +1285,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteCodeRoute: InviteCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
+  PlayRoomRoute: PlayRoomRoute,
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
   AdminIndexRoute: AdminIndexRoute,
