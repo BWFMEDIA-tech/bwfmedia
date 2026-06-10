@@ -193,6 +193,24 @@ export const endPlaySession = createServerFn({ method: "POST" })
     return { ok: true, winnerTrackId: top?.id ?? null };
   });
 
+/** Host: permanently delete a track from a stream's play queue/leaderboard. */
+export const deletePlayTrack = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ streamId: z.string().uuid(), trackId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertHost(supabase, userId, data.streamId);
+    const { error } = await supabase
+      .from("play_tracks")
+      .delete()
+      .eq("id", data.trackId)
+      .eq("stream_id", data.streamId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 /** Read the caller's membership + boost-credit state. */
 export const getMyPlayStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
