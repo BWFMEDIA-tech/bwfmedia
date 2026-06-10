@@ -187,7 +187,7 @@ export function WaveformBackground({
       aria-hidden
       className={
         className ??
-        "pointer-events-none absolute inset-0 h-full w-full opacity-70 [filter:blur(2px)]"
+        "pointer-events-none absolute inset-0 h-full w-full opacity-100 [filter:saturate(1.4)_brightness(1.15)]"
       }
     />
   );
