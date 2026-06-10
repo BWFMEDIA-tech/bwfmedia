@@ -18,6 +18,7 @@ import guestImg from "@/assets/stream-guest.jpg";
 import { useAuth } from "@/lib/auth-context";
 import { useServerFn } from "@tanstack/react-start";
 import { startOrResumeStream, endStream } from "@/lib/streams.functions";
+import { getMyActiveStream } from "@/lib/streams.functions";
 import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
@@ -30,6 +31,7 @@ import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
+import { useStagePresence } from "@/lib/use-stage-presence";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
