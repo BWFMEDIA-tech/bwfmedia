@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { BoostCheckoutModal } from "@/components/play/BoostCheckoutModal";
 import { SubmitTrackDialog } from "@/components/play/SubmitTrackDialog";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { WaveformBackground } from "@/components/play/WaveformBackground";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -139,6 +140,8 @@ export function PlayArenaView({ stream, showChat = true }: { stream: { id: strin
 function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: string | null }) {
   const voteFn = useServerFn(votePlayTrack);
   const [myVote] = useMyVote(track?.id ?? null, userId);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const cast = async (v: 1 | -1) => {
     if (!track) return;
@@ -153,23 +156,38 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
       <div className="text-center text-xs font-bold tracking-widest text-violet-300 mb-3">♪ NOW PLAYING ♪</div>
       {track ? (
         <>
-          <div className="mx-auto aspect-square w-full max-w-sm rounded-2xl overflow-hidden border-2 border-violet-500/60 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] bg-gradient-to-br from-violet-700 to-blue-700">
-            {track.cover_url ? (
-              <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
-            ) : (
-              <div className="h-full w-full flex items-center justify-center">
-                <Music className="h-16 w-16 text-white/40" />
-              </div>
-            )}
+          <div className="relative mx-auto aspect-square w-full max-w-sm">
+            {/* Live waveform sits BEHIND the artwork */}
+            <div className="absolute -inset-8 sm:-inset-10">
+              <WaveformBackground
+                audioRef={audioRef}
+                isPlaying={isPlaying}
+                trackKey={track.id}
+              />
+            </div>
+            <div className="relative h-full w-full rounded-2xl overflow-hidden border-2 border-violet-500/60 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] bg-gradient-to-br from-violet-700 to-blue-700">
+              {track.cover_url ? (
+                <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center">
+                  <Music className="h-16 w-16 text-white/40" />
+                </div>
+              )}
+            </div>
           </div>
           <h2 className="mt-4 text-center text-2xl font-bold">{track.title}</h2>
           <p className="text-center text-white/60">{track.artist_name}</p>
           {track.audio_url && (
             <audio
               key={track.id}
+              ref={audioRef}
               src={track.audio_url}
               controls
               autoPlay
+              crossOrigin="anonymous"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => setIsPlaying(false)}
               className="mt-3 w-full"
               style={{ colorScheme: "dark" }}
             />
