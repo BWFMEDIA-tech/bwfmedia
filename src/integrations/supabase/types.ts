@@ -751,6 +751,7 @@ export type Database = {
           description: string | null
           ended_at: string | null
           host_id: string
+          host_transfer_mode: string
           id: string
           mode: string
           room_name: string
@@ -768,6 +769,7 @@ export type Database = {
           description?: string | null
           ended_at?: string | null
           host_id: string
+          host_transfer_mode?: string
           id?: string
           mode?: string
           room_name: string
@@ -785,6 +787,7 @@ export type Database = {
           description?: string | null
           ended_at?: string | null
           host_id?: string
+          host_transfer_mode?: string
           id?: string
           mode?: string
           room_name?: string
@@ -1159,6 +1162,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_stream_host: {
+        Args: { _stream_id: string; _user_id: string }
         Returns: boolean
       }
       move_to_dlq: {
