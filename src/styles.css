@@ -228,3 +228,10 @@
     animation: section-bar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
+
+/* Hide LiveKit ParticipantTile built-in name/metadata so our HOST/GUEST chip is the only label */
+.stage-tile .lk-participant-metadata,
+.stage-tile .lk-participant-name,
+.stage-tile .lk-participant-metadata-item {
+  display: none !important;
+}

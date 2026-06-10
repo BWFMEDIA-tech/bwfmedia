@@ -140,9 +140,8 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
 
 function StageTile({ track, label, fallbackImage, placeholder, profile }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite }) {
   const avatar = profile?.avatar_url ?? fallbackImage;
-  const name = track?.participant?.name || profile?.display_name || track?.participant?.identity;
   return (
-    <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
+    <div className="stage-tile relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18]">
       {track ? (
         <TrackRefContext.Provider value={track}>
           <ParticipantTile className="!h-full !w-full" />
@@ -164,22 +163,6 @@ function StageTile({ track, label, fallbackImage, placeholder, profile }: { trac
           {label}
         </span>
       </div>
-      {track?.participant && (
-        <div className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-2 rounded-xl bg-black/50 px-3 py-2 backdrop-blur">
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
-          ) : (
-            <div className="h-8 w-8 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
-          )}
-          <div>
-            <div className="flex items-center gap-1 text-sm font-bold text-white">
-              {name}
-              <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />
-            </div>
-            <div className="text-[10px] text-white/60">{track.participant.isLocal ? "you" : "live"}</div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
