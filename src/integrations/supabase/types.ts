@@ -561,24 +561,30 @@ export type Database = {
       }
       stage_participants: {
         Row: {
+          connection_status: string
           id: string
           joined_at: string
+          last_seen_at: string
           muted_until: string | null
           stage_role: string
           stream_id: string
           user_id: string
         }
         Insert: {
+          connection_status?: string
           id?: string
           joined_at?: string
+          last_seen_at?: string
           muted_until?: string | null
           stage_role?: string
           stream_id: string
           user_id: string
         }
         Update: {
+          connection_status?: string
           id?: string
           joined_at?: string
+          last_seen_at?: string
           muted_until?: string | null
           stage_role?: string
           stream_id?: string
