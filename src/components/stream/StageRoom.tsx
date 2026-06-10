@@ -6,9 +6,10 @@ import {
   removeStageParticipant,
   promoteToHost,
   revokeHostPrivileges,
+  demoteToAudience,
 } from "@/lib/stage.functions";
 import { toast } from "sonner";
-import { Mic, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck } from "lucide-react";
+import { Mic, UserPlus, Crown, X, MoreVertical, Shield, Star, ArrowRightLeft, UserMinus, UserCheck, UserX } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
@@ -38,6 +39,7 @@ export function StageRoom({
   const remove = useServerFn(removeStageParticipant);
   const promote = useServerFn(promoteToHost);
   const revoke = useServerFn(revokeHostPrivileges);
+  const demoteSrv = useServerFn(demoteToAudience);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
   const [confirm, setConfirm] = useState<null | {
     title: string;
@@ -129,6 +131,19 @@ export function StageRoom({
     });
   };
 
+  const doDemoteToAudience = (uid: string, name: string) => {
+    if (!streamId) return;
+    setConfirm({
+      title: "Demote to Audience",
+      description: `${name} will return to the audience. They'll lose mic and camera publishing rights immediately but stay in the stream as a viewer.`,
+      confirmLabel: "Demote to Audience",
+      run: async () => {
+        await demoteSrv({ data: { streamId, targetUserId: uid } });
+        toast.success("Moved to audience");
+      },
+    });
+  };
+
   return (
     <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-5">
       <div className="mb-4 flex items-center justify-between">
@@ -158,10 +173,12 @@ export function StageRoom({
             kind={p.stage_role === "co_host" ? "co_host" : "host"}
             canManage={canManage}
             isPrimaryHost={!!primaryHostId && p.user_id === primaryHostId}
+            isSelf={!!selfProfile && selfProfile.user_id === p.user_id}
             hostTransferMode={hostTransferMode}
             onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "This user", mode)}
             onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
             onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
+            onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "This user")}
           />
         ))}
         {showSelfHostPlaceholder && (
@@ -203,10 +220,12 @@ export function StageRoom({
               kind="speaker"
               canManage={canManage}
               isPrimaryHost={false}
+              isSelf={!!selfProfile && selfProfile.user_id === p.user_id}
               hostTransferMode={hostTransferMode}
               onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Guest", mode)}
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
+              onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "Guest")}
             />
           ))}
           {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
