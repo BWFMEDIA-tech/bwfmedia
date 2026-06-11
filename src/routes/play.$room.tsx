@@ -40,7 +40,6 @@ function PlayArena() {
           </div>
           <Link to="/live" className="text-sm text-white/60 hover:text-white">← All live</Link>
         </div>
-        {stream && <ShareListenLink room={room} isHost={false /* gated inside view */} />}
         <PlayArenaView stream={stream} room={room} />
       </div>
     </div>
