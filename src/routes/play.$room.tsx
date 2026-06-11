@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag, Trash2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag, Trash2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
@@ -40,13 +40,14 @@ function PlayArena() {
           </div>
           <Link to="/live" className="text-sm text-white/60 hover:text-white">← All live</Link>
         </div>
-        <PlayArenaView stream={stream} />
+        {stream && <ShareListenLink room={room} isHost={false /* gated inside view */} />}
+        <PlayArenaView stream={stream} room={room} />
       </div>
     </div>
   );
 }
 
-export function PlayArenaView({ stream, showChat = true }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean }) {
+export function PlayArenaView({ stream, showChat = true, room }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean; room?: string }) {
   const statusFn = useServerFn(getMyPlayStatus);
   const auth = useAuth();
   const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
@@ -110,7 +111,7 @@ export function PlayArenaView({ stream, showChat = true }: { stream: { id: strin
 
             {/* Host controls */}
             {isHost && stream && (
-              <HostControls streamId={stream.id} queued={queued} />
+              <HostControls streamId={stream.id} queued={queued} room={room} />
             )}
           </div>
 
@@ -363,15 +364,30 @@ function ArtistMembershipCard({ active, onUpgrade }: { active: boolean; onUpgrad
   );
 }
 
-function HostControls({ streamId, queued }: { streamId: string; queued: PlayTrack[] }) {
+function HostControls({ streamId, queued, room }: { streamId: string; queued: PlayTrack[]; room?: string }) {
   const playFn = useServerFn(playTrackNow);
   const advanceFn = useServerFn(advancePlayQueue);
   const endFn = useServerFn(endPlaySession);
   const next = queued[0];
+  const audienceUrl = room && typeof window !== "undefined" ? `${window.location.origin}/play/audience/${room}` : null;
+  const copyLink = async () => {
+    if (!audienceUrl) return;
+    try { await navigator.clipboard.writeText(audienceUrl); toast.success("Audience listen link copied"); }
+    catch { toast.error("Copy failed — long-press the link to copy"); }
+  };
   return (
     <div className="rounded-2xl border border-amber-400/30 bg-amber-500/5 p-4">
       <div className="text-xs font-bold tracking-widest text-amber-300 mb-3">HOST CONTROLS</div>
       <div className="flex flex-wrap gap-2">
+        {audienceUrl && (
+          <button
+            onClick={copyLink}
+            className="flex items-center gap-1.5 rounded-md bg-violet-600/80 px-3 py-1.5 text-xs font-bold hover:bg-violet-500"
+            title={audienceUrl}
+          >
+            <Share2 className="h-3 w-3" /> Share listen link
+          </button>
+        )}
         <button
           disabled={!next}
           onClick={async () => {
