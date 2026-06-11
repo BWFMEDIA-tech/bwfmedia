@@ -59,6 +59,7 @@ import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.canc
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
@@ -320,6 +321,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayAudienceRoomRoute = PlayAudienceRoomRouteImport.update({
+  id: '/play/audience/$room',
+  path: '/play/audience/$room',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -431,6 +437,7 @@ export interface FileRoutesByFullPath {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -493,6 +500,7 @@ export interface FileRoutesByTo {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -556,6 +564,7 @@ export interface FileRoutesById {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -620,6 +629,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
+    | '/play/audience/$room'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -682,6 +692,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
+    | '/play/audience/$room'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -744,6 +755,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
+    | '/play/audience/$room'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -805,6 +817,7 @@ export interface RootRouteChildren {
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1165,6 +1178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/play/audience/$room': {
+      id: '/play/audience/$room'
+      path: '/play/audience/$room'
+      fullPath: '/play/audience/$room'
+      preLoaderRoute: typeof PlayAudienceRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -1315,6 +1335,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  PlayAudienceRoomRoute: PlayAudienceRoomRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
