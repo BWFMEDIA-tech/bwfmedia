@@ -31,15 +31,6 @@ export const getAudiencePlayState = createServerFn({ method: "POST" })
       .eq("status", "playing")
       .maybeSingle();
 
-    const { data: queue } = await client
-      .from("play_tracks")
-      .select("id, title, artist_name, cover_url, boosted")
-      .eq("stream_id", stream.id)
-      .eq("status", "queued")
-      .order("boosted", { ascending: false })
-      .order("position", { ascending: true })
-      .limit: undefined as any;
-
     return {
       stream: {
         id: stream.id,
