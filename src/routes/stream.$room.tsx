@@ -15,6 +15,7 @@ import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
+import { PlayArenaView } from "@/routes/play.$room";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -31,7 +32,8 @@ function GuestPage() {
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
-  const [streamMode, setStreamMode] = useState<"broadcast" | "stage">("broadcast");
+  const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
+  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
@@ -48,7 +50,8 @@ function GuestPage() {
     streamFn({ data: { roomName: room } })
       .then((s: any) => {
         setStreamId(s?.id ?? null);
-        if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage");
+        if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage" | "play");
+        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id });
       })
       .catch(() => {});
   }, [room]);
@@ -63,7 +66,7 @@ function GuestPage() {
         { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
         (p) => {
           const r = p.new as any;
-          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage");
+          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage" | "play");
           if (typeof r.viewer_count === "number") setViewerCount(r.viewer_count);
         },
       )
@@ -154,7 +157,12 @@ function GuestPage() {
     <div className="min-h-screen bg-[#050509] text-white p-4">
       <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="flex flex-col gap-4 min-w-0">
-          {streamMode === "stage" && streamId && auth.user ? (
+          {streamMode === "play" && streamId && streamMeta ? (
+            <PlayArenaView
+              stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
+              showChat={false}
+            />
+          ) : streamMode === "stage" && streamId && auth.user ? (
             <StageAudioShell
               token={lk.token}
               serverUrl={lk.wsUrl}
