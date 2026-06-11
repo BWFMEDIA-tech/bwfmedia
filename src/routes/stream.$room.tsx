@@ -180,6 +180,13 @@ function GuestPage() {
           ) : (
             <>
               <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} />
+              {streamId && (
+                <StageRoom
+                  streamId={streamId}
+                  participants={participants as StageParticipant[]}
+                  canManage={isHostLike}
+                />
+              )}
               {streamId && inCrowd && (
                 <InCrowdBanner streamId={streamId} auth={auth} mode="broadcast" />
               )}
