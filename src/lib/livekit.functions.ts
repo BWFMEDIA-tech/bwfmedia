@@ -108,6 +108,19 @@ export const getGuestLiveKitToken = createServerFn({ method: "POST" })
     const wsUrl = process.env.LIVEKIT_URL;
     if (!apiKey || !apiSecret || !wsUrl) throw new Error("LiveKit not configured");
 
+    // Only mint guest tokens for rooms backed by a currently-live stream.
+    // Guests are listener-only — publishing requires an authenticated account
+    // with stage_participants standing (see getLiveKitToken).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: streamRow } = await supabaseAdmin
+      .from("streams")
+      .select("status")
+      .eq("room_name", data.roomName)
+      .maybeSingle();
+    if (!streamRow || streamRow.status !== "live") {
+      throw new Error("Stream is not live");
+    }
+
     const identity = `guest_${crypto.randomUUID()}`;
     const at = new AccessToken(apiKey, apiSecret, {
       identity,
@@ -117,15 +130,10 @@ export const getGuestLiveKitToken = createServerFn({ method: "POST" })
     at.addGrant({
       room: data.roomName,
       roomJoin: true,
-      // Unauthenticated guests may publish their mic so they can speak from
-      // any device after tapping unmute. Audio is muted by default in the UI.
-      canPublish: true,
-      canPublishSources: [
-        TrackSource.MICROPHONE,
-        TrackSource.CAMERA,
-        TrackSource.SCREEN_SHARE,
-        TrackSource.SCREEN_SHARE_AUDIO,
-      ],
+      // Unauthenticated guests are listener-only. Speaking/publishing
+      // requires sign-in so the host can identify, moderate, and remove
+      // participants. Prevents anonymous audio/video/screen-share injection.
+      canPublish: false,
       canSubscribe: true,
       canPublishData: true,
     });
