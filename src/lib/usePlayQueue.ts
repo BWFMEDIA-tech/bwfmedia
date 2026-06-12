@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 export interface PlayTrack {
   id: string;
   stream_id: string;
-  artist_user_id: string | null;
   artist_name: string;
   title: string;
   audio_url: string | null;
@@ -28,7 +27,7 @@ export function usePlayQueue(streamId: string | null) {
     const refresh = async () => {
       const { data } = await supabase
         .from("play_tracks")
-        .select("*")
+        .select("id, stream_id, artist_name, title, audio_url, cover_url, boosted, position, status, score, like_count, dislike_count, created_at")
         .eq("stream_id", streamId)
         .order("status", { ascending: true })
         .order("boosted", { ascending: false })
