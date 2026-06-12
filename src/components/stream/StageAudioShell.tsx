@@ -37,6 +37,7 @@ export function StageAudioShell({
   isHost,
   children,
   onLeave,
+  showHostTools = true,
 }: {
   token: string;
   serverUrl: string;
@@ -45,6 +46,8 @@ export function StageAudioShell({
   isHost?: boolean;
   children: React.ReactNode;
   onLeave?: () => void;
+  /** When false (audience/listeners), hides mic bar, device selector, diagnostics, and leave button. */
+  showHostTools?: boolean;
 }) {
   const [connect, setConnect] = useState(false);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
@@ -116,8 +119,8 @@ export function StageAudioShell({
         <ParticipantAudioLogger />
         <ReconnectAudioGuard />
         {children}
-        <StageDiagnostics />
-        <StageMicBar onLeave={onLeave} />
+        {showHostTools && <StageDiagnostics />}
+        {showHostTools && <StageMicBar onLeave={onLeave} />}
       </StageConnectionProvider>
     </LiveKitRoom>
   );

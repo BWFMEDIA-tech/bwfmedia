@@ -32,9 +32,11 @@ interface LiveStageProps {
   streamId?: string;
   /** Whether to auto-publish the local camera/mic. Default true (host/guest on stage). Pass false for crowd viewers. */
   publish?: boolean;
+  /** Show host/admin LiveKit controls (mic, camera, screen-share, end stream, device selector). */
+  showHostTools?: boolean;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
   return (
     <LiveKitRoom
       token={token}
@@ -46,7 +48,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       className="contents"
     >
       <RoomAudioRenderer />
-      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} />
+      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
       <PublishSync publish={publish} />
     </LiveKitRoom>
   );
@@ -75,7 +77,7 @@ function PublishSync({ publish }: { publish: boolean }) {
   return null;
 }
 
-function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean }) {
+function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -135,7 +137,7 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
           );
         })}
       </div>
-      <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />
+      {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
     </>
   );
 }
