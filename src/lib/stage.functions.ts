@@ -30,7 +30,10 @@ async function logHostAction(
 ) {
   try {
     const { data: actor } = await supabase.auth.getUser();
-    await supabase.from("admin_audit_log").insert({
+    // admin_audit_log has no INSERT policy for end users; use service role
+    // so audit entries actually persist instead of failing silently.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("admin_audit_log").insert({
       actor_id: args.actorId,
       actor_email: actor?.user?.email ?? null,
       action: args.action,
