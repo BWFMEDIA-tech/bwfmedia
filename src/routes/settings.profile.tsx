@@ -355,9 +355,9 @@ const SAMPLE_MERCH = [
 
 function DateBlock({ month, day }: { month: string; day: string }) {
   return (
-    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-center">
-      <div className="-mb-1 text-[9px] font-bold uppercase tracking-widest text-red-500">{month}</div>
-      <div className="text-base font-black leading-none">{day}</div>
+    <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-center">
+      <div className="text-[9px] font-bold uppercase tracking-widest text-red-500">{month}</div>
+      <div className="text-base font-black leading-none mt-0.5">{day}</div>
     </div>
   );
 }
