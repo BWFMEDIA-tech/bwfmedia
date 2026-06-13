@@ -328,6 +328,40 @@ function ProfileSettingsPage() {
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+          <div className="text-sm font-semibold">Upcoming Events Preview</div>
+          <p className="text-xs text-white/50 mt-0.5">Your next 3 upcoming events.</p>
+          <div className="mt-3 space-y-2">
+            {SAMPLE_EVENTS.map((e) => (
+              <div key={e.title} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-2">
+                <DateBlock month={e.month} day={e.day} />
+                <div className="min-w-0">
+                  <div className="truncate text-xs font-semibold">{e.title}</div>
+                  <div className="truncate text-[11px] text-white/50">{e.location} • {e.time}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-center"><a href="/settings/events" className="text-xs font-semibold text-red-500 hover:underline">View All Events</a></div>
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+          <div className="text-sm font-semibold">Merch Store Preview</div>
+          <p className="text-xs text-white/50 mt-0.5">See how your store appears to fans.</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {SAMPLE_MERCH.slice(0, 3).map((m) => (
+              <div key={m.name} className="overflow-hidden rounded-md border border-white/10 bg-white/[0.02]">
+                <div className="aspect-square bg-gradient-to-br from-zinc-800 to-black grid place-items-center text-white/30"><ShoppingBag className="h-4 w-4" /></div>
+                <div className="p-1.5">
+                  <div className="truncate text-[10px] font-semibold">{m.name}</div>
+                  <div className="text-[10px] text-white/50">{m.price}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-center"><a href="/settings/merch" className="text-xs font-semibold text-red-500 hover:underline">View Store</a></div>
+        </div>
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
           <div className="flex items-center gap-2 text-sm font-semibold"><Sparkles className="h-4 w-4 text-red-500" /> Profile Tips</div>
           <ul className="mt-3 space-y-3 text-xs">
             <Tip icon={<Camera className="h-3.5 w-3.5" />} title="Add a clear profile photo" body="Profiles with a photo get more engagement." />

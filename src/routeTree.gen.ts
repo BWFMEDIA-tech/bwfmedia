@@ -45,6 +45,7 @@ import { Route as SettingsSecurityRouteImport } from './routes/settings.security
 import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
 import { Route as SettingsMusicMediaRouteImport } from './routes/settings.music-media'
+import { Route as SettingsMerchRouteImport } from './routes/settings.merch'
 import { Route as SettingsMembershipRouteImport } from './routes/settings.membership'
 import { Route as SettingsEventsRouteImport } from './routes/settings.events'
 import { Route as SettingsConnectedAppsRouteImport } from './routes/settings.connected-apps'
@@ -260,6 +261,11 @@ const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
 const SettingsMusicMediaRoute = SettingsMusicMediaRouteImport.update({
   id: '/music-media',
   path: '/music-media',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsMerchRoute = SettingsMerchRouteImport.update({
+  id: '/merch',
+  path: '/merch',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsMembershipRoute = SettingsMembershipRouteImport.update({
@@ -500,6 +506,7 @@ export interface FileRoutesByFullPath {
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
+  '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/profile': typeof SettingsProfileRoute
@@ -574,6 +581,7 @@ export interface FileRoutesByTo {
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
+  '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/profile': typeof SettingsProfileRoute
@@ -649,6 +657,7 @@ export interface FileRoutesById {
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
+  '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/profile': typeof SettingsProfileRoute
@@ -725,6 +734,7 @@ export interface FileRouteTypes {
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
+    | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
     | '/settings/profile'
@@ -799,6 +809,7 @@ export interface FileRouteTypes {
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
+    | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
     | '/settings/profile'
@@ -873,6 +884,7 @@ export interface FileRouteTypes {
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
+    | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
     | '/settings/profile'
@@ -1212,6 +1224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsMusicMediaRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/settings/merch': {
+      id: '/settings/merch'
+      path: '/merch'
+      fullPath: '/settings/merch'
+      preLoaderRoute: typeof SettingsMerchRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/membership': {
       id: '/settings/membership'
       path: '/membership'
@@ -1486,6 +1505,7 @@ interface SettingsRouteChildren {
   SettingsConnectedAppsRoute: typeof SettingsConnectedAppsRoute
   SettingsEventsRoute: typeof SettingsEventsRoute
   SettingsMembershipRoute: typeof SettingsMembershipRoute
+  SettingsMerchRoute: typeof SettingsMerchRoute
   SettingsMusicMediaRoute: typeof SettingsMusicMediaRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
   SettingsProfileRoute: typeof SettingsProfileRoute
@@ -1500,6 +1520,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsConnectedAppsRoute: SettingsConnectedAppsRoute,
   SettingsEventsRoute: SettingsEventsRoute,
   SettingsMembershipRoute: SettingsMembershipRoute,
+  SettingsMerchRoute: SettingsMerchRoute,
   SettingsMusicMediaRoute: SettingsMusicMediaRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
   SettingsProfileRoute: SettingsProfileRoute,
