@@ -169,6 +169,30 @@ export type Database = {
         }
         Relationships: []
       }
+      connected_apps: {
+        Row: {
+          account_label: string | null
+          connected_at: string
+          id: string
+          provider: string
+          user_id: string
+        }
+        Insert: {
+          account_label?: string | null
+          connected_at?: string
+          id?: string
+          provider: string
+          user_id: string
+        }
+        Update: {
+          account_label?: string | null
+          connected_at?: string
+          id?: string
+          provider?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       deck_leads: {
         Row: {
           company: string | null
@@ -725,39 +749,60 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
+          featured_track_id: string | null
+          featured_video_id: string | null
           genre: string | null
+          genres: string[] | null
           id: string
           interests: string[] | null
           last_seen_at: string | null
+          location: string | null
+          member_since: string | null
           stage_name: string | null
           updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          featured_track_id?: string | null
+          featured_video_id?: string | null
           genre?: string | null
+          genres?: string[] | null
           id: string
           interests?: string[] | null
           last_seen_at?: string | null
+          location?: string | null
+          member_since?: string | null
           stage_name?: string | null
           updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          featured_track_id?: string | null
+          featured_video_id?: string | null
           genre?: string | null
+          genres?: string[] | null
           id?: string
           interests?: string[] | null
           last_seen_at?: string | null
+          location?: string | null
+          member_since?: string | null
           stage_name?: string | null
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -1216,6 +1261,81 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          accent_color: string
+          audio_quality: string
+          autoplay: boolean
+          crossfade_seconds: number
+          email_marketing: boolean
+          email_product: boolean
+          language: string
+          theme: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accent_color?: string
+          audio_quality?: string
+          autoplay?: boolean
+          crossfade_seconds?: number
+          email_marketing?: boolean
+          email_product?: boolean
+          language?: string
+          theme?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accent_color?: string
+          audio_quality?: string
+          autoplay?: boolean
+          crossfade_seconds?: number
+          email_marketing?: boolean
+          email_product?: boolean
+          language?: string
+          theme?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_social_links: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          handle: string | null
+          id: string
+          provider: string
+          sort_order: number
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          handle?: string | null
+          id?: string
+          provider: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          handle?: string | null
+          id?: string
+          provider?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
           user_id?: string
         }
         Relationships: []
