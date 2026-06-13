@@ -40,6 +40,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
+import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
@@ -226,6 +227,11 @@ const StreamRoomRoute = StreamRoomRouteImport.update({
   path: '/stream/$room',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const PlayRoomRoute = PlayRoomRouteImport.update({
   id: '/play/$room',
   path: '/play/$room',
@@ -402,7 +408,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -428,6 +434,7 @@ export interface FileRoutesByFullPath {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/settings/profile': typeof SettingsProfileRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -465,7 +472,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -491,6 +498,7 @@ export interface FileRoutesByTo {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/settings/profile': typeof SettingsProfileRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -529,7 +537,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -555,6 +563,7 @@ export interface FileRoutesById {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/settings/profile': typeof SettingsProfileRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -620,6 +629,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/settings/profile'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -683,6 +693,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/settings/profile'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -746,6 +757,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/settings/profile'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -784,7 +796,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SettingsRoute: typeof SettingsRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StreamStudioRoute: typeof StreamStudioRoute
@@ -1045,6 +1057,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StreamRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/play/$room': {
       id: '/play/$room'
       path: '/play/$room'
@@ -1270,6 +1289,18 @@ const LiveReviewRouteWithChildren = LiveReviewRoute._addFileChildren(
   LiveReviewRouteChildren,
 )
 
+interface SettingsRouteChildren {
+  SettingsProfileRoute: typeof SettingsProfileRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsProfileRoute: SettingsProfileRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 interface VideosRouteChildren {
   VideosIdRoute: typeof VideosIdRoute
 }
@@ -1301,7 +1332,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SettingsRoute: SettingsRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StreamStudioRoute: StreamStudioRoute,
