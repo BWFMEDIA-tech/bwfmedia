@@ -46,6 +46,7 @@ import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
 import { Route as SettingsMusicMediaRouteImport } from './routes/settings.music-media'
 import { Route as SettingsMembershipRouteImport } from './routes/settings.membership'
+import { Route as SettingsEventsRouteImport } from './routes/settings.events'
 import { Route as SettingsConnectedAppsRouteImport } from './routes/settings.connected-apps'
 import { Route as SettingsBillingRouteImport } from './routes/settings.billing'
 import { Route as SettingsArtistInfoRouteImport } from './routes/settings.artist-info'
@@ -264,6 +265,11 @@ const SettingsMusicMediaRoute = SettingsMusicMediaRouteImport.update({
 const SettingsMembershipRoute = SettingsMembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsEventsRoute = SettingsEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsConnectedAppsRoute = SettingsConnectedAppsRouteImport.update({
@@ -492,6 +498,7 @@ export interface FileRoutesByFullPath {
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
+  '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -565,6 +572,7 @@ export interface FileRoutesByTo {
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
+  '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -639,6 +647,7 @@ export interface FileRoutesById {
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
+  '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
@@ -714,6 +723,7 @@ export interface FileRouteTypes {
     | '/settings/artist-info'
     | '/settings/billing'
     | '/settings/connected-apps'
+    | '/settings/events'
     | '/settings/membership'
     | '/settings/music-media'
     | '/settings/notifications'
@@ -787,6 +797,7 @@ export interface FileRouteTypes {
     | '/settings/artist-info'
     | '/settings/billing'
     | '/settings/connected-apps'
+    | '/settings/events'
     | '/settings/membership'
     | '/settings/music-media'
     | '/settings/notifications'
@@ -860,6 +871,7 @@ export interface FileRouteTypes {
     | '/settings/artist-info'
     | '/settings/billing'
     | '/settings/connected-apps'
+    | '/settings/events'
     | '/settings/membership'
     | '/settings/music-media'
     | '/settings/notifications'
@@ -1207,6 +1219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsMembershipRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/settings/events': {
+      id: '/settings/events'
+      path: '/events'
+      fullPath: '/settings/events'
+      preLoaderRoute: typeof SettingsEventsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/connected-apps': {
       id: '/settings/connected-apps'
       path: '/connected-apps'
@@ -1465,6 +1484,7 @@ interface SettingsRouteChildren {
   SettingsArtistInfoRoute: typeof SettingsArtistInfoRoute
   SettingsBillingRoute: typeof SettingsBillingRoute
   SettingsConnectedAppsRoute: typeof SettingsConnectedAppsRoute
+  SettingsEventsRoute: typeof SettingsEventsRoute
   SettingsMembershipRoute: typeof SettingsMembershipRoute
   SettingsMusicMediaRoute: typeof SettingsMusicMediaRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
@@ -1478,6 +1498,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsArtistInfoRoute: SettingsArtistInfoRoute,
   SettingsBillingRoute: SettingsBillingRoute,
   SettingsConnectedAppsRoute: SettingsConnectedAppsRoute,
+  SettingsEventsRoute: SettingsEventsRoute,
   SettingsMembershipRoute: SettingsMembershipRoute,
   SettingsMusicMediaRoute: SettingsMusicMediaRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
