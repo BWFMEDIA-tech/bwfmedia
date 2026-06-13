@@ -40,6 +40,16 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
+import { Route as SettingsSocialLinksRouteImport } from './routes/settings.social-links'
+import { Route as SettingsSecurityRouteImport } from './routes/settings.security'
+import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
+import { Route as SettingsMusicMediaRouteImport } from './routes/settings.music-media'
+import { Route as SettingsMembershipRouteImport } from './routes/settings.membership'
+import { Route as SettingsConnectedAppsRouteImport } from './routes/settings.connected-apps'
+import { Route as SettingsBillingRouteImport } from './routes/settings.billing'
+import { Route as SettingsArtistInfoRouteImport } from './routes/settings.artist-info'
+import { Route as SettingsAppearanceRouteImport } from './routes/settings.appearance'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
@@ -226,6 +236,56 @@ const StreamRoomRoute = StreamRoomRouteImport.update({
   path: '/stream/$room',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsSocialLinksRoute = SettingsSocialLinksRouteImport.update({
+  id: '/social-links',
+  path: '/social-links',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsMusicMediaRoute = SettingsMusicMediaRouteImport.update({
+  id: '/music-media',
+  path: '/music-media',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsMembershipRoute = SettingsMembershipRouteImport.update({
+  id: '/membership',
+  path: '/membership',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsConnectedAppsRoute = SettingsConnectedAppsRouteImport.update({
+  id: '/connected-apps',
+  path: '/connected-apps',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsBillingRoute = SettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsArtistInfoRoute = SettingsArtistInfoRouteImport.update({
+  id: '/artist-info',
+  path: '/artist-info',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsAppearanceRoute = SettingsAppearanceRouteImport.update({
+  id: '/appearance',
+  path: '/appearance',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const PlayRoomRoute = PlayRoomRouteImport.update({
   id: '/play/$room',
   path: '/play/$room',
@@ -402,7 +462,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -428,6 +488,16 @@ export interface FileRoutesByFullPath {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/artist-info': typeof SettingsArtistInfoRoute
+  '/settings/billing': typeof SettingsBillingRoute
+  '/settings/connected-apps': typeof SettingsConnectedAppsRoute
+  '/settings/membership': typeof SettingsMembershipRoute
+  '/settings/music-media': typeof SettingsMusicMediaRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
+  '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -465,7 +535,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -491,6 +561,16 @@ export interface FileRoutesByTo {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/artist-info': typeof SettingsArtistInfoRoute
+  '/settings/billing': typeof SettingsBillingRoute
+  '/settings/connected-apps': typeof SettingsConnectedAppsRoute
+  '/settings/membership': typeof SettingsMembershipRoute
+  '/settings/music-media': typeof SettingsMusicMediaRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
+  '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -529,7 +609,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
@@ -555,6 +635,16 @@ export interface FileRoutesById {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/settings/appearance': typeof SettingsAppearanceRoute
+  '/settings/artist-info': typeof SettingsArtistInfoRoute
+  '/settings/billing': typeof SettingsBillingRoute
+  '/settings/connected-apps': typeof SettingsConnectedAppsRoute
+  '/settings/membership': typeof SettingsMembershipRoute
+  '/settings/music-media': typeof SettingsMusicMediaRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
+  '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -620,6 +710,16 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/settings/appearance'
+    | '/settings/artist-info'
+    | '/settings/billing'
+    | '/settings/connected-apps'
+    | '/settings/membership'
+    | '/settings/music-media'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
+    | '/settings/social-links'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -683,6 +783,16 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/settings/appearance'
+    | '/settings/artist-info'
+    | '/settings/billing'
+    | '/settings/connected-apps'
+    | '/settings/membership'
+    | '/settings/music-media'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
+    | '/settings/social-links'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -746,6 +856,16 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/settings/appearance'
+    | '/settings/artist-info'
+    | '/settings/billing'
+    | '/settings/connected-apps'
+    | '/settings/membership'
+    | '/settings/music-media'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
+    | '/settings/social-links'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -784,7 +904,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SettingsRoute: typeof SettingsRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StreamStudioRoute: typeof StreamStudioRoute
@@ -1045,6 +1165,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StreamRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/social-links': {
+      id: '/settings/social-links'
+      path: '/social-links'
+      fullPath: '/settings/social-links'
+      preLoaderRoute: typeof SettingsSocialLinksRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/security': {
+      id: '/settings/security'
+      path: '/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof SettingsSecurityRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/music-media': {
+      id: '/settings/music-media'
+      path: '/music-media'
+      fullPath: '/settings/music-media'
+      preLoaderRoute: typeof SettingsMusicMediaRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/membership': {
+      id: '/settings/membership'
+      path: '/membership'
+      fullPath: '/settings/membership'
+      preLoaderRoute: typeof SettingsMembershipRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/connected-apps': {
+      id: '/settings/connected-apps'
+      path: '/connected-apps'
+      fullPath: '/settings/connected-apps'
+      preLoaderRoute: typeof SettingsConnectedAppsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/billing': {
+      id: '/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof SettingsBillingRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/artist-info': {
+      id: '/settings/artist-info'
+      path: '/artist-info'
+      fullPath: '/settings/artist-info'
+      preLoaderRoute: typeof SettingsArtistInfoRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/appearance': {
+      id: '/settings/appearance'
+      path: '/appearance'
+      fullPath: '/settings/appearance'
+      preLoaderRoute: typeof SettingsAppearanceRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/play/$room': {
       id: '/play/$room'
       path: '/play/$room'
@@ -1270,6 +1460,36 @@ const LiveReviewRouteWithChildren = LiveReviewRoute._addFileChildren(
   LiveReviewRouteChildren,
 )
 
+interface SettingsRouteChildren {
+  SettingsAppearanceRoute: typeof SettingsAppearanceRoute
+  SettingsArtistInfoRoute: typeof SettingsArtistInfoRoute
+  SettingsBillingRoute: typeof SettingsBillingRoute
+  SettingsConnectedAppsRoute: typeof SettingsConnectedAppsRoute
+  SettingsMembershipRoute: typeof SettingsMembershipRoute
+  SettingsMusicMediaRoute: typeof SettingsMusicMediaRoute
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
+  SettingsSecurityRoute: typeof SettingsSecurityRoute
+  SettingsSocialLinksRoute: typeof SettingsSocialLinksRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsAppearanceRoute: SettingsAppearanceRoute,
+  SettingsArtistInfoRoute: SettingsArtistInfoRoute,
+  SettingsBillingRoute: SettingsBillingRoute,
+  SettingsConnectedAppsRoute: SettingsConnectedAppsRoute,
+  SettingsMembershipRoute: SettingsMembershipRoute,
+  SettingsMusicMediaRoute: SettingsMusicMediaRoute,
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
+  SettingsSecurityRoute: SettingsSecurityRoute,
+  SettingsSocialLinksRoute: SettingsSocialLinksRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 interface VideosRouteChildren {
   VideosIdRoute: typeof VideosIdRoute
 }
@@ -1301,7 +1521,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SettingsRoute: SettingsRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StreamStudioRoute: StreamStudioRoute,

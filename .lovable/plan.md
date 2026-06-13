@@ -1,74 +1,82 @@
-Build the **BWFPLAY Live Arena** on top of your existing BWF stream/live infrastructure. All four pieces, adapted to your current dark BWF theme (not the screenshot's neon sidebar).
+# Settings Hub — `/settings/profile`
 
-## What gets built
+Premium dark-mode settings hub matching the BWF Network mockup. Three-column layout: sidebar tabs (left), tab content (center), live profile preview + tips (right), persistent bottom music player.
 
-### 1. Live Arena page — `/play/$room`
-New route layered on top of the existing `streams` + LiveKit infrastructure. Layout from the mockup, styled with your current tokens:
+## Routes
 
-- **Now Playing** card — current track cover art, title, artist, progress bar, glow accent
-- **Like / Dislike** buttons with animated live score (+1/−1)
-- **"You and N others voted"** social proof
-- **Live Queue** panel — upcoming songs, Boosted tracks highlighted with crown badge
-- **Live Leaderboard** — top 5 by score this session
-- **Live Chat** — reuses existing `LiveChat` component
-- **"Skip the Line / Boost Now"** CTA → Stripe checkout
-- **How It Works** strip — 4 steps (Upload → Play → Vote → Win)
+- `/settings/profile` — Profile tab (default)
+- `/settings/artist-info`
+- `/settings/social-links`
+- `/settings/music-media`
+- `/settings/membership`
+- `/settings/notifications`
+- `/settings/appearance`
+- `/settings/security`
+- `/settings/billing`
+- `/settings/connected-apps`
 
-### 2. Voting + Leaderboard backend
-New tables + realtime:
-- `play_tracks` — songs in the queue (artist, title, audio_url, cover_url, boosted flag, position, status: queued / playing / done)
-- `play_votes` — one row per user per track, value +1 or −1 (unique on `(track_id, user_id)`)
-- `play_sessions` — per-stream session, current playing track, winner at end
+All under a `_authenticated` shared layout (`settings.tsx`) that renders sidebar + right rail + bottom player.
 
-Server functions: `submitVote`, `getLeaderboard`, `advanceTrack` (host), `endSession` (declares winner). Realtime channels for vote score, queue order, current track.
+## Schema additions (one migration)
 
-### 3. Boost — $25 / 2 submissions
-- Stripe product `play_boost` ($25, one-time, qty 1)
-- Embedded checkout from "Boost Now" button → on success, grants 2 boost credits stored in `play_boost_credits` table
-- Submitting a song while you have credits → consumes one credit and marks `boosted=true`, jumps to top of queue
-- Boosted tracks rendered with crown + amber border in the queue
+Two new tables and columns on `profiles`:
 
-### 4. Artist Membership — $6.99/mo
-- Stripe product `bwf_artist_membership` ($6.99, recurring monthly, qty 1)
-- Subscription gating: only members can submit songs to the queue
-- "Upgrade" CTA on submission form when not subscribed
-- Reuses the existing `subscriptions` table + webhook (already wired)
-- Membership perks card on the Arena page (Submit, Join Queue, Analytics, Priority Support)
+- `profiles`: add `banner_url text`, `username citext unique`, `location text`, `genres text[]`, `member_since date`, `featured_track_id uuid`, `featured_video_id uuid`
+- `user_social_links` — per-user (provider, handle, url, enabled). RLS: owner-only writes; public read of `enabled=true` rows.
+- `user_settings` — single row per user, holds: `theme` (`dark`/`light`/`system`), `accent_color`, `language`, `autoplay`, `crossfade_seconds`, `audio_quality`, `email_marketing`, `email_product`. Owner-only.
+- `connected_apps` — per-user `(provider, account_label, connected_at)` for Connected Apps tab. Owner-only.
+- Storage: new public bucket `banners` (5 MB cap) with owner-write RLS.
 
-## Technical details (for reference)
+## Tabs
 
-```text
-src/routes/play.$room.tsx        # new Live Arena page
-src/routes/play.index.tsx        # list of live arenas (reuses listLiveStreams)
-src/components/play/
-  NowPlayingCard.tsx
-  VoteButtons.tsx
-  LiveQueue.tsx
-  Leaderboard.tsx
-  BoostButton.tsx
-  MembershipCard.tsx
-  SubmitTrackDialog.tsx
-src/lib/play.functions.ts        # vote, queue, leaderboard, advance, submit
-src/lib/play-checkout.functions.ts  # boost + membership checkout
-src/lib/usePlaySession.ts        # realtime hook
-supabase/migrations/<ts>_play_arena.sql
-```
+| Tab | Function |
+|---|---|
+| **Profile** | Photo + banner upload, artist name, username, location, genres (multi-select chips), member-since (read-only), bio (500 char), socials toggles, featured track/video pickers, Save/Reset |
+| **Artist Info** | Stage name, primary genre, label, hometown, website, press bio (longer); writes to `profiles` |
+| **Social Links** | Full CRUD on `user_social_links` (add/remove/toggle, drag-reorder) |
+| **Music & Media** | List user's `play_tracks` + `videos`; set featured; archive |
+| **Membership** | Reads `play_memberships` / subscription tier; CTA to manage in Stripe portal |
+| **Notifications** | Toggles on `notification_preferences` (in-app, email, push, live alerts) |
+| **Appearance** | Theme (dark/light/system), accent color, language; writes `user_settings`; applies theme live |
+| **Security** | Change password (Supabase `updateUser`), sign-out all sessions, list recent sign-ins from auth log |
+| **Billing** | List paid `tips` sent + received, recent Stripe invoices via portal link |
+| **Connected Apps** | List/disconnect `connected_apps` (Spotify, Apple Music, Instagram placeholders) |
 
-Tax: Stripe managed_payments enabled (digital memberships, US-eligible) — +3.5% per txn for full tax/dispute/support handling. Tell me if you'd rather only calculate tax (+0.5%) and handle filing yourself.
+## Bottom player
 
-Stripe products created via tools, no manual dashboard work.
+New `src/components/player/GlobalPlayer.tsx` reading a new `PlayerContext`. Loads currently-playing track via existing `usePlayQueue` for the user's active play room (falls back to user's featured track). Controls: shuffle/prev/play-pause/next/repeat/volume/progress. Wired through a shared `<audio>` element managed in context. Mounted in the settings layout (later promoted to root if you want it site-wide).
 
-## Build order (one turn each)
-1. DB migration (tables, RLS, realtime)
-2. Stripe products + checkout fns
-3. Server functions (vote/queue/leaderboard)
-4. UI page + components, wired to current BWF theme
+## Security fixes (auto-fix, in same migration)
 
-## Out of scope (flag for later)
-- AI song scoring
-- Genre rooms
-- Mobile native apps
-- Label A&R tools
-- Redis (your Postgres + realtime is fine at current scale; revisit when concurrency demands it)
+1. **`is_stream_host` escalation** — add `WITH CHECK (stage_role IN ('listener','green_room'))` to `stage_participants` self-update policy so listeners can't self-promote to host/co_host.
+2. **`profiles.id` public exposure** — drop public SELECT; new policy: `TO authenticated USING (true)`. Public artist pages will fetch via a SECURITY DEFINER `public.get_public_profile(username)` that returns name/avatar/bio only (no UUID).
+3. **`streams.host_id` correlation** — drop public SELECT on `streams`; replace with a `public.get_public_stream(slug)` SECURITY DEFINER returning safe columns (title, cover, started_at, listener_count) — no `host_id`. Authenticated SELECT still returns full row.
 
-I'll start with step 1 (DB migration) when you approve.
+I'll touch existing routes that read `streams`/`profiles` publicly (artist page, live index) to use the new RPCs.
+
+## File changes
+
+**New**
+- `src/routes/settings.tsx` (layout: sidebar + right rail + player + Outlet)
+- `src/routes/settings.profile.tsx` … `settings.connected-apps.tsx` (10 files)
+- `src/components/settings/SettingsSidebar.tsx`
+- `src/components/settings/ProfilePreview.tsx`
+- `src/components/settings/SocialLinkRow.tsx`
+- `src/components/settings/BannerUploader.tsx`
+- `src/components/player/GlobalPlayer.tsx`
+- `src/lib/player-context.tsx`
+- `src/lib/settings.functions.ts` (server fns: get/set user_settings, change password)
+- One migration file
+
+**Edited**
+- `src/router.tsx` — wrap with `<PlayerProvider>`
+- `src/routes/artist.$id.tsx` + any public stream reader — use new RPCs
+- `src/components/site/SiteHeader.tsx` — add link to Settings under profile menu
+
+## Out of scope (deferred, will stub with "Coming soon" notice in the same UI)
+
+- Drag-reorder on Social Links (simple up/down buttons instead)
+- Real Spotify/Apple OAuth in Connected Apps (UI + DB only; OAuth wiring is its own task)
+- Two-factor auth in Security tab
+
+Confirm and I'll ship it.
