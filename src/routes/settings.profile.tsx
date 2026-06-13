@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Loader2, MapPin, Upload, X, Image as ImageIcon, Music, Video as VideoIcon, CheckCircle2, Sparkles, BookText, Share2, Music2 } from "lucide-react";
+import { Camera, Loader2, MapPin, Upload, X, Image as ImageIcon, Music, Video as VideoIcon, CheckCircle2, Sparkles, BookText, Share2, Music2, Calendar, Plus, Pencil, Trash2, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
@@ -218,7 +218,77 @@ function ProfileSettingsPage() {
         </Section>
 
         <Section title="Music & Media Settings" icon={<Music2 className="h-4 w-4 text-red-500" />}>
-          <div className="text-sm text-white/60">Manage your featured track and video in <a href="/settings/music-media" className="text-red-400 hover:underline">Music & Media</a>.</div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="text-[10px] uppercase tracking-widest text-white/40 w-20 shrink-0">Featured Track</div>
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded bg-gradient-to-br from-red-600/40 to-purple-600/30"><Music className="h-4 w-4" /></div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold">No Turning Back</div>
+                  <div className="truncate text-xs text-white/50">{displayName || "Artist"}</div>
+                </div>
+              </div>
+              <a href="/settings/music-media" className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Change</a>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="text-[10px] uppercase tracking-widest text-white/40 w-20 shrink-0">Featured Video</div>
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded bg-gradient-to-br from-red-600/40 to-purple-600/30"><VideoIcon className="h-4 w-4" /></div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold">No Turning Back (Official Video)</div>
+                  <div className="truncate text-xs text-white/50">3:24</div>
+                </div>
+              </div>
+              <a href="/settings/music-media" className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Change</a>
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Upcoming Events" icon={<Calendar className="h-4 w-4 text-red-500" />}>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs text-white/50">Add and manage your upcoming shows and events.</p>
+            <a href="/settings/events" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Event</a>
+          </div>
+          <div className="space-y-2">
+            {SAMPLE_EVENTS.map((e) => (
+              <div key={e.title} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <DateBlock month={e.month} day={e.day} />
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold">{e.title}</div>
+                    <div className="truncate text-xs text-white/50">{e.location} • {e.time}</div>
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <button className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"><Pencil className="h-3 w-3 inline mr-1" />Edit</button>
+                  <button className="grid h-8 w-8 place-items-center rounded-md border border-red-600/30 text-red-500 hover:bg-red-600/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-center"><a href="/settings/events" className="text-xs font-semibold text-red-500 hover:underline">View All Events</a></div>
+        </Section>
+
+        <Section title="Merch Store" icon={<ShoppingBag className="h-4 w-4 text-red-500" />}>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs text-white/50">Manage the products in your official store.</p>
+            <a href="/settings/merch" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Product</a>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {SAMPLE_MERCH.map((m) => (
+              <div key={m.name} className="overflow-hidden rounded-lg border border-white/10 bg-white/[0.02]">
+                <div className="aspect-square bg-gradient-to-br from-zinc-800 to-black grid place-items-center text-white/30"><ShoppingBag className="h-6 w-6" /></div>
+                <div className="p-2">
+                  <div className="truncate text-xs font-semibold">{m.name}</div>
+                  <div className="text-[11px] text-white/50">{m.price}</div>
+                  <button className="mt-1.5 w-full rounded border border-white/10 bg-white/5 py-1 text-[10px] uppercase tracking-wider hover:bg-white/10">Edit</button>
+                </div>
+              </div>
+            ))}
+            <a href="/settings/merch" className="grid aspect-square place-items-center rounded-lg border border-dashed border-white/20 bg-white/[0.02] text-white/40 hover:bg-white/[0.04]">
+              <div className="text-center"><Plus className="mx-auto h-5 w-5" /><div className="mt-1 text-[10px] uppercase tracking-wider">Add Product</div></div>
+            </a>
+          </div>
         </Section>
 
         <div className="sticky bottom-24 z-10 flex justify-end gap-3 rounded-xl border border-white/10 bg-[#0a0a0a]/90 p-3 backdrop-blur">
@@ -267,6 +337,27 @@ function ProfileSettingsPage() {
           </ul>
         </div>
       </aside>
+    </div>
+  );
+}
+
+const SAMPLE_EVENTS = [
+  { month: "JUN", day: "21", title: "BWF Live Concert", location: "Atlanta, GA", time: "8:00 PM" },
+  { month: "JUL", day: "13", title: "Summer Jam 2024", location: "Miami, FL", time: "7:00 PM" },
+  { month: "AUG", day: "03", title: "Indie Artist Showcase", location: "Nashville, TN", time: "9:00 PM" },
+];
+const SAMPLE_MERCH = [
+  { name: "BWF Hoodie", price: "$49.99" },
+  { name: "BWF Tee", price: "$29.99" },
+  { name: "BWF Hat", price: "$24.99" },
+  { name: "BWF Chain", price: "$79.99" },
+];
+
+function DateBlock({ month, day }: { month: string; day: string }) {
+  return (
+    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-center">
+      <div className="-mb-1 text-[9px] font-bold uppercase tracking-widest text-red-500">{month}</div>
+      <div className="text-base font-black leading-none">{day}</div>
     </div>
   );
 }
