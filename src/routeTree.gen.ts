@@ -21,6 +21,7 @@ import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as MicDropRouteImport } from './routes/mic-drop'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveReviewRouteImport } from './routes/live-review'
@@ -141,6 +142,11 @@ const OffTheBlockRoute = OffTheBlockRouteImport.update({
 const NotificationsRoute = NotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MicDropRoute = MicDropRouteImport.update({
+  id: '/mic-drop',
+  path: '/mic-drop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -469,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
+  '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/profile': typeof ProfileRoute
@@ -544,6 +551,7 @@ export interface FileRoutesByTo {
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
+  '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/profile': typeof ProfileRoute
@@ -620,6 +628,7 @@ export interface FileRoutesById {
   '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
+  '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/profile': typeof ProfileRoute
@@ -697,6 +706,7 @@ export interface FileRouteTypes {
     | '/live-review'
     | '/login'
     | '/messages'
+    | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
     | '/profile'
@@ -772,6 +782,7 @@ export interface FileRouteTypes {
     | '/live-review'
     | '/login'
     | '/messages'
+    | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
     | '/profile'
@@ -847,6 +858,7 @@ export interface FileRouteTypes {
     | '/live-review'
     | '/login'
     | '/messages'
+    | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
     | '/profile'
@@ -923,6 +935,7 @@ export interface RootRouteChildren {
   LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
+  MicDropRoute: typeof MicDropRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   ProfileRoute: typeof ProfileRoute
@@ -1054,6 +1067,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mic-drop': {
+      id: '/mic-drop'
+      path: '/mic-drop'
+      fullPath: '/mic-drop'
+      preLoaderRoute: typeof MicDropRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -1558,6 +1578,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
+  MicDropRoute: MicDropRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   ProfileRoute: ProfileRoute,
