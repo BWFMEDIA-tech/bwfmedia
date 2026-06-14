@@ -30,8 +30,8 @@ function AdminDashboard() {
   const isAdmin = auth.roles.includes("admin");
 
   useEffect(() => {
-    if (!auth.loading && !isAdmin) navigate({ to: "/" });
-  }, [auth.loading, isAdmin]);
+    if (!auth.loading && !auth.rolesLoading && !isAdmin) navigate({ to: "/access-denied" });
+  }, [auth.loading, auth.rolesLoading, isAdmin, navigate]);
 
   const refresh = async () => {
     const [s, t, w, b] = await Promise.all([
