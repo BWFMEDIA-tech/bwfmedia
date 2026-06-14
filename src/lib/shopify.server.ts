@@ -75,6 +75,18 @@ export async function fetchAllProducts(shop: string, token: string) {
   return j.products as ShopifyProduct[];
 }
 
+export async function registerWebhooks(shop: string, token: string, origin: string) {
+  const topics = ["products/update", "products/create", "products/delete", "inventory_levels/update", "orders/paid", "orders/create"];
+  const address = `${origin}/api/public/shopify/webhook`;
+  for (const topic of topics) {
+    await fetch(`https://${shop}/admin/api/2024-10/webhooks.json`, {
+      method: "POST",
+      headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
+      body: JSON.stringify({ webhook: { topic, address, format: "json" } }),
+    }).catch((e) => console.error(`[shopify] webhook ${topic} register failed`, e));
+  }
+}
+
 export interface ShopifyVariant {
   id: number; title: string; sku: string; price: string; compare_at_price: string | null;
   inventory_quantity: number; option1: string | null; option2: string | null; option3: string | null;
