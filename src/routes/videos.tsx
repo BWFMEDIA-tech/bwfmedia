@@ -504,60 +504,6 @@ function VideosPage() {
               No videos yet
             </div>
           )}
-                      <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-white/80">
-                    <span>1:24 / {pseudoDuration(hero.id)}</span>
-                    <div className="flex items-center gap-4">
-                      <Volume2 size={16} />
-                      <SettingsIcon size={16} />
-                      <button onClick={togglePlay}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
-                      <Maximize size={16} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hero meta */}
-              <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold">{hero.title}</h1>
-                    {hero.category === "sponsored" ? (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white px-2 py-1 rounded">
-                        Sponsored
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-1 rounded">
-                        Exclusive
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mt-2 text-sm text-white/60">
-                    <span className="text-white font-semibold uppercase tracking-wider">{hero.artist ?? "BWF Artist"}</span>
-                    <BadgeCheck size={14} className="text-red-500 fill-red-500/20" />
-                    <span>·</span>
-                    <span>{formatViews(pseudoViews(hero.id))} views</span>
-                    <span>·</span>
-                    <span>{timeAgo(hero.created_at)}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ActionPill icon={Heart} label="Like" count="10K" />
-                  <ActionPill icon={Bookmark} label="Save" />
-                  <ActionPill icon={Share2} label="Share" />
-                  <button className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center">
-                    <MoreHorizontal size={16} />
-                  </button>
-                </div>
-              </div>
-            </section>
-          ) : (
-            <div className="aspect-video bg-white/5 rounded-2xl flex items-center justify-center text-white/40">
-              No videos yet
-            </div>
-          )}
 
           {/* TRENDING */}
           <section>
