@@ -28,6 +28,7 @@ import { Route as LiveRouteImport } from './routes/live'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EarningsRouteImport } from './routes/earnings'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -190,6 +191,11 @@ const EventsRoute = EventsRouteImport.update({
 const EarningsRoute = EarningsRouteImport.update({
   id: '/earnings',
   path: '/earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckRoute = DeckRouteImport.update({
@@ -548,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
+  '/discover': typeof DiscoverRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -636,6 +643,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
+  '/discover': typeof DiscoverRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -726,6 +734,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
+  '/discover': typeof DiscoverRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -817,6 +826,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/deck'
+    | '/discover'
     | '/earnings'
     | '/events'
     | '/forgot-password'
@@ -905,6 +915,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/deck'
+    | '/discover'
     | '/earnings'
     | '/events'
     | '/forgot-password'
@@ -994,6 +1005,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/deck'
+    | '/discover'
     | '/earnings'
     | '/events'
     | '/forgot-password'
@@ -1084,6 +1096,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
+  DiscoverRoute: typeof DiscoverRoute
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -1264,6 +1277,13 @@ declare module '@tanstack/react-router' {
       path: '/earnings'
       fullPath: '/earnings'
       preLoaderRoute: typeof EarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck': {
@@ -1849,6 +1869,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
+  DiscoverRoute: DiscoverRoute,
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
