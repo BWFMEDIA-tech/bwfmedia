@@ -323,7 +323,7 @@ function ProfileSettingsPage() {
               <Stat label="Monthly" value={stats.monthly} />
               <Stat label="Streams" value={stats.streams} />
             </div>
-            <button className="mt-3 w-full rounded-lg bg-red-600 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-red-500">View Profile</button>
+            <a href="/profile" className="mt-3 block w-full rounded-lg bg-red-600 py-2 text-center text-xs font-bold uppercase tracking-wider text-white hover:bg-red-500">View Profile</a>
           </div>
         </div>
 
