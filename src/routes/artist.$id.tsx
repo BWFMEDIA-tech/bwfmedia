@@ -10,15 +10,45 @@ import {
   TrendingUp, DollarSign, Clock, Plus, ShoppingBag, Send,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getArtistMeta } from "@/lib/artist-meta.functions";
 
 export const Route = createFileRoute("/artist/$id")({
-  head: () => ({
-    meta: [
-      { title: "Artist Profile — BWF Network" },
-      { name: "description", content: "Stream music, support artists, and join live sessions on BWF Network." },
-      { property: "og:title", content: "Artist Profile — BWF Network" },
-    ],
-  }),
+  loader: ({ params }) => getArtistMeta({ data: { id: params.id } }),
+  head: ({ params, loaderData }) => {
+    const name = loaderData?.name?.trim() || "Artist Profile";
+    const title = `${name} — BWF Network`;
+    const desc = `Stream ${name}'s music, watch live sessions, support with tips, and join the community on BWF Network — the creator-powered entertainment platform.`;
+    const url = `https://bwfnetwork.com/artist/${params.id}`;
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: url },
+    ];
+    if (loaderData?.photo) {
+      meta.push({ property: "og:image", content: loaderData.photo });
+      meta.push({ name: "twitter:image", content: loaderData.photo });
+    }
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          mainEntity: {
+            "@type": "Person",
+            name,
+            url,
+            ...(loaderData?.photo ? { image: loaderData.photo } : {}),
+          },
+        }),
+      }],
+    };
+  },
   component: ArtistProfilePage,
 });
 
