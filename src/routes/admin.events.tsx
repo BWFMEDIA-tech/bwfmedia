@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, ListOrdered } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { SectionPage } from "@/components/admin/SectionPage";
 import { getSectionStats } from "@/lib/admin-sections.functions";
 import { useAuth } from "@/lib/auth-context";
