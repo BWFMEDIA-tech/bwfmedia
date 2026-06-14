@@ -1,26 +1,32 @@
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
 import {
   Play,
   Mic,
-  Film,
-  Scissors,
-  Camera,
-  Share2,
-  Globe,
-  TrendingUp,
-  DollarSign,
   ArrowRight,
   Check,
+  Radio,
+  Eye,
+  Music,
+  Headphones,
+  Star,
+  Sparkles,
   Youtube,
   Instagram,
-  Facebook,
   Twitter,
+  Facebook,
   Music2,
-  Linkedin,
+  Calendar,
+  PlayCircle,
+  Camera,
+  ChevronRight,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import { getHomepageData } from "@/lib/homepage.functions";
+import { LIVE_TIER_LIST } from "@/lib/live-review-tiers";
+import { CartButton } from "@/components/CartDrawer";
 
 /* ---------- shared ---------- */
 
@@ -59,563 +65,465 @@ function ScrollProgress() {
   );
 }
 
-/* ---------- HERO ---------- */
-
-function Hero() {
+function SectionHead({ kicker, title, sub }: { kicker?: string; title: string; sub?: string }) {
   return (
-    <section id="top" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
+    <div className="max-w-3xl mb-10">
+      {kicker && (
+        <div className="flex items-center gap-3 mb-4">
+          <span className="block h-px w-10 bg-blood" />
+          <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">{kicker}</span>
+        </div>
+      )}
+      <h2 className="font-display text-3xl md:text-5xl uppercase text-bone leading-[0.95]">{title}</h2>
+      {sub && <p className="mt-4 text-bone/60 text-base md:text-lg leading-relaxed">{sub}</p>}
+    </div>
+  );
+}
+
+function EmptyHint({ icon: Icon, text }: { icon: any; text: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-10 px-6 border border-dashed border-white/10 rounded-xl bg-white/[0.02]">
+      <Icon className="h-7 w-7 text-blood/70 mb-3" />
+      <p className="text-bone/60 text-sm">{text}</p>
+    </div>
+  );
+}
+
+/* ---------- HERO + LIVE PANEL ---------- */
+
+function Hero({ liveStreams }: { liveStreams: any[] }) {
+  const feature = liveStreams[0];
+  return (
+    <section id="top" className="relative w-full overflow-hidden pt-28 pb-12 md:pt-32 md:pb-20">
       <video
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover opacity-50"
         src={heroRapperVideo.url}
         autoPlay
         muted
         loop
         playsInline
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
-      <div
-        className="absolute inset-0 opacity-30 pointer-events-none"
-        style={{ background: "radial-gradient(60% 50% at 50% 40%, rgba(139,92,246,0.25), transparent 70%)" }}
-      />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 text-center pt-24 pb-16">
-        <Reveal delay={0}>
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-white/15 bg-white/5 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-blood animate-pulse" />
-            <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/80">BWF Media TV</span>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.1}>
-          <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] leading-[0.9] uppercase text-bone">
-            Where Culture
-            <br />
-            <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
-              Goes Viral
-            </span>
-          </h1>
-        </Reveal>
-
-        <Reveal delay={0.25}>
-          <p className="mt-6 max-w-2xl mx-auto text-base md:text-lg text-bone/70 leading-relaxed">
-            BWF™ turns artists, moments, and movements into global cultural events.
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.4}>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="#book"
-              className="group inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
-            >
-              Book a Shoot
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="https://youtube.com/@bwfmedia"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
-            >
-              <Play size={14} fill="currentColor" />
-              Watch on YouTube
-            </a>
-            <RouterLink
-              to="/off-the-block"
-              className="inline-flex items-center gap-2 px-7 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors"
-            >
-              Off The Block
-              <ArrowRight size={14} />
-            </RouterLink>
-            <RouterLink
-              to="/live-review"
-              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
-            >
-              <Mic size={14} />
-              Live Review
-            </RouterLink>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- FEATURED VIDEO ---------- */
-
-function FeaturedVideo() {
-  return (
-    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-        <Reveal>
-          <SectionHead
-            kicker="Latest Drop"
-            title="Finesse2Tymes SIGNED? The Exposed Truth Behind His 360 Deal (Full Breakdown)"
-            sub="Breaking down the industry rumors, contract details, and what a 360 deal really means for artists."
-          />
-        </Reveal>
-        <Reveal delay={0.15}>
-          <div className="relative aspect-video w-full max-w-5xl mx-auto border border-blood/30 backdrop-blur-md bg-black overflow-hidden group">
-            <iframe
-              className="absolute inset-0 w-full h-full"
-              src="https://www.youtube.com/embed/aqOppO_xvRs?rel=0"
-              title="Finesse2Tymes SIGNED? The Exposed Truth Behind His 360 Deal (Full Breakdown)"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </Reveal>
-        <Reveal delay={0.25}>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="https://www.youtube.com/watch?v=aqOppO_xvRs"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
-            >
-              <Youtube size={16} />
-              Watch on YouTube
-            </a>
-            <RouterLink
-              to="/off-the-block"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
-            >
-              More Videos
-              <ArrowRight size={14} />
-            </RouterLink>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- SOCIAL PROOF STRIP ---------- */
-
-function ProofStrip() {
-  const items = [
-    { v: "329,044", l: "Subscribers" },
-    { v: "703.9M", l: "Views" },
-    { v: "18.3M", l: "Likes" },
-    { v: "771,000K", l: "Comments" },
-    { v: "3.0M", l: "Shares" },
-    { v: "6.6M", l: "Recent Views" },
-  ];
-  const loop = [...items, ...items];
-  return (
-    <section className="border-y border-blood/20 bg-black/40 backdrop-blur-sm overflow-hidden">
-      <div className="relative py-8 group">
-        <div className="flex gap-16 md:gap-24 animate-marquee group-hover:[animation-play-state:paused] whitespace-nowrap w-max">
-          {loop.map((it, i) => (
-            <div key={i} className="flex items-baseline gap-4 shrink-0">
-              <div className="font-display text-3xl md:text-5xl text-bone">{it.v}</div>
-              <div className="font-cond tracking-[0.3em] text-[10px] md:text-xs uppercase text-bone/50">{it.l}</div>
-              <span className="ml-16 md:ml-24 h-2 w-2 rounded-full bg-blood/70" aria-hidden />
-            </div>
-          ))}
-        </div>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-black to-transparent" />
-      </div>
-    </section>
-  );
-}
-
-/* ---------- SECTION SHELL ---------- */
-
-function SectionHead({ kicker, title, sub }: { kicker?: string; title: string; sub?: string }) {
-  return (
-    <div className="max-w-3xl mb-14">
-      {kicker && (
-        <div className="flex items-center gap-3 mb-5">
-          <span className="block h-px w-10" style={{ backgroundColor: "var(--blood)" }} />
-          <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">{kicker}</span>
-        </div>
-      )}
-      <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">{title}</h2>
-      {sub && <p className="mt-5 text-bone/60 text-base md:text-lg leading-relaxed">{sub}</p>}
-    </div>
-  );
-}
-
-/* ---------- SERVICES ---------- */
-
-function Services() {
-  const items = [
-    { icon: Mic, title: "Artist Interviews", desc: "Cinematic on-camera conversations engineered to clip and travel." },
-    { icon: Film, title: "Music Videos", desc: "Story-driven visuals shot for the algorithm and the timeline." },
-    {
-      icon: Scissors,
-      title: "Viral Clips",
-      desc: "One shoot, dozens of vertical assets cut for TikTok, Reels, Shorts.",
-    },
-    { icon: Camera, title: "Event Coverage", desc: "Live moments captured, edited, and pushed before the night ends." },
-    {
-      icon: Share2,
-      title: "Distribution Engine",
-      desc: "Multi-platform release across YouTube, TikTok, Instagram, and Shorts.",
-    },
-  ];
-  return (
-    <section id="services" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-        <Reveal>
-          <SectionHead kicker="What We Do" title="Built to Make You Seen." />
-        </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {items.map((it, i) => (
-            <Reveal key={it.title} delay={i * 0.06}>
-              <div className="group relative h-full p-7 bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-blood/60 hover:bg-white/[0.05] transition-all duration-300">
-                <div className="w-11 h-11 flex items-center justify-center bg-blood/10 border border-blood/30 mb-5 group-hover:bg-blood group-hover:border-blood transition-colors">
-                  <it.icon size={20} className="text-blood group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="font-cond font-bold tracking-[0.15em] uppercase text-lg text-bone mb-2">{it.title}</h3>
-                <p className="text-sm text-bone/60 leading-relaxed">{it.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- WHY BWF ---------- */
-
-function Why() {
-  return (
-    <section
-      id="why"
-      className="relative bg-black/40 backdrop-blur-sm border-b border-blood/20 overflow-hidden"
-    >
-      <div
-        className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl"
-        style={{ backgroundColor: "var(--blood)" }}
-      />
-      <div className="relative max-w-5xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
-        <Reveal>
-          <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Why BWF</span>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <h2 className="mt-6 font-display text-4xl md:text-7xl uppercase text-bone leading-[0.95]">
-            We don't make content.
-            <br />
-            <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
-              We build visibility systems.
-            </span>
-          </h2>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="mt-8 max-w-2xl mx-auto text-bone/70 text-lg leading-relaxed">
-            One shoot becomes a full content cycle across YouTube, TikTok, Instagram, and Shorts. Designed to compound,
-            not disappear.
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- AUDIENCE ---------- */
-
-function Audience() {
-  const regions = [
-    { country: "United States", pct: 38 },
-    { country: "United Kingdom", pct: 17 },
-    { country: "India", pct: 14 },
-    { country: "Germany", pct: 9 },
-    { country: "Canada", pct: 7 },
-    { country: "Rest of World", pct: 15 },
-  ];
-  return (
-    <section id="audience" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32 grid lg:grid-cols-2 gap-16 items-center">
-        <Reveal>
-          <SectionHead
-            kicker="Global Audience"
-            title="Built for Global Reach. Not Local Exposure."
-            sub="Our audience spans continents. When we publish, the world watches."
-          />
-          <div className="inline-flex items-center gap-2 text-bone/70">
-            <Globe size={18} className="text-blood" />
-            <span className="font-cond tracking-[0.25em] text-xs uppercase">Active in 90+ countries</span>
-          </div>
-        </Reveal>
-        <Reveal delay={0.15}>
-          <div className="space-y-5">
-            {regions.map((r, i) => (
-              <div key={r.country}>
-                <div className="flex justify-between items-baseline mb-2">
-                  <span className="font-cond tracking-[0.15em] text-sm uppercase text-bone">{r.country}</span>
-                  <span className="font-display text-xl text-blood">{r.pct}%</span>
-                </div>
-                <div className="h-1 bg-white/10 overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${r.pct * 2.5}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                    className="h-full"
-                    style={{ background: "var(--gradient-blood)" }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- CONTENT SYSTEM ---------- */
-
-function ContentSystem() {
-  const steps = [
-    { n: "01", t: "Shoot", d: "One premium production day." },
-    { n: "02", t: "Edit", d: "Hero piece crafted for retention." },
-    { n: "03", t: "Clip", d: "Cut into vertical assets per platform." },
-    { n: "04", t: "Distribute", d: "Pushed across YouTube, TikTok, IG, Shorts." },
-    { n: "05", t: "Repeat", d: "Compound. Optimize. Scale." },
-  ];
-  return (
-    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-        <Reveal>
-          <SectionHead
-            kicker="The System"
-            title="One Shoot. Multiple Viral Assets."
-            sub="A content engine, not a one-off campaign."
-          />
-        </Reveal>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-white/10 border border-white/10">
-          {steps.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.06}>
-              <div className="h-full p-6 md:p-8 bg-black hover:bg-white/[0.03] transition-colors">
-                <div className="font-display text-3xl text-blood mb-3">{s.n}</div>
-                <div className="font-cond font-bold tracking-[0.2em] text-sm uppercase text-bone">{s.t}</div>
-                <div className="text-sm text-bone/55 mt-2 leading-relaxed">{s.d}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- PRICING ---------- */
-
-function Pricing() {
-  const plans = [
-    {
-      name: "Basic",
-      price: "$400–$600",
-      popular: false,
-      features: ["1 hour shoot", "1 hero edit", "3 vertical clips", "Single platform release"],
-    },
-    {
-      name: "Standard",
-      price: "$700–$1,000",
-      popular: true,
-      features: ["2 hour shoot", "1 hero edit", "6 vertical clips", "Multi-platform release", "Thumbnail design"],
-    },
-    {
-      name: "Premium",
-      price: "$1,200–$2,000",
-      popular: false,
-      features: [
-        "Half-day shoot",
-        "Cinematic hero edit",
-        "10+ vertical clips",
-        "Full distribution push",
-        "Performance report",
-      ],
-    },
-    {
-      name: "Flagship",
-      price: "$1,500–$3,000",
-      popular: false,
-      features: [
-        "Full-day production",
-        "Director-led shoot",
-        "15+ assets",
-        "Featured BWF placement",
-        "Strategy session",
-      ],
-    },
-  ];
-  return (
-    <section id="pricing" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-        <Reveal>
-          <SectionHead
-            kicker="Packages"
-            title="Pick Your Tier. Go Viral."
-            sub="Transparent pricing. No retainers. Production starts within 14 days of booking."
-          />
-        </Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {plans.map((p, i) => (
-            <Reveal key={p.name} delay={i * 0.06}>
-              <div
-                className={`relative h-full flex flex-col p-7 border backdrop-blur-md transition-all duration-300 ${
-                  p.popular
-                    ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(139,92,246,0.5)]"
-                    : "bg-white/[0.03] border-white/10 hover:border-white/30"
-                }`}
-              >
-                {p.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blood text-white font-cond font-bold tracking-[0.2em] text-[10px] uppercase">
-                    Most Popular
-                  </div>
-                )}
-                <div className="font-cond font-bold tracking-[0.25em] text-xs uppercase text-bone/60">{p.name}</div>
-                <div className="mt-3 font-display text-3xl md:text-4xl text-bone">{p.price}</div>
-                <ul className="mt-6 space-y-3 flex-1">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-bone/75">
-                      <Check size={14} className="text-blood mt-0.5 shrink-0" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href="#book"
-                  className={`mt-7 inline-flex items-center justify-center px-5 py-3 font-cond font-bold tracking-[0.2em] text-[11px] uppercase transition-colors ${
-                    p.popular
-                      ? "bg-blood text-white hover:bg-blood-glow"
-                      : "border border-white/20 text-bone hover:bg-white/10"
-                  }`}
-                >
-                  Book {p.name}
-                </a>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- PODCAST ---------- */
-
-function Podcast() {
-  return (
-    <section className="bg-black/40 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-28 grid md:grid-cols-2 gap-12 items-center">
-        <Reveal>
-          <div className="flex items-center gap-3 mb-5">
-            <span className="block h-px w-10 bg-blood" />
-            <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Podcast</span>
-          </div>
-          <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">BWF Red Mic</h2>
-          <p className="mt-5 text-bone/65 text-lg leading-relaxed max-w-md">
-            Unfiltered conversations with the artists shaping culture. Streaming on iHeart and everywhere you listen.
-          </p>
-          <a
-            href="https://www.iheart.com"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-7 inline-flex items-center gap-2 px-6 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
-          >
-            <Play size={14} fill="currentColor" />
-            Listen on iHeart
-          </a>
-        </Reveal>
-        <Reveal delay={0.15}>
-          <div className="relative aspect-square max-w-md mx-auto">
-            <div className="absolute inset-0 bg-gradient-to-br from-blood/40 to-transparent blur-2xl" />
-            <div className="relative h-full flex flex-col items-center justify-center bg-black border border-blood/30 backdrop-blur-md">
-              <div className="w-24 h-24 rounded-full bg-blood/20 border border-blood flex items-center justify-center mb-5">
-                <Mic size={40} className="text-blood" />
-              </div>
-              <div className="font-display text-3xl text-bone uppercase">Red Mic</div>
-              <div className="font-cond tracking-[0.3em] text-[11px] uppercase text-bone/50 mt-2">A BWF Production</div>
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- PARTNERSHIPS ---------- */
-
-function Partnerships() {
-  const items = [
-    { icon: Share2, t: "Content Licensing", d: "License our viral catalog for brand campaigns and platform deals." },
-    { icon: TrendingUp, t: "Distribution Deals", d: "Plug into our network and reach 686M+ views with your IP." },
-    { icon: DollarSign, t: "Strategic Investment", d: "Partner with BWF on the next era of culture media." },
-  ];
-  return (
-    <section id="partner" className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-        <Reveal>
-          <SectionHead kicker="Partnerships" title="Work With BWF." />
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {items.map((it, i) => (
-            <Reveal key={it.t} delay={i * 0.08}>
-              <div className="group h-full p-8 bg-white/[0.03] border border-white/10 backdrop-blur-md hover:border-blood/60 transition-all duration-300">
-                <div className="w-12 h-12 flex items-center justify-center bg-blood/10 border border-blood/30 mb-6 group-hover:bg-blood transition-colors">
-                  <it.icon size={22} className="text-blood group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="font-cond font-bold tracking-[0.15em] uppercase text-xl text-bone mb-3">{it.t}</h3>
-                <p className="text-sm text-bone/60 leading-relaxed">{it.d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- FINAL CTA ---------- */
-
-function FinalCTA() {
-  return (
-    <section id="book" className="relative bg-black/30 backdrop-blur-sm overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/80 to-black" />
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{ background: "radial-gradient(50% 50% at 50% 50%, rgba(139,92,246,0.4), transparent 70%)" }}
+        style={{ background: "radial-gradient(60% 50% at 50% 30%, rgba(225,29,42,0.35), transparent 70%)" }}
       />
-      <div className="relative max-w-4xl mx-auto px-6 md:px-12 py-28 md:py-40 text-center">
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-[1fr_360px] gap-8">
+        {/* Left: marquee hero card */}
+        <div className="relative rounded-2xl overflow-hidden border border-blood/30 bg-black/40 backdrop-blur-md min-h-[420px] md:min-h-[480px] flex flex-col justify-end p-6 md:p-10">
+          <div
+            className="absolute inset-0 -z-10"
+            style={{
+              backgroundImage: feature?.thumbnailUrl
+                ? `linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%), url(${feature.thumbnailUrl})`
+                : "linear-gradient(135deg, rgba(225,29,42,0.18), rgba(0,0,0,0.6))",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-5">
+            <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+            <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
+              {feature ? "Live Now" : "BWF Network"}
+            </span>
+          </div>
+          {feature ? (
+            <>
+              <p className="font-cond tracking-[0.3em] text-[11px] uppercase text-blood mb-3">Live in Play Arena</p>
+              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9] uppercase text-bone">
+                {feature.host?.stage_name || feature.host?.display_name || feature.title}
+                <br />
+                <span className="inline-flex items-center gap-3">
+                  Live
+                  <span className="h-3 w-3 rounded-full bg-blood animate-pulse" />
+                </span>
+              </h1>
+              <p className="mt-5 max-w-xl text-bone/75 text-sm md:text-base">
+                {feature.title || "Watch the exclusive live session happening right now."}
+              </p>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <RouterLink
+                  to="/play/$room"
+                  params={{ room: feature.roomName }}
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
+                >
+                  <Play size={14} fill="currentColor" /> Watch Live
+                </RouterLink>
+                <RouterLink
+                  to="/live"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/25 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
+                >
+                  View Details
+                </RouterLink>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9] uppercase text-bone">
+                Where Culture
+                <br />
+                <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
+                  Goes Live
+                </span>
+              </h1>
+              <p className="mt-5 max-w-xl text-bone/75 text-sm md:text-base">
+                Music. Streams. Reviews. The home stage for the next wave of artists.
+              </p>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <RouterLink
+                  to="/studio"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
+                >
+                  <Camera size={14} /> Book a Shoot
+                </RouterLink>
+                <RouterLink
+                  to="/off-the-block"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-blood/40 bg-blood/10 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors rounded-md"
+                >
+                  Off Da Block <ArrowRight size={14} />
+                </RouterLink>
+                <RouterLink
+                  to="/live-review"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
+                >
+                  <Mic size={14} /> Live Review
+                </RouterLink>
+              </div>
+            </>
+          )}
+
+          {feature && (
+            <div className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-black/70 backdrop-blur px-3 py-1.5 border border-white/10">
+              <span className="h-1.5 w-1.5 rounded-full bg-blood animate-pulse" />
+              <span className="font-cond text-[11px] uppercase tracking-widest text-bone/80">LIVE</span>
+              <span className="text-[11px] text-bone/60 inline-flex items-center gap-1">
+                <Eye size={11} /> {feature.viewerCount.toLocaleString()} watching
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Right: live activity rail */}
+        <aside className="space-y-6">
+          <div className="rounded-2xl border border-white/10 bg-[#0d0d18]/90 backdrop-blur p-5">
+            <h3 className="font-bold text-bone mb-4">Live Activity</h3>
+            {liveStreams.length === 0 ? (
+              <EmptyHint icon={Radio} text="Nothing live right now. Check back soon." />
+            ) : (
+              <div className="space-y-3">
+                {liveStreams.slice(0, 3).map((s) => (
+                  <RouterLink
+                    key={s.id}
+                    to="/play/$room"
+                    params={{ room: s.roomName }}
+                    className="group flex items-center gap-3 p-2.5 rounded-lg border border-white/5 hover:border-blood/40 hover:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="inline-flex items-center gap-1.5 rounded bg-blood px-2 py-0.5 text-[10px] font-bold tracking-widest text-white">
+                      LIVE
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold text-bone group-hover:text-blood-glow">
+                        {s.title || "Live session"}
+                      </div>
+                      <div className="truncate text-[11px] text-bone/50">
+                        {s.host?.stage_name || s.host?.display_name || "BWF host"}
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-bone/60 inline-flex items-center gap-1">
+                      <Eye size={11} /> {s.viewerCount}
+                    </span>
+                  </RouterLink>
+                ))}
+              </div>
+            )}
+            <RouterLink
+              to="/live"
+              className="mt-5 block w-full text-center rounded-md bg-blood text-white font-cond font-bold tracking-[0.2em] text-[11px] uppercase py-3 hover:bg-blood-glow transition-colors"
+            >
+              {liveStreams.length ? "Join Live Session" : "Browse Live Shows"}
+            </RouterLink>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0d0d18]/90 backdrop-blur p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-bone">Quick Actions</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <QuickLink to="/studio" icon={Camera} label="Book a Shoot" />
+              <QuickLink to="/off-the-block" icon={Star} label="Off Da Block" />
+              <QuickLink to="/live-review" icon={Mic} label="Live Review" />
+              <QuickLink to="/artists" icon={Headphones} label="Artists" />
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function QuickLink({ to, icon: Icon, label }: { to: string; icon: any; label: string }) {
+  return (
+    <RouterLink
+      to={to}
+      className="group flex flex-col items-start gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-3 hover:border-blood/50 hover:bg-blood/5 transition-colors"
+    >
+      <Icon size={16} className="text-blood" />
+      <span className="font-cond font-bold tracking-[0.2em] text-[10px] uppercase text-bone/80 group-hover:text-bone">
+        {label}
+      </span>
+    </RouterLink>
+  );
+}
+
+/* ---------- SPOTLIGHT (Featured Artists) ---------- */
+
+function Spotlight({ artists }: { artists: any[] }) {
+  return (
+    <section className="bg-black/40 border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-24">
         <Reveal>
-          <h2 className="font-display text-5xl md:text-8xl uppercase text-bone leading-[0.95]">
-            Ready to{" "}
+          <SectionHead
+            kicker="Spotlight"
+            title="Rising Voices. Real Stories."
+            sub="Discover the independent artists shaping the culture."
+          />
+        </Reveal>
+
+        {artists.length === 0 ? (
+          <EmptyHint
+            icon={Sparkles}
+            text="No featured artists yet. Join the network to claim your spotlight."
+          />
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {artists.map((a, i) => (
+              <Reveal key={a.id} delay={i * 0.05}>
+                <RouterLink
+                  to="/artist/$id"
+                  params={{ id: a.id }}
+                  className="group block relative rounded-2xl overflow-hidden border border-white/10 bg-[#0d0d18] hover:border-blood/50 transition-colors"
+                >
+                  <div
+                    className="aspect-[4/5] w-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: a.avatar_url
+                        ? `url(${a.avatar_url})`
+                        : "linear-gradient(135deg, #2a0a10, #0d0d18)",
+                    }}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black via-black/80 to-transparent">
+                    <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-blood mb-1">Featured Artist</div>
+                    <h3 className="font-display text-2xl uppercase text-bone leading-tight">
+                      {a.stage_name || a.display_name || "Artist"}
+                    </h3>
+                    {a.bio && (
+                      <p className="mt-2 text-bone/70 text-sm line-clamp-2">{a.bio}</p>
+                    )}
+                    <div className="mt-4 inline-flex items-center gap-1.5 text-blood text-xs font-bold tracking-widest uppercase group-hover:gap-3 transition-all">
+                      View Artist <ChevronRight size={14} />
+                    </div>
+                  </div>
+                </RouterLink>
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- LIVE REVIEW PLANS ---------- */
+
+function Plans() {
+  return (
+    <section className="bg-black border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-24">
+        <Reveal>
+          <SectionHead
+            kicker="Choose Your Plan"
+            title="Submit. Get Seen. Grow Your Career."
+            sub="Get your music in front of the BWF audience — pick the tier that fits your push."
+          />
+        </Reveal>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {LIVE_TIER_LIST.map((tier, i) => {
+            const highlight = tier.highlight;
+            return (
+              <Reveal key={tier.id} delay={i * 0.06}>
+                <div
+                  className={`relative h-full flex flex-col rounded-2xl p-6 border backdrop-blur-md transition-all ${
+                    highlight
+                      ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(225,29,42,0.5)]"
+                      : "bg-white/[0.03] border-white/10 hover:border-white/25"
+                  }`}
+                >
+                  {tier.badge && (
+                    <div className="absolute -top-3 right-5 px-3 py-1 bg-blood text-white font-cond font-bold tracking-[0.2em] text-[10px] uppercase rounded">
+                      {tier.badge}
+                    </div>
+                  )}
+                  <div className="w-12 h-12 rounded-full bg-blood/15 border border-blood/40 grid place-items-center mb-4">
+                    {highlight ? <Star size={20} className="text-blood" fill="currentColor" /> : <Mic size={20} className="text-blood" />}
+                  </div>
+                  <h3 className="font-cond font-bold tracking-[0.2em] text-sm uppercase text-bone">{tier.name}</h3>
+                  <div className="mt-2 font-display text-3xl text-bone">
+                    ${(tier.amountCents / 100).toFixed(2)}
+                  </div>
+                  <p className="mt-1 text-xs text-bone/60">{tier.tagline}</p>
+                  <ul className="mt-5 space-y-2.5 flex-1">
+                    {tier.perks.map((p) => (
+                      <li key={p} className="flex items-start gap-2 text-sm text-bone/80">
+                        <Check size={14} className="text-blood mt-0.5 shrink-0" />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <RouterLink
+                    to="/live-review"
+                    className={`mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md font-cond font-bold tracking-[0.2em] text-[11px] uppercase transition-colors ${
+                      highlight
+                        ? "bg-blood text-white hover:bg-blood-glow"
+                        : "border border-white/25 text-bone hover:bg-white/10"
+                    }`}
+                  >
+                    Choose Plan <ArrowRight size={13} />
+                  </RouterLink>
+                </div>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- MUSIC VIDEOS ---------- */
+
+function VideosRow({ videos }: { videos: any[] }) {
+  return (
+    <section className="bg-black/40 border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-24">
+        <div className="flex items-end justify-between mb-8">
+          <Reveal>
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="block h-px w-10 bg-blood" />
+                <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Music Videos</span>
+              </div>
+              <h2 className="font-display text-3xl md:text-5xl uppercase text-bone leading-[0.95]">
+                Watch. Discover. Support.
+              </h2>
+            </div>
+          </Reveal>
+          <RouterLink to="/videos" className="hidden md:inline-flex items-center gap-1 text-blood text-sm font-bold tracking-widest uppercase hover:gap-2 transition-all">
+            View All <ChevronRight size={14} />
+          </RouterLink>
+        </div>
+
+        {videos.length === 0 ? (
+          <EmptyHint icon={PlayCircle} text="No music videos uploaded yet." />
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {videos.map((v) => (
+              <RouterLink
+                key={v.id}
+                to="/videos/$id"
+                params={{ id: v.id }}
+                className="group block rounded-xl overflow-hidden border border-white/10 bg-[#0d0d18] hover:border-blood/40 transition-colors"
+              >
+                <div
+                  className="aspect-video w-full bg-cover bg-center relative"
+                  style={{
+                    backgroundImage: v.thumbnailUrl
+                      ? `url(${v.thumbnailUrl})`
+                      : "linear-gradient(135deg, #2a0a10, #0d0d18)",
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors grid place-items-center">
+                    <div className="w-12 h-12 rounded-full bg-blood/90 grid place-items-center group-hover:scale-110 transition-transform">
+                      <Play size={18} className="text-white ml-0.5" fill="currentColor" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <div className="font-semibold text-bone text-sm truncate">{v.title}</div>
+                  <div className="text-[11px] text-bone/50 truncate uppercase tracking-widest font-cond">
+                    {v.artist || "BWF Artist"}
+                  </div>
+                </div>
+              </RouterLink>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- BOOK A SHOOT CTA ---------- */
+
+function BookShoot() {
+  return (
+    <section id="book" className="bg-black border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-24 grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
+        <Reveal>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="block h-px w-10 bg-blood" />
+            <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">Studio</span>
+          </div>
+          <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">
+            Book a Shoot.
+            <br />
             <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
-              Go Viral?
+              Make the Moment Travel.
             </span>
           </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mt-6 text-bone/70 text-lg max-w-xl mx-auto">The audience is real. The opportunity is now.</p>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <p className="mt-5 text-bone/70 max-w-xl">
+            Interviews, music videos, viral clips — production engineered for the algorithm. One shoot, dozens of assets,
+            pushed across every major platform.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
             <RouterLink
               to="/studio"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
             >
-              Book a Shoot
-              <ArrowRight size={16} />
+              <Calendar size={14} /> Book a Shoot
             </RouterLink>
             <RouterLink
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 bg-white/5 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
             >
-              Contact Us
+              Talk to the Team
             </RouterLink>
-            <RouterLink
-              to="/off-the-block"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-blood/40 bg-blood/10 backdrop-blur-md text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors"
-            >
-              Off The Block
-              <ArrowRight size={16} />
-            </RouterLink>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.15}>
+          <div className="relative rounded-2xl overflow-hidden border border-blood/30 aspect-[4/3]">
+            <video
+              src={heroRapperVideo.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+            <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
+              <div>
+                <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-blood">By Appointment</div>
+                <div className="font-display text-2xl uppercase text-bone">BWF Studio</div>
+              </div>
+              <RouterLink
+                to="/studio"
+                className="inline-flex items-center gap-1 px-3 py-2 bg-blood text-white text-[11px] font-bold tracking-widest uppercase rounded hover:bg-blood-glow"
+              >
+                Book <ArrowRight size={12} />
+              </RouterLink>
+            </div>
           </div>
         </Reveal>
       </div>
@@ -623,111 +531,126 @@ function FinalCTA() {
   );
 }
 
-/* ---------- FOOTER ---------- */
+/* ---------- SOCIAL STRIP ---------- */
 
+const SOCIALS = [
+  { href: "https://youtube.com/@bwfmedia", label: "YouTube", Icon: Youtube },
+  { href: "https://instagram.com/bwfmediatv", label: "Instagram", Icon: Instagram },
+  { href: "https://tiktok.com/@bwfmediatv", label: "TikTok", Icon: Music2 },
+  { href: "https://x.com/bwfmediatv", label: "X / Twitter", Icon: Twitter },
+  { href: "https://facebook.com/bwfmediatv", label: "Facebook", Icon: Facebook },
+];
 
-import { CartButton } from "@/components/CartDrawer";
-import { Link } from "@tanstack/react-router";
+function FollowStrip() {
+  return (
+    <section className="border-t border-blood/20 bg-gradient-to-b from-black to-[#0a0405]">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-14 grid md:grid-cols-[1fr_auto] items-center gap-6">
+        <div>
+          <div className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood mb-2">Follow BWF</div>
+          <h3 className="font-display text-3xl md:text-4xl uppercase text-bone leading-tight">
+            686M+ Views. 329K+ Subscribers. The culture is here.
+          </h3>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {SOCIALS.map(({ href, label, Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={label}
+              className="w-11 h-11 grid place-items-center rounded-md border border-white/15 text-bone/80 hover:bg-blood hover:border-blood hover:text-white transition-colors"
+            >
+              <Icon size={18} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- BE PART OF THE MOVEMENT ---------- */
+
+function MovementCTA() {
+  return (
+    <section className="relative overflow-hidden border-t border-white/5">
+      <div
+        className="absolute inset-0 opacity-50 pointer-events-none"
+        style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(225,29,42,0.35), transparent 70%)" }}
+      />
+      <div className="relative max-w-4xl mx-auto px-6 md:px-12 py-20 md:py-28 text-center">
+        <Reveal>
+          <h2 className="font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">
+            Be Part of the Movement
+          </h2>
+          <p className="mt-5 text-bone/70 text-base md:text-lg">
+            Join as an artist or a listener and help elevate the culture.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <RouterLink
+              to="/signup"
+              className="inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
+            >
+              <Mic size={14} /> Join as an Artist
+            </RouterLink>
+            <RouterLink
+              to="/signup"
+              className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
+            >
+              <Headphones size={14} /> Join as a Listener
+            </RouterLink>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
 /* ---------- ROOT ---------- */
 
 export function OnePager() {
+  const fetchHomepage = useServerFn(getHomepageData);
+  const { data } = useQuery({
+    queryKey: ["homepage"],
+    queryFn: () => fetchHomepage(),
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+
+  const liveStreams = data?.liveStreams ?? [];
+  const featuredArtists = data?.featuredArtists ?? [];
+  const videos = data?.videos ?? [];
+
   return (
     <div
       className="relative min-h-screen text-bone antialiased overflow-hidden"
       style={{
-        backgroundColor: "#000000",
+        backgroundColor: "#050505",
         backgroundImage: [
-          "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(139,92,246,0.18), transparent 60%)",
-          "radial-gradient(ellipse 60% 50% at 90% 100%, rgba(139,92,246,0.12), transparent 60%)",
-          "linear-gradient(180deg, #000 0%, #060000 50%, #000 100%)",
+          "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(225,29,42,0.18), transparent 60%)",
+          "radial-gradient(ellipse 60% 50% at 90% 100%, rgba(225,29,42,0.10), transparent 60%)",
+          "linear-gradient(180deg, #050505 0%, #0a0203 50%, #050505 100%)",
         ].join(","),
       }}
     >
-      {/* Fixed futuristic grid */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.12] z-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(139,92,246,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.45) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage:
-            "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 85%)",
-        }}
-      />
-      {/* Roving scan line */}
-      <motion.div
-        className="fixed left-0 right-0 h-[2px] pointer-events-none z-0"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(167,139,250,0.9), transparent)",
-          boxShadow: "0 0 24px rgba(139,92,246,0.8)",
-        }}
-        initial={{ top: "0%" }}
-        animate={{ top: ["0%", "100%", "0%"] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
-      />
-      {/* CRT scanlines */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.05] z-0"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, transparent 0, transparent 2px, #fff 3px, transparent 4px)",
-        }}
-      />
-      {/* Glow blobs */}
-      <div
-        className="fixed -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-25 blur-3xl pointer-events-none z-0"
-        style={{ backgroundColor: "rgba(139,92,246,0.7)" }}
-      />
-      <div
-        className="fixed -bottom-40 -right-40 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none z-0"
-        style={{ backgroundColor: "rgba(139,92,246,0.6)" }}
-      />
-
       <div className="relative z-10">
         <ScrollProgress />
         <div className="flex justify-end pt-20 md:pt-24 pb-2 px-6 md:px-12 max-w-7xl mx-auto">
           <CartButton className="relative top-auto right-auto" />
         </div>
-        <Hero />
-        <FeaturedVideo />
-        <ProofStrip />
-        <Services />
-        <Why />
-        <Audience />
-        <section className="bg-black/30 backdrop-blur-sm border-b border-blood/20">
-          <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28 text-center">
-            <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">By The Numbers</span>
-            <h2 className="mt-4 font-display text-4xl md:text-6xl uppercase text-bone leading-[0.95]">
-              See Our Growth Dashboard
-            </h2>
-            <p className="mt-5 max-w-2xl mx-auto text-bone/60 text-base md:text-lg leading-relaxed">
-              Live platform stats, audience reach, and partner network — all in one place.
-            </p>
-            <Link
-              to="/dashboard"
-              className="mt-8 inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors"
-            >
-              Open Dashboard
-            </Link>
-          </div>
-        </section>
-        <ContentSystem />
-        <Podcast />
-        <Partnerships />
-        <FinalCTA />
+        <Hero liveStreams={liveStreams} />
+        <Spotlight artists={featuredArtists} />
+        <Plans />
+        <VideosRow videos={videos} />
+        <BookShoot />
+        <FollowStrip />
+        <MovementCTA />
       </div>
 
-      {/* Bottom accent strip */}
       <div
         className="relative h-[2px] z-20"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(139,92,246,0.9), transparent)",
-        }}
+        style={{ background: "linear-gradient(90deg, transparent, rgba(225,29,42,0.9), transparent)" }}
       />
     </div>
   );
