@@ -65,6 +65,7 @@ import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
+import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
@@ -82,6 +83,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify/webhook'
 import { Route as ApiPublicShopifyInstallRouteImport } from './routes/api/public/shopify/install'
 import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify/callback'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -366,6 +368,11 @@ const AdminOpsRoute = AdminOpsRouteImport.update({
   path: '/admin/ops',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMerchRoute = AdminMerchRouteImport.update({
+  id: '/admin/merch',
+  path: '/admin/merch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -455,6 +462,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicShopifyWebhookRoute = ApiPublicShopifyWebhookRouteImport.update({
+  id: '/api/public/shopify/webhook',
+  path: '/api/public/shopify/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicShopifyInstallRoute = ApiPublicShopifyInstallRouteImport.update({
   id: '/api/public/shopify/install',
   path: '/api/public/shopify/install',
@@ -508,6 +520,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/merch': typeof AdminMerchRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -545,6 +558,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
+  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -586,6 +600,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/merch': typeof AdminMerchRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -623,6 +638,7 @@ export interface FileRoutesByTo {
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
+  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -665,6 +681,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/merch': typeof AdminMerchRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -702,6 +719,7 @@ export interface FileRoutesById {
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
+  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -745,6 +763,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/merch'
     | '/admin/ops'
     | '/admin/streams'
     | '/admin/users'
@@ -782,6 +801,7 @@ export interface FileRouteTypes {
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
+    | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -823,6 +843,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/merch'
     | '/admin/ops'
     | '/admin/streams'
     | '/admin/users'
@@ -860,6 +881,7 @@ export interface FileRouteTypes {
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
+    | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -901,6 +923,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/live-queue'
     | '/admin/login'
+    | '/admin/merch'
     | '/admin/ops'
     | '/admin/streams'
     | '/admin/users'
@@ -938,6 +961,7 @@ export interface FileRouteTypes {
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
+    | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -980,6 +1004,7 @@ export interface RootRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMerchRoute: typeof AdminMerchRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -1003,6 +1028,7 @@ export interface RootRouteChildren {
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
   ApiPublicShopifyInstallRoute: typeof ApiPublicShopifyInstallRoute
+  ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1404,6 +1430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOpsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/merch': {
+      id: '/admin/merch'
+      path: '/admin/merch'
+      fullPath: '/admin/merch'
+      preLoaderRoute: typeof AdminMerchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -1523,6 +1556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shopify/webhook': {
+      id: '/api/public/shopify/webhook'
+      path: '/api/public/shopify/webhook'
+      fullPath: '/api/public/shopify/webhook'
+      preLoaderRoute: typeof ApiPublicShopifyWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/shopify/install': {
       id: '/api/public/shopify/install'
       path: '/api/public/shopify/install'
@@ -1639,6 +1679,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMerchRoute: AdminMerchRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminStreamsRoute: AdminStreamsRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -1663,6 +1704,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
   ApiPublicShopifyInstallRoute: ApiPublicShopifyInstallRoute,
+  ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { useEffect, useMemo, useState } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
@@ -113,6 +114,7 @@ function ArtistProfilePage() {
           </div>
           <Albums />
           <MusicVideos />
+          <ArtistMerchSection userId={id} />
           <UpcomingEvents />
         </div>
         <aside className="space-y-4">
@@ -121,7 +123,6 @@ function ArtistProfilePage() {
           <Membership />
           <ArtistDashboard />
           <BookConnect />
-          <MerchStore />
           <SocialFeed name={artist.name} handle={artist.handle} />
         </aside>
       </main>
