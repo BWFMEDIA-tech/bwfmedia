@@ -6,8 +6,13 @@ export const Route = createFileRoute("/artists")({
   head: () => ({
     meta: [
       { title: "Artists — BWF Network" },
-      { name: "description", content: "Browse and connect with BWF Network artists." },
+      { name: "description", content: "Discover independent artists on BWF Network — browse profiles, stream music, watch live sets, and connect with the creators shaping the next wave of culture." },
+      { property: "og:title", content: "Artists — BWF Network" },
+      { property: "og:description", content: "Discover independent artists on BWF Network — browse profiles, stream music, watch live sets, and connect with the creators shaping the next wave of culture." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfnetwork.com/artists" },
     ],
+    links: [{ rel: "canonical", href: "https://bwfnetwork.com/artists" }],
   }),
   component: () => (
     <StudioStub
