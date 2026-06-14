@@ -154,7 +154,12 @@ function VideosPage() {
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) { v.play(); setPlaying(true); } else { v.pause(); setPlaying(false); }
+    if (v.paused) {
+      v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
   };
 
   return (
@@ -299,6 +304,8 @@ function VideosPage() {
                   src={publicUrl(hero.storage_path)}
                   poster=""
                   preload="metadata"
+                  playsInline
+                  controls={playing}
                   onPlay={() => setPlaying(true)}
                   onPause={() => setPlaying(false)}
                   className="w-full h-full object-cover"
