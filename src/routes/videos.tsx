@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Trash2, Upload, LogIn, LogOut, Megaphone,
+  Upload, LogIn, LogOut,
   Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
   Bell, MessageSquare, Search, ChevronDown, BadgeCheck,
   PlayCircle, Sparkles, Flame, Star, Eye, Award, Music2,
