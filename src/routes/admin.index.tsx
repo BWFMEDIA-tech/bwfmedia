@@ -46,7 +46,7 @@ function Dashboard() {
             <EmptyState icon={Radio} title="No streams yet" hint="Streams will appear here as hosts go live." />
           ) : (
             <div className="divide-y divide-white/5">
-              {data.topShows.map((s, i) => (
+              {data.topShows.map((s: any, i: number) => (
                 <Link key={s.id} to="/admin/streams" className="flex items-center gap-3 py-3 hover:bg-white/[0.02]">
                   <span className="w-5 text-center text-xs text-white/40">{i + 1}</span>
                   <Avatar url={s.host?.avatar_url} name={s.host?.display_name || s.title} />
@@ -75,7 +75,7 @@ function Dashboard() {
             <EmptyState icon={Activity} title="No activity yet" />
           ) : (
             <div className="space-y-3">
-              {data.recentActivity.map((a, i) => (
+              {data.recentActivity.map((a: any, i: number) => (
                 <div key={i} className="flex items-start gap-3 text-sm">
                   <div className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-400" />
                   <div className="min-w-0 flex-1">
@@ -100,7 +100,7 @@ function Dashboard() {
             <EmptyState icon={Users} title="No artists yet" hint="Users with the artist role will rank here." />
           ) : (
             <div className="divide-y divide-white/5">
-              {data.topArtists.map((a, i) => (
+              {data.topArtists.map((a: any, i: number) => (
                 <Link key={a.id} to="/artist/$id" params={{ id: a.id }} className="flex items-center gap-3 py-3 hover:bg-white/[0.02]">
                   <span className="w-5 text-center text-xs text-white/40">{i + 1}</span>
                   <Avatar url={a.profile?.avatar_url} name={a.profile?.display_name || "?"} />
