@@ -186,7 +186,14 @@ function VideosPage() {
       playAfterLoadRef.current = false;
       v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
     }
-  }, [hero?.id, muted, volume]);
+  }, [hero?.id]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.volume = volume;
+    v.muted = muted;
+  }, [muted, volume]);
 
   const togglePlay = () => {
     const v = videoRef.current;
