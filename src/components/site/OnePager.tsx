@@ -1,26 +1,30 @@
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { Link as RouterLink } from "@tanstack/react-router";
 import {
   Play,
   Mic,
-  Film,
-  Scissors,
-  Camera,
-  Share2,
-  Globe,
-  TrendingUp,
-  DollarSign,
   ArrowRight,
   Check,
+  Radio,
+  Eye,
+  Music,
+  Headphones,
+  Star,
+  Sparkles,
   Youtube,
   Instagram,
-  Facebook,
   Twitter,
-  Music2,
-  Linkedin,
+  Facebook,
+  Music2 as TiktokIcon,
+  Calendar,
+  PlayCircle,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import { getHomepageData } from "@/lib/homepage.functions";
+import { LIVE_TIER_LIST } from "@/lib/live-review-tiers";
+import { CartButton } from "@/components/CartDrawer";
 
 /* ---------- shared ---------- */
 
