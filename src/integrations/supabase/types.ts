@@ -447,6 +447,195 @@ export type Database = {
         }
         Relationships: []
       }
+      merch_commissions: {
+        Row: {
+          artist_tier: string
+          commission_cents: number
+          commission_rate: number
+          created_at: string
+          currency: string | null
+          id: string
+          order_number: string | null
+          order_total_cents: number
+          shopify_order_id: number
+          status: string
+          store_id: string | null
+          user_id: string
+        }
+        Insert: {
+          artist_tier?: string
+          commission_cents: number
+          commission_rate: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          order_number?: string | null
+          order_total_cents: number
+          shopify_order_id: number
+          status?: string
+          store_id?: string | null
+          user_id: string
+        }
+        Update: {
+          artist_tier?: string
+          commission_cents?: number
+          commission_rate?: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          order_number?: string | null
+          order_total_cents?: number
+          shopify_order_id?: number
+          status?: string
+          store_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merch_commissions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merch_products: {
+        Row: {
+          created_at: string
+          currency: string | null
+          description: string | null
+          handle: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          is_published: boolean
+          max_price_cents: number | null
+          min_price_cents: number | null
+          product_type: string | null
+          shopify_product_id: number
+          status: string | null
+          store_id: string
+          tags: string[] | null
+          title: string
+          total_inventory: number | null
+          updated_at: string
+          user_id: string
+          vendor: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          handle?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          is_published?: boolean
+          max_price_cents?: number | null
+          min_price_cents?: number | null
+          product_type?: string | null
+          shopify_product_id: number
+          status?: string | null
+          store_id: string
+          tags?: string[] | null
+          title: string
+          total_inventory?: number | null
+          updated_at?: string
+          user_id: string
+          vendor?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          handle?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          is_published?: boolean
+          max_price_cents?: number | null
+          min_price_cents?: number | null
+          product_type?: string | null
+          shopify_product_id?: number
+          status?: string | null
+          store_id?: string
+          tags?: string[] | null
+          title?: string
+          total_inventory?: number | null
+          updated_at?: string
+          user_id?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merch_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merch_variants: {
+        Row: {
+          available: boolean
+          compare_at_price_cents: number | null
+          created_at: string
+          id: string
+          image_url: string | null
+          inventory_quantity: number | null
+          option1: string | null
+          option2: string | null
+          option3: string | null
+          price_cents: number
+          product_id: string
+          shopify_variant_id: number
+          sku: string | null
+          title: string | null
+        }
+        Insert: {
+          available?: boolean
+          compare_at_price_cents?: number | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          inventory_quantity?: number | null
+          option1?: string | null
+          option2?: string | null
+          option3?: string | null
+          price_cents: number
+          product_id: string
+          shopify_variant_id: number
+          sku?: string | null
+          title?: string | null
+        }
+        Update: {
+          available?: boolean
+          compare_at_price_cents?: number | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          inventory_quantity?: number | null
+          option1?: string | null
+          option2?: string | null
+          option3?: string | null
+          price_cents?: number
+          product_id?: string
+          shopify_variant_id?: number
+          sku?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merch_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "merch_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           email: boolean
@@ -837,6 +1026,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shopify_stores: {
+        Row: {
+          access_token: string
+          connected_at: string
+          created_at: string
+          currency: string | null
+          id: string
+          last_synced_at: string | null
+          scope: string | null
+          shop_domain: string
+          shop_email: string | null
+          shop_name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          connected_at?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          last_synced_at?: string | null
+          scope?: string | null
+          shop_domain: string
+          shop_email?: string | null
+          shop_name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          connected_at?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          last_synced_at?: string | null
+          scope?: string | null
+          shop_domain?: string
+          shop_email?: string | null
+          shop_name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       stage_participants: {
         Row: {
