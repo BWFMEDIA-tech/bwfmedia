@@ -44,9 +44,9 @@ export const Route = createFileRoute("/off-the-block")({
         content: "Raw, on-location interviews from the block to the world. Tap in with BWF Media.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfmedia.company/off-the-block" },
+      { property: "og:url", content: "https://bwfnetwork.com/off-the-block" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfmedia.company/off-the-block" }],
+    links: [{ rel: "canonical", href: "https://bwfnetwork.com/off-the-block" }],
   }),
   component: OffTheBlockPage,
 });
@@ -154,6 +154,7 @@ function OffTheBlockPage() {
         {/* PILLARS */}
         <section className="py-16">
           <SectionTag>System // Pillars</SectionTag>
+          <h2 className="sr-only">Our Pillars</h2>
           <div className="mt-10 grid md:grid-cols-2 gap-5">
             {[
               { icon: Mic, n: "01", title: "REAL CONVERSATIONS", desc: "Raw and uncut from the block to the world." },
@@ -201,6 +202,7 @@ function OffTheBlockPage() {
         {/* FEATURED VIDEO */}
         <section className="py-16">
           <SectionTag>Featured // Latest Drop</SectionTag>
+          <h2 className="sr-only">Featured Street Interviews</h2>
           <div className="mt-10">
             <VideoPlayer
               videos={[
@@ -218,6 +220,7 @@ function OffTheBlockPage() {
         {/* WHAT WE COVER */}
         <section className="py-16">
           <SectionTag>Coverage Matrix</SectionTag>
+          <h2 className="sr-only">What We Cover</h2>
           <HUDFrame className="mt-10 p-8 md:p-10">
             <div className="grid md:grid-cols-3 gap-4">
               {[
@@ -247,6 +250,7 @@ function OffTheBlockPage() {
         {/* WHY IT MATTERS */}
         <section className="py-16 text-center">
           <SectionTag>Mission // Why It Matters</SectionTag>
+          <h2 className="sr-only">Our Mission</h2>
           <p className="mx-auto mt-8 max-w-2xl text-bone/85 text-base md:text-lg">
             We amplify real stories, real people, real situations. BWF Off The Block gives a voice to the culture and
             keeps it authentic - frame by frame.
@@ -271,6 +275,7 @@ function OffTheBlockPage() {
         {/* BOOKING CALENDAR */}
         <section id="book" className="py-16">
           <SectionTag>Schedule // Pull-Up Request</SectionTag>
+          <h2 className="sr-only">Book a Pull-Up Shoot</h2>
           <BookingCalendar />
         </section>
 
