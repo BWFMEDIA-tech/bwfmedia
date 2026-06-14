@@ -13,6 +13,7 @@ import {
   Video,
   Activity,
   ScrollText,
+  ShoppingBag,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
@@ -36,6 +37,7 @@ const tiles = [
   { to: "/admin/live-queue", icon: ListOrdered, title: "Live Review Queue", desc: "Approve submissions for live shows." },
   { to: "/admin/bookings", icon: Calendar, title: "Bookings", desc: "Studio and block booking requests." },
   { to: "/admin/cancellation-emails", icon: Mail, title: "Email Health", desc: "Cancellation emails & dedupe outcomes." },
+  { to: "/admin/merch", icon: ShoppingBag, title: "Merch Marketplace", desc: "Shopify stores, products, commissions." },
 ] as const;
 
 function AdminHome() {
