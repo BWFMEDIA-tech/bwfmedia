@@ -65,6 +65,7 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
+import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -369,6 +370,11 @@ const AdminStreamsRoute = AdminStreamsRouteImport.update({
   path: '/streams',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOpsRoute = AdminOpsRouteImport.update({
   id: '/ops',
   path: '/ops',
@@ -529,6 +535,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -609,6 +616,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -691,6 +699,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
@@ -774,6 +783,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/merch'
     | '/admin/ops'
+    | '/admin/profile'
     | '/admin/streams'
     | '/admin/users'
     | '/artist/$id'
@@ -854,6 +864,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/merch'
     | '/admin/ops'
+    | '/admin/profile'
     | '/admin/streams'
     | '/admin/users'
     | '/artist/$id'
@@ -935,6 +946,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/merch'
     | '/admin/ops'
+    | '/admin/profile'
     | '/admin/streams'
     | '/admin/users'
     | '/artist/$id'
@@ -1429,6 +1441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStreamsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ops': {
       id: '/admin/ops'
       path: '/ops'
@@ -1603,6 +1622,7 @@ interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMerchRoute: typeof AdminMerchRoute
   AdminOpsRoute: typeof AdminOpsRoute
+  AdminProfileRoute: typeof AdminProfileRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1618,6 +1638,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminMerchRoute: AdminMerchRoute,
   AdminOpsRoute: AdminOpsRoute,
+  AdminProfileRoute: AdminProfileRoute,
   AdminStreamsRoute: AdminStreamsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
