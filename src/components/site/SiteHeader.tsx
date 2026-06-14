@@ -136,7 +136,7 @@ export function SiteHeader() {
       <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center gap-4">
         {/* Logo */}
         <RouterLink to="/" className="flex items-center gap-2 shrink-0 mr-2">
-          <img src={bwfLogo} alt="BWF Network" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
+          <img src={bwfLogo} alt="BWF Network" className="h-10 md:h-14 lg:h-16 w-auto object-contain" />
         </RouterLink>
 
         {/* Desktop primary nav */}
