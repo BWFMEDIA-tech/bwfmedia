@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { OnePager } from "@/components/site/OnePager";
+import { TrendingMerch } from "@/components/merch/TrendingMerch";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,5 +18,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  return <OnePager />;
+  return (
+    <>
+      <OnePager />
+      <div className="bg-black text-white"><TrendingMerch /></div>
+    </>
+  );
 }
