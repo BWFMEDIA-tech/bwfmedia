@@ -109,6 +109,14 @@ function pseudoDuration(id: string) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function formatSeconds(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
+  const total = Math.floor(seconds);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 function VideosPage() {
   const [videos, setVideos] = useState<VideoRow[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -117,8 +125,18 @@ function VideosPage() {
   const [showAuth, setShowAuth] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [canUpload, setCanUpload] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.8);
+  const [muted, setMuted] = useState(false);
+  const [shuffleEnabled, setShuffleEnabled] = useState(false);
+  const [repeatEnabled, setRepeatEnabled] = useState(false);
+  const [nativeControls, setNativeControls] = useState(false);
+  const [queueOpen, setQueueOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playAfterLoadRef = useRef(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
@@ -146,10 +164,29 @@ function VideosPage() {
   };
   useEffect(() => { load(); }, []);
 
-  const hero = videos[0];
+  const hero = videos[activeIndex] ?? videos[0];
   const trending = videos.slice(0, 5);
   const newReleases = videos.slice(0, 5);
   const videoOfWeek = videos[1] ?? hero;
+  const progressPercent = duration > 0 ? Math.min(100, Math.max(0, (currentTime / duration) * 100)) : 0;
+
+  useEffect(() => {
+    if (videos.length > 0 && activeIndex >= videos.length) setActiveIndex(0);
+  }, [activeIndex, videos.length]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    setCurrentTime(0);
+    setDuration(0);
+    setPlaying(false);
+    if (!v || !hero) return;
+    v.volume = volume;
+    v.muted = muted;
+    if (playAfterLoadRef.current) {
+      playAfterLoadRef.current = false;
+      v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    }
+  }, [hero?.id, muted, volume]);
 
   const togglePlay = () => {
     const v = videoRef.current;
@@ -160,6 +197,76 @@ function VideosPage() {
       v.pause();
       setPlaying(false);
     }
+  };
+
+  const selectVideo = (index: number, autoplay = playing) => {
+    if (!videos.length) return;
+    playAfterLoadRef.current = autoplay;
+    setActiveIndex((index + videos.length) % videos.length);
+    setQueueOpen(false);
+  };
+
+  const nextVideo = (autoplay = playing) => {
+    if (!videos.length) return;
+    if (shuffleEnabled && videos.length > 1) {
+      let next = activeIndex;
+      while (next === activeIndex) next = Math.floor(Math.random() * videos.length);
+      selectVideo(next, autoplay);
+      return;
+    }
+    selectVideo(activeIndex + 1, autoplay);
+  };
+
+  const prevVideo = (autoplay = playing) => {
+    const v = videoRef.current;
+    if (v && v.currentTime > 3) {
+      v.currentTime = 0;
+      setCurrentTime(0);
+      return;
+    }
+    selectVideo(activeIndex - 1, autoplay);
+  };
+
+  const handleEnded = () => {
+    if (repeatEnabled) {
+      const v = videoRef.current;
+      if (!v) return;
+      v.currentTime = 0;
+      v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      return;
+    }
+    if (shuffleEnabled || activeIndex < videos.length - 1) nextVideo(true);
+    else setPlaying(false);
+  };
+
+  const seekVideo = (seconds: number) => {
+    const v = videoRef.current;
+    if (!v || !Number.isFinite(seconds)) return;
+    v.currentTime = seconds;
+    setCurrentTime(seconds);
+  };
+
+  const changeVolume = (value: number) => {
+    const safeValue = Math.min(1, Math.max(0, value));
+    setVolume(safeValue);
+    const v = videoRef.current;
+    if (v) v.volume = safeValue;
+    if (safeValue > 0 && muted) {
+      setMuted(false);
+      if (v) v.muted = false;
+    }
+  };
+
+  const toggleMute = () => {
+    const nextMuted = !muted;
+    setMuted(nextMuted);
+    if (videoRef.current) videoRef.current.muted = nextMuted;
+  };
+
+  const toggleFullscreen = () => {
+    const v = videoRef.current as (HTMLVideoElement & { webkitRequestFullscreen?: () => Promise<void> | void }) | null;
+    const request = v?.requestFullscreen?.bind(v) ?? v?.webkitRequestFullscreen?.bind(v);
+    request?.();
   };
 
   return (
