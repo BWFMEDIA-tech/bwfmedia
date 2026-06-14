@@ -6,8 +6,13 @@ export const Route = createFileRoute("/events")({
   head: () => ({
     meta: [
       { title: "Events — BWF Network" },
-      { name: "description", content: "Upcoming BWF Network live events, shows, and listening parties." },
+      { name: "description", content: "Catch upcoming BWF Network live events, listening parties, podcast tapings, and DJ sessions — RSVP, set reminders, and never miss a drop from your favorite creators." },
+      { property: "og:title", content: "Events — BWF Network" },
+      { property: "og:description", content: "Live shows, listening parties, podcast tapings, and DJ sessions on BWF Network. RSVP and set reminders so you never miss a moment." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bwfnetwork.com/events" },
     ],
+    links: [{ rel: "canonical", href: "https://bwfnetwork.com/events" }],
   }),
   component: () => (
     <StudioStub
