@@ -15,6 +15,13 @@ export const saveRecording = createServerFn({ method: 'POST' })
   .inputValidator((data) => SaveSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // Path ownership guard: the storage_path MUST be inside the caller's
+    // user-id-prefixed folder. Prevents a host from claiming another host's
+    // recording path and then minting a signed URL for it via
+    // getRecordingSignedUrl (which uses the service-role client).
+    if (!data.storagePath.startsWith(`${userId}/`)) {
+      throw new Error('Invalid storage path');
+    }
     const { data: row, error } = await supabase
       .from('stream_recordings')
       .insert({
