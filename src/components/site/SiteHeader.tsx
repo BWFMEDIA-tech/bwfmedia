@@ -53,7 +53,7 @@ const PRIMARY: NavItem[] = [
   { to: "/", label: "Home", icon: Home },
   { to: "/play", label: "Play Arena", icon: Music },
   { to: "/live", label: "Live Shows", icon: Radio },
-  { to: "/artists", label: "Discover", icon: Compass },
+  { to: "/discover", label: "Discover", icon: Compass },
   { to: "/videos", label: "Videos", icon: Mic },
   { to: "/dashboard", label: "Charts", icon: BarChart3 },
 ];
@@ -61,7 +61,6 @@ const PRIMARY: NavItem[] = [
 const BROWSE: NavItem[] = [
   { to: "/studio", label: "Book a Shoot", icon: Camera },
   { to: "/off-the-block", label: "Off Da Block", icon: Star },
-  { to: "/live-review", label: "Live Review", icon: Mic },
   { to: "/events", label: "Events", icon: Calendar },
   { to: "/blog", label: "Blog", icon: Newspaper },
   { to: "/contact", label: "Contact", icon: Mail },

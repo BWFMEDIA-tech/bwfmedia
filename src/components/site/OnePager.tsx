@@ -20,12 +20,12 @@ import {
   PlayCircle,
   Camera,
   ChevronRight,
+  Compass,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { getHomepageData } from "@/lib/homepage.functions";
-import { LIVE_TIER_LIST } from "@/lib/live-review-tiers";
 import { CartButton } from "@/components/CartDrawer";
 
 /* ---------- shared ---------- */
@@ -184,10 +184,10 @@ function Hero({ liveStreams }: { liveStreams: any[] }) {
                   Off Da Block <ArrowRight size={14} />
                 </RouterLink>
                 <RouterLink
-                  to="/live-review"
+                  to="/discover"
                   className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
                 >
-                  <Mic size={14} /> Live Review
+                  <Compass size={14} /> Discover
                 </RouterLink>
               </div>
             </>
@@ -252,7 +252,7 @@ function Hero({ liveStreams }: { liveStreams: any[] }) {
             <div className="grid grid-cols-2 gap-2">
               <QuickLink to="/studio" icon={Camera} label="Book a Shoot" />
               <QuickLink to="/off-the-block" icon={Star} label="Off Da Block" />
-              <QuickLink to="/live-review" icon={Mic} label="Live Review" />
+              <QuickLink to="/discover" icon={Compass} label="Discover" />
               <QuickLink to="/artists" icon={Headphones} label="Artists" />
             </div>
           </div>
@@ -329,72 +329,6 @@ function Spotlight({ artists }: { artists: any[] }) {
             ))}
           </div>
         )}
-      </div>
-    </section>
-  );
-}
-
-/* ---------- LIVE REVIEW PLANS ---------- */
-
-function Plans() {
-  return (
-    <section className="bg-black border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-24">
-        <Reveal>
-          <SectionHead
-            kicker="Choose Your Plan"
-            title="Submit. Get Seen. Grow Your Career."
-            sub="Get your music in front of the BWF audience — pick the tier that fits your push."
-          />
-        </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {LIVE_TIER_LIST.map((tier, i) => {
-            const highlight = tier.highlight;
-            return (
-              <Reveal key={tier.id} delay={i * 0.06}>
-                <div
-                  className={`relative h-full flex flex-col rounded-2xl p-6 border backdrop-blur-md transition-all ${
-                    highlight
-                      ? "bg-blood/10 border-blood shadow-[0_20px_60px_-20px_rgba(225,29,42,0.5)]"
-                      : "bg-white/[0.03] border-white/10 hover:border-white/25"
-                  }`}
-                >
-                  {tier.badge && (
-                    <div className="absolute -top-3 right-5 px-3 py-1 bg-blood text-white font-cond font-bold tracking-[0.2em] text-[10px] uppercase rounded">
-                      {tier.badge}
-                    </div>
-                  )}
-                  <div className="w-12 h-12 rounded-full bg-blood/15 border border-blood/40 grid place-items-center mb-4">
-                    {highlight ? <Star size={20} className="text-blood" fill="currentColor" /> : <Mic size={20} className="text-blood" />}
-                  </div>
-                  <h3 className="font-cond font-bold tracking-[0.2em] text-sm uppercase text-bone">{tier.name}</h3>
-                  <div className="mt-2 font-display text-3xl text-bone">
-                    ${(tier.amountCents / 100).toFixed(2)}
-                  </div>
-                  <p className="mt-1 text-xs text-bone/60">{tier.tagline}</p>
-                  <ul className="mt-5 space-y-2.5 flex-1">
-                    {tier.perks.map((p) => (
-                      <li key={p} className="flex items-start gap-2 text-sm text-bone/80">
-                        <Check size={14} className="text-blood mt-0.5 shrink-0" />
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <RouterLink
-                    to="/live-review"
-                    className={`mt-6 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md font-cond font-bold tracking-[0.2em] text-[11px] uppercase transition-colors ${
-                      highlight
-                        ? "bg-blood text-white hover:bg-blood-glow"
-                        : "border border-white/25 text-bone hover:bg-white/10"
-                    }`}
-                  >
-                    Choose Plan <ArrowRight size={13} />
-                  </RouterLink>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
       </div>
     </section>
   );
@@ -641,7 +575,6 @@ export function OnePager() {
         </div>
         <Hero liveStreams={liveStreams} />
         <Spotlight artists={featuredArtists} />
-        <Plans />
         <VideosRow videos={videos} />
         <BookShoot />
         <FollowStrip />

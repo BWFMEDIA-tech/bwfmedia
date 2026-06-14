@@ -36,22 +36,6 @@ async function markBookingPaid(session: any) {
   if (error) console.error('Webhook: failed to mark booking paid', error);
 }
 
-async function markLiveSubmissionPaid(session: any) {
-  const meta = session.metadata || {};
-  const submissionId = meta.submissionId as string | undefined;
-  if (!submissionId) return;
-  const supabase = getSupabase();
-  const { error } = await supabase
-    .from('live_submissions')
-    .update({
-      status: 'paid',
-      stripe_payment_intent_id: session.payment_intent ?? null,
-      paid_at: new Date().toISOString(),
-    })
-    .eq('id', submissionId);
-  if (error) console.error('Webhook: failed to mark live submission paid', error);
-}
-
 async function recordTip(session: any) {
   const meta = session.metadata || {};
   const streamId = meta.streamId as string | undefined;
@@ -185,7 +169,6 @@ function routeSessionPaid(session: any) {
   if (meta.kind === 'tip') return recordTip(session);
   if (meta.kind === 'play_boost') return grantPlayBoost(session);
   if (meta.kind === 'play_membership') return Promise.resolve(); // handled via subscription events
-  if (meta.submissionType === 'live_review') return markLiveSubmissionPaid(session);
   if (meta.bookingTable) return markBookingPaid(session);
   console.warn('Webhook: session has no recognized metadata', session.id);
   return Promise.resolve();

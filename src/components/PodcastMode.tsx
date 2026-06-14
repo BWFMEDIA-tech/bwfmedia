@@ -13,11 +13,25 @@ import {
   Music,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import type { LiveQueueRow } from "@/lib/useLiveQueue";
 import { cn } from "@/lib/utils";
 import { usePodcastState } from "@/lib/usePodcastState";
 
 const RED = "#ef2b2b";
+
+export type LiveQueueRow = {
+  id: string;
+  artist_name: string;
+  song_title: string | null;
+  song_link: string;
+  photo_url: string | null;
+  tier: "basic" | "featured" | "premium";
+  queue_status: "queued" | "next_up" | "live" | "done";
+  created_at: string;
+  paid_at: string | null;
+  uploaded_audio_url: string | null;
+  audio_file_type: string | null;
+  audio_uploaded_at: string | null;
+};
 
 export type LiveMode = "review" | "podcast";
 

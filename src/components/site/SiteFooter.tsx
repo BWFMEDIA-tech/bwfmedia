@@ -22,7 +22,6 @@ const menuGroups: Array<{
       { label: "Studio Bookings", to: "/studio" },
       { label: "Stream Studio", to: "/stream-studio", adminOnly: true },
       { label: "Off Da Block", to: "/off-the-block" },
-      { label: "Live Review", to: "/live-review" },
       { label: "Artist Interviews", href: "/#services" },
       { label: "Music Videos", href: "/#services" },
       { label: "Viral Clips", href: "/#services" },

@@ -83,7 +83,6 @@ function AnalyticsPage() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Stat icon={DollarSign} label="Tips · 30d" value={dollars(data.revenueCents.tipsLast30Days)} />
                 <Stat icon={DollarSign} label="Tips · all-time" value={dollars(data.revenueCents.tipsAllTime)} />
-                <Stat icon={DollarSign} label="Live submissions" value={dollars(data.revenueCents.liveSubmissions)} />
                 <Stat icon={DollarSign} label="Studio bookings" value={dollars(data.revenueCents.studioBookings)} />
               </div>
             </section>

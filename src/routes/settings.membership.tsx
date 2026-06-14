@@ -32,7 +32,7 @@ function MembershipPage() {
             <div className="text-lg font-black">{m?.tier ? String(m.tier).toUpperCase() : "Free Member"}</div>
             <div className="text-xs text-white/60">{m?.status === "active" ? "Active subscription" : "Upgrade to unlock priority placement."}</div>
           </div>
-          <a href="/live-review" className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold hover:bg-red-500">Upgrade</a>
+          <a href="/artist/upgrade" className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold hover:bg-red-500">Upgrade</a>
         </div>
       </Card>
       <Card title="Play Boost Credits">
