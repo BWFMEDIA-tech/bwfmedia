@@ -72,6 +72,7 @@ export type Database = {
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
+          user_id: string | null
         }
         Insert: {
           amount_cents?: number | null
@@ -91,6 +92,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          user_id?: string | null
         }
         Update: {
           amount_cents?: number | null
@@ -110,6 +112,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1337,6 +1340,7 @@ export type Database = {
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
+          user_id: string | null
         }
         Insert: {
           amount_cents?: number | null
@@ -1357,6 +1361,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          user_id?: string | null
         }
         Update: {
           amount_cents?: number | null
@@ -1377,6 +1382,7 @@ export type Database = {
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1846,6 +1852,10 @@ export type Database = {
         Returns: boolean
       }
       is_stream_host: {
+        Args: { _stream_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_stream_host_or_cohost: {
         Args: { _stream_id: string; _user_id: string }
         Returns: boolean
       }
