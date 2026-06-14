@@ -20,11 +20,32 @@ import {
   Mail,
   Newspaper,
   Calendar,
+  ShoppingCart,
 } from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
 import { useAuth } from "@/lib/auth-context";
 import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
+import { useCart } from "@/contexts/CartContext";
+
+function HeaderCartButton() {
+  const { totalCount, openCart } = useCart();
+  return (
+    <button
+      type="button"
+      onClick={openCart}
+      aria-label={`Open cart, ${totalCount} item${totalCount === 1 ? "" : "s"}`}
+      className="relative inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 hover:border-blood/60 transition-colors text-bone"
+    >
+      <ShoppingCart size={17} />
+      {totalCount > 0 && (
+        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full bg-blood text-white text-[10px] font-bold">
+          {totalCount}
+        </span>
+      )}
+    </button>
+  );
+}
 
 type NavItem = { to: string; label: string; icon?: any };
 
@@ -217,6 +238,7 @@ export function SiteHeader() {
 
         {/* Right cluster */}
         <div className="hidden md:flex items-center gap-2">
+          <HeaderCartButton />
           {auth.isAuthenticated ? (
             <>
               <NotificationBell />
@@ -289,6 +311,9 @@ export function SiteHeader() {
         </div>
 
         {/* Mobile toggle */}
+        <div className="md:hidden">
+          <HeaderCartButton />
+        </div>
         <button
           type="button"
           aria-label="Toggle menu"
