@@ -7,6 +7,7 @@ import {
   toCents,
   verifyOAuthHmac,
   getShopifyCreds,
+  registerWebhooks,
 } from "@/lib/shopify.server";
 
 export const Route = createFileRoute("/api/public/shopify/callback")({
@@ -32,6 +33,11 @@ export const Route = createFileRoute("/api/public/shopify/callback")({
 
         const { access_token, scope } = await exchangeCodeForToken(shop, code);
         const info = await fetchShopInfo(shop, access_token).catch(() => null);
+
+        // Register webhooks (best-effort, idempotent — Shopify returns 422 for duplicates)
+        registerWebhooks(shop, access_token, url.origin).catch((e) =>
+          console.error("[shopify] webhook registration error", e),
+        );
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
