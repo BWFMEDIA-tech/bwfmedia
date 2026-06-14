@@ -412,9 +412,17 @@ function VideosPage() {
                   poster=""
                   preload="metadata"
                   playsInline
-                  controls={playing}
+                  controls={nativeControls}
                   onPlay={() => setPlaying(true)}
                   onPause={() => setPlaying(false)}
+                  onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                  onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+                  onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}
+                  onVolumeChange={(e) => {
+                    setVolume(e.currentTarget.volume);
+                    setMuted(e.currentTarget.muted);
+                  }}
+                  onEnded={handleEnded}
                   className="w-full h-full object-cover"
                 />
                 {!playing && (
@@ -430,8 +438,72 @@ function VideosPage() {
                 )}
                 {/* Progress overlay */}
                 <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
-                  <div className="h-1 bg-white/20 rounded-full overflow-hidden mb-3">
-                    <div className="h-full bg-red-500 w-1/3 relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      seekVideo(((e.clientX - rect.left) / rect.width) * duration);
+                    }}
+                    className="block h-3 w-full py-1 mb-1 cursor-pointer"
+                    aria-label="Seek video"
+                  >
+                    <span className="block h-1 bg-white/20 rounded-full">
+                      <span className="block h-full bg-red-500 relative rounded-full" style={{ width: `${progressPercent}%` }}>
+                        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
+                      </span>
+                    </span>
+                  </button>
+                  <div className="flex items-center justify-between text-xs text-white/80">
+                    <span>{formatSeconds(currentTime)} / {formatSeconds(duration)}</span>
+                    <div className="flex items-center gap-4">
+                      <button type="button" onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"}><Volume2 size={16} /></button>
+                      <button type="button" onClick={() => setNativeControls((v) => !v)} aria-label="Toggle video controls"><SettingsIcon size={16} /></button>
+                      <button type="button" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
+                      <button type="button" onClick={toggleFullscreen} aria-label="Fullscreen"><Maximize size={16} /></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hero meta */}
+              <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-2xl font-bold">{hero.title}</h1>
+                    {hero.category === "sponsored" ? (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white px-2 py-1 rounded">
+                        Sponsored
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-1 rounded">
+                        Exclusive
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-2 text-sm text-white/60">
+                    <span className="text-white font-semibold uppercase tracking-wider">{hero.artist ?? "BWF Artist"}</span>
+                    <BadgeCheck size={14} className="text-red-500 fill-red-500/20" />
+                    <span>·</span>
+                    <span>{formatViews(pseudoViews(hero.id))} views</span>
+                    <span>·</span>
+                    <span>{timeAgo(hero.created_at)}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ActionPill icon={Heart} label="Like" count="10K" />
+                  <ActionPill icon={Bookmark} label="Save" />
+                  <ActionPill icon={Share2} label="Share" />
+                  <button className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center">
+                    <MoreHorizontal size={16} />
+                  </button>
+                </div>
+              </div>
+            </section>
+          ) : (
+            <div className="aspect-video bg-white/5 rounded-2xl flex items-center justify-center text-white/40">
+              No videos yet
+            </div>
+          )}
                       <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
                     </div>
                   </div>
