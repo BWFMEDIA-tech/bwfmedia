@@ -106,7 +106,7 @@ export function GlobalPlayer() {
           <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-white/5">
             {track?.coverUrl ? <img src={track.coverUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-white/30"><Mic2 className="h-5 w-5" /></div>}
           </div>
-          <div className="min-w-0 hidden sm:block">
+          <div className="min-w-0 block">
             <div className="truncate text-sm font-semibold text-white">{track?.title ?? "Nothing playing"}</div>
             <div className="truncate text-xs text-white/50">{track?.artist ?? "Pick a track from your library"}</div>
           </div>
@@ -114,7 +114,7 @@ export function GlobalPlayer() {
             onClick={toggleLike}
             disabled={!track}
             aria-label={liked ? "Unlike" : "Like"}
-            className={`ml-2 hidden md:block transition-colors disabled:opacity-30 ${liked ? "text-red-500" : "text-white/40 hover:text-red-500"}`}
+            className={`ml-2 transition-colors disabled:opacity-30 ${liked ? "text-red-500" : "text-white/40 hover:text-red-500"}`}
           >
             <Heart className="h-4 w-4" fill={liked ? "currentColor" : "none"} />
           </button>
@@ -122,17 +122,17 @@ export function GlobalPlayer() {
 
         <div className="flex flex-col items-center gap-1.5 flex-[2]">
           <div className="flex items-center gap-3">
-            <button onClick={p.toggleShuffle} className={`hidden sm:block ${p.shuffle ? "text-red-500" : "text-white/50 hover:text-white"}`}><Shuffle className="h-4 w-4" /></button>
+            <button onClick={p.toggleShuffle} aria-label="Shuffle" className={`${p.shuffle ? "text-red-500" : "text-white/50 hover:text-white"}`}><Shuffle className="h-4 w-4" /></button>
             <button onClick={p.prev} className="text-white/70 hover:text-white"><SkipBack className="h-5 w-5" /></button>
             <button onClick={p.toggle} className="grid h-10 w-10 place-items-center rounded-full bg-red-600 text-white hover:bg-red-500" disabled={!track}>
               {p.isPlaying ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
             </button>
             <button onClick={p.next} className="text-white/70 hover:text-white"><SkipForward className="h-5 w-5" /></button>
-            <button onClick={p.cycleRepeat} className={`hidden sm:block ${p.repeat !== "off" ? "text-red-500" : "text-white/50 hover:text-white"}`}>
+            <button onClick={p.cycleRepeat} aria-label="Repeat" className={`${p.repeat !== "off" ? "text-red-500" : "text-white/50 hover:text-white"}`}>
               {p.repeat === "one" ? <Repeat1 className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}
             </button>
           </div>
-          <div className="hidden w-full max-w-xl items-center gap-2 text-[10px] text-white/50 md:flex">
+          <div className="flex w-full max-w-xl items-center gap-2 text-[10px] text-white/50">
             <span className="w-8 text-right tabular-nums">{fmt(p.progress)}</span>
             <input type="range" min={0} max={p.duration || 0} value={p.progress} onChange={(e) => p.seek(Number(e.target.value))} className="h-1 flex-1 cursor-pointer accent-red-600" />
             <span className="w-8 tabular-nums">{fmt(p.duration)}</span>
