@@ -44,8 +44,8 @@ export const getAdminOverview = createServerFn({ method: "POST" })
     const merchCount = (merchCommissions.data ?? []).length;
 
     // Resolve host names for streamsRecent + top artists by stream count
-    const hostIds = Array.from(new Set((streamsRecent.data ?? []).map((s: any) => s.host_id).filter(Boolean)));
-    const artistIds = Array.from(new Set((topArtistRoles.data ?? []).map((r: any) => r.user_id)));
+    const hostIds = Array.from(new Set((streamsRecent.data ?? []).map((s: any) => s.host_id).filter(Boolean))) as string[];
+    const artistIds = Array.from(new Set((topArtistRoles.data ?? []).map((r: any) => r.user_id))) as string[];
     const allIds = Array.from(new Set([...hostIds, ...artistIds]));
     const profilesRes = allIds.length
       ? await sb.from("profiles").select("id,display_name,stage_name,avatar_url").in("id", allIds)
@@ -58,7 +58,7 @@ export const getAdminOverview = createServerFn({ method: "POST" })
       const counts = await sb.from("streams").select("host_id").in("host_id", artistIds);
       const tally = new Map<string, number>();
       (counts.data ?? []).forEach((s: any) => tally.set(s.host_id, (tally.get(s.host_id) ?? 0) + 1));
-      topArtists = artistIds
+      topArtists = (artistIds as string[])
         .map((id) => ({ id, streams: tally.get(id) ?? 0, profile: pmap.get(id) }))
         .sort((a, b) => b.streams - a.streams)
         .slice(0, 4);
@@ -130,7 +130,7 @@ export const updateAdminProfile = createServerFn({ method: "POST" })
     if (typeof data.bio === "string") updates.bio = data.bio.slice(0, 500);
     if (typeof data.avatar_url === "string") updates.avatar_url = data.avatar_url.slice(0, 1000);
     if (!Object.keys(updates).length) return { ok: true };
-    const { error } = await context.supabase.from("profiles").update(updates).eq("id", context.userId);
+    const { error } = await (context.supabase as any).from("profiles").update(updates).eq("id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
