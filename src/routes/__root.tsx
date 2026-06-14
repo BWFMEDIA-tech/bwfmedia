@@ -1,4 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/contexts/CartContext";
@@ -141,15 +143,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/");
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
+  }));
   return (
-    <CartProvider>
-      <PaymentTestModeBanner />
-      {isChrome && <SiteHeader />}
-      <div className={isChrome ? "pt-24 md:pt-28" : ""}>
-        <Outlet />
-      </div>
-      {isChrome && <SiteFooter />}
-      <CartDrawer />
-    </CartProvider>
+    <QueryClientProvider client={queryClient}>
+      <CartProvider>
+        <PaymentTestModeBanner />
+        {isChrome && <SiteHeader />}
+        <div className={isChrome ? "pt-24 md:pt-28" : ""}>
+          <Outlet />
+        </div>
+        {isChrome && <SiteFooter />}
+        <CartDrawer />
+      </CartProvider>
+    </QueryClientProvider>
   );
 }
