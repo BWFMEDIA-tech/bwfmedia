@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Upload, LogIn, LogOut,
+  Upload,
   Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
   BadgeCheck,
   PlayCircle, Sparkles, Flame, Star, Eye, Award, Music2,
@@ -41,16 +41,6 @@ type VideoRow = {
 function publicUrl(path: string) {
   return supabase.storage.from("videos").getPublicUrl(path).data.publicUrl;
 }
-
-const NAV_LINKS = [
-  { label: "Home", to: "/" as const },
-  { label: "Play Arena", to: "/play-arena" as const },
-  { label: "Live Shows", to: "/live-shows" as const },
-  { label: "Discover", to: "/discover" as const },
-  { label: "Radio", to: "/radio" as const },
-  { label: "Music Videos", to: "/videos" as const, active: true },
-  { label: "Charts", to: "/charts" as const },
-];
 
 const SIDEBAR_PRIMARY = [
   { label: "All Videos", icon: PlayCircle, key: "all" as const },
