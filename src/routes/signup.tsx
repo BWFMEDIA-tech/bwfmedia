@@ -25,7 +25,7 @@ function SignupPage() {
     e.preventDefault();
     if (!role) return;
     setLoading(true);
-    const redirectTo = role === "artist" ? "/stream-studio" : "/";
+    const redirectTo = role === "artist" ? "/artist/upgrade" : "/";
     const meta: Record<string, unknown> = {
       display_name: displayName,
       role,
@@ -59,7 +59,7 @@ function SignupPage() {
 
   const google = async () => {
     if (!role) return toast.error("Choose a role first");
-    const redirectTo = role === "artist" ? "/stream-studio" : "/";
+    const redirectTo = role === "artist" ? "/artist/upgrade" : "/";
     // Persist chosen role for post-OAuth assignment fallback
     try { sessionStorage.setItem("pending_role", role); } catch {}
     const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + redirectTo });
