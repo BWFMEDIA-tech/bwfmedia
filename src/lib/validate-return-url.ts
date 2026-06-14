@@ -2,6 +2,9 @@ const ALLOWED_HOSTS = [
   'bwfmedia.company',
   'www.bwfmedia.company',
   'bwfmedia.lovable.app',
+  'bwfnetwork.com',
+  'www.bwfnetwork.com',
+  'bwfnetwork.lovable.app',
 ];
 
 const ALLOWED_HOST_SUFFIXES = ['.lovable.app'];
