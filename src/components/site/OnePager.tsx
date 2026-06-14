@@ -25,7 +25,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { getHomepageData } from "@/lib/homepage.functions";
-import { LIVE_TIER_LIST } from "@/lib/live-review-tiers";
 import { CartButton } from "@/components/CartDrawer";
 
 /* ---------- shared ---------- */
@@ -184,10 +183,10 @@ function Hero({ liveStreams }: { liveStreams: any[] }) {
                   Off Da Block <ArrowRight size={14} />
                 </RouterLink>
                 <RouterLink
-                  to="/live-review"
+                  to="/discover"
                   className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
                 >
-                  <Mic size={14} /> Live Review
+                  <Compass size={14} /> Discover
                 </RouterLink>
               </div>
             </>
