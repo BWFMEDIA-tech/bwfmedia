@@ -11,6 +11,7 @@ import {
   syncShopifyProducts,
   disconnectShopifyStore,
   toggleProductFeatured,
+  startShopifyInstall,
 } from "@/lib/merch.functions";
 
 export const Route = createFileRoute("/settings/merch")({
@@ -126,12 +127,18 @@ function fmt(cents: number, currency: string | null) {
 
 function ConnectCard({ userId }: { userId?: string }) {
   const [shop, setShop] = useState("");
-  function connect(e: React.FormEvent) {
+  const startInstall = useServerFn(startShopifyInstall);
+  async function connect(e: React.FormEvent) {
     e.preventDefault();
     if (!userId) return;
     const clean = shop.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
     const full = clean.endsWith(".myshopify.com") ? clean : `${clean}.myshopify.com`;
-    window.location.href = `/api/public/shopify/install?shop=${encodeURIComponent(full)}&user_id=${encodeURIComponent(userId)}`;
+    try {
+      const { authUrl } = await startInstall({ data: { shop: full, origin: window.location.origin } });
+      window.location.href = authUrl;
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to start Shopify install");
+    }
   }
   return (
     <SettingsShell title="Merch Store" blurb="Connect your Shopify store to sell merch on BWF Network.">
