@@ -583,6 +583,28 @@ function VideosPage() {
       {/* BOTTOM NOW PLAYING BAR */}
       {hero && (
         <div className="fixed bottom-0 inset-x-0 z-40 bg-black/95 backdrop-blur-xl border-t border-white/10">
+          {queueOpen && (
+            <div className="absolute bottom-full right-4 mb-2 w-80 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-black/95 p-3 shadow-2xl">
+              <div className="mb-2 flex items-center justify-between border-b border-white/10 pb-2">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Video Queue</p>
+                <button type="button" onClick={() => setQueueOpen(false)} className="text-xs text-white/50 hover:text-white">Close</button>
+              </div>
+              {videos.map((v, index) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => selectVideo(index, true)}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-xs ${index === activeIndex ? "bg-red-500/15 text-red-300" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                >
+                  <span className="w-5 text-white/30 tabular-nums">{index + 1}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{v.title}</span>
+                    <span className="block truncate text-white/40">{v.artist ?? "BWF"}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-24 flex items-center gap-4">
             <div className="flex items-center gap-3 w-72 shrink-0">
               <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-red-500/40 to-red-900/40 border border-white/10 shrink-0 flex items-center justify-center">
@@ -597,34 +619,35 @@ function VideosPage() {
 
             <div className="flex-1 flex flex-col items-center gap-2">
               <div className="flex items-center gap-5">
-                <button className="text-white/60 hover:text-white"><Shuffle size={16} /></button>
-                <button className="text-white/80 hover:text-white"><SkipBack size={20} /></button>
+                <button type="button" onClick={() => setShuffleEnabled((v) => !v)} aria-label="Shuffle" className={shuffleEnabled ? "text-red-500" : "text-white/60 hover:text-white"}><Shuffle size={16} /></button>
+                <button type="button" onClick={() => prevVideo()} aria-label="Previous video" className="text-white/80 hover:text-white"><SkipBack size={20} /></button>
                 <button onClick={togglePlay} className="w-11 h-11 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center">
                   {playing ? <Pause size={18} className="text-white" /> : <Play size={18} className="text-white ml-0.5" />}
                 </button>
-                <button className="text-white/80 hover:text-white"><SkipForward size={20} /></button>
-                <button className="text-white/60 hover:text-white"><Repeat size={16} /></button>
+                <button type="button" onClick={() => nextVideo()} aria-label="Next video" className="text-white/80 hover:text-white"><SkipForward size={20} /></button>
+                <button type="button" onClick={() => setRepeatEnabled((v) => !v)} aria-label="Repeat video" className={repeatEnabled ? "text-red-500" : "text-white/60 hover:text-white"}><Repeat size={16} /></button>
               </div>
               <div className="w-full max-w-2xl flex items-center gap-3 text-[11px] text-white/50">
-                <span>1:24</span>
-                <div className="flex-1 h-1 bg-white/15 rounded-full overflow-hidden">
-                  <div className="h-full w-1/3 bg-red-500 relative">
-                    <span className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full" />
-                  </div>
-                </div>
-                <span>{pseudoDuration(hero.id)}</span>
+                <span className="w-9 text-right tabular-nums">{formatSeconds(currentTime)}</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={duration || 0}
+                  step={0.1}
+                  value={Math.min(currentTime, duration || currentTime)}
+                  onChange={(e) => seekVideo(Number(e.target.value))}
+                  className="h-1 flex-1 cursor-pointer accent-red-500"
+                  aria-label="Seek video"
+                />
+                <span className="w-9 tabular-nums">{formatSeconds(duration)}</span>
               </div>
             </div>
 
             <div className="hidden md:flex items-center gap-3 w-56 shrink-0 justify-end">
-              <Volume2 size={16} className="text-white/60" />
-              <div className="w-24 h-1 bg-white/15 rounded-full overflow-hidden">
-                <div className="h-full w-2/3 bg-red-500 relative">
-                  <span className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full" />
-                </div>
-              </div>
-              <button className="text-white/60 hover:text-white"><Maximize size={16} /></button>
-              <button className="text-white/60 hover:text-white"><ListVideo size={16} /></button>
+              <button type="button" onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"} className={muted ? "text-red-500" : "text-white/60 hover:text-white"}><Volume2 size={16} /></button>
+              <input type="range" min={0} max={1} step={0.01} value={muted ? 0 : volume} onChange={(e) => changeVolume(Number(e.target.value))} className="h-1 w-24 cursor-pointer accent-red-500" aria-label="Volume" />
+              <button type="button" onClick={toggleFullscreen} aria-label="Fullscreen" className="text-white/60 hover:text-white"><Maximize size={16} /></button>
+              <button type="button" onClick={() => setQueueOpen((v) => !v)} aria-label="Video queue" className={queueOpen ? "text-red-500" : "text-white/60 hover:text-white"}><ListVideo size={16} /></button>
             </div>
           </div>
         </div>
