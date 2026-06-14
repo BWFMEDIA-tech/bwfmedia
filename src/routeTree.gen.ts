@@ -34,6 +34,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
@@ -63,15 +64,25 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
+import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSecurityRouteImport } from './routes/admin.security'
+import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
+import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.cancellation-emails'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -213,6 +224,11 @@ const ArtistsRoute = ArtistsRouteImport.update({
   path: '/artists',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccessDeniedRoute = AccessDeniedRouteImport.update({
   id: '/access-denied',
   path: '/access-denied',
@@ -229,9 +245,9 @@ const PlayIndexRoute = PlayIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const VideosIdRoute = VideosIdRouteImport.update({
   id: '/$id',
@@ -354,59 +370,109 @@ const ArtistIdRoute = ArtistIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTransactionsRoute = AdminTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTicketsRoute = AdminTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminStreamsRoute = AdminStreamsRouteImport.update({
-  id: '/admin/streams',
-  path: '/admin/streams',
-  getParentRoute: () => rootRouteImport,
+  id: '/streams',
+  path: '/streams',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSecurityRoute = AdminSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPayoutsRoute = AdminPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminOpsRoute = AdminOpsRouteImport.update({
-  id: '/admin/ops',
-  path: '/admin/ops',
-  getParentRoute: () => rootRouteImport,
+  id: '/ops',
+  path: '/ops',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminMerchRoute = AdminMerchRouteImport.update({
-  id: '/admin/merch',
-  path: '/admin/merch',
-  getParentRoute: () => rootRouteImport,
+  id: '/merch',
+  path: '/merch',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminLiveQueueRoute = AdminLiveQueueRouteImport.update({
-  id: '/admin/live-queue',
-  path: '/admin/live-queue',
-  getParentRoute: () => rootRouteImport,
+  id: '/live-queue',
+  path: '/live-queue',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminContentRoute = AdminContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCancellationEmailsRoute = AdminCancellationEmailsRouteImport.update({
-  id: '/admin/cancellation-emails',
-  path: '/admin/cancellation-emails',
-  getParentRoute: () => rootRouteImport,
+  id: '/cancellation-emails',
+  path: '/cancellation-emails',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
-  id: '/admin/bookings',
-  path: '/admin/bookings',
-  getParentRoute: () => rootRouteImport,
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: '/admin/audit',
-  path: '/admin/audit',
-  getParentRoute: () => rootRouteImport,
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminArtistsRoute = AdminArtistsRouteImport.update({
+  id: '/artists',
+  path: '/artists',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/admin/analytics',
-  path: '/admin/analytics',
-  getParentRoute: () => rootRouteImport,
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
 } as any)
 const PlayAudienceRoomRoute = PlayAudienceRoomRouteImport.update({
   id: '/play/audience/$room',
@@ -488,6 +554,7 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/admin': typeof AdminRouteWithChildren
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
@@ -514,15 +581,25 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/profile': typeof AdminProfileRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/tickets': typeof AdminTicketsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -594,15 +671,25 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/profile': typeof AdminProfileRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/tickets': typeof AdminTicketsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -649,6 +736,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/admin': typeof AdminRouteWithChildren
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
@@ -675,15 +763,25 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/ops': typeof AdminOpsRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/profile': typeof AdminProfileRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/tickets': typeof AdminTicketsRoute
+  '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -731,6 +829,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/access-denied'
+    | '/admin'
     | '/artists'
     | '/blog'
     | '/contact'
@@ -757,15 +856,25 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
+    | '/admin/artists'
     | '/admin/audit'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
+    | '/admin/content'
     | '/admin/dashboard'
+    | '/admin/events'
     | '/admin/live-queue'
     | '/admin/login'
     | '/admin/merch'
+    | '/admin/messages'
     | '/admin/ops'
+    | '/admin/payouts'
+    | '/admin/profile'
+    | '/admin/security'
+    | '/admin/settings'
     | '/admin/streams'
+    | '/admin/tickets'
+    | '/admin/transactions'
     | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
@@ -837,15 +946,25 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
+    | '/admin/artists'
     | '/admin/audit'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
+    | '/admin/content'
     | '/admin/dashboard'
+    | '/admin/events'
     | '/admin/live-queue'
     | '/admin/login'
     | '/admin/merch'
+    | '/admin/messages'
     | '/admin/ops'
+    | '/admin/payouts'
+    | '/admin/profile'
+    | '/admin/security'
+    | '/admin/settings'
     | '/admin/streams'
+    | '/admin/tickets'
+    | '/admin/transactions'
     | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
@@ -891,6 +1010,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/access-denied'
+    | '/admin'
     | '/artists'
     | '/blog'
     | '/contact'
@@ -917,15 +1037,25 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
+    | '/admin/artists'
     | '/admin/audit'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
+    | '/admin/content'
     | '/admin/dashboard'
+    | '/admin/events'
     | '/admin/live-queue'
     | '/admin/login'
     | '/admin/merch'
+    | '/admin/messages'
     | '/admin/ops'
+    | '/admin/payouts'
+    | '/admin/profile'
+    | '/admin/security'
+    | '/admin/settings'
     | '/admin/streams'
+    | '/admin/tickets'
+    | '/admin/transactions'
     | '/admin/users'
     | '/artist/$id'
     | '/checkout/cancel'
@@ -972,6 +1102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
@@ -997,17 +1128,6 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
-  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminAuditRoute: typeof AdminAuditRoute
-  AdminBookingsRoute: typeof AdminBookingsRoute
-  AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminLiveQueueRoute: typeof AdminLiveQueueRoute
-  AdminLoginRoute: typeof AdminLoginRoute
-  AdminMerchRoute: typeof AdminMerchRoute
-  AdminOpsRoute: typeof AdminOpsRoute
-  AdminStreamsRoute: typeof AdminStreamsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
   ArtistIdRoute: typeof ArtistIdRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -1018,7 +1138,6 @@ export interface RootRouteChildren {
   PlayRoomRoute: typeof PlayRoomRoute
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
-  AdminIndexRoute: typeof AdminIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1213,6 +1332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/access-denied': {
       id: '/access-denied'
       path: '/access-denied'
@@ -1236,10 +1362,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/videos/$id': {
       id: '/videos/$id'
@@ -1411,80 +1537,150 @@ declare module '@tanstack/react-router' {
     }
     '/admin/users': {
       id: '/admin/users'
-      path: '/admin/users'
+      path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/transactions': {
+      id: '/admin/transactions'
+      path: '/transactions'
+      fullPath: '/admin/transactions'
+      preLoaderRoute: typeof AdminTransactionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tickets': {
+      id: '/admin/tickets'
+      path: '/tickets'
+      fullPath: '/admin/tickets'
+      preLoaderRoute: typeof AdminTicketsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/streams': {
       id: '/admin/streams'
-      path: '/admin/streams'
+      path: '/streams'
       fullPath: '/admin/streams'
       preLoaderRoute: typeof AdminStreamsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/security': {
+      id: '/admin/security'
+      path: '/security'
+      fullPath: '/admin/security'
+      preLoaderRoute: typeof AdminSecurityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payouts': {
+      id: '/admin/payouts'
+      path: '/payouts'
+      fullPath: '/admin/payouts'
+      preLoaderRoute: typeof AdminPayoutsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/ops': {
       id: '/admin/ops'
-      path: '/admin/ops'
+      path: '/ops'
       fullPath: '/admin/ops'
       preLoaderRoute: typeof AdminOpsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/merch': {
       id: '/admin/merch'
-      path: '/admin/merch'
+      path: '/merch'
       fullPath: '/admin/merch'
       preLoaderRoute: typeof AdminMerchRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/login': {
       id: '/admin/login'
-      path: '/admin/login'
+      path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/live-queue': {
       id: '/admin/live-queue'
-      path: '/admin/live-queue'
+      path: '/live-queue'
       fullPath: '/admin/live-queue'
       preLoaderRoute: typeof AdminLiveQueueRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
-      path: '/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/content': {
+      id: '/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AdminContentRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/cancellation-emails': {
       id: '/admin/cancellation-emails'
-      path: '/admin/cancellation-emails'
+      path: '/cancellation-emails'
       fullPath: '/admin/cancellation-emails'
       preLoaderRoute: typeof AdminCancellationEmailsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/bookings': {
       id: '/admin/bookings'
-      path: '/admin/bookings'
+      path: '/bookings'
       fullPath: '/admin/bookings'
       preLoaderRoute: typeof AdminBookingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/audit': {
       id: '/admin/audit'
-      path: '/admin/audit'
+      path: '/audit'
       fullPath: '/admin/audit'
       preLoaderRoute: typeof AdminAuditRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/artists': {
+      id: '/admin/artists'
+      path: '/artists'
+      fullPath: '/admin/artists'
+      preLoaderRoute: typeof AdminArtistsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/analytics': {
       id: '/admin/analytics'
-      path: '/admin/analytics'
+      path: '/analytics'
       fullPath: '/admin/analytics'
       preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/play/audience/$room': {
       id: '/play/audience/$room'
@@ -1587,6 +1783,58 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminArtistsRoute: typeof AdminArtistsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
+  AdminContentRoute: typeof AdminContentRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminEventsRoute: typeof AdminEventsRoute
+  AdminLiveQueueRoute: typeof AdminLiveQueueRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminMerchRoute: typeof AdminMerchRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminOpsRoute: typeof AdminOpsRoute
+  AdminPayoutsRoute: typeof AdminPayoutsRoute
+  AdminProfileRoute: typeof AdminProfileRoute
+  AdminSecurityRoute: typeof AdminSecurityRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminStreamsRoute: typeof AdminStreamsRoute
+  AdminTicketsRoute: typeof AdminTicketsRoute
+  AdminTransactionsRoute: typeof AdminTransactionsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminArtistsRoute: AdminArtistsRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminBookingsRoute: AdminBookingsRoute,
+  AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
+  AdminContentRoute: AdminContentRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminEventsRoute: AdminEventsRoute,
+  AdminLiveQueueRoute: AdminLiveQueueRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminMerchRoute: AdminMerchRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminOpsRoute: AdminOpsRoute,
+  AdminPayoutsRoute: AdminPayoutsRoute,
+  AdminProfileRoute: AdminProfileRoute,
+  AdminSecurityRoute: AdminSecurityRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminStreamsRoute: AdminStreamsRoute,
+  AdminTicketsRoute: AdminTicketsRoute,
+  AdminTransactionsRoute: AdminTransactionsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface LiveReviewRouteChildren {
   LiveReviewSuccessRoute: typeof LiveReviewSuccessRoute
 }
@@ -1647,6 +1895,7 @@ const VideosRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
+  AdminRoute: AdminRouteWithChildren,
   ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
@@ -1672,17 +1921,6 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminAuditRoute: AdminAuditRoute,
-  AdminBookingsRoute: AdminBookingsRoute,
-  AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
-  AdminLiveQueueRoute: AdminLiveQueueRoute,
-  AdminLoginRoute: AdminLoginRoute,
-  AdminMerchRoute: AdminMerchRoute,
-  AdminOpsRoute: AdminOpsRoute,
-  AdminStreamsRoute: AdminStreamsRoute,
-  AdminUsersRoute: AdminUsersRoute,
   ArtistIdRoute: ArtistIdRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
@@ -1693,7 +1931,6 @@ const rootRouteChildren: RootRouteChildren = {
   PlayRoomRoute: PlayRoomRoute,
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
-  AdminIndexRoute: AdminIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
@@ -1714,13 +1951,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
