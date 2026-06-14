@@ -39,7 +39,8 @@ export const startShopifyInstall = createServerFn({ method: "POST" })
 export const getMyShopifyStore = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: store } = await context.supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: store } = await supabaseAdmin
       .from("shopify_stores")
       .select("id, shop_domain, shop_name, currency, connected_at, last_synced_at")
       .eq("user_id", context.userId)
