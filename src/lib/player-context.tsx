@@ -88,7 +88,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setState((s) => {
       if (!s.queue.length) return s;
       const idx = s.queue.findIndex((t) => t.id === s.track?.id);
-      const nxt = s.shuffle ? s.queue[Math.floor(Math.random() * s.queue.length)] : (s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null));
+      let nxt: PlayerTrack | null;
+      if (s.shuffle && s.queue.length > 1) {
+        let r = idx;
+        while (r === idx) r = Math.floor(Math.random() * s.queue.length);
+        nxt = s.queue[r];
+      } else {
+        nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
+      }
       if (!nxt) return s;
       const a = audioRef.current; if (a) { a.src = nxt.audioUrl; a.play().catch(() => {}); }
       return { ...s, track: nxt, isPlaying: true, progress: 0 };
