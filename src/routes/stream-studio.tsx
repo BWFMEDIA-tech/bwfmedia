@@ -53,6 +53,7 @@ function StreamStudioGuard() {
   const navigate = useNavigate();
   const canBroadcast =
     auth.roles.includes("admin") ||
+    auth.roles.includes("manager") ||
     auth.roles.includes("host") ||
     auth.roles.includes("artist");
 
