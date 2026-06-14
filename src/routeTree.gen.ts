@@ -83,6 +83,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicShopifyInstallRouteImport } from './routes/api/public/shopify/install'
+import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify/callback'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const VideosRoute = VideosRouteImport.update({
@@ -459,6 +460,12 @@ const ApiPublicShopifyInstallRoute = ApiPublicShopifyInstallRouteImport.update({
   path: '/api/public/shopify/install',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicShopifyCallbackRoute =
+  ApiPublicShopifyCallbackRouteImport.update({
+    id: '/api/public/shopify/callback',
+    path: '/api/public/shopify/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -536,6 +543,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -613,6 +621,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -691,6 +700,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/install': typeof ApiPublicShopifyInstallRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -770,6 +780,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/public/payments/webhook'
+    | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -847,6 +858,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/public/payments/webhook'
+    | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -924,6 +936,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/public/payments/webhook'
+    | '/api/public/shopify/callback'
     | '/api/public/shopify/install'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -988,6 +1001,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
   ApiPublicShopifyInstallRoute: typeof ApiPublicShopifyInstallRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1516,6 +1530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicShopifyInstallRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shopify/callback': {
+      id: '/api/public/shopify/callback'
+      path: '/api/public/shopify/callback'
+      fullPath: '/api/public/shopify/callback'
+      preLoaderRoute: typeof ApiPublicShopifyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -1640,6 +1661,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
   ApiPublicShopifyInstallRoute: ApiPublicShopifyInstallRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
