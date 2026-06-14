@@ -21,9 +21,13 @@ function PublicProfilePage() {
   useEffect(() => {
     let mounted = true;
     async function load() {
-      const { data } = await supabase.from("profiles").select("display_name, avatar_url, bio").eq("id", id).maybeSingle();
+      const { data } = await supabase
+        .from("public_profiles" as any)
+        .select("display_name, avatar_url, bio")
+        .eq("public_id", id)
+        .maybeSingle();
       if (!mounted) return;
-      setProfile(data ?? null);
+      setProfile((data as any) ?? null);
       setLoading(false);
     }
     load();
