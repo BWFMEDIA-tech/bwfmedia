@@ -24,7 +24,6 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as LiveReviewRouteImport } from './routes/live-review'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as EventsRouteImport } from './routes/events'
@@ -57,7 +56,6 @@ import { Route as SettingsAppearanceRouteImport } from './routes/settings.appear
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
-import { Route as LiveReviewSuccessRouteImport } from './routes/live-review.success'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -76,7 +74,6 @@ import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AdminLiveQueueRouteImport } from './routes/admin.live-queue'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
@@ -173,11 +170,6 @@ const MessagesRoute = MessagesRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LiveReviewRoute = LiveReviewRouteImport.update({
-  id: '/live-review',
-  path: '/live-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveRoute = LiveRouteImport.update({
@@ -340,11 +332,6 @@ const PayBookingIdRoute = PayBookingIdRouteImport.update({
   path: '/pay/$bookingId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LiveReviewSuccessRoute = LiveReviewSuccessRouteImport.update({
-  id: '/success',
-  path: '/success',
-  getParentRoute: () => LiveReviewRoute,
-} as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
@@ -433,11 +420,6 @@ const AdminMerchRoute = AdminMerchRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLiveQueueRoute = AdminLiveQueueRouteImport.update({
-  id: '/live-queue',
-  path: '/live-queue',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminEventsRoute = AdminEventsRouteImport.update({
@@ -570,7 +552,6 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/live': typeof LiveRoute
-  '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
@@ -594,7 +575,6 @@ export interface FileRoutesByFullPath {
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
-  '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -613,7 +593,6 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
-  '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -661,7 +640,6 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/live': typeof LiveRoute
-  '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
@@ -685,7 +663,6 @@ export interface FileRoutesByTo {
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
-  '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -704,7 +681,6 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
-  '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -754,7 +730,6 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/live': typeof LiveRoute
-  '/live-review': typeof LiveReviewRouteWithChildren
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
@@ -778,7 +753,6 @@ export interface FileRoutesById {
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
-  '/admin/live-queue': typeof AdminLiveQueueRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -797,7 +771,6 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
-  '/live-review/success': typeof LiveReviewSuccessRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -848,7 +821,6 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/live'
-    | '/live-review'
     | '/login'
     | '/messages'
     | '/mic-drop'
@@ -872,7 +844,6 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
-    | '/admin/live-queue'
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
@@ -891,7 +862,6 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
-    | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -939,7 +909,6 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/live'
-    | '/live-review'
     | '/login'
     | '/messages'
     | '/mic-drop'
@@ -963,7 +932,6 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
-    | '/admin/live-queue'
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
@@ -982,7 +950,6 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
-    | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1031,7 +998,6 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/live'
-    | '/live-review'
     | '/login'
     | '/messages'
     | '/mic-drop'
@@ -1055,7 +1021,6 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
-    | '/admin/live-queue'
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
@@ -1074,7 +1039,6 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
-    | '/live-review/success'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1124,7 +1088,6 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LiveRoute: typeof LiveRoute
-  LiveReviewRoute: typeof LiveReviewRouteWithChildren
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   MicDropRoute: typeof MicDropRoute
@@ -1273,13 +1236,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live-review': {
-      id: '/live-review'
-      path: '/live-review'
-      fullPath: '/live-review'
-      preLoaderRoute: typeof LiveReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live': {
@@ -1506,13 +1462,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PayBookingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/live-review/success': {
-      id: '/live-review/success'
-      path: '/success'
-      fullPath: '/live-review/success'
-      preLoaderRoute: typeof LiveReviewSuccessRouteImport
-      parentRoute: typeof LiveReviewRoute
-    }
     '/invite/$code': {
       id: '/invite/$code'
       path: '/invite/$code'
@@ -1637,13 +1586,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/live-queue': {
-      id: '/admin/live-queue'
-      path: '/live-queue'
-      fullPath: '/admin/live-queue'
-      preLoaderRoute: typeof AdminLiveQueueRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/events': {
@@ -1812,7 +1754,6 @@ interface AdminRouteChildren {
   AdminContentRoute: typeof AdminContentRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventsRoute: typeof AdminEventsRoute
-  AdminLiveQueueRoute: typeof AdminLiveQueueRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMerchRoute: typeof AdminMerchRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
@@ -1837,7 +1778,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminContentRoute: AdminContentRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEventsRoute: AdminEventsRoute,
-  AdminLiveQueueRoute: AdminLiveQueueRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMerchRoute: AdminMerchRoute,
   AdminMessagesRoute: AdminMessagesRoute,
@@ -1854,18 +1794,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
-interface LiveReviewRouteChildren {
-  LiveReviewSuccessRoute: typeof LiveReviewSuccessRoute
-}
-
-const LiveReviewRouteChildren: LiveReviewRouteChildren = {
-  LiveReviewSuccessRoute: LiveReviewSuccessRoute,
-}
-
-const LiveReviewRouteWithChildren = LiveReviewRoute._addFileChildren(
-  LiveReviewRouteChildren,
-)
 
 interface SettingsRouteChildren {
   SettingsAppearanceRoute: typeof SettingsAppearanceRoute
@@ -1925,7 +1853,6 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LiveRoute: LiveRoute,
-  LiveReviewRoute: LiveReviewRouteWithChildren,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   MicDropRoute: MicDropRoute,
