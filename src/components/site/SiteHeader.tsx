@@ -137,10 +137,6 @@ export function SiteHeader() {
         {/* Logo */}
         <RouterLink to="/" className="flex items-center gap-2 shrink-0 mr-2">
           <img src={bwfLogo} alt="BWF Network" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
-          <span className="hidden sm:block leading-tight">
-            <span className="block font-display text-base md:text-lg tracking-widest text-bone">BWF</span>
-            <span className="block font-cond text-[9px] tracking-[0.35em] text-blood -mt-0.5">NETWORK</span>
-          </span>
         </RouterLink>
 
         {/* Desktop primary nav */}
