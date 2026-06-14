@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /lovable/
 
-Sitemap: https://bwfmedia.company/sitemap.xml
+Sitemap: https://www.bwfnetwork.com/sitemap.xml
