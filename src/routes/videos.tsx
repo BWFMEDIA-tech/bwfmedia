@@ -1,9 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Upload, LogIn, LogOut, Music2, Megaphone, ExternalLink } from "lucide-react";
+import {
+  Trash2, Upload, LogIn, LogOut, Megaphone,
+  Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
+  Bell, MessageSquare, Search, ChevronDown, BadgeCheck,
+  PlayCircle, Sparkles, Flame, Star, Eye, Award, Music2,
+  Music, Smile, MapPin, User, Clapperboard, Plus,
+  Clock, ListVideo, Settings as SettingsIcon,
+  Volume2, Maximize, Shuffle, SkipBack, SkipForward, Repeat,
+} from "lucide-react";
 import bwfLogo from "@/assets/bwf-logo.png";
-import grunge from "@/assets/grunge-bg.jpg";
 
 export const Route = createFileRoute("/videos")({
   component: VideosPage,
