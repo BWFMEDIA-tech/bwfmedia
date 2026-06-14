@@ -41,10 +41,10 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
   const pmap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
 
   // Featured artists: profiles with bio + avatar, capped at 6.
-  const featuredArtists = artistIds
+  const featuredArtists = (artistIds
     .map((id) => pmap.get(id))
     .filter((p: any) => p && (p.avatar_url || p.bio))
-    .slice(0, 6);
+    .slice(0, 6)) as any[];
 
   // Resolve thumbnail URLs for videos.
   const videos = await Promise.all(
