@@ -34,6 +34,7 @@ import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
+import { useArtistSubscription } from "@/hooks/useArtistSubscription";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -51,11 +52,17 @@ export const Route = createFileRoute("/stream-studio")({
 function StreamStudioGuard() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const artistSub = useArtistSubscription();
   const canBroadcast =
     auth.roles.includes("admin") ||
     auth.roles.includes("manager") ||
     auth.roles.includes("host") ||
     auth.roles.includes("artist");
+
+  const isPrivileged =
+    auth.roles.includes("admin") || auth.roles.includes("manager") || auth.roles.includes("host");
+  const isArtistOnly = !isPrivileged && auth.roles.includes("artist");
+  const needsTrial = isArtistOnly && !artistSub.isLoading && !artistSub.isActive;
 
   useEffect(() => {
     if (auth.loading || auth.rolesLoading) return;
@@ -71,10 +78,14 @@ function StreamStudioGuard() {
         route: "/stream-studio",
       } as any);
       navigate({ to: "/access-denied", replace: true });
+      return;
     }
-  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, canBroadcast, auth.user?.id, navigate]);
+    if (needsTrial) {
+      navigate({ to: "/artist/upgrade", replace: true });
+    }
+  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, canBroadcast, needsTrial, auth.user?.id, navigate]);
 
-  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !canBroadcast) {
+  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !canBroadcast || (isArtistOnly && artistSub.isLoading) || needsTrial) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#07070d] text-white/60 text-sm">
         Checking permissions…
