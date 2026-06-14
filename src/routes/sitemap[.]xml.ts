@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const BASE_URL = "https://bwfmedia.company";
+const BASE_URL = "https://www.bwfnetwork.com";
 
 interface SitemapEntry {
   path: string;
@@ -20,6 +20,12 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/studio", changefreq: "weekly", priority: "0.9" },
           { path: "/off-the-block", changefreq: "weekly", priority: "0.9" },
           { path: "/videos", changefreq: "weekly", priority: "0.8" },
+          { path: "/artists", changefreq: "weekly", priority: "0.8" },
+          { path: "/events", changefreq: "weekly", priority: "0.7" },
+          { path: "/deck", changefreq: "monthly", priority: "0.5" },
+          { path: "/dashboard", changefreq: "monthly", priority: "0.4" },
+          { path: "/earnings", changefreq: "monthly", priority: "0.4" },
+          { path: "/access-denied", changefreq: "yearly", priority: "0.1" },
           { path: "/blog", changefreq: "weekly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.6" },
         ];

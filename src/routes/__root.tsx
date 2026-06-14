@@ -37,44 +37,25 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BWF Media TV" },
-      {
-        name: "description",
-        content:
-          "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners.",
-      },
+      { title: "BWF Network — Music, Live Streams, and Creator Platform" },
+      { name: "description", content: "BWF Network is the creator-powered entertainment platform for independent artists: stream music, host live audio and video, sell merch, and grow your fanbase." },
       { name: "author", content: "BWF Media TV" },
-      { property: "og:title", content: "BWF Media TV" },
-      {
-        property: "og:description",
-        content:
-          "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners.",
-      },
+      { property: "og:title", content: "BWF Network — Music, Live Streams, and Creator Platform" },
+      { property: "og:description", content: "Stream music, go live, and monetize your audience on BWF Network — the creator-powered entertainment platform from BWF Media TV." },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "BWF Media TV" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@bwfmediatv" },
-      { name: "twitter:title", content: "BWF Media TV" },
-      {
-        name: "twitter:description",
-        content:
-          "Viral Velocity Deck is a pitch deck template for BWF Media TV to attract investors and media partners.",
-      },
+      { name: "twitter:title", content: "BWF Network — Music, Live Streams, and Creator Platform" },
+      { name: "twitter:description", content: "Stream music, go live, and monetize your audience on BWF Network." },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png",
+        content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png",
       },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ddc10b07-a589-4ecc-a77c-3e9e2883515d/id-preview-8d4f3b74--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1777303921831.png",
+        content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png",
       },
-      { name: "description", content: "BWFNETWORK is a production-ready livestream platform for BWF Media TV's viral content." },
-      { property: "og:description", content: "BWFNETWORK is a production-ready livestream platform for BWF Media TV's viral content." },
-      { name: "twitter:description", content: "BWFNETWORK is a production-ready livestream platform for BWF Media TV's viral content." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png" },
     ],
     scripts: [
       {
@@ -87,18 +68,18 @@ export const Route = createRootRoute({
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://bwfmedia.company/#organization",
+              "@id": "https://bwfnetwork.com/#organization",
               name: "BWF Media TV",
-              url: "https://bwfmedia.company",
-              logo: "https://bwfmedia.company/favicon.png",
+              url: "https://bwfnetwork.com",
+              logo: "https://bwfnetwork.com/favicon.png",
               sameAs: ["https://youtube.com/@bwfmedia", "https://instagram.com/bwfmediatv"],
             },
             {
               "@type": "WebSite",
-              "@id": "https://bwfmedia.company/#website",
-              url: "https://bwfmedia.company",
+              "@id": "https://bwfnetwork.com/#website",
+              url: "https://bwfnetwork.com",
               name: "BWF Media TV",
-              publisher: { "@id": "https://bwfmedia.company/#organization" },
+              publisher: { "@id": "https://bwfnetwork.com/#organization" },
             },
           ],
         }),

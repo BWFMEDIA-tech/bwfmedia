@@ -9,9 +9,20 @@ export const Route = createFileRoute("/blog")({
       { property: "og:title", content: "BWF Media TV Blog, Where Culture Speaks" },
       { property: "og:description", content: "Interviews, BTS, and culture commentary from BWF Media TV." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfmedia.company/blog" },
+      { property: "og:url", content: "https://bwfnetwork.com/blog" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfmedia.company/blog" }],
+    links: [{ rel: "canonical", href: "https://bwfnetwork.com/blog" }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        name: "BWF Media TV Blog",
+        url: "https://bwfnetwork.com/blog",
+        description: "Interviews, BTS, and culture commentary from BWF Media TV.",
+        publisher: { "@type": "Organization", name: "BWF Media TV", url: "https://bwfnetwork.com" },
+      }),
+    }],
   }),
   component: BlogPage,
 });
