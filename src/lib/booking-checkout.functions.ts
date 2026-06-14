@@ -16,8 +16,9 @@ const Schema = z.object({
 });
 
 export const createBookingCheckout = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data) => Schema.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const pkg = BOOKING_PACKAGES[data.packageId];
     if (!pkg) throw new Error('Unknown package');
 
@@ -31,6 +32,21 @@ export const createBookingCheckout = createServerFn({ method: 'POST' })
       .eq('id', data.bookingId)
       .maybeSingle();
     if (error || !booking) throw new Error('Booking not found');
+
+    // Ownership: the booking's email must match the authenticated user, OR
+    // the caller must be an admin. Prevents a stranger who guesses/learns a
+    // booking UUID from initiating checkout and locking out the real payer.
+    const { data: userRow } = await context.supabase.auth.getUser();
+    const callerEmail = userRow.user?.email?.toLowerCase() ?? null;
+    const callerId = userRow.user?.id ?? null;
+    const { data: adminRow } = callerId
+      ? await supabase.from('user_roles').select('role').eq('user_id', callerId).eq('role', 'admin').maybeSingle()
+      : { data: null };
+    const isAdmin = !!adminRow;
+    if (!isAdmin && (!callerEmail || !booking.email || booking.email.toLowerCase() !== callerEmail)) {
+      throw new Error('Not authorized for this booking');
+    }
+
     if (booking.status === 'confirmed' || booking.status === 'delivered') {
       throw new Error('Booking is already paid');
     }
