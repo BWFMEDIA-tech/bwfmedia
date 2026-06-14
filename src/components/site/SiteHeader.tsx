@@ -246,7 +246,7 @@ export function SiteHeader() {
                     >
                       <div className="px-4 py-3 border-b border-white/10">
                         <div className="text-sm font-semibold text-bone truncate">{auth.displayName || "User"}</div>
-                        <div className="text-[11px] text-bone/50 truncate">{auth.email}</div>
+                        <div className="text-[11px] text-bone/50 truncate">{auth.user?.email}</div>
                       </div>
                       <RouterLink to="/profile" className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
                         <User size={15} /> Profile
@@ -385,7 +385,7 @@ export function SiteHeader() {
                       )}
                       <div className="min-w-0">
                         <div className="text-sm font-semibold text-bone truncate">{auth.displayName || "User"}</div>
-                        <div className="text-[11px] text-bone/50 truncate">{auth.email}</div>
+                        <div className="text-[11px] text-bone/50 truncate">{auth.user?.email}</div>
                       </div>
                     </div>
                     <RouterLink to="/profile" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
