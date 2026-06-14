@@ -1511,6 +1511,24 @@ export type Database = {
           },
         ]
       }
+      track_likes: {
+        Row: {
+          created_at: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_bans: {
         Row: {
           banned_by: string
