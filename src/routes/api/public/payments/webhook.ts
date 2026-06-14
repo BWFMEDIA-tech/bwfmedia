@@ -130,6 +130,56 @@ async function upsertPlayMembershipFromSubscription(sub: any) {
   if (error) console.error('play_memberships upsert failed', error);
 }
 
+async function upsertArtistSubscription(sub: any, env: StripeEnv) {
+  const userId = sub?.metadata?.userId as string | undefined;
+  if (!userId) {
+    console.warn('artist_membership sub missing userId', sub?.id);
+    return;
+  }
+  const item = sub.items?.data?.[0];
+  const priceId = item?.price?.lookup_key
+    || item?.price?.metadata?.lovable_external_id
+    || item?.price?.id;
+  const productId = typeof item?.price?.product === 'string'
+    ? item.price.product
+    : item?.price?.product?.id;
+  const periodStart = item?.current_period_start ?? sub.current_period_start;
+  const periodEnd = item?.current_period_end ?? sub.current_period_end;
+  const trialEnd = sub.trial_end ?? null;
+  const supabase = getSupabase();
+  const { error } = await supabase.from('subscriptions').upsert({
+    user_id: userId,
+    stripe_subscription_id: sub.id,
+    stripe_customer_id: sub.customer,
+    product_id: productId ?? 'artist_membership',
+    price_id: priceId ?? 'artist_monthly',
+    status: sub.status ?? 'active',
+    current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    trial_end: trialEnd ? new Date(trialEnd * 1000).toISOString() : null,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    environment: env,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'stripe_subscription_id' });
+  if (error) console.error('artist subscriptions upsert failed', error);
+}
+
+async function markArtistSubscriptionDeleted(sub: any, env: StripeEnv) {
+  const supabase = getSupabase();
+  const periodEnd = sub.items?.data?.[0]?.current_period_end ?? sub.current_period_end;
+  const { error } = await supabase
+    .from('subscriptions')
+    .update({
+      status: 'canceled',
+      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      cancel_at_period_end: !!sub.cancel_at_period_end,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_subscription_id', sub.id)
+    .eq('environment', env);
+  if (error) console.error('artist subscriptions cancel failed', error);
+}
+
 function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
   if (meta.kind === 'tip') return recordTip(session);
@@ -164,6 +214,12 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
               const sub: any = event.data.object;
               if (sub?.metadata?.kind === 'play_membership') {
                 await upsertPlayMembershipFromSubscription(sub);
+              } else if (sub?.metadata?.kind === 'artist_membership') {
+                if (event.type === 'customer.subscription.deleted') {
+                  await markArtistSubscriptionDeleted(sub, env);
+                } else {
+                  await upsertArtistSubscription(sub, env);
+                }
               }
               break;
             }

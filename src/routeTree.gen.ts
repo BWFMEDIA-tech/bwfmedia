@@ -62,6 +62,7 @@ import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
+import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
@@ -364,6 +365,11 @@ const CheckoutCancelRoute = CheckoutCancelRouteImport.update({
   path: '/checkout/cancel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArtistUpgradeRoute = ArtistUpgradeRouteImport.update({
+  id: '/artist/upgrade',
+  path: '/artist/upgrade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArtistIdRoute = ArtistIdRouteImport.update({
   id: '/artist/$id',
   path: '/artist/$id',
@@ -602,6 +608,7 @@ export interface FileRoutesByFullPath {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
+  '/artist/upgrade': typeof ArtistUpgradeRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -692,6 +699,7 @@ export interface FileRoutesByTo {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
+  '/artist/upgrade': typeof ArtistUpgradeRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -784,6 +792,7 @@ export interface FileRoutesById {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
+  '/artist/upgrade': typeof ArtistUpgradeRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -877,6 +886,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/artist/$id'
+    | '/artist/upgrade'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -967,6 +977,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/artist/$id'
+    | '/artist/upgrade'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -1058,6 +1069,7 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/artist/$id'
+    | '/artist/upgrade'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -1129,6 +1141,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
   ArtistIdRoute: typeof ArtistIdRoute
+  ArtistUpgradeRoute: typeof ArtistUpgradeRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1528,6 +1541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutCancelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/artist/upgrade': {
+      id: '/artist/upgrade'
+      path: '/artist/upgrade'
+      fullPath: '/artist/upgrade'
+      preLoaderRoute: typeof ArtistUpgradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/artist/$id': {
       id: '/artist/$id'
       path: '/artist/$id'
@@ -1922,6 +1942,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
   ArtistIdRoute: ArtistIdRoute,
+  ArtistUpgradeRoute: ArtistUpgradeRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
