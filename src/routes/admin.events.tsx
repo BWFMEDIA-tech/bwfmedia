@@ -29,11 +29,6 @@ function EventsAdmin() {
           <div className="mt-3 font-bold">Bookings</div>
           <div className="text-xs text-white/50">Studio and block booking requests.</div>
         </Link>
-        <Link to="/admin/live-queue" className="rounded-2xl border border-white/10 bg-[#0d0d18] p-6 transition hover:border-violet-500/40">
-          <ListOrdered className="h-6 w-6 text-violet-400" />
-          <div className="mt-3 font-bold">Live Review Queue</div>
-          <div className="text-xs text-white/50">Approve submissions for live shows.</div>
-        </Link>
       </div>
     </SectionPage>
   );

@@ -11,7 +11,6 @@ import {
   Headphones, Wifi, PhoneOff, ChevronRight, GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLiveQueue } from "@/lib/useLiveQueue";
 import { toast } from "sonner";
 import hostImg from "@/assets/stream-host.jpg";
 import guestImg from "@/assets/stream-guest.jpg";
@@ -320,20 +319,18 @@ function JoinRequests() {
 }
 
 function OnDeck() {
-  const { rows } = useLiveQueue();
-  const queue = rows.filter((r) => r.queue_status === "queued" || r.queue_status === "next_up").slice(0, 4);
   const fallback = [
     { id: "1", artist_name: "Kairo", handle: "@kairo.wav", genre: "Alternative" },
     { id: "2", artist_name: "Jae Moné", handle: "@jaemone.music", genre: "R&B" },
     { id: "3", artist_name: "Treyvon", handle: "@treyvonofficial", genre: "Hip Hop" },
     { id: "4", artist_name: "Dolla Dreamz", handle: "@dolladreamzmusic", genre: "Trap / Rap" },
   ];
-  const list = queue.length ? queue.map((q, i) => ({ id: q.id, artist_name: q.artist_name, handle: `@${q.artist_name.toLowerCase().replace(/\s+/g, "")}`, genre: q.song_title ?? "Track" })) : fallback;
+  const list = fallback;
 
   return (
     <Panel title="ON DECK" count={list.length} dismissible>
       <div className="flex flex-col gap-2.5">
-        {list.map((a, i) => (
+        {list.map((a: typeof fallback[number], i: number) => (
           <div key={a.id} className="flex items-center gap-3 rounded-lg px-1">
             <span className="w-4 text-xs font-bold text-white/40">{i + 1}</span>
             <div className="h-9 w-9 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />

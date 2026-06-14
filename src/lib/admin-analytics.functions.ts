@@ -17,7 +17,6 @@ export const getGlobalAnalytics = createServerFn({ method: "POST" })
       videosCount,
       recordingsCount,
       messages30,
-      submissionsPaid,
       bookingsPaid,
       bansActive,
       rolesAll,
@@ -30,7 +29,6 @@ export const getGlobalAnalytics = createServerFn({ method: "POST" })
       sb.from("videos").select("id", { count: "exact", head: true }),
       sb.from("stream_recordings").select("id", { count: "exact", head: true }).eq("status", "ready"),
       sb.from("stream_messages").select("id", { count: "exact", head: true }).gte("created_at", since30),
-      sb.from("live_submissions").select("amount_cents").eq("status", "paid"),
       sb.from("studio_bookings").select("amount_paid_cents").not("paid_at", "is", null),
       sb.from("user_bans").select("id", { count: "exact", head: true }),
       sb.from("user_roles").select("role"),
@@ -53,7 +51,6 @@ export const getGlobalAnalytics = createServerFn({ method: "POST" })
       revenueCents: {
         tipsAllTime: sumCents(tipsPaid.data),
         tipsLast30Days: sumCents(tips30.data),
-        liveSubmissions: sumCents(submissionsPaid.data),
         studioBookings: sumCents(bookingsPaid.data, "amount_paid_cents"),
       },
       content: {
