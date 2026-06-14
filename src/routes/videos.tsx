@@ -2,15 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Upload, LogIn, LogOut,
+  Upload,
   Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
-  Bell, MessageSquare, Search, ChevronDown, BadgeCheck,
+  BadgeCheck,
   PlayCircle, Sparkles, Flame, Star, Eye, Award, Music2,
   Music, Smile, MapPin, User, Clapperboard, Plus,
   Clock, ListVideo, Settings as SettingsIcon,
   Volume2, Maximize, Shuffle, SkipBack, SkipForward, Repeat,
 } from "lucide-react";
-import bwfLogo from "@/assets/bwf-logo.png";
 
 export const Route = createFileRoute("/videos")({
   component: VideosPage,
@@ -42,16 +41,6 @@ type VideoRow = {
 function publicUrl(path: string) {
   return supabase.storage.from("videos").getPublicUrl(path).data.publicUrl;
 }
-
-const NAV_LINKS = [
-  { label: "Home", to: "/" as const },
-  { label: "Play Arena", to: "/play-arena" as const },
-  { label: "Live Shows", to: "/live-shows" as const },
-  { label: "Discover", to: "/discover" as const },
-  { label: "Radio", to: "/radio" as const },
-  { label: "Music Videos", to: "/videos" as const, active: true },
-  { label: "Charts", to: "/charts" as const },
-];
 
 const SIDEBAR_PRIMARY = [
   { label: "All Videos", icon: PlayCircle, key: "all" as const },
@@ -278,65 +267,6 @@ function VideosPage() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* TOP NAV */}
-      <nav className="sticky top-0 z-40 bg-black/95 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-16 flex items-center gap-6">
-          <Link to="/" className="flex items-center shrink-0">
-            <img src={bwfLogo} alt="BWF Network" className="h-10 w-auto object-contain" />
-          </Link>
-          <div className="hidden lg:flex items-center gap-7 flex-1">
-            {NAV_LINKS.map((l) => (
-              <Link
-                key={l.label}
-                to={l.to as any}
-                className={`text-sm font-medium transition-colors relative ${
-                  l.active ? "text-red-500" : "text-white/80 hover:text-white"
-                }`}
-              >
-                {l.label}
-                {l.active && <span className="absolute -bottom-[22px] left-0 right-0 h-[2px] bg-red-500" />}
-              </Link>
-            ))}
-            <button className="text-sm font-medium text-white/80 hover:text-white flex items-center gap-1">
-              Browse <ChevronDown size={14} />
-            </button>
-          </div>
-          <div className="hidden md:flex items-center bg-white/5 rounded-full px-4 py-2 w-72 gap-2 border border-white/5">
-            <Search size={16} className="text-white/40" />
-            <input
-              placeholder="Search music videos, artists..."
-              className="bg-transparent text-sm outline-none flex-1 placeholder:text-white/40"
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 relative">
-              <Bell size={16} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10">
-              <MessageSquare size={16} />
-            </button>
-            {userId ? (
-              <button
-                onClick={() => supabase.auth.signOut()}
-                className="w-10 h-10 rounded-full border-2 border-red-500 flex items-center justify-center"
-                title="Sign out"
-              >
-                <LogOut size={14} />
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowAuth(true)}
-                className="w-10 h-10 rounded-full border-2 border-red-500 flex items-center justify-center"
-                title="Sign in"
-              >
-                <LogIn size={14} />
-              </button>
-            )}
-          </div>
-        </div>
-      </nav>
-
       {/* MAIN LAYOUT */}
       <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 md:px-8 py-6 grid grid-cols-12 gap-6 pb-32">
         {/* LEFT SIDEBAR */}
