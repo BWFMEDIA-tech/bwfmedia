@@ -36,6 +36,7 @@ const Ctx = createContext<PlayerApi | null>(null);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const stateRef = useRef<PlayerState | null>(null);
   const [state, setState] = useState<PlayerState>({
     track: null,
     queue: [],
@@ -46,71 +47,93 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     shuffle: false,
     repeat: "off",
   });
+  stateRef.current = state;
 
   // lazy create audio element on client
   useEffect(() => {
     if (typeof window === "undefined") return;
     const a = new Audio();
     a.preload = "metadata";
-    a.volume = state.volume;
+    a.volume = stateRef.current?.volume ?? 0.8;
     audioRef.current = a;
     const onTime = () => setState((s) => ({ ...s, progress: a.currentTime }));
     const onMeta = () => setState((s) => ({ ...s, duration: a.duration || 0 }));
+    const onPlay = () => setState((s) => ({ ...s, isPlaying: true }));
+    const onPause = () => setState((s) => ({ ...s, isPlaying: false }));
     const onEnd = () => {
-      setState((s) => {
-        if (s.repeat === "one") { a.currentTime = 0; a.play(); return s; }
-        const idx = s.queue.findIndex((t) => t.id === s.track?.id);
-        const next = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
-        if (next) { a.src = next.audioUrl; a.play(); return { ...s, track: next, progress: 0 }; }
-        return { ...s, isPlaying: false };
-      });
+      const s = stateRef.current; if (!s) return;
+      if (s.repeat === "one") { a.currentTime = 0; a.play().catch(() => {}); return; }
+      const idx = s.queue.findIndex((t) => t.id === s.track?.id);
+      const nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
+      if (nxt) {
+        a.src = nxt.audioUrl; a.play().catch(() => {});
+        setState((p) => ({ ...p, track: nxt, progress: 0, isPlaying: true }));
+      } else {
+        setState((p) => ({ ...p, isPlaying: false }));
+      }
     };
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("loadedmetadata", onMeta);
+    a.addEventListener("durationchange", onMeta);
+    a.addEventListener("play", onPlay);
+    a.addEventListener("pause", onPause);
     a.addEventListener("ended", onEnd);
-    return () => { a.pause(); a.removeEventListener("timeupdate", onTime); a.removeEventListener("loadedmetadata", onMeta); a.removeEventListener("ended", onEnd); };
+    return () => {
+      a.pause();
+      a.removeEventListener("timeupdate", onTime);
+      a.removeEventListener("loadedmetadata", onMeta);
+      a.removeEventListener("durationchange", onMeta);
+      a.removeEventListener("play", onPlay);
+      a.removeEventListener("pause", onPause);
+      a.removeEventListener("ended", onEnd);
+    };
   }, []);
 
   const play = useCallback((track?: PlayerTrack, queue?: PlayerTrack[]) => {
     const a = audioRef.current; if (!a) return;
-    setState((s) => {
-      const t = track ?? s.track; if (!t) return s;
-      if (a.src !== t.audioUrl) a.src = t.audioUrl;
-      a.play().catch(() => {});
-      return { ...s, track: t, queue: queue ?? s.queue, isPlaying: true };
-    });
+    const s = stateRef.current!;
+    const t = track ?? s.track; if (!t) return;
+    const nextQueue = queue ?? (s.queue.length ? s.queue : [t]);
+    if (a.src !== t.audioUrl) { a.src = t.audioUrl; }
+    a.play().catch(() => { setState((p) => ({ ...p, isPlaying: false })); });
+    setState((p) => ({ ...p, track: t, queue: nextQueue, isPlaying: true, progress: 0 }));
   }, []);
 
-  const pause = useCallback(() => { audioRef.current?.pause(); setState((s) => ({ ...s, isPlaying: false })); }, []);
-  const toggle = useCallback(() => { const a = audioRef.current; if (!a || !state.track) return; if (a.paused) { a.play(); setState((s) => ({ ...s, isPlaying: true })); } else { a.pause(); setState((s) => ({ ...s, isPlaying: false })); } }, [state.track]);
+  const pause = useCallback(() => { audioRef.current?.pause(); }, []);
+
+  const toggle = useCallback(() => {
+    const a = audioRef.current; const s = stateRef.current;
+    if (!a || !s?.track) return;
+    if (a.paused) { a.play().catch(() => {}); } else { a.pause(); }
+  }, []);
 
   const next = useCallback(() => {
-    setState((s) => {
-      if (!s.queue.length) return s;
-      const idx = s.queue.findIndex((t) => t.id === s.track?.id);
-      let nxt: PlayerTrack | null;
-      if (s.shuffle && s.queue.length > 1) {
-        let r = idx;
-        while (r === idx) r = Math.floor(Math.random() * s.queue.length);
-        nxt = s.queue[r];
-      } else {
-        nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
-      }
-      if (!nxt) return s;
-      const a = audioRef.current; if (a) { a.src = nxt.audioUrl; a.play().catch(() => {}); }
-      return { ...s, track: nxt, isPlaying: true, progress: 0 };
-    });
+    const a = audioRef.current; const s = stateRef.current;
+    if (!a || !s || !s.queue.length) return;
+    const idx = s.queue.findIndex((t) => t.id === s.track?.id);
+    let nxt: PlayerTrack | null;
+    if (s.shuffle && s.queue.length > 1) {
+      let r = idx;
+      while (r === idx) r = Math.floor(Math.random() * s.queue.length);
+      nxt = s.queue[r];
+    } else {
+      nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
+    }
+    if (!nxt) return;
+    a.src = nxt.audioUrl; a.play().catch(() => {});
+    setState((p) => ({ ...p, track: nxt, isPlaying: true, progress: 0 }));
   }, []);
 
   const prev = useCallback(() => {
-    setState((s) => {
-      if (!s.queue.length) return s;
-      const idx = s.queue.findIndex((t) => t.id === s.track?.id);
-      const prv = s.queue[idx - 1] ?? s.queue[s.queue.length - 1];
-      if (!prv) return s;
-      const a = audioRef.current; if (a) { a.src = prv.audioUrl; a.play().catch(() => {}); }
-      return { ...s, track: prv, isPlaying: true, progress: 0 };
-    });
+    const a = audioRef.current; const s = stateRef.current;
+    if (!a || !s || !s.queue.length) return;
+    // If we're past 3s, restart current track instead of going back
+    if (a.currentTime > 3) { a.currentTime = 0; return; }
+    const idx = s.queue.findIndex((t) => t.id === s.track?.id);
+    const prv = s.queue[idx - 1] ?? (s.repeat === "all" ? s.queue[s.queue.length - 1] : s.queue[0]);
+    if (!prv) return;
+    a.src = prv.audioUrl; a.play().catch(() => {});
+    setState((p) => ({ ...p, track: prv, isPlaying: true, progress: 0 }));
   }, []);
 
   const seek = useCallback((sec: number) => { const a = audioRef.current; if (a) { a.currentTime = sec; setState((s) => ({ ...s, progress: sec })); } }, []);
