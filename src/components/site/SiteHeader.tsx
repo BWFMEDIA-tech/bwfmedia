@@ -311,6 +311,9 @@ export function SiteHeader() {
         </div>
 
         {/* Mobile toggle */}
+        <div className="md:hidden">
+          <HeaderCartButton />
+        </div>
         <button
           type="button"
           aria-label="Toggle menu"
