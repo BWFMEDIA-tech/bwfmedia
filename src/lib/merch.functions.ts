@@ -1,5 +1,40 @@
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseHeader } from "@tanstack/react-start/server";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  getShopifyCreds,
+  normalizeShopDomain,
+  newNonce,
+  SHOPIFY_SCOPES,
+} from "@/lib/shopify.server";
+
+// Auth-gated install starter. Replaces the previous public
+// /api/public/shopify/install endpoint that accepted an attacker-controlled
+// user_id query parameter. The userId is now bound to the authenticated
+// session, eliminating the account-hijack vector.
+export const startShopifyInstall = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({ shop: z.string().min(3).max(255), origin: z.string().url() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const shop = normalizeShopDomain(data.shop);
+    if (!shop) throw new Error("Invalid shop domain. Use yourstore.myshopify.com");
+    const { key } = getShopifyCreds();
+    const state = `${context.userId}.${newNonce()}`;
+    const redirectUri = `${new URL(data.origin).origin}/api/public/shopify/callback`;
+    const authUrl =
+      `https://${shop}/admin/oauth/authorize?client_id=${encodeURIComponent(key)}` +
+      `&scope=${encodeURIComponent(SHOPIFY_SCOPES)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&state=${encodeURIComponent(state)}`;
+    setResponseHeader(
+      "Set-Cookie",
+      `shopify_oauth_state=${state}; Path=/; Max-Age=600; HttpOnly; Secure; SameSite=Lax`,
+    );
+    return { authUrl };
+  });
 
 export const getMyShopifyStore = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
