@@ -951,6 +951,7 @@ export type Database = {
           last_seen_at: string | null
           location: string | null
           member_since: string | null
+          public_id: string
           stage_name: string | null
           updated_at: string
           username: string | null
@@ -970,6 +971,7 @@ export type Database = {
           last_seen_at?: string | null
           location?: string | null
           member_since?: string | null
+          public_id?: string
           stage_name?: string | null
           updated_at?: string
           username?: string | null
@@ -989,6 +991,7 @@ export type Database = {
           last_seen_at?: string | null
           location?: string | null
           member_since?: string | null
+          public_id?: string
           stage_name?: string | null
           updated_at?: string
           username?: string | null
