@@ -11,7 +11,7 @@ import {
 import "@livekit/components-styles";
 import { Track, ConnectionQuality } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
-import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
+import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { RecordButton } from "./RecordButton";
@@ -323,6 +323,28 @@ function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; on
     }
   };
 
+  const retryDevices = async () => {
+    if (!localParticipant) return;
+    try {
+      // Release any half-acquired tracks first so getUserMedia can re-prompt cleanly.
+      await localParticipant.setCameraEnabled(false);
+      await localParticipant.setMicrophoneEnabled(false);
+      await new Promise((r) => setTimeout(r, 150));
+      await localParticipant.setMicrophoneEnabled(true);
+      await localParticipant.setCameraEnabled(true);
+      setMicOn(true);
+      setCamOn(true);
+      toast.success("Camera & mic reconnected");
+    } catch (e: any) {
+      const msg = e?.name === "NotReadableError"
+        ? "Camera or mic is still in use by another app or tab."
+        : e?.name === "NotAllowedError"
+          ? "Camera/mic permission denied. Allow access in your browser settings."
+          : e?.message || "Could not reacquire camera/mic";
+      toast.error(msg);
+    }
+  };
+
   const qualityLabel = quality === ConnectionQuality.Excellent ? "Excellent"
     : quality === ConnectionQuality.Good ? "Good"
     : quality === ConnectionQuality.Poor ? "Poor" : "Connecting";
@@ -341,6 +363,7 @@ function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; on
       <CtrlBtn icon={micOn ? Mic : MicOff} label={micOn ? "Mute" : "Unmute"} onClick={toggleMic} active={!micOn} />
       <CtrlBtn icon={camOn ? Camera : CameraOff} label={camOn ? "Stop Cam" : "Start Cam"} onClick={toggleCam} active={!camOn} />
       <CtrlBtn icon={MonitorUp} label={sharing ? "Stop Share" : "Share Screen"} onClick={toggleShare} active={sharing} />
+      <CtrlBtn icon={RefreshCw} label="Retry Camera" onClick={retryDevices} />
       <CtrlBtn icon={UserPlus} label="Invite Guest" onClick={onInvite} />
       {streamId && <RecordButton streamId={streamId} />}
       <DeviceSelector compact />
