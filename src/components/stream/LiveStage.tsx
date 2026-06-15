@@ -97,49 +97,128 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
     onViewerCount?.(participants.length);
   }, [participants.length, onViewerCount]);
 
-  // Host = first camera track; everyone else = guests. Always show a guest slot
-  // even when empty so the host can invite more guests on the fly.
-  const hostTrack = cameraTracks[0] ?? null;
-  const guestTracks = cameraTracks.slice(1);
-  const guestSlotCount = Math.max(1, guestTracks.length);
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
+  const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
 
-  // Responsive column count: 1 tile = 1 col, 2 = 2 cols, 3-4 = 2 cols, 5+ = 3 cols
-  const totalTiles = 1 + guestSlotCount;
-  const gridCols =
-    totalTiles <= 1
-      ? "grid-cols-1"
-      : totalTiles <= 4
-        ? "grid-cols-1 sm:grid-cols-2"
-        : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+  // Bucket camera tracks by role panel.
+  type Panel = "admin" | "middle" | "host";
+  const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [] };
+  for (const t of cameraTracks) {
+    const id = t.participant?.identity ?? "";
+    const role = roleMap[id];
+    const panel: Panel =
+      role === "admin" || role === "administrator" || role === "owner" || role === "moderator"
+        ? "admin"
+        : role === "host" || role === "cohost" || role === "co_host"
+          ? "host"
+          : "middle"; // artist | guest | listener | speaker | unknown
+    buckets[panel].push(t);
+  }
+  // Priority: active speaker first within each bucket.
+  const sortByActive = (arr: typeof cameraTracks) =>
+    [...arr].sort((a, b) => Number(!!b.participant?.isSpeaking) - Number(!!a.participant?.isSpeaking));
+
+  const renderPanel = (panel: Panel, label: string, placeholder: string, fallback?: string) => {
+    const items = sortByActive(buckets[panel]);
+    const primary = items[0] ?? null;
+    const overflow = items.slice(1);
+    const primaryId = primary?.participant?.identity ?? null;
+    return (
+      <div className="flex flex-col gap-2">
+        <StageTile
+          track={primary}
+          label={label}
+          fallbackImage={fallback}
+          profile={primaryId ? profiles[primaryId] : undefined}
+          placeholder={placeholder}
+        />
+        {overflow.length > 0 && (
+          <div className="grid grid-cols-2 gap-2">
+            {overflow.map((t) => {
+              const id = t.participant?.identity ?? "";
+              return (
+                <StageTile
+                  key={id}
+                  track={t}
+                  label={label}
+                  profile={profiles[id]}
+                  small
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
-      <div className={`grid gap-4 ${gridCols}`}>
-        <StageTile
-          track={hostTrack}
-          label="HOST"
-          fallbackImage={hostImage}
-          profile={hostTrack?.participant?.identity ? profiles[hostTrack.participant.identity] : undefined}
-        />
-        {Array.from({ length: guestSlotCount }).map((_, i) => {
-          const t = guestTracks[i] ?? null;
-          const id = t?.participant?.identity ?? null;
-          return (
-            <StageTile
-              key={id ?? `guest-empty-${i}`}
-              track={t}
-              label={guestSlotCount > 1 ? `GUEST ${i + 1}` : "GUEST"}
-              fallbackImage={i === 0 ? guestImage : undefined}
-              profile={id ? profiles[id] : undefined}
-              placeholder={`Waiting for guest (${Math.max(0, participants.length - 1)} in room)`}
-            />
-          );
-        })}
+      {/* Desktop / tablet: 3-column grid. Mobile: swipeable horizontal carousel. */}
+      <div
+        className={cn(
+          "gap-4",
+          "flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "md:grid md:grid-cols-3 md:overflow-visible md:pb-0",
+        )}
+      >
+        <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
+          {renderPanel("admin", "ADMIN", "Waiting for Administrator")}
+        </div>
+        <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
+          {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
+        </div>
+        <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
+          {renderPanel("host", "HOST", "Waiting for Host", hostImage)}
+        </div>
       </div>
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
     </>
   );
+}
+
+/**
+ * Resolve LiveKit identities → role string for 3-panel broadcast routing.
+ * Combines `user_roles` (admin/moderator) with `stage_participants.stage_role`
+ * (host/co_host/speaker/listener), subscribed in realtime so role changes
+ * move feeds across panels without a refresh.
+ */
+function useParticipantRoles(streamId: string | undefined, identities: string[]): Record<string, string> {
+  const [map, setMap] = useState<Record<string, string>>({});
+  const key = [...new Set(identities)].sort().join(",");
+  useEffect(() => {
+    const ids = [...new Set(identities)].filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+    if (!ids.length) { setMap({}); return; }
+    let cancelled = false;
+    const refresh = async () => {
+      const next: Record<string, string> = {};
+      const [{ data: adminRows }, stageRes] = await Promise.all([
+        supabase.from("user_roles").select("user_id, role").in("user_id", ids),
+        streamId
+          ? supabase.from("stage_participants").select("user_id, stage_role").eq("stream_id", streamId).in("user_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      (stageRes.data ?? []).forEach((r: any) => { next[r.user_id] = r.stage_role; });
+      // Admin/moderator overrides stage role for left-panel routing.
+      (adminRows ?? []).forEach((r: any) => {
+        if (r.role === "admin" || r.role === "moderator" || r.role === "owner" || r.role === "administrator") {
+          next[r.user_id] = r.role;
+        }
+      });
+      if (!cancelled) setMap(next);
+    };
+    refresh();
+    const ch = streamId
+      ? supabase
+          .channel(`lk-roles-${streamId}`)
+          .on("postgres_changes", { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` }, refresh)
+          .on("postgres_changes", { event: "*", schema: "public", table: "user_roles" }, refresh)
+          .subscribe()
+      : null;
+    return () => { cancelled = true; if (ch) supabase.removeChannel(ch); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, streamId]);
+  return map;
 }
 
 type ProfileLite = { display_name: string | null; avatar_url: string | null };
@@ -167,10 +246,10 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
   return map;
 }
 
-function StageTile({ track, label, fallbackImage, placeholder, profile }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite }) {
+function StageTile({ track, label, fallbackImage, placeholder, profile, small }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite; small?: boolean }) {
   const avatar = profile?.avatar_url ?? fallbackImage;
   return (
-    <div className="stage-tile-glow relative aspect-video rounded-2xl p-[2px]">
+    <div className={cn("stage-tile-glow relative aspect-video rounded-2xl p-[2px]", small && "rounded-xl")}>
       <div className="stage-tile relative h-full w-full overflow-hidden rounded-[14px] bg-[#0d0d18]">
       {track ? (
         <TrackRefContext.Provider value={track}>
@@ -189,7 +268,7 @@ function StageTile({ track, label, fallbackImage, placeholder, profile }: { trac
         </div>
       )}
       <div className="pointer-events-none absolute left-3 top-3">
-        <span className="rounded-md bg-black/60 px-2 py-1 text-[10px] font-bold tracking-widest text-white backdrop-blur">
+        <span className={cn("rounded-md bg-black/60 px-2 py-1 font-bold tracking-widest text-white backdrop-blur", small ? "text-[9px]" : "text-[10px]")}>
           {label}
         </span>
       </div>
