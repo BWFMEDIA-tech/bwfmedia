@@ -42,8 +42,8 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       token={token}
       serverUrl={serverUrl}
       connect
-      video={publish}
-      audio={publish}
+      video={false}
+      audio={false}
       onError={(e) => toast.error(`Stream error: ${e.message}`)}
       className="contents"
     >
@@ -59,9 +59,11 @@ function PublishSync({ publish }: { publish: boolean }) {
   const prev = useRef<boolean | null>(null);
   useEffect(() => {
     if (!localParticipant) return;
+    let cancelled = false;
     (async () => {
       try {
         await localParticipant.setMicrophoneEnabled(publish);
+        if (cancelled) return;
         await localParticipant.setCameraEnabled(publish);
         if (prev.current === false && publish) {
           toast.success("You're on stage — mic and camera enabled");
@@ -70,9 +72,17 @@ function PublishSync({ publish }: { publish: boolean }) {
         }
         prev.current = publish;
       } catch (e: any) {
-        if (publish) toast.error(e?.message || "Could not enable mic/camera");
+        if (publish) {
+          const msg = e?.name === "NotReadableError"
+            ? "Camera or mic is in use by another app or tab. Close it and try again."
+            : e?.name === "NotAllowedError"
+              ? "Camera/mic permission denied. Allow access in your browser settings."
+              : e?.message || "Could not enable mic/camera";
+          toast.error(msg);
+        }
       }
     })();
+    return () => { cancelled = true; };
   }, [publish, localParticipant]);
   return null;
 }
