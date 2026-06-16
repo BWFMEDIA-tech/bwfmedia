@@ -228,6 +228,13 @@ export type Database = {
             foreignKeyName: "boost_spends_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "boost_spends_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
             referencedRelation: "play_tracks"
             referencedColumns: ["id"]
           },
@@ -1132,6 +1139,13 @@ export type Database = {
           value?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "play_votes_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
           {
             foreignKeyName: "play_votes_track_id_fkey"
             columns: ["track_id"]
@@ -2069,6 +2083,23 @@ export type Database = {
           uploaded_audio_url?: string | null
         }
         Relationships: []
+      }
+      play_track_boost_totals: {
+        Row: {
+          recent_weight: number | null
+          stream_id: string | null
+          total_weight: number | null
+          track_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_tracks_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       public_profiles: {
         Row: {
