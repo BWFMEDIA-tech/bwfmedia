@@ -236,6 +236,25 @@
   display: none !important;
 }
 
+/* Lock LiveKit tile + video element to the parent box so the broadcast
+   tiles never resize when tracks attach, resolutions change, or the
+   participant joins/leaves. Aspect ratio is owned by the .aspect-video
+   wrapper, not by the intrinsic video dimensions. */
+.stage-tile,
+.stage-tile .lk-participant-tile,
+.stage-tile .lk-video-track,
+.stage-tile video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  object-fit: cover !important;
+  display: block;
+}
+
 /* Vibrant animated gradient border for host/guest video tiles */
 @keyframes stage-tile-spin {
   0%   { background-position: 0% 50%; }
