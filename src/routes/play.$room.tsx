@@ -156,28 +156,30 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
       <div className="text-center text-xs font-bold tracking-widest text-violet-300 mb-3">♪ NOW PLAYING ♪</div>
       {track ? (
         <>
-          <div className="relative mx-auto w-full">
-            {/* Full-width waveform stretches across the card, behind the album */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 -my-2">
+          <div className="relative flex flex-col items-center gap-5 sm:flex-row sm:items-start sm:gap-6">
+            {/* Waveform sits behind everything, scoped to the card */}
+            <div className="pointer-events-none absolute inset-0 -my-2">
               <WaveformBackground
                 audioRef={audioRef}
                 isPlaying={isPlaying}
                 trackKey={track.id}
               />
             </div>
-            <div className="relative mx-auto aspect-square w-full max-w-[260px] sm:max-w-[280px] rounded-2xl overflow-hidden border-2 border-violet-500/60 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] bg-gradient-to-br from-violet-700 to-blue-700">
+            {/* Cover art — pinned to the stage side (left on tablet/desktop) */}
+            <div className="relative aspect-square w-full max-w-[220px] shrink-0 overflow-hidden rounded-2xl border-2 border-violet-500/60 bg-gradient-to-br from-violet-700 to-blue-700 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] sm:w-44 md:w-52">
               {track.cover_url ? (
                 <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
               ) : (
-                <div className="h-full w-full flex items-center justify-center">
+                <div className="flex h-full w-full items-center justify-center">
                   <Music className="h-16 w-16 text-white/40" />
                 </div>
               )}
             </div>
-          </div>
-          <h2 className="mt-4 text-center text-2xl font-bold">{track.title}</h2>
-          <p className="text-center text-white/60">{track.artist_name}</p>
-          {track.audio_url && (
+            {/* Track info + controls — aligned beside the cover, never overlapping */}
+            <div className="relative z-10 min-w-0 flex-1 text-center sm:text-left">
+              <h2 className="truncate text-2xl font-bold">{track.title}</h2>
+              <p className="truncate text-white/60">{track.artist_name}</p>
+              {track.audio_url && (
             <audio
               key={track.id}
               ref={audioRef}
@@ -191,8 +193,8 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
               className="mt-3 w-full"
               style={{ colorScheme: "dark" }}
             />
-          )}
-          <div className="mt-5 flex items-center justify-center gap-6">
+              )}
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-4 sm:justify-start sm:gap-6">
             <button onClick={() => cast(1)}
               className={`flex items-center gap-2 rounded-full border-2 px-5 py-2.5 font-bold transition ${
                 myVote === 1 ? "border-green-400 bg-green-500/20 text-green-300" : "border-green-500/40 text-green-300 hover:bg-green-500/10"
@@ -209,10 +211,12 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
               }`}>
               <ThumbsDown className="h-4 w-4" /> DISLIKE
             </button>
+              </div>
+              <p className="mt-3 text-xs text-white/50 text-center sm:text-left">
+                {track.like_count + track.dislike_count} {track.like_count + track.dislike_count === 1 ? "vote" : "votes"} so far
+              </p>
+            </div>
           </div>
-          <p className="mt-3 text-center text-xs text-white/50">
-            {track.like_count + track.dislike_count} {track.like_count + track.dislike_count === 1 ? "vote" : "votes"} so far
-          </p>
         </>
       ) : (
         <div className="py-16 text-center text-white/50">
