@@ -23,7 +23,7 @@ export function ModeToggle({
   const set = async (next: "broadcast" | "stage" | "play") => {
     if (next === mode) return;
     onLocalChange?.(next);
-    if (!streamId) return;
+    if (!streamId || next === "play") return;
     try { await update({ data: { streamId, mode: next } }); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
