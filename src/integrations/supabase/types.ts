@@ -1386,6 +1386,75 @@ export type Database = {
         }
         Relationships: []
       }
+      submission_payments: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          environment: string
+          failure_reason: string | null
+          id: string
+          metadata: Json
+          paid_at: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          submission_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          failure_reason?: string | null
+          id?: string
+          metadata?: Json
+          paid_at?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          submission_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          failure_reason?: string | null
+          id?: string
+          metadata?: Json
+          paid_at?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          submission_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submission_payments_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "live_queue_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submission_payments_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "live_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean
