@@ -104,6 +104,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify/webhook'
 import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify/callback'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
 
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
@@ -586,6 +587,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksProcessPayoutsRoute =
+  ApiPublicHooksProcessPayoutsRouteImport.update({
+    id: '/api/public/hooks/process-payouts',
+    path: '/api/public/hooks/process-payouts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -675,6 +682,7 @@ export interface FileRoutesByFullPath {
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
@@ -771,6 +779,7 @@ export interface FileRoutesByTo {
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
@@ -869,6 +878,7 @@ export interface FileRoutesById {
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
@@ -968,6 +978,7 @@ export interface FileRouteTypes {
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
+    | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/webhook'
@@ -1064,6 +1075,7 @@ export interface FileRouteTypes {
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
+    | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/webhook'
@@ -1161,6 +1173,7 @@ export interface FileRouteTypes {
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
+    | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/webhook'
@@ -1225,6 +1238,7 @@ export interface RootRouteChildren {
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
+  ApiPublicHooksProcessPayoutsRoute: typeof ApiPublicHooksProcessPayoutsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
   ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
@@ -1902,6 +1916,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/process-payouts': {
+      id: '/api/public/hooks/process-payouts'
+      path: '/api/public/hooks/process-payouts'
+      fullPath: '/api/public/hooks/process-payouts'
+      preLoaderRoute: typeof ApiPublicHooksProcessPayoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2055,6 +2076,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
+  ApiPublicHooksProcessPayoutsRoute: ApiPublicHooksProcessPayoutsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
   ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
