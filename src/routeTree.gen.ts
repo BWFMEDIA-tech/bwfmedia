@@ -11,14 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
@@ -28,12 +31,16 @@ import { Route as LiveRouteImport } from './routes/live'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EarningsRouteImport } from './routes/earnings'
+import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
+import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
+import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
@@ -107,6 +114,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
   path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
@@ -137,6 +149,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecordingsRoute = RecordingsRouteImport.update({
   id: '/recordings',
   path: '/recordings',
@@ -145,6 +162,11 @@ const RecordingsRoute = RecordingsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
@@ -192,6 +214,11 @@ const EarningsRoute = EarningsRouteImport.update({
   path: '/earnings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DmcaRoute = DmcaRouteImport.update({
+  id: '/dmca',
+  path: '/dmca',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -207,6 +234,16 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorAgreementRoute = CreatorAgreementRouteImport.update({
+  id: '/creator-agreement',
+  path: '/creator-agreement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiePolicyRoute = CookiePolicyRouteImport.update({
+  id: '/cookie-policy',
+  path: '/cookie-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -220,6 +257,11 @@ const BlogRoute = BlogRouteImport.update({
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtistSubmissionRoute = ArtistSubmissionRouteImport.update({
+  id: '/artist-submission',
+  path: '/artist-submission',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -543,12 +585,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/admin': typeof AdminRouteWithChildren
+  '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
+  '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
+  '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -558,14 +604,17 @@ export interface FileRoutesByFullPath {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
+  '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -631,12 +680,16 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
+  '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
+  '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -646,14 +699,17 @@ export interface FileRoutesByTo {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
+  '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -721,12 +777,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/admin': typeof AdminRouteWithChildren
+  '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
+  '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
+  '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -736,14 +796,17 @@ export interface FileRoutesById {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
+  '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -812,12 +875,16 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/admin'
+    | '/artist-submission'
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/cookie-policy'
+    | '/creator-agreement'
     | '/dashboard'
     | '/deck'
     | '/discover'
+    | '/dmca'
     | '/earnings'
     | '/events'
     | '/forgot-password'
@@ -827,14 +894,17 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/privacy'
     | '/profile'
     | '/recordings'
+    | '/refund-policy'
     | '/reset-password'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
+    | '/terms'
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
@@ -900,12 +970,16 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/access-denied'
+    | '/artist-submission'
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/cookie-policy'
+    | '/creator-agreement'
     | '/dashboard'
     | '/deck'
     | '/discover'
+    | '/dmca'
     | '/earnings'
     | '/events'
     | '/forgot-password'
@@ -915,14 +989,17 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/privacy'
     | '/profile'
     | '/recordings'
+    | '/refund-policy'
     | '/reset-password'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
+    | '/terms'
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
@@ -989,12 +1066,16 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/admin'
+    | '/artist-submission'
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/cookie-policy'
+    | '/creator-agreement'
     | '/dashboard'
     | '/deck'
     | '/discover'
+    | '/dmca'
     | '/earnings'
     | '/events'
     | '/forgot-password'
@@ -1004,14 +1085,17 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/privacy'
     | '/profile'
     | '/recordings'
+    | '/refund-policy'
     | '/reset-password'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/stream-studio'
     | '/studio'
+    | '/terms'
     | '/unsubscribe'
     | '/videos'
     | '/admin/analytics'
@@ -1079,12 +1163,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
+  CookiePolicyRoute: typeof CookiePolicyRoute
+  CreatorAgreementRoute: typeof CreatorAgreementRoute
   DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
   DiscoverRoute: typeof DiscoverRoute
+  DmcaRoute: typeof DmcaRoute
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -1094,14 +1182,17 @@ export interface RootRouteChildren {
   MicDropRoute: typeof MicDropRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
+  TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VideosRoute: typeof VideosRouteWithChildren
   ArtistIdRoute: typeof ArtistIdRoute
@@ -1147,6 +1238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/studio': {
       id: '/studio'
       path: '/studio'
@@ -1189,6 +1287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recordings': {
       id: '/recordings'
       path: '/recordings'
@@ -1201,6 +1306,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-the-block': {
@@ -1266,6 +1378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EarningsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dmca': {
+      id: '/dmca'
+      path: '/dmca'
+      fullPath: '/dmca'
+      preLoaderRoute: typeof DmcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/discover': {
       id: '/discover'
       path: '/discover'
@@ -1287,6 +1406,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creator-agreement': {
+      id: '/creator-agreement'
+      path: '/creator-agreement'
+      fullPath: '/creator-agreement'
+      preLoaderRoute: typeof CreatorAgreementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookie-policy': {
+      id: '/cookie-policy'
+      path: '/cookie-policy'
+      fullPath: '/cookie-policy'
+      preLoaderRoute: typeof CookiePolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -1306,6 +1439,13 @@ declare module '@tanstack/react-router' {
       path: '/artists'
       fullPath: '/artists'
       preLoaderRoute: typeof ArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artist-submission': {
+      id: '/artist-submission'
+      path: '/artist-submission'
+      fullPath: '/artist-submission'
+      preLoaderRoute: typeof ArtistSubmissionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1844,12 +1984,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
   AdminRoute: AdminRouteWithChildren,
+  ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
+  CookiePolicyRoute: CookiePolicyRoute,
+  CreatorAgreementRoute: CreatorAgreementRoute,
   DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
   DiscoverRoute: DiscoverRoute,
+  DmcaRoute: DmcaRoute,
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -1859,14 +2003,17 @@ const rootRouteChildren: RootRouteChildren = {
   MicDropRoute: MicDropRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
+  TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VideosRoute: VideosRouteWithChildren,
   ArtistIdRoute: ArtistIdRoute,
