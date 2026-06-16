@@ -58,7 +58,7 @@ export const updateStreamMode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({
       streamId: z.string().uuid(),
-      mode: z.enum(["broadcast", "stage"]).optional(),
+      mode: z.enum(["broadcast", "stage", "play"]).optional(),
       stageLocked: z.boolean().optional(),
     }).parse(input),
   )
