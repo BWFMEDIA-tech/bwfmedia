@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag, Trash2, Share2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Pause, Flag, Trash2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
@@ -180,23 +180,39 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
               <h2 className="truncate text-2xl font-bold">{track.title}</h2>
               <p className="truncate text-white/60">{track.artist_name}</p>
               {track.audio_url && (
-            <audio
-              key={track.id}
-              ref={audioRef}
-              src={track.audio_url}
-              controls
-              autoPlay
-              crossOrigin="anonymous"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => setIsPlaying(false)}
-              className="mt-3 w-full"
-              style={{ colorScheme: "dark" }}
-            />
+                <audio
+                  key={track.id}
+                  ref={audioRef}
+                  src={track.audio_url}
+                  autoPlay
+                  crossOrigin="anonymous"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onEnded={() => setIsPlaying(false)}
+                  className="hidden"
+                />
               )}
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-4 sm:justify-start sm:gap-6">
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:justify-start sm:gap-4">
+            {track.audio_url && (
+              <button
+                type="button"
+                onClick={() => {
+                  const a = audioRef.current;
+                  if (!a) return;
+                  if (a.paused) a.play().catch(() => {}); else a.pause();
+                }}
+                aria-label={isPlaying ? "Pause" : "Play"}
+                className="flex items-center gap-2 rounded-full border-2 border-violet-500/40 px-4 py-2 text-sm font-bold text-violet-200 transition hover:bg-violet-500/10"
+              >
+                {isPlaying ? (
+                  <><Pause className="h-4 w-4" /> PAUSE</>
+                ) : (
+                  <><Play className="h-4 w-4" /> PLAY</>
+                )}
+              </button>
+            )}
             <button onClick={() => cast(1)}
-              className={`flex items-center gap-2 rounded-full border-2 px-5 py-2.5 font-bold transition ${
+              className={`flex items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-bold transition ${
                 myVote === 1 ? "border-green-400 bg-green-500/20 text-green-300" : "border-green-500/40 text-green-300 hover:bg-green-500/10"
               }`}>
               <ThumbsUp className="h-4 w-4" /> LIKE
@@ -206,7 +222,7 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
               <div className="text-[10px] tracking-widest text-white/50">LIVE SCORE</div>
             </div>
             <button onClick={() => cast(-1)}
-              className={`flex items-center gap-2 rounded-full border-2 px-5 py-2.5 font-bold transition ${
+              className={`flex items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-bold transition ${
                 myVote === -1 ? "border-red-400 bg-red-500/20 text-red-300" : "border-red-500/40 text-red-300 hover:bg-red-500/10"
               }`}>
               <ThumbsDown className="h-4 w-4" /> DISLIKE
