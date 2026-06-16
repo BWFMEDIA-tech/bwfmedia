@@ -133,8 +133,19 @@ export function SiteHeader() {
       }`}
     >
       <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center gap-4">
+        {/* Mobile hamburger (left) */}
+        <button
+          type="button"
+          aria-label="Toggle menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-bone shrink-0"
+        >
+          {open ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
         {/* Logo */}
-        <RouterLink to="/" className="flex items-center gap-2 shrink-0 ml-12 mr-2">
+        <RouterLink to="/" className="flex items-center gap-2 shrink-0 md:ml-12 mr-2">
           <img src={bwfLogo} alt="BWF Network" className="h-10 md:h-14 lg:h-16 w-auto object-contain" />
         </RouterLink>
 
@@ -309,15 +320,6 @@ export function SiteHeader() {
         <div className="md:hidden">
           <HeaderCartButton />
         </div>
-        <button
-          type="button"
-          aria-label="Toggle menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 text-bone"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
       </div>
 
       {/* Mobile menu */}
