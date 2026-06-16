@@ -1,19 +1,27 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, MessageCircle, Instagram, Youtube, Twitter, Facebook, Link2,
-  Users, Headphones, ListMusic, Disc3, ThumbsUp, Share, Calendar,
+  Headphones, ListMusic, Disc3, ThumbsUp, Calendar,
   Search, Bell, MessageSquare, Home, Radio, BarChart3, ChevronDown,
   Shuffle, SkipBack, SkipForward, Repeat, Volume2, ChevronRight,
   TrendingUp, DollarSign, Clock, Plus, ShoppingBag, Send,
+  Users, Video as VideoIcon, DollarSign as Dollar,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
+import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+
+const artistMetaOptions = (id: string) =>
+  queryOptions({
+    queryKey: ["artist-meta", id],
+    queryFn: () => getArtistMeta({ data: { id } }),
+  });
 
 export const Route = createFileRoute("/artist/$id")({
-  loader: ({ params }) => getArtistMeta({ data: { id: params.id } }),
+  loader: ({ params, context }) =>
+    context.queryClient.ensureQueryData(artistMetaOptions(params.id)),
   head: ({ params, loaderData }) => {
     const name = loaderData?.name?.trim() || "Artist Profile";
     const title = `${name} — BWF Network`;
