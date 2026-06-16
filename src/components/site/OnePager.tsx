@@ -570,9 +570,6 @@ export function OnePager() {
     >
       <div className="relative z-10">
         <ScrollProgress />
-        <div className="flex justify-end pt-20 md:pt-24 pb-2 px-6 md:px-12 max-w-7xl mx-auto">
-          <CartButton className="relative top-auto right-auto" />
-        </div>
         <Hero liveStreams={liveStreams} />
         <Spotlight artists={featuredArtists} />
         <VideosRow videos={videos} />
