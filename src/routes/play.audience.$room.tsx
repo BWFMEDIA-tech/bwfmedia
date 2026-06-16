@@ -4,6 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Music, Users, Radio, Pause, Play as PlayIcon, VolumeX, Volume2, ThumbsUp, ThumbsDown, Trophy } from "lucide-react";
 import { getAudiencePlayState } from "@/lib/play-audience.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { LiveChat } from "@/components/stream/LiveChat";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/play/audience/$room")({
   head: () => ({
@@ -36,6 +38,7 @@ type AudienceState = {
 function AudiencePage() {
   const { room } = Route.useParams();
   const fetchState = useServerFn(getAudiencePlayState);
+  const auth = useAuth();
   const [state, setState] = useState<AudienceState>(null);
   const [listeners, setListeners] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -197,6 +200,16 @@ function AudiencePage() {
         <footer className="mt-10 text-center text-[11px] text-white/40">
           Listen-only mode · No account required
         </footer>
+
+        {state?.stream.id && (
+          <div className="mt-8 w-full">
+            <LiveChat
+              streamId={state.stream.id}
+              auth={auth}
+              viewerCount={listeners}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
