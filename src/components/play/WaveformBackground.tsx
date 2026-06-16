@@ -133,7 +133,8 @@ export function WaveformBackground({
         const x2 = cx + Math.cos(angle) * (innerR + len);
         const y2 = cy + Math.sin(angle) * (innerR + len);
 
-        const hue = 300 + Math.sin(t * 0.8 + i * 0.12) * 60 + i * 1.2;
+        // Blue-leaning spectrum: cyan → azure → indigo.
+        const hue = 200 + Math.sin(t * 0.8 + i * 0.12) * 25 + (i / bars) * 40;
         const alpha = Math.min(1, 0.8 + intensity * 0.3);
         c.strokeStyle = `hsla(${hue}, 100%, 70%, ${alpha})`;
         c.lineWidth = Math.max(2, (Math.min(w, h) / 220) * dpr);
@@ -150,7 +151,7 @@ export function WaveformBackground({
         const phase = (t * 0.6 + r * 0.33) % 1;
         const radius = innerR + phase * maxLen * 1.4;
         const ringAlpha = (1 - phase) * (0.25 + intensity * 0.55);
-        const hue = 280 + r * 30 + Math.sin(t + r) * 20;
+        const hue = 210 + r * 15 + Math.sin(t + r) * 15;
         c.strokeStyle = `hsla(${hue}, 100%, 72%, ${ringAlpha})`;
         c.lineWidth = Math.max(1.5, 2 * dpr);
         c.shadowColor = `hsla(${hue}, 100%, 60%, ${ringAlpha})`;
