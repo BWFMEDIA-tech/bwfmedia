@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Flag, Trash2, Share2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Pause, Flag, Trash2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
