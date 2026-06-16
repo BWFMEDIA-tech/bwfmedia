@@ -699,7 +699,11 @@ function TrendingCard({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group block">
       <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
-        <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        {thumbUrl(v) ? (
+          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        )}
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 flex items-center justify-center transition-colors">
           <span className="w-10 h-10 rounded-full bg-black/50 border border-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Play size={14} className="text-white ml-0.5" />
@@ -727,7 +731,11 @@ function NewReleaseRow({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5">
       <div className="relative w-20 h-14 rounded-md overflow-hidden bg-black shrink-0 border border-white/5">
-        <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        {thumbUrl(v) ? (
+          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        )}
         <span className="absolute bottom-0.5 right-0.5 text-[9px] bg-black/80 px-1 rounded">{pseudoDuration(v.id)}</span>
       </div>
       <div className="min-w-0 flex-1">
