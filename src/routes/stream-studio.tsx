@@ -876,7 +876,7 @@ function StreamStudio() {
                 when another mode is active.
               */}
               {stream?.id && auth.user && (
-                <div className={streamMode === "play" ? "" : "hidden"}>
+                <div className={streamMode === "play" || streamMode === "stage" ? "order-2" : "hidden"}>
                   <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                 </div>
               )}
@@ -946,11 +946,6 @@ function StreamStudio() {
                     </button>
                   </div>
                 )
-              )}
-
-              {/* In Stage mode, also render the Play arena (Now Playing / Scorecard / Crowd) directly below the Stage Room */}
-              {streamMode === "stage" && stream?.id && auth.user && (
-                <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
               )}
 
               {/* Three live panels */}

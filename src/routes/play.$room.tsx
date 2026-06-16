@@ -157,17 +157,16 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
       {track ? (
         <>
           <div className="relative flex flex-col items-center gap-5 sm:flex-row sm:items-start sm:gap-6">
-            {/* Cover art with radial waveform centered behind it */}
-            <div className="relative aspect-square w-32 shrink-0 sm:w-44 md:w-52">
-              {/* Waveform radiates outward from the album center */}
-              <div className="pointer-events-none absolute -inset-[80%] z-0">
-                <WaveformBackground
-                  audioRef={audioRef}
-                  isPlaying={isPlaying}
-                  trackKey={track.id}
-                />
-              </div>
-              <div className="relative z-10 aspect-square w-full overflow-hidden rounded-2xl border-2 border-violet-500/60 bg-gradient-to-br from-violet-700 to-blue-700 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)]">
+            {/* Waveform sits behind everything, scoped to the card */}
+            <div className="pointer-events-none absolute inset-0 -my-2">
+              <WaveformBackground
+                audioRef={audioRef}
+                isPlaying={isPlaying}
+                trackKey={track.id}
+              />
+            </div>
+            {/* Cover art — pinned to the stage side (left on tablet/desktop) */}
+            <div className="relative aspect-square w-32 shrink-0 overflow-hidden rounded-2xl border-2 border-violet-500/60 bg-gradient-to-br from-violet-700 to-blue-700 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)] sm:w-44 md:w-52">
               {track.cover_url ? (
                 <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
               ) : (
@@ -175,7 +174,6 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
                   <Music className="h-16 w-16 text-white/40" />
                 </div>
               )}
-              </div>
             </div>
             {/* Track info + controls — aligned beside the cover, never overlapping */}
             <div className="relative z-10 min-w-0 flex-1 text-center sm:text-left">

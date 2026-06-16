@@ -18,10 +18,8 @@ import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-conne
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 5;
 
-// Gritty black/red stage theme
-const PURPLE = "#ef4444"; // primary red (kept name for minimal diff)
-const BLUE = "#7f1d1d";   // deep blood red
-const ACCENT = "#f97316"; // ember/orange grit accent
+const PURPLE = "#8b5cf6";
+const BLUE = "#3b82f6";
 
 export function StageRoom({
   streamId,
@@ -167,26 +165,11 @@ export function StageRoom({
   };
 
   return (
-    <div
-      className="relative overflow-hidden rounded-2xl border border-red-900/40 p-5 shadow-[0_0_60px_-20px_rgba(239,68,68,0.45)]"
-      style={{
-        background:
-          "radial-gradient(120% 80% at 0% 0%, rgba(127,29,29,0.35), transparent 60%), radial-gradient(120% 80% at 100% 100%, rgba(239,68,68,0.18), transparent 60%), #07020399",
-        backgroundColor: "#0a0405",
-      }}
-    >
-      {/* gritty noise overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-        }}
-      />
+    <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-5">
       <div className="mb-4 flex items-center justify-between">
-        <div className="relative flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <Mic className="h-4 w-4" style={{ color: PURPLE }} />
-          <span className="text-sm font-black uppercase tracking-[0.2em] text-white" style={{ textShadow: `0 0 18px ${PURPLE}aa` }}>STAGE ROOM</span>
+          <span className="text-sm font-bold tracking-wider text-white">STAGE ROOM</span>
           <span className="text-[11px] text-white/50">
             · {hosts.length}/{MAX_HOSTS} hosts · {guests.length}/{MAX_GUESTS} guests
           </span>
@@ -245,7 +228,7 @@ export function StageRoom({
         <SectionHeader
           label="GUESTS"
           count={`${guests.length}/${MAX_GUESTS}`}
-          color={ACCENT}
+          color="#22c55e"
           canInvite={canManage && guests.length < MAX_GUESTS}
           onInvite={() => setInvite("speaker")}
           inviteLabel="Invite Guest"
@@ -398,7 +381,7 @@ function SpeakerBubble({
   onDemoteToAudience?: () => void;
   onToggleMute?: () => void;
 }) {
-  const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;
+  const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#60a5fa" : "#22c55e";
   const connected = useConnectedIdentities();
   const isConnected = connected.has(p.user_id);
   const speaking = useSpeakingIdentities();
@@ -418,7 +401,7 @@ function SpeakerBubble({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [menuOpen]);
   const badgeLabel = kind === "host" ? "HOST" : kind === "co_host" ? "CO-HOST" : "GUEST";
-  const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#991b1b" : "#c2410c";
+  const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#2563eb" : "#16a34a";
   const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
   return (
     <div className="flex flex-col items-center gap-2">
