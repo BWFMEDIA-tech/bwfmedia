@@ -112,51 +112,51 @@ export function WaveformBackground({
       const cx = w / 2;
       const cy = h / 2;
 
-      // Horizontal mirrored waveform bars extending left & right from album.
-      // Album sits in the center; bars fan out to both sides like an EQ.
-      const albumHalf = h * 0.5 * 0.62; // ≈ album half-width inside the canvas
-      const sideGap = h * 0.04;
-      const sideStart = cx + albumHalf + sideGap;
-      const sideAvail = w / 2 - (albumHalf + sideGap);
-      const bars = 56;
-      const barGap = sideAvail / bars;
-      const barWidth = Math.max(2, barGap * 0.45);
-      const maxBar = h * 0.42;
+      // Radial frequency bars + concentric pulse rings, centered on album.
       const samples = analyser ? data.length : 64;
+      const innerR = Math.min(w, h) * 0.22; // just outside album edge
+      const maxLen = Math.min(w, h) * 0.32;
+      const bars = 96;
 
       c.lineCap = "round";
       for (let i = 0; i < bars; i++) {
-        // Sample from low → high freq as bars move outward; nicer EQ shape.
-        const freqIdx = Math.floor(((i + 2) / (bars + 4)) * (samples * 0.7));
+        const freqIdx = Math.floor((i / bars) * (samples * 0.7));
         const raw = analyser
           ? data[freqIdx] / 255
           : 0.35 + Math.sin(t * 3 + i * 0.35) * 0.25 + Math.sin(t * 1.1 + i * 0.18) * 0.15;
-        // Falloff toward outer edges so the shape tapers off naturally.
-        const falloff = 1 - Math.pow(i / bars, 1.6) * 0.7;
-        const amp = (0.08 + (isPlaying ? Math.max(0, raw) : 0) * 0.95) * falloff;
-        const barH = Math.max(barWidth, amp * maxBar);
+        const amp = 0.12 + (isPlaying ? Math.max(0, raw) : 0) * 0.95;
+        const len = Math.max(2, amp * maxLen);
 
-        // Vivid spectrum: pink → magenta → violet → indigo → cyan.
-        const hue = 300 + Math.sin(t * 0.8 + i * 0.18) * 60 + i * 1.4;
-        const alpha = Math.min(1, 0.85 + intensity * 0.25);
-        const stroke = `hsla(${hue}, 100%, 70%, ${alpha})`;
-        c.strokeStyle = stroke;
-        c.lineWidth = barWidth;
+        const angle = (i / bars) * Math.PI * 2 + t * 0.25;
+        const x1 = cx + Math.cos(angle) * innerR;
+        const y1 = cy + Math.sin(angle) * innerR;
+        const x2 = cx + Math.cos(angle) * (innerR + len);
+        const y2 = cy + Math.sin(angle) * (innerR + len);
+
+        const hue = 300 + Math.sin(t * 0.8 + i * 0.12) * 60 + i * 1.2;
+        const alpha = Math.min(1, 0.8 + intensity * 0.3);
+        c.strokeStyle = `hsla(${hue}, 100%, 70%, ${alpha})`;
+        c.lineWidth = Math.max(2, (Math.min(w, h) / 220) * dpr);
         c.shadowColor = `hsla(${hue}, 100%, 65%, 1)`;
-        c.shadowBlur = 22 * dpr;
-
-        // Right side
-        const xR = sideStart + i * barGap;
+        c.shadowBlur = 18 * dpr;
         c.beginPath();
-        c.moveTo(xR, cy - barH / 2);
-        c.lineTo(xR, cy + barH / 2);
+        c.moveTo(x1, y1);
+        c.lineTo(x2, y2);
         c.stroke();
+      }
 
-        // Mirrored left side
-        const xL = cx - albumHalf - sideGap - i * barGap;
+      // Concentric pulse rings that swell with the beat.
+      for (let r = 0; r < 3; r++) {
+        const phase = (t * 0.6 + r * 0.33) % 1;
+        const radius = innerR + phase * maxLen * 1.4;
+        const ringAlpha = (1 - phase) * (0.25 + intensity * 0.55);
+        const hue = 280 + r * 30 + Math.sin(t + r) * 20;
+        c.strokeStyle = `hsla(${hue}, 100%, 72%, ${ringAlpha})`;
+        c.lineWidth = Math.max(1.5, 2 * dpr);
+        c.shadowColor = `hsla(${hue}, 100%, 60%, ${ringAlpha})`;
+        c.shadowBlur = 24 * dpr;
         c.beginPath();
-        c.moveTo(xL, cy - barH / 2);
-        c.lineTo(xL, cy + barH / 2);
+        c.arc(cx, cy, radius, 0, Math.PI * 2);
         c.stroke();
       }
       c.shadowBlur = 0;
