@@ -20,8 +20,7 @@ const artistMetaOptions = (id: string) =>
   });
 
 export const Route = createFileRoute("/artist/$id")({
-  loader: ({ params, context }) =>
-    context.queryClient.ensureQueryData(artistMetaOptions(params.id)),
+  loader: ({ params }) => getArtistMeta({ data: { id: params.id } }),
   head: ({ params, loaderData }) => {
     const name = loaderData?.name?.trim() || "Artist Profile";
     const title = `${name} — BWF Network`;
@@ -100,52 +99,38 @@ const MERCH = [
 
 function ArtistProfilePage() {
   const { id } = useParams({ from: "/artist/$id" });
-  const [artist, setArtist] = useState<ArtistView | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: meta } = useSuspenseQuery(artistMetaOptions(id));
   const [playing, setPlaying] = useState(false);
   const [tip, setTip] = useState<number>(5);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data } = await supabase
-        .from("live_queue_public")
-        .select("artist_name, photo_url")
-        .eq("id", id)
-        .maybeSingle();
-      if (!mounted) return;
-      const name = (data as any)?.artist_name ?? "JAY TRU";
-      setArtist({
-        name,
-        handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, "") + "official",
-        photo: (data as any)?.photo_url ?? null,
-      });
-      setLoading(false);
-    })();
-    return () => { mounted = false; };
-  }, [id]);
-
+  const name = meta?.name?.trim() || "Artist";
+  const artist: ArtistView = {
+    name,
+    handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, "") + "official",
+    photo: meta?.photo ?? null,
+    banner: meta?.banner ?? null,
+  };
   const initials = useMemo(
-    () => (artist?.name ?? "JT").split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase(),
-    [artist?.name],
+    () => name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase(),
+    [name],
   );
-
-  if (loading || !artist) {
-    return (
-      <div className="min-h-screen bg-[#070708] text-white grid place-items-center text-sm text-white/50">
-        Loading artist…
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#070708] text-white pb-28">
       <TopNav />
       <main className="mx-auto max-w-[1400px] px-4 md:px-6 py-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6 min-w-0">
-          <HeroBanner artist={artist} initials={initials} playing={playing} setPlaying={setPlaying} />
+          <HeroBanner
+            artist={artist}
+            initials={initials}
+            playing={playing}
+            setPlaying={setPlaying}
+            location={meta?.location ?? null}
+            genre={meta?.genre ?? null}
+            memberSince={meta?.memberSince ?? null}
+          />
           <AboutBlock name={artist.name} />
-          <StatsRow />
+          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
           <div className="grid gap-6 md:grid-cols-2">
             <LatestRelease setPlaying={setPlaying} playing={playing} />
             <PopularTracks />
