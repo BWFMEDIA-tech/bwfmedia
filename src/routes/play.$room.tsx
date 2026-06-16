@@ -105,7 +105,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
             </div>
 
             {/* Leaderboard + How it works */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid gap-4 xl:grid-cols-2">
               <Leaderboard items={leaderboard} isHost={isHost} streamId={stream?.id ?? null} />
               <HowItWorks />
             </div>
