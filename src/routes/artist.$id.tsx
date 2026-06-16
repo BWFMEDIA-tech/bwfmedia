@@ -279,19 +279,24 @@ function AboutBlock({ name }: { name: string }) {
   );
 }
 
-function StatsRow() {
-  const stats = [
-    { icon: Users,      label: "Followers",         value: "12.4K" },
-    { icon: Headphones, label: "Monthly Listeners", value: "48.2K" },
-    { icon: ListMusic,  label: "Total Streams",     value: "2.4M" },
-    { icon: Heart,      label: "Songs Uploaded",    value: "58" },
-    { icon: Disc3,      label: "Albums Released",   value: "4" },
-    { icon: ThumbsUp,   label: "Likes Received",    value: "156K" },
-    { icon: Share,      label: "Shares",            value: "28K" },
+function StatsRow({ stats }: { stats: { songs: number; videos: number; likes: number; tipsCents: number } }) {
+  const fmt = (n: number) => {
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+    return String(n);
+  };
+  const tips = stats.tipsCents > 0
+    ? "$" + (stats.tipsCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })
+    : "$0";
+  const items = [
+    { icon: ListMusic,  label: "Songs Uploaded",  value: fmt(stats.songs) },
+    { icon: VideoIcon,  label: "Videos",          value: fmt(stats.videos) },
+    { icon: ThumbsUp,   label: "Likes Received",  value: fmt(stats.likes) },
+    { icon: Dollar,     label: "Tips Received",   value: tips },
   ];
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {stats.map((s) => (
+    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {items.map((s) => (
         <div key={s.label} className="flex items-center gap-3">
           <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />
           <div className="min-w-0">
