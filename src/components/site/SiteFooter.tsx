@@ -53,6 +53,18 @@ const menuGroups: Array<{
       { label: "Profile", to: "/profile" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy Policy", to: "/privacy" },
+      { label: "Terms of Service", to: "/terms" },
+      { label: "DMCA Policy", to: "/dmca" },
+      { label: "Creator Agreement", to: "/creator-agreement" },
+      { label: "Artist Submission Terms", to: "/artist-submission" },
+      { label: "Refund Policy", to: "/refund-policy" },
+      { label: "Cookie Policy", to: "/cookie-policy" },
+    ],
+  },
 ];
 
 export function SiteFooter() {

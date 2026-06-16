@@ -36,6 +36,7 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
+import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
@@ -236,6 +237,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const CreatorAgreementRoute = CreatorAgreementRouteImport.update({
   id: '/creator-agreement',
   path: '/creator-agreement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiePolicyRoute = CookiePolicyRouteImport.update({
+  id: '/cookie-policy',
+  path: '/cookie-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -583,6 +589,7 @@ export interface FileRoutesByFullPath {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
@@ -677,6 +684,7 @@ export interface FileRoutesByTo {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
@@ -773,6 +781,7 @@ export interface FileRoutesById {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
@@ -870,6 +879,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/cookie-policy'
     | '/creator-agreement'
     | '/dashboard'
     | '/deck'
@@ -964,6 +974,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/cookie-policy'
     | '/creator-agreement'
     | '/dashboard'
     | '/deck'
@@ -1059,6 +1070,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/cookie-policy'
     | '/creator-agreement'
     | '/dashboard'
     | '/deck'
@@ -1155,6 +1167,7 @@ export interface RootRouteChildren {
   ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
+  CookiePolicyRoute: typeof CookiePolicyRoute
   CreatorAgreementRoute: typeof CreatorAgreementRoute
   DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
@@ -1398,6 +1411,13 @@ declare module '@tanstack/react-router' {
       path: '/creator-agreement'
       fullPath: '/creator-agreement'
       preLoaderRoute: typeof CreatorAgreementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookie-policy': {
+      id: '/cookie-policy'
+      path: '/cookie-policy'
+      fullPath: '/cookie-policy'
+      preLoaderRoute: typeof CookiePolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1968,6 +1988,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
+  CookiePolicyRoute: CookiePolicyRoute,
   CreatorAgreementRoute: CreatorAgreementRoute,
   DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
