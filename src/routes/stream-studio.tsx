@@ -876,7 +876,7 @@ function StreamStudio() {
                 when another mode is active.
               */}
               {stream?.id && auth.user && (
-                <div className={streamMode === "play" ? "" : "hidden"}>
+                <div className={streamMode === "play" || streamMode === "stage" ? "order-2" : "hidden"}>
                   <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                 </div>
               )}
