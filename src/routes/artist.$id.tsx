@@ -190,7 +190,15 @@ function TopNav() {
   );
 }
 
-function HeroBanner({ artist, initials, playing, setPlaying }: { artist: ArtistView; initials: string; playing: boolean; setPlaying: (b: boolean) => void; }) {
+function HeroBanner({
+  artist, initials, playing, setPlaying, location, genre, memberSince,
+}: {
+  artist: ArtistView; initials: string; playing: boolean; setPlaying: (b: boolean) => void;
+  location: string | null; genre: string | null; memberSince: string | null;
+}) {
+  const memberSinceLabel = memberSince
+    ? new Date(memberSince).toLocaleDateString(undefined, { month: "short", year: "numeric" })
+    : null;
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0606] via-[#0e0e10] to-[#0a0a0c]">
       <div className="absolute inset-0 opacity-60" style={{ background: `radial-gradient(120% 80% at 70% 0%, ${RED}33, transparent 60%)` }} />
@@ -214,9 +222,15 @@ function HeroBanner({ artist, initials, playing, setPlaying }: { artist: ArtistV
             </div>
             <div className="text-sm text-white/60 mt-1">{artist.handle}</div>
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
-              <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> Atlanta, GA, USA</span>
-              <span className="flex items-center gap-1"><Music2 className="h-3.5 w-3.5" style={{ color: RED }} /> Hip-Hop / R&B</span>
-              <span className="text-white/50">Member Since May 2021</span>
+              {location && (
+                <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> {location}</span>
+              )}
+              {genre && (
+                <span className="flex items-center gap-1"><Music2 className="h-3.5 w-3.5" style={{ color: RED }} /> {genre}</span>
+              )}
+              {memberSinceLabel && (
+                <span className="text-white/50">Member Since {memberSinceLabel}</span>
+              )}
             </div>
           </div>
         </div>
