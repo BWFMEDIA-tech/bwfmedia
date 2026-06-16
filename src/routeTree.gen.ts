@@ -38,6 +38,7 @@ import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
+import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
@@ -244,6 +245,11 @@ const BlogRoute = BlogRouteImport.update({
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtistSubmissionRoute = ArtistSubmissionRouteImport.update({
+  id: '/artist-submission',
+  path: '/artist-submission',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -567,6 +573,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/admin': typeof AdminRouteWithChildren
+  '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
@@ -659,6 +666,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
+  '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
@@ -753,6 +761,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/access-denied': typeof AccessDeniedRoute
   '/admin': typeof AdminRouteWithChildren
+  '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
@@ -848,6 +857,7 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/admin'
+    | '/artist-submission'
     | '/artists'
     | '/blog'
     | '/contact'
@@ -940,6 +950,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/access-denied'
+    | '/artist-submission'
     | '/artists'
     | '/blog'
     | '/contact'
@@ -1033,6 +1044,7 @@ export interface FileRouteTypes {
     | '/'
     | '/access-denied'
     | '/admin'
+    | '/artist-submission'
     | '/artists'
     | '/blog'
     | '/contact'
@@ -1127,6 +1139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccessDeniedRoute: typeof AccessDeniedRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
@@ -1386,6 +1399,13 @@ declare module '@tanstack/react-router' {
       path: '/artists'
       fullPath: '/artists'
       preLoaderRoute: typeof ArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artist-submission': {
+      id: '/artist-submission'
+      path: '/artist-submission'
+      fullPath: '/artist-submission'
+      preLoaderRoute: typeof ArtistSubmissionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1924,6 +1944,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
   AdminRoute: AdminRouteWithChildren,
+  ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
