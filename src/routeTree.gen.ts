@@ -22,6 +22,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PayoutsRouteImport } from './routes/payouts'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
@@ -169,6 +170,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayoutsRoute = PayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
@@ -618,6 +624,7 @@ export interface FileRoutesByFullPath {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/payouts': typeof PayoutsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -715,6 +722,7 @@ export interface FileRoutesByTo {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/payouts': typeof PayoutsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -814,6 +822,7 @@ export interface FileRoutesById {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/payouts': typeof PayoutsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -914,6 +923,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/payouts'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1011,6 +1021,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/payouts'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1109,6 +1120,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/payouts'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1208,6 +1220,7 @@ export interface RootRouteChildren {
   MicDropRoute: typeof MicDropRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  PayoutsRoute: typeof PayoutsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
@@ -1340,6 +1353,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payouts': {
+      id: '/payouts'
+      path: '/payouts'
+      fullPath: '/payouts'
+      preLoaderRoute: typeof PayoutsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-the-block': {
@@ -2045,6 +2065,7 @@ const rootRouteChildren: RootRouteChildren = {
   MicDropRoute: MicDropRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  PayoutsRoute: PayoutsRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
