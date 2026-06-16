@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
@@ -15,13 +14,19 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setFailed(false);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      // Generic message — never reveal whether the email exists
+      setFailed(true);
+      return toast.error("Incorrect email or password.");
+    }
     toast.success("Signed in");
     const uid = data.user?.id;
     let dest: "/stream-studio" | "/" = "/stream-studio";
@@ -31,11 +36,6 @@ function LoginPage() {
       if (list.includes("listener") && !list.includes("artist")) dest = "/";
     }
     nav({ to: dest });
-  };
-
-  const google = async () => {
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/stream-studio" });
-    if (res.error) toast.error(res.error.message);
   };
 
   return (
@@ -73,15 +73,6 @@ function LoginPage() {
         </h1>
         <p className="mt-3 mb-6 text-sm text-bone/60">Welcome back to the stage.</p>
 
-        <button
-          onClick={google}
-          className="w-full mb-4 rounded-md bg-bone text-black py-2.5 font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white transition-colors"
-        >
-          Continue with Google
-        </button>
-        <div className="flex items-center gap-2 my-4 text-[10px] text-bone/40">
-          <div className="flex-1 h-px bg-white/10" />OR<div className="flex-1 h-px bg-white/10" />
-        </div>
         <form onSubmit={submit} className="flex flex-col gap-3">
           <input type="email" required placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
             className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
@@ -91,6 +82,14 @@ function LoginPage() {
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
+        {failed && (
+          <div className="mt-4 rounded-md border border-blood/40 bg-blood/10 p-3 text-center">
+            <p className="text-xs text-bone/80 mb-2">Incorrect email or password.</p>
+            <Link to="/forgot-password" className="font-cond tracking-[0.2em] text-xs uppercase text-blood hover:text-blood-glow transition-colors">
+              Forgot password?
+            </Link>
+          </div>
+        )}
         <div className="flex justify-between mt-5 text-xs text-bone/60">
           <Link to="/forgot-password" className="hover:text-blood transition-colors">Forgot password?</Link>
           <Link to="/signup" className="hover:text-blood transition-colors">Create account</Link>

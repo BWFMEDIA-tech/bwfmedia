@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
@@ -25,6 +24,11 @@ function SignupPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!role) return;
+    // Strong password: 8+ chars, upper, lower, number
+    const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!strong.test(password)) {
+      return toast.error("Password must be 8+ chars with upper, lower, and a number.");
+    }
     setLoading(true);
     const redirectTo = role === "artist" ? "/artist/upgrade" : "/";
     const meta: Record<string, unknown> = {
@@ -56,15 +60,6 @@ function SignupPage() {
     }
     toast.success("Check your email to confirm your account");
     nav({ to: "/login" });
-  };
-
-  const google = async () => {
-    if (!role) return toast.error("Choose a role first");
-    const redirectTo = role === "artist" ? "/artist/upgrade" : "/";
-    // Persist chosen role for post-OAuth assignment fallback
-    try { sessionStorage.setItem("pending_role", role); } catch {}
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + redirectTo });
-    if (res.error) toast.error(res.error.message);
   };
 
   return (
@@ -143,10 +138,6 @@ function SignupPage() {
             >
               ← Change role ({role})
             </button>
-            <button onClick={google} className="w-full mb-4 rounded-md bg-bone text-black py-2.5 font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white transition-colors">
-              Continue with Google
-            </button>
-            <div className="flex items-center gap-2 my-4 text-[10px] text-bone/40"><div className="flex-1 h-px bg-white/10" />OR<div className="flex-1 h-px bg-white/10" /></div>
             <form onSubmit={submit} className="flex flex-col gap-3">
               <input required placeholder={role === "artist" ? "Display name" : "Username"} value={displayName} onChange={(e) => setDisplayName(e.target.value)}
                 className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
@@ -164,7 +155,7 @@ function SignupPage() {
               )}
               <input type="email" required placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
                 className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
-              <input type="password" required minLength={6} placeholder="Password (min 6)" value={password} onChange={(e) => setPassword(e.target.value)}
+              <input type="password" required minLength={8} placeholder="Password (8+ chars, upper, lower, number)" value={password} onChange={(e) => setPassword(e.target.value)}
                 className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
               <button disabled={loading} className="rounded-md bg-blood text-white py-3 font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors disabled:opacity-50">
                 {loading ? "Creating…" : "Create account"}
