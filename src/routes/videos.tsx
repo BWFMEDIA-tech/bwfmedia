@@ -91,6 +91,25 @@ async function captureVideoThumbnail(file: File): Promise<Blob | null> {
   });
 }
 
+function captureFrameFromVideoEl(video: HTMLVideoElement): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    try {
+      const canvas = document.createElement("canvas");
+      const w = video.videoWidth || 1280;
+      const h = video.videoHeight || 720;
+      const scale = Math.min(1, 1280 / w);
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.85);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
 const SIDEBAR_PRIMARY = [
   { label: "All Videos", icon: PlayCircle, key: "all" as const },
   { label: "New Releases", icon: Sparkles, key: "new" as const, badge: "NEW" },
