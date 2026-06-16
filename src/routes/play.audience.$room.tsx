@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Music, Users, Radio, Pause, Play as PlayIcon, VolumeX, Volume2 } from "lucide-react";
+import { Music, Users, Radio, Pause, Play as PlayIcon, VolumeX, Volume2, ThumbsUp, ThumbsDown, Trophy } from "lucide-react";
 import { getAudiencePlayState } from "@/lib/play-audience.functions";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -133,6 +133,26 @@ function AudiencePage() {
           <div className="text-2xl font-bold">{playing?.title ?? (isLive ? "Waiting for next track…" : "Not live")}</div>
           <div className="text-white/60">{playing?.artist_name ?? "—"}</div>
         </div>
+
+        {playing && (
+          <div className="mt-5 flex items-center justify-center gap-5 text-sm">
+            <div className="flex items-center gap-1.5 text-green-300">
+              <ThumbsUp className="h-4 w-4" />
+              <span className="font-bold tabular-nums">{playing.like_count}</span>
+            </div>
+            <div className="flex flex-col items-center px-3">
+              <div className="flex items-center gap-1 text-amber-300">
+                <Trophy className="h-3.5 w-3.5" />
+                <span className="text-xl font-black tabular-nums">{playing.score}</span>
+              </div>
+              <span className="text-[9px] tracking-widest text-white/40">LIVE SCORE</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-red-300">
+              <ThumbsDown className="h-4 w-4" />
+              <span className="font-bold tabular-nums">{playing.dislike_count}</span>
+            </div>
+          </div>
+        )}
 
         {playing?.audio_url ? (
           <>
