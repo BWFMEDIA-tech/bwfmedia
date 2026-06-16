@@ -9,6 +9,7 @@ import {
   Music, Smile, MapPin, User, Clapperboard, Plus,
   Clock, ListVideo, Settings as SettingsIcon,
   Volume2, Maximize, Shuffle, SkipBack, SkipForward, Repeat,
+  Menu, X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/videos")({
@@ -124,6 +125,7 @@ function VideosPage() {
   const [repeatEnabled, setRepeatEnabled] = useState(false);
   const [nativeControls, setNativeControls] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playAfterLoadRef = useRef(false);
 
@@ -267,77 +269,99 @@ function VideosPage() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
+      {/* MENU TOGGLE */}
+      <button
+        type="button"
+        onClick={() => setSidebarOpen((v) => !v)}
+        aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+        className="fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur flex items-center justify-center text-white"
+      >
+        {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
+
+      {/* BACKDROP */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
+        />
+      )}
+
+      {/* SLIDE-IN LEFT SIDEBAR */}
+      <aside
+        className={`fixed top-0 left-0 z-40 h-full w-72 bg-black border-r border-white/10 overflow-y-auto transition-transform duration-300 ease-out pt-16 px-3 pb-8 space-y-6 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <SidebarSection title="Music Videos">
+          {SIDEBAR_PRIMARY.map((it) => {
+            const Icon = it.icon;
+            const active = activeFilter === it.key;
+            return (
+              <button
+                key={it.key}
+                onClick={() => { setActiveFilter(it.key); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  active
+                    ? "bg-red-500/15 text-red-500 border-l-2 border-red-500"
+                    : "text-white/70 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <Icon size={16} />
+                <span className="flex-1 text-left">{it.label}</span>
+                {it.badge && (
+                  <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded">
+                    {it.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </SidebarSection>
+
+        <SidebarSection title="Browse By">
+          {BROWSE_BY.map((it) => {
+            const Icon = it.icon;
+            return (
+              <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:bg-white/5 hover:text-white">
+                <Icon size={16} />
+                <span>{it.label}</span>
+              </button>
+            );
+          })}
+        </SidebarSection>
+
+        <SidebarSection
+          title="My Playlists"
+          action={<button className="text-red-500 hover:text-red-400"><Plus size={14} /></button>}
+        >
+          {MY_PLAYLISTS.map((it) => {
+            const Icon = it.icon;
+            return (
+              <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:bg-white/5 hover:text-white">
+                <Icon size={16} />
+                <span>{it.label}</span>
+              </button>
+            );
+          })}
+        </SidebarSection>
+
+        {canUpload && (
+          <button
+            onClick={() => { setShowUpload(true); setSidebarOpen(false); }}
+            className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2"
+          >
+            <Upload size={14} /> Upload Video
+          </button>
+        )}
+      </aside>
+
       {/* MAIN LAYOUT */}
       <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 md:px-8 pt-2 pb-32 grid grid-cols-12 gap-6">
-        {/* LEFT SIDEBAR */}
-        <aside className="col-span-12 lg:col-span-2 space-y-6">
-          <SidebarSection title="Music Videos">
-            {SIDEBAR_PRIMARY.map((it) => {
-              const Icon = it.icon;
-              const active = activeFilter === it.key;
-              return (
-                <button
-                  key={it.key}
-                  onClick={() => setActiveFilter(it.key)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                    active
-                      ? "bg-red-500/15 text-red-500 border-l-2 border-red-500"
-                      : "text-white/70 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <Icon size={16} />
-                  <span className="flex-1 text-left">{it.label}</span>
-                  {it.badge && (
-                    <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded">
-                      {it.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </SidebarSection>
-
-          <SidebarSection title="Browse By">
-            {BROWSE_BY.map((it) => {
-              const Icon = it.icon;
-              return (
-                <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:bg-white/5 hover:text-white">
-                  <Icon size={16} />
-                  <span>{it.label}</span>
-                </button>
-              );
-            })}
-          </SidebarSection>
-
-          <SidebarSection
-            title="My Playlists"
-            action={
-              <button className="text-red-500 hover:text-red-400"><Plus size={14} /></button>
-            }
-          >
-            {MY_PLAYLISTS.map((it) => {
-              const Icon = it.icon;
-              return (
-                <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:bg-white/5 hover:text-white">
-                  <Icon size={16} />
-                  <span>{it.label}</span>
-                </button>
-              );
-            })}
-          </SidebarSection>
-
-          {canUpload && (
-            <button
-              onClick={() => setShowUpload(true)}
-              className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2"
-            >
-              <Upload size={14} /> Upload Video
-            </button>
-          )}
-        </aside>
-
         {/* CENTER */}
-        <main className="col-span-12 lg:col-span-7 space-y-8">
+        <main className="col-span-12 lg:col-span-9 space-y-8">
           {loading ? (
             <div className="aspect-video bg-white/5 rounded-2xl animate-pulse" />
           ) : hero ? (
