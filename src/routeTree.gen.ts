@@ -25,6 +25,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PayoutsRouteImport } from './routes/payouts'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as NetworkRouteImport } from './routes/network'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
@@ -185,6 +186,11 @@ const OffTheBlockRoute = OffTheBlockRouteImport.update({
 const NotificationsRoute = NotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NetworkRoute = NetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MicDropRoute = MicDropRouteImport.update({
@@ -622,6 +628,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
+  '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/payouts': typeof PayoutsRoute
@@ -720,6 +727,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
+  '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/payouts': typeof PayoutsRoute
@@ -820,6 +828,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
+  '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/payouts': typeof PayoutsRoute
@@ -921,6 +930,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/messages'
     | '/mic-drop'
+    | '/network'
     | '/notifications'
     | '/off-the-block'
     | '/payouts'
@@ -1019,6 +1029,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/messages'
     | '/mic-drop'
+    | '/network'
     | '/notifications'
     | '/off-the-block'
     | '/payouts'
@@ -1118,6 +1129,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/messages'
     | '/mic-drop'
+    | '/network'
     | '/notifications'
     | '/off-the-block'
     | '/payouts'
@@ -1218,6 +1230,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   MicDropRoute: typeof MicDropRoute
+  NetworkRoute: typeof NetworkRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   PayoutsRoute: typeof PayoutsRoute
@@ -1374,6 +1387,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/network': {
+      id: '/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof NetworkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mic-drop': {
@@ -2063,6 +2083,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   MicDropRoute: MicDropRoute,
+  NetworkRoute: NetworkRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   PayoutsRoute: PayoutsRoute,
