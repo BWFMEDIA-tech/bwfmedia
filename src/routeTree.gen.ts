@@ -19,6 +19,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
@@ -145,6 +146,11 @@ const RecordingsRoute = RecordingsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
@@ -558,6 +564,7 @@ export interface FileRoutesByFullPath {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -646,6 +653,7 @@ export interface FileRoutesByTo {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -736,6 +744,7 @@ export interface FileRoutesById {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -827,6 +836,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/privacy'
     | '/profile'
     | '/recordings'
     | '/reset-password'
@@ -915,6 +925,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/privacy'
     | '/profile'
     | '/recordings'
     | '/reset-password'
@@ -1004,6 +1015,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/privacy'
     | '/profile'
     | '/recordings'
     | '/reset-password'
@@ -1094,6 +1106,7 @@ export interface RootRouteChildren {
   MicDropRoute: typeof MicDropRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1201,6 +1214,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-the-block': {
@@ -1859,6 +1879,7 @@ const rootRouteChildren: RootRouteChildren = {
   MicDropRoute: MicDropRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
