@@ -121,7 +121,6 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
   const renderPanel = (panel: Panel, label: string, placeholder: string, fallback?: string) => {
     const items = sortByActive(buckets[panel]);
     const primary = items[0] ?? null;
-    const overflow = items.slice(1);
     const primaryId = primary?.participant?.identity ?? null;
     return (
       <div className="flex flex-col gap-2">
@@ -132,22 +131,6 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
           profile={primaryId ? profiles[primaryId] : undefined}
           placeholder={placeholder}
         />
-        {overflow.length > 0 && (
-          <div className="grid grid-cols-2 gap-2">
-            {overflow.map((t) => {
-              const id = t.participant?.identity ?? "";
-              return (
-                <StageTile
-                  key={id}
-                  track={t}
-                  label={label}
-                  profile={profiles[id]}
-                  small
-                />
-              );
-            })}
-          </div>
-        )}
       </div>
     );
   };
