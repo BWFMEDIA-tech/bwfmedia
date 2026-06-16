@@ -930,6 +930,7 @@ export type Database = {
           artist_name: string
           artist_user_id: string | null
           audio_url: string | null
+          boost_weight: number
           boosted: boolean
           cover_url: string | null
           created_at: string
@@ -938,6 +939,8 @@ export type Database = {
           id: string
           like_count: number
           position: number
+          rank_score: number
+          rank_updated_at: string
           score: number
           status: string
           stream_id: string
@@ -948,6 +951,7 @@ export type Database = {
           artist_name: string
           artist_user_id?: string | null
           audio_url?: string | null
+          boost_weight?: number
           boosted?: boolean
           cover_url?: string | null
           created_at?: string
@@ -956,6 +960,8 @@ export type Database = {
           id?: string
           like_count?: number
           position?: number
+          rank_score?: number
+          rank_updated_at?: string
           score?: number
           status?: string
           stream_id: string
@@ -966,6 +972,7 @@ export type Database = {
           artist_name?: string
           artist_user_id?: string | null
           audio_url?: string | null
+          boost_weight?: number
           boosted?: boolean
           cover_url?: string | null
           created_at?: string
@@ -974,6 +981,8 @@ export type Database = {
           id?: string
           like_count?: number
           position?: number
+          rank_score?: number
+          rank_updated_at?: string
           score?: number
           status?: string
           stream_id?: string
@@ -2093,6 +2102,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      recompute_play_arena_rankings: { Args: never; Returns: number }
       spend_boost_on_track: {
         Args: { _track_id: string; _weight?: number }
         Returns: {
