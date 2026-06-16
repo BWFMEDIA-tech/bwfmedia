@@ -964,8 +964,6 @@ function StreamStudio() {
               <AudienceRow participants={participants} />
             </div>
           </div>
-
-          <OnAirBar />
         </main>
       </div>
     </div>
