@@ -93,6 +93,25 @@ async function grantPlayBoost(session: any) {
   if (error) console.error('grant_play_boost_credits failed', error);
 }
 
+async function grantBoostCreditPack(session: any) {
+  const meta = session.metadata || {};
+  const userId = meta.userId as string | undefined;
+  const packId = meta.packId as string | undefined;
+  const credits = parseInt((meta.credits as string) || '0', 10);
+  if (!userId || !packId || !Number.isFinite(credits) || credits < 1) {
+    console.warn('boost_credit_pack webhook missing metadata', session.id, meta);
+    return;
+  }
+  const supabase = getSupabase();
+  const { error } = await supabase.rpc('grant_boost_credits_purchase', {
+    _user_id: userId,
+    _credits: credits,
+    _stripe_session_id: session.id,
+    _pack_id: packId,
+  });
+  if (error) console.error('grant_boost_credits_purchase failed', error);
+}
+
 async function upsertPlayMembershipFromSubscription(sub: any) {
   const userId = sub?.metadata?.userId as string | undefined;
   if (!userId) { console.warn('play_membership sub missing userId', sub?.id); return; }
@@ -168,6 +187,7 @@ function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
   if (meta.kind === 'tip') return recordTip(session);
   if (meta.kind === 'play_boost') return grantPlayBoost(session);
+  if (meta.kind === 'boost_credit_pack') return grantBoostCreditPack(session);
   if (meta.kind === 'play_membership') return Promise.resolve(); // handled via subscription events
   if (meta.bookingTable) return markBookingPaid(session);
   console.warn('Webhook: session has no recognized metadata', session.id);

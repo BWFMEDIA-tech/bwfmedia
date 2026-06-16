@@ -35,6 +35,7 @@ import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -232,6 +233,11 @@ const DeckRoute = DeckRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditsRoute = CreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatorAgreementRoute = CreatorAgreementRouteImport.update({
@@ -591,6 +597,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
+  '/credits': typeof CreditsRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
@@ -686,6 +693,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
+  '/credits': typeof CreditsRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
@@ -783,6 +791,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
+  '/credits': typeof CreditsRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
@@ -881,6 +890,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
+    | '/credits'
     | '/dashboard'
     | '/deck'
     | '/discover'
@@ -976,6 +986,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
+    | '/credits'
     | '/dashboard'
     | '/deck'
     | '/discover'
@@ -1072,6 +1083,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
+    | '/credits'
     | '/dashboard'
     | '/deck'
     | '/discover'
@@ -1169,6 +1181,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
   CreatorAgreementRoute: typeof CreatorAgreementRoute
+  CreditsRoute: typeof CreditsRoute
   DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
   DiscoverRoute: typeof DiscoverRoute
@@ -1404,6 +1417,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credits': {
+      id: '/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof CreditsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/creator-agreement': {
@@ -1990,6 +2010,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CookiePolicyRoute: CookiePolicyRoute,
   CreatorAgreementRoute: CreatorAgreementRoute,
+  CreditsRoute: CreditsRoute,
   DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
   DiscoverRoute: DiscoverRoute,
