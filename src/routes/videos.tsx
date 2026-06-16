@@ -36,11 +36,59 @@ type VideoRow = {
   category: "music" | "sponsored";
   storage_path: string;
   external_url: string | null;
+  thumbnail_path: string | null;
   created_at: string;
 };
 
 function publicUrl(path: string) {
   return supabase.storage.from("videos").getPublicUrl(path).data.publicUrl;
+}
+
+function thumbUrl(v: { thumbnail_path: string | null }) {
+  return v.thumbnail_path ? publicUrl(v.thumbnail_path) : null;
+}
+
+async function captureVideoThumbnail(file: File): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.muted = true;
+      video.playsInline = true;
+      video.crossOrigin = "anonymous";
+      video.src = url;
+      const cleanup = () => URL.revokeObjectURL(url);
+      video.onloadedmetadata = () => {
+        try {
+          video.currentTime = Math.min(1, (video.duration || 2) / 2);
+        } catch {
+          cleanup();
+          resolve(null);
+        }
+      };
+      video.onseeked = () => {
+        const canvas = document.createElement("canvas");
+        const w = video.videoWidth || 1280;
+        const h = video.videoHeight || 720;
+        const scale = Math.min(1, 1280 / w);
+        canvas.width = Math.round(w * scale);
+        canvas.height = Math.round(h * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { cleanup(); resolve(null); return; }
+        try {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => { cleanup(); resolve(blob); }, "image/jpeg", 0.85);
+        } catch {
+          cleanup();
+          resolve(null);
+        }
+      };
+      video.onerror = () => { cleanup(); resolve(null); };
+    } catch {
+      resolve(null);
+    }
+  });
 }
 
 const SIDEBAR_PRIMARY = [
