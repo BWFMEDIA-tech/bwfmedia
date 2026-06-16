@@ -34,6 +34,7 @@ import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
@@ -223,6 +224,11 @@ const DeckRoute = DeckRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorAgreementRoute = CreatorAgreementRouteImport.update({
+  id: '/creator-agreement',
+  path: '/creator-agreement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -564,6 +570,7 @@ export interface FileRoutesByFullPath {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
@@ -655,6 +662,7 @@ export interface FileRoutesByTo {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
@@ -748,6 +756,7 @@ export interface FileRoutesById {
   '/artists': typeof ArtistsRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
+  '/creator-agreement': typeof CreatorAgreementRoute
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
@@ -842,6 +851,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/creator-agreement'
     | '/dashboard'
     | '/deck'
     | '/discover'
@@ -933,6 +943,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/creator-agreement'
     | '/dashboard'
     | '/deck'
     | '/discover'
@@ -1025,6 +1036,7 @@ export interface FileRouteTypes {
     | '/artists'
     | '/blog'
     | '/contact'
+    | '/creator-agreement'
     | '/dashboard'
     | '/deck'
     | '/discover'
@@ -1118,6 +1130,7 @@ export interface RootRouteChildren {
   ArtistsRoute: typeof ArtistsRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
+  CreatorAgreementRoute: typeof CreatorAgreementRoute
   DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
   DiscoverRoute: typeof DiscoverRoute
@@ -1345,6 +1358,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator-agreement': {
+      id: '/creator-agreement'
+      path: '/creator-agreement'
+      fullPath: '/creator-agreement'
+      preLoaderRoute: typeof CreatorAgreementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1907,6 +1927,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistsRoute: ArtistsRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
+  CreatorAgreementRoute: CreatorAgreementRoute,
   DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
   DiscoverRoute: DiscoverRoute,
