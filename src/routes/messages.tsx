@@ -325,8 +325,12 @@ function MessagesPage() {
                   ) : (
                     activeMessages.map((m) => {
                       const mine = m.sender_id === auth.user!.id;
+                      const senderProfile = mine
+                        ? { id: auth.user!.id, display_name: auth.user!.user_metadata?.display_name ?? null, avatar_url: auth.user!.user_metadata?.avatar_url ?? null }
+                        : (activeProfile ?? { id: m.sender_id, display_name: null, avatar_url: null });
                       return (
-                        <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                        <div key={m.id} className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
+                          {!mine && <Avatar profile={senderProfile} />}
                           <div
                             className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? "bg-violet-600 text-white" : "bg-white/10 text-bone"}`}
                           >
@@ -335,6 +339,7 @@ function MessagesPage() {
                               {new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                             </p>
                           </div>
+                          {mine && <Avatar profile={senderProfile} />}
                         </div>
                       );
                     })
