@@ -185,7 +185,6 @@ function GuestPage() {
                   <RaiseHandButton streamId={streamId} auth={auth} />
                 </div>
               )}
-              <NowPlayingMini streamId={streamId} />
               <AudienceRow participants={participants as StageParticipant[]} />
             </StageAudioShell>
           ) : (
