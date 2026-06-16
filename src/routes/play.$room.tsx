@@ -152,14 +152,23 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-violet-900/30 via-[#0d0d18] to-blue-900/20 p-6">
-      <div className="mb-3 text-xs font-bold tracking-widest text-violet-300 text-center sm:text-left">♪ NOW PLAYING ♪</div>
-      {track ? (
-        <>
-          <div className="relative flex flex-col items-center gap-5 sm:flex-row sm:items-start sm:gap-6">
-            {/* Cover art with radial waveform centered behind it */}
-            <div className="relative aspect-square w-32 shrink-0 sm:w-44 md:w-52">
-              {/* Waveform radiates outward from the album center */}
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-10 backdrop-blur-2xl shadow-[0_0_60px_-20px_rgba(139,92,246,0.55)]">
+      {/* Ambient neon glow */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
+        <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/3 rounded-full bg-violet-500/25 blur-3xl" />
+        <div className="absolute left-1/2 bottom-0 h-64 w-64 -translate-x-1/2 translate-y-1/3 rounded-full bg-blue-500/20 blur-3xl" />
+      </div>
+
+      <div className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center text-center">
+        {/* Header */}
+        <div className="mb-6 text-[11px] font-bold tracking-[0.4em] text-violet-300/90">
+          ♪ NOW PLAYING ♪
+        </div>
+
+        {track ? (
+          <>
+            {/* Album art — focal point */}
+            <div className="relative mx-auto aspect-square w-56 sm:w-64 md:w-72">
               <div className="pointer-events-none absolute -inset-[80%] z-0">
                 <WaveformBackground
                   audioRef={audioRef}
@@ -167,34 +176,40 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
                   trackKey={track.id}
                 />
               </div>
-              <div className="relative z-10 aspect-square w-full overflow-hidden rounded-2xl border-2 border-violet-500/60 bg-gradient-to-br from-violet-700 to-blue-700 shadow-[0_0_60px_-10px_rgba(139,92,246,0.6)]">
-              {track.cover_url ? (
-                <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <Music className="h-16 w-16 text-white/40" />
-                </div>
-              )}
+              <div className="relative z-10 aspect-square w-full overflow-hidden rounded-2xl border-2 border-violet-500/60 bg-gradient-to-br from-violet-700 to-blue-700 shadow-[0_0_80px_-10px_rgba(139,92,246,0.75)] transition-transform duration-500 hover:scale-[1.02]">
+                {track.cover_url ? (
+                  <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Music className="h-16 w-16 text-white/40" />
+                  </div>
+                )}
               </div>
             </div>
-            {/* Track info + controls — aligned beside the cover, never overlapping */}
-            <div className="relative z-10 min-w-0 flex-1 text-center sm:text-left">
-              <h2 className="truncate text-2xl font-bold">{track.title}</h2>
-              <p className="truncate text-white/60">{track.artist_name}</p>
-              {track.audio_url && (
-                <audio
-                  key={track.id}
-                  ref={audioRef}
-                  src={track.audio_url}
-                  autoPlay
-                  crossOrigin="anonymous"
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  onEnded={() => setIsPlaying(false)}
-                  className="hidden"
-                />
-              )}
-              <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:justify-start sm:gap-4">
+
+            {/* Title + artist */}
+            <h2 className="mt-8 w-full truncate text-2xl font-bold tracking-tight sm:text-3xl">
+              {track.title}
+            </h2>
+            <p className="mt-1 w-full truncate text-sm text-white/60 sm:text-base">
+              {track.artist_name}
+            </p>
+
+            {track.audio_url && (
+              <audio
+                key={track.id}
+                ref={audioRef}
+                src={track.audio_url}
+                autoPlay
+                crossOrigin="anonymous"
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+                className="hidden"
+              />
+            )}
+
+            {/* Playback */}
             {track.audio_url && (
               <button
                 type="button"
@@ -204,44 +219,63 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
                   if (a.paused) a.play().catch(() => {}); else a.pause();
                 }}
                 aria-label={isPlaying ? "Pause" : "Play"}
-                className="flex items-center gap-2 rounded-full border-2 border-violet-500/40 px-4 py-2 text-sm font-bold text-violet-200 transition hover:bg-violet-500/10"
+                className="mt-8 flex h-16 w-16 items-center justify-center rounded-full border border-violet-400/40 bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-[0_0_40px_-5px_rgba(139,92,246,0.8)] transition-transform duration-200 hover:scale-110 active:scale-95"
               >
-                {isPlaying ? (
-                  <><Pause className="h-4 w-4" /> PAUSE</>
-                ) : (
-                  <><Play className="h-4 w-4" /> PLAY</>
-                )}
+                {isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7 translate-x-0.5" />}
               </button>
             )}
-            <button onClick={() => cast(1)}
-              className={`flex items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-bold transition ${
-                myVote === 1 ? "border-green-400 bg-green-500/20 text-green-300" : "border-green-500/40 text-green-300 hover:bg-green-500/10"
-              }`}>
-              <ThumbsUp className="h-4 w-4" /> LIKE
-            </button>
-            <div className="text-center">
-              <div className="text-3xl font-black">{track.score}</div>
-              <div className="text-[10px] tracking-widest text-white/50">LIVE SCORE</div>
-            </div>
-            <button onClick={() => cast(-1)}
-              className={`flex items-center gap-2 rounded-full border-2 px-4 py-2 text-sm font-bold transition ${
-                myVote === -1 ? "border-red-400 bg-red-500/20 text-red-300" : "border-red-500/40 text-red-300 hover:bg-red-500/10"
-              }`}>
-              <ThumbsDown className="h-4 w-4" /> DISLIKE
-            </button>
+
+            {/* Action row — Like · Score · Dislike */}
+            <div className="mt-8 grid w-full grid-cols-3 items-center gap-4">
+              <div className="flex justify-center">
+                <button
+                  onClick={() => cast(1)}
+                  aria-label="Like"
+                  className={`group flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all duration-200 hover:scale-110 ${
+                    myVote === 1
+                      ? "border-green-400 bg-green-500/20 text-green-300 shadow-[0_0_30px_-5px_rgba(74,222,128,0.7)]"
+                      : "border-green-500/40 text-green-300 hover:bg-green-500/10 hover:shadow-[0_0_25px_-5px_rgba(74,222,128,0.5)]"
+                  }`}
+                >
+                  <ThumbsUp className="h-5 w-5" />
+                </button>
               </div>
-              <p className="mt-3 text-xs text-white/50 text-center sm:text-left">
-                {track.like_count + track.dislike_count} {track.like_count + track.dislike_count === 1 ? "vote" : "votes"} so far
-              </p>
+
+              <div className="flex flex-col items-center">
+                <div className="text-4xl font-black tabular-nums leading-none bg-gradient-to-br from-violet-300 to-blue-300 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]">
+                  {track.score}
+                </div>
+                <div className="mt-1.5 text-[10px] tracking-[0.3em] text-white/50">
+                  LIVE SCORE
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <button
+                  onClick={() => cast(-1)}
+                  aria-label="Dislike"
+                  className={`group flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all duration-200 hover:scale-110 ${
+                    myVote === -1
+                      ? "border-red-400 bg-red-500/20 text-red-300 shadow-[0_0_30px_-5px_rgba(248,113,113,0.7)]"
+                      : "border-red-500/40 text-red-300 hover:bg-red-500/10 hover:shadow-[0_0_25px_-5px_rgba(248,113,113,0.5)]"
+                  }`}
+                >
+                  <ThumbsDown className="h-5 w-5" />
+                </button>
+              </div>
             </div>
+
+            <p className="mt-6 text-xs text-white/50">
+              {track.like_count + track.dislike_count} {track.like_count + track.dislike_count === 1 ? "vote" : "votes"} so far
+            </p>
+          </>
+        ) : (
+          <div className="py-16 text-center text-white/50">
+            <Music className="mx-auto mb-3 h-12 w-12 text-white/20" />
+            Waiting for the host to start the next track…
           </div>
-        </>
-      ) : (
-        <div className="py-16 text-center text-white/50">
-          <Music className="mx-auto h-12 w-12 mb-3 text-white/20" />
-          Waiting for the host to start the next track…
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
