@@ -236,6 +236,22 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
               await sendStripeCancellationEmail(getSupabase(), intent.receipt_email ?? intent.charges?.data?.[0]?.billing_details?.email, intent.id);
               break;
             }
+            case 'account.updated': {
+              const acct: any = event.data.object;
+              const sb = getSupabase();
+              await sb
+                .from('payout_accounts')
+                .update({
+                  charges_enabled: !!acct.charges_enabled,
+                  payouts_enabled: !!acct.payouts_enabled,
+                  details_submitted: !!acct.details_submitted,
+                  country: acct.country ?? null,
+                  default_currency: acct.default_currency ?? 'usd',
+                  requirements: acct.requirements ?? {},
+                })
+                .eq('stripe_account_id', acct.id);
+              break;
+            }
             default:
               console.log('Unhandled Stripe event', event.type);
           }

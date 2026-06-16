@@ -22,6 +22,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PayoutsRouteImport } from './routes/payouts'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
@@ -104,6 +105,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify/webhook'
 import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify/callback'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
 
 const VideosRoute = VideosRouteImport.update({
   id: '/videos',
@@ -168,6 +170,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayoutsRoute = PayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffTheBlockRoute = OffTheBlockRouteImport.update({
@@ -586,6 +593,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksProcessPayoutsRoute =
+  ApiPublicHooksProcessPayoutsRouteImport.update({
+    id: '/api/public/hooks/process-payouts',
+    path: '/api/public/hooks/process-payouts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -611,6 +624,7 @@ export interface FileRoutesByFullPath {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/payouts': typeof PayoutsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -675,6 +689,7 @@ export interface FileRoutesByFullPath {
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
@@ -707,6 +722,7 @@ export interface FileRoutesByTo {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/payouts': typeof PayoutsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -771,6 +787,7 @@ export interface FileRoutesByTo {
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
@@ -805,6 +822,7 @@ export interface FileRoutesById {
   '/mic-drop': typeof MicDropRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
+  '/payouts': typeof PayoutsRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -869,6 +887,7 @@ export interface FileRoutesById {
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
@@ -904,6 +923,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/payouts'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -968,6 +988,7 @@ export interface FileRouteTypes {
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
+    | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/webhook'
@@ -1000,6 +1021,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/payouts'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1064,6 +1086,7 @@ export interface FileRouteTypes {
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
+    | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/webhook'
@@ -1097,6 +1120,7 @@ export interface FileRouteTypes {
     | '/mic-drop'
     | '/notifications'
     | '/off-the-block'
+    | '/payouts'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1161,6 +1185,7 @@ export interface FileRouteTypes {
     | '/api/public/studio-booking'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
+    | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
     | '/api/public/shopify/webhook'
@@ -1195,6 +1220,7 @@ export interface RootRouteChildren {
   MicDropRoute: typeof MicDropRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
+  PayoutsRoute: typeof PayoutsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
@@ -1225,6 +1251,7 @@ export interface RootRouteChildren {
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
+  ApiPublicHooksProcessPayoutsRoute: typeof ApiPublicHooksProcessPayoutsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
   ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
@@ -1326,6 +1353,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payouts': {
+      id: '/payouts'
+      path: '/payouts'
+      fullPath: '/payouts'
+      preLoaderRoute: typeof PayoutsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-the-block': {
@@ -1902,6 +1936,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/process-payouts': {
+      id: '/api/public/hooks/process-payouts'
+      path: '/api/public/hooks/process-payouts'
+      fullPath: '/api/public/hooks/process-payouts'
+      preLoaderRoute: typeof ApiPublicHooksProcessPayoutsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2024,6 +2065,7 @@ const rootRouteChildren: RootRouteChildren = {
   MicDropRoute: MicDropRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
+  PayoutsRoute: PayoutsRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
@@ -2055,6 +2097,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
+  ApiPublicHooksProcessPayoutsRoute: ApiPublicHooksProcessPayoutsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
   ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
