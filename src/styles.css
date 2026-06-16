@@ -255,6 +255,24 @@
   display: block;
 }
 
+/* LiveKit renders an SVG avatar placeholder (320x320) when the camera is
+   off. Without these overrides the intrinsic SVG size pushes the tile
+   taller than its aspect-video wrapper. */
+.stage-tile .lk-participant-placeholder {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.stage-tile .lk-participant-placeholder svg {
+  width: 40% !important;
+  height: auto !important;
+  max-height: 60% !important;
+}
+
 /* Vibrant animated gradient border for host/guest video tiles */
 @keyframes stage-tile-spin {
   0%   { background-position: 0% 50%; }
