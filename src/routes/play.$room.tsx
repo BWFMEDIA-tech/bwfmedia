@@ -65,7 +65,9 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
           {/* Main column */}
           <div className="space-y-5">
-            <NowPlayingCard track={playing} userId={auth.user?.id ?? null} />
+            <div className="mx-auto w-full max-w-xl">
+              <NowPlayingCard track={playing} userId={auth.user?.id ?? null} />
+            </div>
 
             {/* Submit / Boost CTAs */}
             <div className="grid sm:grid-cols-2 gap-3">
