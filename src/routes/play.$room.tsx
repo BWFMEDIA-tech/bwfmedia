@@ -105,7 +105,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
             </div>
 
             {/* Leaderboard + How it works */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid gap-4 xl:grid-cols-2">
               <Leaderboard items={leaderboard} isHost={isHost} streamId={stream?.id ?? null} />
               <HowItWorks />
             </div>
@@ -380,12 +380,12 @@ function HowItWorks() {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-4">
       <div className="text-sm font-bold mb-3 text-violet-300">HOW IT WORKS</div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-2">
         {steps.map((s) => (
-          <div key={s.label} className="rounded-lg border border-white/5 p-2.5">
+          <div key={s.label} className="min-w-0 rounded-lg border border-white/5 p-2.5">
             <s.icon className="h-5 w-5 text-violet-400 mb-1" />
-            <div className="text-xs font-bold">{s.label}</div>
-            <div className="text-[10px] text-white/50">{s.sub}</div>
+            <div className="text-xs font-bold leading-tight">{s.label}</div>
+            <div className="text-[10px] text-white/50 leading-snug">{s.sub}</div>
           </div>
         ))}
       </div>
