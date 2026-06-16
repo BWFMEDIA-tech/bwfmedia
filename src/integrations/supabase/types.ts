@@ -116,6 +116,123 @@ export type Database = {
         }
         Relationships: []
       }
+      boost_credit_ledger: {
+        Row: {
+          balance_after: number
+          created_at: string
+          delta: number
+          id: string
+          metadata: Json
+          reason: string
+          reference_id: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string
+          delta: number
+          id?: string
+          metadata?: Json
+          reason: string
+          reference_id?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string
+          delta?: number
+          id?: string
+          metadata?: Json
+          reason?: string
+          reference_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      boost_credit_packs: {
+        Row: {
+          active: boolean
+          created_at: string
+          credits: number
+          currency: string
+          id: string
+          name: string
+          price_cents: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          credits: number
+          currency?: string
+          id: string
+          name: string
+          price_cents: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          credits?: number
+          currency?: string
+          id?: string
+          name?: string
+          price_cents?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      boost_spends: {
+        Row: {
+          created_at: string
+          credits_cost: number
+          expires_at: string
+          id: string
+          ledger_id: string | null
+          track_id: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          credits_cost: number
+          expires_at?: string
+          id?: string
+          ledger_id?: string | null
+          track_id: string
+          user_id: string
+          weight: number
+        }
+        Update: {
+          created_at?: string
+          credits_cost?: number
+          expires_at?: string
+          id?: string
+          ledger_id?: string | null
+          track_id?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boost_spends_ledger_id_fkey"
+            columns: ["ledger_id"]
+            isOneToOne: false
+            referencedRelation: "boost_credit_ledger"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_spends_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_timeouts: {
         Row: {
           created_at: string
@@ -1926,6 +2043,15 @@ export type Database = {
           total_cents: number
         }[]
       }
+      grant_boost_credits_purchase: {
+        Args: {
+          _credits: number
+          _pack_id: string
+          _stripe_session_id: string
+          _user_id: string
+        }
+        Returns: number
+      }
       grant_play_boost_credits: {
         Args: { _credits: number; _user_id: string }
         Returns: number
@@ -1965,6 +2091,13 @@ export type Database = {
           message: Json
           msg_id: number
           read_ct: number
+        }[]
+      }
+      spend_boost_on_track: {
+        Args: { _track_id: string; _weight?: number }
+        Returns: {
+          new_balance: number
+          spend_id: string
         }[]
       }
     }
