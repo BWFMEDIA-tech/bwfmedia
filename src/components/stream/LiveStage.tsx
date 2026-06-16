@@ -142,7 +142,7 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
         className={cn(
           "gap-4",
           "flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          "md:grid md:grid-cols-3 md:overflow-visible md:pb-0",
+          "md:grid md:grid-cols-3 md:items-start md:overflow-visible md:pb-0",
         )}
       >
         <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
