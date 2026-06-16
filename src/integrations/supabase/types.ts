@@ -830,6 +830,113 @@ export type Database = {
           },
         ]
       }
+      payout_accounts: {
+        Row: {
+          charges_enabled: boolean
+          country: string | null
+          created_at: string
+          default_currency: string
+          details_submitted: boolean
+          environment: string
+          id: string
+          payouts_enabled: boolean
+          requirements: Json
+          stripe_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          charges_enabled?: boolean
+          country?: string | null
+          created_at?: string
+          default_currency?: string
+          details_submitted?: boolean
+          environment?: string
+          id?: string
+          payouts_enabled?: boolean
+          requirements?: Json
+          stripe_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          charges_enabled?: boolean
+          country?: string | null
+          created_at?: string
+          default_currency?: string
+          details_submitted?: boolean
+          environment?: string
+          id?: string
+          payouts_enabled?: boolean
+          requirements?: Json
+          stripe_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payout_requests: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          environment: string
+          failure_reason: string | null
+          id: string
+          metadata: Json
+          payout_account_id: string | null
+          processed_at: string | null
+          requested_at: string
+          status: string
+          stripe_destination_id: string | null
+          stripe_transfer_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          failure_reason?: string | null
+          id?: string
+          metadata?: Json
+          payout_account_id?: string | null
+          processed_at?: string | null
+          requested_at?: string
+          status?: string
+          stripe_destination_id?: string | null
+          stripe_transfer_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          failure_reason?: string | null
+          id?: string
+          metadata?: Json
+          payout_account_id?: string | null
+          processed_at?: string | null
+          requested_at?: string
+          status?: string
+          stripe_destination_id?: string | null
+          stripe_transfer_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_requests_payout_account_id_fkey"
+            columns: ["payout_account_id"]
+            isOneToOne: false
+            referencedRelation: "payout_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       play_boost_credits: {
         Row: {
           credits: number
@@ -2044,6 +2151,17 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_creator_balance_cents: {
+        Args: { _user_id: string }
+        Returns: {
+          available_cents: number
+          earned_cents: number
+          merch_cents: number
+          paid_out_cents: number
+          pending_cents: number
+          tips_cents: number
+        }[]
       }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }
