@@ -240,6 +240,33 @@ export type Database = {
           },
         ]
       }
+      boost_spends_access_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          context: Json | null
+          created_at: string
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          context?: Json | null
+          created_at?: string
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          context?: Json | null
+          created_at?: string
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       chat_timeouts: {
         Row: {
           created_at: string
@@ -2174,6 +2201,10 @@ export type Database = {
       }
     }
     Functions: {
+      boost_spends_access_check: {
+        Args: { _row_user_id: string }
+        Returns: boolean
+      }
       consume_play_boost_credit: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
