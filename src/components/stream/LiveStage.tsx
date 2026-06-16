@@ -42,9 +42,10 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       token={token}
       serverUrl={serverUrl}
       connect
-      video={publish}
-      audio={publish}
-      onError={(e) => toast.error(`Stream error: ${e.message}`)}
+      video={false}
+      audio={false}
+      onError={(e) => toast.error(`Stream error: ${friendlyDeviceError(e)}`)}
+      onMediaDeviceFailure={(failure) => toast.error(friendlyDeviceError(failure))}
       className="contents"
     >
       <RoomAudioRenderer />
@@ -60,21 +61,48 @@ function PublishSync({ publish }: { publish: boolean }) {
   useEffect(() => {
     if (!localParticipant) return;
     (async () => {
-      try {
-        await localParticipant.setMicrophoneEnabled(publish);
-        await localParticipant.setCameraEnabled(publish);
+      if (!publish) {
+        await Promise.allSettled([
+          localParticipant.setMicrophoneEnabled(false),
+          localParticipant.setCameraEnabled(false),
+        ]);
+        if (prev.current === true) toast.info("You're back in the crowd");
+        prev.current = false;
+        return;
+      }
+
+      const [micResult, cameraResult] = await Promise.allSettled([
+        localParticipant.setMicrophoneEnabled(true),
+        localParticipant.setCameraEnabled(true),
+      ]);
+
+      if (micResult.status === "rejected") {
+        toast.error(friendlyDeviceError(micResult.reason));
+      }
+      if (cameraResult.status === "rejected") {
+        toast.error(friendlyDeviceError(cameraResult.reason));
+      }
+      if (micResult.status === "fulfilled" || cameraResult.status === "fulfilled") {
         if (prev.current === false && publish) {
-          toast.success("You're on stage — mic and camera enabled");
-        } else if (prev.current === true && !publish) {
-          toast.info("You're back in the crowd");
+          toast.success("You're on stage");
         }
         prev.current = publish;
-      } catch (e: any) {
-        if (publish) toast.error(e?.message || "Could not enable mic/camera");
       }
     })();
   }, [publish, localParticipant]);
   return null;
+}
+
+function friendlyDeviceError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  const name = error instanceof Error ? error.name : "";
+  if (/notfound|requested device not found|no device/i.test(`${name} ${message}`)) {
+    return "No camera or microphone was found. You can still stay live and connect a device anytime.";
+  }
+  if (/notallowed|permission|denied/i.test(`${name} ${message}`)) {
+    return "Allow camera and microphone permissions in your browser to broadcast.";
+  }
+  return message || "Could not enable camera or microphone.";
 }
 
 function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean }) {
