@@ -153,7 +153,7 @@ function NowPlayingCard({ track, userId }: { track: PlayTrack | null; userId: st
 
   return (
     <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-violet-900/30 via-[#0d0d18] to-blue-900/20 p-6">
-      <div className="text-center text-xs font-bold tracking-widest text-violet-300 mb-3">♪ NOW PLAYING ♪</div>
+      <div className="mb-3 text-xs font-bold tracking-widest text-violet-300 text-center sm:text-left">♪ NOW PLAYING ♪</div>
       {track ? (
         <>
           <div className="relative flex flex-col items-center gap-5 sm:flex-row sm:items-start sm:gap-6">
