@@ -139,7 +139,7 @@ export function SiteHeader() {
         </RouterLink>
 
         {/* Desktop primary nav */}
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1 mx-auto">
           {PRIMARY.map((item) => {
             const active = isActive(item.to);
             return (
