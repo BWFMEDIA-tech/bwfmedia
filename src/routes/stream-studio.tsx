@@ -107,8 +107,8 @@ const NAV: Array<{ icon: any; label: string; to: string; badge?: number }> = [
   { icon: Users, label: "Artists", to: "/artists" },
   { icon: Compass, label: "Discover", to: "/videos" },
   { icon: Calendar, label: "Events", to: "/events" },
-  { icon: MessageSquare, label: "Messages", to: "/messages", badge: 12 },
-  { icon: Bell, label: "Notifications", to: "/notifications", badge: 24 },
+  { icon: MessageSquare, label: "Messages", to: "/messages" },
+  { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: BarChart3, label: "Insights", to: "/admin/dashboard" },
   { icon: DollarSign, label: "Earnings", to: "/earnings" },
   { icon: Settings, label: "Settings", to: "/settings" },
@@ -116,6 +116,39 @@ const NAV: Array<{ icon: any; label: string; to: string; badge?: number }> = [
 
 function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const auth = useAuth();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
+
+  useEffect(() => {
+    const uid = auth.user?.id;
+    if (!uid) { setUnreadMessages(0); setUnreadNotifs(0); return; }
+    let cancelled = false;
+    const load = async () => {
+      const [{ count: msgCount }, { count: notifCount }] = await Promise.all([
+        supabase.from("direct_messages").select("id", { count: "exact", head: true })
+          .eq("recipient_id", uid).is("read_at", null),
+        supabase.from("notifications").select("id", { count: "exact", head: true })
+          .eq("user_id", uid).is("read_at", null),
+      ]);
+      if (cancelled) return;
+      setUnreadMessages(msgCount ?? 0);
+      setUnreadNotifs(notifCount ?? 0);
+    };
+    load();
+    const ch = supabase
+      .channel(`sidebar-counts-${uid}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "direct_messages", filter: `recipient_id=eq.${uid}` }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${uid}` }, load)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [auth.user?.id]);
+
+  const badgeFor = (label: string): number | undefined => {
+    if (label === "Messages") return unreadMessages || undefined;
+    if (label === "Notifications") return unreadNotifs || undefined;
+    return undefined;
+  };
   return (
     <aside className="hidden lg:flex w-[240px] shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] p-4">
       <Link to="/" className="flex items-center gap-2 px-2 py-3">
@@ -139,6 +172,7 @@ function Sidebar() {
       <nav className="mt-4 flex flex-col gap-1">
         {NAV.map((item) => {
           const active = pathname === item.to;
+          const badge = badgeFor(item.label) ?? item.badge;
           return (
             <Link
               key={item.label}
@@ -154,12 +188,12 @@ function Sidebar() {
                 <item.icon className="h-4 w-4" style={active ? { color: PURPLE } : undefined} />
                 {item.label}
               </span>
-              {item.badge ? (
+              {badge ? (
                 <span
                   className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
                   style={{ background: PURPLE }}
                 >
-                  {item.badge}
+                  {badge > 99 ? "99+" : badge}
                 </span>
               ) : null}
             </Link>
