@@ -831,6 +831,48 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [thumbBlob, setThumbBlob] = useState<Blob | null>(null);
+  const [thumbPreview, setThumbPreview] = useState<string | null>(null);
+  const [capturing, setCapturing] = useState(false);
+
+  useEffect(() => {
+    if (!file) { setVideoUrl(null); return; }
+    const url = URL.createObjectURL(file);
+    setVideoUrl(url);
+    setThumbBlob(null);
+    setThumbPreview((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+    setCurrentTime(0);
+    setDuration(0);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const captureNow = async () => {
+    const v = videoRef.current;
+    if (!v) return;
+    setCapturing(true);
+    try {
+      const wasPaused = v.paused;
+      if (!wasPaused) v.pause();
+      const blob = await captureFrameFromVideoEl(v);
+      if (blob) {
+        setThumbBlob(blob);
+        setThumbPreview((prev) => { if (prev) URL.revokeObjectURL(prev); return URL.createObjectURL(blob); });
+      }
+    } finally {
+      setCapturing(false);
+    }
+  };
+
+  const seekTo = (t: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = Math.max(0, Math.min(v.duration || t, t));
+    setCurrentTime(v.currentTime);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -842,13 +884,13 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     const up = await supabase.storage.from("videos").upload(path, file, { contentType: file.type });
     if (up.error) { setErr(up.error.message); setBusy(false); return; }
 
-    // Auto-generate a thumbnail by grabbing a frame from the uploaded video
+    // Use user-picked thumbnail if available; otherwise fall back to an auto-grab.
     let thumbnail_path: string | null = null;
     try {
-      const thumbBlob = await captureVideoThumbnail(file);
-      if (thumbBlob) {
+      const blob = thumbBlob ?? (await captureVideoThumbnail(file));
+      if (blob) {
         const tPath = `${userId}/${stamp}-thumb.jpg`;
-        const tUp = await supabase.storage.from("videos").upload(tPath, thumbBlob, { contentType: "image/jpeg" });
+        const tUp = await supabase.storage.from("videos").upload(tPath, blob, { contentType: "image/jpeg" });
         if (!tUp.error) thumbnail_path = tPath;
       }
     } catch { /* non-fatal */ }
@@ -889,6 +931,45 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
         <input ref={fileRef} type="file" accept="video/*" required aria-label="Video file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           className="w-full text-bone/70 text-sm file:mr-3 file:py-2 file:px-4 file:border-0 file:bg-blood file:text-bone file:font-cond file:uppercase file:tracking-widest file:text-[10px]" />
+        {videoUrl && (
+          <div className="space-y-2 border border-bone/15 p-3">
+            <p className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/70">Thumbnail</p>
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              className="w-full max-h-56 bg-black"
+              controls
+              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+              onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+            />
+            <input
+              type="range"
+              min={0}
+              max={Math.max(duration, 0.01)}
+              step={0.1}
+              value={currentTime}
+              onChange={(e) => seekTo(parseFloat(e.target.value))}
+              aria-label="Scrub to frame"
+              className="w-full accent-blood"
+            />
+            <div className="flex items-center justify-between text-[11px] text-bone/60 font-cond tracking-widest uppercase">
+              <span>{currentTime.toFixed(1)}s / {duration ? duration.toFixed(1) : "—"}s</span>
+              <button type="button" onClick={captureNow} disabled={capturing}
+                className="px-3 py-1 border border-bone/30 text-bone hover:bg-blood/30 disabled:opacity-50">
+                {capturing ? "Capturing…" : "Capture frame"}
+              </button>
+            </div>
+            {thumbPreview && (
+              <div className="flex items-center gap-3">
+                <img src={thumbPreview} alt="Thumbnail preview" className="w-32 aspect-video object-cover border border-bone/20" />
+                <button type="button" onClick={() => { if (thumbPreview) URL.revokeObjectURL(thumbPreview); setThumbBlob(null); setThumbPreview(null); }}
+                  className="text-[11px] font-cond tracking-widest uppercase text-bone/60 hover:text-bone">
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+        )}
         {err && <p className="text-blood text-sm">{err}</p>}
         <button disabled={busy} className="w-full py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-bone disabled:opacity-50"
           style={{ backgroundColor: "var(--blood)" }}>
