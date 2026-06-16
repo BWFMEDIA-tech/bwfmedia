@@ -806,12 +806,26 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     if (!file) { setErr("Pick a video file"); return; }
     setBusy(true); setErr(null);
     const ext = file.name.split(".").pop() || "mp4";
-    const path = `${userId}/${Date.now()}.${ext}`;
+    const stamp = Date.now();
+    const path = `${userId}/${stamp}.${ext}`;
     const up = await supabase.storage.from("videos").upload(path, file, { contentType: file.type });
     if (up.error) { setErr(up.error.message); setBusy(false); return; }
+
+    // Auto-generate a thumbnail by grabbing a frame from the uploaded video
+    let thumbnail_path: string | null = null;
+    try {
+      const thumbBlob = await captureVideoThumbnail(file);
+      if (thumbBlob) {
+        const tPath = `${userId}/${stamp}-thumb.jpg`;
+        const tUp = await supabase.storage.from("videos").upload(tPath, thumbBlob, { contentType: "image/jpeg" });
+        if (!tUp.error) thumbnail_path = tPath;
+      }
+    } catch { /* non-fatal */ }
+
     const ins = await supabase.from("videos").insert({
       user_id: userId, title, artist: artist || null, description: description || null,
       category, storage_path: path, external_url: externalUrl || null,
+      thumbnail_path,
     });
     setBusy(false);
     if (ins.error) { setErr(ins.error.message); return; }
