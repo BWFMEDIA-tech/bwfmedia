@@ -418,7 +418,7 @@ function VideosPage() {
                 <video
                   ref={videoRef}
                   src={publicUrl(hero.storage_path)}
-                  poster=""
+                  poster={thumbUrl(hero) ?? undefined}
                   preload="metadata"
                   playsInline
                   controls={nativeControls}
@@ -553,7 +553,11 @@ function VideosPage() {
               <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-red-500 mb-3">Video of the Week</h3>
               <div className="rounded-xl overflow-hidden bg-white/5 border border-white/5">
                 <Link to="/videos/$id" params={{ id: videoOfWeek.id }} className="block relative aspect-video bg-black group">
-                  <video src={publicUrl(videoOfWeek.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+                  {thumbUrl(videoOfWeek) ? (
+                    <img src={thumbUrl(videoOfWeek)!} alt={videoOfWeek.title} className="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <video src={publicUrl(videoOfWeek.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+                  )}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40">
                     <span className="w-14 h-14 rounded-full bg-black/50 border-2 border-white/80 flex items-center justify-center">
                       <Play size={20} className="text-white ml-0.5" />
