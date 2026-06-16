@@ -39,7 +39,7 @@ export function usePlayQueue(streamId: string | null) {
     };
     refresh();
     const ch = supabase
-      .channel(`play-tracks-${streamId}`)
+      .channel(`play-tracks-${streamId}-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` }, refresh)
       .on("postgres_changes", { event: "*", schema: "public", table: "play_votes" }, refresh)
       .subscribe();
@@ -71,7 +71,7 @@ export function useMyVote(trackId: string | null, userId: string | null) {
     };
     refresh();
     const ch = supabase
-      .channel(`my-vote-${trackId}-${userId}`)
+      .channel(`my-vote-${trackId}-${userId}-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", {
         event: "*", schema: "public", table: "play_votes",
         filter: `track_id=eq.${trackId}`,
