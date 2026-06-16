@@ -948,11 +948,6 @@ function StreamStudio() {
                 )
               )}
 
-              {/* In Stage mode, also render the Play arena (Now Playing / Scorecard / Crowd) directly below the Stage Room */}
-              {streamMode === "stage" && stream?.id && auth.user && (
-                <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
-              )}
-
               {/* Three live panels */}
               <div className="grid gap-4 lg:grid-cols-3">
                 <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />
