@@ -36,11 +36,59 @@ type VideoRow = {
   category: "music" | "sponsored";
   storage_path: string;
   external_url: string | null;
+  thumbnail_path: string | null;
   created_at: string;
 };
 
 function publicUrl(path: string) {
   return supabase.storage.from("videos").getPublicUrl(path).data.publicUrl;
+}
+
+function thumbUrl(v: { thumbnail_path: string | null }) {
+  return v.thumbnail_path ? publicUrl(v.thumbnail_path) : null;
+}
+
+async function captureVideoThumbnail(file: File): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.muted = true;
+      video.playsInline = true;
+      video.crossOrigin = "anonymous";
+      video.src = url;
+      const cleanup = () => URL.revokeObjectURL(url);
+      video.onloadedmetadata = () => {
+        try {
+          video.currentTime = Math.min(1, (video.duration || 2) / 2);
+        } catch {
+          cleanup();
+          resolve(null);
+        }
+      };
+      video.onseeked = () => {
+        const canvas = document.createElement("canvas");
+        const w = video.videoWidth || 1280;
+        const h = video.videoHeight || 720;
+        const scale = Math.min(1, 1280 / w);
+        canvas.width = Math.round(w * scale);
+        canvas.height = Math.round(h * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { cleanup(); resolve(null); return; }
+        try {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => { cleanup(); resolve(blob); }, "image/jpeg", 0.85);
+        } catch {
+          cleanup();
+          resolve(null);
+        }
+      };
+      video.onerror = () => { cleanup(); resolve(null); };
+    } catch {
+      resolve(null);
+    }
+  });
 }
 
 const SIDEBAR_PRIMARY = [
@@ -370,7 +418,7 @@ function VideosPage() {
                 <video
                   ref={videoRef}
                   src={publicUrl(hero.storage_path)}
-                  poster=""
+                  poster={thumbUrl(hero) ?? undefined}
                   preload="metadata"
                   playsInline
                   controls={nativeControls}
@@ -505,7 +553,11 @@ function VideosPage() {
               <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-red-500 mb-3">Video of the Week</h3>
               <div className="rounded-xl overflow-hidden bg-white/5 border border-white/5">
                 <Link to="/videos/$id" params={{ id: videoOfWeek.id }} className="block relative aspect-video bg-black group">
-                  <video src={publicUrl(videoOfWeek.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+                  {thumbUrl(videoOfWeek) ? (
+                    <img src={thumbUrl(videoOfWeek)!} alt={videoOfWeek.title} className="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <video src={publicUrl(videoOfWeek.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+                  )}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40">
                     <span className="w-14 h-14 rounded-full bg-black/50 border-2 border-white/80 flex items-center justify-center">
                       <Play size={20} className="text-white ml-0.5" />
@@ -647,7 +699,11 @@ function TrendingCard({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group block">
       <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
-        <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        {thumbUrl(v) ? (
+          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        )}
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 flex items-center justify-center transition-colors">
           <span className="w-10 h-10 rounded-full bg-black/50 border border-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Play size={14} className="text-white ml-0.5" />
@@ -675,7 +731,11 @@ function NewReleaseRow({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5">
       <div className="relative w-20 h-14 rounded-md overflow-hidden bg-black shrink-0 border border-white/5">
-        <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        {thumbUrl(v) ? (
+          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        )}
         <span className="absolute bottom-0.5 right-0.5 text-[9px] bg-black/80 px-1 rounded">{pseudoDuration(v.id)}</span>
       </div>
       <div className="min-w-0 flex-1">
@@ -758,12 +818,26 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     if (!file) { setErr("Pick a video file"); return; }
     setBusy(true); setErr(null);
     const ext = file.name.split(".").pop() || "mp4";
-    const path = `${userId}/${Date.now()}.${ext}`;
+    const stamp = Date.now();
+    const path = `${userId}/${stamp}.${ext}`;
     const up = await supabase.storage.from("videos").upload(path, file, { contentType: file.type });
     if (up.error) { setErr(up.error.message); setBusy(false); return; }
+
+    // Auto-generate a thumbnail by grabbing a frame from the uploaded video
+    let thumbnail_path: string | null = null;
+    try {
+      const thumbBlob = await captureVideoThumbnail(file);
+      if (thumbBlob) {
+        const tPath = `${userId}/${stamp}-thumb.jpg`;
+        const tUp = await supabase.storage.from("videos").upload(tPath, thumbBlob, { contentType: "image/jpeg" });
+        if (!tUp.error) thumbnail_path = tPath;
+      }
+    } catch { /* non-fatal */ }
+
     const ins = await supabase.from("videos").insert({
       user_id: userId, title, artist: artist || null, description: description || null,
       category, storage_path: path, external_url: externalUrl || null,
+      thumbnail_path,
     });
     setBusy(false);
     if (ins.error) { setErr(ins.error.message); return; }
