@@ -38,9 +38,10 @@ export function StageAudioShell({
   children,
   onLeave,
   showHostTools = true,
+  embedded = false,
 }: {
-  token: string;
-  serverUrl: string;
+  token?: string;
+  serverUrl?: string;
   streamId: string;
   userId: string;
   isHost?: boolean;
@@ -48,6 +49,8 @@ export function StageAudioShell({
   onLeave?: () => void;
   /** When false (audience/listeners), hides mic bar, device selector, diagnostics, and leave button. */
   showHostTools?: boolean;
+  /** Render inside an existing `<LiveKitRoom>` (e.g. PersistentLiveRoom) instead of creating one. */
+  embedded?: boolean;
 }) {
   const [connect, setConnect] = useState(false);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
@@ -64,6 +67,22 @@ export function StageAudioShell({
     })();
     return () => { active = false; };
   }, [userId]);
+
+  // Embedded mode: the persistent room is already connected — skip the
+  // join-audio gate and don't open a second LiveKitRoom.
+  if (embedded) {
+    return (
+      <StageConnectionProvider>
+        <StageMicSync streamId={streamId} userId={userId} />
+        <AudioPlaybackUnblocker />
+        <ParticipantAudioLogger />
+        <ReconnectAudioGuard />
+        {children}
+        {showHostTools && <StageDiagnostics />}
+        {showHostTools && <StageMicBar onLeave={onLeave} />}
+      </StageConnectionProvider>
+    );
+  }
 
   if (!connect) {
     return (

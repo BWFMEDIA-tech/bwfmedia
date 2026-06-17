@@ -22,8 +22,9 @@ const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
 
 interface LiveStageProps {
-  token: string;
-  serverUrl: string;
+  /** Required unless `embedded` — the persistent room provides the connection. */
+  token?: string;
+  serverUrl?: string;
   onEnd: () => void;
   onInvite: () => void;
   hostImage?: string;
@@ -34,9 +35,19 @@ interface LiveStageProps {
   publish?: boolean;
   /** Show host/admin LiveKit controls (mic, camera, screen-share, end stream, device selector). */
   showHostTools?: boolean;
+  /** Render inside an existing `<LiveKitRoom>` (e.g. PersistentLiveRoom) instead of creating one. */
+  embedded?: boolean;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, embedded = false }: LiveStageProps) {
+  if (embedded) {
+    return (
+      <>
+        <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
+        <PublishSync publish={publish} />
+      </>
+    );
+  }
   return (
     <LiveKitRoom
       token={token}
