@@ -28,7 +28,7 @@ import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 
-const MAX_HOSTS = 20;
+const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
 
 // Gritty black/red stage theme
