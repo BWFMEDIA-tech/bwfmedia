@@ -1,23 +1,16 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, MessageCircle, Instagram, Youtube, Twitter, Facebook, Link2,
-  Headphones, ListMusic, Disc3, ThumbsUp, Calendar,
+  Users, Headphones, ListMusic, Disc3, ThumbsUp, Share, Calendar,
   Search, Bell, MessageSquare, Home, Radio, BarChart3, ChevronDown,
   Shuffle, SkipBack, SkipForward, Repeat, Volume2, ChevronRight,
   TrendingUp, DollarSign, Clock, Plus, ShoppingBag, Send,
-  Users, Video as VideoIcon, DollarSign as Dollar,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-
-const artistMetaOptions = (id: string) =>
-  queryOptions({
-    queryKey: ["artist-meta", id],
-    queryFn: () => getArtistMeta({ data: { id } }),
-  });
 
 export const Route = createFileRoute("/artist/$id")({
   loader: ({ params }) => getArtistMeta({ data: { id: params.id } }),
@@ -99,38 +92,52 @@ const MERCH = [
 
 function ArtistProfilePage() {
   const { id } = useParams({ from: "/artist/$id" });
-  const { data: meta } = useSuspenseQuery(artistMetaOptions(id));
+  const [artist, setArtist] = useState<ArtistView | null>(null);
+  const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [tip, setTip] = useState<number>(5);
 
-  const name = meta?.name?.trim() || "Artist";
-  const artist: ArtistView = {
-    name,
-    handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, "") + "official",
-    photo: meta?.photo ?? null,
-    banner: meta?.banner ?? null,
-  };
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data } = await supabase
+        .from("live_queue_public")
+        .select("artist_name, photo_url")
+        .eq("id", id)
+        .maybeSingle();
+      if (!mounted) return;
+      const name = (data as any)?.artist_name ?? "JAY TRU";
+      setArtist({
+        name,
+        handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, "") + "official",
+        photo: (data as any)?.photo_url ?? null,
+      });
+      setLoading(false);
+    })();
+    return () => { mounted = false; };
+  }, [id]);
+
   const initials = useMemo(
-    () => name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase(),
-    [name],
+    () => (artist?.name ?? "JT").split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase(),
+    [artist?.name],
   );
+
+  if (loading || !artist) {
+    return (
+      <div className="min-h-screen bg-[#070708] text-white grid place-items-center text-sm text-white/50">
+        Loading artist…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#070708] text-white pb-28">
       <TopNav />
       <main className="mx-auto max-w-[1400px] px-4 md:px-6 py-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6 min-w-0">
-          <HeroBanner
-            artist={artist}
-            initials={initials}
-            playing={playing}
-            setPlaying={setPlaying}
-            location={meta?.location ?? null}
-            genre={meta?.genre ?? null}
-            memberSince={meta?.memberSince ?? null}
-          />
+          <HeroBanner artist={artist} initials={initials} playing={playing} setPlaying={setPlaying} />
           <AboutBlock name={artist.name} />
-          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
+          <StatsRow />
           <div className="grid gap-6 md:grid-cols-2">
             <LatestRelease setPlaying={setPlaying} playing={playing} />
             <PopularTracks />
@@ -190,15 +197,7 @@ function TopNav() {
   );
 }
 
-function HeroBanner({
-  artist, initials, playing, setPlaying, location, genre, memberSince,
-}: {
-  artist: ArtistView; initials: string; playing: boolean; setPlaying: (b: boolean) => void;
-  location: string | null; genre: string | null; memberSince: string | null;
-}) {
-  const memberSinceLabel = memberSince
-    ? new Date(memberSince).toLocaleDateString(undefined, { month: "short", year: "numeric" })
-    : null;
+function HeroBanner({ artist, initials, playing, setPlaying }: { artist: ArtistView; initials: string; playing: boolean; setPlaying: (b: boolean) => void; }) {
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0606] via-[#0e0e10] to-[#0a0a0c]">
       <div className="absolute inset-0 opacity-60" style={{ background: `radial-gradient(120% 80% at 70% 0%, ${RED}33, transparent 60%)` }} />
@@ -222,15 +221,9 @@ function HeroBanner({
             </div>
             <div className="text-sm text-white/60 mt-1">{artist.handle}</div>
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
-              {location && (
-                <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> {location}</span>
-              )}
-              {genre && (
-                <span className="flex items-center gap-1"><Music2 className="h-3.5 w-3.5" style={{ color: RED }} /> {genre}</span>
-              )}
-              {memberSinceLabel && (
-                <span className="text-white/50">Member Since {memberSinceLabel}</span>
-              )}
+              <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> Atlanta, GA, USA</span>
+              <span className="flex items-center gap-1"><Music2 className="h-3.5 w-3.5" style={{ color: RED }} /> Hip-Hop / R&B</span>
+              <span className="text-white/50">Member Since May 2021</span>
             </div>
           </div>
         </div>
@@ -279,24 +272,19 @@ function AboutBlock({ name }: { name: string }) {
   );
 }
 
-function StatsRow({ stats }: { stats: { songs: number; videos: number; likes: number; tipsCents: number } }) {
-  const fmt = (n: number) => {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
-    if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
-    return String(n);
-  };
-  const tips = stats.tipsCents > 0
-    ? "$" + (stats.tipsCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })
-    : "$0";
-  const items = [
-    { icon: ListMusic,  label: "Songs Uploaded",  value: fmt(stats.songs) },
-    { icon: VideoIcon,  label: "Videos",          value: fmt(stats.videos) },
-    { icon: ThumbsUp,   label: "Likes Received",  value: fmt(stats.likes) },
-    { icon: Dollar,     label: "Tips Received",   value: tips },
+function StatsRow() {
+  const stats = [
+    { icon: Users,      label: "Followers",         value: "12.4K" },
+    { icon: Headphones, label: "Monthly Listeners", value: "48.2K" },
+    { icon: ListMusic,  label: "Total Streams",     value: "2.4M" },
+    { icon: Heart,      label: "Songs Uploaded",    value: "58" },
+    { icon: Disc3,      label: "Albums Released",   value: "4" },
+    { icon: ThumbsUp,   label: "Likes Received",    value: "156K" },
+    { icon: Share,      label: "Shares",            value: "28K" },
   ];
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {items.map((s) => (
+    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {stats.map((s) => (
         <div key={s.label} className="flex items-center gap-3">
           <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />
           <div className="min-w-0">

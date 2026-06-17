@@ -12,7 +12,6 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { PersistentLiveRoom } from "@/components/stream/PersistentLiveRoom";
 import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
@@ -159,49 +158,38 @@ function GuestPage() {
     <div className="min-h-screen bg-[#050509] text-white p-4">
       <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="flex flex-col gap-4 min-w-0">
-          {/*
-            Persistent LiveKit room. We mount ONE <LiveKitRoom> for the
-            whole visit; switching modes (broadcast/stage/play) only swaps
-            visible UI so the viewer's session, mic permissions, chat, and
-            audience presence survive across format changes.
-          */}
-          <PersistentLiveRoom token={lk.token} serverUrl={lk.wsUrl}>
-            {streamId && streamMeta && (
-              <div className={streamMode === "play" ? "" : "hidden"}>
-                <PlayArenaView
-                  stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
-                  showChat={false}
-                />
-              </div>
-            )}
-            {streamId && auth.user && (
-              <div className={streamMode === "stage" ? "" : "hidden"}>
-                <StageAudioShell
-                  embedded
-                  streamId={streamId}
-                  userId={auth.user.id}
-                  onLeave={() => setLk(null)}
-                  showHostTools={isHostLike}
-                >
-                  <StageRoom
-                    streamId={streamId}
-                    participants={participants as StageParticipant[]}
-                    canManage={isHostLike}
-                  />
-                  {inCrowd && (
-                    <InCrowdBanner streamId={streamId} auth={auth} mode="stage" />
-                  )}
-                  {!inCrowd && (
-                    <div className="flex justify-center">
-                      <RaiseHandButton streamId={streamId} auth={auth} />
-                    </div>
-                  )}
-                  <AudienceRow participants={participants as StageParticipant[]} />
-                </StageAudioShell>
-              </div>
-            )}
-            <div className={streamMode === "broadcast" ? "" : "hidden"}>
-              <LiveStage embedded onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} />
+          {streamMode === "play" && streamId && streamMeta ? (
+            <PlayArenaView
+              stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
+              showChat={false}
+            />
+          ) : streamMode === "stage" && streamId && auth.user ? (
+            <StageAudioShell
+              token={lk.token}
+              serverUrl={lk.wsUrl}
+              streamId={streamId}
+              userId={auth.user.id}
+              onLeave={() => setLk(null)}
+              showHostTools={isHostLike}
+            >
+              <StageRoom
+                streamId={streamId}
+                participants={participants as StageParticipant[]}
+                canManage={isHostLike}
+              />
+              {inCrowd && (
+                <InCrowdBanner streamId={streamId} auth={auth} mode="stage" />
+              )}
+              {!inCrowd && (
+                <div className="flex justify-center">
+                  <RaiseHandButton streamId={streamId} auth={auth} />
+                </div>
+              )}
+              <AudienceRow participants={participants as StageParticipant[]} />
+            </StageAudioShell>
+          ) : (
+            <>
+              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} />
               {streamId && (
                 <StageRoom
                   streamId={streamId}
@@ -219,8 +207,8 @@ function GuestPage() {
               )}
               {streamId && <NowPlayingMini streamId={streamId} />}
               <AudienceRow participants={participants as StageParticipant[]} />
-            </div>
-          </PersistentLiveRoom>
+            </>
+          )}
         </div>
         <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
           <CrowdPanel
