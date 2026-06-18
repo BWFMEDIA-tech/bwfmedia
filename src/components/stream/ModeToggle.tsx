@@ -1,7 +1,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { updateStreamMode } from "@/lib/stage.functions";
 import { toast } from "sonner";
-import { Lock, Unlock, Video, Mic, Music2 } from "lucide-react";
+import { Lock, Unlock, Video, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const PURPLE = "#8b5cf6";
@@ -45,17 +45,6 @@ export function ModeToggle({
       >
         <Video className="mr-1 inline h-3.5 w-3.5" />
         BROADCAST MODE (Video)
-      </button>
-      <button
-        onClick={() => set("play")}
-        className={cn(
-          "flex-1 rounded-xl px-4 py-3 text-xs font-bold tracking-widest text-white transition",
-          mode === "play" ? "" : "bg-white/5 text-white/60 hover:bg-white/10",
-        )}
-        style={mode === "play" ? { background: `linear-gradient(135deg, #ec4899, ${PURPLE})` } : undefined}
-      >
-        <Music2 className="mr-1 inline h-3.5 w-3.5" />
-        PLAY ARENA
       </button>
       <button
         onClick={() => set("stage")}

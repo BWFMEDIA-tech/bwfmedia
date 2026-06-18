@@ -903,31 +903,9 @@ function StreamStudio() {
                 </div>
               )}
 
-              {/*
-                Keep PlayArenaView mounted whenever the stream + user exist so the
-                <audio> element survives mode switches and music keeps playing
-                in the background until the user pauses. We just hide it visually
-                when another mode is active.
-              */}
-              {stream?.id && auth.user && (
-                <div className={streamMode === "play" ? "" : "hidden"}>
-                  <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
-                </div>
-              )}
-
-              {streamMode === "play" ? (
-                !(stream?.id && auth.user) && (
-                  <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
-                    <Music2 className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />
-                    <div className="mb-1 text-sm font-bold text-white">BWFPLAY Live Arena</div>
-                    <p className="mb-4 text-xs text-white/60">Go live to open the arena — artists submit, fans vote, boosted tracks skip the line.</p>
-                    <button onClick={goLive} disabled={going} className="rounded-md px-4 py-2 text-xs font-semibold text-white disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
-                      <Radio className="mr-1 inline h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live to open Arena"}
-                    </button>
-                  </div>
-                )
-              ) : streamMode === "broadcast" ? (
-                lk ? (
+              {streamMode === "broadcast" ? (
+                <>
+                {lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
                 ) : (
                   <>
@@ -939,7 +917,11 @@ function StreamStudio() {
                       Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
                     </div>
                   </>
-                )
+                )}
+                {stream?.id && auth.user && (
+                  <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
+                )}
+                </>
               ) : (
                 stream?.id ? (
                   lk && auth.user ? (
