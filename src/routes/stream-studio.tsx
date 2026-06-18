@@ -905,7 +905,7 @@ function StreamStudio() {
 
               {streamMode === "broadcast" ? (
                 <>
-                lk ? (
+                {lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
                 ) : (
                   <>
@@ -917,7 +917,7 @@ function StreamStudio() {
                       Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
                     </div>
                   </>
-                )
+                )}
                 {stream?.id && auth.user && (
                   <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                 )}
