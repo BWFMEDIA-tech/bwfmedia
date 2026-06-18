@@ -158,12 +158,7 @@ function GuestPage() {
     <div className="min-h-screen bg-[#050509] text-white p-4">
       <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
         <div className="flex flex-col gap-4 min-w-0">
-          {streamMode === "play" && streamId && streamMeta ? (
-            <PlayArenaView
-              stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
-              showChat={false}
-            />
-          ) : streamMode === "stage" && streamId && auth.user ? (
+          {streamMode === "stage" && streamId && auth.user ? (
             <StageAudioShell
               token={lk.token}
               serverUrl={lk.wsUrl}
@@ -207,6 +202,12 @@ function GuestPage() {
               )}
               {streamId && <NowPlayingMini streamId={streamId} />}
               <AudienceRow participants={participants as StageParticipant[]} />
+              {streamId && streamMeta && (
+                <PlayArenaView
+                  stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
+                  showChat={false}
+                />
+              )}
             </>
           )}
         </div>
