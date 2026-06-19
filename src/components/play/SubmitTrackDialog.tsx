@@ -122,8 +122,12 @@ export function SubmitTrackDialog({
     if (!title.trim() || !artistName.trim()) return;
     setBusy(true);
     try {
-      await submitFn({ data: { streamId, title, artistName, audioUrl, coverUrl, useBoost } });
-      toast.success(useBoost ? "Boosted — jumping the line!" : "Track submitted");
+      const res: any = await submitFn({ data: { streamId, title, artistName, audioUrl, coverUrl, useBoost } });
+      if (res?.routedToBattle) {
+        toast.success(`Routed to Side ${String(res.battleSide).toUpperCase()} of the live battle`);
+      } else {
+        toast.success(useBoost ? "Boosted — jumping the line!" : "Track submitted to the queue");
+      }
       onSubmitted();
       onClose();
     } catch (e: any) {
