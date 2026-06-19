@@ -17,7 +17,7 @@ import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
-import { NowPlayingMini } from "@/components/stream/NowPlayingMini";
+import { NowPlayingHeader } from "@/components/stream/NowPlayingHeader";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
