@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
+import { getLiveKitToken } from "@/lib/livekit.functions";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -40,6 +41,8 @@ interface LiveStageProps {
 
 export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
+  const [activeToken, setActiveToken] = useState(token);
+  useEffect(() => { setActiveToken(token); }, [token]);
 
   // Publish health to the global store; reset on unmount so other surfaces
   // (chat, queue) don't see stale "degraded" state after the user leaves.
@@ -72,7 +75,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
   }
   return (
     <LiveKitRoom
-      token={token}
+      token={activeToken}
       serverUrl={serverUrl}
       connect={!fatal}
       video={false}
@@ -90,14 +93,16 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
     >
       <RoomAudioRenderer />
       <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
-      <PublishSync publish={publish} />
+      <PublishSync publish={publish} onTokenRefresh={setActiveToken} />
     </LiveKitRoom>
   );
 }
 
-function PublishSync({ publish }: { publish: boolean }) {
+function PublishSync({ publish, onTokenRefresh }: { publish: boolean; onTokenRefresh?: (token: string) => void }) {
   const { localParticipant } = useLocalParticipant();
+  const room = useRoomContext();
   const prev = useRef<boolean | null>(null);
+  const refreshing = useRef(false);
   useEffect(() => {
     if (!localParticipant) return;
     (async () => {
@@ -109,6 +114,25 @@ function PublishSync({ publish }: { publish: boolean }) {
         if (prev.current === true) toast.info("You're back in the crowd");
         prev.current = false;
         return;
+      }
+
+      // Guest may have joined as listener (canPublish=false). If they were
+      // then promoted to stage, re-mint the token so the room reconnects
+      // with publish permissions before attempting to enable devices.
+      const tokenCanPublish = localParticipant.permissions?.canPublish ?? true;
+      if (!tokenCanPublish && onTokenRefresh && room?.name && !refreshing.current) {
+        refreshing.current = true;
+        try {
+          const t = await getLiveKitToken({ data: { roomName: room.name } });
+          onTokenRefresh(t.token);
+          console.log("[live-stage] Token refreshed after promotion");
+        } catch (err: any) {
+          console.error("[live-stage] Token refresh failed", err);
+          toast.error(err?.message || "Could not enable microphone");
+        } finally {
+          refreshing.current = false;
+        }
+        return; // Room will reconnect with new token; next effect run will publish.
       }
 
       const [micResult, cameraResult] = await Promise.allSettled([
