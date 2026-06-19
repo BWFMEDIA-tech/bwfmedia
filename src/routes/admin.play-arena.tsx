@@ -71,6 +71,30 @@ function PlayArenaAdminPage() {
     if (isAdmin) load();
   }, [isAdmin, tab]);
 
+  useEffect(() => {
+    if (!isAdmin) return;
+    let pending = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => {
+      if (pending) return;
+      pending = true;
+      timer = setTimeout(() => {
+        pending = false;
+        load();
+      }, 400);
+    };
+    const channel = supabase
+      .channel("admin-play-arena")
+      .on("postgres_changes", { event: "*", schema: "public", table: "play_sessions" }, schedule)
+      .on("postgres_changes", { event: "*", schema: "public", table: "play_tracks" }, schedule)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "streams" }, schedule)
+      .subscribe();
+    return () => {
+      if (timer) clearTimeout(timer);
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin, tab]);
+
   if (auth.loading || !isAdmin) return null;
 
   return (
