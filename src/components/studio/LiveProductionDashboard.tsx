@@ -95,11 +95,6 @@ export function LiveProductionDashboard({
         <BroadcastPanel />
       </div>
 
-      {/* How it works + key points */}
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <HowItWorks />
-        <KeyPointsCard />
-      </div>
     </div>
   );
 }
@@ -896,7 +891,7 @@ function ErrorBanners() {
 
 /* ---------------- How it works ---------------- */
 
-function HowItWorks() {
+export function HowItWorks() {
   return (
     <section className="rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
       <h3 className="mb-4 text-center text-xs font-bold tracking-widest text-white/70">HOW IT WORKS</h3>
@@ -946,7 +941,7 @@ function Arrow({ label }: { label: string }) {
 
 /* ---------------- Key points ---------------- */
 
-function KeyPointsCard() {
+export function KeyPointsCard() {
   const { state } = useMediaEngine();
   const points = [
     "Stage is the input layer (mic / participants).",
