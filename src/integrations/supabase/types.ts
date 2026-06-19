@@ -1327,6 +1327,8 @@ export type Database = {
           artist_name: string
           artist_user_id: string | null
           audio_url: string | null
+          battle_match_id: string | null
+          battle_side: string | null
           boost_weight: number
           boosted: boolean
           cover_url: string | null
@@ -1348,6 +1350,8 @@ export type Database = {
           artist_name: string
           artist_user_id?: string | null
           audio_url?: string | null
+          battle_match_id?: string | null
+          battle_side?: string | null
           boost_weight?: number
           boosted?: boolean
           cover_url?: string | null
@@ -1369,6 +1373,8 @@ export type Database = {
           artist_name?: string
           artist_user_id?: string | null
           audio_url?: string | null
+          battle_match_id?: string | null
+          battle_side?: string | null
           boost_weight?: number
           boosted?: boolean
           cover_url?: string | null
@@ -1387,6 +1393,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "play_tracks_battle_match_id_fkey"
+            columns: ["battle_match_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "play_tracks_stream_id_fkey"
             columns: ["stream_id"]
