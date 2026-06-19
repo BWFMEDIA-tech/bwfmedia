@@ -295,3 +295,8 @@
     0 0 28px -6px rgba(168, 85, 247, 0.55),
     0 0 40px -10px rgba(236, 72, 153, 0.35);
 }
+
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1.4); }
+}
