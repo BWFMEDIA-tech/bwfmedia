@@ -157,7 +157,7 @@ export const dispatchBattleEvent = createServerFn({ method: "POST" })
             m.active_side === "a" ? "a_track_finished_at" : "b_track_finished_at";
           await supabase
             .from("battle_rounds")
-            .update({ [stampCol]: new Date().toISOString() })
+            .update({ [stampCol]: new Date().toISOString() } as any)
             .eq("id", round.id);
         }
 
@@ -172,7 +172,7 @@ export const dispatchBattleEvent = createServerFn({ method: "POST" })
         const trackCol = side === "a" ? "a_playing_track_id" : "b_playing_track_id";
         await supabase
           .from("battle_rounds")
-          .update({ [trackCol]: trackId })
+          .update({ [trackCol]: trackId } as any)
           .eq("id", round.id);
         await supabase
           .from("battle_matches")
@@ -200,7 +200,7 @@ export const dispatchBattleEvent = createServerFn({ method: "POST" })
             m.active_side === "a" ? "a_track_finished_at" : "b_track_finished_at";
           await supabase
             .from("battle_rounds")
-            .update({ [stampCol]: new Date().toISOString() })
+            .update({ [stampCol]: new Date().toISOString() } as any)
             .eq("id", round!.id);
         }
         await supabase
