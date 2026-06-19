@@ -10,10 +10,22 @@ import { MediaEngine } from "./MediaEngine";
  *   - stop any media tracks
  */
 
-type FakeTrack = { kind: "audio" | "video"; enabled: boolean; stop: ReturnType<typeof vi.fn>; addEventListener: () => void };
+type FakeTrack = {
+  kind: "audio" | "video";
+  enabled: boolean;
+  stop: ReturnType<typeof vi.fn>;
+  addEventListener: () => void;
+  getSettings: () => MediaTrackSettings;
+};
 
 function makeTrack(kind: "audio" | "video"): FakeTrack {
-  return { kind, enabled: true, stop: vi.fn(), addEventListener: () => {} };
+  return {
+    kind,
+    enabled: true,
+    stop: vi.fn(),
+    addEventListener: () => {},
+    getSettings: () => ({ width: 1920, height: 1080, frameRate: 30 } as MediaTrackSettings),
+  };
 }
 function makeStream(tracks: FakeTrack[]) {
   return {
