@@ -1,0 +1,460 @@
+import { useEffect, useRef } from "react";
+import {
+  Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus, Settings,
+  Activity, CircleDot, Users, Volume2, VolumeX,
+} from "lucide-react";
+import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+const PURPLE = "#8b5cf6";
+const BLUE = "#3b82f6";
+const PINK = "#ec4899";
+
+/**
+ * Live Production Dashboard.
+ *
+ * Single page. One MediaEngine. Stage and Broadcast are independent source
+ * toggles. Toggling them never reinitializes devices, never restarts WebRTC,
+ * never resets the mixer, and never interrupts active streams.
+ */
+export function LiveProductionDashboard({
+  participants = [],
+  onInvite,
+  onEndBroadcast,
+}: {
+  participants?: Array<{ id: string; name: string; avatar?: string | null }>;
+  onInvite?: () => void;
+  onEndBroadcast?: () => void;
+}) {
+  const { engine, state } = useMediaEngine();
+
+  // Auto-init: warm up the audio context on mount so meters animate.
+  useEffect(() => { engine.ensureAudio(); }, [engine]);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Top toggle bar */}
+      <ToggleHeader
+        stage={state.stageEnabled}
+        broadcast={state.broadcastEnabled}
+        muted={state.masterMuted}
+        camera={state.cameraEnabled}
+        onStage={async (v) => {
+          if (v && !state.hasMic) {
+            try { await engine.acquireMic(); } catch { toast.error("Microphone access denied"); return; }
+          }
+          engine.setStageEnabled(v);
+        }}
+        onBroadcast={async (v) => {
+          if (v && !state.hasCamera) {
+            try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+          }
+          engine.setBroadcastEnabled(v);
+        }}
+        onMuteAll={() => engine.setMasterMuted(!state.masterMuted)}
+        onCamera={async () => {
+          if (!state.hasCamera) {
+            try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+          }
+          engine.setCameraEnabled(!state.cameraEnabled);
+        }}
+        onEnd={() => {
+          engine.setBroadcastEnabled(false);
+          engine.setStageEnabled(false);
+          onEndBroadcast?.();
+        }}
+      />
+
+      {/* Main two-panel layout */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <StagePanel participants={participants} onInvite={onInvite} />
+        <BroadcastPanel />
+      </div>
+
+      {/* How it works + key points */}
+      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+        <HowItWorks />
+        <KeyPointsCard />
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Toggle header ---------------- */
+
+function ToggleHeader({
+  stage, broadcast, muted, camera,
+  onStage, onBroadcast, onMuteAll, onCamera, onEnd,
+}: {
+  stage: boolean; broadcast: boolean; muted: boolean; camera: boolean;
+  onStage: (v: boolean) => void; onBroadcast: (v: boolean) => void;
+  onMuteAll: () => void; onCamera: () => void; onEnd: () => void;
+}) {
+  return (
+    <div className="grid gap-3 rounded-2xl border border-white/5 bg-[#0d0d18] p-4 md:grid-cols-[1fr_auto]">
+      <div className="flex flex-wrap items-center gap-4">
+        <ToggleChip label="STAGE MODE" on={stage} onChange={onStage} accent={PURPLE} />
+        <span className="hidden h-8 w-px bg-white/10 md:block" />
+        <ToggleChip label="BROADCAST MODE" on={broadcast} onChange={onBroadcast} accent={BLUE} />
+      </div>
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <span className="mr-2 text-[10px] font-bold tracking-widest text-white/50">QUICK CONTROLS</span>
+        <QuickBtn icon={muted ? VolumeX : Volume2} label={muted ? "Unmute All" : "Mute All"} onClick={onMuteAll} active={muted} />
+        <QuickBtn icon={camera ? Video : VideoOff} label="Camera" onClick={onCamera} active={!camera} />
+        <button
+          onClick={onEnd}
+          className="flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-500"
+        >
+          <Radio className="h-3.5 w-3.5" /> End Broadcast
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ToggleChip({ label, on, onChange, accent }: { label: string; on: boolean; onChange: (v: boolean) => void; accent: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs font-bold tracking-widest text-white/80">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        onClick={() => onChange(!on)}
+        className={cn(
+          "relative inline-flex h-7 w-16 items-center rounded-full border border-white/10 transition",
+          on ? "" : "bg-white/5",
+        )}
+        style={on ? { background: `linear-gradient(135deg, ${accent}, ${accent}cc)` } : undefined}
+      >
+        <span
+          className={cn(
+            "absolute top-1/2 -translate-y-1/2 rounded-full bg-white text-[9px] font-bold text-black shadow transition-all",
+            on ? "left-9 px-2 py-0.5" : "left-1 px-2 py-0.5",
+          )}
+        >
+          {on ? "ON" : "OFF"}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function QuickBtn({ icon: Icon, label, onClick, active }: { icon: any; label: string; onClick?: () => void; active?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/5",
+        active ? "bg-white/10 text-white" : "text-white/80",
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" /> {label}
+    </button>
+  );
+}
+
+/* ---------------- Stage panel ---------------- */
+
+function StagePanel({ participants, onInvite }: { participants: Array<{ id: string; name: string; avatar?: string | null }>; onInvite?: () => void }) {
+  const { engine, state } = useMediaEngine();
+  const mic = state.sources.find((s) => s.id === "mic");
+
+  return (
+    <section className="flex flex-col rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+      <header className="mb-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-bold tracking-widest" style={{ color: PURPLE }}>
+          <Users className="h-4 w-4" /> STAGE (AUDIO)
+        </h2>
+        <span className="text-[10px] font-semibold text-white/40">{state.stageEnabled ? "Live" : "Idle"}</span>
+      </header>
+
+      <div className="mb-2 text-[11px] font-semibold text-white/60">Microphone</div>
+      <div className="mb-5 flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+        <button
+          onClick={async () => {
+            if (!state.hasMic) { try { await engine.acquireMic(); } catch { toast.error("Mic denied"); return; } }
+            engine.setMicEnabled(!state.micEnabled);
+          }}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full"
+          style={{ background: state.micEnabled ? `linear-gradient(135deg, ${PURPLE}, ${BLUE})` : "rgba(255,255,255,0.06)" }}
+          aria-label={state.micEnabled ? "Mute mic" : "Unmute mic"}
+        >
+          {state.micEnabled ? <Mic className="h-4 w-4 text-white" /> : <MicOff className="h-4 w-4 text-white/60" />}
+        </button>
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 text-xs font-semibold text-white">Mic Input</div>
+          <LevelMeter level={state.micLevel} active={!!mic?.enabled} />
+        </div>
+        <span className={cn("text-[11px] font-semibold", state.micLevel > 0.05 ? "text-emerald-400" : "text-white/40")}>
+          {state.hasMic ? (state.micLevel > 0.05 ? "Good" : "Quiet") : "Off"}
+        </span>
+      </div>
+
+      <div className="mb-2 text-[11px] font-semibold text-white/60">Participants ({participants.length})</div>
+      <div className="flex-1 space-y-2">
+        {participants.length === 0 && (
+          <div className="rounded-lg border border-dashed border-white/10 p-4 text-center text-[11px] text-white/40">
+            No participants yet — invite a guest.
+          </div>
+        )}
+        {participants.map((p) => (
+          <ParticipantRow key={p.id} id={p.id} name={p.name} avatar={p.avatar} />
+        ))}
+      </div>
+
+      <button
+        onClick={onInvite}
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-3 text-xs font-semibold text-white/80 transition hover:bg-white/5"
+      >
+        <UserPlus className="h-4 w-4" /> Invite Participant
+      </button>
+    </section>
+  );
+}
+
+function ParticipantRow({ id, name, avatar }: { id: string; name: string; avatar?: string | null }) {
+  const { engine, state } = useMediaEngine();
+  const src = state.sources.find((s) => s.id === id);
+  const enabled = src ? src.enabled : true;
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-2">
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-bold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+        {avatar ? <img src={avatar} alt={name} className="h-full w-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs font-semibold text-white">{name}</div>
+        <LevelMeter level={enabled ? 0.45 + Math.random() * 0.1 : 0} active={enabled} />
+      </div>
+      <button
+        onClick={() => engine.setParticipantEnabled(id, !enabled)}
+        className={cn(
+          "rounded-md px-2.5 py-1 text-[11px] font-semibold transition",
+          enabled ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-white/50",
+        )}
+      >
+        {enabled ? "On" : "Off"}
+      </button>
+    </div>
+  );
+}
+
+function LevelMeter({ level, active }: { level: number; active: boolean }) {
+  const bars = 24;
+  const lit = Math.min(bars, Math.round(level * bars * 2));
+  return (
+    <div className="flex h-2 items-center gap-[2px]">
+      {Array.from({ length: bars }).map((_, i) => {
+        const on = active && i < lit;
+        const color = i < bars * 0.6 ? PURPLE : i < bars * 0.85 ? "#22c55e" : "#ef4444";
+        return (
+          <span
+            key={i}
+            className="block h-full w-[3px] rounded-sm transition-opacity"
+            style={{ background: on ? color : "rgba(255,255,255,0.08)" }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------------- Broadcast panel ---------------- */
+
+function BroadcastPanel() {
+  const { engine, state } = useMediaEngine();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Bind whichever video stream is active (screen > camera).
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const stream = engine.getScreenStream() ?? engine.getCameraStream();
+    if (stream && el.srcObject !== stream) {
+      el.srcObject = stream;
+      el.muted = true;
+      el.play().catch(() => {});
+    }
+    if (!stream && el.srcObject) {
+      el.srcObject = null;
+    }
+  }, [engine, state.cameraEnabled, state.screenEnabled, state.hasCamera, state.hasScreen]);
+
+  return (
+    <section className="flex flex-col rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+      <header className="mb-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-bold tracking-widest" style={{ color: BLUE }}>
+          <Video className="h-4 w-4" /> BROADCAST (VIDEO)
+        </h2>
+        <button
+          onClick={async () => {
+            if (state.screenEnabled) { engine.releaseScreen(); return; }
+            try { await engine.acquireScreen(); } catch { toast.error("Screen share denied"); }
+          }}
+          className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[11px] text-white/70 hover:bg-white/5"
+        >
+          <MonitorUp className="h-3 w-3" /> {state.screenEnabled ? "Stop Share" : "Share Screen"}
+        </button>
+      </header>
+
+      <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
+        <div>
+          <div className="mb-2 text-[11px] font-semibold text-white/60">Program Preview</div>
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black">
+            <video ref={videoRef} className="h-full w-full object-cover" playsInline />
+            {!(state.hasCamera || state.hasScreen) && (
+              <div className="absolute inset-0 grid place-items-center text-[11px] text-white/40">
+                Enable Broadcast Mode to start camera
+              </div>
+            )}
+            {state.broadcastEnabled && (
+              <span className="absolute left-3 top-3 flex items-center gap-1 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-bold tracking-widest text-white">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE
+              </span>
+            )}
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[10px] text-white/80">
+              <span className="rounded bg-black/60 px-2 py-0.5 backdrop-blur">{state.resolution}</span>
+              <span className="rounded bg-black/60 px-2 py-0.5 backdrop-blur">{state.fps} fps</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-2 text-[11px] font-semibold text-white/60">Stream Output</div>
+          <dl className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px]">
+            <StreamRow label="Platform" value={state.platform} />
+            <StreamRow label="Status" value={state.streaming ? "Streaming" : "Ready"} valueClass={state.streaming ? "text-emerald-400" : "text-white/60"} />
+            <StreamRow label="Bitrate" value={`${state.bitrateKbps} kbps`} />
+            <StreamRow label="Resolution" value={state.resolution} />
+            <StreamRow label="FPS" value={String(state.fps || "—")} />
+          </dl>
+          <button
+            onClick={async () => {
+              if (state.streaming) { engine.setBroadcastEnabled(false); return; }
+              if (!state.hasCamera) {
+                try { await engine.acquireCamera(); } catch { toast.error("Camera denied"); return; }
+              }
+              engine.setBroadcastEnabled(true);
+            }}
+            className={cn(
+              "mt-3 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold text-white transition",
+              state.streaming ? "bg-red-600 hover:bg-red-500" : "",
+            )}
+            style={state.streaming ? undefined : { background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})` }}
+          >
+            <Radio className="h-3.5 w-3.5" /> {state.streaming ? "Stop Stream" : "Start Stream"}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StreamRow({ label, value, valueClass }: { label: string; value: string; valueClass?: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <dt className="text-white/50">{label}</dt>
+      <dd className={cn("font-semibold text-white", valueClass)}>{value}</dd>
+    </div>
+  );
+}
+
+/* ---------------- How it works ---------------- */
+
+function HowItWorks() {
+  return (
+    <section className="rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+      <h3 className="mb-4 text-center text-xs font-bold tracking-widest text-white/70">HOW IT WORKS</h3>
+      <div className="grid items-stretch gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
+        <Block tone={PURPLE} title="STAGE LAYER (INPUT)">
+          <Bullet>Microphone (getUserMedia / WebRTC)</Bullet>
+          <Bullet>Participants (optional WebRTC)</Bullet>
+          <Bullet>Audience mics</Bullet>
+        </Block>
+        <Arrow label="Audio Input" />
+        <Block tone="#f59e0b" title="AUDIO MIXER (ROUTING)">
+          <Bullet>Mix multiple inputs</Bullet>
+          <Bullet>Noise suppression</Bullet>
+          <Bullet>Echo cancellation</Bullet>
+          <Bullet>Gain control → Program Mix</Bullet>
+        </Block>
+        <Arrow label="Mixed Audio" />
+        <Block tone={BLUE} title="BROADCAST LAYER (OUTPUT)">
+          <Bullet>Video source (camera / screen / media)</Bullet>
+          <Bullet>Encoder (video + audio)</Bullet>
+          <Bullet>Stream output (RTMP / SRT / WebRTC)</Bullet>
+        </Block>
+      </div>
+    </section>
+  );
+}
+
+function Block({ tone, title, children }: { tone: string; title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border p-3" style={{ borderColor: `${tone}55`, background: `${tone}10` }}>
+      <div className="mb-2 text-[11px] font-bold tracking-widest" style={{ color: tone }}>{title}</div>
+      <ul className="space-y-1 text-[11px] text-white/75">{children}</ul>
+    </div>
+  );
+}
+function Bullet({ children }: { children: React.ReactNode }) {
+  return <li className="flex items-start gap-2"><CircleDot className="mt-0.5 h-3 w-3 shrink-0 text-white/40" /><span>{children}</span></li>;
+}
+function Arrow({ label }: { label: string }) {
+  return (
+    <div className="hidden flex-col items-center justify-center px-2 text-[10px] text-white/40 md:flex">
+      <span>→</span>
+      <span className="mt-1 whitespace-nowrap">{label}</span>
+    </div>
+  );
+}
+
+/* ---------------- Key points ---------------- */
+
+function KeyPointsCard() {
+  const { state } = useMediaEngine();
+  const points = [
+    "Stage is the input layer (mic / participants).",
+    "Broadcast is the output layer (video stream).",
+    "Audio Mixer connects them safely.",
+    "Enable / disable Stage or Broadcast independently.",
+    "No hard switching. No reinitializing mic or camera.",
+  ];
+  const modes = [
+    { label: "Stage Only", s: state.stageEnabled && !state.broadcastEnabled },
+    { label: "Broadcast Only", s: !state.stageEnabled && state.broadcastEnabled },
+    { label: "Both Active", s: state.stageEnabled && state.broadcastEnabled },
+    { label: "Idle", s: !state.stageEnabled && !state.broadcastEnabled },
+  ];
+  return (
+    <section className="space-y-4">
+      <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+        <div className="mb-3 flex items-center gap-2 text-[11px] font-bold tracking-widest text-emerald-400">
+          <Activity className="h-3.5 w-3.5" /> KEY POINTS
+        </div>
+        <ul className="space-y-2 text-[11px] text-white/75">
+          {points.map((p) => (
+            <li key={p} className="flex items-start gap-2">
+              <span className="mt-0.5 grid h-3.5 w-3.5 place-items-center rounded-sm bg-emerald-500/20 text-emerald-300 text-[10px]">✓</span>
+              {p}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+        <div className="mb-3 text-[11px] font-bold tracking-widest text-white/70">CURRENT STATE</div>
+        <ul className="space-y-1.5 text-[11px]">
+          {modes.map((m) => (
+            <li key={m.label} className="flex items-center justify-between">
+              <span className="text-white/70">{m.label}</span>
+              <span className={cn("rounded px-2 py-0.5 text-[10px] font-bold", m.s ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-white/40")}>
+                {m.s ? "ACTIVE" : "—"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
