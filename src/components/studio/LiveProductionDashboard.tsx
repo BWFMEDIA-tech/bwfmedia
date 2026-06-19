@@ -435,8 +435,14 @@ function ParticipantRow({
   const src = state.sources.find((s) => s.id === id);
   const enabled = src ? src.enabled : true;
   const [open, setOpen] = useState(false);
-  const [gain, setGain] = useState(1);
+  const [gain, setGain] = useState(0.5);
   const [soloed, setSoloed] = useState(false);
+
+  // Preset participant volume to 50% on mount.
+  useEffect(() => {
+    engine.setParticipantGain(id, 0.5);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleSolo = () => {
     if (soloed) {
