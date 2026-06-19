@@ -73,6 +73,7 @@ import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
+import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -430,6 +431,11 @@ const CheckoutCancelRoute = CheckoutCancelRouteImport.update({
   path: '/checkout/cancel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BroadcastBroadcastIdRoute = BroadcastBroadcastIdRouteImport.update({
+  id: '/broadcast/$broadcastId',
+  path: '/broadcast/$broadcastId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArtistUpgradeRoute = ArtistUpgradeRouteImport.update({
   id: '/artist/upgrade',
   path: '/artist/upgrade',
@@ -679,6 +685,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -780,6 +787,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -883,6 +891,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -987,6 +996,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -1088,6 +1098,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -1190,6 +1201,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -1273,6 +1285,7 @@ export interface RootRouteChildren {
   VideosRoute: typeof VideosRouteWithChildren
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
+  BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1750,6 +1763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutCancelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/broadcast/$broadcastId': {
+      id: '/broadcast/$broadcastId'
+      path: '/broadcast/$broadcastId'
+      fullPath: '/broadcast/$broadcastId'
+      preLoaderRoute: typeof BroadcastBroadcastIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/artist/upgrade': {
       id: '/artist/upgrade'
       path: '/artist/upgrade'
@@ -2143,6 +2163,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideosRoute: VideosRouteWithChildren,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
+  BroadcastBroadcastIdRoute: BroadcastBroadcastIdRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
