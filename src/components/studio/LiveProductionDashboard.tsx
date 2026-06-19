@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import {
-  Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus, Settings,
+  Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus,
   Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
-  AlertTriangle, X, Wifi, ShieldAlert, CheckCircle2,
+  X, Wifi, ShieldAlert,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
 import { friendlyMediaError } from "@/lib/media-engine/errors";
