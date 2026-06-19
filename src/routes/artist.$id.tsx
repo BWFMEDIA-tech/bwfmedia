@@ -419,40 +419,6 @@ function SideCard({ children, className = "" }: { children: React.ReactNode; cla
   return <div className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur p-4 ${className}`}>{children}</div>;
 }
 
-function LiveActivity() {
-  return (
-    <SideCard>
-      <h3 className="text-sm font-semibold mb-3">Live Activity</h3>
-      <div className="flex items-center gap-2 mb-2">
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase text-white" style={{ background: RED }}>
-          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" /> Live
-        </span>
-        <span className="text-xs text-white/70">Live in Play Arena</span>
-        <ChevronRight className="h-3 w-3 ml-auto text-white/40" />
-      </div>
-      <div className="rounded-xl bg-white/5 p-3 flex items-center gap-3">
-        <div className="h-10 w-10 rounded bg-gradient-to-br from-red-900 to-black shrink-0" />
-        <div className="min-w-0 flex-1">
-          <div className="text-[10px] uppercase text-white/50">Now Playing</div>
-          <div className="text-sm font-semibold truncate">No Turning Back</div>
-        </div>
-        <ChevronRight className="h-3 w-3 text-white/40" />
-      </div>
-      <div className="mt-3 flex items-center gap-2">
-        <div className="flex -space-x-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-6 w-6 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 ring-2 ring-[#0b0b0d]" />
-          ))}
-        </div>
-        <div className="text-xs text-white/70">Listeners <span className="font-bold text-white">1,284</span></div>
-        <div className="ml-auto text-xs text-white/50">+1.1K</div>
-      </div>
-      <Link to="/play" className="mt-3 block w-full text-center px-4 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110" style={{ background: RED }}>
-        Join Live Session
-      </Link>
-    </SideCard>
-  );
-}
 
 function SupportArtist({ tip, setTip }: { tip: number; setTip: (n: number) => void }) {
   const options = [5, 10, 25];
