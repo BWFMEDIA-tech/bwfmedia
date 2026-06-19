@@ -206,6 +206,44 @@ function ProfileSettingsPage() {
           </div>
         </Section>
 
+        <Section title="Brand / Network Identity" icon={<Sparkles className="h-4 w-4 text-red-500" />}>
+          <p className="mb-3 text-xs text-white/50">
+            If you broadcast on behalf of a network, brand, or organization, set the name here.
+            When set, this name and logo replace your personal name everywhere on stage —
+            stage roster, video tiles, audio tiles, chat header, and audience view. Your personal
+            name is only used inside account settings.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Input
+              label="Brand / Network Name"
+              value={brandName}
+              onChange={setBrandName}
+              maxLength={80}
+              placeholder="e.g. BWF NETWORK"
+            />
+            <Input
+              label="Brand Logo URL"
+              value={brandAvatarUrl}
+              onChange={setBrandAvatarUrl}
+              maxLength={500}
+              placeholder="https://…"
+            />
+          </div>
+          {brandName.trim() && (
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-white/10 bg-black/40">
+                {brandAvatarUrl
+                  ? <img src={brandAvatarUrl} alt="" className="h-full w-full object-cover" />
+                  : <Sparkles className="h-4 w-4 text-red-400" />}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-bold text-white">{brandName.trim()}</div>
+                <div className="text-[10px] uppercase tracking-widest text-red-300">Host identity — shown on stage</div>
+              </div>
+            </div>
+          )}
+        </Section>
+
         <Section title="Links & Socials" icon={<Share2 className="h-4 w-4 text-red-500" />}>
           <div className="space-y-2">
             {socials.map((s, idx) => {
