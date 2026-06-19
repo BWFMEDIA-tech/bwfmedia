@@ -214,20 +214,8 @@ function ProfileSettingsPage() {
             name is only used inside account settings.
           </p>
           <div className="grid gap-4 md:grid-cols-2">
-            <Input
-              label="Brand / Network Name"
-              value={brandName}
-              onChange={setBrandName}
-              maxLength={80}
-              placeholder="e.g. BWF NETWORK"
-            />
-            <Input
-              label="Brand Logo URL"
-              value={brandAvatarUrl}
-              onChange={setBrandAvatarUrl}
-              maxLength={500}
-              placeholder="https://…"
-            />
+            <Input label="Brand / Network Name" value={brandName} onChange={setBrandName} maxLength={80} />
+            <Input label="Brand Logo URL" value={brandAvatarUrl} onChange={setBrandAvatarUrl} maxLength={500} />
           </div>
           {brandName.trim() && (
             <div className="mt-3 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
