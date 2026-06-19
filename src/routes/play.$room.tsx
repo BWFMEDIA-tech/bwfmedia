@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Pause, Flag, Trash2, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
 import { usePlayQueue, useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
@@ -60,6 +61,27 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
   const { playing, queued, leaderboard } = usePlayQueue(stream?.id ?? null);
   const isHost = !!stream && auth.user?.id === stream.host_id;
+
+  // Register presence as a listener so chat/queue RLS policies that require
+  // stage_participant membership accept this viewer. Matches /stream/$room.
+  useEffect(() => {
+    if (!stream?.id || !auth.user) return;
+    const sid = stream.id;
+    const uid = auth.user.id;
+    (async () => {
+      const { data: existing } = await supabase
+        .from("stage_participants")
+        .select("stage_role")
+        .eq("stream_id", sid)
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (!existing) {
+        await supabase
+          .from("stage_participants")
+          .insert({ stream_id: sid, user_id: uid, stage_role: "listener" });
+      }
+    })();
+  }, [stream?.id, auth.user?.id]);
 
   // Derive unique artist participants from play queue for the battle picker.
   const battleParticipants = (() => {
