@@ -1217,6 +1217,8 @@ export type Database = {
           avatar_url: string | null
           banner_url: string | null
           bio: string | null
+          brand_avatar_url: string | null
+          brand_name: string | null
           created_at: string
           display_name: string | null
           featured_track_id: string | null
@@ -1237,6 +1239,8 @@ export type Database = {
           avatar_url?: string | null
           banner_url?: string | null
           bio?: string | null
+          brand_avatar_url?: string | null
+          brand_name?: string | null
           created_at?: string
           display_name?: string | null
           featured_track_id?: string | null
@@ -1257,6 +1261,8 @@ export type Database = {
           avatar_url?: string | null
           banner_url?: string | null
           bio?: string | null
+          brand_avatar_url?: string | null
+          brand_name?: string | null
           created_at?: string
           display_name?: string | null
           featured_track_id?: string | null
