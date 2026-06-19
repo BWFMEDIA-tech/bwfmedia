@@ -145,7 +145,7 @@ function friendlyDeviceError(error: unknown) {
   return message || "Could not enable camera or microphone.";
 }
 
-function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean }) {
+export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -226,6 +226,25 @@ function StageInner({ onEnd, onInvite, hostImage, guestImage, onViewerCount, str
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
     </>
   );
+}
+
+const StageInner = LiveStageContent;
+
+/**
+ * Camera-only publish sync. Use inside an existing LiveKitRoom (e.g. the
+ * persistent StageAudioShell) so flipping UI modes turns the camera on/off
+ * WITHOUT touching the microphone or the room connection.
+ */
+export function CameraPublishSync({ publish }: { publish: boolean }) {
+  const { localParticipant } = useLocalParticipant();
+  useEffect(() => {
+    if (!localParticipant) return;
+    localParticipant.setCameraEnabled(publish).catch((err) => {
+      // Soft-fail: no camera attached is fine.
+      console.warn("[live-stage] setCameraEnabled failed", err);
+    });
+  }, [publish, localParticipant]);
+  return null;
 }
 
 /**
