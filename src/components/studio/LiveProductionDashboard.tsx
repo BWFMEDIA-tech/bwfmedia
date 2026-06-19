@@ -2,8 +2,10 @@ import { useEffect, useRef } from "react";
 import {
   Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus, Settings,
   Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
+  AlertTriangle, X, Wifi, ShieldAlert, CheckCircle2,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
+import { friendlyMediaError } from "@/lib/media-engine/errors";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -34,6 +36,12 @@ export function LiveProductionDashboard({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Live status indicators (always visible) */}
+      <LiveStatusBar />
+
+      {/* Friendly error banners */}
+      <ErrorBanners />
+
       {/* Top toggle bar */}
       <ToggleHeader
         stage={state.stageEnabled}
@@ -42,20 +50,20 @@ export function LiveProductionDashboard({
         camera={state.cameraEnabled}
         onStage={async (v) => {
           if (v && !state.hasMic) {
-            try { await engine.acquireMic(); } catch { toast.error("Microphone access denied"); return; }
+            try { await engine.acquireMic(); } catch (e) { notifyMediaError(e, "mic"); return; }
           }
           engine.setStageEnabled(v);
         }}
         onBroadcast={async (v) => {
           if (v && !state.hasCamera) {
-            try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+            try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
           }
           engine.setBroadcastEnabled(v);
         }}
         onMuteAll={() => engine.setMasterMuted(!state.masterMuted)}
         onCamera={async () => {
           if (!state.hasCamera) {
-            try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+            try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
           }
           engine.setCameraEnabled(!state.cameraEnabled);
         }}
@@ -170,7 +178,7 @@ function SourceTogglePanel() {
 
   const handleMic = async () => {
     if (!state.hasMic) {
-      try { await engine.acquireMic(); } catch { toast.error("Microphone access denied"); return; }
+      try { await engine.acquireMic(); } catch (e) { notifyMediaError(e, "mic"); return; }
     }
     engine.setMicEnabled(!state.micEnabled);
   };
@@ -186,20 +194,20 @@ function SourceTogglePanel() {
 
   const handleCamera = async () => {
     if (!state.hasCamera) {
-      try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+      try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
     }
     engine.setCameraEnabled(!state.cameraEnabled);
   };
 
   const handleScreen = async () => {
     if (state.screenEnabled) { engine.releaseScreen(); return; }
-    try { await engine.acquireScreen(); } catch { toast.error("Screen share denied"); }
+    try { await engine.acquireScreen(); } catch (e) { notifyMediaError(e, "screen"); }
   };
 
   const handleStream = async () => {
     if (state.streaming) { engine.setBroadcastEnabled(false); return; }
     if (!state.hasCamera) {
-      try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+      try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
     }
     engine.setBroadcastEnabled(true);
   };
