@@ -98,6 +98,7 @@ import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
@@ -556,6 +557,12 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BroadcastBroadcastIdManageRoute =
+  BroadcastBroadcastIdManageRouteImport.update({
+    id: '/manage',
+    path: '/manage',
+    getParentRoute: () => BroadcastBroadcastIdRoute,
+  } as any)
 const ApiPublicStudioBookingRoute = ApiPublicStudioBookingRouteImport.update({
   id: '/api/public/studio-booking',
   path: '/api/public/studio-booking',
@@ -685,7 +692,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
-  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRoute
+  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -715,6 +722,7 @@ export interface FileRoutesByFullPath {
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
+  '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
@@ -787,7 +795,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
-  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRoute
+  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -817,6 +825,7 @@ export interface FileRoutesByTo {
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
+  '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
@@ -891,7 +900,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
-  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRoute
+  '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -921,6 +930,7 @@ export interface FileRoutesById {
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
+  '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
@@ -1026,6 +1036,7 @@ export interface FileRouteTypes {
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
+    | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/public/hooks/process-payouts'
@@ -1128,6 +1139,7 @@ export interface FileRouteTypes {
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
+    | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/public/hooks/process-payouts'
@@ -1231,6 +1243,7 @@ export interface FileRouteTypes {
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
+    | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/public/hooks/process-payouts'
@@ -1285,7 +1298,7 @@ export interface RootRouteChildren {
   VideosRoute: typeof VideosRouteWithChildren
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
-  BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRoute
+  BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRouteWithChildren
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1938,6 +1951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/broadcast/$broadcastId/manage': {
+      id: '/broadcast/$broadcastId/manage'
+      path: '/manage'
+      fullPath: '/broadcast/$broadcastId/manage'
+      preLoaderRoute: typeof BroadcastBroadcastIdManageRouteImport
+      parentRoute: typeof BroadcastBroadcastIdRoute
+    }
     '/api/public/studio-booking': {
       id: '/api/public/studio-booking'
       path: '/api/public/studio-booking'
@@ -2122,6 +2142,17 @@ const VideosRouteChildren: VideosRouteChildren = {
 const VideosRouteWithChildren =
   VideosRoute._addFileChildren(VideosRouteChildren)
 
+interface BroadcastBroadcastIdRouteChildren {
+  BroadcastBroadcastIdManageRoute: typeof BroadcastBroadcastIdManageRoute
+}
+
+const BroadcastBroadcastIdRouteChildren: BroadcastBroadcastIdRouteChildren = {
+  BroadcastBroadcastIdManageRoute: BroadcastBroadcastIdManageRoute,
+}
+
+const BroadcastBroadcastIdRouteWithChildren =
+  BroadcastBroadcastIdRoute._addFileChildren(BroadcastBroadcastIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccessDeniedRoute: AccessDeniedRoute,
@@ -2163,7 +2194,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideosRoute: VideosRouteWithChildren,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
-  BroadcastBroadcastIdRoute: BroadcastBroadcastIdRoute,
+  BroadcastBroadcastIdRoute: BroadcastBroadcastIdRouteWithChildren,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
