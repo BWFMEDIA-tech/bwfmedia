@@ -11,6 +11,7 @@ import {
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
+import { usePlayer } from "@/lib/player-context";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -110,7 +111,7 @@ function ArtistProfilePage() {
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
           <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
-          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} />
+          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} />
           <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
           <ArtistMerchSection userId={id} />
         </div>
@@ -261,7 +262,16 @@ function fmtDur(s: number | null) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
-function PopularTracks({ tracks, isOwner }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null }>; isOwner: boolean }) {
+function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string }) {
+  const player = usePlayer();
+  const playable = tracks.filter((t) => !!t.audio_url).map((t) => ({
+    id: t.id,
+    title: t.title,
+    artist: artistName,
+    audioUrl: t.audio_url as string,
+    coverUrl: t.cover_url,
+    durationSec: t.duration_seconds,
+  }));
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
       <div className="flex items-center justify-between mb-3">
@@ -286,9 +296,24 @@ function PopularTracks({ tracks, isOwner }: { tracks: Array<{ id: string; title:
           {tracks.map((t, i) => (
             <li key={t.id} className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] gap-3 items-center py-2 text-sm">
               <span className="text-white/40 text-xs">{i + 1}</span>
-              <div className="h-9 w-9 rounded overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!t.audio_url) return;
+                  const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds };
+                  if (player.track?.id === t.id) { player.toggle(); } else { player.play(track, playable); }
+                }}
+                disabled={!t.audio_url}
+                aria-label={player.track?.id === t.id && player.isPlaying ? `Pause ${t.title}` : `Play ${t.title}`}
+                className="group relative h-9 w-9 rounded overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 disabled:opacity-50"
+              >
                 {t.cover_url && <img src={t.cover_url} alt="" className="h-full w-full object-cover" />}
-              </div>
+                {t.audio_url && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Play className="h-4 w-4 text-white" fill="currentColor" />
+                  </span>
+                )}
+              </button>
               <div className="min-w-0 truncate">{t.title}</div>
               <div className="text-xs text-white/60 flex items-center gap-3">
                 <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {fmtNum(t.like_count)}</span>
