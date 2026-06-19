@@ -52,6 +52,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
+import { Route as StageRoomIdRouteImport } from './routes/stage.$roomId'
 import { Route as SettingsSocialLinksRouteImport } from './routes/settings.social-links'
 import { Route as SettingsSecurityRouteImport } from './routes/settings.security'
 import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
@@ -322,6 +323,11 @@ const UserIdRoute = UserIdRouteImport.update({
 const StreamRoomRoute = StreamRoomRouteImport.update({
   id: '/stream/$room',
   path: '/stream/$room',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StageRoomIdRoute = StageRoomIdRouteImport.update({
+  id: '/stage/$roomId',
+  path: '/stage/$roomId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsSocialLinksRoute = SettingsSocialLinksRouteImport.update({
@@ -693,6 +699,7 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/settings/social-links': typeof SettingsSocialLinksRoute
+  '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -793,6 +800,7 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/settings/social-links': typeof SettingsSocialLinksRoute
+  '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -895,6 +903,7 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/settings/social-links': typeof SettingsSocialLinksRoute
+  '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
@@ -998,6 +1007,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/settings/social-links'
+    | '/stage/$roomId'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -1098,6 +1108,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/settings/social-links'
+    | '/stage/$roomId'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -1199,6 +1210,7 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/settings/social-links'
+    | '/stage/$roomId'
     | '/stream/$room'
     | '/user/$id'
     | '/videos/$id'
@@ -1268,6 +1280,7 @@ export interface RootRouteChildren {
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
+  StageRoomIdRoute: typeof StageRoomIdRoute
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
   PlayIndexRoute: typeof PlayIndexRoute
@@ -1588,6 +1601,13 @@ declare module '@tanstack/react-router' {
       path: '/stream/$room'
       fullPath: '/stream/$room'
       preLoaderRoute: typeof StreamRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage/$roomId': {
+      id: '/stage/$roomId'
+      path: '/stage/$roomId'
+      fullPath: '/stage/$roomId'
+      preLoaderRoute: typeof StageRoomIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/social-links': {
@@ -2130,6 +2150,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
+  StageRoomIdRoute: StageRoomIdRoute,
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
   PlayIndexRoute: PlayIndexRoute,
