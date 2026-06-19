@@ -18,6 +18,7 @@ import { RecordButton } from "./RecordButton";
 import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
+import { setRealtimeHealth } from "@/lib/realtime-health";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -39,7 +40,28 @@ interface LiveStageProps {
 
 export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
+
+  // Publish health to the global store; reset on unmount so other surfaces
+  // (chat, queue) don't see stale "degraded" state after the user leaves.
+  useEffect(() => {
+    if (!fatal) {
+      setRealtimeHealth("livekit", "connected");
+      return;
+    }
+    const status =
+      fatal.kind === "quota"
+        ? "quota_exceeded"
+        : fatal.kind === "auth"
+          ? "auth_failed"
+          : "degraded";
+    setRealtimeHealth("livekit", status, fatal.detail);
+  }, [fatal]);
+  useEffect(() => () => setRealtimeHealth("livekit", "connected"), []);
+
   if (fatal) {
+    // Degraded mode: keep parent UI (chat, queue, stage list) alive — render
+    // a compact inline status where the video tiles would have been, instead
+    // of replacing the whole route.
     return (
       <LiveKitFatalBanner
         kind={fatal.kind}
