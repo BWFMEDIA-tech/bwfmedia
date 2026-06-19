@@ -34,6 +34,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
 import { useArtistSubscription } from "@/hooks/useArtistSubscription";
+import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
+import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -830,6 +832,7 @@ function StreamStudio() {
 
   return (
     <div className="min-h-screen bg-[#050509] text-white">
+      <MediaEngineProvider>
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="flex flex-1 flex-col">
@@ -874,12 +877,16 @@ function StreamStudio() {
                 </div>
               </div>
 
-              {/* Mode toggle — always available, switches the central view */}
-              <ModeToggle
-                streamId={stream?.id ?? null}
-                mode={streamMode}
-                stageLocked={stageLocked}
-                onLocalChange={setStreamMode}
+              {/* Unified Live Production Dashboard — single MediaEngine.
+                  Stage and Broadcast are independent source toggles. */}
+              <LiveProductionDashboard
+                participants={participants.map((p) => ({
+                  id: p.user_id,
+                  name: p.display_name ?? "Guest",
+                  avatar: p.avatar_url,
+                }))}
+                onInvite={copyInvite}
+                onEndBroadcast={stop}
               />
 
               {stream?.id && (
@@ -903,20 +910,16 @@ function StreamStudio() {
                 </div>
               )}
 
-              {streamMode === "broadcast" ? (
-                <>
+              {/* LiveKit stage + PlayArena + StageRoom remain mounted regardless
+                  of toggle state. The unified dashboard above owns the media
+                  pipeline; these components own collaborative rooms / queues. */}
+              <>
                 {lk ? (
                   <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
                 ) : (
-                  <>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <VideoTile label="HOST" name="BWF Network (Host)" handle="@bwfnetwork" gradient="linear-gradient(135deg,#1e1b4b,#581c87,#9333ea)" image={hostImg} />
-                      <VideoTile label="GUEST" name="JXHNNY RICH" handle="@jxhnnyrich" gradient="linear-gradient(135deg,#0c4a6e,#1e3a8a,#3b82f6)" image={guestImg} />
-                    </div>
-                    <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
+                  <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
                       Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
-                    </div>
-                  </>
+                  </div>
                 )}
                 {stream?.id && auth.user && (
                   <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
@@ -931,48 +934,7 @@ function StreamStudio() {
                     selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
                   />
                 )}
-                </>
-              ) : (
-                stream?.id ? (
-                  lk && auth.user ? (
-                    <StageAudioShell
-                      token={lk.token}
-                      serverUrl={lk.wsUrl}
-                      streamId={stream.id}
-                      userId={auth.user.id}
-                      isHost
-                      onLeave={stop}
-                    >
-                      <StageRoom
-                        streamId={stream.id}
-                        participants={participants}
-                        canManage
-                        primaryHostId={auth.user?.id ?? null}
-                        hostTransferMode={hostTransferMode}
-                        selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
-                      />
-                    </StageAudioShell>
-                  ) : (
-                    <StageRoom
-                      streamId={stream.id}
-                      participants={participants}
-                      canManage
-                      primaryHostId={auth.user?.id ?? null}
-                      hostTransferMode={hostTransferMode}
-                      selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
-                    />
-                  )
-                ) : (
-                  <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
-                    <Mic className="mx-auto mb-3 h-8 w-8" style={{ color: PURPLE }} />
-                    <div className="mb-1 text-sm font-bold text-white">Stage Mode (Audio)</div>
-                    <p className="mb-4 text-xs text-white/60">Audio-only rooms with speakers, listeners, raise-hand, and a backstage queue.</p>
-                    <button onClick={goLive} disabled={going} className="rounded-md px-4 py-2 text-xs font-semibold text-white disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
-                      <Radio className="mr-1 inline h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live to open Stage"}
-                    </button>
-                  </div>
-                )
-              )}
+              </>
 
               {/* Three live panels */}
               <div className="grid gap-4 lg:grid-cols-3">
@@ -992,6 +954,7 @@ function StreamStudio() {
           </div>
         </main>
       </div>
+      </MediaEngineProvider>
     </div>
   );
 }
