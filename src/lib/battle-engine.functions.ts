@@ -51,22 +51,13 @@ function invalid(msg: string): never {
   throw new Error(`INVALID_TRANSITION: ${msg}`);
 }
 
-export const dispatchBattleEvent = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z
-      .object({
-        matchId: z.string().uuid(),
-        type: z.enum(EVENT_TYPES),
-        payload: z
-          .object({ trackId: z.string().uuid().optional() })
-          .partial()
-          .optional(),
-      })
-      .parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+/** Pure handler so wrappers in battles.functions.ts can call into the engine
+ *  without going back through the server-fn RPC boundary. */
+export async function runBattleEvent(
+  supabase: any,
+  userId: string,
+  data: { matchId: string; type: BattleEventType; payload?: { trackId?: string } },
+) {
     const m = await assertHost(supabase, userId, data.matchId);
     if (m.status === "completed" || m.status === "cancelled") {
       invalid(`match is ${m.status}`);
@@ -383,7 +374,25 @@ export const dispatchBattleEvent = createServerFn({ method: "POST" })
       default:
         invalid(`unknown event ${data.type}`);
     }
-  });
+}
+
+export const dispatchBattleEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        matchId: z.string().uuid(),
+        type: z.enum(EVENT_TYPES),
+        payload: z
+          .object({ trackId: z.string().uuid().optional() })
+          .partial()
+          .optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) =>
+    runBattleEvent(context.supabase, context.userId, data),
+  );
 
 /** Single authoritative snapshot for any battle on a stream. */
 export const getBattleRoomState = createServerFn({ method: "GET" })
