@@ -19,7 +19,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           .select("provider, url, handle, sort_order")
           .eq("user_id", id).eq("enabled", true).order("sort_order", { ascending: true }),
         sb.from("play_tracks")
-          .select("id, title, cover_url, like_count, dislike_count, duration_seconds, created_at")
+          .select("id, title, cover_url, like_count, dislike_count, duration_seconds, created_at, audio_url")
           .eq("artist_user_id", id)
           .order("like_count", { ascending: false })
           .limit(8),
@@ -69,6 +69,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           id: string; title: string; cover_url: string | null;
           like_count: number; dislike_count: number;
           duration_seconds: number | null; created_at: string;
+          audio_url: string | null;
         }>,
         videos: (videoListRes.data ?? []) as Array<{
           id: string; title: string; thumbnail_path: string | null;
@@ -83,7 +84,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         memberSince: null as string | null,
         stats: { songs: 0, videos: 0, likes: 0, tipsCents: 0 },
         socials: [] as Array<{ provider: string; url: string; handle: string | null }>,
-        tracks: [] as Array<{ id: string; title: string; cover_url: string | null; like_count: number; dislike_count: number; duration_seconds: number | null; created_at: string }>,
+        tracks: [] as Array<{ id: string; title: string; cover_url: string | null; like_count: number; dislike_count: number; duration_seconds: number | null; created_at: string; audio_url: string | null }>,
         videos: [] as Array<{ id: string; title: string; thumbnail_path: string | null; external_url: string | null; created_at: string }>,
       };
     }
