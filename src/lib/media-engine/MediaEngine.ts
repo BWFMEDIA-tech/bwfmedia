@@ -213,6 +213,36 @@ export class MediaEngine {
     this.refreshSources();
   }
 
+  /** Per-participant gain (0..2). Live, no pipeline rebuild. */
+  setParticipantGain(id: string, gain: number) {
+    const p = this.sources.get(id);
+    if (!p) return;
+    const v = Math.max(0, Math.min(2, gain));
+    (p as any).level = v;
+    if (p.enabled) p.gain.gain.value = v;
+  }
+
+  /** Solo a participant — mute everyone else of kind "participant". */
+  soloParticipant(id: string) {
+    this.sources.forEach((s) => {
+      if (s.kind !== "participant") return;
+      const on = s.id === id;
+      s.enabled = on;
+      s.gain.gain.value = on ? 1 : 0;
+    });
+    this.refreshSources();
+  }
+
+  /** Unsolo — re-enable every participant source. */
+  unsoloAll() {
+    this.sources.forEach((s) => {
+      if (s.kind !== "participant") return;
+      s.enabled = true;
+      s.gain.gain.value = 1;
+    });
+    this.refreshSources();
+  }
+
   /** Add a remote participant audio stream into the mixer without touching the
    * pipeline. Returns an id to remove it later. */
   addParticipantStream(label: string, stream: MediaStream): string {

@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus,
   Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
-  X, Wifi, ShieldAlert,
+  X, Wifi, ShieldAlert, MoreVertical, Headphones, ShieldCheck, UserMinus, MessageSquare,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
 import { friendlyMediaError } from "@/lib/media-engine/errors";
@@ -24,10 +24,16 @@ export function LiveProductionDashboard({
   participants = [],
   onInvite,
   onEndBroadcast,
+  onPromoteParticipant,
+  onRemoveParticipant,
+  onMessageParticipant,
 }: {
   participants?: Array<{ id: string; name: string; avatar?: string | null }>;
   onInvite?: () => void;
   onEndBroadcast?: () => void;
+  onPromoteParticipant?: (id: string) => void;
+  onRemoveParticipant?: (id: string) => void;
+  onMessageParticipant?: (id: string) => void;
 }) {
   const { engine, state } = useMediaEngine();
 
@@ -79,7 +85,13 @@ export function LiveProductionDashboard({
 
       {/* Main two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <StagePanel participants={participants} onInvite={onInvite} />
+        <StagePanel
+          participants={participants}
+          onInvite={onInvite}
+          onPromoteParticipant={onPromoteParticipant}
+          onRemoveParticipant={onRemoveParticipant}
+          onMessageParticipant={onMessageParticipant}
+        />
         <BroadcastPanel />
       </div>
 
@@ -337,7 +349,15 @@ function StatusPill({ on, partial, accent }: { on: boolean; partial?: boolean; a
 
 /* ---------------- Stage panel (continued) ---------------- */
 
-function StagePanel({ participants, onInvite }: { participants: Array<{ id: string; name: string; avatar?: string | null }>; onInvite?: () => void }) {
+function StagePanel({
+  participants, onInvite, onPromoteParticipant, onRemoveParticipant, onMessageParticipant,
+}: {
+  participants: Array<{ id: string; name: string; avatar?: string | null }>;
+  onInvite?: () => void;
+  onPromoteParticipant?: (id: string) => void;
+  onRemoveParticipant?: (id: string) => void;
+  onMessageParticipant?: (id: string) => void;
+}) {
   const { engine, state } = useMediaEngine();
   const mic = state.sources.find((s) => s.id === "mic");
 
@@ -380,7 +400,15 @@ function StagePanel({ participants, onInvite }: { participants: Array<{ id: stri
           </div>
         )}
         {participants.map((p) => (
-          <ParticipantRow key={p.id} id={p.id} name={p.name} avatar={p.avatar} />
+          <ParticipantRow
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            avatar={p.avatar}
+            onPromote={onPromoteParticipant}
+            onRemove={onRemoveParticipant}
+            onMessage={onMessageParticipant}
+          />
         ))}
       </div>
 
@@ -394,29 +422,135 @@ function StagePanel({ participants, onInvite }: { participants: Array<{ id: stri
   );
 }
 
-function ParticipantRow({ id, name, avatar }: { id: string; name: string; avatar?: string | null }) {
+function ParticipantRow({
+  id, name, avatar, onPromote, onRemove, onMessage,
+}: {
+  id: string;
+  name: string;
+  avatar?: string | null;
+  onPromote?: (id: string) => void;
+  onRemove?: (id: string) => void;
+  onMessage?: (id: string) => void;
+}) {
   const { engine, state } = useMediaEngine();
   const src = state.sources.find((s) => s.id === id);
   const enabled = src ? src.enabled : true;
+  const [open, setOpen] = useState(false);
+  const [gain, setGain] = useState(1);
+  const [soloed, setSoloed] = useState(false);
+
+  const handleSolo = () => {
+    if (soloed) {
+      engine.unsoloAll();
+      setSoloed(false);
+    } else {
+      engine.soloParticipant(id);
+      setSoloed(true);
+    }
+  };
+
+  const handlePromote = () => {
+    if (onPromote) onPromote(id);
+    else toast.info(`${name} promoted to co-host`);
+  };
+
+  const handleRemove = () => {
+    if (onRemove) onRemove(id);
+    else toast.success(`${name} removed from stage`);
+    engine.removeSource(id);
+  };
+
+  const handleMessage = () => {
+    if (onMessage) onMessage(id);
+    else toast.info(`Open DM with ${name}`);
+  };
+
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-2">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-bold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
-        {avatar ? <img src={avatar} alt={name} className="h-full w-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
+    <div className="rounded-lg border border-white/5 bg-white/[0.02]">
+      <div className="flex items-center gap-3 p-2">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-bold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+          {avatar ? <img src={avatar} alt={name} className="h-full w-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="truncate text-xs font-semibold text-white">{name}</span>
+            {soloed && (
+              <span className="rounded bg-amber-500/20 px-1 py-0.5 text-[9px] font-bold uppercase tracking-widest text-amber-300">Solo</span>
+            )}
+          </div>
+          <LevelMeter level={enabled ? Math.min(1, 0.45 * gain + Math.random() * 0.1) : 0} active={enabled} />
+        </div>
+        <button
+          onClick={() => engine.setParticipantEnabled(id, !enabled)}
+          className={cn(
+            "rounded-md px-2.5 py-1 text-[11px] font-semibold transition",
+            enabled ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-white/50",
+          )}
+          aria-label={enabled ? "Mute participant" : "Unmute participant"}
+        >
+          {enabled ? "On" : "Off"}
+        </button>
+        <button
+          onClick={() => setOpen((v: boolean) => !v)}
+          className={cn(
+            "grid h-7 w-7 place-items-center rounded-md transition",
+            open ? "bg-white/15 text-white" : "text-white/60 hover:bg-white/5 hover:text-white",
+          )}
+          aria-label="Participant tools"
+          aria-expanded={open}
+        >
+          <MoreVertical className="h-3.5 w-3.5" />
+        </button>
       </div>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-xs font-semibold text-white">{name}</div>
-        <LevelMeter level={enabled ? 0.45 + Math.random() * 0.1 : 0} active={enabled} />
-      </div>
-      <button
-        onClick={() => engine.setParticipantEnabled(id, !enabled)}
-        className={cn(
-          "rounded-md px-2.5 py-1 text-[11px] font-semibold transition",
-          enabled ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-white/50",
-        )}
-      >
-        {enabled ? "On" : "Off"}
-      </button>
+
+      {open && (
+        <div className="border-t border-white/5 p-3 pt-2">
+          <div className="mb-2">
+            <div className="mb-1 flex items-center justify-between text-[10px] font-semibold uppercase tracking-widest text-white/50">
+              <span className="flex items-center gap-1"><Volume2 className="h-3 w-3" /> Volume</span>
+              <span className="text-white/70">{Math.round(gain * 100)}%</span>
+            </div>
+            <input
+              type="range" min={0} max={2} step={0.05} value={gain}
+              onChange={(e) => { const v = Number(e.target.value); setGain(v); engine.setParticipantGain(id, v); }}
+              className="w-full accent-white"
+              aria-label="Participant volume"
+            />
+          </div>
+          <div className="grid grid-cols-4 gap-1.5">
+            <ToolBtn icon={Headphones} label={soloed ? "Unsolo" : "Solo"} active={soloed} onClick={handleSolo} />
+            <ToolBtn icon={MessageSquare} label="DM" onClick={handleMessage} />
+            <ToolBtn icon={ShieldCheck} label="Promote" onClick={handlePromote} accent="emerald" />
+            <ToolBtn icon={UserMinus} label="Remove" onClick={handleRemove} accent="red" />
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function ToolBtn({
+  icon: Icon, label, onClick, active, accent,
+}: {
+  icon: any; label: string; onClick?: () => void; active?: boolean;
+  accent?: "emerald" | "red";
+}) {
+  const tone =
+    accent === "emerald" ? "hover:bg-emerald-500/15 hover:text-emerald-300"
+    : accent === "red"   ? "hover:bg-red-500/15 hover:text-red-300"
+    : "hover:bg-white/10 hover:text-white";
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center gap-0.5 rounded-md border border-white/5 px-2 py-1.5 text-[10px] font-semibold transition",
+        active ? "bg-white/15 text-white" : "bg-white/[0.02] text-white/70",
+        tone,
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </button>
   );
 }
 
