@@ -11,6 +11,7 @@ import { BoostCheckoutModal } from "@/components/play/BoostCheckoutModal";
 import { SubmitTrackDialog } from "@/components/play/SubmitTrackDialog";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { WaveformBackground } from "@/components/play/WaveformBackground";
+import { BattleArena } from "@/components/stream/BattleArena";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -59,6 +60,17 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
   const { playing, queued, leaderboard } = usePlayQueue(stream?.id ?? null);
   const isHost = !!stream && auth.user?.id === stream.host_id;
+
+  // Derive unique artist participants from play queue for the battle picker.
+  const battleParticipants = (() => {
+    const seen = new Map<string, { user_id: string; display_name: string | null; avatar_url: string | null }>();
+    for (const t of [...(playing ? [playing] : []), ...queued, ...leaderboard]) {
+      if (t.artist_user_id && !seen.has(t.artist_user_id)) {
+        seen.set(t.artist_user_id, { user_id: t.artist_user_id, display_name: t.artist_name, avatar_url: t.cover_url });
+      }
+    }
+    return Array.from(seen.values());
+  })();
 
   return (
     <>
@@ -113,6 +125,11 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
             {/* Host controls */}
             {isHost && stream && (
               <HostControls streamId={stream.id} queued={queued} room={room} />
+            )}
+
+            {/* Battle Arena — 1v1 head-to-head over the play queue */}
+            {stream && (
+              <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} />
             )}
           </div>
 
