@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import {
   Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus,
   Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
-  X, Wifi, ShieldAlert,
+  X, Wifi, ShieldAlert, MoreVertical, Headphones, ShieldCheck, UserMinus, MessageSquare,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
 import { friendlyMediaError } from "@/lib/media-engine/errors";
@@ -24,10 +24,16 @@ export function LiveProductionDashboard({
   participants = [],
   onInvite,
   onEndBroadcast,
+  onPromoteParticipant,
+  onRemoveParticipant,
+  onMessageParticipant,
 }: {
   participants?: Array<{ id: string; name: string; avatar?: string | null }>;
   onInvite?: () => void;
   onEndBroadcast?: () => void;
+  onPromoteParticipant?: (id: string) => void;
+  onRemoveParticipant?: (id: string) => void;
+  onMessageParticipant?: (id: string) => void;
 }) {
   const { engine, state } = useMediaEngine();
 
@@ -79,7 +85,13 @@ export function LiveProductionDashboard({
 
       {/* Main two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <StagePanel participants={participants} onInvite={onInvite} />
+        <StagePanel
+          participants={participants}
+          onInvite={onInvite}
+          onPromoteParticipant={onPromoteParticipant}
+          onRemoveParticipant={onRemoveParticipant}
+          onMessageParticipant={onMessageParticipant}
+        />
         <BroadcastPanel />
       </div>
 
