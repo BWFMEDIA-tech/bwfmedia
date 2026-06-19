@@ -103,12 +103,9 @@ export const startNextRound = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ matchId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    // Thin wrapper for backward-compat. All state machine logic lives in the
-    // Battle Engine (battle-engine.functions.ts). Do not add logic here.
-    const { dispatchBattleEvent } = await import("./battle-engine.functions");
-    return (dispatchBattleEvent as any).handler({
-      data: { matchId: data.matchId, type: "START_ROUND" },
-      context,
+    const { runBattleEvent } = await import("./battle-engine.functions");
+    return runBattleEvent(context.supabase, context.userId, {
+      matchId: data.matchId, type: "START_ROUND",
     });
   });
 
@@ -118,10 +115,9 @@ export const endRound = createServerFn({ method: "POST" })
     z.object({ matchId: z.string().uuid(), roundId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { dispatchBattleEvent } = await import("./battle-engine.functions");
-    return (dispatchBattleEvent as any).handler({
-      data: { matchId: data.matchId, type: "END_ROUND" },
-      context,
+    const { runBattleEvent } = await import("./battle-engine.functions");
+    return runBattleEvent(context.supabase, context.userId, {
+      matchId: data.matchId, type: "END_ROUND",
     });
   });
 
@@ -129,10 +125,9 @@ export const cancelBattle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ matchId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { dispatchBattleEvent } = await import("./battle-engine.functions");
-    return (dispatchBattleEvent as any).handler({
-      data: { matchId: data.matchId, type: "CANCEL_BATTLE" },
-      context,
+    const { runBattleEvent } = await import("./battle-engine.functions");
+    return runBattleEvent(context.supabase, context.userId, {
+      matchId: data.matchId, type: "CANCEL_BATTLE",
     });
   });
 
