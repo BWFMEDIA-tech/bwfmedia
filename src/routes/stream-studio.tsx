@@ -28,6 +28,7 @@ import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { setHostTransferMode as setHostTransferModeFn } from "@/lib/stage.functions";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { BattleArena } from "@/components/stream/BattleArena";
+import { NowPlayingHeader } from "@/components/stream/NowPlayingHeader";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
@@ -974,6 +975,14 @@ function StreamStudio() {
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                     )}
 
+                    <NowPlayingHeader
+                      streamId={stream.id}
+                      liveParticipants={participants.map((p) => ({
+                        user_id: p.user_id,
+                        display_name: p.display_name,
+                        avatar_url: p.avatar_url,
+                      }))}
+                    />
                     <StageRoom
                       streamId={stream.id}
                       participants={participants}

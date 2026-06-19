@@ -17,7 +17,7 @@ import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
-import { NowPlayingMini } from "@/components/stream/NowPlayingMini";
+import { NowPlayingHeader } from "@/components/stream/NowPlayingHeader";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -168,6 +168,14 @@ function GuestPage() {
               onLeave={() => setLk(null)}
               showHostTools={isHostLike}
             >
+              <NowPlayingHeader
+                streamId={streamId}
+                liveParticipants={(participants as StageParticipant[]).map((p) => ({
+                  user_id: p.user_id,
+                  display_name: p.display_name,
+                  avatar_url: p.avatar_url,
+                }))}
+              />
               <StageRoom
                 streamId={streamId}
                 participants={participants as StageParticipant[]}
@@ -198,6 +206,16 @@ function GuestPage() {
             <>
               <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} />
               {streamId && (
+                <NowPlayingHeader
+                  streamId={streamId}
+                  liveParticipants={(participants as StageParticipant[]).map((p) => ({
+                    user_id: p.user_id,
+                    display_name: p.display_name,
+                    avatar_url: p.avatar_url,
+                  }))}
+                />
+              )}
+              {streamId && (
                 <StageRoom
                   streamId={streamId}
                   participants={participants as StageParticipant[]}
@@ -223,7 +241,6 @@ function GuestPage() {
                   <RaiseHandButton streamId={streamId} auth={auth} />
                 </div>
               )}
-              {streamId && <NowPlayingMini streamId={streamId} />}
               <AudienceRow participants={participants as StageParticipant[]} />
               {streamId && streamMeta && (
                 <PlayArenaView
