@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar, ShoppingBag, Mic2,
+  LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar, ShoppingBag,
   Receipt, Banknote, BarChart3, MessageSquare, LifeBuoy, Settings, Shield, ScrollText,
   Menu, Search, Bell, ChevronDown, LogOut, User as UserIcon, Crown,
 } from "lucide-react";
@@ -13,7 +13,6 @@ const NAV: Item[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/streams", label: "Shows & Live Streams", icon: Radio },
-  { to: "/admin/play-arena", label: "Play Arena", icon: Mic2 },
   { to: "/admin/artists", label: "Artists", icon: Star },
   { to: "/admin/content", label: "Content", icon: PlayCircle },
   { to: "/admin/events", label: "Events", icon: Calendar },
