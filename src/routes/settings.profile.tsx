@@ -36,6 +36,8 @@ function ProfileSettingsPage() {
   const [bannerUrl, setBannerUrl] = useState("");
   const [memberSince, setMemberSince] = useState<string>("");
   const [socials, setSocials] = useState<SocialLink[]>([]);
+  const [brandName, setBrandName] = useState("");
+  const [brandAvatarUrl, setBrandAvatarUrl] = useState("");
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
@@ -51,7 +53,7 @@ function ProfileSettingsPage() {
     (async () => {
       const uid = user.id;
       const [{ data: p }, { data: ls }, msgRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, location, genres, member_since").eq("id", uid).maybeSingle(),
+        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, location, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
         supabase.from("user_social_links").select("id, provider, handle, url, enabled").eq("user_id", uid),
         supabase.from("stream_messages").select("id", { count: "exact", head: true }).eq("user_id", uid),
       ]);
@@ -64,6 +66,8 @@ function ProfileSettingsPage() {
       setLocation((p as any)?.location ?? "");
       setGenres(((p as any)?.genres ?? []) as string[]);
       setMemberSince((p as any)?.member_since ?? "");
+      setBrandName((p as any)?.brand_name ?? "");
+      setBrandAvatarUrl((p as any)?.brand_avatar_url ?? "");
       const existing = (ls ?? []) as SocialLink[];
       const filled = SOCIAL_PROVIDERS.map((sp) => existing.find((e) => e.provider === sp.key) ?? { provider: sp.key, handle: "", url: "", enabled: false });
       setSocials(filled);
@@ -116,6 +120,8 @@ function ProfileSettingsPage() {
       username: username.trim() || null,
       location: location.trim() || null,
       genres,
+      brand_name: brandName.trim() || null,
+      brand_avatar_url: brandAvatarUrl.trim() || null,
     } as any);
     if (error) { setSaving(false); toast.error(error.message); return; }
     // upsert socials
