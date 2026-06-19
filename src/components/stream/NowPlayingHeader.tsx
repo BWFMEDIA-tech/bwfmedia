@@ -14,8 +14,8 @@ interface ActiveBattle {
 
 interface LiveParticipant {
   user_id: string;
-  display_name: string | null;
-  avatar_url: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
 }
 
 /**
