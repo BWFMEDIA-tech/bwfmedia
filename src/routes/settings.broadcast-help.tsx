@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HowItWorks, KeyPointsCard } from "@/components/studio/LiveProductionDashboard";
-import { MediaEngineProvider } from "@/lib/media-engine";
+import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 
 export const Route = createFileRoute("/settings/broadcast-help")({
   ssr: false,
