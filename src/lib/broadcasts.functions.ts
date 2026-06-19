@@ -141,19 +141,14 @@ export const updateBroadcast = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch: {
-      stream_title?: string;
-      description?: string;
-      featured_content?: Record<string, unknown>;
-      playback_source?: z.infer<typeof PlaybackSource>;
-    } = {};
+    const patch: Record<string, unknown> = {};
     if (data.stream_title !== undefined) patch.stream_title = data.stream_title;
     if (data.description !== undefined) patch.description = data.description;
     if (data.featured_content !== undefined) patch.featured_content = data.featured_content;
     if (data.playback_source !== undefined) patch.playback_source = data.playback_source;
     const { error } = await supabase
       .from("broadcasts")
-      .update(patch)
+      .update(patch as never)
       .eq("id", data.id)
       .eq("host_id", userId);
     if (error) throw new Error(error.message);
