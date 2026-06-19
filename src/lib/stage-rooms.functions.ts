@@ -84,7 +84,7 @@ export const setStageStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch: Record<string, unknown> = { status: data.status };
+    const patch: { status: "idle" | "live" | "ended"; started_at?: string; ended_at?: string } = { status: data.status };
     if (data.status === "live") patch.started_at = new Date().toISOString();
     if (data.status === "ended") patch.ended_at = new Date().toISOString();
     const { error } = await supabase
