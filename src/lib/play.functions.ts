@@ -42,6 +42,30 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       if (!active) throw new Error("Artist membership required to submit");
     }
 
+    // Battle routing: if a battle is live on this stream and the submitter is
+    // Artist A or Artist B, auto-assign the track to their side. Everyone
+    // else's submissions stay in the regular queue (battle_match_id = null).
+    const { data: liveBattle } = await supabase
+      .from("battle_matches")
+      .select("id, artist_a_id, artist_b_id")
+      .eq("stream_id", data.streamId)
+      .eq("status", "live")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let battleMatchId: string | null = null;
+    let battleSide: "a" | "b" | null = null;
+    if (liveBattle) {
+      if (liveBattle.artist_a_id === userId) {
+        battleMatchId = liveBattle.id;
+        battleSide = "a";
+      } else if (liveBattle.artist_b_id === userId) {
+        battleMatchId = liveBattle.id;
+        battleSide = "b";
+      }
+    }
+
     let boosted = false;
     if (data.useBoost) {
       const { data: consumed, error: rpcErr } =
@@ -74,11 +98,17 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
         cover_url: data.coverUrl || null,
         boosted,
         position: nextPosition,
+        battle_match_id: battleMatchId,
+        battle_side: battleSide,
       })
-      .select("id, boosted")
+      .select("id, boosted, battle_match_id, battle_side")
       .single();
     if (error) throw new Error(error.message);
-    return inserted;
+    return {
+      ...inserted,
+      routedToBattle: !!battleSide,
+      battleSide,
+    };
   });
 
 /** Cast / change a vote on a track (+1 or -1). Toggling the same value clears it. */
