@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate, ErrorComponent, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
 import { getStageRoom, setStageStatus } from "@/lib/stage-rooms.functions";
-import { Users, Radio, Loader2, Mic } from "lucide-react";
+import { Users, Radio, Mic } from "lucide-react";
 
 export const Route = createFileRoute("/stage/$roomId")({
   head: () => ({
