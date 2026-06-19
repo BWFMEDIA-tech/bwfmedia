@@ -486,14 +486,22 @@ function ParticipantRow({
           <LevelMeter level={enabled ? Math.min(1, 0.45 * gain + Math.random() * 0.1) : 0} active={enabled} />
         </div>
         <button
-          onClick={() => engine.setParticipantEnabled(id, !enabled)}
+          onClick={() => {
+            engine.setParticipantEnabled(id, !enabled);
+            toast.success(`${name} ${enabled ? "muted" : "unmuted"}`);
+          }}
           className={cn(
-            "rounded-md px-2.5 py-1 text-[11px] font-semibold transition",
-            enabled ? "bg-emerald-500/20 text-emerald-300" : "bg-white/5 text-white/50",
+            "inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold transition",
+            enabled
+              ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
+              : "bg-red-500/20 text-red-300 hover:bg-red-500/30",
           )}
-          aria-label={enabled ? "Mute participant" : "Unmute participant"}
+          aria-label={enabled ? `Mute ${name}` : `Unmute ${name}`}
+          aria-pressed={!enabled}
+          title={enabled ? "Mute" : "Unmute"}
         >
-          {enabled ? "On" : "Off"}
+          {enabled ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
+          {enabled ? "Mute" : "Unmute"}
         </button>
         <button
           onClick={() => setOpen((v: boolean) => !v)}
