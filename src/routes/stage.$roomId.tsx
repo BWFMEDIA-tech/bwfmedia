@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
 import { getStageRoom, setStageStatus } from "@/lib/stage-rooms.functions";
-import { getLiveKitToken } from "@/lib/livekit.functions";
-import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { LiveStage } from "@/components/stream/LiveStage";
-import { Users, Radio, Loader2 } from "lucide-react";
+import { Users, Radio, Loader2, Mic } from "lucide-react";
 
 export const Route = createFileRoute("/stage/$roomId")({
   head: () => ({
@@ -51,23 +48,10 @@ function StagePage() {
   useEffect(() => {
     if (!auth.user) {
       navigate({ to: "/login", search: { redirect: `/stage/${room.id}` } as never });
-      return;
     }
-    let cancelled = false;
-    fetchToken({ data: { roomName: room.livekit_room, canPublish: isHost } })
-      .then((res) => { if (!cancelled) setToken((res as { token: string }).token); })
-      .catch((e) => console.error("token fetch failed", e));
-    return () => { cancelled = true; };
-  }, [auth.user, fetchToken, room.id, room.livekit_room, isHost, navigate]);
+  }, [auth.user, navigate, room.id]);
 
   if (!auth.user) return null;
-  if (!token) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-black text-white">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -108,10 +92,21 @@ function StagePage() {
           </div>
         )}
       </header>
-      <main className="p-4">
-        <StageAudioShell token={token} roomName={room.livekit_room} canPublish={isHost}>
-          <LiveStage token={token} roomName={room.livekit_room} canPublish={isHost} />
-        </StageAudioShell>
+      <main className="mx-auto max-w-5xl p-6">
+        <section className="rounded-2xl border border-white/10 bg-[#0d0d18] p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xs font-bold tracking-widest text-purple-300">
+            <Mic className="h-3.5 w-3.5" /> INTERACTIVE STAGE
+          </h2>
+          {room.description && <p className="mb-4 text-sm text-white/70">{room.description}</p>}
+          <div className="rounded-lg border border-white/10 bg-black/40 p-4 text-xs text-white/60">
+            <div className="mb-2 font-mono text-[10px] uppercase tracking-widest text-white/40">LiveKit room</div>
+            <div className="font-mono text-white/80">{room.livekit_room}</div>
+          </div>
+          <p className="mt-4 text-[11px] text-white/40">
+            Stage participation, queue, battles, and raise-hand wiring connect to this room.
+            Audience count: {room.audience_count}
+          </p>
+        </section>
       </main>
     </div>
   );
