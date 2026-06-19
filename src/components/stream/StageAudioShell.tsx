@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StageConnectionProvider } from "@/lib/stage-connection-context";
 import { DeviceSelector } from "./DeviceSelector";
+import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -51,6 +52,7 @@ export function StageAudioShell({
 }) {
   const [connect, setConnect] = useState(false);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+  const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -68,6 +70,19 @@ export function StageAudioShell({
     })();
     return () => { active = false; };
   }, [userId]);
+
+  if (fatal) {
+    return (
+      <LiveKitFatalBanner
+        kind={fatal.kind}
+        detail={fatal.detail}
+        onRetry={() => {
+          setFatal(null);
+          setConnect(false);
+        }}
+      />
+    );
+  }
 
   if (!connect) {
     return (
@@ -113,7 +128,14 @@ export function StageAudioShell({
       connect
       audio
       video={false}
-      onError={(e) => toast.error(`Stage audio: ${e.message}`)}
+      onError={(e) => {
+        const kind = classifyLiveKitError(e);
+        if (kind) {
+          setFatal({ kind, detail: e instanceof Error ? e.message : String(e) });
+          return;
+        }
+        toast.error(`Stage audio: ${e.message}`);
+      }}
       className="contents"
     >
       <StageConnectionProvider>
