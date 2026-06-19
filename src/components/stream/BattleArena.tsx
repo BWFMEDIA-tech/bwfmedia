@@ -93,7 +93,7 @@ export function BattleArena({
     loadMatch();
 
     const matchCh = supabase
-      .channel(`battle-match-${streamId}`)
+      .channel(`battle-match-${streamId}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "battle_matches", filter: `stream_id=eq.${streamId}` },
@@ -110,7 +110,7 @@ export function BattleArena({
   useEffect(() => {
     if (!match?.id) return;
     const ch = supabase
-      .channel(`battle-rounds-${match.id}`)
+      .channel(`battle-rounds-${match.id}-${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "battle_rounds", filter: `match_id=eq.${match.id}` },
