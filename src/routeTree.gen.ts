@@ -83,7 +83,6 @@ import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSecurityRouteImport } from './routes/admin.security'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
-import { Route as AdminPlayArenaRouteImport } from './routes/admin.play-arena'
 import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
@@ -483,11 +482,6 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminPlayArenaRoute = AdminPlayArenaRouteImport.update({
-  id: '/play-arena',
-  path: '/play-arena',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminPayoutsRoute = AdminPayoutsRouteImport.update({
   id: '/payouts',
   path: '/payouts',
@@ -689,7 +683,6 @@ export interface FileRoutesByFullPath {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
-  '/admin/play-arena': typeof AdminPlayArenaRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -793,7 +786,6 @@ export interface FileRoutesByTo {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
-  '/admin/play-arena': typeof AdminPlayArenaRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -899,7 +891,6 @@ export interface FileRoutesById {
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
-  '/admin/play-arena': typeof AdminPlayArenaRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -1006,7 +997,6 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/ops'
     | '/admin/payouts'
-    | '/admin/play-arena'
     | '/admin/profile'
     | '/admin/security'
     | '/admin/settings'
@@ -1110,7 +1100,6 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/ops'
     | '/admin/payouts'
-    | '/admin/play-arena'
     | '/admin/profile'
     | '/admin/security'
     | '/admin/settings'
@@ -1215,7 +1204,6 @@ export interface FileRouteTypes {
     | '/admin/messages'
     | '/admin/ops'
     | '/admin/payouts'
-    | '/admin/play-arena'
     | '/admin/profile'
     | '/admin/security'
     | '/admin/settings'
@@ -1858,13 +1846,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/play-arena': {
-      id: '/admin/play-arena'
-      path: '/play-arena'
-      fullPath: '/admin/play-arena'
-      preLoaderRoute: typeof AdminPlayArenaRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/payouts': {
       id: '/admin/payouts'
       path: '/payouts'
@@ -2078,7 +2059,6 @@ interface AdminRouteChildren {
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPayoutsRoute: typeof AdminPayoutsRoute
-  AdminPlayArenaRoute: typeof AdminPlayArenaRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminSecurityRoute: typeof AdminSecurityRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -2103,7 +2083,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminMessagesRoute: AdminMessagesRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPayoutsRoute: AdminPayoutsRoute,
-  AdminPlayArenaRoute: AdminPlayArenaRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminSecurityRoute: AdminSecurityRoute,
   AdminSettingsRoute: AdminSettingsRoute,
