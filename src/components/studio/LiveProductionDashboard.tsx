@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import {
-  Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus, Settings,
+  Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus,
   Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
+  X, Wifi, ShieldAlert,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
+import { friendlyMediaError } from "@/lib/media-engine/errors";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -34,6 +36,12 @@ export function LiveProductionDashboard({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Live status indicators (always visible) */}
+      <LiveStatusBar />
+
+      {/* Friendly error banners */}
+      <ErrorBanners />
+
       {/* Top toggle bar */}
       <ToggleHeader
         stage={state.stageEnabled}
@@ -42,20 +50,20 @@ export function LiveProductionDashboard({
         camera={state.cameraEnabled}
         onStage={async (v) => {
           if (v && !state.hasMic) {
-            try { await engine.acquireMic(); } catch { toast.error("Microphone access denied"); return; }
+            try { await engine.acquireMic(); } catch (e) { notifyMediaError(e, "mic"); return; }
           }
           engine.setStageEnabled(v);
         }}
         onBroadcast={async (v) => {
           if (v && !state.hasCamera) {
-            try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+            try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
           }
           engine.setBroadcastEnabled(v);
         }}
         onMuteAll={() => engine.setMasterMuted(!state.masterMuted)}
         onCamera={async () => {
           if (!state.hasCamera) {
-            try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+            try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
           }
           engine.setCameraEnabled(!state.cameraEnabled);
         }}
@@ -170,7 +178,7 @@ function SourceTogglePanel() {
 
   const handleMic = async () => {
     if (!state.hasMic) {
-      try { await engine.acquireMic(); } catch { toast.error("Microphone access denied"); return; }
+      try { await engine.acquireMic(); } catch (e) { notifyMediaError(e, "mic"); return; }
     }
     engine.setMicEnabled(!state.micEnabled);
   };
@@ -186,20 +194,20 @@ function SourceTogglePanel() {
 
   const handleCamera = async () => {
     if (!state.hasCamera) {
-      try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+      try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
     }
     engine.setCameraEnabled(!state.cameraEnabled);
   };
 
   const handleScreen = async () => {
     if (state.screenEnabled) { engine.releaseScreen(); return; }
-    try { await engine.acquireScreen(); } catch { toast.error("Screen share denied"); }
+    try { await engine.acquireScreen(); } catch (e) { notifyMediaError(e, "screen"); }
   };
 
   const handleStream = async () => {
     if (state.streaming) { engine.setBroadcastEnabled(false); return; }
     if (!state.hasCamera) {
-      try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+      try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
     }
     engine.setBroadcastEnabled(true);
   };
@@ -528,6 +536,129 @@ function StreamRow({ label, value, valueClass }: { label: string; value: string;
     <div className="flex items-center justify-between">
       <dt className="text-white/50">{label}</dt>
       <dd className={cn("font-semibold text-white", valueClass)}>{value}</dd>
+    </div>
+  );
+}
+
+/* ---------------- Live status + friendly errors ---------------- */
+
+function notifyMediaError(e: unknown, source: "mic" | "camera" | "screen" | "stream") {
+  const f = friendlyMediaError(e, source);
+  toast.error(f.title, { description: f.hint });
+}
+
+type Tone = "ok" | "warn" | "err" | "idle";
+const TONE: Record<Tone, { dot: string; text: string; bg: string; ring: string; label: string }> = {
+  ok:   { dot: "#22c55e", text: "text-emerald-300", bg: "bg-emerald-500/10", ring: "ring-emerald-500/30", label: "OK" },
+  warn: { dot: "#f59e0b", text: "text-amber-300",   bg: "bg-amber-500/10",   ring: "ring-amber-500/30",   label: "Check" },
+  err:  { dot: "#ef4444", text: "text-red-300",     bg: "bg-red-500/10",     ring: "ring-red-500/30",     label: "Error" },
+  idle: { dot: "#64748b", text: "text-white/50",    bg: "bg-white/[0.03]",   ring: "ring-white/10",       label: "Idle" },
+};
+
+function LiveStatusBar() {
+  const { state } = useMediaEngine();
+
+  const hasMicErr = state.errors.some((e) => e.source === "mic");
+  const hasCamErr = state.errors.some((e) => e.source === "camera");
+  const hasScrErr = state.errors.some((e) => e.source === "screen");
+
+  const micTone: Tone = hasMicErr ? "err" : state.micEnabled && state.hasMic ? "ok" : state.hasMic ? "warn" : "idle";
+  const camTone: Tone = hasCamErr ? "err" : state.cameraEnabled && state.hasCamera ? "ok" : state.hasCamera ? "warn" : "idle";
+  const scrTone: Tone = hasScrErr ? "err" : state.screenEnabled ? "ok" : "idle";
+
+  const stageTone: Tone = !state.stageEnabled
+    ? "idle"
+    : state.stagePublishing
+      ? "ok"
+      : "warn"; // stage on but mic not publishing
+
+  const broadcastTone: Tone = !state.broadcastEnabled
+    ? "idle"
+    : state.broadcastPublishing
+      ? "ok"
+      : "warn"; // broadcast on but no video source
+
+  const encoderTone: Tone = mapHealth(state.encoderHealth);
+  const outputTone: Tone = mapHealth(state.outputHealth);
+
+  const messages: Record<Tone, string> = {
+    ok: "Live",
+    warn: "Needs source",
+    err: "Permission error",
+    idle: "Idle",
+  };
+
+  return (
+    <section
+      aria-label="Live status"
+      className="grid grid-cols-2 gap-2 rounded-2xl border border-white/5 bg-[#0d0d18] p-3 sm:grid-cols-3 lg:grid-cols-7"
+    >
+      <StatusDot icon={Mic} label="Mic" tone={micTone} note={hasMicErr ? "Permission needed" : state.hasMic ? (state.micEnabled ? "Capturing" : "Muted") : "Not started"} />
+      <StatusDot icon={Video} label="Camera" tone={camTone} note={hasCamErr ? "Permission needed" : state.hasCamera ? (state.cameraEnabled ? "Capturing" : "Paused") : "Not started"} />
+      <StatusDot icon={MonitorUp} label="Screen" tone={scrTone} note={hasScrErr ? "Permission needed" : state.screenEnabled ? "Sharing" : "Not sharing"} />
+      <StatusDot icon={Users} label="Stage Publish" tone={stageTone} note={state.stageEnabled ? (state.stagePublishing ? "Publishing audio" : "Enable mic to publish") : "Off"} />
+      <StatusDot icon={Radio} label="Broadcast Publish" tone={broadcastTone} note={state.broadcastEnabled ? (state.broadcastPublishing ? "Publishing video" : "Enable a video source") : "Off"} />
+      <StatusDot icon={Activity} label="Encoder" tone={encoderTone} note={messages[encoderTone]} />
+      <StatusDot icon={Wifi} label="Output" tone={outputTone} note={state.streaming ? `${state.bitrateKbps} kbps` : messages[outputTone]} />
+    </section>
+  );
+}
+
+function mapHealth(h: "ok" | "warning" | "error" | "idle"): Tone {
+  return h === "ok" ? "ok" : h === "warning" ? "warn" : h === "error" ? "err" : "idle";
+}
+
+function StatusDot({ icon: Icon, label, tone, note }: { icon: any; label: string; tone: Tone; note: string }) {
+  const t = TONE[tone];
+  return (
+    <div
+      className={cn("flex items-center gap-2.5 rounded-xl px-3 py-2 ring-1", t.bg, t.ring)}
+      title={`${label}: ${note}`}
+    >
+      <span className="relative grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/[0.04]">
+        <Icon className={cn("h-3.5 w-3.5", t.text)} />
+        <span
+          className={cn("absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full ring-2 ring-[#0d0d18]", tone === "ok" && "animate-pulse")}
+          style={{ background: t.dot }}
+        />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-[11px] font-semibold text-white">{label}</span>
+        </div>
+        <div className={cn("truncate text-[10px]", t.text)}>{note}</div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorBanners() {
+  const { engine, state } = useMediaEngine();
+  if (!state.errors.length) return null;
+  return (
+    <div className="flex flex-col gap-2" role="status" aria-live="polite">
+      {state.errors.map((err) => (
+        <div
+          key={err.id}
+          className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-[12px] text-red-100"
+        >
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-red-300" />
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-red-200">{err.title}</div>
+            <div className="mt-0.5 text-red-100/80">{err.hint}</div>
+            <div className="mt-1 text-[10px] uppercase tracking-widest text-red-200/50">
+              Source: {err.source} · {err.code}
+            </div>
+          </div>
+          <button
+            onClick={() => engine.dismissError(err.id)}
+            className="rounded-md p-1 text-red-200/70 hover:bg-white/10 hover:text-white"
+            aria-label="Dismiss"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

@@ -7,7 +7,17 @@
  * never disconnects the room, and never tears down the encoder.
  */
 
+import { friendlyMediaError, type FriendlyMediaError } from "./errors";
+
 export type SourceKind = "mic" | "participant" | "media";
+
+export type EngineHealth = "ok" | "warning" | "error" | "idle";
+
+export interface EngineError extends FriendlyMediaError {
+  id: string;
+  source: "mic" | "camera" | "screen" | "stream";
+  at: number;
+}
 
 export interface MixerSource {
   id: string;
@@ -37,7 +47,11 @@ export interface EngineState {
   resolution: string;
   fps: number;
   platform: string;
-  errors: string[];
+  errors: EngineError[];
+  stagePublishing: boolean;
+  broadcastPublishing: boolean;
+  encoderHealth: EngineHealth;
+  outputHealth: EngineHealth;
 }
 
 type Listener = (s: EngineState) => void;
@@ -73,6 +87,10 @@ export class MediaEngine {
     fps: 0,
     platform: "BWF Network",
     errors: [],
+    stagePublishing: false,
+    broadcastPublishing: false,
+    encoderHealth: "idle",
+    outputHealth: "idle",
   };
 
   /** Initialize the audio graph once. Safe to call repeatedly. */
@@ -150,7 +168,7 @@ export class MediaEngine {
       this.patch({ hasMic: true, micEnabled: true });
       this.refreshSources();
     } catch (e: any) {
-      this.patch({ errors: [...this.state.errors, `Mic: ${e?.message ?? e}`] });
+      this.pushError(e, "mic");
       throw e;
     }
   }
@@ -203,9 +221,15 @@ export class MediaEngine {
       this.setCameraEnabled(true);
       return this.cameraStream;
     }
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
-    });
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
+      });
+    } catch (e) {
+      this.pushError(e, "camera");
+      throw e;
+    }
     this.cameraStream = stream;
     const settings = stream.getVideoTracks()[0]?.getSettings();
     this.patch({
@@ -228,7 +252,13 @@ export class MediaEngine {
       this.setScreenEnabled(true);
       return this.screenStream;
     }
-    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    } catch (e) {
+      this.pushError(e, "screen");
+      throw e;
+    }
     this.screenStream = stream;
     // If screen carries audio, route it through the mixer.
     const audio = stream.getAudioTracks()[0];
@@ -257,7 +287,10 @@ export class MediaEngine {
 
   /** STAGE toggle — only flips publish state for stage audio. Never rebuilds. */
   setStageEnabled(on: boolean) {
-    this.patch({ stageEnabled: on });
+    this.patch({
+      stageEnabled: on,
+      stagePublishing: on && this.state.micEnabled && this.state.hasMic,
+    });
     // Stage maps to mic publishing in our pipeline. Toggling Stage off keeps
     // the mic stream alive but mutes its outgoing track so re-enabling is
     // instant.
@@ -268,7 +301,15 @@ export class MediaEngine {
 
   /** BROADCAST toggle — only flips egress publish state. Never rebuilds. */
   setBroadcastEnabled(on: boolean) {
-    this.patch({ broadcastEnabled: on, streaming: on, bitrateKbps: on ? 4500 : 0 });
+    const hasVideo = this.state.hasCamera || this.state.hasScreen;
+    this.patch({
+      broadcastEnabled: on,
+      streaming: on,
+      bitrateKbps: on ? 4500 : 0,
+      broadcastPublishing: on && hasVideo,
+      encoderHealth: on ? (hasVideo ? "ok" : "warning") : "idle",
+      outputHealth: on ? (hasVideo ? "ok" : "warning") : "idle",
+    });
     if (this.cameraStream) {
       this.cameraStream.getVideoTracks().forEach((t) => (t.enabled = on && this.state.cameraEnabled));
     }
@@ -280,6 +321,28 @@ export class MediaEngine {
   }
 
   setPlatform(name: string) { this.patch({ platform: name }); }
+
+  /** Convert a raw media error into a friendly EngineError and store it. */
+  pushError(e: unknown, source: "mic" | "camera" | "screen" | "stream") {
+    const f = friendlyMediaError(e, source);
+    const entry: EngineError = {
+      ...f,
+      id: `${source}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      source,
+      at: Date.now(),
+    };
+    // Keep at most 5 most recent, dedup by title+source.
+    const filtered = this.state.errors.filter(
+      (x) => !(x.source === source && x.title === entry.title),
+    );
+    this.patch({ errors: [entry, ...filtered].slice(0, 5) });
+  }
+
+  dismissError(id: string) {
+    this.patch({ errors: this.state.errors.filter((e) => e.id !== id) });
+  }
+
+  clearErrors() { this.patch({ errors: [] }); }
 
   getCameraStream(): MediaStream | null { return this.cameraStream; }
   getScreenStream(): MediaStream | null { return this.screenStream; }
