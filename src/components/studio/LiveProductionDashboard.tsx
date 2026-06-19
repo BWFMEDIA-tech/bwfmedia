@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
   Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus, Settings,
-  Activity, CircleDot, Users, Volume2, VolumeX,
+  Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
 import { cn } from "@/lib/utils";
@@ -65,6 +65,9 @@ export function LiveProductionDashboard({
           onEndBroadcast?.();
         }}
       />
+
+      {/* Source toggle panel — single source of truth for inputs/outputs */}
+      <SourceTogglePanel />
 
       {/* Main two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -156,6 +159,175 @@ function QuickBtn({ icon: Icon, label, onClick, active }: { icon: any; label: st
 }
 
 /* ---------------- Stage panel ---------------- */
+
+/* ---------------- Source toggle panel ---------------- */
+
+function SourceTogglePanel() {
+  const { engine, state } = useMediaEngine();
+  const participantSources = state.sources.filter((s) => s.kind === "participant");
+  const anyParticipantOn = participantSources.some((p) => p.enabled);
+  const allParticipantsOn = participantSources.length > 0 && participantSources.every((p) => p.enabled);
+
+  const handleMic = async () => {
+    if (!state.hasMic) {
+      try { await engine.acquireMic(); } catch { toast.error("Microphone access denied"); return; }
+    }
+    engine.setMicEnabled(!state.micEnabled);
+  };
+
+  const handleParticipants = () => {
+    if (participantSources.length === 0) {
+      toast.info("No participant mics connected yet");
+      return;
+    }
+    const target = !allParticipantsOn;
+    participantSources.forEach((p) => engine.setParticipantEnabled(p.id, target));
+  };
+
+  const handleCamera = async () => {
+    if (!state.hasCamera) {
+      try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+    }
+    engine.setCameraEnabled(!state.cameraEnabled);
+  };
+
+  const handleScreen = async () => {
+    if (state.screenEnabled) { engine.releaseScreen(); return; }
+    try { await engine.acquireScreen(); } catch { toast.error("Screen share denied"); }
+  };
+
+  const handleStream = async () => {
+    if (state.streaming) { engine.setBroadcastEnabled(false); return; }
+    if (!state.hasCamera) {
+      try { await engine.acquireCamera(); } catch { toast.error("Camera access denied"); return; }
+    }
+    engine.setBroadcastEnabled(true);
+  };
+
+  return (
+    <section className="rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
+      <header className="mb-3 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-xs font-bold tracking-widest text-white/70">
+          <SlidersHorizontal className="h-3.5 w-3.5" /> SOURCE TOGGLES
+        </h3>
+        <span className="text-[10px] font-semibold text-white/40">
+          Inputs → Mixer → Outputs
+        </span>
+      </header>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <SourceToggleCard
+          label="Mic"
+          sub={state.hasMic ? "Connected" : "Tap to enable"}
+          on={state.micEnabled}
+          accent={PURPLE}
+          icon={state.micEnabled ? Mic : MicOff}
+          onClick={handleMic}
+        />
+        <SourceToggleCard
+          label="Participant Mics"
+          sub={
+            participantSources.length === 0
+              ? "None connected"
+              : `${participantSources.filter((p) => p.enabled).length}/${participantSources.length} live`
+          }
+          on={anyParticipantOn}
+          partial={anyParticipantOn && !allParticipantsOn}
+          accent={PINK}
+          icon={Users2}
+          onClick={handleParticipants}
+        />
+        <SourceToggleCard
+          label="Camera"
+          sub={state.hasCamera ? state.resolution : "Tap to enable"}
+          on={state.cameraEnabled}
+          accent={BLUE}
+          icon={state.cameraEnabled ? Video : VideoOff}
+          onClick={handleCamera}
+        />
+        <SourceToggleCard
+          label="Screen Share"
+          sub={state.screenEnabled ? "Sharing" : "Idle"}
+          on={state.screenEnabled}
+          accent="#22c55e"
+          icon={MonitorUp}
+          onClick={handleScreen}
+        />
+        <SourceToggleCard
+          label="Stream"
+          sub={state.streaming ? `${state.bitrateKbps} kbps` : "Ready"}
+          on={state.streaming}
+          accent="#ef4444"
+          icon={Radio}
+          onClick={handleStream}
+        />
+      </div>
+    </section>
+  );
+}
+
+function SourceToggleCard({
+  label, sub, on, partial, accent, icon: Icon, onClick,
+}: {
+  label: string;
+  sub: string;
+  on: boolean;
+  partial?: boolean;
+  accent: string;
+  icon: any;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={`${label} ${on ? "on" : "off"}`}
+      onClick={onClick}
+      className={cn(
+        "group relative flex items-center gap-3 rounded-xl border p-3 text-left transition",
+        on ? "border-white/15 bg-white/[0.04]" : "border-white/5 bg-white/[0.02] hover:bg-white/[0.04]",
+      )}
+    >
+      <span
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition"
+        style={{
+          background: on ? `linear-gradient(135deg, ${accent}, ${accent}99)` : "rgba(255,255,255,0.05)",
+          boxShadow: on ? `0 0 16px ${accent}55` : undefined,
+        }}
+      >
+        <Icon className={cn("h-4 w-4", on ? "text-white" : "text-white/50")} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <span className="truncate text-xs font-semibold text-white">{label}</span>
+          <StatusPill on={on} partial={partial} accent={accent} />
+        </div>
+        <div className="mt-0.5 truncate text-[10px] text-white/50">{sub}</div>
+      </div>
+    </button>
+  );
+}
+
+function StatusPill({ on, partial, accent }: { on: boolean; partial?: boolean; accent: string }) {
+  const label = partial ? "PARTIAL" : on ? "ON" : "OFF";
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-widest",
+        on ? "text-white" : "bg-white/10 text-white/50",
+      )}
+      style={on ? { background: `${accent}33`, color: accent } : undefined}
+    >
+      <span
+        className={cn("h-1.5 w-1.5 rounded-full", on ? "animate-pulse" : "")}
+        style={{ background: on ? accent : "rgba(255,255,255,0.3)" }}
+      />
+      {label}
+    </span>
+  );
+}
+
+/* ---------------- Stage panel (continued) ---------------- */
 
 function StagePanel({ participants, onInvite }: { participants: Array<{ id: string; name: string; avatar?: string | null }>; onInvite?: () => void }) {
   const { engine, state } = useMediaEngine();
