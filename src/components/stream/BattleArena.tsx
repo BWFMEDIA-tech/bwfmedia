@@ -192,6 +192,7 @@ export function BattleArena({
       liveRound={liveRound}
       myVote={myVote}
       isHost={isHost}
+      streamId={streamId}
       onVoteCast={(c) => setMyVote(c)}
     />
   );
@@ -203,6 +204,7 @@ function BattleView({
   liveRound,
   myVote,
   isHost,
+  streamId,
   onVoteCast,
 }: {
   match: Match;
@@ -210,12 +212,48 @@ function BattleView({
   liveRound: Round | null;
   myVote: "a" | "b" | null;
   isHost: boolean;
+  streamId: string;
   onVoteCast: (c: "a" | "b") => void;
 }) {
   const startFn = useServerFn(startNextRound);
   const endFn = useServerFn(endRound);
   const cancelFn = useServerFn(cancelBattle);
   const voteFn = useServerFn(castBattleVote);
+
+  // Fetch each artist's latest track (cover + title) from the play queue for this stream
+  // so the battle UI mirrors the song that's actually playing or queued for them.
+  const [artistTracks, setArtistTracks] = useState<Record<string, { cover_url: string | null; title: string | null }>>({});
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const { data } = await supabase
+        .from("play_tracks")
+        .select("artist_user_id, title, cover_url, status, created_at")
+        .eq("stream_id", streamId)
+        .in("artist_user_id", [match.artist_a_id, match.artist_b_id])
+        .order("created_at", { ascending: false });
+      if (cancelled || !data) return;
+      const map: Record<string, { cover_url: string | null; title: string | null }> = {};
+      const order = ["playing", "queued", "completed", "skipped", "removed"];
+      for (const row of data as any[]) {
+        const uid = row.artist_user_id;
+        if (!uid) continue;
+        const existing = map[uid];
+        if (!existing) { map[uid] = { cover_url: row.cover_url, title: row.title }; continue; }
+        // Prefer currently playing > queued > older completed
+        const prevRank = order.indexOf((data as any[]).find(r => r.artist_user_id === uid && r.title === existing.title)?.status ?? "");
+        const newRank = order.indexOf(row.status);
+        if (newRank >= 0 && (prevRank < 0 || newRank < prevRank)) map[uid] = { cover_url: row.cover_url, title: row.title };
+      }
+      setArtistTracks(map);
+    };
+    load();
+    const ch = supabase
+      .channel(`battle-art-${match.id}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` }, load)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [streamId, match.id, match.artist_a_id, match.artist_b_id]);
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -291,6 +329,8 @@ function BattleView({
         <ArtistSide
           side="a"
           name={match.artist_a_name ?? "Artist A"}
+          coverUrl={artistTracks[match.artist_a_id]?.cover_url ?? null}
+          trackTitle={artistTracks[match.artist_a_id]?.title ?? null}
           wins={match.a_wins}
           pct={aPct}
           isLeading={aScore > bScore}
@@ -303,6 +343,8 @@ function BattleView({
         <ArtistSide
           side="b"
           name={match.artist_b_name ?? "Artist B"}
+          coverUrl={artistTracks[match.artist_b_id]?.cover_url ?? null}
+          trackTitle={artistTracks[match.artist_b_id]?.title ?? null}
           wins={match.b_wins}
           pct={bPct}
           isLeading={bScore > aScore}
@@ -367,6 +409,8 @@ function BattleView({
 function ArtistSide({
   side,
   name,
+  coverUrl,
+  trackTitle,
   wins,
   pct,
   isLeading,
@@ -378,6 +422,8 @@ function ArtistSide({
 }: {
   side: "a" | "b";
   name: string;
+  coverUrl: string | null;
+  trackTitle: string | null;
   wins: number;
   pct: number;
   isLeading: boolean;
@@ -398,7 +444,22 @@ function ArtistSide({
         </div>
       )}
       <div className="text-[10px] uppercase tracking-widest text-white/40">Artist {side.toUpperCase()}</div>
+      <div
+        className="relative h-20 w-20 overflow-hidden rounded-xl border-2"
+        style={{ borderImage: `${grad} 1`, borderColor: side === "a" ? "#c53dff" : "#ff00a6" }}
+      >
+        {coverUrl ? (
+          <img src={coverUrl} alt={trackTitle ?? name} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-white/5">
+            <Swords className="h-6 w-6 text-white/30" />
+          </div>
+        )}
+      </div>
       <div className="text-center text-sm font-bold text-white">{name}</div>
+      {trackTitle && (
+        <div className="-mt-1 max-w-[10rem] truncate text-center text-[11px] text-white/60">♪ {trackTitle}</div>
+      )}
       <div className="text-[11px] text-white/50">Rounds won: {wins}</div>
 
       <div className="w-full">
