@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { IDENTITY_COLUMNS, effectiveIdentity } from "./host-identity";
 
 export type StageParticipant = {
   id: string;
@@ -38,9 +39,12 @@ export type QueueEntry = {
 async function hydrateProfiles<T extends { user_id: string }>(rows: T[]): Promise<T[]> {
   const ids = [...new Set(rows.map((r) => r.user_id))];
   if (!ids.length) return rows;
-  const { data } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", ids);
+  const { data } = await supabase.from("profiles").select(IDENTITY_COLUMNS).in("id", ids);
   const map = new Map<string, { display_name: string | null; avatar_url: string | null }>();
-  (data ?? []).forEach((p: any) => map.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url }));
+  (data ?? []).forEach((p: any) => {
+    const eff = effectiveIdentity(p);
+    map.set(p.id, { display_name: eff.display_name, avatar_url: eff.avatar_url });
+  });
   return rows.map((r) => ({ ...r, ...(map.get(r.user_id) ?? {}) }));
 }
 
