@@ -65,9 +65,10 @@ function installFakeMedia() {
   const screenStream = makeStream([makeTrack("video"), makeTrack("audio")]);
   const getUserMedia = vi.fn(async (c: any) => (c.video ? camStream : micStream));
   const getDisplayMedia = vi.fn(async () => screenStream);
-  (globalThis as any).navigator = {
-    mediaDevices: { getUserMedia, getDisplayMedia },
-  };
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value: { mediaDevices: { getUserMedia, getDisplayMedia } },
+  });
   return { micStream, camStream, screenStream, getUserMedia, getDisplayMedia };
 }
 
