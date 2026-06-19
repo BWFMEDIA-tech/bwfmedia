@@ -56,6 +56,7 @@ export type Database = {
       battle_matches: {
         Row: {
           a_wins: number
+          active_side: string | null
           artist_a_id: string
           artist_a_name: string | null
           artist_b_id: string
@@ -63,6 +64,7 @@ export type Database = {
           b_wins: number
           created_at: string
           current_round: number
+          current_round_id: string | null
           ended_at: string | null
           host_id: string
           id: string
@@ -76,6 +78,7 @@ export type Database = {
         }
         Insert: {
           a_wins?: number
+          active_side?: string | null
           artist_a_id: string
           artist_a_name?: string | null
           artist_b_id: string
@@ -83,6 +86,7 @@ export type Database = {
           b_wins?: number
           created_at?: string
           current_round?: number
+          current_round_id?: string | null
           ended_at?: string | null
           host_id: string
           id?: string
@@ -96,6 +100,7 @@ export type Database = {
         }
         Update: {
           a_wins?: number
+          active_side?: string | null
           artist_a_id?: string
           artist_a_name?: string | null
           artist_b_id?: string
@@ -103,6 +108,7 @@ export type Database = {
           b_wins?: number
           created_at?: string
           current_round?: number
+          current_round_id?: string | null
           ended_at?: string | null
           host_id?: string
           id?: string
@@ -116,6 +122,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "battle_matches_current_round_id_fkey"
+            columns: ["current_round_id"]
+            isOneToOne: false
+            referencedRelation: "battle_rounds"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "battle_matches_stream_id_fkey"
             columns: ["stream_id"]
             isOneToOne: false
@@ -126,8 +139,12 @@ export type Database = {
       }
       battle_rounds: {
         Row: {
+          a_playing_track_id: string | null
+          a_track_finished_at: string | null
           a_votes: number
           a_weight: number
+          b_playing_track_id: string | null
+          b_track_finished_at: string | null
           b_votes: number
           b_weight: number
           created_at: string
@@ -138,11 +155,16 @@ export type Database = {
           started_at: string | null
           status: string
           updated_at: string
+          voting_status: string
           winner_choice: string | null
         }
         Insert: {
+          a_playing_track_id?: string | null
+          a_track_finished_at?: string | null
           a_votes?: number
           a_weight?: number
+          b_playing_track_id?: string | null
+          b_track_finished_at?: string | null
           b_votes?: number
           b_weight?: number
           created_at?: string
@@ -153,11 +175,16 @@ export type Database = {
           started_at?: string | null
           status?: string
           updated_at?: string
+          voting_status?: string
           winner_choice?: string | null
         }
         Update: {
+          a_playing_track_id?: string | null
+          a_track_finished_at?: string | null
           a_votes?: number
           a_weight?: number
+          b_playing_track_id?: string | null
+          b_track_finished_at?: string | null
           b_votes?: number
           b_weight?: number
           created_at?: string
@@ -168,9 +195,38 @@ export type Database = {
           started_at?: string | null
           status?: string
           updated_at?: string
+          voting_status?: string
           winner_choice?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "battle_rounds_a_playing_track_id_fkey"
+            columns: ["a_playing_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "battle_rounds_a_playing_track_id_fkey"
+            columns: ["a_playing_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battle_rounds_b_playing_track_id_fkey"
+            columns: ["b_playing_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "battle_rounds_b_playing_track_id_fkey"
+            columns: ["b_playing_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "battle_rounds_match_id_fkey"
             columns: ["match_id"]

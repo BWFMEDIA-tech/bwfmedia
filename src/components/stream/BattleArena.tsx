@@ -1,46 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { Swords, Trophy, Zap, Play, StopCircle, X, Crown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Swords, Trophy, Zap, Crown } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import {
-  createBattleMatch,
-  startNextRound,
-  endRound,
-  cancelBattle,
-  castBattleVote,
-} from "@/lib/battles.functions";
+import { createBattleMatch, castBattleVote } from "@/lib/battles.functions";
+import { getBattleRoomState } from "@/lib/battle-engine.functions";
+import { BattleHostControls } from "./BattleHostControls";
 
-type Match = {
-  id: string;
-  stream_id: string;
-  host_id: string;
-  artist_a_id: string;
-  artist_b_id: string;
-  artist_a_name: string | null;
-  artist_b_name: string | null;
-  total_rounds: number;
-  round_seconds: number;
-  current_round: number;
-  status: "pending" | "live" | "completed" | "cancelled";
-  winner_id: string | null;
-  a_wins: number;
-  b_wins: number;
-};
-
-type Round = {
-  id: string;
-  match_id: string;
-  round_number: number;
-  status: "pending" | "live" | "closed";
-  ends_at: string | null;
-  winner_choice: "a" | "b" | "tie" | null;
-  a_votes: number;
-  b_votes: number;
-  a_weight: number;
-  b_weight: number;
-};
+type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
 type Participant = {
   user_id: string;
@@ -57,84 +25,43 @@ export function BattleArena({
   isHost: boolean;
   participants: Participant[];
 }) {
-  const [match, setMatch] = useState<Match | null>(null);
-  const [rounds, setRounds] = useState<Round[]>([]);
+  const stateFn = useServerFn(getBattleRoomState);
+  const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [myVote, setMyVote] = useState<"a" | "b" | null>(null);
   const [showCreate, setShowCreate] = useState(false);
 
-  // Initial fetch + realtime subscriptions on matches/rounds for this stream.
+  // Single source of truth: the Battle Engine room state. Realtime row changes
+  // on battle_matches / battle_rounds simply trigger a re-fetch; we never
+  // compute battle state in the UI.
   useEffect(() => {
     if (!streamId) return;
     let cancelled = false;
-
-    const loadMatch = async () => {
-      const { data: m } = await supabase
-        .from("battle_matches")
-        .select("*")
-        .eq("stream_id", streamId)
-        .in("status", ["pending", "live"])
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (cancelled) return;
-      setMatch((m as Match | null) ?? null);
-      if (m?.id) loadRounds(m.id);
-      else setRounds([]);
+    const refresh = async () => {
+      try {
+        const s = await stateFn({ data: { streamId } });
+        if (!cancelled) setRoomState(s as RoomState);
+      } catch { /* ignore */ }
     };
-    const loadRounds = async (matchId: string) => {
-      const { data: r } = await supabase
-        .from("battle_rounds")
-        .select("*")
-        .eq("match_id", matchId)
-        .order("round_number", { ascending: true });
-      if (!cancelled) setRounds((r as Round[]) ?? []);
-    };
-
-    loadMatch();
-
-    const matchCh = supabase
-      .channel(`battle-match-${streamId}-${Math.random().toString(36).slice(2)}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "battle_matches", filter: `stream_id=eq.${streamId}` },
-        () => loadMatch(),
-      )
-      .subscribe();
-
-    return () => {
-      cancelled = true;
-      supabase.removeChannel(matchCh);
-    };
-  }, [streamId]);
-
-  useEffect(() => {
-    if (!match?.id) return;
+    refresh();
     const ch = supabase
-      .channel(`battle-rounds-${match.id}-${Math.random().toString(36).slice(2)}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "battle_rounds", filter: `match_id=eq.${match.id}` },
-        async () => {
-          const { data } = await supabase
-            .from("battle_rounds")
-            .select("*")
-            .eq("match_id", match.id)
-            .order("round_number", { ascending: true });
-          setRounds((data as Round[]) ?? []);
-        },
-      )
+      .channel(`battle-room-${streamId}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_matches", filter: `stream_id=eq.${streamId}` },
+        refresh)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_rounds" },
+        refresh)
       .subscribe();
-    return () => {
-      supabase.removeChannel(ch);
-    };
-  }, [match?.id]);
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [streamId, stateFn]);
 
-  const liveRound = useMemo(() => rounds.find((r) => r.status === "live") ?? null, [rounds]);
+  const match = roomState?.match ?? null;
+  const currentRound = roomState?.currentRound ?? null;
 
-  // Track this user's vote on the current round so we can disable the button.
+  // Track this user's vote on the current round (read-only, UI hint only).
   useEffect(() => {
     setMyVote(null);
-    if (!liveRound) return;
+    if (!currentRound) return;
     let cancelled = false;
     (async () => {
       const { data: auth } = await supabase.auth.getUser();
@@ -142,15 +69,13 @@ export function BattleArena({
       const { data } = await supabase
         .from("battle_votes")
         .select("choice")
-        .eq("round_id", liveRound.id)
+        .eq("round_id", currentRound.id)
         .eq("voter_id", auth.user.id)
         .maybeSingle();
       if (!cancelled && data?.choice) setMyVote(data.choice as "a" | "b");
     })();
-    return () => {
-      cancelled = true;
-    };
-  }, [liveRound?.id]);
+    return () => { cancelled = true; };
+  }, [currentRound?.id]);
 
   if (!match && !isHost) return null;
 
@@ -183,104 +108,56 @@ export function BattleArena({
     );
   }
 
-  if (!match) return null;
+  if (!match || !roomState) return null;
 
   return (
     <BattleView
-      match={match}
-      rounds={rounds}
-      liveRound={liveRound}
+      roomState={roomState}
       myVote={myVote}
       isHost={isHost}
-      streamId={streamId}
       onVoteCast={(c) => setMyVote(c)}
     />
   );
 }
 
 function BattleView({
-  match,
-  rounds,
-  liveRound,
+  roomState,
   myVote,
   isHost,
-  streamId,
   onVoteCast,
 }: {
-  match: Match;
-  rounds: Round[];
-  liveRound: Round | null;
+  roomState: RoomState;
   myVote: "a" | "b" | null;
   isHost: boolean;
-  streamId: string;
   onVoteCast: (c: "a" | "b") => void;
 }) {
-  const startFn = useServerFn(startNextRound);
-  const endFn = useServerFn(endRound);
-  const cancelFn = useServerFn(cancelBattle);
   const voteFn = useServerFn(castBattleVote);
+  const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack } = roomState;
 
-  // Fetch each artist's latest track (cover + title) from the play queue for this stream
-  // so the battle UI mirrors the song that's actually playing or queued for them.
-  const [artistTracks, setArtistTracks] = useState<Record<string, { cover_url: string | null; title: string | null }>>({});
-  const [playingArtistId, setPlayingArtistId] = useState<string | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      const { data } = await supabase
-        .from("play_tracks")
-        .select("artist_user_id, title, cover_url, status, created_at")
-        .eq("stream_id", streamId)
-        .in("artist_user_id", [match.artist_a_id, match.artist_b_id])
-        .order("created_at", { ascending: false });
-      if (cancelled || !data) return;
-      const map: Record<string, { cover_url: string | null; title: string | null }> = {};
-      const order = ["playing", "queued", "completed", "skipped", "removed"];
-      for (const row of data as any[]) {
-        const uid = row.artist_user_id;
-        if (!uid) continue;
-        const existing = map[uid];
-        if (!existing) { map[uid] = { cover_url: row.cover_url, title: row.title }; continue; }
-        // Prefer currently playing > queued > older completed
-        const prevRank = order.indexOf((data as any[]).find(r => r.artist_user_id === uid && r.title === existing.title)?.status ?? "");
-        const newRank = order.indexOf(row.status);
-        if (newRank >= 0 && (prevRank < 0 || newRank < prevRank)) map[uid] = { cover_url: row.cover_url, title: row.title };
-      }
-      setArtistTracks(map);
-      const playingRow = (data as any[]).find((r) => r.status === "playing");
-      setPlayingArtistId(playingRow?.artist_user_id ?? null);
-    };
-    load();
-    const ch = supabase
-      .channel(`battle-art-${match.id}-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` }, load)
-      .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(ch); };
-  }, [streamId, match.id, match.artist_a_id, match.artist_b_id]);
-
+  // Read-only countdown derived from server-stamped ends_at (advisory display).
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(t);
   }, []);
-
-  const remainingMs = liveRound?.ends_at
-    ? Math.max(0, new Date(liveRound.ends_at).getTime() - now)
+  const remainingMs = currentRound?.ends_at
+    ? Math.max(0, new Date(currentRound.ends_at as string).getTime() - now)
     : 0;
   const remainingSec = Math.ceil(remainingMs / 1000);
 
-  const aScore = liveRound?.a_weight ?? 0;
-  const bScore = liveRound?.b_weight ?? 0;
+  const aScore = (currentRound as any)?.a_weight ?? 0;
+  const bScore = (currentRound as any)?.b_weight ?? 0;
   const total = aScore + bScore;
   const aPct = total > 0 ? Math.round((aScore / total) * 100) : 50;
   const bPct = 100 - aPct;
 
-  const lastClosed = [...rounds].reverse().find((r) => r.status === "closed");
+  const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
+  const canVote = votingStatus === "open" && !myVote;
 
   const vote = async (choice: "a" | "b", useBoost = false) => {
-    if (!liveRound) return;
+    if (!currentRound) return;
     try {
-      await voteFn({ data: { roundId: liveRound.id, choice, useBoost } });
+      await voteFn({ data: { roundId: currentRound.id, choice, useBoost } });
       onVoteCast(choice);
       toast.success(useBoost ? "Super vote cast! +5x" : "Vote cast");
     } catch (e: any) {
@@ -288,20 +165,30 @@ function BattleView({
     }
   };
 
+  if (!match) return null;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18]">
       <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-2">
         <div className="flex items-center gap-2 text-xs font-bold text-white">
           <Swords className="h-3.5 w-3.5 text-[#ff00a6]" />
-          BATTLE · Round {Math.max(1, match.current_round)} / {match.total_rounds}
+          BATTLE · Round {Math.max(1, match.current_round as number)} / {match.total_rounds as number}
           {match.status === "completed" && (
             <span className="ml-2 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] text-emerald-300">
               FINAL
             </span>
           )}
+          <span className={cn(
+            "ml-2 rounded px-1.5 py-0.5 text-[10px] uppercase tracking-widest",
+            votingStatus === "open" ? "bg-emerald-500/20 text-emerald-300"
+              : votingStatus === "finalized" ? "bg-blue-500/20 text-blue-300"
+              : "bg-white/10 text-white/60"
+          )}>
+            Voting {votingStatus}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          {liveRound && (
+          {currentRound && currentRound.status === "live" && (
             <span
               className={cn(
                 "rounded px-2 py-0.5 text-[11px] font-mono font-bold tabular-nums",
@@ -311,20 +198,6 @@ function BattleView({
               {remainingSec}s
             </span>
           )}
-          {isHost && match.status !== "completed" && (
-            <button
-              onClick={async () => {
-                try {
-                  await cancelFn({ data: { matchId: match.id } });
-                  toast.success("Battle cancelled");
-                } catch (e: any) { toast.error(e?.message ?? "Failed"); }
-              }}
-              className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
-              title="Cancel battle"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
         </div>
       </div>
 
@@ -332,14 +205,14 @@ function BattleView({
         <ArtistSide
           side="a"
           name={match.artist_a_name ?? "Artist A"}
-          coverUrl={artistTracks[match.artist_a_id]?.cover_url ?? null}
-          trackTitle={artistTracks[match.artist_a_id]?.title ?? null}
-          isPlaying={playingArtistId === match.artist_a_id}
-          wins={match.a_wins}
+          coverUrl={(aTrack as any)?.cover_url ?? null}
+          trackTitle={(aTrack as any)?.title ?? null}
+          isPlaying={activeSide === "a"}
+          wins={match.a_wins as number}
           pct={aPct}
           isLeading={aScore > bScore}
           voted={myVote === "a"}
-          canVote={!!liveRound && !myVote}
+          canVote={canVote}
           onVote={() => vote("a", false)}
           onSuperVote={() => vote("a", true)}
           overallWinner={match.winner_id === match.artist_a_id}
@@ -347,21 +220,21 @@ function BattleView({
         <ArtistSide
           side="b"
           name={match.artist_b_name ?? "Artist B"}
-          coverUrl={artistTracks[match.artist_b_id]?.cover_url ?? null}
-          trackTitle={artistTracks[match.artist_b_id]?.title ?? null}
-          isPlaying={playingArtistId === match.artist_b_id}
-          wins={match.b_wins}
+          coverUrl={(bTrack as any)?.cover_url ?? null}
+          trackTitle={(bTrack as any)?.title ?? null}
+          isPlaying={activeSide === "b"}
+          wins={match.b_wins as number}
           pct={bPct}
           isLeading={bScore > aScore}
           voted={myVote === "b"}
-          canVote={!!liveRound && !myVote}
+          canVote={canVote}
           onVote={() => vote("b", false)}
           onSuperVote={() => vote("b", true)}
           overallWinner={match.winner_id === match.artist_b_id}
         />
       </div>
 
-      {lastClosed && lastClosed.id !== liveRound?.id && (
+      {lastClosed && lastClosed.id !== currentRound?.id && (
         <div className="border-t border-white/10 bg-black/30 px-4 py-2 text-[11px] text-white/60">
           Round {lastClosed.round_number} winner:{" "}
           <span className="font-bold text-white">
@@ -376,36 +249,18 @@ function BattleView({
         </div>
       )}
 
-      {isHost && match.status !== "completed" && (
-        <div className="flex items-center justify-end gap-2 border-t border-white/10 bg-black/40 px-4 py-2">
-          {liveRound ? (
-            <button
-              onClick={async () => {
-                try {
-                  await endFn({ data: { matchId: match.id, roundId: liveRound.id } });
-                  toast.success("Round closed");
-                } catch (e: any) { toast.error(e?.message ?? "Failed"); }
-              }}
-              className="flex items-center gap-1 rounded-md bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/20"
-            >
-              <StopCircle className="h-3 w-3" /> End round
-            </button>
-          ) : match.current_round < match.total_rounds ? (
-            <button
-              onClick={async () => {
-                try {
-                  await startFn({ data: { matchId: match.id } });
-                  toast.success(`Round ${match.current_round + 1} started`);
-                } catch (e: any) { toast.error(e?.message ?? "Failed"); }
-              }}
-              className="flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold text-white"
-              style={{ background: "linear-gradient(135deg, #c53dff, #ff00a6)" }}
-            >
-              <Play className="h-3 w-3" />{" "}
-              {match.current_round === 0 ? "Start battle" : `Start round ${match.current_round + 1}`}
-            </button>
-          ) : null}
-        </div>
+      {isHost && (
+        <BattleHostControls
+          matchId={match.id as string}
+          activeSide={activeSide}
+          votingStatus={votingStatus}
+          currentRoundExists={!!currentRound && currentRound.status === "live"}
+          matchStatus={match.status as string}
+          currentRound={match.current_round as number}
+          totalRounds={match.total_rounds as number}
+          artistAName={match.artist_a_name ?? "Side A"}
+          artistBName={match.artist_b_name ?? "Side B"}
+        />
       )}
     </div>
   );
