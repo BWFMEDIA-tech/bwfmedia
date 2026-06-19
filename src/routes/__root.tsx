@@ -9,6 +9,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +134,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <PaymentTestModeBanner />
+        <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div className={isChrome ? (tightTop ? "pt-16 md:pt-20" : "pt-24 md:pt-28") : ""}>
