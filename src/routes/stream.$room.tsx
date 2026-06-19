@@ -12,6 +12,7 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
+import { BattleArena } from "@/components/stream/BattleArena";
 import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
@@ -172,6 +173,17 @@ function GuestPage() {
                 participants={participants as StageParticipant[]}
                 canManage={isHostLike}
               />
+              {streamId && (
+                <BattleArena
+                  streamId={streamId}
+                  isHost={isHostLike}
+                  participants={(participants as StageParticipant[]).map((p) => ({
+                    user_id: p.user_id,
+                    display_name: p.display_name,
+                    avatar_url: p.avatar_url,
+                  }))}
+                />
+              )}
               {inCrowd && (
                 <InCrowdBanner streamId={streamId} auth={auth} mode="stage" />
               )}
@@ -190,6 +202,17 @@ function GuestPage() {
                   streamId={streamId}
                   participants={participants as StageParticipant[]}
                   canManage={isHostLike}
+                />
+              )}
+              {streamId && (
+                <BattleArena
+                  streamId={streamId}
+                  isHost={isHostLike}
+                  participants={(participants as StageParticipant[]).map((p) => ({
+                    user_id: p.user_id,
+                    display_name: p.display_name,
+                    avatar_url: p.avatar_url,
+                  }))}
                 />
               )}
               {streamId && inCrowd && (

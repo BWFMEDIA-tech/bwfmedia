@@ -981,6 +981,15 @@ function StreamStudio() {
                       hostTransferMode={hostTransferMode}
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
+                    <BattleArena
+                      streamId={stream.id}
+                      isHost
+                      participants={participants.map((p) => ({
+                        user_id: p.user_id,
+                        display_name: p.display_name,
+                        avatar_url: p.avatar_url,
+                      }))}
+                    />
                     {streamMode === "stage" && <AudienceRow participants={participants} />}
                   </StageAudioShell>
                 )}
