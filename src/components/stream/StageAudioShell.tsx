@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { StageConnectionProvider } from "@/lib/stage-connection-context";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
+import { setRealtimeHealth } from "@/lib/realtime-health";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -54,6 +55,23 @@ export function StageAudioShell({
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
 
+  // Mirror LiveKit health into the global store so chat/queue surfaces can
+  // react and switch to "sync on reconnect" without each page reimplementing.
+  useEffect(() => {
+    if (!fatal) {
+      setRealtimeHealth("livekit", "connected");
+      return;
+    }
+    const status =
+      fatal.kind === "quota"
+        ? "quota_exceeded"
+        : fatal.kind === "auth"
+          ? "auth_failed"
+          : "degraded";
+    setRealtimeHealth("livekit", status, fatal.detail);
+  }, [fatal]);
+  useEffect(() => () => setRealtimeHealth("livekit", "connected"), []);
+
   useEffect(() => {
     let active = true;
     (async () => {
@@ -72,15 +90,21 @@ export function StageAudioShell({
   }, [userId]);
 
   if (fatal) {
+    // Degraded mode: skip LiveKitRoom (no reconnect storm, no mic capture)
+    // but keep children mounted so chat, stage roster, raise-hand queue, and
+    // votes remain usable. Banner is sticky at the top via root layout.
     return (
-      <LiveKitFatalBanner
-        kind={fatal.kind}
-        detail={fatal.detail}
-        onRetry={() => {
-          setFatal(null);
-          setConnect(false);
-        }}
-      />
+      <div className="flex flex-col gap-4">
+        <LiveKitFatalBanner
+          kind={fatal.kind}
+          detail={fatal.detail}
+          onRetry={() => {
+            setFatal(null);
+            setConnect(false);
+          }}
+        />
+        {children}
+      </div>
     );
   }
 
