@@ -931,9 +931,10 @@ function StreamStudio() {
                 </div>
               )}
 
-              {/* LiveKit stage + PlayArena + StageRoom remain mounted regardless
-                  of toggle state. The unified dashboard above owns the media
-                  pipeline; these components own collaborative rooms / queues. */}
+              {/* SINGLE persistent LiveKit room. `streamMode` only swaps the
+                  inner UI — the LiveKitRoom (mic publish + audio subscriptions)
+                  stays mounted across mode toggles, so the microphone never
+                  disconnects and we never trigger a reconnect storm / 429. */}
               <>
                 {!lk && (
                   <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
@@ -941,12 +942,7 @@ function StreamStudio() {
                   </div>
                 )}
 
-                {/* In stage mode the host joins the LiveKit *audio* room
-                    directly from the studio (mic + diagnostics + mute bar).
-                    StageRoom is nested so promote/demote/mute controls share
-                    the same room context. In broadcast/play modes we keep
-                    the video tile grid. */}
-                {lk && stream?.id && auth.user && streamMode === "stage" ? (
+                {lk && stream?.id && auth.user && (
                   <StageAudioShell
                     token={lk.token}
                     serverUrl={lk.wsUrl}
@@ -956,6 +952,27 @@ function StreamStudio() {
                     onLeave={stop}
                     showHostTools
                   >
+                    {/* Camera follows the UI mode WITHOUT touching the mic
+                        or the room connection. */}
+                    <CameraPublishSync publish={streamMode === "broadcast"} />
+
+                    {streamMode === "broadcast" && (
+                      <LiveStageContent
+                        onEnd={stop}
+                        onInvite={copyInvite}
+                        hostImage={hostImg}
+                        guestImage={guestImg}
+                        onViewerCount={setViewerCount}
+                        streamId={stream.id}
+                        publish={false /* mic handled by StageAudioShell */}
+                        showHostTools
+                      />
+                    )}
+
+                    {streamMode === "play" && (
+                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
+                    )}
+
                     <StageRoom
                       streamId={stream.id}
                       participants={participants}
@@ -964,27 +981,8 @@ function StreamStudio() {
                       hostTransferMode={hostTransferMode}
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
-                    <AudienceRow participants={participants} />
+                    {streamMode === "stage" && <AudienceRow participants={participants} />}
                   </StageAudioShell>
-                ) : (
-                  <>
-                    {lk && (
-                      <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={stop} onInvite={copyInvite} hostImage={hostImg} guestImage={guestImg} onViewerCount={setViewerCount} streamId={stream?.id} />
-                    )}
-                    {stream?.id && auth.user && (
-                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
-                    )}
-                    {stream?.id && (
-                      <StageRoom
-                        streamId={stream.id}
-                        participants={participants}
-                        canManage
-                        primaryHostId={auth.user?.id ?? null}
-                        hostTransferMode={hostTransferMode}
-                        selfProfile={auth.user ? { user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url } : null}
-                      />
-                    )}
-                  </>
                 )}
               </>
 
