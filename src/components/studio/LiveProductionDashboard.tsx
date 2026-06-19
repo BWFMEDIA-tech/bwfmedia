@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
   Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus, Settings,
-  Activity, CircleDot, Users, Volume2, VolumeX,
+  Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
 } from "lucide-react";
 import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
 import { cn } from "@/lib/utils";
@@ -65,6 +65,9 @@ export function LiveProductionDashboard({
           onEndBroadcast?.();
         }}
       />
+
+      {/* Source toggle panel — single source of truth for inputs/outputs */}
+      <SourceTogglePanel />
 
       {/* Main two-panel layout */}
       <div className="grid gap-4 lg:grid-cols-2">
