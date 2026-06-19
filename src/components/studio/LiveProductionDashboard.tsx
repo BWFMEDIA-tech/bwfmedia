@@ -50,7 +50,6 @@ export function LiveProductionDashboard({
       <ErrorBanners />
 
       {/* Top toggle bar */}
-      {(() => null)()}
       <ToggleHeader
         stage={state.stageEnabled}
         broadcast={state.broadcastEnabled}
