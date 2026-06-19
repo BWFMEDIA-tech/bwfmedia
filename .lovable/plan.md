@@ -1,131 +1,125 @@
-# Separate Stage Mode and Broadcast Mode
+## Refactor Plan — Event-Driven Play Arena Battle Engine
 
-Split the current single-stream-with-mode-toggle architecture into two independent systems that can be composed: Stage Rooms (interactive participation) and Broadcasts (one-to-many distribution).
+### What exists today
 
-## Goals
+- `src/lib/battles.functions.ts` already routes every host action through server functions (`createBattleMatch`, `startNextRound`, `endRound`, `cancelBattle`, `castBattleVote`, `getActiveBattle`). The UI never writes the DB directly today — it calls RPCs.
+- `src/components/stream/BattleArena.tsx` is the host + audience battle surface. The host buttons call the RPCs above, and the UI subscribes to `battle_matches` + `battle_rounds` realtime for state.
+- The current round model has only two states: `live` and `closed`. There is no separate "voting open / closed" or "finalized" phase, and there is no concept of "currently playing track" inside the battle (track playback is tracked separately on `play_tracks.status`).
+- LiveKit is already pure transport — it carries audio/video; it does not drive battle state.
 
-- Stage Rooms own live participation (LiveKit, participants, queue, battles, mic).
-- Broadcasts own distribution (viewers, playback source, monetization, analytics).
-- A Broadcast can reference 0..N Stage Rooms (plus uploaded/prerecorded content) without further migrations.
-- Switching modes never disconnects anyone — Stage LiveKit room persists when a Broadcast is started or stopped.
+### Gap vs. the requested spec
 
----
+The new vocabulary requires concepts the schema doesn't yet model:
 
-## 1. Database (migration)
+- `PLAY_SIDE_A_TRACK / PLAY_SIDE_B_TRACK / STOP_TRACK` — need a "currently playing battle track" per side on the match.
+- `OPEN_VOTING / CLOSE_VOTING / FINALIZE_ROUND` — need a `voting_status` ∈ `closed | open | finalized` distinct from round lifecycle.
+- `ROOM_STATE = battle_engine.getState(roomId)` — need a single read endpoint that returns the full machine snapshot.
 
-### New tables
+### Plan
 
-`stage_rooms`
-- `id uuid pk`
-- `host_id uuid -> auth.users`
-- `title text`, `description text`
-- `status text` — `idle | live | ended` (trigger-validated lifecycle)
-- `stage_state jsonb` (open_mic, battle_active, locked, etc.)
-- `audience_count int default 0`
-- `livekit_room text` (LiveKit room name; reuses existing identity helper)
-- `started_at`, `ended_at`, `created_at`, `updated_at`
+#### 1. Schema (migration)
 
-`broadcasts`
-- `id uuid pk`
-- `host_id uuid -> auth.users`
-- `stream_title text`, `description text`
-- `stream_status text` — `scheduled | live | ended` (trigger-validated)
-- `viewer_count int default 0`
-- `playback_source jsonb` — discriminated union: `{ kind: 'stage', stage_room_ids: uuid[] } | { kind: 'upload', asset_url } | { kind: 'prerecord', recording_id }`
-- `featured_content jsonb`
-- `started_at`, `ended_at`, `scheduled_for`, `created_at`, `updated_at`
+`battle_rounds`:
+- add `voting_status text not null default 'closed' check in ('closed','open','finalized')`
+- add `a_playing_track_id uuid null references play_tracks(id)`
+- add `b_playing_track_id uuid null references play_tracks(id)`
+- add `a_track_finished_at timestamptz`, `b_track_finished_at timestamptz` (used by engine to auto-allow voting once both played)
 
-`broadcast_stage_links` (join — enables one broadcast → many stages)
-- `broadcast_id uuid -> broadcasts on delete cascade`
-- `stage_room_id uuid -> stage_rooms on delete cascade`
-- `role text` — `primary | secondary`
-- `pk (broadcast_id, stage_room_id)`
+`battle_matches`:
+- add `active_side text null check in ('a','b')` — which side currently has audio playing
+- add `current_round_id uuid null references battle_rounds(id)`
 
-GRANTs + RLS for all three (authenticated CRUD scoped to host; anon SELECT only on `broadcasts` for public viewer pages and on `stage_rooms` minimal fields for audience pages). Realtime enabled on all three.
+No data migration needed; defaults are safe.
 
-### Compatibility with existing `streams` table
+#### 2. Battle Engine (`src/lib/battle-engine.functions.ts`)
 
-We do not drop or alter `streams`. New entities live alongside it. Existing `streams.mode` keeps working for legacy `/stream/$room` and `/play/$room` paths during the transition. Stage and Broadcast queries on new routes use the new tables exclusively.
-
----
-
-## 2. Server functions (`src/lib/`)
-
-`stage-rooms.functions.ts`
-- `createStageRoom`, `getStageRoom`, `updateStageState`, `endStageRoom`, `listMyStageRooms`
-
-`broadcasts.functions.ts`
-- `createBroadcast`, `getBroadcast`, `startBroadcast`, `endBroadcast`, `updateBroadcast`, `linkStageToBroadcast`, `unlinkStageFromBroadcast`, `listMyBroadcasts`, `listLiveBroadcasts`
-
-All host-mutating fns use `requireSupabaseAuth` + host check. Public reads (`getBroadcast`, `listLiveBroadcasts`) use the server publishable client with narrow `TO anon` policies so SSR works for shareable broadcast URLs.
-
----
-
-## 3. Routes
-
-New independent routes:
-
-- `src/routes/stage.$roomId.tsx` (auth-gated, under `_authenticated/`) — interactive stage UI: LiveKit shell, participants, queue, battles, raise-hand, host controls. Reuses `StageAudioShell`, `LiveStage`, `BackstageQueue`, `BattleArena`, `RaiseHandPanel`.
-- `src/routes/broadcast.$broadcastId.tsx` (public) — viewer page: player + chat + viewer count + tips/merch. SSR with loader-fed OG metadata.
-- `src/routes/_authenticated/broadcast.$broadcastId.manage.tsx` — host control surface for a broadcast.
-
-Existing `/stream/$room` and `/play/$room` stay intact (legacy + Play Mode). `ModeToggle.tsx` is no longer used in the new dashboard but is left in place for legacy stream routes.
-
----
-
-## 4. Studio Dashboard
-
-Refactor `src/components/studio/LiveProductionDashboard.tsx`:
+Single dispatch entrypoint:
 
 ```text
-┌──────────────────────────────┬──────────────────────────────┐
-│ STAGE ROOM PANEL             │ BROADCAST PANEL              │
-│ - Status (idle/live)          │ - Status (offline/live)      │
-│ - Create / End stage          │ - Create / Start / End       │
-│ - Participants list           │ - Linked stage rooms (multi) │
-│ - Artist queue                │ - Add upload / prerecord     │
-│ - Battle controls             │ - Viewer count + analytics   │
-│ - Host controls (lock/mic)    │ - Monetization (tips/merch)  │
-│                              │ - Featured content slot      │
-└──────────────────────────────┴──────────────────────────────┘
+dispatchBattleEvent({ matchId, type, payload? })
 ```
 
-Two new components:
-- `src/components/studio/StageRoomPanel.tsx`
-- `src/components/studio/BroadcastPanel.tsx`
+Event types (host-only unless noted):
 
-The old `ModeToggle` is removed from this dashboard. Each panel operates independently — starting/stopping a broadcast does not touch the stage's LiveKit room.
+```text
+START_ROUND
+PLAY_SIDE_A_TRACK { trackId }
+PLAY_SIDE_B_TRACK { trackId }
+STOP_TRACK
+OPEN_VOTING
+CLOSE_VOTING
+FINALIZE_ROUND
+NEXT_ROUND
+END_ROUND
+CANCEL_BATTLE
+```
 
----
+Rules enforced in the engine (UI cannot bypass):
 
-## 5. Session persistence
+- `START_ROUND` requires `match.status in (pending, live)` and `current_round < total_rounds`. Creates / opens next round with `voting_status='closed'`.
+- `PLAY_SIDE_*_TRACK` requires a live round; sets `match.active_side`, writes `play_tracks.status='playing'` for that track, marks others on the stream as `completed`, sets `a_playing_track_id` or `b_playing_track_id` on the round, stamps `*_track_finished_at` on the previously playing side.
+- `STOP_TRACK` clears `active_side` and demotes the current playing `play_track` row.
+- `OPEN_VOTING` requires both `a_playing_track_id` and `b_playing_track_id` set on the round. Sets `voting_status='open'`.
+- `CLOSE_VOTING` sets `voting_status='closed'`.
+- `FINALIZE_ROUND` computes winner from `a_weight`/`b_weight`, sets `voting_status='finalized'`, round `status='closed'`, increments `a_wins` / `b_wins`.
+- `NEXT_ROUND` requires last round finalized; if `current_round === total_rounds`, completes the match and computes overall winner; otherwise opens the next round.
+- `END_ROUND` / `CANCEL_BATTLE` — kept as terminal ops.
 
-- LiveKit room name is owned by `stage_rooms.livekit_room`, never derived from a broadcast.
-- `BroadcastPanel` calls `startBroadcast({ broadcastId, stageRoomIds: [currentStageRoomId] })` which inserts/updates `broadcast_stage_links` and flips `stream_status` to `live` — no LiveKit reconnection, no token refresh, no participant disruption.
-- Ending a broadcast only updates broadcast rows; the stage room stays `live` until the host explicitly ends it.
+Voting (`castBattleVote`) is updated to require `voting_status='open'` (not the timer). Timer becomes advisory; engine controls truth.
 
----
+All event handlers run inside one server function with a switch; each branch enforces host/admin (via existing `assertMatchHost`) and the state-machine preconditions, then performs DB writes. Errors throw `Error("INVALID_TRANSITION: …")` so the UI can surface them.
 
-## 6. Out of scope (this iteration)
+#### 3. Room state reader
 
-- Migrating existing live `streams` rows into the new tables (kept side-by-side).
-- Viewer-side broadcast video pipeline beyond a placeholder player surface that reads `playback_source`.
-- Analytics dashboards beyond raw `viewer_count`.
+`getBattleRoomState({ streamId })` returns:
 
----
+```text
+{
+  match,                       // battle_matches row or null
+  rounds,                      // all battle_rounds rows
+  currentRound,                // resolved row for match.current_round_id
+  activeSide,                  // 'a' | 'b' | null
+  votingStatus,                // 'closed' | 'open' | 'finalized'
+  aTrack, bTrack,              // joined play_tracks rows for current round
+  battleStatus,                // match.status
+}
+```
 
-## Technical notes
+This becomes the single source the UI reads from (initial load + realtime invalidation).
 
-- Lifecycle triggers mirror existing `play_tracks_enforce_lifecycle` pattern.
-- `playback_source` is jsonb (not enum) so future `kind` values (e.g. `multi`, `simulcast`) don't require migrations.
-- RLS: hosts manage their own rows; `has_role(_, 'admin')` bypass for moderation; anon SELECT only on `broadcasts` columns needed for public viewer rendering and on `stage_rooms` for audience count.
-- New routes use the canonical loader pattern (`ensureQueryData` + `useSuspenseQuery`) with `errorComponent` + `notFoundComponent`.
-- `og:image` set on the broadcast leaf route from loader data.
+#### 4. Frontend changes
 
-## Execution order
+`src/components/stream/BattleArena.tsx`:
+- Replace direct imports of `startNextRound`, `endRound`, `cancelBattle` with a single `emitBattleEvent(type, payload)` helper that calls `dispatchBattleEvent`.
+- Remove local logic that decides "should the Start button show?" based on `match.current_round < total_rounds`; instead show buttons unconditionally and rely on the engine's `INVALID_TRANSITION` error toast — OR derive button enablement from `roomState` only.
+- Replace the ad-hoc `play_tracks` join in `BattleView` with `roomState.aTrack` / `roomState.bTrack` / `roomState.activeSide` from the engine reader.
+- Add host buttons for the new events: Play A / Play B / Stop / Open voting / Close voting / Finalize / Next round (Start/End Battle stay).
 
-1. Migration (new tables, GRANTs, RLS, triggers, realtime publication).
-2. Server functions for both entities.
-3. New routes (stage + broadcast viewer + broadcast manage).
-4. Refactor `LiveProductionDashboard` into Stage + Broadcast panels.
-5. Verify build, smoke-test the two panels operate independently.
+`src/components/stream/HostControlPanel.tsx` (new, optional split): a thin component that takes `roomState` + `emit` and renders only buttons — zero state.
+
+Audience UI: vote button disabled unless `roomState.votingStatus === 'open'` (replaces the timer-based gate).
+
+#### 5. Keep wrappers for backward-compat
+
+`startNextRound`, `endRound`, `cancelBattle` remain exported but become thin wrappers that call `dispatchBattleEvent` internally. This keeps any callers (admin tools, tests) working while the new code paths take over.
+
+#### 6. Out of scope (explicitly)
+
+- No LiveKit changes. LiveKit is already transport-only.
+- No new events bus / queue / pub-sub system; RPC + existing realtime on `battle_matches` / `battle_rounds` is the transport.
+- No audit/event-log table (can be added later if requested).
+- No demo/auto-advance fallbacks exist today; nothing to remove.
+
+### Files touched
+
+- new: `supabase/migrations/<ts>_battle_engine_state.sql`
+- new: `src/lib/battle-engine.functions.ts` (dispatch + getBattleRoomState)
+- edit: `src/lib/battles.functions.ts` (convert host fns to thin wrappers; tighten vote precondition)
+- edit: `src/components/stream/BattleArena.tsx` (read room state, emit events only)
+- new (small): `src/components/stream/BattleHostControls.tsx` (extracted button strip)
+
+### Verification
+
+- Migration applied; new columns visible on `battle_rounds` / `battle_matches`.
+- Smoke: create match → START_ROUND → PLAY_SIDE_A_TRACK → PLAY_SIDE_B_TRACK → OPEN_VOTING → cast vote → CLOSE_VOTING → FINALIZE_ROUND → NEXT_ROUND.
+- Out-of-order events (e.g., OPEN_VOTING before both tracks played) return `INVALID_TRANSITION` and the UI toasts the error without DB drift.
