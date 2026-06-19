@@ -36,6 +36,7 @@ import { PlayArenaView } from "@/routes/play.$room";
 import { useArtistSubscription } from "@/hooks/useArtistSubscription";
 import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
+import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -717,6 +718,26 @@ function StreamStudio() {
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
 
+  // Resolved host identity — brand name takes priority over personal name.
+  const [selfIdentity, setSelfIdentity] = useState<{ display_name: string | null; avatar_url: string | null; is_brand: boolean }>({
+    display_name: null, avatar_url: null, is_brand: false,
+  });
+  useEffect(() => {
+    if (!auth.user?.id) { setSelfIdentity({ display_name: null, avatar_url: null, is_brand: false }); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.from("profiles").select(IDENTITY_COLUMNS).eq("id", auth.user!.id).maybeSingle();
+      if (cancelled) return;
+      const eff = effectiveIdentity(data as any);
+      setSelfIdentity({
+        display_name: eff.display_name ?? auth.user!.user_metadata?.full_name ?? auth.user!.user_metadata?.name ?? null,
+        avatar_url: eff.avatar_url ?? auth.user!.user_metadata?.avatar_url ?? null,
+        is_brand: eff.is_brand,
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [auth.user?.id]);
+
   // Keep the host's presence row fresh while the studio tab is open.
   useStagePresence(stream?.id ?? null, auth.user?.id ?? null);
 
@@ -931,7 +952,7 @@ function StreamStudio() {
                     canManage
                     primaryHostId={auth.user?.id ?? null}
                     hostTransferMode={hostTransferMode}
-                    selfProfile={auth.user ? { user_id: auth.user.id, display_name: auth.user.user_metadata?.full_name ?? auth.user.user_metadata?.name ?? null, avatar_url: auth.user.user_metadata?.avatar_url ?? null } : null}
+                    selfProfile={auth.user ? { user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url } : null}
                   />
                 )}
               </>
