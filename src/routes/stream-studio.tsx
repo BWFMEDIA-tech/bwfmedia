@@ -27,7 +27,6 @@ import { ModeToggle } from "@/components/stream/ModeToggle";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { setHostTransferMode as setHostTransferModeFn } from "@/lib/stage.functions";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { BattleArena } from "@/components/stream/BattleArena";
 import { NowPlayingHeader } from "@/components/stream/NowPlayingHeader";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
