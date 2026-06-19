@@ -39,9 +39,7 @@ function StagePage() {
   const { room } = Route.useLoaderData();
   const auth = useAuth();
   const navigate = useNavigate();
-  const fetchToken = useServerFn(getLiveKitToken);
   const updateStatus = useServerFn(setStageStatus);
-  const [token, setToken] = useState<string | null>(null);
 
   const isHost = auth.user?.id === room.host_id;
 
