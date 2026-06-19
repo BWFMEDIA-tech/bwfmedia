@@ -55,12 +55,16 @@ export function StageAudioShell({
   useEffect(() => {
     let active = true;
     (async () => {
+      const { IDENTITY_COLUMNS, effectiveIdentity } = await import("@/lib/host-identity");
       const { data } = await supabase
         .from("profiles")
-        .select("display_name, avatar_url")
+        .select(IDENTITY_COLUMNS)
         .eq("id", userId)
         .maybeSingle();
-      if (active) setMe((data as any) ?? null);
+      if (active) {
+        const eff = effectiveIdentity(data as any);
+        setMe({ display_name: eff.display_name, avatar_url: eff.avatar_url });
+      }
     })();
     return () => { active = false; };
   }, [userId]);

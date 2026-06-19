@@ -242,13 +242,17 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
     if (!ids.length) { setMap({}); return; }
     let cancelled = false;
     (async () => {
+      const { IDENTITY_COLUMNS, effectiveIdentity } = await import("@/lib/host-identity");
       const { data } = await supabase
         .from("profiles")
-        .select("id, display_name, avatar_url")
+        .select(IDENTITY_COLUMNS)
         .in("id", ids);
       if (cancelled) return;
       const next: Record<string, ProfileLite> = {};
-      (data ?? []).forEach((p: any) => { next[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url }; });
+      (data ?? []).forEach((p: any) => {
+        const eff = effectiveIdentity(p);
+        next[p.id] = { display_name: eff.display_name, avatar_url: eff.avatar_url };
+      });
       setMap(next);
     })();
     return () => { cancelled = true; };

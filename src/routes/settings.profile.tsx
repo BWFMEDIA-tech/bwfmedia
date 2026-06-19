@@ -36,6 +36,8 @@ function ProfileSettingsPage() {
   const [bannerUrl, setBannerUrl] = useState("");
   const [memberSince, setMemberSince] = useState<string>("");
   const [socials, setSocials] = useState<SocialLink[]>([]);
+  const [brandName, setBrandName] = useState("");
+  const [brandAvatarUrl, setBrandAvatarUrl] = useState("");
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
@@ -51,7 +53,7 @@ function ProfileSettingsPage() {
     (async () => {
       const uid = user.id;
       const [{ data: p }, { data: ls }, msgRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, location, genres, member_since").eq("id", uid).maybeSingle(),
+        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, location, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
         supabase.from("user_social_links").select("id, provider, handle, url, enabled").eq("user_id", uid),
         supabase.from("stream_messages").select("id", { count: "exact", head: true }).eq("user_id", uid),
       ]);
@@ -64,6 +66,8 @@ function ProfileSettingsPage() {
       setLocation((p as any)?.location ?? "");
       setGenres(((p as any)?.genres ?? []) as string[]);
       setMemberSince((p as any)?.member_since ?? "");
+      setBrandName((p as any)?.brand_name ?? "");
+      setBrandAvatarUrl((p as any)?.brand_avatar_url ?? "");
       const existing = (ls ?? []) as SocialLink[];
       const filled = SOCIAL_PROVIDERS.map((sp) => existing.find((e) => e.provider === sp.key) ?? { provider: sp.key, handle: "", url: "", enabled: false });
       setSocials(filled);
@@ -116,6 +120,8 @@ function ProfileSettingsPage() {
       username: username.trim() || null,
       location: location.trim() || null,
       genres,
+      brand_name: brandName.trim() || null,
+      brand_avatar_url: brandAvatarUrl.trim() || null,
     } as any);
     if (error) { setSaving(false); toast.error(error.message); return; }
     // upsert socials
@@ -198,6 +204,32 @@ function ProfileSettingsPage() {
               <div className="mt-1 text-right text-xs text-white/40">{bio.length}/500</div>
             </div>
           </div>
+        </Section>
+
+        <Section title="Brand / Network Identity" icon={<Sparkles className="h-4 w-4 text-red-500" />}>
+          <p className="mb-3 text-xs text-white/50">
+            If you broadcast on behalf of a network, brand, or organization, set the name here.
+            When set, this name and logo replace your personal name everywhere on stage —
+            stage roster, video tiles, audio tiles, chat header, and audience view. Your personal
+            name is only used inside account settings.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Input label="Brand / Network Name" value={brandName} onChange={setBrandName} maxLength={80} />
+            <Input label="Brand Logo URL" value={brandAvatarUrl} onChange={setBrandAvatarUrl} maxLength={500} />
+          </div>
+          {brandName.trim() && (
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-white/10 bg-black/40">
+                {brandAvatarUrl
+                  ? <img src={brandAvatarUrl} alt="" className="h-full w-full object-cover" />
+                  : <Sparkles className="h-4 w-4 text-red-400" />}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-bold text-white">{brandName.trim()}</div>
+                <div className="text-[10px] uppercase tracking-widest text-red-300">Host identity — shown on stage</div>
+              </div>
+            </div>
+          )}
         </Section>
 
         <Section title="Links & Socials" icon={<Share2 className="h-4 w-4 text-red-500" />}>
