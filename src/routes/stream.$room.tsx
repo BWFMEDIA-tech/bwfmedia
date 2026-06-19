@@ -18,6 +18,7 @@ import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
 import { NowPlayingHeader } from "@/components/stream/NowPlayingHeader";
+import joinBgAsset from "@/assets/bwf-join-bg.jpeg.asset.json";
 
 export const Route = createFileRoute("/stream/$room")({
   head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
@@ -141,8 +142,11 @@ function GuestPage() {
 
   if (!lk) {
     return (
-      <div className="min-h-screen bg-[#050509] text-white flex items-center justify-center p-6">
-        <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18] p-6">
+      <div
+        className="min-h-screen bg-[#050509] text-white flex items-center justify-center p-6 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${joinBgAsset.url})` }}
+      >
+        <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18]/85 backdrop-blur-md p-6 shadow-2xl">
           <h1 className="text-2xl font-bold mb-1">Join the stream</h1>
           <p className="text-sm text-white/60 mb-4">Room: <span className="text-white">{room}</span></p>
           <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
