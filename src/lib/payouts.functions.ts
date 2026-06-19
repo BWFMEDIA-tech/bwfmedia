@@ -22,7 +22,7 @@ export const getPayoutOverview = createServerFn({ method: "GET" })
       supabase
         .from("payout_accounts")
         .select(
-          "stripe_account_id, charges_enabled, payouts_enabled, details_submitted, country, default_currency, requirements, updated_at",
+          "charges_enabled, payouts_enabled, details_submitted, country, default_currency, requirements, updated_at",
         )
         .eq("user_id", userId)
         .eq("environment", env)
@@ -76,8 +76,8 @@ export const startConnectOnboarding = createServerFn({ method: "POST" })
     try {
       const stripe = createStripeClient(env);
 
-      // Look up or create the connect account
-      const { data: existing } = await supabase
+      // Look up or create the connect account (admin-only column read)
+      const { data: existing } = await supabaseAdmin
         .from("payout_accounts")
         .select("stripe_account_id")
         .eq("user_id", userId)
@@ -134,7 +134,7 @@ export const refreshConnectAccount = createServerFn({ method: "POST" })
       "@/lib/stripe.server"
     );
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabase
+    const { data: row } = await supabaseAdmin
       .from("payout_accounts")
       .select("stripe_account_id")
       .eq("user_id", userId)
