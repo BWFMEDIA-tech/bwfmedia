@@ -53,6 +53,178 @@ export type Database = {
         }
         Relationships: []
       }
+      battle_matches: {
+        Row: {
+          a_wins: number
+          artist_a_id: string
+          artist_a_name: string | null
+          artist_b_id: string
+          artist_b_name: string | null
+          b_wins: number
+          created_at: string
+          current_round: number
+          ended_at: string | null
+          host_id: string
+          id: string
+          round_seconds: number
+          started_at: string | null
+          status: string
+          stream_id: string
+          total_rounds: number
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          a_wins?: number
+          artist_a_id: string
+          artist_a_name?: string | null
+          artist_b_id: string
+          artist_b_name?: string | null
+          b_wins?: number
+          created_at?: string
+          current_round?: number
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          round_seconds?: number
+          started_at?: string | null
+          status?: string
+          stream_id: string
+          total_rounds?: number
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          a_wins?: number
+          artist_a_id?: string
+          artist_a_name?: string | null
+          artist_b_id?: string
+          artist_b_name?: string | null
+          b_wins?: number
+          created_at?: string
+          current_round?: number
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          round_seconds?: number
+          started_at?: string | null
+          status?: string
+          stream_id?: string
+          total_rounds?: number
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_matches_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      battle_rounds: {
+        Row: {
+          a_votes: number
+          a_weight: number
+          b_votes: number
+          b_weight: number
+          created_at: string
+          ends_at: string | null
+          id: string
+          match_id: string
+          round_number: number
+          started_at: string | null
+          status: string
+          updated_at: string
+          winner_choice: string | null
+        }
+        Insert: {
+          a_votes?: number
+          a_weight?: number
+          b_votes?: number
+          b_weight?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          match_id: string
+          round_number: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner_choice?: string | null
+        }
+        Update: {
+          a_votes?: number
+          a_weight?: number
+          b_votes?: number
+          b_weight?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          match_id?: string
+          round_number?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          winner_choice?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_rounds_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      battle_votes: {
+        Row: {
+          choice: string
+          created_at: string
+          id: string
+          match_id: string
+          round_id: string
+          voter_id: string
+          weight: number
+        }
+        Insert: {
+          choice: string
+          created_at?: string
+          id?: string
+          match_id: string
+          round_id: string
+          voter_id: string
+          weight?: number
+        }
+        Update: {
+          choice?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          round_id?: string
+          voter_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_votes_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battle_votes_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "battle_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       block_bookings: {
         Row: {
           amount_cents: number | null
