@@ -502,18 +502,12 @@ function BroadcastPanel() {
 
         <div>
           <div className="mb-2 text-[11px] font-semibold text-white/60">Stream Output</div>
-          <dl className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px]">
-            <StreamRow label="Platform" value={state.platform} />
-            <StreamRow label="Status" value={state.streaming ? "Streaming" : "Ready"} valueClass={state.streaming ? "text-emerald-400" : "text-white/60"} />
-            <StreamRow label="Bitrate" value={`${state.bitrateKbps} kbps`} />
-            <StreamRow label="Resolution" value={state.resolution} />
-            <StreamRow label="FPS" value={String(state.fps || "—")} />
-          </dl>
+          <OutputSettingsPanel />
           <button
             onClick={async () => {
               if (state.streaming) { engine.setBroadcastEnabled(false); return; }
               if (!state.hasCamera) {
-                try { await engine.acquireCamera(); } catch { toast.error("Camera denied"); return; }
+                try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
               }
               engine.setBroadcastEnabled(true);
             }}
@@ -523,7 +517,7 @@ function BroadcastPanel() {
             )}
             style={state.streaming ? undefined : { background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})` }}
           >
-            <Radio className="h-3.5 w-3.5" /> {state.streaming ? "Stop Stream" : "Start Stream"}
+            <Radio className="h-3.5 w-3.5" /> {state.streaming ? "Stream ON — Stop" : "Stream OFF — Start"}
           </button>
         </div>
       </div>
@@ -536,6 +530,109 @@ function StreamRow({ label, value, valueClass }: { label: string; value: string;
     <div className="flex items-center justify-between">
       <dt className="text-white/50">{label}</dt>
       <dd className={cn("font-semibold text-white", valueClass)}>{value}</dd>
+    </div>
+  );
+}
+
+function OutputSettingsPanel() {
+  const { engine, state } = useMediaEngine();
+  const o = state.output;
+  return (
+    <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px]">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Protocol</span>
+        <div className="flex gap-1">
+          {(["rtmp", "srt", "webrtc"] as const).map((p) => (
+            <button
+              key={p}
+              onClick={() => engine.setOutputSettings({ protocol: p })}
+              className={cn(
+                "rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest transition",
+                o.protocol === p ? "bg-white text-black" : "bg-white/5 text-white/60 hover:bg-white/10",
+              )}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
+      <label className="block">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
+          {o.protocol === "webrtc" ? "WHIP Endpoint" : `${o.protocol.toUpperCase()} URL`}
+        </span>
+        <input
+          type="text"
+          value={o.url}
+          onChange={(e) => engine.setOutputSettings({ url: e.target.value })}
+          placeholder={
+            o.protocol === "rtmp" ? "rtmp://live.example.com/app"
+              : o.protocol === "srt" ? "srt://ingest.example.com:9999"
+              : "https://whip.example.com/publish"
+          }
+          className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1 text-[11px] text-white outline-none focus:border-white/30"
+        />
+      </label>
+      {o.protocol !== "webrtc" && (
+        <label className="block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Stream Key</span>
+          <input
+            type="password"
+            value={o.streamKey}
+            onChange={(e) => engine.setOutputSettings({ streamKey: e.target.value })}
+            placeholder="••••••••"
+            className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1 text-[11px] text-white outline-none focus:border-white/30"
+          />
+        </label>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        <label className="block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">Resolution</span>
+          <select
+            value={o.resolution}
+            onChange={(e) => engine.setOutputSettings({ resolution: e.target.value as any })}
+            className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1 text-[11px] text-white outline-none focus:border-white/30"
+          >
+            <option value="1920x1080">1080p</option>
+            <option value="1280x720">720p</option>
+            <option value="854x480">480p</option>
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">FPS</span>
+          <select
+            value={o.fps}
+            onChange={(e) => engine.setOutputSettings({ fps: Number(e.target.value) as any })}
+            className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1 text-[11px] text-white outline-none focus:border-white/30"
+          >
+            <option value={24}>24</option>
+            <option value={30}>30</option>
+            <option value={60}>60</option>
+          </select>
+        </label>
+      </div>
+      <label className="block">
+        <span className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-widest text-white/50">
+          <span>Bitrate</span>
+          <span className="text-white/70">{o.bitrateKbps} kbps</span>
+        </span>
+        <input
+          type="range"
+          min={500}
+          max={12000}
+          step={250}
+          value={o.bitrateKbps}
+          onChange={(e) => engine.setOutputSettings({ bitrateKbps: Number(e.target.value) })}
+          className="mt-1 w-full accent-white"
+        />
+      </label>
+      <dl className="mt-2 space-y-1 border-t border-white/5 pt-2 text-[11px]">
+        <StreamRow
+          label="Status"
+          value={state.streaming ? "Live" : "Ready"}
+          valueClass={state.streaming ? "text-emerald-400" : "text-white/60"}
+        />
+        <StreamRow label="Capture" value={state.resolution} />
+      </dl>
     </div>
   );
 }

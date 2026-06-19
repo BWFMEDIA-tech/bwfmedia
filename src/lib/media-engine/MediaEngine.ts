@@ -13,6 +13,17 @@ export type SourceKind = "mic" | "participant" | "media";
 
 export type EngineHealth = "ok" | "warning" | "error" | "idle";
 
+export type OutputProtocol = "rtmp" | "srt" | "webrtc";
+
+export interface OutputSettings {
+  protocol: OutputProtocol;
+  url: string;
+  streamKey: string;
+  bitrateKbps: number;
+  resolution: "1920x1080" | "1280x720" | "854x480";
+  fps: 24 | 30 | 60;
+}
+
 export interface EngineError extends FriendlyMediaError {
   id: string;
   source: "mic" | "camera" | "screen" | "stream";
@@ -52,6 +63,7 @@ export interface EngineState {
   broadcastPublishing: boolean;
   encoderHealth: EngineHealth;
   outputHealth: EngineHealth;
+  output: OutputSettings;
 }
 
 type Listener = (s: EngineState) => void;
@@ -91,6 +103,14 @@ export class MediaEngine {
     broadcastPublishing: false,
     encoderHealth: "idle",
     outputHealth: "idle",
+    output: {
+      protocol: "rtmp",
+      url: "",
+      streamKey: "",
+      bitrateKbps: 4500,
+      resolution: "1920x1080",
+      fps: 30,
+    },
   };
 
   /** Initialize the audio graph once. Safe to call repeatedly. */
@@ -305,7 +325,7 @@ export class MediaEngine {
     this.patch({
       broadcastEnabled: on,
       streaming: on,
-      bitrateKbps: on ? 4500 : 0,
+      bitrateKbps: on ? this.state.output.bitrateKbps : 0,
       broadcastPublishing: on && hasVideo,
       encoderHealth: on ? (hasVideo ? "ok" : "warning") : "idle",
       outputHealth: on ? (hasVideo ? "ok" : "warning") : "idle",
@@ -313,6 +333,20 @@ export class MediaEngine {
     if (this.cameraStream) {
       this.cameraStream.getVideoTracks().forEach((t) => (t.enabled = on && this.state.cameraEnabled));
     }
+  }
+
+  /**
+   * Update output (encoder + destination) settings. Safe to call while
+   * streaming — never rebuilds the audio graph, never reacquires devices,
+   * never disconnects the room.
+   */
+  setOutputSettings(partial: Partial<OutputSettings>) {
+    const output = { ...this.state.output, ...partial };
+    const patch: Partial<EngineState> = { output };
+    if (this.state.streaming) {
+      patch.bitrateKbps = output.bitrateKbps;
+    }
+    this.patch(patch);
   }
 
   setMasterMuted(on: boolean) {
