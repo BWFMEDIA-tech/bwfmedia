@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { User, Mic2, Link2, Music, CreditCard, Bell, Palette, Shield, Receipt, Plug, HelpCircle, ExternalLink, Calendar, ShoppingBag } from "lucide-react";
+import { User, Mic2, Link2, Music, CreditCard, Bell, Palette, Shield, Receipt, Plug, HelpCircle, ExternalLink, Calendar, ShoppingBag, Radio } from "lucide-react";
 
 const items = [
   { to: "/settings/profile", label: "Profile", icon: User },
@@ -14,6 +14,7 @@ const items = [
   { to: "/settings/security", label: "Security", icon: Shield },
   { to: "/settings/billing", label: "Billing", icon: Receipt },
   { to: "/settings/connected-apps", label: "Connected Apps", icon: Plug },
+  { to: "/settings/broadcast-help", label: "Broadcast Help", icon: Radio },
 ] as const;
 
 export function SettingsSidebar() {
