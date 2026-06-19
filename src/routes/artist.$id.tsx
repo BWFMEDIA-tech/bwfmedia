@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
-  ListMusic, ThumbsUp, Search, Bell, MessageSquare, ChevronDown,
+  ListMusic, ThumbsUp,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar,
 } from "lucide-react";
