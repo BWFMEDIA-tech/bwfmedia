@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
-  ListMusic, ThumbsUp, Search, Bell, MessageSquare, ChevronDown,
+  ListMusic, ThumbsUp,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar,
 } from "lucide-react";
@@ -95,7 +95,6 @@ function ArtistProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#070708] text-white pb-28">
-      <TopNav />
       <main className="mx-auto max-w-[1400px] px-4 md:px-6 py-6 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6 min-w-0">
           <HeroBanner
@@ -121,42 +120,6 @@ function ArtistProfilePage() {
         </aside>
       </main>
     </div>
-  );
-}
-
-/* ─────────── shell sections ─────────── */
-
-function TopNav() {
-  const links = ["Home", "Play Arena", "Live Shows", "Discover", "Radio", "Charts"];
-  return (
-    <header className="sticky top-0 z-30 border-b border-white/5 bg-[#070708]/80 backdrop-blur-xl">
-      <div className="mx-auto max-w-[1400px] px-4 md:px-6 h-16 flex items-center gap-6">
-        <Link to="/" className="font-anton text-lg tracking-tight">
-          <span className="text-white">BWF</span>
-          <span style={{ color: RED }}> NETWORK</span>
-        </Link>
-        <nav className="hidden md:flex items-center gap-5 text-sm text-white/70">
-          {links.map((l) => (
-            <a key={l} href="#" className="hover:text-white">{l}</a>
-          ))}
-          <button className="flex items-center gap-1 hover:text-white">Browse <ChevronDown className="h-3.5 w-3.5" /></button>
-        </nav>
-        <div className="flex-1 max-w-md ml-auto hidden sm:block">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
-            <input
-              placeholder="Search for songs, artists, shows…"
-              className="w-full bg-white/[0.06] border border-white/10 rounded-full pl-9 pr-4 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-white/30"
-            />
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 hover:bg-white/10"><Bell className="h-4 w-4" /></button>
-          <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 hover:bg-white/10"><MessageSquare className="h-4 w-4" /></button>
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-fuchsia-500/40 to-red-500/40 ring-1 ring-white/10 text-xs font-bold">U</div>
-        </div>
-      </div>
-    </header>
   );
 }
 
