@@ -223,6 +223,7 @@ function BattleView({
   // Fetch each artist's latest track (cover + title) from the play queue for this stream
   // so the battle UI mirrors the song that's actually playing or queued for them.
   const [artistTracks, setArtistTracks] = useState<Record<string, { cover_url: string | null; title: string | null }>>({});
+  const [playingArtistId, setPlayingArtistId] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -246,6 +247,8 @@ function BattleView({
         if (newRank >= 0 && (prevRank < 0 || newRank < prevRank)) map[uid] = { cover_url: row.cover_url, title: row.title };
       }
       setArtistTracks(map);
+      const playingRow = (data as any[]).find((r) => r.status === "playing");
+      setPlayingArtistId(playingRow?.artist_user_id ?? null);
     };
     load();
     const ch = supabase
@@ -331,6 +334,7 @@ function BattleView({
           name={match.artist_a_name ?? "Artist A"}
           coverUrl={artistTracks[match.artist_a_id]?.cover_url ?? null}
           trackTitle={artistTracks[match.artist_a_id]?.title ?? null}
+          isPlaying={playingArtistId === match.artist_a_id}
           wins={match.a_wins}
           pct={aPct}
           isLeading={aScore > bScore}
@@ -345,6 +349,7 @@ function BattleView({
           name={match.artist_b_name ?? "Artist B"}
           coverUrl={artistTracks[match.artist_b_id]?.cover_url ?? null}
           trackTitle={artistTracks[match.artist_b_id]?.title ?? null}
+          isPlaying={playingArtistId === match.artist_b_id}
           wins={match.b_wins}
           pct={bPct}
           isLeading={bScore > aScore}
@@ -411,6 +416,7 @@ function ArtistSide({
   name,
   coverUrl,
   trackTitle,
+  isPlaying,
   wins,
   pct,
   isLeading,
@@ -424,6 +430,7 @@ function ArtistSide({
   name: string;
   coverUrl: string | null;
   trackTitle: string | null;
+  isPlaying?: boolean;
   wins: number;
   pct: number;
   isLeading: boolean;
@@ -436,6 +443,7 @@ function ArtistSide({
   const grad = side === "a"
     ? "linear-gradient(135deg, #c53dff, #004bff)"
     : "linear-gradient(135deg, #ff00a6, #00e6ff)";
+  const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
   return (
     <div className={cn("relative flex flex-col items-center gap-2 p-4", side === "a" ? "border-r border-white/10" : "")}>
       {overallWinner && (
@@ -444,15 +452,55 @@ function ArtistSide({
         </div>
       )}
       <div className="text-[10px] uppercase tracking-widest text-white/40">Artist {side.toUpperCase()}</div>
-      <div
-        className="relative h-20 w-20 overflow-hidden rounded-xl border-2"
-        style={{ borderImage: `${grad} 1`, borderColor: side === "a" ? "#c53dff" : "#ff00a6" }}
-      >
-        {coverUrl ? (
-          <img src={coverUrl} alt={trackTitle ?? name} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-white/5">
-            <Swords className="h-6 w-6 text-white/30" />
+      <div className="relative h-28 w-28">
+        {isPlaying && (
+          <>
+            <span
+              className="pointer-events-none absolute inset-0 rounded-full animate-ping"
+              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.5 }}
+            />
+            <span
+              className="pointer-events-none absolute -inset-2 rounded-full animate-ping"
+              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.3, animationDelay: "0.4s" }}
+            />
+            <span
+              className="pointer-events-none absolute -inset-4 rounded-full animate-ping"
+              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.2, animationDelay: "0.8s" }}
+            />
+          </>
+        )}
+        <div
+          className={cn(
+            "relative h-full w-full overflow-hidden rounded-full border-2",
+            isPlaying && "shadow-[0_0_30px_rgba(255,0,166,0.6)]",
+          )}
+          style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
+        >
+          {coverUrl ? (
+            <img
+              src={coverUrl}
+              alt={trackTitle ?? name}
+              className={cn("h-full w-full object-cover", isPlaying && "animate-[spin_8s_linear_infinite]")}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-white/5">
+              <Swords className="h-6 w-6 text-white/30" />
+            </div>
+          )}
+        </div>
+        {isPlaying && (
+          <div className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-end gap-0.5 rounded-full bg-black/70 px-2 py-1 backdrop-blur">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span
+                key={i}
+                className="w-0.5 rounded-full"
+                style={{
+                  height: `${6 + (i % 3) * 4}px`,
+                  background: waveColor,
+                  animation: `eq-bounce 0.9s ease-in-out ${i * 0.12}s infinite`,
+                }}
+              />
+            ))}
           </div>
         )}
       </div>
