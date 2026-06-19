@@ -8,6 +8,7 @@ import type { AuthState } from "@/lib/auth-context";
 import { TipModal } from "@/components/stream/TipModal";
 import { useServerFn } from "@tanstack/react-start";
 import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions";
+import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -80,8 +81,11 @@ export function LiveChat({
       if (cancelled || !data) return;
       const userIds = [...new Set(data.map((r: any) => r.user_id))];
       if (userIds.length) {
-        const { data: profs } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
-        profs?.forEach((p: any) => { profileCache.current[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url }; });
+        const { data: profs } = await supabase.from("profiles").select(IDENTITY_COLUMNS).in("id", userIds);
+        profs?.forEach((p: any) => {
+          const eff = effectiveIdentity(p);
+          profileCache.current[p.id] = { display_name: eff.display_name ?? "Anon", avatar_url: eff.avatar_url };
+        });
       }
       setMessages(data.map((r: any) => ({ ...r, display_name: profileCache.current[r.user_id]?.display_name ?? "Anon", avatar_url: profileCache.current[r.user_id]?.avatar_url ?? null })));
     })();
@@ -95,8 +99,9 @@ export function LiveChat({
           const row = payload.new as any;
           let cached = profileCache.current[row.user_id];
           if (!cached) {
-            const { data } = await supabase.from("profiles").select("display_name, avatar_url").eq("id", row.user_id).maybeSingle();
-            cached = { display_name: data?.display_name ?? "Anon", avatar_url: data?.avatar_url ?? null };
+            const { data } = await supabase.from("profiles").select(IDENTITY_COLUMNS).eq("id", row.user_id).maybeSingle();
+            const eff = effectiveIdentity(data as any);
+            cached = { display_name: eff.display_name ?? "Anon", avatar_url: eff.avatar_url };
             profileCache.current[row.user_id] = cached;
           }
           setMessages((cur) => [...cur, { ...row, display_name: cached.display_name, avatar_url: cached.avatar_url }]);
