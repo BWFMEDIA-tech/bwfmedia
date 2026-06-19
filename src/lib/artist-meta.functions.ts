@@ -7,7 +7,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     const sb: any = supabaseAdmin;
     const id = data.id;
     try {
-      const [profileRes, queueRes, tracksRes, videosRes, streamsRes] = await Promise.all([
+      const [profileRes, queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes] = await Promise.all([
         sb.from("profiles")
           .select("display_name, stage_name, avatar_url, banner_url, bio, location, genre, genres, member_since, created_at")
           .eq("id", id).maybeSingle(),
@@ -15,6 +15,19 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         sb.from("play_tracks").select("like_count, dislike_count").eq("artist_user_id", id),
         sb.from("videos").select("id", { count: "exact", head: true }).eq("user_id", id),
         sb.from("streams").select("id").eq("host_id", id),
+        sb.from("user_social_links")
+          .select("provider, url, handle, sort_order")
+          .eq("user_id", id).eq("enabled", true).order("sort_order", { ascending: true }),
+        sb.from("play_tracks")
+          .select("id, title, cover_url, like_count, dislike_count, duration_seconds, created_at")
+          .eq("artist_user_id", id)
+          .order("like_count", { ascending: false })
+          .limit(8),
+        sb.from("videos")
+          .select("id, title, thumbnail_path, external_url, created_at")
+          .eq("user_id", id)
+          .order("created_at", { ascending: false })
+          .limit(8),
       ]);
 
       const p = profileRes.data ?? {};
@@ -51,6 +64,16 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           likes: likeCount,
           tipsCents,
         },
+        socials: (socialsRes.data ?? []) as Array<{ provider: string; url: string; handle: string | null }>,
+        tracks: (trackListRes.data ?? []) as Array<{
+          id: string; title: string; cover_url: string | null;
+          like_count: number; dislike_count: number;
+          duration_seconds: number | null; created_at: string;
+        }>,
+        videos: (videoListRes.data ?? []) as Array<{
+          id: string; title: string; thumbnail_path: string | null;
+          external_url: string | null; created_at: string;
+        }>,
       };
     } catch {
       return {
@@ -59,6 +82,9 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         location: null as string | null, genre: null as string | null,
         memberSince: null as string | null,
         stats: { songs: 0, videos: 0, likes: 0, tipsCents: 0 },
+        socials: [] as Array<{ provider: string; url: string; handle: string | null }>,
+        tracks: [] as Array<{ id: string; title: string; cover_url: string | null; like_count: number; dislike_count: number; duration_seconds: number | null; created_at: string }>,
+        videos: [] as Array<{ id: string; title: string; thumbnail_path: string | null; external_url: string | null; created_at: string }>,
       };
     }
   });
