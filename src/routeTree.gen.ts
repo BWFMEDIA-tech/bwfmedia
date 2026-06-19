@@ -61,6 +61,7 @@ import { Route as SettingsMerchRouteImport } from './routes/settings.merch'
 import { Route as SettingsMembershipRouteImport } from './routes/settings.membership'
 import { Route as SettingsEventsRouteImport } from './routes/settings.events'
 import { Route as SettingsConnectedAppsRouteImport } from './routes/settings.connected-apps'
+import { Route as SettingsBroadcastHelpRouteImport } from './routes/settings.broadcast-help'
 import { Route as SettingsBillingRouteImport } from './routes/settings.billing'
 import { Route as SettingsArtistInfoRouteImport } from './routes/settings.artist-info'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings.appearance'
@@ -366,6 +367,11 @@ const SettingsEventsRoute = SettingsEventsRouteImport.update({
 const SettingsConnectedAppsRoute = SettingsConnectedAppsRouteImport.update({
   id: '/connected-apps',
   path: '/connected-apps',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsBroadcastHelpRoute = SettingsBroadcastHelpRouteImport.update({
+  id: '/broadcast-help',
+  path: '/broadcast-help',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsBillingRoute = SettingsBillingRouteImport.update({
@@ -677,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
+  '/settings/broadcast-help': typeof SettingsBroadcastHelpRoute
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
@@ -776,6 +783,7 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
+  '/settings/broadcast-help': typeof SettingsBroadcastHelpRoute
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
@@ -877,6 +885,7 @@ export interface FileRoutesById {
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
+  '/settings/broadcast-help': typeof SettingsBroadcastHelpRoute
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
@@ -979,6 +988,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/artist-info'
     | '/settings/billing'
+    | '/settings/broadcast-help'
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
@@ -1078,6 +1088,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/artist-info'
     | '/settings/billing'
+    | '/settings/broadcast-help'
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
@@ -1178,6 +1189,7 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/artist-info'
     | '/settings/billing'
+    | '/settings/broadcast-help'
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
@@ -1641,6 +1653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsConnectedAppsRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/settings/broadcast-help': {
+      id: '/settings/broadcast-help'
+      path: '/broadcast-help'
+      fullPath: '/settings/broadcast-help'
+      preLoaderRoute: typeof SettingsBroadcastHelpRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/billing': {
       id: '/settings/billing'
       path: '/billing'
@@ -2020,6 +2039,7 @@ interface SettingsRouteChildren {
   SettingsAppearanceRoute: typeof SettingsAppearanceRoute
   SettingsArtistInfoRoute: typeof SettingsArtistInfoRoute
   SettingsBillingRoute: typeof SettingsBillingRoute
+  SettingsBroadcastHelpRoute: typeof SettingsBroadcastHelpRoute
   SettingsConnectedAppsRoute: typeof SettingsConnectedAppsRoute
   SettingsEventsRoute: typeof SettingsEventsRoute
   SettingsMembershipRoute: typeof SettingsMembershipRoute
@@ -2035,6 +2055,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsAppearanceRoute: SettingsAppearanceRoute,
   SettingsArtistInfoRoute: SettingsArtistInfoRoute,
   SettingsBillingRoute: SettingsBillingRoute,
+  SettingsBroadcastHelpRoute: SettingsBroadcastHelpRoute,
   SettingsConnectedAppsRoute: SettingsConnectedAppsRoute,
   SettingsEventsRoute: SettingsEventsRoute,
   SettingsMembershipRoute: SettingsMembershipRoute,
