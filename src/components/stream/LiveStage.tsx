@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { RecordButton } from "./RecordButton";
 import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
+import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -37,14 +38,31 @@ interface LiveStageProps {
 }
 
 export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
+  const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
+  if (fatal) {
+    return (
+      <LiveKitFatalBanner
+        kind={fatal.kind}
+        detail={fatal.detail}
+        onRetry={() => setFatal(null)}
+      />
+    );
+  }
   return (
     <LiveKitRoom
       token={token}
       serverUrl={serverUrl}
-      connect
+      connect={!fatal}
       video={false}
       audio={false}
-      onError={(e) => toast.error(`Stream error: ${friendlyDeviceError(e)}`)}
+      onError={(e) => {
+        const kind = classifyLiveKitError(e);
+        if (kind) {
+          setFatal({ kind, detail: e instanceof Error ? e.message : String(e) });
+          return;
+        }
+        toast.error(`Stream error: ${friendlyDeviceError(e)}`);
+      }}
       onMediaDeviceFailure={(failure) => toast.error(friendlyDeviceError(failure))}
       className="contents"
     >
