@@ -521,7 +521,35 @@ function SpeakerBubble({
         </div>
       </div>
       {canManage && !isPlaceholder && (
-        <div className="relative" ref={menuRef}>
+        <div className="flex items-center gap-1.5">
+          {/* Quick host actions — always visible on the tile so the host
+              doesn't need to open the Manage menu for the most common ops. */}
+          {!isSelf && onToggleMute && (
+            <button
+              type="button"
+              title={isMuted ? "Unmute mic" : "Mute mic"}
+              onClick={onToggleMute}
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-full border text-white/90 transition",
+                isMuted
+                  ? "border-amber-400/60 bg-amber-500/15 hover:bg-amber-500/25"
+                  : "border-white/15 hover:bg-white/10",
+              )}
+            >
+              {isMuted ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+            </button>
+          )}
+          {!isSelf && !isPrimaryHost && onKick && (
+            <button
+              type="button"
+              title="Remove from stage"
+              onClick={onKick}
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-red-500/40 text-red-300 transition hover:bg-red-500/15"
+            >
+              <UserMinus className="h-3.5 w-3.5" />
+            </button>
+          )}
+          <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen((v) => !v)}
             className="flex items-center gap-1 rounded-full border border-white/15 px-2 py-0.5 text-[10px] font-semibold text-white/80 hover:bg-white/5"
@@ -678,6 +706,7 @@ function SpeakerBubble({
               )}
             </div>
           )}
+          </div>
         </div>
       )}
       {!canManage && false && onDemote && <button onClick={onDemote} />}
