@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Mic, MicOff, Video, VideoOff, MonitorUp, Radio, UserPlus,
   Activity, CircleDot, Users, Volume2, VolumeX, Users2, SlidersHorizontal,
@@ -491,7 +491,7 @@ function ParticipantRow({
           {enabled ? "On" : "Off"}
         </button>
         <button
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setOpen((v: boolean) => !v)}
           className={cn(
             "grid h-7 w-7 place-items-center rounded-md transition",
             open ? "bg-white/15 text-white" : "text-white/60 hover:bg-white/5 hover:text-white",
