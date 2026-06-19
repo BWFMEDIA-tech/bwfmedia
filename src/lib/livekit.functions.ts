@@ -18,6 +18,17 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
     if (!apiKey || !apiSecret || !wsUrl) throw new Error("LiveKit not configured");
 
     const { userId, supabase } = context;
+
+    // Banned users keep their JWT, so block at token issuance — otherwise
+    // they could call the LiveKit SDK directly and publish to any room.
+    const { data: ban } = await supabase
+      .from("user_bans")
+      .select("id, expires_at")
+      .eq("user_id", userId)
+      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+      .maybeSingle();
+    if (ban) throw new Error("Your account has been suspended.");
+
     const { data: profile } = await supabase
       .from("profiles")
       .select("display_name")
@@ -39,11 +50,30 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       .maybeSingle();
     const isHost = (stream?.host_id === userId) || !!adminRow;
 
-    // Allow every authenticated participant to publish audio so guests can
-    // unmute themselves on any device (desktop, iPad, iPhone, etc.). The
-    // UI and StageMicSync still default listeners to muted; the host can
-    // mute via `muted_until`.
-    const canPublish = true;
+    // Mirror LiveKit publish rights to the stage role recorded in
+    // `stage_participants`. Only host / co_host / speaker get canPublish;
+    // listeners (and anyone who hasn't been promoted) cannot publish even
+    // by driving the LiveKit SDK directly. Hosts/admins always can.
+    let canPublish = isHost;
+    if (!canPublish && stream) {
+      const { data: streamIdRow } = await supabase
+        .from("streams")
+        .select("id")
+        .eq("room_name", data.roomName)
+        .maybeSingle();
+      if (streamIdRow?.id) {
+        const { data: sp } = await supabase
+          .from("stage_participants")
+          .select("stage_role")
+          .eq("stream_id", streamIdRow.id)
+          .eq("user_id", userId)
+          .maybeSingle();
+        const role = sp?.stage_role as string | undefined;
+        if (role === "host" || role === "co_host" || role === "speaker") {
+          canPublish = true;
+        }
+      }
+    }
 
     const at = new AccessToken(apiKey, apiSecret, {
       identity: userId,
