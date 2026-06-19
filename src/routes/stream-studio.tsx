@@ -34,6 +34,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
 import { useArtistSubscription } from "@/hooks/useArtistSubscription";
+import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
+import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
