@@ -1,69 +1,131 @@
-# Live Studio: Unified Media Engine
+# Separate Stage Mode and Broadcast Mode
 
-Refactor the current mode-switched studio into a single-page Live Production Dashboard with one persistent Media Engine. Stage and Broadcast become independent toggle layers feeding a shared audio mixer + encoder, never separate apps.
+Split the current single-stream-with-mode-toggle architecture into two independent systems that can be composed: Stage Rooms (interactive participation) and Broadcasts (one-to-many distribution).
 
-## Architecture
+## Goals
+
+- Stage Rooms own live participation (LiveKit, participants, queue, battles, mic).
+- Broadcasts own distribution (viewers, playback source, monetization, analytics).
+- A Broadcast can reference 0..N Stage Rooms (plus uploaded/prerecorded content) without further migrations.
+- Switching modes never disconnects anyone — Stage LiveKit room persists when a Broadcast is started or stopped.
+
+---
+
+## 1. Database (migration)
+
+### New tables
+
+`stage_rooms`
+- `id uuid pk`
+- `host_id uuid -> auth.users`
+- `title text`, `description text`
+- `status text` — `idle | live | ended` (trigger-validated lifecycle)
+- `stage_state jsonb` (open_mic, battle_active, locked, etc.)
+- `audience_count int default 0`
+- `livekit_room text` (LiveKit room name; reuses existing identity helper)
+- `started_at`, `ended_at`, `created_at`, `updated_at`
+
+`broadcasts`
+- `id uuid pk`
+- `host_id uuid -> auth.users`
+- `stream_title text`, `description text`
+- `stream_status text` — `scheduled | live | ended` (trigger-validated)
+- `viewer_count int default 0`
+- `playback_source jsonb` — discriminated union: `{ kind: 'stage', stage_room_ids: uuid[] } | { kind: 'upload', asset_url } | { kind: 'prerecord', recording_id }`
+- `featured_content jsonb`
+- `started_at`, `ended_at`, `scheduled_for`, `created_at`, `updated_at`
+
+`broadcast_stage_links` (join — enables one broadcast → many stages)
+- `broadcast_id uuid -> broadcasts on delete cascade`
+- `stage_room_id uuid -> stage_rooms on delete cascade`
+- `role text` — `primary | secondary`
+- `pk (broadcast_id, stage_room_id)`
+
+GRANTs + RLS for all three (authenticated CRUD scoped to host; anon SELECT only on `broadcasts` for public viewer pages and on `stage_rooms` minimal fields for audience pages). Realtime enabled on all three.
+
+### Compatibility with existing `streams` table
+
+We do not drop or alter `streams`. New entities live alongside it. Existing `streams.mode` keeps working for legacy `/stream/$room` and `/play/$room` paths during the transition. Stage and Broadcast queries on new routes use the new tables exclusively.
+
+---
+
+## 2. Server functions (`src/lib/`)
+
+`stage-rooms.functions.ts`
+- `createStageRoom`, `getStageRoom`, `updateStageState`, `endStageRoom`, `listMyStageRooms`
+
+`broadcasts.functions.ts`
+- `createBroadcast`, `getBroadcast`, `startBroadcast`, `endBroadcast`, `updateBroadcast`, `linkStageToBroadcast`, `unlinkStageFromBroadcast`, `listMyBroadcasts`, `listLiveBroadcasts`
+
+All host-mutating fns use `requireSupabaseAuth` + host check. Public reads (`getBroadcast`, `listLiveBroadcasts`) use the server publishable client with narrow `TO anon` policies so SSR works for shareable broadcast URLs.
+
+---
+
+## 3. Routes
+
+New independent routes:
+
+- `src/routes/stage.$roomId.tsx` (auth-gated, under `_authenticated/`) — interactive stage UI: LiveKit shell, participants, queue, battles, raise-hand, host controls. Reuses `StageAudioShell`, `LiveStage`, `BackstageQueue`, `BattleArena`, `RaiseHandPanel`.
+- `src/routes/broadcast.$broadcastId.tsx` (public) — viewer page: player + chat + viewer count + tips/merch. SSR with loader-fed OG metadata.
+- `src/routes/_authenticated/broadcast.$broadcastId.manage.tsx` — host control surface for a broadcast.
+
+Existing `/stream/$room` and `/play/$room` stay intact (legacy + Play Mode). `ModeToggle.tsx` is no longer used in the new dashboard but is left in place for legacy stream routes.
+
+---
+
+## 4. Studio Dashboard
+
+Refactor `src/components/studio/LiveProductionDashboard.tsx`:
 
 ```text
-INPUTS                    ROUTING                OUTPUTS
-─────────────────        ─────────────         ──────────────────
-Mic (getUserMedia)  ┐                      ┌─ Local monitor
-Guest mics (WebRTC) ├──► AudioMixer ──────►├─ Stage publish (LiveKit audio)
-Audience mics       │   (GainNodes,        │
-Media/music         ┘    AudioContext)     │
-                                           │
-Camera ─────────────┐                      │
-Screen share        ├──► Encoder ─────────►├─ Broadcast publish (LiveKit video
-Video media         ┘   (video track +     │   + mixed audio track)
-                        mixed audio)       └─ RTMP/SRT egress
+┌──────────────────────────────┬──────────────────────────────┐
+│ STAGE ROOM PANEL             │ BROADCAST PANEL              │
+│ - Status (idle/live)          │ - Status (offline/live)      │
+│ - Create / End stage          │ - Create / Start / End       │
+│ - Participants list           │ - Linked stage rooms (multi) │
+│ - Artist queue                │ - Add upload / prerecord     │
+│ - Battle controls             │ - Viewer count + analytics   │
+│ - Host controls (lock/mic)    │ - Monetization (tips/merch)  │
+│                              │ - Featured content slot      │
+└──────────────────────────────┴──────────────────────────────┘
 ```
 
-Single `MediaEngine` singleton (React context) owns:
-- One persistent `AudioContext` + master `GainNode`
-- Per-source `MediaStreamAudioSourceNode` + `GainNode` (mic, each participant, each media element)
-- One `MediaStreamAudioDestinationNode` producing the program-mix track
-- Camera/screen `MediaStream`s held independently
-- One LiveKit `Room` connection, joined once per session
+Two new components:
+- `src/components/studio/StageRoomPanel.tsx`
+- `src/components/studio/BroadcastPanel.tsx`
 
-Toggles mutate `enabled`/`gain.value`/`track.enabled` and call `room.localParticipant.setMicrophoneEnabled/setCameraEnabled/publishTrack/unpublishTrack`. Never `disconnect()` the room, never re-call `getUserMedia`, never rebuild the `AudioContext` on a toggle.
+The old `ModeToggle` is removed from this dashboard. Each panel operates independently — starting/stopping a broadcast does not touch the stage's LiveKit room.
 
-## Files
+---
 
-New:
-- `src/lib/media-engine/MediaEngine.ts` — class wrapping AudioContext, source registry, mixer graph, camera/screen acquisition, LiveKit publish helpers. Idempotent `acquireMic()`, `acquireCamera()`, `acquireScreen()` cache the stream; `release*` stops the track. `setStageEnabled(bool)` / `setBroadcastEnabled(bool)` only flip publish state.
-- `src/lib/media-engine/MediaEngineContext.tsx` — React provider that constructs one engine per room, exposes `useMediaEngine()` with reactive state (levels, source list, toggle states, stream stats).
-- `src/components/studio/LiveProductionDashboard.tsx` — the new single-page layout matching the reference: header (Stage/Broadcast toggles + quick controls), Stage(Audio) panel, Broadcast(Video) panel, System Status sidebar. Mobile-first responsive (stacks Stage above Broadcast under `md`).
-- `src/components/studio/StagePanel.tsx` — mic meter, participants list with per-row On/Off, Invite button. Reads from engine, never owns media.
-- `src/components/studio/BroadcastPanel.tsx` — program preview `<video>` bound to the camera/screen MediaStream, Stream Output info (platform, key, status, bitrate, resolution, fps), Stop/Start Stream button.
-- `src/components/studio/QuickControls.tsx` — Mute All, Camera, End Broadcast.
-- `src/components/studio/SystemStatusCard.tsx` — Stage/Broadcast/Mixer/Stream status dots derived from engine state.
+## 5. Session persistence
 
-Changed:
-- `src/routes/stream-studio.tsx` — replace mode-switched render with `<MediaEngineProvider><LiveProductionDashboard/></MediaEngineProvider>`. Keep auth + stream lookup. Mount existing `PlayArenaView`, `StageRoom`, `LiveChat` below the dashboard so PlayArena functionality stays intact.
-- `src/components/stream/ModeToggle.tsx` — delete or repurpose as the two independent Stage/Broadcast toggle pills used in the header. Toggles do not unmount anything.
-- `src/lib/stage-connection-context.tsx` — keep, but the engine becomes the single owner of `LocalParticipant` audio/video publish state; existing context calls route through the engine instead of issuing its own `setMicrophoneEnabled`.
+- LiveKit room name is owned by `stage_rooms.livekit_room`, never derived from a broadcast.
+- `BroadcastPanel` calls `startBroadcast({ broadcastId, stageRoomIds: [currentStageRoomId] })` which inserts/updates `broadcast_stage_links` and flips `stream_status` to `live` — no LiveKit reconnection, no token refresh, no participant disruption.
+- Ending a broadcast only updates broadcast rows; the stage room stays `live` until the host explicitly ends it.
 
-Untouched: voting flow, PlayArena, StageRoom permissions, all server functions, DB.
+---
 
-## Toggle semantics (must hold)
+## 6. Out of scope (this iteration)
 
-| Action | Effect | What is NEVER done |
-|---|---|---|
-| Stage OFF | unpublish local mic track, mute participant subscribers' gain to 0 | room disconnect, AudioContext close, getUserMedia stop |
-| Stage ON | re-publish cached mic track, restore gains | new getUserMedia, new AudioContext |
-| Broadcast OFF | unpublish camera + stop RTMP egress | stop camera track, tear down encoder graph |
-| Broadcast ON | publish cached camera track + start egress | new getUserMedia for camera, rebuild mix |
-| Mute All | set master output gain to 0 | unpublish anything |
-| Camera button | `videoTrack.enabled = !enabled` | acquire/release device |
+- Migrating existing live `streams` rows into the new tables (kept side-by-side).
+- Viewer-side broadcast video pipeline beyond a placeholder player surface that reads `playback_source`.
+- Analytics dashboards beyond raw `viewer_count`.
 
-All four state combinations (Stage on/off × Broadcast on/off) supported with zero media reinit.
+---
 
-## Out of scope this pass
+## Technical notes
 
-- Real RTMP/SRT egress wiring (LiveKit Egress API call stub is fine; UI shows status from existing recording function).
-- Audio-mixer DSP beyond gain + browser-native echo/noise suppression flags.
-- Multi-camera switching UI.
+- Lifecycle triggers mirror existing `play_tracks_enforce_lifecycle` pattern.
+- `playback_source` is jsonb (not enum) so future `kind` values (e.g. `multi`, `simulcast`) don't require migrations.
+- RLS: hosts manage their own rows; `has_role(_, 'admin')` bypass for moderation; anon SELECT only on `broadcasts` columns needed for public viewer rendering and on `stage_rooms` for audience count.
+- New routes use the canonical loader pattern (`ensureQueryData` + `useSuspenseQuery`) with `errorComponent` + `notFoundComponent`.
+- `og:image` set on the broadcast leaf route from loader data.
 
-## Verification
+## Execution order
 
-After implementing, drive Playwright against `/stream-studio` while signed in: toggle Stage off→on→off and Broadcast off→on→off in sequence, assert in console that `AudioContext` instance id and `getUserMedia` call count never increase after the first acquisition.
+1. Migration (new tables, GRANTs, RLS, triggers, realtime publication).
+2. Server functions for both entities.
+3. New routes (stage + broadcast viewer + broadcast manage).
+4. Refactor `LiveProductionDashboard` into Stage + Broadcast panels.
+5. Verify build, smoke-test the two panels operate independently.

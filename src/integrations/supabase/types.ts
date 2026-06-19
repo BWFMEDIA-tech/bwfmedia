@@ -439,6 +439,90 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_stage_links: {
+        Row: {
+          broadcast_id: string
+          created_at: string
+          role: string
+          stage_room_id: string
+        }
+        Insert: {
+          broadcast_id: string
+          created_at?: string
+          role?: string
+          stage_room_id: string
+        }
+        Update: {
+          broadcast_id?: string
+          created_at?: string
+          role?: string
+          stage_room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_stage_links_broadcast_id_fkey"
+            columns: ["broadcast_id"]
+            isOneToOne: false
+            referencedRelation: "broadcasts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broadcast_stage_links_stage_room_id_fkey"
+            columns: ["stage_room_id"]
+            isOneToOne: false
+            referencedRelation: "stage_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broadcasts: {
+        Row: {
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          featured_content: Json
+          host_id: string
+          id: string
+          playback_source: Json
+          scheduled_for: string | null
+          started_at: string | null
+          stream_status: string
+          stream_title: string
+          updated_at: string
+          viewer_count: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          featured_content?: Json
+          host_id: string
+          id?: string
+          playback_source?: Json
+          scheduled_for?: string | null
+          started_at?: string | null
+          stream_status?: string
+          stream_title?: string
+          updated_at?: string
+          viewer_count?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          featured_content?: Json
+          host_id?: string
+          id?: string
+          playback_source?: Json
+          scheduled_for?: string | null
+          started_at?: string | null
+          stream_status?: string
+          stream_title?: string
+          updated_at?: string
+          viewer_count?: number
+        }
+        Relationships: []
+      }
       chat_timeouts: {
         Row: {
           created_at: string
@@ -1570,6 +1654,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stage_rooms: {
+        Row: {
+          audience_count: number
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          host_id: string
+          id: string
+          livekit_room: string
+          stage_state: Json
+          started_at: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience_count?: number
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          livekit_room: string
+          stage_state?: Json
+          started_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          audience_count?: number
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          livekit_room?: string
+          stage_state?: Json
+          started_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       stream_messages: {
         Row: {
