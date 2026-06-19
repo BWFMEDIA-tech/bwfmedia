@@ -20,7 +20,18 @@ function admin() {
 export const Route = createFileRoute("/api/public/hooks/process-payouts")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        // Cron-only endpoint. Require the service role key as a Bearer
+        // token so unauthenticated attackers cannot trigger Stripe transfers.
+        const authHeader = request.headers.get("Authorization") ?? "";
+        const expected = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (
+          !expected ||
+          !authHeader.startsWith("Bearer ") ||
+          authHeader.slice(7) !== expected
+        ) {
+          return Response.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const db = admin();
         const { data: queued, error } = await db
           .from("payout_requests")
