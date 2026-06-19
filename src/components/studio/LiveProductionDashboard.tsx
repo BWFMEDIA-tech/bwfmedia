@@ -50,10 +50,14 @@ export function LiveProductionDashboard({
       <ErrorBanners />
 
       {/* Top toggle bar */}
+      {(() => null)()}
       <ToggleHeader
         stage={state.stageEnabled}
         broadcast={state.broadcastEnabled}
-        muted={state.masterMuted}
+        muted={
+          state.sources.filter((s) => s.kind === "participant").length > 0 &&
+          state.sources.filter((s) => s.kind === "participant").every((s) => !s.enabled)
+        }
         camera={state.cameraEnabled}
         onStage={async (v) => {
           if (v && !state.hasMic) {
@@ -67,7 +71,17 @@ export function LiveProductionDashboard({
           }
           engine.setBroadcastEnabled(v);
         }}
-        onMuteAll={() => engine.setMasterMuted(!state.masterMuted)}
+        onMuteAll={() => {
+          const participants = state.sources.filter((s) => s.kind === "participant");
+          if (participants.length === 0) {
+            toast.info("No participants to mute");
+            return;
+          }
+          const allMuted = participants.every((s) => !s.enabled);
+          const target = allMuted; // if all muted, unmute; else mute all
+          participants.forEach((p) => engine.setParticipantEnabled(p.id, target));
+          toast.success(target ? "All participants unmuted" : "All participants muted");
+        }}
         onCamera={async () => {
           if (!state.hasCamera) {
             try { await engine.acquireCamera(); } catch (e) { notifyMediaError(e, "camera"); return; }
