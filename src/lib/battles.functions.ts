@@ -103,58 +103,13 @@ export const startNextRound = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ matchId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const m = await assertMatchHost(supabase, userId, data.matchId);
-    if (m.status === "completed" || m.status === "cancelled") {
-      throw new Error("Match already finished");
-    }
-    if (m.current_round >= m.total_rounds) {
-      throw new Error("All rounds already played");
-    }
-
-    // Ensure no other round is still live for this match.
-    await supabase
-      .from("battle_rounds")
-      .update({ status: "closed" })
-      .eq("match_id", data.matchId)
-      .eq("status", "live");
-
-    const nextNumber = m.current_round + 1;
-    const { data: full } = await supabase
-      .from("battle_matches")
-      .select("round_seconds")
-      .eq("id", data.matchId)
-      .single();
-    const seconds = (full?.round_seconds as number | undefined) ?? 60;
-
-    const now = new Date();
-    const endsAt = new Date(now.getTime() + seconds * 1000);
-    const { data: round, error: rErr } = await supabase
-      .from("battle_rounds")
-      .upsert(
-        {
-          match_id: data.matchId,
-          round_number: nextNumber,
-          status: "live",
-          started_at: now.toISOString(),
-          ends_at: endsAt.toISOString(),
-        },
-        { onConflict: "match_id,round_number" },
-      )
-      .select("*")
-      .single();
-    if (rErr) throw new Error(rErr.message);
-
-    await supabase
-      .from("battle_matches")
-      .update({
-        status: "live",
-        current_round: nextNumber,
-        started_at: m.status === "pending" ? now.toISOString() : undefined,
-      })
-      .eq("id", data.matchId);
-
-    return round;
+    // Thin wrapper for backward-compat. All state machine logic lives in the
+    // Battle Engine (battle-engine.functions.ts). Do not add logic here.
+    const { dispatchBattleEvent } = await import("./battle-engine.functions");
+    return (dispatchBattleEvent as any).handler({
+      data: { matchId: data.matchId, type: "START_ROUND" },
+      context,
+    });
   });
 
 export const endRound = createServerFn({ method: "POST" })
@@ -163,70 +118,22 @@ export const endRound = createServerFn({ method: "POST" })
     z.object({ matchId: z.string().uuid(), roundId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const m = await assertMatchHost(supabase, userId, data.matchId);
-
-    const { data: round } = await supabase
-      .from("battle_rounds")
-      .select("*")
-      .eq("id", data.roundId)
-      .eq("match_id", data.matchId)
-      .maybeSingle();
-    if (!round) throw new Error("Round not found");
-    if (round.status === "closed") return { round, match: m };
-
-    const aScore = (round.a_weight as number) || 0;
-    const bScore = (round.b_weight as number) || 0;
-    const winner: "a" | "b" | "tie" = aScore === bScore ? "tie" : aScore > bScore ? "a" : "b";
-
-    await supabase
-      .from("battle_rounds")
-      .update({ status: "closed", winner_choice: winner })
-      .eq("id", data.roundId);
-
-    const aWins = (m.a_wins as number) + (winner === "a" ? 1 : 0);
-    const bWins = (m.b_wins as number) + (winner === "b" ? 1 : 0);
-    const isLastRound = (m.current_round as number) >= (m.total_rounds as number);
-
-    if (isLastRound) {
-      const overallWinner =
-        aWins === bWins ? null : aWins > bWins ? (m.artist_a_id as string) : (m.artist_b_id as string);
-      await supabase
-        .from("battle_matches")
-        .update({
-          a_wins: aWins,
-          b_wins: bWins,
-          winner_id: overallWinner,
-          status: "completed",
-          ended_at: new Date().toISOString(),
-        })
-        .eq("id", data.matchId);
-    } else {
-      await supabase
-        .from("battle_matches")
-        .update({ a_wins: aWins, b_wins: bWins })
-        .eq("id", data.matchId);
-    }
-
-    return { ok: true, winner, aWins, bWins, completed: isLastRound };
+    const { dispatchBattleEvent } = await import("./battle-engine.functions");
+    return (dispatchBattleEvent as any).handler({
+      data: { matchId: data.matchId, type: "END_ROUND" },
+      context,
+    });
   });
 
 export const cancelBattle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ matchId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    await assertMatchHost(supabase, userId, data.matchId);
-    await supabase
-      .from("battle_rounds")
-      .update({ status: "closed" })
-      .eq("match_id", data.matchId)
-      .eq("status", "live");
-    await supabase
-      .from("battle_matches")
-      .update({ status: "cancelled", ended_at: new Date().toISOString() })
-      .eq("id", data.matchId);
-    return { ok: true };
+    const { dispatchBattleEvent } = await import("./battle-engine.functions");
+    return (dispatchBattleEvent as any).handler({
+      data: { matchId: data.matchId, type: "CANCEL_BATTLE" },
+      context,
+    });
   });
 
 export const castBattleVote = createServerFn({ method: "POST" })
@@ -245,14 +152,12 @@ export const castBattleVote = createServerFn({ method: "POST" })
 
     const { data: round } = await supabase
       .from("battle_rounds")
-      .select("id, match_id, status, ends_at")
+      .select("id, match_id, status, ends_at, voting_status")
       .eq("id", data.roundId)
       .maybeSingle();
     if (!round) throw new Error("Round not found");
     if (round.status !== "live") throw new Error("Voting is closed");
-    if (round.ends_at && new Date(round.ends_at as string).getTime() < Date.now()) {
-      throw new Error("Voting is closed");
-    }
+    if (round.voting_status !== "open") throw new Error("Voting is closed");
 
     // Boost weight = consume 1 boost credit via existing RPC (returns true on
     // success). Default weight is 1.
