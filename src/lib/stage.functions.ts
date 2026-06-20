@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { RoomServiceClient } from "livekit-server-sdk";
+import { TrackSource } from "@livekit/protocol";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertHostOrMod(supabase: any, userId: string, streamId: string) {
@@ -49,6 +51,43 @@ async function logHostAction(
     });
   } catch (e) {
     console.warn("audit log failed", e);
+  }
+}
+
+async function syncLiveKitPublishPermission(
+  supabase: any,
+  streamId: string,
+  targetUserId: string,
+  stageRole: "host" | "co_host" | "speaker" | "listener" | "green_room",
+) {
+  const apiKey = process.env.LIVEKIT_API_KEY;
+  const apiSecret = process.env.LIVEKIT_API_SECRET;
+  const wsUrl = process.env.LIVEKIT_URL;
+  if (!apiKey || !apiSecret || !wsUrl) return;
+
+  const { data: stream } = await supabase
+    .from("streams")
+    .select("room_name")
+    .eq("id", streamId)
+    .maybeSingle();
+  if (!stream?.room_name) return;
+
+  const canPublish = stageRole === "host" || stageRole === "co_host" || stageRole === "speaker";
+  const serviceUrl = wsUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
+  const roomClient = new RoomServiceClient(serviceUrl, apiKey, apiSecret);
+  try {
+    await roomClient.updateParticipant(stream.room_name, targetUserId, undefined, {
+      canPublish,
+      canSubscribe: true,
+      canPublishData: true,
+      canPublishSources: canPublish
+        ? [TrackSource.MICROPHONE, TrackSource.CAMERA, TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO]
+        : [],
+    });
+  } catch (e: any) {
+    if (!/participant.*not.*found|not.*found|404/i.test(String(e?.message ?? e))) {
+      console.warn("LiveKit permission sync failed", e);
+    }
   }
 }
 
