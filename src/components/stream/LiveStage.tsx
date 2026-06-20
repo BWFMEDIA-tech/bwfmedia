@@ -125,6 +125,7 @@ function PublishSync({ publish }: { publish: boolean }) {
         prev.current = false;
         return;
       }
+      if (localParticipant.permissions?.canPublish === false) return;
 
       const [micResult, cameraResult] = await Promise.allSettled([
         localParticipant.setMicrophoneEnabled(true),
