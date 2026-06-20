@@ -45,6 +45,11 @@ export const Route = createFileRoute("/play/")({
   component: PlayArenaDashboard,
 });
 
+Route.update({
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(arenaQuery(() => getArenaDashboard())),
+});
+
 function PlayArenaDashboard() {
   const fn = useServerFn(getArenaDashboard);
   const { data } = useSuspenseQuery(arenaQuery(() => fn()));
