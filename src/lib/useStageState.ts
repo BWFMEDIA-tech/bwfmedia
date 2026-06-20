@@ -63,21 +63,30 @@ export function useStageState(streamId: string | null) {
     const refreshParticipants = async () => {
       const { data } = await supabase.from("stage_participants").select("*").eq("stream_id", streamId);
       if (cancelled || !data) return;
-      setParticipants(await hydrateProfiles(data as any));
+      const next = (await hydrateProfiles(data as any)) as StageParticipant[];
+      if (cancelled) return;
+      // PATCH-style merge: preserve object identity for rows whose payload
+      // hasn't materially changed so consumers that depend on participants
+      // by reference don't trigger reconnect/remount on heartbeat ticks.
+      setParticipants((prev) => mergeById(prev, next));
     };
     const refreshHands = async () => {
       const { data } = await supabase.from("raise_hand_requests")
         .select("*").eq("stream_id", streamId).eq("status", "pending")
         .order("created_at", { ascending: true });
       if (cancelled || !data) return;
-      setHands(await hydrateProfiles(data as any));
+      const next = (await hydrateProfiles(data as any)) as HandRequest[];
+      if (cancelled) return;
+      setHands((prev) => mergeById(prev, next));
     };
     const refreshQueue = async () => {
       const { data } = await supabase.from("stream_queue")
         .select("*").eq("stream_id", streamId).neq("status", "removed")
         .order("position", { ascending: true });
       if (cancelled || !data) return;
-      setQueue(await hydrateProfiles(data as any));
+      const next = (await hydrateProfiles(data as any)) as QueueEntry[];
+      if (cancelled) return;
+      setQueue((prev) => mergeById(prev, next));
     };
 
     refreshParticipants(); refreshHands(); refreshQueue();
@@ -93,4 +102,36 @@ export function useStageState(streamId: string | null) {
   }, [streamId]);
 
   return { participants, hands, queue };
+}
+
+// Merge incoming rows with the previous array by `id`, reusing existing
+// object references when nothing changed. Returns the previous array
+// reference unchanged when the lists are deeply equivalent — keeping
+// downstream effects/keys stable across realtime ticks.
+function mergeById<T extends { id: string } & Record<string, any>>(prev: T[], next: T[]): T[] {
+  const prevById = new Map(prev.map((row) => [row.id, row] as const));
+  let changed = prev.length !== next.length;
+  const merged = next.map((row) => {
+    const existing = prevById.get(row.id);
+    if (existing && shallowEqual(existing, row)) return existing;
+    changed = true;
+    return row;
+  });
+  if (!changed) {
+    // Also confirm order is identical.
+    for (let i = 0; i < prev.length; i++) {
+      if (prev[i] !== merged[i]) { changed = true; break; }
+    }
+  }
+  return changed ? merged : prev;
+}
+
+function shallowEqual(a: Record<string, any>, b: Record<string, any>): boolean {
+  const ak = Object.keys(a);
+  const bk = Object.keys(b);
+  if (ak.length !== bk.length) return false;
+  for (const k of ak) {
+    if (a[k] !== b[k]) return false;
+  }
+  return true;
 }

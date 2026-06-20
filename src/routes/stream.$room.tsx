@@ -69,8 +69,16 @@ function GuestPage() {
         { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
         (p) => {
           const r = p.new as any;
-          setStreamMode((r.mode ?? "broadcast") as "broadcast" | "stage" | "play");
-          if (typeof r.viewer_count === "number") setViewerCount(r.viewer_count);
+          // Guard: only update when the value actually changes. Without this,
+          // any unrelated UPDATE on the streams row (e.g. viewer_count tick)
+          // would call setStreamMode with the same value and force the entire
+          // LiveKit subtree to remount on the next render, kicking guests
+          // back to the audience.
+          const nextMode = (r.mode ?? "broadcast") as "broadcast" | "stage" | "play";
+          setStreamMode((prev) => (prev === nextMode ? prev : nextMode));
+          if (typeof r.viewer_count === "number") {
+            setViewerCount((prev) => (prev === r.viewer_count ? prev : r.viewer_count));
+          }
         },
       )
       .subscribe();
