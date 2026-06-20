@@ -342,12 +342,14 @@ export const promoteToHost = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
       if (e2) throw new Error(e2.message);
+      await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "host");
       // 2) original host -> co_host
       const { error: e3 } = await supabase.from("stage_participants").upsert(
         { stream_id: data.streamId, user_id: stream.host_id, stage_role: "co_host" },
         { onConflict: "stream_id,user_id" },
       );
       if (e3) throw new Error(e3.message);
+      await syncLiveKitPublishPermission(supabase, data.streamId, stream.host_id, "co_host");
       await logHostAction(supabase, {
         actorId: userId, action: "transfer_ownership",
         streamId: data.streamId, targetUserId: data.targetUserId,
@@ -361,6 +363,7 @@ export const promoteToHost = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
       if (error) throw new Error(error.message);
+      await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, newRole);
       await logHostAction(supabase, {
         actorId: userId, action: data.mode === "host" ? "promote_host" : "promote_co_host",
         streamId: data.streamId, targetUserId: data.targetUserId,
@@ -398,6 +401,7 @@ export const revokeHostPrivileges = createServerFn({ method: "POST" })
       { onConflict: "stream_id,user_id" },
     );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "speaker");
     await logHostAction(supabase, {
       actorId: userId, action: "revoke_host",
       streamId: data.streamId, targetUserId: data.targetUserId,
@@ -437,6 +441,7 @@ export const demoteToAudience = createServerFn({ method: "POST" })
       { onConflict: "stream_id,user_id" },
     );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "listener");
 
     await logHostAction(supabase, {
       actorId: userId, action: "demote_to_audience",
