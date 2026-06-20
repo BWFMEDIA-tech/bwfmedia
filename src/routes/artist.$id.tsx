@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
@@ -13,7 +13,6 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
 import { toast } from "sonner";
-import { useEffect } from "react";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
