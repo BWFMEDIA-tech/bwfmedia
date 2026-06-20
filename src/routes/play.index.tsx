@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Mic2,
   Swords,
@@ -23,13 +23,12 @@ import {
 } from "lucide-react";
 import { getArenaDashboard, type ArenaDashboard } from "@/lib/play-arena.functions";
 
-const arenaQuery = (fn: () => Promise<ArenaDashboard>) =>
-  queryOptions({
-    queryKey: ["arena-dashboard"],
-    queryFn: fn,
-    staleTime: 15_000,
-    refetchInterval: 20_000,
-  });
+const EMPTY_DASHBOARD: ArenaDashboard = {
+  liveBattle: null,
+  trendingStream: null,
+  queue: [],
+  totals: { liveStreams: 0, liveBattles: 0, activeArtists: 0, totalViewers: 0 },
+};
 
 export const Route = createFileRoute("/play/")({
   head: () => ({
@@ -47,7 +46,13 @@ export const Route = createFileRoute("/play/")({
 
 function PlayArenaDashboard() {
   const fn = useServerFn(getArenaDashboard);
-  const { data } = useSuspenseQuery(arenaQuery(() => fn()));
+  const { data } = useQuery({
+    queryKey: ["arena-dashboard"],
+    queryFn: () => fn(),
+    staleTime: 15_000,
+    refetchInterval: 20_000,
+    initialData: EMPTY_DASHBOARD,
+  });
   return (
     <div className="min-h-screen bg-[#06060d] text-white pt-20 pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
