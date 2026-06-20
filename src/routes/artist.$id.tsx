@@ -266,6 +266,7 @@ function fmtDur(s: number | null) {
 function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
   const preview = !isAuthenticated;
+  const [showSignInModal, setShowSignInModal] = useState(false);
   const playable = tracks.filter((t) => !!t.audio_url).map((t) => ({
     id: t.id,
     title: t.title,
@@ -278,12 +279,7 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
 
   useEffect(() => {
     if (!preview) { player.setPreviewLimitHandler(null); return; }
-    player.setPreviewLimitHandler(() => {
-      toast("Sign in to hear the full song", {
-        description: "Previews are limited to 30 seconds.",
-        action: { label: "Sign in", onClick: () => { window.location.href = "/login"; } },
-      });
-    });
+    player.setPreviewLimitHandler(() => setShowSignInModal(true));
     return () => player.setPreviewLimitHandler(null);
   }, [preview, player]);
   return (
@@ -337,6 +333,38 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
           ))}
         </ul>
       )}
+      <Dialog open={showSignInModal} onOpenChange={setShowSignInModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in to keep listening</DialogTitle>
+            <DialogDescription>
+              You've reached the 30-second preview. Create a free account or sign in to hear the full song.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSignInModal(false)}
+              className="px-4 py-2 rounded-full text-xs font-semibold border border-white/15 text-white/80 hover:bg-white/5"
+            >
+              Maybe later
+            </button>
+            <Link
+              to="/signup"
+              className="px-4 py-2 rounded-full text-xs font-semibold border border-white/15 text-white hover:bg-white/10"
+            >
+              Create account
+            </Link>
+            <Link
+              to="/login"
+              className="px-4 py-2 rounded-full text-xs font-semibold text-white"
+              style={{ background: RED }}
+            >
+              Sign in
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
