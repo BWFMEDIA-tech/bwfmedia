@@ -233,6 +233,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     // force-disable here — that would override their manual Unmute tap on
     // iOS / iPad / desktop. The host can still mute them via `muted_until`.
     if (canSpeak) {
+      if (localParticipant.permissions?.canPublish === false) return;
       localParticipant
         .setMicrophoneEnabled(true)
         .then(() => {
