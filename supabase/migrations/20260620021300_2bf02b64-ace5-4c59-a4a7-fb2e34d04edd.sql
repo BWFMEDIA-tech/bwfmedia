@@ -1,0 +1,1 @@
+REVOKE SELECT (stripe_transfer_id, stripe_destination_id) ON public.payout_requests FROM anon, authenticated;
