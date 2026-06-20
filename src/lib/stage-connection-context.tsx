@@ -3,15 +3,15 @@ import { useLocalParticipant, useRemoteParticipants } from "@livekit/components-
 import { ParticipantEvent, RoomEvent, type Participant } from "livekit-client";
 import { useRoomContext } from "@livekit/components-react";
 
-const ConnectedIdentitiesContext = createContext<Set<string>>(new Set());
-const SpeakingIdentitiesContext = createContext<Set<string>>(new Set());
+const ConnectedIdentitiesContext = createContext<Set<string> | null>(null);
+const SpeakingIdentitiesContext = createContext<Set<string> | null>(null);
 
 export function useConnectedIdentities() {
   return useContext(ConnectedIdentitiesContext);
 }
 
 export function useSpeakingIdentities() {
-  return useContext(SpeakingIdentitiesContext);
+  return useContext(SpeakingIdentitiesContext) ?? new Set<string>();
 }
 
 /** Must be rendered inside a <LiveKitRoom>. Tracks identities currently
