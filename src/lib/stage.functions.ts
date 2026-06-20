@@ -173,6 +173,7 @@ export const respondHand = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (spErr) throw new Error(spErr.message);
+    await syncLiveKitPublishPermission(supabase, req.stream_id, req.user_id, stageRole);
     await supabase.from("raise_hand_requests").update({ status: "accepted" }).eq("id", req.id);
     return { ok: true };
   });
@@ -215,6 +216,7 @@ export const setStageRole = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, data.stageRole);
     return { ok: true };
   });
 
