@@ -175,13 +175,11 @@ export function StageAudioShell({
   );
 }
 
-function StageMicSync({ streamId, userId, onTokenRefresh }: { streamId: string; userId: string; onTokenRefresh?: (token: string) => void }) {
+function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
   const { localParticipant } = useLocalParticipant();
-  const room = useRoomContext();
   const [role, setRole] = useState<string | null>(null);
   const [mutedUntil, setMutedUntil] = useState<string | null>(null);
   const [prevCanSpeak, setPrevCanSpeak] = useState<boolean | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -220,33 +218,15 @@ function StageMicSync({ streamId, userId, onTokenRefresh }: { streamId: string; 
     // force-disable here — that would override their manual Unmute tap on
     // iOS / iPad / desktop. The host can still mute them via `muted_until`.
     if (canSpeak) {
-      const tokenCanPublish = localParticipant.permissions?.canPublish ?? true;
-      if (!tokenCanPublish && onTokenRefresh && room?.name && !refreshing) {
-        // Guest was just promoted but their existing LiveKit token was minted
-        // as a listener (canPublish=false). Re-mint and hot-swap so the room
-        // reconnects with publish permissions.
-        setRefreshing(true);
-        getLiveKitToken({ data: { roomName: room.name } })
-          .then((t) => {
-            console.log("[stage-audio] Token refreshed after promotion", { role });
-            onTokenRefresh(t.token);
-          })
-          .catch((err) => {
-            console.error("[stage-audio] Token refresh failed", err);
-            toast.error(err?.message || "Could not enable microphone");
-          })
-          .finally(() => setRefreshing(false));
-      } else {
-        localParticipant
-          .setMicrophoneEnabled(true)
-          .then(() => {
-            console.log("[stage-audio] Mic enabled for stage role", { role });
-          })
-          .catch((err) => {
-            console.error("[stage-audio] Audio device error", err);
-            toast.error(err?.message || "Microphone unavailable");
-          });
-      }
+      localParticipant
+        .setMicrophoneEnabled(true)
+        .then(() => {
+          console.log("[stage-audio] Mic enabled for stage role", { role });
+        })
+        .catch((err) => {
+          console.error("[stage-audio] Audio device error", err);
+          toast.error(err?.message || "Microphone unavailable");
+        });
     } else if (isHostMuted) {
       localParticipant.setMicrophoneEnabled(false).catch(() => {});
     }
@@ -256,7 +236,7 @@ function StageMicSync({ streamId, userId, onTokenRefresh }: { streamId: string; 
       toast.info(isHostMuted ? "You've been muted by the host" : "You're back in the audience");
     }
     setPrevCanSpeak(canSpeak);
-  }, [role, mutedUntil, localParticipant, room?.name, onTokenRefresh, refreshing]);
+  }, [role, mutedUntil, localParticipant]);
 
   return null;
 }
