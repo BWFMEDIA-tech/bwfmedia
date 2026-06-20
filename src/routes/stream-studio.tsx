@@ -39,6 +39,7 @@ import { useArtistSubscription } from "@/hooks/useArtistSubscription";
 import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
+import { SiteHeader } from "@/components/site/SiteHeader";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -856,6 +857,7 @@ function StreamStudio() {
   return (
     <div className="min-h-screen bg-[#050509] text-white">
       <MediaEngineProvider>
+      <SiteHeader />
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="flex flex-1 flex-col">
