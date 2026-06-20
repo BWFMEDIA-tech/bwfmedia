@@ -63,7 +63,7 @@ export function useStageState(streamId: string | null) {
     const refreshParticipants = async () => {
       const { data } = await supabase.from("stage_participants").select("*").eq("stream_id", streamId);
       if (cancelled || !data) return;
-      const next = await hydrateProfiles(data as any);
+      const next = (await hydrateProfiles(data as any)) as StageParticipant[];
       if (cancelled) return;
       // PATCH-style merge: preserve object identity for rows whose payload
       // hasn't materially changed so consumers that depend on participants
@@ -75,7 +75,7 @@ export function useStageState(streamId: string | null) {
         .select("*").eq("stream_id", streamId).eq("status", "pending")
         .order("created_at", { ascending: true });
       if (cancelled || !data) return;
-      const next = await hydrateProfiles(data as any);
+      const next = (await hydrateProfiles(data as any)) as HandRequest[];
       if (cancelled) return;
       setHands((prev) => mergeById(prev, next));
     };
@@ -84,7 +84,7 @@ export function useStageState(streamId: string | null) {
         .select("*").eq("stream_id", streamId).neq("status", "removed")
         .order("position", { ascending: true });
       if (cancelled || !data) return;
-      const next = await hydrateProfiles(data as any);
+      const next = (await hydrateProfiles(data as any)) as QueueEntry[];
       if (cancelled) return;
       setQueue((prev) => mergeById(prev, next));
     };
