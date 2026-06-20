@@ -251,6 +251,7 @@ export const leaveStage = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, userId, "listener");
     return { ok: true };
   });
 
