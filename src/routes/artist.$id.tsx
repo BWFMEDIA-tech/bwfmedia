@@ -112,7 +112,7 @@ function ArtistProfilePage() {
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
           <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
-          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} />
+          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={auth.isAuthenticated} />
           <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
           <ArtistMerchSection userId={id} />
         </div>
