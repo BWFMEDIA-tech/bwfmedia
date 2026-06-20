@@ -12,7 +12,7 @@ import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
-import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
