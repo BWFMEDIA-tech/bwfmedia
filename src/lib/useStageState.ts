@@ -108,7 +108,7 @@ export function useStageState(streamId: string | null) {
 // object references when nothing changed. Returns the previous array
 // reference unchanged when the lists are deeply equivalent — keeping
 // downstream effects/keys stable across realtime ticks.
-function mergeById<T extends { id: string }>(prev: T[], next: T[]): T[] {
+function mergeById<T extends { id: string } & Record<string, any>>(prev: T[], next: T[]): T[] {
   const prevById = new Map(prev.map((row) => [row.id, row] as const));
   let changed = prev.length !== next.length;
   const merged = next.map((row) => {
