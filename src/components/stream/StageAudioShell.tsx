@@ -23,7 +23,6 @@ import { StageConnectionProvider } from "@/lib/stage-connection-context";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
-import { getLiveKitToken } from "@/lib/livekit.functions";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -55,12 +54,6 @@ export function StageAudioShell({
   const [connect, setConnect] = useState(false);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
-  // Token is held in state so we can hot-swap it when a guest gets promoted
-  // to a publishing role (server re-mints with canPublish=true and we
-  // reconnect the LiveKit room with the new permissions).
-  const [activeToken, setActiveToken] = useState(token);
-  useEffect(() => { setActiveToken(token); }, [token]);
-
   // Mirror LiveKit health into the global store so chat/queue surfaces can
   // react and switch to "sync on reconnect" without each page reimplementing.
   useEffect(() => {
@@ -153,7 +146,7 @@ export function StageAudioShell({
 
   return (
     <LiveKitRoom
-      token={activeToken}
+      token={token}
       serverUrl={serverUrl}
       connect
       audio
@@ -170,7 +163,7 @@ export function StageAudioShell({
     >
       <StageConnectionProvider>
         <RoomAudioRenderer />
-        <StageMicSync streamId={streamId} userId={userId} onTokenRefresh={setActiveToken} />
+        <StageMicSync streamId={streamId} userId={userId} />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
         <ReconnectAudioGuard />
