@@ -57,6 +57,7 @@ async function syncLiveKitPublishPermission(
   streamId: string,
   targetUserId: string,
   stageRole: "host" | "co_host" | "speaker" | "listener" | "green_room",
+  options?: { allowCamera?: boolean },
 ) {
   const apiKey = process.env.LIVEKIT_API_KEY;
   const apiSecret = process.env.LIVEKIT_API_SECRET;
@@ -71,19 +72,33 @@ async function syncLiveKitPublishPermission(
   if (!stream?.room_name) return;
 
   const canPublish = stageRole === "host" || stageRole === "co_host" || stageRole === "speaker";
+  // Hosts/co-hosts always keep full A/V. Promoted speakers can be restricted
+  // to audio-only when the host promotes them with the camera toggle OFF —
+  // they then appear on the audio stage but cannot publish a video tile
+  // until the host explicitly grants camera.
+  const allowCamera = options?.allowCamera ?? true;
   const serviceUrl = wsUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
   const [{ RoomServiceClient }, { TrackSource }] = await Promise.all([
     import("livekit-server-sdk"),
     import("@livekit/protocol"),
   ]);
   const roomClient = new RoomServiceClient(serviceUrl, apiKey, apiSecret);
+  const fullSources = [
+    TrackSource.MICROPHONE,
+    TrackSource.CAMERA,
+    TrackSource.SCREEN_SHARE,
+    TrackSource.SCREEN_SHARE_AUDIO,
+  ];
+  const audioOnlySources = [TrackSource.MICROPHONE];
   try {
     await roomClient.updateParticipant(stream.room_name, targetUserId, undefined, {
       canPublish,
       canSubscribe: true,
       canPublishData: true,
       canPublishSources: canPublish
-        ? [TrackSource.MICROPHONE, TrackSource.CAMERA, TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO]
+        ? allowCamera
+          ? fullSources
+          : audioOnlySources
         : [],
     });
   } catch (e: any) {
@@ -153,6 +168,7 @@ export const respondHand = createServerFn({ method: "POST" })
     z.object({
       requestId: z.string().uuid(),
       action: z.enum(["accept_green_room", "accept_stage", "decline"]),
+      allowCamera: z.boolean().optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -175,7 +191,13 @@ export const respondHand = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (spErr) throw new Error(spErr.message);
-    await syncLiveKitPublishPermission(supabase, req.stream_id, req.user_id, stageRole);
+    await syncLiveKitPublishPermission(
+      supabase,
+      req.stream_id,
+      req.user_id,
+      stageRole,
+      { allowCamera: data.allowCamera ?? false },
+    );
     await supabase.from("raise_hand_requests").update({ status: "accepted" }).eq("id", req.id);
     return { ok: true };
   });
