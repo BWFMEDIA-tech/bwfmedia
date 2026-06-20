@@ -12,6 +12,8 @@ import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
