@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
+import { PlayerProvider } from "@/lib/player-context";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +134,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
+        <PlayerProvider>
         <PaymentTestModeBanner />
         <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
@@ -142,6 +144,7 @@ function RootComponent() {
         </div>
         {isChrome && <SiteFooter />}
         <CartDrawer />
+        </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>
   );
