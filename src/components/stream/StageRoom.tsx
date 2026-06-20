@@ -432,12 +432,19 @@ function SpeakerBubble({
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;
   const connected = useConnectedIdentities();
-  const isConnected = connected.has(p.user_id);
+  // When no LiveKit context is mounted (e.g. audience viewer in broadcast
+  // mode), trust the DB connection_status heartbeat instead of forcing
+  // every tile into a "Reconnecting…" state.
+  const hasLiveKitContext = connected !== null;
+  const isConnected = hasLiveKitContext ? connected.has(p.user_id) : true;
   const speaking = useSpeakingIdentities();
   const isSpeaking = speaking.has(p.user_id);
   const isPlaceholder = p.id === "self-host-placeholder";
   const dbStatus = p.connection_status ?? "connected";
-  const isReconnecting = !isPlaceholder && (dbStatus === "reconnecting" || (dbStatus === "connected" && !isConnected));
+  const isReconnecting =
+    !isPlaceholder &&
+    (dbStatus === "reconnecting" ||
+      (hasLiveKitContext && dbStatus === "connected" && !isConnected));
   const isDisconnected = dbStatus === "disconnected";
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
