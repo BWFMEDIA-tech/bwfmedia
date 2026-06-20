@@ -9,7 +9,7 @@ import {
   RoomAudioRenderer,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track, ConnectionQuality } from "livekit-client";
+import { Track, ConnectionQuality, RoomEvent, type Participant } from "livekit-client";
 import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
-import { getLiveKitToken } from "@/lib/livekit.functions";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -41,8 +40,6 @@ interface LiveStageProps {
 
 export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
-  const [activeToken, setActiveToken] = useState(token);
-  useEffect(() => { setActiveToken(token); }, [token]);
 
   // Publish health to the global store; reset on unmount so other surfaces
   // (chat, queue) don't see stale "degraded" state after the user leaves.
@@ -75,7 +72,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
   }
   return (
     <LiveKitRoom
-      token={activeToken}
+      token={token}
       serverUrl={serverUrl}
       connect={!fatal}
       video={false}
@@ -93,16 +90,29 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
     >
       <RoomAudioRenderer />
       <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
-      <PublishSync publish={publish} onTokenRefresh={setActiveToken} />
+      <PublishSync publish={publish} />
     </LiveKitRoom>
   );
 }
 
-function PublishSync({ publish, onTokenRefresh }: { publish: boolean; onTokenRefresh?: (token: string) => void }) {
+function PublishSync({ publish }: { publish: boolean }) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
   const prev = useRef<boolean | null>(null);
-  const refreshing = useRef(false);
+  const [permissionTick, setPermissionTick] = useState(0);
+  useEffect(() => {
+    if (!room) return;
+    const onPermissionsChanged = (_prev: unknown, participant: Participant) => {
+      if (participant.identity === localParticipant?.identity) {
+        setPermissionTick((tick) => tick + 1);
+      }
+    };
+    room.on(RoomEvent.ParticipantPermissionsChanged, onPermissionsChanged);
+    return () => {
+      room.off(RoomEvent.ParticipantPermissionsChanged, onPermissionsChanged);
+    };
+  }, [room, localParticipant?.identity]);
+
   useEffect(() => {
     if (!localParticipant) return;
     (async () => {
@@ -115,25 +125,7 @@ function PublishSync({ publish, onTokenRefresh }: { publish: boolean; onTokenRef
         prev.current = false;
         return;
       }
-
-      // Guest may have joined as listener (canPublish=false). If they were
-      // then promoted to stage, re-mint the token so the room reconnects
-      // with publish permissions before attempting to enable devices.
-      const tokenCanPublish = localParticipant.permissions?.canPublish ?? true;
-      if (!tokenCanPublish && onTokenRefresh && room?.name && !refreshing.current) {
-        refreshing.current = true;
-        try {
-          const t = await getLiveKitToken({ data: { roomName: room.name } });
-          onTokenRefresh(t.token);
-          console.log("[live-stage] Token refreshed after promotion");
-        } catch (err: any) {
-          console.error("[live-stage] Token refresh failed", err);
-          toast.error(err?.message || "Could not enable microphone");
-        } finally {
-          refreshing.current = false;
-        }
-        return; // Room will reconnect with new token; next effect run will publish.
-      }
+      if (localParticipant.permissions?.canPublish === false) return;
 
       const [micResult, cameraResult] = await Promise.allSettled([
         localParticipant.setMicrophoneEnabled(true),
@@ -153,7 +145,7 @@ function PublishSync({ publish, onTokenRefresh }: { publish: boolean; onTokenRef
         prev.current = publish;
       }
     })();
-  }, [publish, localParticipant]);
+  }, [publish, localParticipant, permissionTick]);
   return null;
 }
 

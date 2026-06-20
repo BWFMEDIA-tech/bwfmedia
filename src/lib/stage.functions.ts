@@ -52,6 +52,47 @@ async function logHostAction(
   }
 }
 
+async function syncLiveKitPublishPermission(
+  supabase: any,
+  streamId: string,
+  targetUserId: string,
+  stageRole: "host" | "co_host" | "speaker" | "listener" | "green_room",
+) {
+  const apiKey = process.env.LIVEKIT_API_KEY;
+  const apiSecret = process.env.LIVEKIT_API_SECRET;
+  const wsUrl = process.env.LIVEKIT_URL;
+  if (!apiKey || !apiSecret || !wsUrl) return;
+
+  const { data: stream } = await supabase
+    .from("streams")
+    .select("room_name")
+    .eq("id", streamId)
+    .maybeSingle();
+  if (!stream?.room_name) return;
+
+  const canPublish = stageRole === "host" || stageRole === "co_host" || stageRole === "speaker";
+  const serviceUrl = wsUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
+  const [{ RoomServiceClient }, { TrackSource }] = await Promise.all([
+    import("livekit-server-sdk"),
+    import("@livekit/protocol"),
+  ]);
+  const roomClient = new RoomServiceClient(serviceUrl, apiKey, apiSecret);
+  try {
+    await roomClient.updateParticipant(stream.room_name, targetUserId, undefined, {
+      canPublish,
+      canSubscribe: true,
+      canPublishData: true,
+      canPublishSources: canPublish
+        ? [TrackSource.MICROPHONE, TrackSource.CAMERA, TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO]
+        : [],
+    });
+  } catch (e: any) {
+    if (!/participant.*not.*found|not.*found|404/i.test(String(e?.message ?? e))) {
+      console.warn("LiveKit permission sync failed", e);
+    }
+  }
+}
+
 /** Set stream mode (broadcast/stage) and stage lock */
 export const updateStreamMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -134,6 +175,7 @@ export const respondHand = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (spErr) throw new Error(spErr.message);
+    await syncLiveKitPublishPermission(supabase, req.stream_id, req.user_id, stageRole);
     await supabase.from("raise_hand_requests").update({ status: "accepted" }).eq("id", req.id);
     return { ok: true };
   });
@@ -176,6 +218,7 @@ export const setStageRole = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, data.stageRole);
     return { ok: true };
   });
 
@@ -210,6 +253,7 @@ export const leaveStage = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, userId, "listener");
     return { ok: true };
   });
 
@@ -301,12 +345,14 @@ export const promoteToHost = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
       if (e2) throw new Error(e2.message);
+      await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "host");
       // 2) original host -> co_host
       const { error: e3 } = await supabase.from("stage_participants").upsert(
         { stream_id: data.streamId, user_id: stream.host_id, stage_role: "co_host" },
         { onConflict: "stream_id,user_id" },
       );
       if (e3) throw new Error(e3.message);
+      await syncLiveKitPublishPermission(supabase, data.streamId, stream.host_id, "co_host");
       await logHostAction(supabase, {
         actorId: userId, action: "transfer_ownership",
         streamId: data.streamId, targetUserId: data.targetUserId,
@@ -320,6 +366,7 @@ export const promoteToHost = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
       if (error) throw new Error(error.message);
+      await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, newRole);
       await logHostAction(supabase, {
         actorId: userId, action: data.mode === "host" ? "promote_host" : "promote_co_host",
         streamId: data.streamId, targetUserId: data.targetUserId,
@@ -357,6 +404,7 @@ export const revokeHostPrivileges = createServerFn({ method: "POST" })
       { onConflict: "stream_id,user_id" },
     );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "speaker");
     await logHostAction(supabase, {
       actorId: userId, action: "revoke_host",
       streamId: data.streamId, targetUserId: data.targetUserId,
@@ -396,6 +444,7 @@ export const demoteToAudience = createServerFn({ method: "POST" })
       { onConflict: "stream_id,user_id" },
     );
     if (error) throw new Error(error.message);
+    await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "listener");
 
     await logHostAction(supabase, {
       actorId: userId, action: "demote_to_audience",
