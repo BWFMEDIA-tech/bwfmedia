@@ -263,8 +263,9 @@ function fmtDur(s: number | null) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
-function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string }) {
+function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
+  const preview = !isAuthenticated;
   const playable = tracks.filter((t) => !!t.audio_url).map((t) => ({
     id: t.id,
     title: t.title,
@@ -272,7 +273,19 @@ function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: st
     audioUrl: t.audio_url as string,
     coverUrl: t.cover_url,
     durationSec: t.duration_seconds,
+    preview,
   }));
+
+  useEffect(() => {
+    if (!preview) { player.setPreviewLimitHandler(null); return; }
+    player.setPreviewLimitHandler(() => {
+      toast("Sign in to hear the full song", {
+        description: "Previews are limited to 30 seconds.",
+        action: { label: "Sign in", onClick: () => { window.location.href = "/login"; } },
+      });
+    });
+    return () => player.setPreviewLimitHandler(null);
+  }, [preview, player]);
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
       <div className="flex items-center justify-between mb-3">
@@ -301,7 +314,7 @@ function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: st
                 type="button"
                 onClick={() => {
                   if (!t.audio_url) return;
-                  const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds };
+                  const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds, preview };
                   if (player.track?.id === t.id) { player.toggle(); } else { player.play(track, playable); }
                 }}
                 disabled={!t.audio_url}
