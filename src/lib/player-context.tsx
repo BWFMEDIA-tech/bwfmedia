@@ -34,6 +34,7 @@ interface PlayerApi extends PlayerState {
   setVolume: (v: number) => void;
   toggleShuffle: () => void;
   cycleRepeat: () => void;
+  setPreviewLimitHandler: (fn: (() => void) | null) => void;
 }
 
 const Ctx = createContext<PlayerApi | null>(null);
@@ -160,7 +161,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const toggleShuffle = useCallback(() => setState((s) => ({ ...s, shuffle: !s.shuffle })), []);
   const cycleRepeat = useCallback(() => setState((s) => ({ ...s, repeat: s.repeat === "off" ? "all" : s.repeat === "all" ? "one" : "off" })), []);
 
-  const value = useMemo<PlayerApi>(() => ({ ...state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat }), [state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat]);
+  const value = useMemo<PlayerApi>(() => ({ ...state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler }), [state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
