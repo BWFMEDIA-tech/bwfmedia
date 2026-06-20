@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Users, Crown, Mic, Headphones, Shield, Sparkles, Search, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { StageParticipant } from "@/lib/useStageState";
 
@@ -173,7 +174,7 @@ export function CrowdPanel({
                 key={p.id}
                 className="flex items-center gap-2.5 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition px-2.5 py-1.5"
               >
-                <div className="relative">
+                <Link to="/user/$id" params={{ id: p.user_id }} className="relative shrink-0">
                   {p.avatar_url ? (
                     <img src={p.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
                   ) : (
@@ -184,7 +185,7 @@ export function CrowdPanel({
                   {onStageNow && (
                     <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0d0d18]" />
                   )}
-                </div>
+                </Link>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-white truncate leading-tight">
                     {p.display_name ?? "Listener"}
