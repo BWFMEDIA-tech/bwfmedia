@@ -36,7 +36,15 @@ export function RaiseHandPanel({ hands, streamId }: { hands: HandRequest[]; stre
     if (!pending) return;
     setBusy(true);
     try {
-      await respond({ data: { requestId: pending.id, action: "accept_stage" } });
+      // Camera toggle controls whether the guest gets a video tile on stage.
+      // OFF = audio-only on stage (no video box). ON = full A/V publish.
+      await respond({
+        data: {
+          requestId: pending.id,
+          action: "accept_stage",
+          allowCamera: camOn,
+        },
+      });
       // Apply optional mute. Camera is host's spoken intent; the guest still
       // controls their own publish state, so we surface a toast for clarity.
       if (!micOn && streamId) {
