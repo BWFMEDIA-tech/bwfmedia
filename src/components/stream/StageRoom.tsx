@@ -479,7 +479,7 @@ function SpeakerBubble({
           background: `conic-gradient(${ringColor}, transparent 70%, ${ringColor})`,
         }}
       >
-        <Link to="/user/$id" params={{ id: p.user_id }}>
+        <Link to="/artist/$id" params={{ id: p.user_id }}>
           {p.avatar_url ? (
             <img src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
           ) : (
