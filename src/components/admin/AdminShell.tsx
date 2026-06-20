@@ -1,30 +1,65 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar, ShoppingBag,
-  Receipt, Banknote, BarChart3, MessageSquare, LifeBuoy, Settings, Shield, ScrollText,
-  Menu, Search, Bell, ChevronDown, LogOut, User as UserIcon, Crown,
+  LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar,
+  BarChart3, Settings, Menu, Search, Bell, ChevronDown, ChevronRight,
+  LogOut, User as UserIcon, Crown, Music2, Video, Mic2, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
-type Item = { to: string; label: string; icon: any; badge?: number };
+type Leaf = { to: string; label: string; search?: Record<string, string> };
+type NavEntry =
+  | { kind: "link"; to: string; label: string; icon: any }
+  | { kind: "group"; key: string; label: string; icon: any; accent?: "broadcast" | "stage"; children: Leaf[] };
 
-const NAV: Item[] = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/streams", label: "Shows & Live Streams", icon: Radio },
-  { to: "/admin/artists", label: "Artists", icon: Star },
-  { to: "/admin/content", label: "Content", icon: PlayCircle },
-  { to: "/admin/events", label: "Events", icon: Calendar },
-  { to: "/admin/merch", label: "Merch Store", icon: ShoppingBag },
-  { to: "/admin/transactions", label: "Transactions", icon: Receipt },
-  { to: "/admin/payouts", label: "Payouts", icon: Banknote },
-  { to: "/admin/analytics", label: "Reports & Analytics", icon: BarChart3 },
-  { to: "/admin/messages", label: "Messages", icon: MessageSquare },
-  { to: "/admin/tickets", label: "Support Tickets", icon: LifeBuoy },
-  { to: "/admin/settings", label: "System Settings", icon: Settings },
-  { to: "/admin/security", label: "Security", icon: Shield },
-  { to: "/admin/audit", label: "Audit Logs", icon: ScrollText },
+const NAV: NavEntry[] = [
+  { kind: "link", to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  {
+    kind: "group", key: "artists", label: "Artists", icon: Star,
+    children: [
+      { to: "/admin/artists", label: "Artist Directory" },
+      { to: "/admin/artists", label: "Verification", search: { tab: "verification" } },
+      { to: "/admin/users", label: "Account Management" },
+      { to: "/admin/users", label: "Permissions", search: { tab: "permissions" } },
+    ],
+  },
+  {
+    kind: "group", key: "music", label: "Music Library", icon: Music2,
+    children: [
+      { to: "/admin/content", label: "All Music" },
+      { to: "/admin/content", label: "Pending Releases", search: { tab: "pending" } },
+      { to: "/admin/content", label: "Content Review", search: { tab: "review" } },
+      { to: "/admin/content", label: "Distribution", search: { tab: "distribution" } },
+    ],
+  },
+  {
+    kind: "group", key: "video", label: "Video Center", icon: Video,
+    children: [
+      { to: "/admin/content", label: "Music Videos", search: { type: "video" } },
+      { to: "/admin/content", label: "Video Approval", search: { type: "video", tab: "approval" } },
+      { to: "/admin/content", label: "Content Moderation", search: { tab: "moderation" } },
+    ],
+  },
+  {
+    kind: "group", key: "broadcast", label: "Broadcast Mode", icon: Radio, accent: "broadcast",
+    children: [
+      { to: "/admin/streams", label: "Live Broadcast Control" },
+      { to: "/admin/streams", label: "Featured Artist Streams", search: { tab: "featured" } },
+      { to: "/admin/events", label: "Event Scheduling" },
+    ],
+  },
+  {
+    kind: "group", key: "stage", label: "Stage Mode", icon: Mic2, accent: "stage",
+    children: [
+      { to: "/admin/streams", label: "Virtual Stage Management", search: { mode: "stage" } },
+      { to: "/admin/streams", label: "Performance Queue", search: { mode: "stage", tab: "queue" } },
+      { to: "/admin/events", label: "Event Production", search: { tab: "production" } },
+      { to: "/admin/streams", label: "Audience Control", search: { mode: "stage", tab: "audience" } },
+    ],
+  },
+  { kind: "link", to: "/admin/settings", label: "Platform Settings", icon: Settings },
+  { kind: "link", to: "/admin/users", label: "User Management", icon: Users },
+  { kind: "link", to: "/admin/analytics", label: "Revenue & Reporting", icon: BarChart3 },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -33,6 +68,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileMenu, setProfileMenu] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    artists: true, music: false, video: false, broadcast: true, stage: true,
+  });
   const isAdmin = auth.roles.includes("admin");
 
   useEffect(() => { setMobileOpen(false); setProfileMenu(false); }, [pathname]);
@@ -64,27 +102,81 @@ export function AdminShell({ children }: { children: ReactNode }) {
           Admin Panel
         </div>
         <nav className="px-2 pb-4">
-          {NAV.map((item) => {
-            const active = pathname === item.to || (item.to !== "/admin" && pathname.startsWith(item.to + "/"));
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`mb-1 flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition ${
-                  active
-                    ? "bg-gradient-to-r from-blue-600/90 to-blue-500/70 text-white shadow-[0_4px_20px_-4px_rgba(59,130,246,0.5)]"
-                    : "text-white/65 hover:bg-white/5 hover:text-white"
-                }`}
-              >
-                <span className="flex items-center gap-3">
+          {NAV.map((entry) => {
+            if (entry.kind === "link") {
+              const active = pathname === entry.to || (entry.to !== "/admin" && pathname.startsWith(entry.to + "/"));
+              const Icon = entry.icon;
+              return (
+                <Link
+                  key={entry.to + entry.label}
+                  to={entry.to}
+                  className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
+                    active
+                      ? "bg-gradient-to-r from-blue-600/90 to-blue-500/70 text-white shadow-[0_4px_20px_-4px_rgba(59,130,246,0.5)]"
+                      : "text-white/65 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
                   <Icon className="h-4 w-4" />
-                  {item.label}
-                </span>
-                {item.badge ? (
-                  <span className="rounded-full bg-blue-500 px-2 py-0.5 text-[10px] font-bold">{item.badge}</span>
-                ) : null}
-              </Link>
+                  {entry.label}
+                </Link>
+              );
+            }
+            const Icon = entry.icon;
+            const open = openGroups[entry.key];
+            const groupActive = entry.children.some((c) => pathname === c.to || pathname.startsWith(c.to + "/"));
+            const accentLabel =
+              entry.accent === "broadcast"
+                ? "from-fuchsia-600/20 to-pink-500/10 border-fuchsia-500/30 text-fuchsia-300"
+                : entry.accent === "stage"
+                ? "from-cyan-500/20 to-blue-600/10 border-cyan-400/30 text-cyan-300"
+                : "";
+            return (
+              <div key={entry.key} className="mb-1">
+                <button
+                  type="button"
+                  onClick={() => setOpenGroups((p) => ({ ...p, [entry.key]: !p[entry.key] }))}
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition ${
+                    entry.accent
+                      ? `border bg-gradient-to-r ${accentLabel}`
+                      : groupActive
+                      ? "bg-white/5 text-white"
+                      : "text-white/65 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    {entry.accent ? <Sparkles className="h-3.5 w-3.5" /> : <Icon className="h-4 w-4" />}
+                    <span className={entry.accent ? "font-bold uppercase tracking-[0.18em] text-[11px]" : ""}>
+                      {entry.label}
+                    </span>
+                  </span>
+                  <ChevronRight className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-90" : ""}`} />
+                </button>
+                {open && (
+                  <div className="mt-1 ml-3 border-l border-white/10 pl-3">
+                    {entry.children.map((c) => {
+                      const active =
+                        pathname === c.to &&
+                        // disambiguate same-route children by label so only one highlights
+                        (!c.search || true);
+                      return (
+                        <Link
+                          key={entry.key + c.label}
+                          to={c.to}
+                          search={c.search as any}
+                          className={`mb-0.5 flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] transition ${
+                            active
+                              ? "text-white"
+                              : "text-white/55 hover:bg-white/5 hover:text-white"
+                          }`}
+                        >
+                          <span className="h-1 w-1 rounded-full bg-current opacity-50" />
+                          {c.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
