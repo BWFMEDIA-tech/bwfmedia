@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import {
   Mic2,
   Swords,
@@ -9,7 +11,6 @@ import {
   Crown,
   Zap,
   Target,
-  Radio,
   Eye,
   Calendar,
   CheckCircle2,
@@ -18,7 +19,17 @@ import {
   Medal,
   Award,
   ChevronRight,
+  Radio,
 } from "lucide-react";
+import { getArenaDashboard, type ArenaDashboard } from "@/lib/play-arena.functions";
+
+const arenaQuery = (fn: () => Promise<ArenaDashboard>) =>
+  queryOptions({
+    queryKey: ["arena-dashboard"],
+    queryFn: fn,
+    staleTime: 15_000,
+    refetchInterval: 20_000,
+  });
 
 export const Route = createFileRoute("/play/")({
   head: () => ({
@@ -35,12 +46,14 @@ export const Route = createFileRoute("/play/")({
 });
 
 function PlayArenaDashboard() {
+  const fn = useServerFn(getArenaDashboard);
+  const { data } = useSuspenseQuery(arenaQuery(() => fn()));
   return (
     <div className="min-h-screen bg-[#06060d] text-white pt-20 pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-        <ProfileHero />
+        <ProfileHero totals={data.totals} />
         <ChoosePath />
-        <LiveArenaStatus />
+        <LiveArenaStatus data={data} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <EarnXp />
           <RankProgression />
@@ -54,7 +67,7 @@ function PlayArenaDashboard() {
 }
 
 /* ---------- Profile Hero ---------- */
-function ProfileHero() {
+function ProfileHero({ totals }: { totals: ArenaDashboard["totals"] }) {
   return (
     <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#11111d] to-[#0a0a14] p-5 sm:p-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
@@ -95,9 +108,9 @@ function ProfileHero() {
         <div className="lg:col-span-2">
           <p className="text-[11px] font-bold tracking-widest text-white/50">RANK STATS</p>
           <div className="mt-2 space-y-1.5 text-sm">
-            <p className="flex items-center gap-2"><Trophy className="h-4 w-4 text-amber-400" /> <span className="font-bold">8</span> <span className="text-white/50">WINS</span></p>
-            <p className="flex items-center gap-2"><Flame className="h-4 w-4 text-[#FF00A6]" /> <span className="font-bold">3</span> <span className="text-white/50">WIN STREAK</span></p>
-            <p className="flex items-center gap-2"><Swords className="h-4 w-4 text-[#00E6FF]" /> <span className="font-bold">24</span> <span className="text-white/50">BATTLES</span></p>
+            <p className="flex items-center gap-2"><Radio className="h-4 w-4 text-emerald-400" /> <span className="font-bold">{totals.liveStreams}</span> <span className="text-white/50">LIVE NOW</span></p>
+            <p className="flex items-center gap-2"><Eye className="h-4 w-4 text-[#00E6FF]" /> <span className="font-bold">{totals.totalViewers.toLocaleString()}</span> <span className="text-white/50">WATCHING</span></p>
+            <p className="flex items-center gap-2"><Swords className="h-4 w-4 text-[#FF00A6]" /> <span className="font-bold">{totals.liveBattles}</span> <span className="text-white/50">BATTLES LIVE</span></p>
           </div>
         </div>
 
@@ -228,19 +241,27 @@ function PathCard({
 }
 
 /* ---------- Live Arena Status ---------- */
-function LiveArenaStatus() {
-  const queue = [
-    { n: 1, name: "NovaRex", status: "Now Performing", color: "text-emerald-400" },
-    { n: 2, name: "J-Soul", status: "Up Next", color: "text-[#C53DFF]" },
-    { n: 3, name: "KJ Blaze", status: "#3 In Queue", color: "text-white/50" },
-    { n: 4, name: "LexX", status: "#4 In Queue", color: "text-white/50" },
-    { n: 5, name: "Aura.wav", status: "#5 In Queue", color: "text-white/50" },
+function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
+  const fallbackQueue = [
+    { id: "1", position: 1, artistName: "NovaRex", artistId: null, avatar: null, status: "playing" as const },
+    { id: "2", position: 2, artistName: "J-Soul", artistId: null, avatar: null, status: "queued" as const },
+    { id: "3", position: 3, artistName: "KJ Blaze", artistId: null, avatar: null, status: "queued" as const },
+    { id: "4", position: 4, artistName: "LexX", artistId: null, avatar: null, status: "queued" as const },
+    { id: "5", position: 5, artistName: "Aura.wav", artistId: null, avatar: null, status: "queued" as const },
   ];
+  const queue = data.queue.length ? data.queue : fallbackQueue;
+  const battle = data.liveBattle;
+  const trending = data.trendingStream;
   return (
     <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-5 sm:p-6">
       <div className="flex items-center gap-3">
         <h3 className="text-xs font-bold tracking-widest text-white/50">LIVE ARENA STATUS</h3>
         <span className="text-xs text-white/50">Real-time overview of active events</span>
+        {(data.totals.liveStreams > 0 || data.totals.liveBattles > 0) && (
+          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> LIVE
+          </span>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -252,19 +273,28 @@ function LiveArenaStatus() {
           </div>
           <p className="text-xs text-white/50 mt-0.5">Who's up next</p>
           <ul className="mt-3 space-y-2 text-sm">
-            {queue.map((q) => (
-              <li key={q.n} className="flex items-center gap-3">
-                <span className="w-4 text-white/40 text-xs">{q.n}</span>
-                <span className="h-7 w-7 rounded-full bg-gradient-to-br from-[#C53DFF] to-[#004BFF] text-[10px] font-bold flex items-center justify-center">
-                  {q.name.slice(0, 2).toUpperCase()}
-                </span>
-                <span className="flex-1 truncate">{q.name}</span>
-                <span className={`text-xs ${q.color} flex items-center gap-1`}>
-                  {q.status === "Now Performing" && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-                  {q.status}
-                </span>
-              </li>
-            ))}
+            {queue.map((q, i) => {
+              const isPlaying = q.status === "playing" || i === 0;
+              const label = isPlaying ? "Now Performing" : i === 1 ? "Up Next" : `#${q.position} In Queue`;
+              const labelColor = isPlaying ? "text-emerald-400" : i === 1 ? "text-[#C53DFF]" : "text-white/50";
+              return (
+                <li key={q.id} className="flex items-center gap-3">
+                  <span className="w-4 text-white/40 text-xs">{q.position}</span>
+                  {q.avatar ? (
+                    <img src={q.avatar} alt={q.artistName} className="h-7 w-7 rounded-full object-cover" />
+                  ) : (
+                    <span className="h-7 w-7 rounded-full bg-gradient-to-br from-[#C53DFF] to-[#004BFF] text-[10px] font-bold flex items-center justify-center">
+                      {q.artistName.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="flex-1 truncate">{q.artistName}</span>
+                  <span className={`text-xs ${labelColor} flex items-center gap-1`}>
+                    {isPlaying && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+                    {label}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
           <button className="mt-4 w-full rounded-lg border border-white/15 px-3 py-2 text-xs font-bold hover:bg-white/5">
             VIEW FULL QUEUE
@@ -278,27 +308,48 @@ function LiveArenaStatus() {
               <Swords className="h-4 w-4 text-[#00E6FF]" />
               <p className="text-sm font-bold text-[#00E6FF]">LIVE BATTLE ARENA</p>
             </div>
-            <span className="rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold">LIVE</span>
+            {battle ? (
+              <span className="rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" /> LIVE
+              </span>
+            ) : (
+              <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/60">IDLE</span>
+            )}
           </div>
           <div className="mt-5 flex items-center justify-around">
-            <div className="text-center">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#00E6FF] to-[#004BFF] ring-2 ring-[#00E6FF]/60 flex items-center justify-center font-bold">AW</div>
-              <p className="mt-2 text-sm font-bold">Aura.wav</p>
-              <p className="text-[10px] text-amber-400">Bronze</p>
-            </div>
+            <BattleSide
+              name={battle?.artistA.name ?? "Aura.wav"}
+              avatar={battle?.artistA.avatar ?? null}
+              wins={battle?.aWins ?? 0}
+              accent="from-[#00E6FF] to-[#004BFF] ring-[#00E6FF]/60"
+            />
             <div className="text-center">
               <p className="text-2xl font-black text-white/60">VS</p>
-              <p className="mt-2 text-xs text-white/50">Round 2</p>
+              <p className="mt-2 text-xs text-white/50">
+                Round {battle?.currentRound ?? 2}
+                {battle ? ` / ${battle.totalRounds}` : ""}
+              </p>
             </div>
-            <div className="text-center">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#FF00A6] to-red-600 ring-2 ring-red-500/60 flex items-center justify-center font-bold">KJ</div>
-              <p className="mt-2 text-sm font-bold">KJ Blaze</p>
-              <p className="text-[10px] text-amber-400">Bronze</p>
-            </div>
+            <BattleSide
+              name={battle?.artistB.name ?? "KJ Blaze"}
+              avatar={battle?.artistB.avatar ?? null}
+              wins={battle?.bWins ?? 0}
+              accent="from-[#FF00A6] to-red-600 ring-red-500/60"
+            />
           </div>
-          <button className="mt-5 w-full rounded-lg bg-[#004BFF] px-3 py-2 text-xs font-bold hover:bg-[#0040d9]">
-            WATCH NOW
-          </button>
+          {battle?.roomName ? (
+            <Link
+              to="/play/$room"
+              params={{ room: battle.roomName }}
+              className="mt-5 block w-full rounded-lg bg-[#004BFF] px-3 py-2 text-center text-xs font-bold hover:bg-[#0040d9]"
+            >
+              WATCH NOW
+            </Link>
+          ) : (
+            <button className="mt-5 w-full rounded-lg bg-[#004BFF]/40 px-3 py-2 text-xs font-bold text-white/70 cursor-not-allowed">
+              NO BATTLE LIVE
+            </button>
+          )}
         </div>
 
         {/* Trending Live Room */}
@@ -308,18 +359,69 @@ function LiveArenaStatus() {
             <p className="text-sm font-bold">TRENDING LIVE ROOM</p>
           </div>
           <p className="text-xs text-white/50 mt-0.5">Top event right now</p>
-          <div className="mt-3 aspect-video rounded-lg bg-gradient-to-br from-[#C53DFF]/40 via-[#FF00A6]/30 to-[#004BFF]/40 flex items-end p-3">
-            <p className="font-bold">Weekly Challenge Finals</p>
+          <div className="mt-3 aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-[#C53DFF]/40 via-[#FF00A6]/30 to-[#004BFF]/40 flex items-end p-3">
+            {trending?.thumbnail && (
+              <img
+                src={trending.thumbnail}
+                alt={trending.title}
+                className="absolute inset-0 h-full w-full object-cover opacity-80"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+            <p className="relative font-bold drop-shadow">
+              {trending?.title ?? "Weekly Challenge Finals"}
+            </p>
           </div>
           <p className="mt-3 text-xs text-white/60 flex items-center gap-1.5">
-            <Eye className="h-3.5 w-3.5" /> 1,245 Watching
+            <Eye className="h-3.5 w-3.5" />{" "}
+            {(trending?.viewerCount ?? 1245).toLocaleString()} Watching
           </p>
-          <button className="mt-3 w-full rounded-lg bg-[#C53DFF] px-3 py-2 text-xs font-bold hover:bg-[#b02ee6]">
-            JOIN ROOM
-          </button>
+          {trending ? (
+            <Link
+              to="/play/$room"
+              params={{ room: trending.roomName }}
+              className="mt-3 block w-full rounded-lg bg-[#C53DFF] px-3 py-2 text-center text-xs font-bold hover:bg-[#b02ee6]"
+            >
+              JOIN ROOM
+            </Link>
+          ) : (
+            <button className="mt-3 w-full rounded-lg bg-[#C53DFF]/40 px-3 py-2 text-xs font-bold text-white/70 cursor-not-allowed">
+              NO LIVE ROOMS
+            </button>
+          )}
         </div>
       </div>
     </section>
+  );
+}
+
+function BattleSide({
+  name,
+  avatar,
+  wins,
+  accent,
+}: {
+  name: string;
+  avatar: string | null;
+  wins: number;
+  accent: string;
+}) {
+  return (
+    <div className="text-center">
+      {avatar ? (
+        <img
+          src={avatar}
+          alt={name}
+          className={`h-16 w-16 rounded-full object-cover ring-2 ${accent.split(" ").pop()}`}
+        />
+      ) : (
+        <div className={`h-16 w-16 rounded-full bg-gradient-to-br ${accent} ring-2 flex items-center justify-center font-bold`}>
+          {name.slice(0, 2).toUpperCase()}
+        </div>
+      )}
+      <p className="mt-2 text-sm font-bold truncate max-w-[6rem]">{name}</p>
+      <p className="text-[10px] text-amber-400">{wins} {wins === 1 ? "win" : "wins"}</p>
+    </div>
   );
 }
 
@@ -484,6 +586,5 @@ function PromoBanner() {
   );
 }
 
-// Keep Link import alive for future routing wire-up
-void Link;
+// silence unused imports kept for future use
 void Radio;
