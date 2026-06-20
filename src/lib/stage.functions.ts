@@ -168,6 +168,7 @@ export const respondHand = createServerFn({ method: "POST" })
     z.object({
       requestId: z.string().uuid(),
       action: z.enum(["accept_green_room", "accept_stage", "decline"]),
+      allowCamera: z.boolean().optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -190,7 +191,13 @@ export const respondHand = createServerFn({ method: "POST" })
         { onConflict: "stream_id,user_id" },
       );
     if (spErr) throw new Error(spErr.message);
-    await syncLiveKitPublishPermission(supabase, req.stream_id, req.user_id, stageRole);
+    await syncLiveKitPublishPermission(
+      supabase,
+      req.stream_id,
+      req.user_id,
+      stageRole,
+      { allowCamera: data.allowCamera ?? false },
+    );
     await supabase.from("raise_hand_requests").update({ status: "accepted" }).eq("id", req.id);
     return { ok: true };
   });
