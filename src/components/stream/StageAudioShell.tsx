@@ -177,9 +177,24 @@ export function StageAudioShell({
 
 function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
   const { localParticipant } = useLocalParticipant();
+  const room = useRoomContext();
   const [role, setRole] = useState<string | null>(null);
   const [mutedUntil, setMutedUntil] = useState<string | null>(null);
   const [prevCanSpeak, setPrevCanSpeak] = useState<boolean | null>(null);
+  const [permissionTick, setPermissionTick] = useState(0);
+
+  useEffect(() => {
+    if (!room) return;
+    const onPermissionsChanged = (_prev: unknown, participant: Participant) => {
+      if (participant.identity === localParticipant?.identity) {
+        setPermissionTick((tick) => tick + 1);
+      }
+    };
+    room.on(RoomEvent.ParticipantPermissionsChanged, onPermissionsChanged);
+    return () => {
+      room.off(RoomEvent.ParticipantPermissionsChanged, onPermissionsChanged);
+    };
+  }, [room, localParticipant?.identity]);
 
   useEffect(() => {
     let active = true;
@@ -236,7 +251,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
       toast.info(isHostMuted ? "You've been muted by the host" : "You're back in the audience");
     }
     setPrevCanSpeak(canSpeak);
-  }, [role, mutedUntil, localParticipant]);
+  }, [role, mutedUntil, localParticipant, permissionTick]);
 
   return null;
 }
