@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useLocalParticipant, useRemoteParticipants } from "@livekit/components-react";
-import { RoomEvent, type Participant } from "livekit-client";
+import { ParticipantEvent, RoomEvent, type Participant } from "livekit-client";
 import { useRoomContext } from "@livekit/components-react";
 
 const ConnectedIdentitiesContext = createContext<Set<string>>(new Set());
@@ -23,14 +23,44 @@ export function StageConnectionProvider({ children }: { children: React.ReactNod
   const room = useRoomContext();
   const [speakingIds, setSpeakingIds] = useState<Set<string>>(new Set());
 
+  // Track speaking state for EVERY participant (host, co-host, guests, and
+  // the local participant). LiveKit's ActiveSpeakersChanged sometimes omits
+  // the local participant, so we also subscribe per-participant to
+  // IsSpeakingChanged to guarantee the spotlight ring/pulse animation lights
+  // up for whoever is actually talking.
   useEffect(() => {
     if (!room) return;
-    const handler = (speakers: Participant[]) => {
-      setSpeakingIds(new Set(speakers.map((s) => s.identity).filter(Boolean)));
+
+    const recompute = () => {
+      const next = new Set<string>();
+      const consider = (p: Participant | undefined | null) => {
+        if (p?.identity && p.isSpeaking) next.add(p.identity);
+      };
+      consider(room.localParticipant);
+      room.remoteParticipants.forEach((p) => consider(p));
+      setSpeakingIds(next);
     };
-    room.on(RoomEvent.ActiveSpeakersChanged, handler);
+
+    const wired = new WeakSet<Participant>();
+    const wire = (p: Participant) => {
+      if (wired.has(p)) return;
+      wired.add(p);
+      p.on(ParticipantEvent.IsSpeakingChanged, recompute);
+    };
+    const onActive = (_speakers: Participant[]) => recompute();
+    const onConnected = (p: Participant) => { wire(p); recompute(); };
+
+    wire(room.localParticipant);
+    room.remoteParticipants.forEach(wire);
+    room.on(RoomEvent.ActiveSpeakersChanged, onActive);
+    room.on(RoomEvent.ParticipantConnected, onConnected);
+    recompute();
+
     return () => {
-      room.off(RoomEvent.ActiveSpeakersChanged, handler);
+      room.off(RoomEvent.ActiveSpeakersChanged, onActive);
+      room.off(RoomEvent.ParticipantConnected, onConnected);
+      // Per-participant listeners detach automatically when participants
+      // disconnect; the WeakSet lets them be GC'd with the participant.
     };
   }, [room]);
 
