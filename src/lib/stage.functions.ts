@@ -1,7 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { RoomServiceClient } from "livekit-server-sdk";
-import { TrackSource } from "@livekit/protocol";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertHostOrMod(supabase: any, userId: string, streamId: string) {
@@ -74,6 +72,10 @@ async function syncLiveKitPublishPermission(
 
   const canPublish = stageRole === "host" || stageRole === "co_host" || stageRole === "speaker";
   const serviceUrl = wsUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
+  const [{ RoomServiceClient }, { TrackSource }] = await Promise.all([
+    import("livekit-server-sdk"),
+    import("@livekit/protocol"),
+  ]);
   const roomClient = new RoomServiceClient(serviceUrl, apiKey, apiSecret);
   try {
     await roomClient.updateParticipant(stream.room_name, targetUserId, undefined, {
