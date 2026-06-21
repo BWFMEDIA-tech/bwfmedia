@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar,
   BarChart3, Settings, Menu, Search, Bell, ChevronDown, ChevronRight,
-  LogOut, User as UserIcon, Crown, Music2, Video, Mic2, Sparkles, ShieldCheck,
+  LogOut, User as UserIcon, Crown, Music2, Video, Mic2, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -60,14 +60,6 @@ const NAV: NavEntry[] = [
   { kind: "link", to: "/admin/settings", label: "Platform Settings", icon: Settings },
   { kind: "link", to: "/admin/users", label: "User Management", icon: Users },
   { kind: "link", to: "/admin/analytics", label: "Revenue & Reporting", icon: BarChart3 },
-  {
-    kind: "group", key: "trust", label: "Trust & Safety", icon: ShieldCheck,
-    children: [
-      { to: "/admin/vote-attempts", label: "Battle Vote Attempts" },
-      { to: "/admin/ops", label: "Live Ops Feed" },
-      { to: "/admin/audit", label: "Audit Log" },
-    ],
-  },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {

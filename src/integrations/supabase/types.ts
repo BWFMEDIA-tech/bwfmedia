@@ -53,109 +53,6 @@ export type Database = {
         }
         Relationships: []
       }
-      arena_events: {
-        Row: {
-          actor_id: string | null
-          battle_id: string | null
-          created_at: string
-          event_type: string
-          id: string
-          payload: Json
-          stream_id: string | null
-        }
-        Insert: {
-          actor_id?: string | null
-          battle_id?: string | null
-          created_at?: string
-          event_type: string
-          id?: string
-          payload?: Json
-          stream_id?: string | null
-        }
-        Update: {
-          actor_id?: string | null
-          battle_id?: string | null
-          created_at?: string
-          event_type?: string
-          id?: string
-          payload?: Json
-          stream_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "arena_events_battle_id_fkey"
-            columns: ["battle_id"]
-            isOneToOne: false
-            referencedRelation: "battle_matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "arena_events_stream_id_fkey"
-            columns: ["stream_id"]
-            isOneToOne: false
-            referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      arena_playback_state: {
-        Row: {
-          created_at: string
-          current_track_id: string | null
-          id: string
-          is_playing: boolean
-          last_sync_at: string
-          position_seconds: number
-          stream_id: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          current_track_id?: string | null
-          id?: string
-          is_playing?: boolean
-          last_sync_at?: string
-          position_seconds?: number
-          stream_id: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          current_track_id?: string | null
-          id?: string
-          is_playing?: boolean
-          last_sync_at?: string
-          position_seconds?: number
-          stream_id?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "arena_playback_state_current_track_id_fkey"
-            columns: ["current_track_id"]
-            isOneToOne: false
-            referencedRelation: "play_track_boost_totals"
-            referencedColumns: ["track_id"]
-          },
-          {
-            foreignKeyName: "arena_playback_state_current_track_id_fkey"
-            columns: ["current_track_id"]
-            isOneToOne: false
-            referencedRelation: "play_tracks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "arena_playback_state_stream_id_fkey"
-            columns: ["stream_id"]
-            isOneToOne: true
-            referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       battle_matches: {
         Row: {
           a_wins: number
@@ -338,36 +235,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      battle_vote_attempts: {
-        Row: {
-          created_at: string
-          id: string
-          match_id: string | null
-          metadata: Json
-          outcome: string
-          reason: string
-          voter_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          match_id?: string | null
-          metadata?: Json
-          outcome: string
-          reason: string
-          voter_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          match_id?: string | null
-          metadata?: Json
-          outcome?: string
-          reason?: string
-          voter_id?: string | null
-        }
-        Relationships: []
       }
       battle_votes: {
         Row: {
@@ -1045,47 +912,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
-      }
-      matchmaking_pool: {
-        Row: {
-          enqueued_at: string
-          id: string
-          matched_battle_id: string | null
-          status: string
-          tier: string
-          updated_at: string
-          user_id: string
-          xp_snapshot: number
-        }
-        Insert: {
-          enqueued_at?: string
-          id?: string
-          matched_battle_id?: string | null
-          status?: string
-          tier?: string
-          updated_at?: string
-          user_id: string
-          xp_snapshot?: number
-        }
-        Update: {
-          enqueued_at?: string
-          id?: string
-          matched_battle_id?: string | null
-          status?: string
-          tier?: string
-          updated_at?: string
-          user_id?: string
-          xp_snapshot?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "matchmaking_pool_matched_battle_id_fkey"
-            columns: ["matched_battle_id"]
-            isOneToOne: false
-            referencedRelation: "battle_matches"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       merch_commissions: {
         Row: {
@@ -1805,50 +1631,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "raise_hand_requests_stream_id_fkey"
-            columns: ["stream_id"]
-            isOneToOne: false
-            referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      revenue_events: {
-        Row: {
-          amount_cents: number
-          created_at: string
-          currency: string
-          id: string
-          metadata: Json
-          reference_id: string | null
-          source: string
-          stream_id: string | null
-          user_id: string
-        }
-        Insert: {
-          amount_cents?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          metadata?: Json
-          reference_id?: string | null
-          source: string
-          stream_id?: string | null
-          user_id: string
-        }
-        Update: {
-          amount_cents?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          metadata?: Json
-          reference_id?: string | null
-          source?: string
-          stream_id?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "revenue_events_stream_id_fkey"
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
@@ -2658,39 +2440,6 @@ export type Database = {
         }
         Relationships: []
       }
-      xp_ledger: {
-        Row: {
-          balance_after: number
-          created_at: string
-          delta: number
-          id: string
-          metadata: Json
-          reason: string
-          reference_id: string | null
-          user_id: string
-        }
-        Insert: {
-          balance_after: number
-          created_at?: string
-          delta: number
-          id?: string
-          metadata?: Json
-          reason: string
-          reference_id?: string | null
-          user_id: string
-        }
-        Update: {
-          balance_after?: number
-          created_at?: string
-          delta?: number
-          id?: string
-          metadata?: Json
-          reason?: string
-          reference_id?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       live_queue_public: {
@@ -2828,16 +2577,6 @@ export type Database = {
       }
     }
     Functions: {
-      award_xp: {
-        Args: {
-          _delta: number
-          _metadata?: Json
-          _reason: string
-          _reference_id?: string
-          _user_id: string
-        }
-        Returns: number
-      }
       boost_spends_access_check: {
         Args: { _row_user_id: string }
         Returns: boolean
@@ -2847,12 +2586,10 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
-      dequeue_matchmaking: { Args: never; Returns: boolean }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
-      enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
@@ -2871,8 +2608,6 @@ export type Database = {
           total_cents: number
         }[]
       }
-      get_user_rank: { Args: { _user_id: string }; Returns: string }
-      get_user_xp: { Args: { _user_id: string }; Returns: number }
       grant_boost_credits_purchase: {
         Args: {
           _credits: number
@@ -2905,10 +2640,6 @@ export type Database = {
       is_stream_participant: {
         Args: { _stream_id: string; _user_id: string }
         Returns: boolean
-      }
-      log_battle_vote_blocked: {
-        Args: { _match_id: string; _metadata?: Json; _reason: string }
-        Returns: string
       }
       move_to_dlq: {
         Args: {

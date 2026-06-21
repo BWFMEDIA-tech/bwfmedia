@@ -62,23 +62,23 @@ type Stat = {
 };
 
 const STATS: Stat[] = [
-  { icon: Users, label: "Subscribers", value: 332025, display: "332,025" },
-  { icon: Eye, label: "Total Views", value: 715.4, decimals: 1, suffix: "M", display: "715.4M" },
-  { icon: ThumbsUp, label: "Likes", value: 18.5, decimals: 1, suffix: "M", display: "18.5M" },
-  { icon: Flame, label: "Recent Views", value: 2.3, decimals: 1, suffix: "M", display: "2.3M" },
-  { icon: MessageCircle, label: "Comments", value: 787.3, decimals: 1, suffix: "K", display: "787.3K" },
+  { icon: Users, label: "Subscribers", value: 329044, display: "329,044" },
+  { icon: Eye, label: "Total Views", value: 703.9, decimals: 1, suffix: "M", display: "703.9M" },
+  { icon: ThumbsUp, label: "Likes", value: 18.3, decimals: 1, suffix: "M", display: "18.3M" },
+  { icon: Flame, label: "Recent Views", value: 6.6, decimals: 1, suffix: "M", display: "6.6M" },
+  { icon: MessageCircle, label: "Comments", value: 771, suffix: "K", display: "771K" },
   { icon: Share2, label: "Shares", value: 3.0, decimals: 1, suffix: "M", display: "3.0M" },
 ];
 
 const MILESTONES = [
-  "715.4M lifetime views milestone reached",
+  "703.9M lifetime views milestone reached",
   "Viral interview crosses 12M views in 72 hours",
-  "332K+ subscribers and climbing daily",
+  "329K+ subscribers and climbing daily",
   "Featured on global hip-hop trending charts",
   "Off The Block hits #1 in cultural commentary",
   "BWF Red Mic ranked top podcast on iHeart",
-  "2.3M new views in the last 7 days",
-  "787K comments across the BWF network",
+  "6.6M new views in the last 7 days",
+  "771K comments across the BWF network",
 ];
 
 const PARTNERS = [

@@ -7,11 +7,7 @@ export interface PlayerTrack {
   audioUrl: string;
   coverUrl?: string | null;
   durationSec?: number | null;
-  /** When true, playback is capped at PREVIEW_LIMIT_SEC seconds. */
-  preview?: boolean;
 }
-
-export const PREVIEW_LIMIT_SEC = 30;
 
 interface PlayerState {
   track: PlayerTrack | null;
@@ -34,7 +30,6 @@ interface PlayerApi extends PlayerState {
   setVolume: (v: number) => void;
   toggleShuffle: () => void;
   cycleRepeat: () => void;
-  setPreviewLimitHandler: (fn: (() => void) | null) => void;
 }
 
 const Ctx = createContext<PlayerApi | null>(null);
@@ -54,11 +49,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   });
   stateRef.current = state;
 
-  const previewLimitHandlerRef = useRef<(() => void) | null>(null);
-  const setPreviewLimitHandler = useCallback((fn: (() => void) | null) => {
-    previewLimitHandlerRef.current = fn;
-  }, []);
-
   // lazy create audio element on client
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -66,17 +56,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     a.preload = "metadata";
     a.volume = stateRef.current?.volume ?? 0.8;
     audioRef.current = a;
-    const onTime = () => {
-      const s = stateRef.current;
-      if (s?.track?.preview && a.currentTime >= PREVIEW_LIMIT_SEC) {
-        a.pause();
-        a.currentTime = 0;
-        setState((p) => ({ ...p, isPlaying: false, progress: 0 }));
-        previewLimitHandlerRef.current?.();
-        return;
-      }
-      setState((s2) => ({ ...s2, progress: a.currentTime }));
-    };
+    const onTime = () => setState((s) => ({ ...s, progress: a.currentTime }));
     const onMeta = () => setState((s) => ({ ...s, duration: a.duration || 0 }));
     const onPlay = () => setState((s) => ({ ...s, isPlaying: true }));
     const onPause = () => setState((s) => ({ ...s, isPlaying: false }));
@@ -161,7 +141,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const toggleShuffle = useCallback(() => setState((s) => ({ ...s, shuffle: !s.shuffle })), []);
   const cycleRepeat = useCallback(() => setState((s) => ({ ...s, repeat: s.repeat === "off" ? "all" : s.repeat === "all" ? "one" : "off" })), []);
 
-  const value = useMemo<PlayerApi>(() => ({ ...state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler }), [state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler]);
+  const value = useMemo<PlayerApi>(() => ({ ...state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat }), [state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
