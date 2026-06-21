@@ -139,7 +139,7 @@ export function SiteHeader() {
           aria-label="Toggle menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-bone shrink-0"
+          className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-bone shrink-0"
         >
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -231,7 +231,7 @@ export function SiteHeader() {
         {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="hidden lg:flex items-center gap-2 w-48 lg:w-72 px-3.5 h-10 rounded-full border border-white/10 bg-white/[0.04] focus-within:border-blood/60 focus-within:bg-white/[0.07] transition-colors"
+          className="hidden md:flex items-center gap-2 w-48 lg:w-72 px-3.5 h-10 rounded-full border border-white/10 bg-white/[0.04] focus-within:border-blood/60 focus-within:bg-white/[0.07] transition-colors"
         >
           <Search size={15} className="text-bone/50" />
           <input
@@ -243,7 +243,7 @@ export function SiteHeader() {
         </form>
 
         {/* Right cluster */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <HeaderCartButton />
           {auth.isAuthenticated ? (
             <>
@@ -317,7 +317,7 @@ export function SiteHeader() {
         </div>
 
         {/* Mobile toggle */}
-        <div className="lg:hidden">
+        <div className="md:hidden">
           <HeaderCartButton />
         </div>
       </div>
@@ -330,7 +330,7 @@ export function SiteHeader() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden border-t border-white/10 bg-[#06060a]/98 backdrop-blur-xl overflow-hidden"
+            className="md:hidden border-t border-white/10 bg-[#06060a]/98 backdrop-blur-xl overflow-hidden"
           >
             <div className="px-4 py-4 space-y-4 max-h-[80vh] overflow-y-auto">
               {/* Mobile search */}
