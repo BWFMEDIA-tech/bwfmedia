@@ -27,6 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { getHomepageData } from "@/lib/homepage.functions";
 import { CartButton } from "@/components/CartDrawer";
+import { PlayArenaIntro } from "@/components/site/PlayArenaIntro";
 
 /* ---------- shared ---------- */
 
@@ -571,6 +572,7 @@ export function OnePager() {
       <div className="relative z-10">
         <ScrollProgress />
         <Hero liveStreams={liveStreams} />
+        <PlayArenaIntro />
         <Spotlight artists={featuredArtists} />
         <VideosRow videos={videos} />
         <BookShoot />
