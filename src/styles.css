@@ -96,15 +96,6 @@
   --gradient-dark: linear-gradient(180deg, #0B0B0B, #050505);
   --shadow-blood: 0 20px 60px -10px rgb(225 29 42 / 0.45);
   --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
-
-  /* BWF neon brand */
-  --neon-fuchsia: #C53DFF;
-  --neon-magenta: #FF00A6;
-  --neon-cyan:    #00E6FF;
-  --neon-blue:    #004BFF;
-  --gradient-neon: linear-gradient(120deg, #C53DFF 0%, #FF00A6 45%, #00E6FF 100%);
-  --gradient-neon-soft: linear-gradient(120deg, rgb(197 61 255 / 0.25), rgb(255 0 166 / 0.18) 50%, rgb(0 230 255 / 0.22));
-  --shadow-neon: 0 30px 80px -20px rgb(197 61 255 / 0.55), 0 0 60px -10px rgb(0 230 255 / 0.35);
 }
 
 @layer base {
