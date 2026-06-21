@@ -1,18 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, queryOptions } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Calendar as CalendarIcon, MapPin, Clock, ExternalLink, Radio } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPublicEvents, type EventRow } from "@/lib/events.functions";
-
-const eventsQuery = queryOptions({
-  queryKey: ["public-events"],
-  queryFn: () => listPublicEvents(),
-  staleTime: 60_000,
-});
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -26,7 +20,6 @@ export const Route = createFileRoute("/events")({
     ],
     links: [{ rel: "canonical", href: "https://bwfnetwork.com/events" }],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(eventsQuery),
   errorComponent: () => (
     <div className="min-h-screen grid place-items-center text-white/70">Failed to load events.</div>
   ),
@@ -51,8 +44,9 @@ function formatDate(iso: string) {
 function EventsPage() {
   const fetchEvents = useServerFn(listPublicEvents);
   const { data: events = [] } = useQuery({
-    ...eventsQuery,
+    queryKey: ["public-events"],
     queryFn: () => fetchEvents(),
+    staleTime: 60_000,
   });
   const [selected, setSelected] = useState<Date | undefined>(new Date());
 
