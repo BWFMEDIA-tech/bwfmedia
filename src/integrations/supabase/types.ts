@@ -339,6 +339,36 @@ export type Database = {
           },
         ]
       }
+      battle_vote_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string | null
+          metadata: Json
+          outcome: string
+          reason: string
+          voter_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id?: string | null
+          metadata?: Json
+          outcome: string
+          reason: string
+          voter_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string | null
+          metadata?: Json
+          outcome?: string
+          reason?: string
+          voter_id?: string | null
+        }
+        Relationships: []
+      }
       battle_votes: {
         Row: {
           choice: string
@@ -2875,6 +2905,10 @@ export type Database = {
       is_stream_participant: {
         Args: { _stream_id: string; _user_id: string }
         Returns: boolean
+      }
+      log_battle_vote_blocked: {
+        Args: { _match_id: string; _metadata?: Json; _reason: string }
+        Returns: string
       }
       move_to_dlq: {
         Args: {
