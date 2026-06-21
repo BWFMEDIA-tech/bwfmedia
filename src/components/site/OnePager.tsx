@@ -482,7 +482,7 @@ function FollowStrip() {
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood mb-2">Follow BWF</div>
           <h3 className="font-display text-3xl md:text-4xl uppercase text-bone leading-tight">
-            686M+ Views. 329K+ Subscribers. The culture is here.
+            715M+ Views. 332K+ Subscribers. The culture is here.
           </h3>
         </div>
         <div className="flex flex-wrap items-center gap-2">
