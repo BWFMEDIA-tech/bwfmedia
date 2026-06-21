@@ -127,13 +127,13 @@ function ProfileHero({ totals }: { totals: ArenaDashboard["totals"] }) {
               <p className="text-xs text-white/80 leading-tight">Enter the arena. Earn your stage.</p>
             </div>
           </button>
-          <button className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left hover:bg-white/[0.06] transition">
+          <Link to="/events" className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left hover:bg-white/[0.06] transition">
             <Calendar className="h-5 w-5 shrink-0 text-[#00E6FF]" />
             <div className="min-w-0">
               <p className="font-bold leading-tight">VIEW UPCOMING EVENTS</p>
               <p className="text-xs text-white/60 leading-tight">See all scheduled competitions and live events.</p>
             </div>
-          </button>
+          </Link>
         </div>
       </div>
     </section>
