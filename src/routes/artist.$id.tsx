@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
@@ -12,6 +12,7 @@ import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -78,7 +79,7 @@ function ArtistProfilePage() {
   const { id } = useParams({ from: "/artist/$id" });
   const { data: meta } = useSuspenseQuery(artistMetaOptions(id));
   const [tip, setTip] = useState<number>(5);
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const isOwner = !!user && user.id === id;
 
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
@@ -111,7 +112,7 @@ function ArtistProfilePage() {
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
           <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
-          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} />
+          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
           <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
           <ArtistMerchSection userId={id} />
         </div>
@@ -262,8 +263,10 @@ function fmtDur(s: number | null) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
-function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string }) {
+function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
+  const preview = !isAuthenticated;
+  const [showSignInModal, setShowSignInModal] = useState(false);
   const playable = tracks.filter((t) => !!t.audio_url).map((t) => ({
     id: t.id,
     title: t.title,
@@ -271,7 +274,14 @@ function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: st
     audioUrl: t.audio_url as string,
     coverUrl: t.cover_url,
     durationSec: t.duration_seconds,
+    preview,
   }));
+
+  useEffect(() => {
+    if (!preview) { player.setPreviewLimitHandler(null); return; }
+    player.setPreviewLimitHandler(() => setShowSignInModal(true));
+    return () => player.setPreviewLimitHandler(null);
+  }, [preview, player]);
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
       <div className="flex items-center justify-between mb-3">
@@ -300,7 +310,7 @@ function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: st
                 type="button"
                 onClick={() => {
                   if (!t.audio_url) return;
-                  const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds };
+                  const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds, preview };
                   if (player.track?.id === t.id) { player.toggle(); } else { player.play(track, playable); }
                 }}
                 disabled={!t.audio_url}
@@ -323,6 +333,38 @@ function PopularTracks({ tracks, isOwner, artistName }: { tracks: Array<{ id: st
           ))}
         </ul>
       )}
+      <Dialog open={showSignInModal} onOpenChange={setShowSignInModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in to keep listening</DialogTitle>
+            <DialogDescription>
+              You've reached the 30-second preview. Create a free account or sign in to hear the full song.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSignInModal(false)}
+              className="px-4 py-2 rounded-full text-xs font-semibold border border-white/15 text-white/80 hover:bg-white/5"
+            >
+              Maybe later
+            </button>
+            <Link
+              to="/signup"
+              className="px-4 py-2 rounded-full text-xs font-semibold border border-white/15 text-white hover:bg-white/10"
+            >
+              Create account
+            </Link>
+            <Link
+              to="/login"
+              className="px-4 py-2 rounded-full text-xs font-semibold text-white"
+              style={{ background: RED }}
+            >
+              Sign in
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

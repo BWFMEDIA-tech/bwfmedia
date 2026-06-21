@@ -27,6 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { getHomepageData } from "@/lib/homepage.functions";
 import { CartButton } from "@/components/CartDrawer";
+import { PlayArenaIntro } from "@/components/site/PlayArenaIntro";
 
 /* ---------- shared ---------- */
 
@@ -482,7 +483,7 @@ function FollowStrip() {
         <div>
           <div className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood mb-2">Follow BWF</div>
           <h3 className="font-display text-3xl md:text-4xl uppercase text-bone leading-tight">
-            686M+ Views. 329K+ Subscribers. The culture is here.
+            715M+ Views. 332K+ Subscribers. The culture is here.
           </h3>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -571,6 +572,7 @@ export function OnePager() {
       <div className="relative z-10">
         <ScrollProgress />
         <Hero liveStreams={liveStreams} />
+        <PlayArenaIntro />
         <Spotlight artists={featuredArtists} />
         <VideosRow videos={videos} />
         <BookShoot />

@@ -77,6 +77,7 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
+import { Route as AdminVoteAttemptsRouteImport } from './routes/admin.vote-attempts'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
 import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
@@ -453,6 +454,11 @@ const ArtistIdRoute = ArtistIdRouteImport.update({
   path: '/artist/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminVoteAttemptsRoute = AdminVoteAttemptsRouteImport.update({
+  id: '/vote-attempts',
+  path: '/vote-attempts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -697,6 +703,7 @@ export interface FileRoutesByFullPath {
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
@@ -801,6 +808,7 @@ export interface FileRoutesByTo {
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
@@ -907,6 +915,7 @@ export interface FileRoutesById {
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
@@ -1014,6 +1023,7 @@ export interface FileRouteTypes {
     | '/admin/tickets'
     | '/admin/transactions'
     | '/admin/users'
+    | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/broadcast/$broadcastId'
@@ -1118,6 +1128,7 @@ export interface FileRouteTypes {
     | '/admin/tickets'
     | '/admin/transactions'
     | '/admin/users'
+    | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/broadcast/$broadcastId'
@@ -1223,6 +1234,7 @@ export interface FileRouteTypes {
     | '/admin/tickets'
     | '/admin/transactions'
     | '/admin/users'
+    | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/broadcast/$broadcastId'
@@ -1817,6 +1829,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/vote-attempts': {
+      id: '/admin/vote-attempts'
+      path: '/vote-attempts'
+      fullPath: '/admin/vote-attempts'
+      preLoaderRoute: typeof AdminVoteAttemptsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -2086,6 +2105,7 @@ interface AdminRouteChildren {
   AdminTicketsRoute: typeof AdminTicketsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminVoteAttemptsRoute: typeof AdminVoteAttemptsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -2110,6 +2130,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTicketsRoute: AdminTicketsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminVoteAttemptsRoute: AdminVoteAttemptsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
