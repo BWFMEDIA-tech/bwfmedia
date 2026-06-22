@@ -156,6 +156,95 @@ export type Database = {
           },
         ]
       }
+      arena_power_up_activations: {
+        Row: {
+          activated_at: string
+          created_at: string
+          credits_spent: number
+          expires_at: string
+          id: string
+          metadata: Json
+          power_up_id: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          created_at?: string
+          credits_spent?: number
+          expires_at: string
+          id?: string
+          metadata?: Json
+          power_up_id: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          created_at?: string
+          credits_spent?: number
+          expires_at?: string
+          id?: string
+          metadata?: Json
+          power_up_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arena_power_up_activations_power_up_id_fkey"
+            columns: ["power_up_id"]
+            isOneToOne: false
+            referencedRelation: "arena_power_ups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      arena_power_ups: {
+        Row: {
+          accent: string | null
+          active: boolean
+          cost_credits: number
+          created_at: string
+          description: string
+          duration_minutes: number
+          icon: string | null
+          id: string
+          multiplier: number
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          accent?: string | null
+          active?: boolean
+          cost_credits?: number
+          created_at?: string
+          description: string
+          duration_minutes?: number
+          icon?: string | null
+          id?: string
+          multiplier?: number
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          accent?: string | null
+          active?: boolean
+          cost_credits?: number
+          created_at?: string
+          description?: string
+          duration_minutes?: number
+          icon?: string | null
+          id?: string
+          multiplier?: number
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       battle_matches: {
         Row: {
           a_wins: number
@@ -2876,6 +2965,14 @@ export type Database = {
       }
     }
     Functions: {
+      activate_power_up: {
+        Args: { _slug: string }
+        Returns: {
+          activation_id: string
+          expires_at: string
+          new_balance: number
+        }[]
+      }
       award_xp: {
         Args: {
           _delta: number
