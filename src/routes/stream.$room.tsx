@@ -193,17 +193,6 @@ function GuestPage() {
                 participants={participants as StageParticipant[]}
                 canManage={isHostLike}
               />
-              {streamId && (
-                <BattleArena
-                  streamId={streamId}
-                  isHost={isHostLike}
-                  participants={(participants as StageParticipant[]).map((p) => ({
-                    user_id: p.user_id,
-                    display_name: p.display_name,
-                    avatar_url: p.avatar_url,
-                  }))}
-                />
-              )}
               {inCrowd && (
                 <InCrowdBanner streamId={streamId} auth={auth} mode="stage" />
               )}
@@ -232,17 +221,6 @@ function GuestPage() {
                   streamId={streamId}
                   participants={participants as StageParticipant[]}
                   canManage={isHostLike}
-                />
-              )}
-              {streamId && (
-                <BattleArena
-                  streamId={streamId}
-                  isHost={isHostLike}
-                  participants={(participants as StageParticipant[]).map((p) => ({
-                    user_id: p.user_id,
-                    display_name: p.display_name,
-                    avatar_url: p.avatar_url,
-                  }))}
                 />
               )}
               {streamId && inCrowd && (
