@@ -19,6 +19,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
+import { useServerFn } from "@tanstack/react-start";
+import { setStreamSpotlight } from "@/lib/stage.functions";
+import { Pin, PinOff, X as XIcon } from "lucide-react";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -183,12 +186,19 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
+  const spotlightUserId = useStreamSpotlight(streamId);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host";
   const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [] };
   for (const t of cameraTracks) {
     const id = t.participant?.identity ?? "";
+    // Spotlight override: pin a specific participant to the middle panel
+    // exclusively, regardless of their stage role.
+    if (spotlightUserId && id === spotlightUserId) {
+      buckets.middle.push(t);
+      continue;
+    }
     const role = roleMap[id];
     const panel: Panel =
       role === "admin" || role === "administrator" || role === "owner" || role === "moderator"
@@ -196,6 +206,9 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         : role === "host" || role === "cohost" || role === "co_host"
           ? "host"
           : "middle"; // artist | guest | listener | speaker | unknown
+    // While a spotlight is active, suppress the middle "catch-all" so only
+    // the pinned participant shows in the middle box.
+    if (spotlightUserId && panel === "middle") continue;
     buckets[panel].push(t);
   }
   // Priority: active speaker first within each bucket.
@@ -215,6 +228,14 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
           profile={primaryId ? profiles[primaryId] : undefined}
           placeholder={placeholder}
         />
+        {panel === "middle" && showHostTools && streamId && (
+          <SpotlightControls
+            streamId={streamId}
+            spotlightUserId={spotlightUserId}
+            participants={participants}
+            profiles={profiles}
+          />
+        )}
       </div>
     );
   };
