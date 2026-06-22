@@ -41,6 +41,15 @@ function LoginPage() {
         return nav({ to: "/admin/login" });
       }
       if (list.includes("listener") && !list.includes("artist")) dest = "/";
+      // Artists do not get Stream Now / hosting tools — only hosts/managers
+      // do. Send artist-only accounts to their dashboard, from which they
+      // can join existing stages as guests.
+      const isPrivileged =
+        list.includes("manager") || list.includes("host");
+      if (list.includes("artist") && !isPrivileged) {
+        // @ts-expect-error widen dest to the artist destination
+        dest = "/artist-dashboard";
+      }
     }
     nav({ to: dest });
   };

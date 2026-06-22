@@ -11,8 +11,11 @@ async function assertCanBroadcast(supabase: any, userId: string) {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId);
+  // Artists are NOT broadcasters — they may only join existing stages as
+  // guests via stage_participants. Starting/ending a stream is restricted to
+  // platform staff (admin / host / manager).
   const ok = (roles ?? []).some((r: any) =>
-    r.role === "admin" || r.role === "host" || r.role === "artist",
+    r.role === "admin" || r.role === "host" || r.role === "manager",
   );
   if (!ok) throw new Error("Not authorized to start streams");
 }
