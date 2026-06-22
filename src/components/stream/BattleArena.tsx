@@ -51,6 +51,9 @@ export function BattleArena({
       .on("postgres_changes",
         { event: "*", schema: "public", table: "battle_rounds" },
         refresh)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` },
+        refresh)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [streamId, stateFn]);
