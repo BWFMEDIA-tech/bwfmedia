@@ -97,14 +97,14 @@ function LiveVisualizer({
       const cy = h / 2;
       tRef.current += isPlaying ? 0.015 : 0.005;
 
-      let data: Uint8Array;
+      let data: Uint8Array<ArrayBuffer>;
       if (analyser) {
-        data = new Uint8Array(analyser.frequencyBinCount);
+        data = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
         analyser.getByteFrequencyData(data);
       } else {
         // idle pulse
         const n = 128;
-        data = new Uint8Array(n);
+        data = new Uint8Array(new ArrayBuffer(n));
         for (let i = 0; i < n; i++) {
           data[i] = isPlaying
             ? 60 + Math.sin(tRef.current * 2 + i * 0.18) * 40 + Math.random() * 20
