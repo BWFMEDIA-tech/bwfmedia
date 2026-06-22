@@ -19,6 +19,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
+import { useServerFn } from "@tanstack/react-start";
+import { setStreamSpotlight } from "@/lib/stage.functions";
+import { Pin, PinOff, X as XIcon } from "lucide-react";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -183,12 +186,19 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
+  const spotlightUserId = useStreamSpotlight(streamId);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host";
   const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [] };
   for (const t of cameraTracks) {
     const id = t.participant?.identity ?? "";
+    // Spotlight override: pin a specific participant to the middle panel
+    // exclusively, regardless of their stage role.
+    if (spotlightUserId && id === spotlightUserId) {
+      buckets.middle.push(t);
+      continue;
+    }
     const role = roleMap[id];
     const panel: Panel =
       role === "admin" || role === "administrator" || role === "owner" || role === "moderator"
@@ -196,6 +206,9 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         : role === "host" || role === "cohost" || role === "co_host"
           ? "host"
           : "middle"; // artist | guest | listener | speaker | unknown
+    // While a spotlight is active, suppress the middle "catch-all" so only
+    // the pinned participant shows in the middle box.
+    if (spotlightUserId && panel === "middle") continue;
     buckets[panel].push(t);
   }
   // Priority: active speaker first within each bucket.
@@ -215,6 +228,14 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
           profile={primaryId ? profiles[primaryId] : undefined}
           placeholder={placeholder}
         />
+        {panel === "middle" && showHostTools && streamId && (
+          <SpotlightControls
+            streamId={streamId}
+            spotlightUserId={spotlightUserId}
+            participants={participants}
+            profiles={profiles}
+          />
+        )}
       </div>
     );
   };
@@ -447,5 +468,162 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
       <Icon className="h-3.5 w-3.5" />
       {label}
     </button>
+  );
+}
+
+/**
+ * Real-time hook: returns the current spotlighted user id for the stream,
+ * or null. Updates instantly when a host pins/unpins via Postgres realtime.
+ */
+function useStreamSpotlight(streamId: string | undefined): string | null {
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    if (!streamId) { setUid(null); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("streams")
+        .select("spotlight_user_id")
+        .eq("id", streamId)
+        .maybeSingle();
+      if (!cancelled) setUid((data as any)?.spotlight_user_id ?? null);
+    })();
+    const ch = supabase
+      .channel(`spotlight-${streamId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
+        (payload) => {
+          const next = (payload.new as any)?.spotlight_user_id ?? null;
+          setUid(next);
+        },
+      )
+      .subscribe();
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(ch);
+    };
+  }, [streamId]);
+  return uid;
+}
+
+/**
+ * Host-only control row under the middle ARTIST panel. Lets the host pin
+ * any participant currently in the room into that slot, or clear it.
+ */
+function SpotlightControls({
+  streamId,
+  spotlightUserId,
+  participants,
+  profiles,
+}: {
+  streamId: string;
+  spotlightUserId: string | null;
+  participants: ReturnType<typeof useParticipants>;
+  profiles: Record<string, ProfileLite>;
+}) {
+  const [open, setOpen] = useState(false);
+  const setSpotlight = useServerFn(setStreamSpotlight);
+  const pinned = spotlightUserId
+    ? profiles[spotlightUserId] ?? null
+    : null;
+  const pin = async (targetUserId: string | null) => {
+    try {
+      await setSpotlight({ data: { streamId, targetUserId } });
+      setOpen(false);
+      toast.success(targetUserId ? "Pinned to middle box" : "Spotlight cleared");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to update spotlight");
+    }
+  };
+  // Only show participants with a real uuid identity (skip ghost / placeholder ids)
+  const pickable = participants.filter((p) =>
+    /^[0-9a-f-]{36}$/i.test(p.identity ?? ""),
+  );
+  return (
+    <>
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5">
+        <div className="flex items-center gap-2 text-[11px] text-white/70">
+          <Pin className="h-3 w-3 text-fuchsia-400" />
+          {pinned ? (
+            <span className="truncate">
+              Pinned: <span className="font-semibold text-white">{pinned.display_name ?? "Guest"}</span>
+            </span>
+          ) : (
+            <span>No spotlight</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/85 hover:bg-white/5"
+          >
+            <UserPlus className="h-3 w-3" /> Add Guest
+          </button>
+          {spotlightUserId && (
+            <button
+              onClick={() => pin(null)}
+              className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/85 hover:bg-white/5"
+            >
+              <PinOff className="h-3 w-3" /> Unpin
+            </button>
+          )}
+        </div>
+      </div>
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0d18] p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm font-bold text-white">Pin guest to middle box</div>
+              <button onClick={() => setOpen(false)} className="text-white/60 hover:text-white">
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+            {pickable.length === 0 ? (
+              <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4 text-center text-xs text-white/50">
+                No one is in the room yet. Invite a guest first.
+              </div>
+            ) : (
+              <ul className="max-h-80 space-y-1 overflow-y-auto">
+                {pickable.map((p) => {
+                  const prof = profiles[p.identity];
+                  const isCurrent = p.identity === spotlightUserId;
+                  return (
+                    <li key={p.identity}>
+                      <button
+                        onClick={() => pin(p.identity)}
+                        disabled={isCurrent}
+                        className={cn(
+                          "flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-white/5",
+                          isCurrent && "opacity-50",
+                        )}
+                      >
+                        {prof?.avatar_url ? (
+                          <img src={prof.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-fuchsia-600 to-blue-600" />
+                        )}
+                        <span className="flex-1 text-sm text-white">
+                          {prof?.display_name ?? p.name ?? "Guest"}
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">
+                          {isCurrent ? "Pinned" : "Pin"}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
