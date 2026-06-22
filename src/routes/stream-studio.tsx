@@ -58,21 +58,29 @@ function StreamStudioGuard() {
   const auth = useAuth();
   const navigate = useNavigate();
   const artistSub = useArtistSubscription();
+  // Stream Now / hosting tools are reserved for admins, managers, and hosts.
+  // Artists join existing stages as guests — they do NOT get broadcasting
+  // controls, the host studio, or the ability to start a stream. Anyone with
+  // only the "artist" role is bounced to their artist dashboard.
   const canBroadcast =
     auth.roles.includes("admin") ||
     auth.roles.includes("manager") ||
-    auth.roles.includes("host") ||
-    auth.roles.includes("artist");
+    auth.roles.includes("host");
 
-  const isPrivileged =
-    auth.roles.includes("admin") || auth.roles.includes("manager") || auth.roles.includes("host");
-  const isArtistOnly = !isPrivileged && auth.roles.includes("artist");
-  const needsTrial = isArtistOnly && !artistSub.isLoading && !artistSub.isActive;
+  const isArtistOnly = !canBroadcast && auth.roles.includes("artist");
+  // Kept so any future host-tier trial logic stays wired, but artists alone
+  // never reach a paid-trial gate here — they're redirected away first.
+  const needsTrial = false;
+  void artistSub;
 
   useEffect(() => {
     if (auth.loading || auth.rolesLoading) return;
     if (!auth.isAuthenticated) {
       navigate({ to: "/login", replace: true });
+      return;
+    }
+    if (isArtistOnly) {
+      navigate({ to: "/artist-dashboard", replace: true });
       return;
     }
     if (!canBroadcast) {
@@ -85,12 +93,9 @@ function StreamStudioGuard() {
       navigate({ to: "/access-denied", replace: true });
       return;
     }
-    if (needsTrial) {
-      navigate({ to: "/artist/upgrade", replace: true });
-    }
-  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, canBroadcast, needsTrial, auth.user?.id, navigate]);
+  }, [auth.loading, auth.rolesLoading, auth.isAuthenticated, canBroadcast, isArtistOnly, auth.user?.id, navigate]);
 
-  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !canBroadcast || (isArtistOnly && artistSub.isLoading) || needsTrial) {
+  if (auth.loading || auth.rolesLoading || !auth.isAuthenticated || !canBroadcast || isArtistOnly) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#07070d] text-white/60 text-sm">
         Checking permissions…
