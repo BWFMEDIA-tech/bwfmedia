@@ -1,18 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ThumbsUp, ThumbsDown, Crown, Music, Trophy, Zap, SkipForward, Play, Pause, Flag, Trash2, Share2 } from "lucide-react";
+import { Music, Trophy, Zap, SkipForward, Play, Flag, Trash2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getStreamByRoom } from "@/lib/streams.functions";
-import { votePlayTrack, playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
-import { usePlayQueue, useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
+import { playTrackNow, advancePlayQueue, endPlaySession, getMyPlayStatus, deletePlayTrack } from "@/lib/play.functions";
+import { usePlayQueue, type PlayTrack } from "@/lib/usePlayQueue";
 import { useAuth } from "@/lib/auth-context";
 import { BoostCheckoutModal } from "@/components/play/BoostCheckoutModal";
 import { SubmitTrackDialog } from "@/components/play/SubmitTrackDialog";
 import { LiveChat } from "@/components/stream/LiveChat";
-import { WaveformBackground } from "@/components/play/WaveformBackground";
 import { BattleArena } from "@/components/stream/BattleArena";
+import { ImmersivePlayer } from "@/components/play/ImmersivePlayer";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -96,13 +96,20 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
   return (
     <>
-      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+      <div className="space-y-5">
+        {/* Immersive hero player + right rail (queue/battle/leaderboard) */}
+        <ImmersivePlayer
+          track={playing}
+          upNext={queued}
+          leaderboard={leaderboard}
+          userId={auth.user?.id ?? null}
+          streamId={stream?.id ?? null}
+          isHost={isHost}
+        />
+
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
           {/* Main column */}
           <div className="space-y-5">
-            <div className="mx-auto w-full max-w-xl">
-              <NowPlayingCard track={playing} userId={auth.user?.id ?? null} />
-            </div>
-
             {/* Submit / Boost CTAs */}
             <div className="grid sm:grid-cols-2 gap-3">
               <button
@@ -111,9 +118,9 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
                   if (!status?.membershipActive) return setModal("membership");
                   setModal("submit");
                 }}
-                className="rounded-2xl border border-violet-500/40 bg-gradient-to-br from-violet-600/20 to-blue-600/10 p-4 text-left hover:border-violet-400 transition"
+                className="rounded-2xl border border-[#C53DFF]/40 bg-gradient-to-br from-[#C53DFF]/20 to-[#004BFF]/10 p-4 text-left hover:border-[#C53DFF] transition"
               >
-                <div className="flex items-center gap-2 text-violet-300 font-semibold">
+                <div className="flex items-center gap-2 text-[#C53DFF] font-semibold">
                   <Music className="h-4 w-4" /> Submit a track
                 </div>
                 <p className="text-xs text-white/60 mt-1">
@@ -124,25 +131,24 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
               </button>
               <button
                 onClick={() => { if (!auth.user) return toast.error("Sign in to boost"); setModal("boost"); }}
-                className="rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/20 to-orange-500/10 p-4 text-left hover:border-amber-300 transition"
+                className="rounded-2xl border border-[#FF00A6]/40 bg-gradient-to-br from-[#FF00A6]/20 to-[#C53DFF]/10 p-4 text-left hover:border-[#FF00A6] transition"
               >
-                <div className="flex items-center gap-2 text-amber-300 font-semibold">
+                <div className="flex items-center gap-2 text-[#FF00A6] font-semibold">
                   <Zap className="h-4 w-4" /> Skip the Line — $25
                 </div>
                 <p className="text-xs text-white/60 mt-1">
                   2 boost credits · jump to the front of the queue.
                   {status && status.boostCredits > 0 && (
-                    <span className="ml-1 text-amber-300">You have {status.boostCredits}.</span>
+                    <span className="ml-1 text-[#FF00A6]">You have {status.boostCredits}.</span>
                   )}
                 </p>
               </button>
             </div>
 
-            {/* Leaderboard + How it works */}
-            <div className="grid gap-4 xl:grid-cols-2">
+            {/* Host-only leaderboard with delete + How it works */}
+            {isHost && (
               <Leaderboard items={leaderboard} isHost={isHost} streamId={stream?.id ?? null} />
-              <HowItWorks />
-            </div>
+            )}
 
             {/* Host controls */}
             {isHost && stream && (
@@ -157,10 +163,10 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
           {/* Right column */}
           <div className="space-y-5">
-            <LiveQueue queued={queued} />
             {showChat && <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />}
             <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
+        </div>
       </div>
 
       {modal === "boost" && <BoostCheckoutModal kind="boost" onClose={() => { setModal(null); refreshStatus(); }} />}
