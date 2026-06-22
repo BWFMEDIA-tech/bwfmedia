@@ -60,13 +60,13 @@ export const emitArenaEvent = createServerFn({ method: "POST" })
     if (!match) throw new Error("Match not found");
 
     const battleType = ARENA_TO_BATTLE[data.type];
-    let result: unknown = null;
+    let result: Record<string, unknown> | null = null;
     if (battleType) {
-      result = await runBattleEvent(supabase, userId, {
+      result = (await runBattleEvent(supabase, userId, {
         matchId: data.matchId,
         type: battleType,
         payload: data.payload as { trackId?: string } | undefined,
-      });
+      })) as Record<string, unknown>;
     }
 
     await supabase.from("arena_events").insert({
