@@ -67,6 +67,7 @@ import { Route as SettingsBroadcastHelpRouteImport } from './routes/settings.bro
 import { Route as SettingsBillingRouteImport } from './routes/settings.billing'
 import { Route as SettingsArtistInfoRouteImport } from './routes/settings.artist-info'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings.appearance'
+import { Route as PlayRanksRouteImport } from './routes/play.ranks'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
@@ -404,6 +405,11 @@ const SettingsAppearanceRoute = SettingsAppearanceRouteImport.update({
   path: '/appearance',
   getParentRoute: () => SettingsRoute,
 } as any)
+const PlayRanksRoute = PlayRanksRouteImport.update({
+  id: '/play/ranks',
+  path: '/play/ranks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlayRoomRoute = PlayRoomRouteImport.update({
   id: '/play/$room',
   path: '/play/$room',
@@ -714,6 +720,7 @@ export interface FileRoutesByFullPath {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/play/ranks': typeof PlayRanksRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
@@ -819,6 +826,7 @@ export interface FileRoutesByTo {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/play/ranks': typeof PlayRanksRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
@@ -926,6 +934,7 @@ export interface FileRoutesById {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/play/ranks': typeof PlayRanksRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
   '/settings/billing': typeof SettingsBillingRoute
@@ -1034,6 +1043,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/play/ranks'
     | '/settings/appearance'
     | '/settings/artist-info'
     | '/settings/billing'
@@ -1139,6 +1149,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/play/ranks'
     | '/settings/appearance'
     | '/settings/artist-info'
     | '/settings/billing'
@@ -1245,6 +1256,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/play/ranks'
     | '/settings/appearance'
     | '/settings/artist-info'
     | '/settings/billing'
@@ -1331,6 +1343,7 @@ export interface RootRouteChildren {
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
+  PlayRanksRoute: typeof PlayRanksRoute
   StageRoomIdRoute: typeof StageRoomIdRoute
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
@@ -1758,6 +1771,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/appearance'
       preLoaderRoute: typeof SettingsAppearanceRouteImport
       parentRoute: typeof SettingsRoute
+    }
+    '/play/ranks': {
+      id: '/play/ranks'
+      path: '/play/ranks'
+      fullPath: '/play/ranks'
+      preLoaderRoute: typeof PlayRanksRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/play/$room': {
       id: '/play/$room'
@@ -2244,6 +2264,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
+  PlayRanksRoute: PlayRanksRoute,
   StageRoomIdRoute: StageRoomIdRoute,
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
