@@ -562,8 +562,15 @@ function RankProgression() {
   ];
   return (
     <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-5">
-      <h3 className="text-xs font-bold tracking-widest text-white/50">RANK PROGRESSION</h3>
-      <p className="mt-1 text-sm text-white/70">Climb the ranks. Earn respect.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-bold tracking-widest text-white/50">RANK PROGRESSION</h3>
+          <p className="mt-1 text-sm text-white/70">Climb the ranks. Earn respect.</p>
+        </div>
+        <Link to="/play/ranks" className="text-[10px] font-bold text-[#00E6FF] hover:underline">
+          VIEW ALL →
+        </Link>
+      </div>
       <ul className="mt-4 space-y-2">
         {ranks.map((r) => (
           <li key={r.label} className={`flex items-center gap-3 rounded-lg border border-white/10 bg-gradient-to-r ${r.bg} px-3 py-2`}>
