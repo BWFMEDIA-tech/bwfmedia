@@ -215,7 +215,7 @@ export const setStageRole = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
-    // Enforce caps: max 5 hosts, max 5 guests (speakers)
+    // Enforce caps: max 5 hosts, max 20 guests (speakers)
     if (data.stageRole === "host" || data.stageRole === "speaker") {
       const { data: existing } = await supabase
         .from("stage_participants")
@@ -225,10 +225,10 @@ export const setStageRole = createServerFn({ method: "POST" })
       const count = (existing ?? []).filter(
         (r: any) => r.stage_role === data.stageRole && r.user_id !== data.targetUserId,
       ).length;
-      const cap = 5;
+      const cap = data.stageRole === "host" ? 5 : 20;
       if (count >= cap) {
         throw new Error(
-          data.stageRole === "host" ? "Host limit reached (5)" : "Guest limit reached (5)",
+          data.stageRole === "host" ? "Host limit reached (5)" : "Guest limit reached (20)",
         );
       }
       void already;
