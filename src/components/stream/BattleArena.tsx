@@ -140,6 +140,38 @@ function BattleView({
   const voteFn = useServerFn(castBattleVote);
   const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack } = roomState;
 
+  // Live XP balance for the signed-in viewer (drives the header XP badge).
+  const [xp, setXp] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth?.user?.id ?? null;
+      if (cancelled) return;
+      setUserId(uid);
+      if (!uid) return;
+      const { data } = await supabase.rpc("get_user_xp", { _user_id: uid });
+      if (!cancelled && typeof data === "number") setXp(data);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+  useEffect(() => {
+    if (!userId) return;
+    const ch = supabase
+      .channel(`xp-${userId}-${Math.random().toString(36).slice(2)}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "xp_ledger", filter: `user_id=eq.${userId}` },
+        (payload: any) => {
+          const ba = payload?.new?.balance_after;
+          if (typeof ba === "number") setXp(ba);
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [userId]);
+
   // Read-only countdown derived from server-stamped ends_at (advisory display).
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -194,6 +226,11 @@ function BattleView({
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {userId && xp !== null && (
+            <span className="flex items-center gap-1 rounded bg-[#c53dff]/15 px-2 py-0.5 text-[11px] font-mono font-bold text-[#e8b6ff]">
+              <Sparkles className="h-3 w-3" /> {xp.toLocaleString()} XP
+            </span>
+          )}
           {currentRound && currentRound.status === "live" && (
             <span
               className={cn(
