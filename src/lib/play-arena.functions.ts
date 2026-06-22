@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type ArenaDashboard = {
   liveBattle: {
@@ -33,6 +34,10 @@ export type ArenaDashboard = {
     activeArtists: number;
     totalViewers: number;
   };
+  nextEventAt: string | null;
+  activeEventsCount: number;
+  battlesToday: number;
+  nextSlotSeconds: number | null;
 };
 
 const EMPTY: ArenaDashboard = {
@@ -40,6 +45,10 @@ const EMPTY: ArenaDashboard = {
   trendingStream: null,
   queue: [],
   totals: { liveStreams: 0, liveBattles: 0, activeArtists: 0, totalViewers: 0 },
+  nextEventAt: null,
+  activeEventsCount: 0,
+  battlesToday: 0,
+  nextSlotSeconds: null,
 };
 
 export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
@@ -47,7 +56,9 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-      const [battleRes, streamsRes, queueRes] = await Promise.all([
+      const startOfDay = new Date();
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const [battleRes, streamsRes, queueRes, eventsRes, battlesTodayRes] = await Promise.all([
         supabaseAdmin
           .from("battle_matches")
           .select(
@@ -64,11 +75,21 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
           .limit(20),
         supabaseAdmin
           .from("play_tracks")
-          .select("id, position, artist_name, artist_user_id, status, stream_id")
+          .select("id, position, artist_name, artist_user_id, status, stream_id, duration_seconds")
           .in("status", ["queued", "playing"])
           .order("status", { ascending: true })
           .order("position", { ascending: true })
-          .limit(5),
+          .limit(50),
+        supabaseAdmin
+          .from("events")
+          .select("starts_at, status")
+          .in("status", ["scheduled", "live"])
+          .gte("starts_at", new Date().toISOString())
+          .order("starts_at", { ascending: true }),
+        supabaseAdmin
+          .from("battle_matches")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", startOfDay.toISOString()),
       ]);
 
       const battle = battleRes.data?.[0] ?? null;
@@ -123,7 +144,7 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
           }
         : null;
 
-      const queue = queueRows.map((r, idx) => ({
+      const queueTop = queueRows.slice(0, 5).map((r, idx) => ({
         id: r.id,
         position: r.position ?? idx + 1,
         artistName: r.artist_name ?? "Artist",
@@ -137,16 +158,28 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
         queueRows.map((r) => r.artist_user_id).filter(Boolean) as string[],
       ).size;
 
+      // Estimate next slot from sum of remaining queue durations (skip the playing one's elapsed time unknown → use full)
+      const queuedOnly = queueRows.filter((r) => r.status === "queued");
+      const nextSlotSeconds = queuedOnly.length
+        ? queuedOnly[0].duration_seconds ?? 180
+        : null;
+
+      const events = (eventsRes.data ?? []) as any[];
+
       return {
         liveBattle,
         trendingStream: trending,
-        queue,
+        queue: queueTop,
         totals: {
           liveStreams: streams.length,
           liveBattles: battle ? 1 : 0,
           activeArtists,
           totalViewers,
         },
+        nextEventAt: events[0]?.starts_at ?? null,
+        activeEventsCount: events.length,
+        battlesToday: battlesTodayRes.count ?? 0,
+        nextSlotSeconds,
       };
     } catch (err) {
       console.error("[getArenaDashboard] failed", err);
@@ -154,3 +187,90 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
     }
   },
 );
+
+/* ---------- User-scoped stats ---------- */
+
+export type ArenaUserStats = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  xp: number;
+  rank: { name: string; floor: number; cap: number | null };
+  nextRank: { name: string; floor: number } | null;
+  xpToNext: number;
+  progressPct: number;
+  queuePosition: number | null;
+  battlesToday: number;
+};
+
+const RANKS = [
+  { name: "Bronze Performer", floor: 0, cap: 2000 },
+  { name: "Silver Artist", floor: 2000, cap: 5000 },
+  { name: "Gold Creator", floor: 5000, cap: 10000 },
+  { name: "Diamond Star", floor: 10000, cap: null as number | null },
+];
+
+export const getArenaUserStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ArenaUserStats> => {
+    const { supabase, userId } = context;
+
+    const [profileRes, xpRes, queueRes, battlesRes] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("display_name, stage_name, username, avatar_url")
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("xp_ledger")
+        .select("balance_after, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("play_tracks")
+        .select("position")
+        .eq("artist_user_id", userId)
+        .in("status", ["queued", "playing"])
+        .order("position", { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+      (async () => {
+        const start = new Date();
+        start.setUTCHours(0, 0, 0, 0);
+        return supabase
+          .from("battle_matches")
+          .select("id", { count: "exact", head: true })
+          .or(`artist_a_id.eq.${userId},artist_b_id.eq.${userId}`)
+          .gte("created_at", start.toISOString());
+      })(),
+    ]);
+
+    const xp = (xpRes.data as any)?.balance_after ?? 0;
+    const rank =
+      [...RANKS].reverse().find((r) => xp >= r.floor) ?? RANKS[0];
+    const nextIdx = RANKS.findIndex((r) => r.name === rank.name) + 1;
+    const nextRank = RANKS[nextIdx] ? { name: RANKS[nextIdx].name, floor: RANKS[nextIdx].floor } : null;
+    const xpToNext = nextRank ? Math.max(0, nextRank.floor - xp) : 0;
+    const progressPct = rank.cap
+      ? Math.min(100, Math.round(((xp - rank.floor) / (rank.cap - rank.floor)) * 100))
+      : 100;
+
+    const profile = (profileRes.data as any) ?? null;
+    const displayName =
+      profile?.stage_name || profile?.display_name || profile?.username || "Artist";
+
+    return {
+      userId,
+      displayName,
+      avatarUrl: profile?.avatar_url ?? null,
+      xp,
+      rank: { name: rank.name, floor: rank.floor, cap: rank.cap },
+      nextRank,
+      xpToNext,
+      progressPct,
+      queuePosition: (queueRes.data as any)?.position ?? null,
+      battlesToday: battlesRes.count ?? 0,
+    };
+  });
