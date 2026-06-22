@@ -476,3 +476,35 @@ export const demoteToAudience = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const setStreamSpotlight = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        streamId: z.string().uuid(),
+        targetUserId: z.string().uuid().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertHostOrMod(supabase, userId, data.streamId);
+    const { error } = await supabase
+      .from("streams")
+      .update({ spotlight_user_id: data.targetUserId })
+      .eq("id", data.streamId);
+    if (error) throw new Error(error.message);
+    await logHostAction(supabase, {
+      actorId: userId,
+      action: data.targetUserId ? "spotlight_set" : "spotlight_clear",
+      streamId: data.streamId,
+      targetUserId: data.targetUserId ?? userId,
+      previousRole: null,
+      newRole: null,
+      summary: data.targetUserId
+        ? `Spotlighted ${data.targetUserId} to middle panel`
+        : `Cleared middle-panel spotlight`,
+    });
+    return { ok: true };
+  });
