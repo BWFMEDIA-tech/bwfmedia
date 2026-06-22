@@ -91,21 +91,47 @@ function PlayArenaDashboard() {
 }
 
 /* ---------- Profile Hero ---------- */
-function ProfileHero({ totals }: { totals: ArenaDashboard["totals"] }) {
+function ProfileHero({
+  totals,
+  user,
+}: {
+  totals: ArenaDashboard["totals"];
+  user: ArenaUserStats | null;
+}) {
+  const initials = (user?.displayName ?? "YW")
+    .split(/\s+/)
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+  const xp = user?.xp ?? 0;
+  const rankCap = user?.rank.cap ?? user?.rank.floor ?? 0;
+  const rankFloor = user?.rank.floor ?? 0;
+  const progressPct = user?.progressPct ?? 0;
   return (
     <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#11111d] to-[#0a0a14] p-5 sm:p-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
         <div className="lg:col-span-4 flex items-center gap-4">
-          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl bg-gradient-to-br from-[#C53DFF] to-[#FF00A6] flex items-center justify-center text-2xl font-black shrink-0">
-            YW
-          </div>
+          {user?.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user.displayName}
+              className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl object-cover shrink-0"
+            />
+          ) : (
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl bg-gradient-to-br from-[#C53DFF] to-[#FF00A6] flex items-center justify-center text-2xl font-black shrink-0">
+              {initials}
+            </div>
+          )}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-bold truncate">YoungWave</h2>
+              <h2 className="text-xl sm:text-2xl font-bold truncate">
+                {user?.displayName ?? "Guest"}
+              </h2>
               <CheckCircle2 className="h-5 w-5 text-[#00E6FF] shrink-0" />
             </div>
             <div className="mt-1 inline-flex items-center gap-1.5 rounded-md bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-xs font-semibold text-amber-300">
-              <Medal className="h-3.5 w-3.5" /> Bronze Performer
+              <Medal className="h-3.5 w-3.5" /> {user?.rank.name ?? "Unranked"}
             </div>
             <p className="mt-2 text-sm text-white/60">Rising artist. Real music. Real energy.</p>
             <button className="mt-3 rounded-md border border-white/15 px-3 py-1.5 text-xs font-semibold hover:bg-white/5">
@@ -117,15 +143,27 @@ function ProfileHero({ totals }: { totals: ArenaDashboard["totals"] }) {
         <div className="lg:col-span-3">
           <p className="text-[11px] font-bold tracking-widest text-white/50">XP PROGRESS</p>
           <p className="mt-1 text-2xl font-bold">
-            1,240 <span className="text-base font-medium text-white/50">/ 2,000 XP</span>
-            <span className="ml-2 text-sm text-[#00E6FF]">62%</span>
+            {xp.toLocaleString()}{" "}
+            <span className="text-base font-medium text-white/50">
+              / {user?.rank.cap ? rankCap.toLocaleString() : "∞"} XP
+            </span>
+            <span className="ml-2 text-sm text-[#00E6FF]">{progressPct}%</span>
           </p>
           <div className="mt-2 h-2 w-full rounded-full bg-white/10 overflow-hidden">
-            <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-[#C53DFF] to-[#FF00A6]" />
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#C53DFF] to-[#FF00A6]"
+              style={{ width: `${progressPct}%` }}
+            />
           </div>
           <p className="mt-2 text-xs text-white/50 flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-[#C53DFF]" />
-            760 XP to reach <span className="text-white/80 font-semibold">Silver Artist</span>
+            {user?.nextRank
+              ? <>
+                  {user.xpToNext.toLocaleString()} XP to reach{" "}
+                  <span className="text-white/80 font-semibold">{user.nextRank.name}</span>
+                </>
+              : <>Top rank reached</>}
+            {!user && <span className="text-white/40">— sign in to track XP</span>}
           </p>
         </div>
 
@@ -160,7 +198,20 @@ function ProfileHero({ totals }: { totals: ArenaDashboard["totals"] }) {
 }
 
 /* ---------- Choose Your Path ---------- */
-function ChoosePath() {
+function ChoosePath({
+  data,
+  user,
+}: {
+  data: ArenaDashboard;
+  user: ArenaUserStats | null;
+}) {
+  const nextSlot =
+    data.nextSlotSeconds != null
+      ? formatMMSS(data.nextSlotSeconds)
+      : "--:--";
+  const queuePos = user?.queuePosition != null ? `#${user.queuePosition}` : "—";
+  const battlesToday = user?.battlesToday ?? 0;
+  const nextEvent = data.nextEventAt ? formatEventDate(data.nextEventAt) : "TBA";
   return (
     <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-5 sm:p-6">
       <div className="flex items-end justify-between flex-wrap gap-2">
@@ -179,10 +230,10 @@ function ChoosePath() {
           title="OPEN STAGE QUEUE"
           desc={<>Join the queue for a chance to perform.<br />First come. First served.</>}
           metricLabel="Next Slot In"
-          metricValue="08:45"
+          metricValue={nextSlot}
           metricColor="text-[#C53DFF]"
           button={{ label: "JOIN QUEUE", className: "bg-[#C53DFF] hover:bg-[#b02ee6]" }}
-          footer={<>Your Position: <span className="font-bold text-white">#12</span></>}
+          footer={<>Your Position: <span className="font-bold text-white">{queuePos}</span></>}
         />
         <PathCard
           accent="from-[#00E6FF]/25 via-[#FF00A6]/20 to-transparent"
@@ -192,10 +243,10 @@ function ChoosePath() {
           title="1V1 BATTLE MATCH"
           desc={<>Get matched. Prove you're better.<br />Winner stays.</>}
           metricLabel="Find Opponent"
-          metricValue="00:30"
+          metricValue={data.totals.liveBattles > 0 ? "LIVE" : "OPEN"}
           metricColor="text-[#00E6FF]"
           button={{ label: "FIND MATCH", className: "bg-[#004BFF] hover:bg-[#0040d9]" }}
-          footer={<>Battles Today: <span className="font-bold text-white">3/10</span></>}
+          footer={<>Battles Today: <span className="font-bold text-white">{battlesToday}/10</span></>}
         />
         <PathCard
           accent="from-amber-500/25 to-transparent"
@@ -205,14 +256,38 @@ function ChoosePath() {
           title="WEEKLY CHALLENGE"
           desc={<>Compete in scheduled events.<br />Win rewards. Climb ranks.</>}
           metricLabel="Next Event"
-          metricValue="FRIDAY 8:00 PM"
+          metricValue={nextEvent}
           metricColor="text-amber-400"
           button={{ label: "VIEW CHALLENGES", className: "bg-amber-500 text-black hover:bg-amber-400" }}
-          footer={<>Active Events: <span className="font-bold text-white">2</span></>}
+          footer={<>Active Events: <span className="font-bold text-white">{data.activeEventsCount}</span></>}
         />
       </div>
     </section>
   );
+}
+
+function formatMMSS(seconds: number) {
+  const s = Math.max(0, Math.floor(seconds));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+}
+
+function formatEventDate(iso: string) {
+  try {
+    const d = new Date(iso);
+    return d
+      .toLocaleString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+      .toUpperCase();
+  } catch {
+    return "TBA";
+  }
 }
 
 function PathCard({
