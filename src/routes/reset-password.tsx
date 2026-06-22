@@ -35,6 +35,17 @@ function ResetPage() {
       return toast.error(error.message);
     }
     toast.success("Password updated");
+    // Send users to a destination that matches their role. Artists/listeners
+    // must not land on /stream-studio — that surface is host/admin only.
+    const { data: sessionData } = await supabase.auth.getSession();
+    const uid = sessionData.session?.user?.id;
+    if (uid) {
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+      const list = (roles ?? []).map((r: any) => r.role);
+      const isPrivileged = list.includes("admin") || list.includes("manager") || list.includes("host");
+      if (!isPrivileged && list.includes("artist")) return nav({ to: "/artist-dashboard" });
+      if (!isPrivileged) return nav({ to: "/" });
+    }
     nav({ to: "/stream-studio" });
   };
   return (
