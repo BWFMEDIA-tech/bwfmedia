@@ -21,13 +21,23 @@ import {
   ChevronRight,
   Radio,
 } from "lucide-react";
-import { getArenaDashboard, type ArenaDashboard } from "@/lib/play-arena.functions";
+import {
+  getArenaDashboard,
+  getArenaUserStats,
+  type ArenaDashboard,
+  type ArenaUserStats,
+} from "@/lib/play-arena.functions";
+import { useAuth } from "@/lib/auth-context";
 
 const EMPTY_DASHBOARD: ArenaDashboard = {
   liveBattle: null,
   trendingStream: null,
   queue: [],
   totals: { liveStreams: 0, liveBattles: 0, activeArtists: 0, totalViewers: 0 },
+  nextEventAt: null,
+  activeEventsCount: 0,
+  battlesToday: 0,
+  nextSlotSeconds: null,
 };
 
 export const Route = createFileRoute("/play/")({
@@ -46,6 +56,8 @@ export const Route = createFileRoute("/play/")({
 
 function PlayArenaDashboard() {
   const fn = useServerFn(getArenaDashboard);
+  const userFn = useServerFn(getArenaUserStats);
+  const { isAuthenticated } = useAuth();
   const { data } = useQuery({
     queryKey: ["arena-dashboard"],
     queryFn: () => fn(),
@@ -53,11 +65,18 @@ function PlayArenaDashboard() {
     refetchInterval: 20_000,
     initialData: EMPTY_DASHBOARD,
   });
+  const { data: userStats } = useQuery<ArenaUserStats | null>({
+    queryKey: ["arena-user-stats"],
+    queryFn: () => userFn(),
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
   return (
     <div className="min-h-screen bg-[#06060d] text-white pt-20 pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-        <ProfileHero totals={data.totals} />
-        <ChoosePath />
+        <ProfileHero totals={data.totals} user={userStats ?? null} />
+        <ChoosePath data={data} user={userStats ?? null} />
         <LiveArenaStatus data={data} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <EarnXp />
