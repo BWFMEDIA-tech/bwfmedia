@@ -178,7 +178,21 @@ export const castBattleVote = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
 
-    return { ok: true, vote, weight };
+    // Award XP for casting a vote (idempotent per round via reference_id).
+    // Base vote = 5 XP, boosted vote = 25 XP.
+    let xpBalance: number | null = null;
+    try {
+      const { data: bal } = await supabase.rpc("award_xp", {
+        _user_id: userId,
+        _delta: weight === 5 ? 25 : 5,
+        _reason: "vote_cast",
+        _reference_id: data.roundId,
+        _metadata: { choice: data.choice, weight },
+      });
+      if (typeof bal === "number") xpBalance = bal;
+    } catch { /* non-fatal */ }
+
+    return { ok: true, vote, weight, xpBalance };
   });
 
 export const getActiveBattle = createServerFn({ method: "GET" })
