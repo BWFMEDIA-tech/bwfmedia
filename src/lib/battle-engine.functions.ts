@@ -490,14 +490,10 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
 
 /** Queued tracks for a battle's two artists, used by the host control panel to pick which song to play. */
 export const getBattleArtistQueues = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ matchId: z.string().uuid() }).parse(input))
-  .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase;
     const { data: m } = await sb
       .from("battle_matches")
       .select("stream_id, artist_a_id, artist_b_id")
