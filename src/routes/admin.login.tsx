@@ -20,9 +20,27 @@ function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin/bookings" });
-    });
+    (async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const uid = sessionData.session?.user?.id;
+      if (!uid) return;
+      // Verify admin role before letting the session into the admin console.
+      // A non-admin who happens to be signed in (e.g. as an artist on another
+      // tab) must not silently land in /admin/* — sign them out of this
+      // surface and surface a clear error instead.
+      const { data: roleRow } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (roleRow) {
+        navigate({ to: "/admin/bookings" });
+      } else {
+        await supabase.auth.signOut();
+        setError("This account does not have admin access. Sign in with an authorized admin account.");
+      }
+    })();
   }, [navigate]);
 
   async function onGoogle() {

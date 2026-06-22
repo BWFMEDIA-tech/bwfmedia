@@ -33,6 +33,13 @@ function LoginPage() {
     if (uid) {
       const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
       const list = (roles ?? []).map((r: any) => r.role);
+      // Admins must use the dedicated /admin/login surface so admin sessions
+      // never leak into the member-facing app. Reject here and redirect.
+      if (list.includes("admin")) {
+        await supabase.auth.signOut();
+        toast.error("Admin accounts must sign in at /admin/login.");
+        return nav({ to: "/admin/login" });
+      }
       if (list.includes("listener") && !list.includes("artist")) dest = "/";
     }
     nav({ to: dest });
