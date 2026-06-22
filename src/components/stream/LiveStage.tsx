@@ -230,7 +230,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         )}
       >
         <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
-          {renderPanel("admin", "ADMIN", "Waiting for Administrator")}
+          {renderPanel("admin", "HOST", "Waiting for Host")}
         </div>
         <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
           {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
