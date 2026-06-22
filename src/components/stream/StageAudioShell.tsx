@@ -353,14 +353,26 @@ function ParticipantAudioLogger() {
  *    the track was torn down during reconnect.
  *  - Retries once on a transient mic failure.
  */
-function ReconnectAudioGuard() {
+function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: string }) {
   const room = useRoomContext();
   const { localParticipant } = useLocalParticipant();
 
   useEffect(() => {
     if (!room) return;
 
+    // Track mic intent across full reconnects. Set whenever the local
+    // participant has an audio publication, so a hard disconnect+rejoin
+    // can restore mic state even though Reconnecting never fired.
     const wantsMic = { current: false };
+    const syncMicIntent = () => {
+      const lp = room.localParticipant;
+      if (!lp) return;
+      const hasAudioPub = Array.from(lp.trackPublications.values()).some(
+        (p) => p.kind === Track.Kind.Audio,
+      );
+      if (hasAudioPub) wantsMic.current = true;
+    };
+    syncMicIntent();
 
     const resubscribeAllRemoteAudio = () => {
       room.remoteParticipants.forEach((p) => {
@@ -441,6 +453,43 @@ function ReconnectAudioGuard() {
       }, 1000);
     };
 
+    // Full disconnect auto-rejoin (token expiry, signal close, transport
+    // failure beyond SDK retry budget). Skips reasons where rejoining would
+    // be incorrect: user pressed Leave, host kicked, room ended, duplicate
+    // identity, or the server rejected us.
+    let rejoinTimer: ReturnType<typeof setTimeout> | null = null;
+    let rejoinAttempt = 0;
+    const NON_RECOVERABLE: ReadonlySet<DisconnectReason> = new Set([
+      DisconnectReason.CLIENT_INITIATED,
+      DisconnectReason.DUPLICATE_IDENTITY,
+      DisconnectReason.PARTICIPANT_REMOVED,
+      DisconnectReason.ROOM_DELETED,
+      DisconnectReason.USER_REJECTED,
+    ]);
+    const onDisconnected = (reason?: DisconnectReason) => {
+      if (reason !== undefined && NON_RECOVERABLE.has(reason)) {
+        console.log("[stage-audio] Disconnected (no rejoin)", reason);
+        return;
+      }
+      rejoinAttempt += 1;
+      const delay = Math.min(15000, 1000 * 2 ** Math.min(rejoinAttempt - 1, 3));
+      console.log("[stage-audio] Auto-rejoin in", delay, "ms (reason:", reason, ")");
+      if (rejoinTimer) clearTimeout(rejoinTimer);
+      rejoinTimer = setTimeout(async () => {
+        try {
+          await room.connect(serverUrl, token);
+          console.log("[stage-audio] Rejoined room");
+          rejoinAttempt = 0;
+          resubscribeAllRemoteAudio();
+          await republishMicIfNeeded();
+        } catch (err) {
+          console.warn("[stage-audio] Auto-rejoin failed", err);
+          if (rejoinAttempt < 8) onDisconnected(reason);
+        }
+      }, delay);
+    };
+    const onLocalTrackPublished = () => syncMicIntent();
+
     // Initial sweep in case we mounted after tracks were already published.
     resubscribeAllRemoteAudio();
 
@@ -450,6 +499,8 @@ function ReconnectAudioGuard() {
     room.on(RoomEvent.ParticipantConnected, onParticipantConnected);
     room.on(RoomEvent.TrackPublished, onTrackPublished as any);
     room.on(RoomEvent.MediaDevicesError, onMediaFailure as any);
+    room.on(RoomEvent.Disconnected, onDisconnected);
+    room.on(RoomEvent.LocalTrackPublished, onLocalTrackPublished);
     return () => {
       room.off(RoomEvent.Reconnecting, onReconnecting);
       room.off(RoomEvent.Reconnected, onReconnected);
@@ -457,8 +508,11 @@ function ReconnectAudioGuard() {
       room.off(RoomEvent.ParticipantConnected, onParticipantConnected);
       room.off(RoomEvent.TrackPublished, onTrackPublished as any);
       room.off(RoomEvent.MediaDevicesError, onMediaFailure as any);
+      room.off(RoomEvent.Disconnected, onDisconnected);
+      room.off(RoomEvent.LocalTrackPublished, onLocalTrackPublished);
+      if (rejoinTimer) clearTimeout(rejoinTimer);
     };
-  }, [room, localParticipant]);
+  }, [room, localParticipant, serverUrl, token]);
 
   return null;
 }
