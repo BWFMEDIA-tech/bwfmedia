@@ -449,6 +449,32 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
         (tracks ?? []).find((t: any) => t.id === currentRound?.b_playing_track_id) ??
         null;
     }
+
+    // Fallback: if the host hasn't picked a track to play yet for a side,
+    // show that artist's most recent submitted track (cover + title) so the
+    // album art appears as soon as the artist submits. This is display-only;
+    // the engine still requires a real PLAY_SIDE_*_TRACK to start playback.
+    const needFallback: Array<{ side: "a" | "b"; artistId: string | null }> = [];
+    if (!aTrack && match.artist_a_id) needFallback.push({ side: "a", artistId: match.artist_a_id as string });
+    if (!bTrack && match.artist_b_id) needFallback.push({ side: "b", artistId: match.artist_b_id as string });
+    if (needFallback.length) {
+      const artistIds = needFallback.map((n) => n.artistId!).filter(Boolean);
+      const { data: subs } = await sb
+        .from("play_tracks")
+        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at")
+        .eq("stream_id", data.streamId)
+        .in("artist_user_id", artistIds)
+        .in("status", ["queued", "playing"])
+        .order("created_at", { ascending: false });
+      for (const n of needFallback) {
+        const t = (subs ?? []).find((row: any) => row.artist_user_id === n.artistId) ?? null;
+        if (t) {
+          if (n.side === "a") aTrack = t;
+          else bTrack = t;
+        }
+      }
+    }
+
     return {
       match,
       rounds: rounds ?? [],
