@@ -177,13 +177,16 @@ function ProfileHero({
         </div>
 
         <div className="lg:col-span-3 flex flex-col gap-2.5">
-          <button className="group flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#C53DFF] to-[#004BFF] px-4 py-3 text-left hover:shadow-[0_0_30px_-5px_#C53DFF80] transition">
+          <Link
+            to="/live"
+            className="group flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#C53DFF] to-[#004BFF] px-4 py-3 text-left hover:shadow-[0_0_30px_-5px_#C53DFF80] transition"
+          >
             <Music2 className="h-5 w-5 shrink-0" />
             <div className="min-w-0">
               <p className="font-bold leading-tight">JOIN LIVE ARENA</p>
               <p className="text-xs text-white/80 leading-tight">Enter the arena. Earn your stage.</p>
             </div>
-          </button>
+          </Link>
           <Link to="/events" className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left hover:bg-white/[0.06] transition">
             <Calendar className="h-5 w-5 shrink-0 text-[#00E6FF]" />
             <div className="min-w-0">
