@@ -597,8 +597,15 @@ function PowerUps() {
   ];
   return (
     <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-5">
-      <h3 className="text-xs font-bold tracking-widest text-white/50">POWER-UPS</h3>
-      <p className="mt-1 text-sm text-white/70">Activate boosts. Dominate the arena.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xs font-bold tracking-widest text-white/50">POWER-UPS</h3>
+          <p className="mt-1 text-sm text-white/70">Activate boosts. Dominate the arena.</p>
+        </div>
+        <Link to="/play/ranks" className="text-[10px] font-bold text-[#C53DFF] hover:underline">
+          ACTIVATE →
+        </Link>
+      </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {items.map((p) => (
           <div key={p.title} className="rounded-xl border border-white/10 bg-[#11111d] p-3">
