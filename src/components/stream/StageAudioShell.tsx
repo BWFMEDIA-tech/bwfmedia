@@ -11,6 +11,7 @@ import {
   RoomEvent,
   Track,
   ConnectionState,
+  DisconnectReason,
   type Participant,
   type RemoteParticipant,
   type RemoteTrackPublication,
@@ -166,7 +167,7 @@ export function StageAudioShell({
         <StageMicSync streamId={streamId} userId={userId} />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
-        <ReconnectAudioGuard />
+        <ReconnectAudioGuard serverUrl={serverUrl} token={token} />
         {children}
         {showHostTools && <StageDiagnostics />}
         {showHostTools && <StageMicBar onLeave={onLeave} />}
