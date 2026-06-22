@@ -12,7 +12,6 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { BattleArena } from "@/components/stream/BattleArena";
 import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
