@@ -319,7 +319,7 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, string> = { connection_status: data.connectionStatus };
+    const patch: { connection_status: string; last_seen_at?: string } = { connection_status: data.connectionStatus };
     if (data.connectionStatus === "connected") patch.last_seen_at = new Date().toISOString();
 
     const { data: existing } = await supabaseAdmin
