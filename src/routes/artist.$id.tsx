@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
-  ListMusic, ThumbsUp,
+  ListMusic, ThumbsUp, Headphones,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar,
 } from "lucide-react";
@@ -15,6 +15,7 @@ import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
+import { incrementTrackPlayCount } from "@/lib/play-counts.functions";
 import {
   getArtistFollowStats,
   getIsFollowingArtist,
