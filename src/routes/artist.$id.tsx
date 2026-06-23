@@ -539,7 +539,7 @@ function TrackRowImpl({
   );
 }
 
-function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
+function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; play_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
   const preview = !isAuthenticated;
   const [showSignInModal, setShowSignInModal] = useState(false);
@@ -568,6 +568,9 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
   });
   const likedSet = new Set(myLikesQuery.data?.liked ?? []);
   const [likeOverrides, setLikeOverrides] = useState<Record<string, { liked: boolean; count: number }>>({});
+  const [playOverrides, setPlayOverrides] = useState<Record<string, number>>({});
+  const incrementPlay = useServerFn(incrementTrackPlayCount);
+  const playedThisSession = useRef<Set<string>>(new Set());
 
   const likeMutation = useMutation({
     mutationFn: (trackId: string) => toggleTrackLike({ data: { trackId } }),
@@ -629,12 +632,27 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
                 audioUrl={t.audio_url}
                 durationSec={t.duration_seconds}
                 likeCount={likeCount}
+                playCount={playOverrides[t.id] ?? t.play_count ?? 0}
                 liked={liked}
                 isPlaying={isThisPlaying}
                 onTogglePlay={() => {
                   if (!t.audio_url) return;
                   const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds, preview };
-                  if (isCurrent) { player.toggle(); } else { player.play(track, playable); }
+                  if (isCurrent) {
+                    player.toggle();
+                  } else {
+                    player.play(track, playable);
+                    if (isAuthenticated && !playedThisSession.current.has(t.id)) {
+                      playedThisSession.current.add(t.id);
+                      incrementPlay({ data: { trackId: t.id } })
+                        .then((res) => {
+                          setPlayOverrides((m) => ({ ...m, [t.id]: res.play_count }));
+                        })
+                        .catch(() => {
+                          playedThisSession.current.delete(t.id);
+                        });
+                    }
+                  }
                 }}
                 onStop={() => { if (isCurrent) player.pause(); }}
                 onToggleLike={() => {
