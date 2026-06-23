@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Music, Play } from "lucide-react";
+import { BarChart3, Loader2, Music, Play, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
 import { SettingsShell, Card } from "@/components/settings/SettingsShell";
 import { toast } from "sonner";
+import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
 
 export const Route = createFileRoute("/settings/music-media")({ component: MusicMediaPage });
 
@@ -15,6 +16,7 @@ function MusicMediaPage() {
   const [tracks, setTracks] = useState<any[]>([]);
   const [featuredTrack, setFeaturedTrack] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitSong, setSubmitSong] = useState<any | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -42,19 +44,32 @@ function MusicMediaPage() {
         {tracks.length === 0 ? <div className="py-6 text-center text-sm text-white/50">No tracks yet. Submit one in Play Arena.</div> : (
           <ul className="divide-y divide-white/5">
             {tracks.map((t) => (
-              <li key={t.id} className="flex items-center gap-3 py-2">
+              <li key={t.id} className="flex items-center gap-2 py-2">
                 <div className="h-10 w-10 overflow-hidden rounded bg-white/5">{t.cover_url && <img src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
                 <div className="flex-1 min-w-0">
                   <div className="truncate text-sm font-semibold">{t.title}</div>
                   <div className="truncate text-xs text-white/50">{t.artist_name}</div>
                 </div>
                 {t.audio_url && <button onClick={() => player.play({ id: t.id, title: t.title, artist: t.artist_name, audioUrl: t.audio_url, coverUrl: t.cover_url }, tracks.filter((x) => x.audio_url).map((x) => ({ id: x.id, title: x.title, artist: x.artist_name, audioUrl: x.audio_url, coverUrl: x.cover_url })))} className="grid h-8 w-8 place-items-center rounded-full bg-red-600 text-white hover:bg-red-500"><Play className="h-3.5 w-3.5" /></button>}
+                <button title="Analytics" className="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 hover:bg-white/5 hover:text-white"><BarChart3 className="h-3.5 w-3.5" /></button>
+                {t.audio_url && (
+                  <button
+                    onClick={() => setSubmitSong(t)}
+                    title="Submit to Play Arena"
+                    className="flex items-center gap-1 rounded-full bg-gradient-to-r from-fuchsia-600 to-pink-600 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow shadow-fuchsia-500/30 hover:from-fuchsia-500 hover:to-pink-500"
+                  >
+                    <Rocket className="h-3 w-3" /> Arena
+                  </button>
+                )}
                 <button onClick={() => setFeatured(featuredTrack === t.id ? null : t.id)} className={`rounded-md border px-2 py-1 text-[10px] uppercase tracking-wider ${featuredTrack === t.id ? "border-red-600 text-red-400" : "border-white/10 text-white/60 hover:bg-white/5"}`}>{featuredTrack === t.id ? "Featured" : "Feature"}</button>
               </li>
             ))}
           </ul>
         )}
       </Card>
+      {submitSong && (
+        <SubmitToArenaModal song={submitSong} onClose={() => setSubmitSong(null)} />
+      )}
     </SettingsShell>
   );
 }
