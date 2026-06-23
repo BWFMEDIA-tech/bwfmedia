@@ -193,6 +193,7 @@ function VideosPage() {
   const [nativeControls, setNativeControls] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playAfterLoadRef = useRef(false);
 
