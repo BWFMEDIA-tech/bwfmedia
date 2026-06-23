@@ -252,7 +252,7 @@ export function StageRoom({
         onInvite={() => setInvite("host")}
         inviteLabel="Invite Host"
       />
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
         {hosts.map((p) => (
           <SpeakerBubble
             key={p.id}
@@ -286,12 +286,12 @@ export function StageRoom({
           />
         )}
         {Array.from({ length: Math.max(0, MAX_HOSTS - hostSlotsTaken) }).map((_, i) => (
-          <EmptySlot key={`h-${i}`} label="Host slot" />
+          <EmptySlot key={`h-${i}`} label="Host slot" color={PURPLE} />
         ))}
       </div>
 
       {/* Guests row */}
-      <div className="mt-6">
+      <div className="mt-8">
         <SectionHeader
           label="GUESTS"
           count={`${guests.length}/${MAX_GUESTS}`}
@@ -300,7 +300,7 @@ export function StageRoom({
           onInvite={() => setInvite("speaker")}
           inviteLabel="Invite Guest"
         />
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
           {guests.map((p) => (
             <SpeakerBubble
               key={p.id}
@@ -317,9 +317,19 @@ export function StageRoom({
               onToggleMute={() => doToggleMute(p)}
             />
           ))}
-          {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
-            <EmptySlot key={`g-${i}`} label="Guest slot" />
-          ))}
+          {(() => {
+            const remaining = Math.max(0, MAX_GUESTS - guests.length);
+            const visible = Math.min(remaining, VISIBLE_EMPTY_GUESTS);
+            const overflow = remaining - visible;
+            return (
+              <>
+                {Array.from({ length: visible }).map((_, i) => (
+                  <EmptySlot key={`g-${i}`} label="Guest slot" color={ACCENT} />
+                ))}
+                {overflow > 0 && <MoreOpenChip count={overflow} color={ACCENT} />}
+              </>
+            );
+          })()}
         </div>
       </div>
 
