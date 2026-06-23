@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getVideoEmbedUrl } from "@/lib/utils";
 import {
   Upload,
   Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
