@@ -139,7 +139,10 @@ function RootComponent() {
         <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
-        <div className={isChrome ? "pt-24 md:pt-28" : ""}>
+        <div
+          className={isChrome ? "pt-24 md:pt-28" : ""}
+          style={isChrome ? { paddingTop: "calc(var(--bwf-banner-h, 0px) + 6rem)" } : undefined}
+        >
           <Outlet />
         </div>
         {isChrome && <SiteFooter />}
