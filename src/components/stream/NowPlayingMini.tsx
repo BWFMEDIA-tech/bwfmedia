@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Music, Play, Pause, Volume2 } from "lucide-react";
 import { usePlayQueue } from "@/lib/usePlayQueue";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 /**
  * Compact "Now Playing" strip that mirrors the Play Arena's currently-playing
@@ -49,7 +50,10 @@ export function NowPlayingMini({ streamId }: { streamId: string | null }) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-bold text-white">{playing.title}</div>
-          <div className="truncate text-xs text-white/60">{playing.artist_name}</div>
+          <div className="flex items-center gap-1.5 text-xs text-white/60">
+            <span className="truncate">{playing.artist_name}</span>
+            <RankBadge userId={playing.artist_user_id} size="xs" />
+          </div>
         </div>
         {playing.audio_url && (
           <button
