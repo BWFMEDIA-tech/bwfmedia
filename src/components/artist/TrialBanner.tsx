@@ -11,7 +11,7 @@ export function ArtistTrialBanner() {
 
   if (isTrialing) {
     return (
-      <div className="w-full bg-gradient-to-r from-fuchsia-600/90 via-pink-600/90 to-cyan-500/90 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
+      <div className="fixed top-0 inset-x-0 z-[60] w-full bg-gradient-to-r from-fuchsia-600/90 via-pink-600/90 to-cyan-500/90 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
         <Clock size={16} className="shrink-0" />
         <span className="font-medium">
           Free trial: {daysLeft ?? 7} day{daysLeft === 1 ? "" : "s"} left
@@ -25,7 +25,7 @@ export function ArtistTrialBanner() {
 
   if (!isActive) {
     return (
-      <div className="w-full bg-gradient-to-r from-fuchsia-700 to-cyan-600 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
+      <div className="fixed top-0 inset-x-0 z-[60] w-full bg-gradient-to-r from-fuchsia-700 to-cyan-600 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
         <Sparkles size={16} className="shrink-0" />
         <span className="font-medium">Start your 7-day free Artist trial — $6.99/mo after.</span>
         <Link
