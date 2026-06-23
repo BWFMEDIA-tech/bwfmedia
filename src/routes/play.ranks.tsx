@@ -4,21 +4,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   ArrowLeft,
-  Award,
+  BadgeCheck,
   ChevronRight,
   Crown,
   Flame,
-  Gem,
-  Medal,
-  Mic2,
-  Music2,
+  Diamond,
+  Shield,
+  Mic,
+  Disc3,
   Rocket,
-  Sparkles,
+  Star,
   Swords,
   Target,
   Trophy,
   Users,
   Zap,
+  Sparkles,
 } from "lucide-react";
 import {
   listPowerUps,
@@ -45,18 +46,18 @@ export const Route = createFileRoute("/play/ranks")({
 });
 
 const RANKS = [
-  { icon: Medal, label: "BRONZE PERFORMER", floor: 0, cap: 2000, range: "0 – 1,999 XP", color: "text-amber-600", bg: "from-amber-700/40 to-amber-900/30", note: "Starting your journey. Build your audience and prove your talent." },
-  { icon: Award, label: "SILVER ARTIST", floor: 2000, cap: 5000, range: "2,000 – 4,999 XP", color: "text-slate-300", bg: "from-slate-400/30 to-slate-600/20", note: "Your music is gaining traction. Fans are starting to notice." },
+  { icon: Shield, label: "BRONZE PERFORMER", floor: 0, cap: 2000, range: "0 – 1,999 XP", color: "text-amber-600", bg: "from-amber-700/40 to-amber-900/30", note: "Starting your journey. Build your audience and prove your talent." },
+  { icon: BadgeCheck, label: "SILVER ARTIST", floor: 2000, cap: 5000, range: "2,000 – 4,999 XP", color: "text-slate-300", bg: "from-slate-400/30 to-slate-600/20", note: "Your music is gaining traction. Fans are starting to notice." },
   { icon: Trophy, label: "GOLD CREATOR", floor: 5000, cap: 10000, range: "5,000 – 9,999 XP", color: "text-amber-400", bg: "from-amber-400/30 to-amber-600/20", note: "Established creator with growing influence and engagement." },
-  { icon: Gem, label: "DIAMOND STAR", floor: 10000, cap: 25000, range: "10,000 – 24,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#004BFF]/20", note: "Elite status. Consistent performance and strong fan support." },
+  { icon: Diamond, label: "DIAMOND STAR", floor: 10000, cap: 25000, range: "10,000 – 24,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#004BFF]/20", note: "Elite status. Consistent performance and strong fan support." },
   { icon: Crown, label: "PLATINUM ICON", floor: 25000, cap: 50000, range: "25,000 – 49,999 XP", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/30 to-[#00E6FF]/20", note: "Recognized across the platform. A true standout artist." },
-  { icon: Rocket, label: "SUPERSTAR", floor: 50000, cap: 100000, range: "50,000 – 99,999 XP", color: "text-[#FF00A6]", bg: "from-[#FF00A6]/30 to-[#C53DFF]/20", note: "Massive reach. Dominating battles, streams, and engagement." },
+  { icon: Star, label: "SUPERSTAR", floor: 50000, cap: 100000, range: "50,000 – 99,999 XP", color: "text-[#FF00A6]", bg: "from-[#FF00A6]/30 to-[#C53DFF]/20", note: "Massive reach. Dominating battles, streams, and engagement." },
   { icon: Sparkles, label: "LEGEND", floor: 100000, cap: null as number | null, range: "100,000+ XP", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/40 to-[#FF00A6]/20", note: "Invite Only · Top 1% of BWF NETWORK performers." },
 ];
 
 const XP_RULES = [
-  { icon: Mic2, label: "Join Live Arena", xp: "+50 XP", sub: "Per Performance", color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  { icon: Music2, label: "Submit Track", xp: "+25 XP", sub: "Per Track", color: "text-[#C53DFF]", bg: "bg-[#C53DFF]/10" },
+  { icon: Mic, label: "Join Live Arena", xp: "+50 XP", sub: "Per Performance", color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  { icon: Disc3, label: "Submit Track", xp: "+25 XP", sub: "Per Track", color: "text-[#C53DFF]", bg: "bg-[#C53DFF]/10" },
   { icon: Swords, label: "Win Battle", xp: "+200 XP", sub: "Per Victory", color: "text-[#00E6FF]", bg: "bg-[#00E6FF]/10" },
   { icon: Users, label: "Audience Votes", xp: "+1 XP", sub: "Per 10 Votes", color: "text-[#FF00A6]", bg: "bg-[#FF00A6]/10" },
   { icon: Flame, label: "Win Streak Bonus", xp: "+10%", sub: "XP Multiplier", color: "text-amber-400", bg: "bg-amber-500/10" },
@@ -67,6 +68,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   target: Target,
   zap: Zap,
   crown: Crown,
+  rocket: Rocket,
 };
 
 function RanksPage() {
