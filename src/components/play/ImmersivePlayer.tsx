@@ -748,42 +748,35 @@ export function ImmersivePlayer({
             {showQueue ? <ChevronDown className="h-4 w-4 text-white/50" /> : <ChevronUp className="h-4 w-4 text-white/50" />}
           </button>
           {showQueue && (
-            upNext.length === 0 ? (
+            orderedUpNext.length === 0 ? (
               <p className="mt-4 text-center text-sm text-white/40">Queue is empty — be first to submit.</p>
             ) : (
-              <ul className="mt-3 space-y-1.5">
-                {upNext.slice(0, 8).map((t, i) => (
-                  <li key={t.id}
-                    className={`group flex items-center gap-2.5 rounded-xl p-2 transition ${
-                      t.boosted ? "border border-[#FF00A6]/40 bg-[#FF00A6]/5" : "border border-white/5 bg-white/[0.02] hover:bg-white/[0.05]"
-                    }`}>
-                    <span className="w-5 text-center text-[11px] font-black text-white/40">{i + 1}</span>
-                    <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
-                      {t.cover_url && <img src={t.cover_url} alt="" className="h-full w-full object-cover" />}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1 truncate text-xs font-semibold">
-                        {t.boosted && <Zap className="h-3 w-3 flex-shrink-0 text-[#FF00A6]" />}
-                        <span className="truncate">{t.title}</span>
-                      </div>
-                      <div className="truncate text-[10px] text-white/50">{t.artist_name}</div>
-                    </div>
-                    {isHost && (
-                      <button
-                        onClick={async () => {
-                          if (!streamId) return;
-                          try { await playFn({ data: { streamId, trackId: t.id } }); toast.success("Playing now"); }
-                          catch (e: any) { toast.error(e?.message ?? "Failed"); }
-                        }}
-                        className="rounded-full bg-white/10 p-1.5 text-white/80 opacity-0 transition group-hover:opacity-100 hover:bg-white/20"
-                        aria-label="Play now"
-                      >
-                        <Play className="h-3 w-3" />
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <>
+                {isHost && (
+                  <p className="mt-3 text-[10px] uppercase tracking-wider text-white/40">
+                    Drag to reorder · host only
+                  </p>
+                )}
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                  <SortableContext items={orderedUpNext.slice(0, 8).map(t => t.id)} strategy={verticalListSortingStrategy}>
+                    <ul className="mt-3 space-y-1.5">
+                      {orderedUpNext.slice(0, 8).map((t, i) => (
+                        <QueueItem
+                          key={t.id}
+                          track={t}
+                          index={i}
+                          isHost={isHost}
+                          onPlayNow={async () => {
+                            if (!streamId) return;
+                            try { await playFn({ data: { streamId, trackId: t.id } }); toast.success("Playing now"); }
+                            catch (e: any) { toast.error(e?.message ?? "Failed"); }
+                          }}
+                        />
+                      ))}
+                    </ul>
+                  </SortableContext>
+                </DndContext>
+              </>
             )
           )}
         </div>
