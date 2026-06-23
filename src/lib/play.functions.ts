@@ -269,3 +269,62 @@ export const getMyPlayStatus = createServerFn({ method: "POST" })
       boostCredits: credRes.data?.credits ?? 0,
     };
   });
+
+/** Host: reorder the queued tracks for a stream. Accepts the new order
+ *  (array of track ids, top-of-queue first). Writes position 1..N and
+ *  bumps rank_score so the host order survives the next ranking recompute. */
+export const reorderPlayQueue = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      streamId: z.string().uuid(),
+      orderedTrackIds: z.array(z.string().uuid()).min(1).max(200),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertHost(supabase, userId, data.streamId);
+
+    // Confirm every id belongs to this stream and is queued.
+    const { data: rows, error: readErr } = await supabase
+      .from("play_tracks")
+      .select("id, like_count, dislike_count, boost_weight")
+      .eq("stream_id", data.streamId)
+      .eq("status", "queued");
+    if (readErr) throw new Error(readErr.message);
+    const byId = new Map((rows ?? []).map((r: any) => [r.id, r]));
+    const ids = data.orderedTrackIds.filter((id) => byId.has(id));
+    if (ids.length === 0) return { ok: true, updated: 0 };
+
+    // Compute a top-anchored rank_score so the next recompute preserves order.
+    // Highest baseline among queued tracks + N offsets keeps the host order
+    // dominant over organic vote drift until the host re-shuffles.
+    let topBase = 0;
+    for (const r of rows ?? []) {
+      const base = (r.like_count ?? 0) - (r.dislike_count ?? 0) + (r.boost_weight ?? 0);
+      if (base > topBase) topBase = base;
+    }
+    const updates = ids.map((id, idx) => ({
+      id,
+      position: idx + 1,
+      rank_score: topBase + (ids.length - idx) * 10,
+      rank_updated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
+
+    // Apply individually — RLS + competitive-writes trigger gates per row.
+    for (const u of updates) {
+      const { error } = await supabase
+        .from("play_tracks")
+        .update({
+          position: u.position,
+          rank_score: u.rank_score,
+          rank_updated_at: u.rank_updated_at,
+          updated_at: u.updated_at,
+        })
+        .eq("id", u.id)
+        .eq("stream_id", data.streamId);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true, updated: updates.length };
+  });
