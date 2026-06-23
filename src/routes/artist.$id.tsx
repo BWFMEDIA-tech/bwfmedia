@@ -346,11 +346,6 @@ function fmtNum(n: number) {
   if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
   return String(n);
 }
-function fmtDur(s: number | null) {
-  if (!s || s <= 0) return "--:--";
-  const m = Math.floor(s / 60); const r = s % 60;
-  return `${m}:${String(r).padStart(2, "0")}`;
-}
 
 function TrackRow({
   ...args
