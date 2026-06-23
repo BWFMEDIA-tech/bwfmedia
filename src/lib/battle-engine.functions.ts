@@ -543,9 +543,8 @@ export const getBattleArtistQueues = createServerFn({ method: "GET" })
     const { data: rows } = await sb
       .from("play_tracks")
       .select("id, title, cover_url, artist_user_id, status, position, created_at")
-      .eq("stream_id", m.stream_id)
       .in("artist_user_id", [m.artist_a_id, m.artist_b_id])
-      .in("status", ["queued", "playing"])
+      .neq("status", "removed")
       .order("created_at", { ascending: true });
     const a = (rows ?? []).filter((r: any) => r.artist_user_id === m.artist_a_id);
     const b = (rows ?? []).filter((r: any) => r.artist_user_id === m.artist_b_id);
