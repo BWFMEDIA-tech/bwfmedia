@@ -887,11 +887,86 @@ export function AudienceRow({ participants }: { participants: StageParticipant[]
   );
 }
 
-function EmptySlot({ label = "Open slot" }: { label?: string }) {
+function EmptySlot({ label = "Open slot", color = "#ffffff" }: { label?: string; color?: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 opacity-40">
-      <div className="h-20 w-20 rounded-full border-2 border-dashed border-white/20" />
-      <div className="text-[10px] text-white/40">{label}</div>
+    <div className="group flex flex-col items-center gap-2">
+      <div
+        className="relative grid h-20 w-20 place-items-center rounded-full border border-dashed transition group-hover:scale-105"
+        style={{
+          borderColor: `${color}55`,
+          background: `radial-gradient(60% 60% at 50% 50%, ${color}10, transparent 70%)`,
+        }}
+      >
+        <span className="text-lg font-thin" style={{ color: `${color}99` }}>
+          +
+        </span>
+      </div>
+      <div
+        className="text-[10px] font-semibold uppercase tracking-widest"
+        style={{ color: `${color}77` }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function MoreOpenChip({ count, color }: { count: number; color: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2">
+      <div
+        className="grid h-20 w-20 place-items-center rounded-full border text-center"
+        style={{
+          borderColor: `${color}55`,
+          background: `radial-gradient(60% 60% at 50% 50%, ${color}18, transparent 70%)`,
+          boxShadow: `inset 0 0 16px ${color}22`,
+        }}
+      >
+        <div>
+          <div className="text-lg font-black leading-none text-white" style={{ textShadow: `0 0 12px ${color}aa` }}>
+            +{count}
+          </div>
+          <div className="mt-0.5 text-[8px] font-bold uppercase tracking-widest" style={{ color: `${color}cc` }}>
+            open
+          </div>
+        </div>
+      </div>
+      <div className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: `${color}77` }}>
+        more seats
+      </div>
+    </div>
+  );
+}
+
+function CapacityChip({
+  label,
+  filled,
+  total,
+  color,
+}: {
+  label: string;
+  filled: number;
+  total: number;
+  color: string;
+}) {
+  const pct = Math.max(0, Math.min(100, (filled / total) * 100));
+  return (
+    <div
+      className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur"
+      style={{ boxShadow: `inset 0 0 12px ${color}22` }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+      <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">{label}</span>
+      <span className="text-[11px] font-black tabular-nums text-white">
+        {filled}
+        <span className="text-white/40">/{total}</span>
+      </span>
+      <span className="relative h-1 w-10 overflow-hidden rounded-full bg-white/10">
+        <span
+          className="absolute inset-y-0 left-0 rounded-full transition-all"
+          style={{ width: `${pct}%`, background: color, boxShadow: `0 0 10px ${color}` }}
+        />
+      </span>
     </div>
   );
 }
