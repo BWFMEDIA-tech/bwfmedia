@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
 import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue } from "@/lib/play.functions";
+import { RankBadge } from "@/components/rank/RankBadge";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
   useSensor, useSensors, type DragEndEvent,
@@ -630,6 +631,7 @@ export function ImmersivePlayer({
               <p className="mt-1 flex items-center gap-1.5 text-sm text-white/70">
                 <span className="truncate">{track.artist_name}</span>
                 <BadgeCheck className="h-4 w-4 text-[#00E6FF]" />
+                <RankBadge userId={track.artist_user_id} size="md" />
               </p>
 
               <div className="mt-3 flex items-center gap-2">
@@ -905,7 +907,10 @@ export function ImmersivePlayer({
                   }`}>{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-semibold">{t.title}</div>
-                    <div className="truncate text-[10px] text-white/50">{t.artist_name}</div>
+                    <div className="flex items-center gap-1 text-[10px] text-white/50">
+                      <span className="truncate">{t.artist_name}</span>
+                      <RankBadge userId={t.artist_user_id} size="xs" />
+                    </div>
                   </div>
                   <span className="font-black text-[#C53DFF]">{t.score}</span>
                 </li>
@@ -973,7 +978,10 @@ function QueueItem({
           {track.boosted && <Zap className="h-3 w-3 flex-shrink-0 text-[#FF00A6]" />}
           <span className="truncate">{track.title}</span>
         </div>
-        <div className="truncate text-[10px] text-white/50">{track.artist_name}</div>
+        <div className="flex items-center gap-1 text-[10px] text-white/50">
+          <span className="truncate">{track.artist_name}</span>
+          <RankBadge userId={track.artist_user_id} size="xs" />
+        </div>
       </div>
       {isHost && (
         <button
