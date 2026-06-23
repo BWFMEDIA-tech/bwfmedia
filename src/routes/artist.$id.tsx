@@ -268,6 +268,92 @@ function fmtDur(s: number | null) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
+function TrackRow({
+  index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
+  onTogglePlay, onStop, onToggleLike,
+}: {
+  index: number;
+  title: string;
+  coverUrl: string | null;
+  audioUrl: string | null;
+  durationSec: number | null;
+  likeCount: number;
+  liked: boolean;
+  isPlaying: boolean;
+  onTogglePlay: () => void;
+  onStop: () => void;
+  onToggleLike: () => void;
+}) {
+  const [detectedDur, setDetectedDur] = useState<number | null>(null);
+  useEffect(() => {
+    if (durationSec && durationSec > 0) return;
+    if (!audioUrl) return;
+    let cancelled = false;
+    const audio = new Audio();
+    audio.preload = "metadata";
+    audio.src = audioUrl;
+    const onMeta = () => {
+      if (!cancelled && isFinite(audio.duration) && audio.duration > 0) {
+        setDetectedDur(Math.round(audio.duration));
+      }
+    };
+    audio.addEventListener("loadedmetadata", onMeta);
+    return () => {
+      cancelled = true;
+      audio.removeEventListener("loadedmetadata", onMeta);
+      audio.src = "";
+    };
+  }, [audioUrl, durationSec]);
+  const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
+
+  return (
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] gap-3 items-center py-2 text-sm group">
+      <span className="text-white/40 text-xs">{index}</span>
+      <button
+        type="button"
+        onClick={onTogglePlay}
+        disabled={!audioUrl}
+        aria-label={isPlaying ? `Pause ${title}` : `Play ${title}`}
+        className="relative h-9 w-9 rounded overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 disabled:opacity-50"
+      >
+        {coverUrl && <img src={coverUrl} alt="" className="h-full w-full object-cover" />}
+        {audioUrl && (
+          <span className={`absolute inset-0 flex items-center justify-center bg-black/55 transition-opacity ${isPlaying ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+            {isPlaying
+              ? <Pause className="h-4 w-4 text-white" fill="currentColor" />
+              : <Play className="h-4 w-4 text-white" fill="currentColor" />}
+          </span>
+        )}
+      </button>
+      <div className="min-w-0 truncate">{title}</div>
+      <div className="text-xs text-white/60 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onToggleLike}
+          aria-pressed={liked}
+          aria-label={liked ? `Unlike ${title}` : `Like ${title}`}
+          className={`flex items-center gap-1 rounded px-1 py-0.5 transition-colors ${liked ? "text-[#FF00A6]" : "text-white/60 hover:text-white"}`}
+        >
+          <Heart className="h-3.5 w-3.5" fill={liked ? "currentColor" : "none"} />
+          <span className="tabular-nums">{fmtNum(likeCount)}</span>
+        </button>
+        {isPlaying && (
+          <button
+            type="button"
+            onClick={onStop}
+            aria-label={`Stop ${title}`}
+            className="text-white/60 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Stop"
+          >
+            <span className="block h-3 w-3 bg-current rounded-[2px]" />
+          </button>
+        )}
+        <span className="text-white/40 tabular-nums">{fmtDur(dur)}</span>
+      </div>
+    </li>
+  );
+}
+
 function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
   const preview = !isAuthenticated;
