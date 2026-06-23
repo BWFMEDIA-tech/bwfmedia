@@ -204,8 +204,45 @@ export async function runBattleEvent(
       case "OPEN_VOTING": {
         const round = await loadCurrentRound();
         if (!round || round.status !== "live") invalid("no live round");
+        // Auto-resolve a "playing" track for either side that hasn't picked
+        // one yet by promoting the artist's most recent submission. This lets
+        // the host open voting as soon as both artists have submitted, even
+        // if they haven't explicitly pressed Play first.
+        const missing: Array<{ side: "a" | "b"; artistId: string | null; col: string }> = [];
+        if (!round.a_playing_track_id)
+          missing.push({ side: "a", artistId: m.artist_a_id as string | null, col: "a_playing_track_id" });
+        if (!round.b_playing_track_id)
+          missing.push({ side: "b", artistId: m.artist_b_id as string | null, col: "b_playing_track_id" });
+        if (missing.length) {
+          const artistIds = missing.map((x) => x.artistId).filter(Boolean) as string[];
+          if (artistIds.length) {
+            const { data: subs } = await supabase
+              .from("play_tracks")
+              .select("id, artist_user_id, status, created_at")
+              .eq("stream_id", m.stream_id)
+              .in("artist_user_id", artistIds)
+              .in("status", ["queued", "playing"])
+              .order("created_at", { ascending: false });
+            for (const slot of missing) {
+              const t = (subs ?? []).find((row: any) => row.artist_user_id === slot.artistId);
+              if (t) {
+                if (t.status === "queued") {
+                  await supabase
+                    .from("play_tracks")
+                    .update({ status: "playing" })
+                    .eq("id", t.id);
+                }
+                await supabase
+                  .from("battle_rounds")
+                  .update({ [slot.col]: t.id } as any)
+                  .eq("id", round.id);
+                (round as any)[slot.col] = t.id;
+              }
+            }
+          }
+        }
         if (!round.a_playing_track_id || !round.b_playing_track_id) {
-          invalid("both sides must play a track before voting opens");
+          invalid("both artists must submit a track before voting opens");
         }
         await supabase
           .from("battle_rounds")
