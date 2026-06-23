@@ -626,7 +626,7 @@ function VideosPage() {
       </main>
 
       {/* BOTTOM NOW PLAYING BAR */}
-      {hero && (
+      {hero && !heroIsIframe && (
         <div className="fixed bottom-0 inset-x-0 z-40 bg-black/95 backdrop-blur-xl border-t border-white/10">
           {queueOpen && (
             <div className="absolute bottom-full right-4 mb-2 w-80 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-black/95 p-3 shadow-2xl">
