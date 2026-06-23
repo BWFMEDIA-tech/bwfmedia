@@ -23,6 +23,59 @@ export const getArtistFollowStats = createServerFn({ method: "GET" })
     return { count: count ?? 0 };
   });
 
+export const listArtistFollowers = createServerFn({ method: "GET" })
+  .inputValidator((d) =>
+    z
+      .object({
+        artistId: z.string().uuid(),
+        page: z.number().int().min(1).max(10_000).default(1),
+        pageSize: z.number().int().min(1).max(50).default(20),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const sb = publicClient();
+    const from = (data.page - 1) * data.pageSize;
+    const to = from + data.pageSize - 1;
+
+    const { data: rows, count, error } = await sb
+      .from("artist_follows")
+      .select("follower_id, created_at", { count: "exact" })
+      .eq("artist_id", data.artistId)
+      .order("created_at", { ascending: false })
+      .range(from, to);
+    if (error) throw error;
+
+    const ids = (rows ?? []).map((r) => r.follower_id as string);
+    let profilesById = new Map<string, { id: string; display_name: string | null; avatar_url: string | null }>();
+    if (ids.length > 0) {
+      const { data: profs } = await sb
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", ids);
+      profilesById = new Map((profs ?? []).map((p) => [p.id, p]));
+    }
+
+    const followers = (rows ?? []).map((r) => {
+      const p = profilesById.get(r.follower_id as string);
+      return {
+        id: r.follower_id as string,
+        followedAt: r.created_at as string,
+        displayName: p?.display_name ?? null,
+        avatarUrl: p?.avatar_url ?? null,
+      };
+    });
+
+    const total = count ?? 0;
+    return {
+      followers,
+      total,
+      page: data.page,
+      pageSize: data.pageSize,
+      totalPages: Math.max(1, Math.ceil(total / data.pageSize)),
+    };
+  });
+
 export const getIsFollowingArtist = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ artistId: z.string().uuid() }).parse(d))
