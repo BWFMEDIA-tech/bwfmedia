@@ -398,17 +398,48 @@ function ArtistSide({
               )}
               style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
             >
-              {coverUrl ? (
-                <img
-                  src={coverUrl}
-                  alt={trackTitle ?? name}
-                  className={cn("h-full w-full object-cover", isPlaying && "animate-[spin_8s_linear_infinite]")}
+              {/* Vinyl record — spins slowly when idle, faster when playing.
+                  Visible to every viewer; driven by shared server state. */}
+              <div
+                className={cn(
+                  "relative h-full w-full rounded-full bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_60%,_#000_100%)]",
+                  isPlaying
+                    ? "animate-[spin_3s_linear_infinite]"
+                    : "animate-[spin_20s_linear_infinite]",
+                )}
+              >
+                {/* concentric grooves */}
+                <span className="pointer-events-none absolute inset-[6%] rounded-full border border-white/5" />
+                <span className="pointer-events-none absolute inset-[14%] rounded-full border border-white/5" />
+                <span className="pointer-events-none absolute inset-[22%] rounded-full border border-white/[0.04]" />
+                {/* highlight sheen */}
+                <span
+                  className="pointer-events-none absolute inset-0 rounded-full"
+                  style={{
+                    background:
+                      "conic-gradient(from 0deg, rgba(255,255,255,0.08), transparent 25%, rgba(255,255,255,0.05) 50%, transparent 75%, rgba(255,255,255,0.08))",
+                  }}
                 />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-white/5">
-                  <Swords className="h-6 w-6 text-white/30" />
+                {/* cover label in center */}
+                <div
+                  className="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-white/20"
+                  style={{ background: grad }}
+                >
+                  {coverUrl ? (
+                    <img
+                      src={coverUrl}
+                      alt={trackTitle ?? name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Swords className="h-5 w-5 text-white/70" />
+                    </div>
+                  )}
                 </div>
-              )}
+                {/* spindle hole */}
+                <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black ring-1 ring-white/30" />
+              </div>
             </div>
             {isPlaying && (
               <div className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-end gap-0.5 rounded-full bg-black/70 px-2 py-1 backdrop-blur">
