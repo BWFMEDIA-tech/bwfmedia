@@ -23,6 +23,7 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useAudioPeaks } from "@/lib/useAudioPeaks";
+import { FollowersModal } from "@/components/artist/FollowersModal";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -216,6 +217,7 @@ function FollowButton({ artistId }: { artistId: string }) {
   const fetchStats = useServerFn(getArtistFollowStats);
   const fetchIsFollowing = useServerFn(getIsFollowingArtist);
   const toggleFn = useServerFn(toggleArtistFollow);
+  const [followersOpen, setFollowersOpen] = useState(false);
 
   const statsQ = useQuery({
     queryKey: ["artist-follow-stats", artistId],
@@ -248,22 +250,38 @@ function FollowButton({ artistId }: { artistId: string }) {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={mut.isPending}
-      aria-pressed={following}
-      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm border transition disabled:opacity-60 ${
-        following
-          ? "bg-white text-black border-white hover:bg-white/90"
-          : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white"
-      }`}
-    >
-      <UserPlus className="h-4 w-4" />
-      <span>{following ? "Following" : "Follow"}</span>
-      <span className={`tabular-nums text-xs ${following ? "text-black/60" : "text-white/60"}`}>
-        {fmtNum(count)}
-      </span>
-    </button>
+    <>
+      <div className={`inline-flex items-stretch rounded-full overflow-hidden border transition ${
+        following ? "border-white" : "border-white/10"
+      }`}>
+        <button
+          onClick={handleClick}
+          disabled={mut.isPending}
+          aria-pressed={following}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm transition disabled:opacity-60 ${
+            following
+              ? "bg-white text-black hover:bg-white/90"
+              : "bg-white/[0.04] hover:bg-white/[0.08] text-white"
+          }`}
+        >
+          <UserPlus className="h-4 w-4" />
+          <span>{following ? "Following" : "Follow"}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setFollowersOpen(true)}
+          aria-label="View followers"
+          className={`px-3 text-xs tabular-nums border-l transition ${
+            following
+              ? "border-black/10 bg-white text-black hover:bg-white/90"
+              : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70"
+          }`}
+        >
+          {fmtNum(count)}
+        </button>
+      </div>
+      <FollowersModal artistId={artistId} open={followersOpen} onOpenChange={setFollowersOpen} />
+    </>
   );
 }
 
