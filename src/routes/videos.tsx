@@ -585,13 +585,15 @@ function VideosPage() {
                   </div>
 
                   <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <button
-                      onClick={togglePlay}
-                      className="flex items-center gap-2 bg-red-500 hover:bg-red-400 hover:scale-[1.03] transition-transform text-white font-bold pl-5 pr-6 py-3 rounded-full"
-                    >
-                      {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
-                      {playing ? "Pause" : "Play"}
-                    </button>
+                    {!heroIsIframe && (
+                      <button
+                        onClick={togglePlay}
+                        className="flex items-center gap-2 bg-red-500 hover:bg-red-400 hover:scale-[1.03] transition-transform text-white font-bold pl-5 pr-6 py-3 rounded-full"
+                      >
+                        {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
+                        {playing ? "Pause" : "Play"}
+                      </button>
+                    )}
                     <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Like"><Heart size={18} /></button>
                     <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Save"><Bookmark size={18} /></button>
                     <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Share"><Share2 size={18} /></button>
