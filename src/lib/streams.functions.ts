@@ -151,3 +151,30 @@ export const getMyActiveStream = createServerFn({ method: "POST" })
       .maybeSingle();
     return data ?? null;
   });
+
+/** Update the thumbnail_url for a stream. Host or admin only. */
+export const updateStreamThumbnail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      streamId: z.string().uuid(),
+      thumbnailUrl: z.string().min(1).max(2048).nullable(),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row } = await supabase
+      .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
+    if (!row) throw new Error("Stream not found");
+    if (row.host_id !== userId) {
+      const { data: adm } = await supabase
+        .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+      if (!adm) throw new Error("Not authorized");
+    }
+    const { error } = await supabase
+      .from("streams")
+      .update({ thumbnail_url: data.thumbnailUrl })
+      .eq("id", data.streamId);
+    if (error) throw new Error(error.message);
+    return { ok: true, thumbnailUrl: data.thumbnailUrl };
+  });

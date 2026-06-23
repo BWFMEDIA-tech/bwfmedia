@@ -40,6 +40,8 @@ import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { StreamThumbnailDialog } from "@/components/stream/StreamThumbnailDialog";
+import { ImageIcon } from "lucide-react";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -725,6 +727,17 @@ function StreamStudio() {
   const [stageLocked, setStageLocked] = useState(false);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
+  const [thumbOpen, setThumbOpen] = useState(false);
+  const [thumbUrl, setThumbUrl] = useState<string | null>(null);
+
+  // Keep thumbnail in sync with the resumed/active stream row.
+  useEffect(() => {
+    if (!stream?.id) { setThumbUrl(null); return; }
+    let cancelled = false;
+    supabase.from("streams").select("thumbnail_url").eq("id", stream.id).maybeSingle()
+      .then(({ data }) => { if (!cancelled) setThumbUrl((data as any)?.thumbnail_url ?? null); });
+    return () => { cancelled = true; };
+  }, [stream?.id]);
 
   // Resolved host identity — brand name takes priority over personal name.
   const [selfIdentity, setSelfIdentity] = useState<{ display_name: string | null; avatar_url: string | null; is_brand: boolean }>({
@@ -901,6 +914,18 @@ function StreamStudio() {
                   <button onClick={copyInvite} className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5">
                     <Share2 className="h-3 w-3" /> Share
                   </button>
+                  <button
+                    onClick={() => setThumbOpen(true)}
+                    className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5"
+                    title="Stream thumbnail"
+                  >
+                    {thumbUrl ? (
+                      <img src={thumbUrl} alt="" className="h-4 w-6 rounded-sm object-cover" />
+                    ) : (
+                      <ImageIcon className="h-3 w-3" />
+                    )}
+                    Thumbnail
+                  </button>
                   <button className="rounded-md border border-white/10 p-1.5 hover:bg-white/5">
                     <MoreHorizontal className="h-3.5 w-3.5" />
                   </button>
@@ -917,6 +942,14 @@ function StreamStudio() {
                 }))}
                 onInvite={copyInvite}
                 onEndBroadcast={stop}
+              />
+
+              <StreamThumbnailDialog
+                open={thumbOpen}
+                onOpenChange={setThumbOpen}
+                streamId={stream?.id ?? null}
+                currentUrl={thumbUrl}
+                onSaved={(u) => setThumbUrl(u)}
               />
 
               {stream?.id && (
