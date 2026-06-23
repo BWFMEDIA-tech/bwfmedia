@@ -245,6 +245,27 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_follows: {
+        Row: {
+          artist_id: string
+          created_at: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       battle_matches: {
         Row: {
           a_wins: number
