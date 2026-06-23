@@ -428,7 +428,7 @@ function MiniWaveform({
 }
 
 function TrackRowImpl({
-  id, index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
+  id, index, title, coverUrl, audioUrl, durationSec, likeCount, playCount, liked, isPlaying,
   onTogglePlay, onStop, onToggleLike,
 }: {
   id: string;
