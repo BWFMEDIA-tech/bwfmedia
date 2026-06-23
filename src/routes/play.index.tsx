@@ -611,12 +611,12 @@ function PowerUps() {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {items.map((p) => (
-          <div key={p.title} className="rounded-xl border border-white/10 bg-[#11111d] p-3">
+          <Link key={p.title} to="/play/ranks" className="block rounded-xl border border-white/10 bg-[#11111d] p-3 transition-colors hover:border-white/20 hover:bg-[#161624]">
             <div className={`h-8 w-8 rounded-lg bg-white/5 ${p.color} flex items-center justify-center`}>{p.icon}</div>
             <p className="mt-2 text-xs font-bold">{p.title}</p>
             <p className="mt-0.5 text-[10px] text-white/55 leading-snug min-h-[28px]">{p.desc}</p>
-            <button className={`mt-2 w-full rounded-md px-2 py-1.5 text-[10px] font-bold ${p.btn}`}>ACTIVATE</button>
-          </div>
+            <span className={`mt-2 block w-full rounded-md px-2 py-1.5 text-center text-[10px] font-bold ${p.btn}`}>ACTIVATE</span>
+          </Link>
         ))}
       </div>
     </section>
@@ -654,14 +654,14 @@ function ArenaPass() {
           ))}
         </ul>
         <div className="lg:col-span-4 grid grid-cols-2 gap-3">
-          <button className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-left hover:bg-amber-500/20">
+          <Link to="/artist/upgrade" className="block rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-left hover:bg-amber-500/20">
             <p className="text-xs font-bold text-amber-300">ARENA PASS</p>
             <p className="text-lg font-black">$4.99<span className="text-xs font-normal text-white/60"> / month</span></p>
-          </button>
-          <button className="rounded-xl border border-[#C53DFF]/40 bg-[#C53DFF]/10 p-3 text-left hover:bg-[#C53DFF]/20">
+          </Link>
+          <Link to="/artist/upgrade" className="block rounded-xl border border-[#C53DFF]/40 bg-[#C53DFF]/10 p-3 text-left hover:bg-[#C53DFF]/20">
             <p className="text-xs font-bold text-[#C53DFF]">ARENA PASS PRO</p>
             <p className="text-lg font-black">$9.99<span className="text-xs font-normal text-white/60"> / month</span></p>
-          </button>
+          </Link>
         </div>
       </div>
     </section>
