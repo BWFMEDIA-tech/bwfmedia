@@ -63,10 +63,10 @@ function StagePage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!auth.user) {
+    if (!auth.loading && !auth.user) {
       navigate({ to: "/login", search: { redirect: `/stage/${roomId}` } as never });
     }
-  }, [auth.user, navigate, roomId]);
+  }, [auth.loading, auth.user, navigate, roomId]);
 
   const { data: room, isLoading, error } = useQuery({
     queryKey: ["stage-room", roomId],
@@ -79,7 +79,15 @@ function StagePage() {
   const isEnded = room?.status === "ended";
   const elapsed = useElapsed(room?.started_at, !!isLive);
 
-  if (!auth.user) return null;
+  if (auth.loading || !auth.user) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-black text-white">
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-white/40">
+          <div className="w-2 h-2 rounded-full bg-[#C53DFF] animate-pulse" /> Loading stage…
+        </div>
+      </div>
+    );
+  }
   if (isLoading || !room) {
     return (
       <div className="min-h-screen grid place-items-center bg-black text-white">
