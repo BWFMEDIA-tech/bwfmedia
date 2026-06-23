@@ -96,7 +96,6 @@ import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.cancellation-emails'
-import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-bookings'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
@@ -552,11 +551,6 @@ const AdminCancellationEmailsRoute = AdminCancellationEmailsRouteImport.update({
   path: '/cancellation-emails',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminBookingsRoute = AdminBookingsRouteImport.update({
-  id: '/bookings',
-  path: '/bookings',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminBlockBookingsRoute = AdminBlockBookingsRouteImport.update({
   id: '/block-bookings',
   path: '/block-bookings',
@@ -705,7 +699,6 @@ export interface FileRoutesByFullPath {
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
-  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -813,7 +806,6 @@ export interface FileRoutesByTo {
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
-  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -923,7 +915,6 @@ export interface FileRoutesById {
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
-  '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -1034,7 +1025,6 @@ export interface FileRouteTypes {
     | '/admin/artists'
     | '/admin/audit'
     | '/admin/block-bookings'
-    | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/content'
     | '/admin/dashboard'
@@ -1142,7 +1132,6 @@ export interface FileRouteTypes {
     | '/admin/artists'
     | '/admin/audit'
     | '/admin/block-bookings'
-    | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/content'
     | '/admin/dashboard'
@@ -1251,7 +1240,6 @@ export interface FileRouteTypes {
     | '/admin/artists'
     | '/admin/audit'
     | '/admin/block-bookings'
-    | '/admin/bookings'
     | '/admin/cancellation-emails'
     | '/admin/content'
     | '/admin/dashboard'
@@ -1999,13 +1987,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCancellationEmailsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/bookings': {
-      id: '/admin/bookings'
-      path: '/bookings'
-      fullPath: '/admin/bookings'
-      preLoaderRoute: typeof AdminBookingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/block-bookings': {
       id: '/admin/block-bookings'
       path: '/block-bookings'
@@ -2147,7 +2128,6 @@ interface AdminRouteChildren {
   AdminArtistsRoute: typeof AdminArtistsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBlockBookingsRoute: typeof AdminBlockBookingsRoute
-  AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -2174,7 +2154,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminArtistsRoute: AdminArtistsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBlockBookingsRoute: AdminBlockBookingsRoute,
-  AdminBookingsRoute: AdminBookingsRoute,
   AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
   AdminContentRoute: AdminContentRoute,
   AdminDashboardRoute: AdminDashboardRoute,
