@@ -389,7 +389,7 @@ function TrackRowImpl({
   const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
 
   return (
-    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_auto] gap-3 items-center py-2 text-sm group">
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_120px] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_120px] gap-3 items-center py-2 text-sm group">
       <span className="text-white/40 text-xs">{index}</span>
       <button
         type="button"
@@ -421,28 +421,26 @@ function TrackRowImpl({
         }}
         className="hidden sm:block"
       />
-      <div className="text-xs text-white/60 flex items-center gap-3">
+      <div className="grid grid-cols-[56px_16px_44px] items-center justify-items-end gap-2 text-xs text-white/60">
         <button
           type="button"
           onClick={onToggleLike}
           aria-pressed={liked}
           aria-label={liked ? `Unlike ${title}` : `Like ${title}`}
-          className={`flex items-center gap-1 rounded px-1 py-0.5 transition-colors ${liked ? "text-[#FF00A6]" : "text-white/60 hover:text-white"}`}
+          className={`inline-flex w-full items-center justify-end gap-1 rounded py-0.5 transition-colors ${liked ? "text-[#FF00A6]" : "text-white/60 hover:text-white"}`}
         >
-          <Heart className="h-3.5 w-3.5" fill={liked ? "currentColor" : "none"} />
+          <Heart className="h-3.5 w-3.5 shrink-0" fill={liked ? "currentColor" : "none"} />
           <span className="tabular-nums">{fmtNum(likeCount)}</span>
         </button>
-        {isPlaying && (
-          <button
-            type="button"
-            onClick={onStop}
-            aria-label={`Stop ${title}`}
-            className="text-white/60 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
-            title="Stop"
-          >
-            <span className="block h-3 w-3 bg-current rounded-[2px]" />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onStop}
+          aria-label={`Stop ${title}`}
+          title="Stop"
+          className={`text-white/60 hover:text-white transition-opacity ${isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-0 pointer-events-none"}`}
+        >
+          <span className="block h-3 w-3 bg-current rounded-[2px]" />
+        </button>
         <span className="text-white/40 tabular-nums">{fmtDur(dur)}</span>
       </div>
     </li>
