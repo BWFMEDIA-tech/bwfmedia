@@ -13,6 +13,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -63,6 +64,7 @@ export const Route = createFileRoute("/artist/$id")({
 const RED = "#ef2b2b";
 
 type ArtistView = {
+  id: string;
   name: string;
   handle: string;
   photo: string | null;
@@ -85,6 +87,7 @@ function ArtistProfilePage() {
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
   const name = meta?.name?.trim() || (isOwner ? "Your Artist Profile" : "Artist");
   const artist: ArtistView = {
+    id,
     name,
     handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, ""),
     photo: meta?.photo ?? null,
@@ -156,6 +159,7 @@ function HeroBanner({
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="font-anton text-4xl md:text-5xl uppercase tracking-tight truncate">{artist.name}</h1>
+              <RankBadge userId={artist.id} size="xl" />
             </div>
             <div className="text-sm text-white/60 mt-1">{artist.handle}</div>
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">

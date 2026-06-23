@@ -9,6 +9,7 @@ import { TipModal } from "@/components/stream/TipModal";
 import { useServerFn } from "@tanstack/react-start";
 import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions";
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -202,6 +203,7 @@ export function LiveChat({
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1 text-[11px]">
                 <span className="font-bold text-white">{c.display_name || "Anon"}</span>
+                <RankBadge userId={c.user_id} size="xs" />
                 {c.user_id === auth.user?.id && <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />}
                 {isTip && <Sparkles className="h-3 w-3" style={{ color: PURPLE }} />}
                 <span className="ml-auto text-[10px] text-white/40">

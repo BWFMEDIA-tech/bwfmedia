@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { createBattleMatch, castBattleVote } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -460,7 +461,14 @@ function ArtistSide({
         )}
       </div>
       <div className={cn("text-center text-sm font-bold", isEmpty ? "text-white/50" : "text-white")}>
-        {isEmpty ? `Artist ${side.toUpperCase()} not loaded` : name}
+        {isEmpty ? (
+          `Artist ${side.toUpperCase()} not loaded`
+        ) : (
+          <span className="inline-flex items-center gap-1.5">
+            {name}
+            <RankBadge userId={artistId ?? null} size="sm" />
+          </span>
+        )}
       </div>
       {isEmpty ? (
         <div className="-mt-1 text-[11px] text-white/40">Waiting for artist…</div>

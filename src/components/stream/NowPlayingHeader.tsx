@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Music, Play, Pause, Radio, Disc3, Swords, Volume2, Mic, Clock, Trophy } from "lucide-react";
 import { usePlayQueue } from "@/lib/usePlayQueue";
 import { supabase } from "@/integrations/supabase/client";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 type Mode = "live" | "upload" | "battle-live" | "battle-pending" | "idle";
 
@@ -226,7 +227,10 @@ export function NowPlayingHeader({
         {/* Meta */}
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-bold text-white sm:text-base">{title}</div>
-          <div className="truncate text-xs text-white/60 sm:text-sm">{artistName}</div>
+          <div className="flex items-center gap-1.5 text-xs text-white/60 sm:text-sm">
+            <span className="truncate">{artistName}</span>
+            <RankBadge userId={playing?.artist_user_id ?? livePerformer?.user_id ?? null} size="sm" />
+          </div>
 
           {/* Progress */}
           {playing?.audio_url && duration > 0 && (
