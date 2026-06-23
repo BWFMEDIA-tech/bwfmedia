@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { getStageRoom, setStageStatus } from "@/lib/stage-rooms.functions";
 import { Mic, MicOff, Video, MessageSquare, Settings, Hand, Radio, LogOut, Users } from "lucide-react";
@@ -13,11 +14,6 @@ export const Route = createFileRoute("/stage/$roomId")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  loader: async ({ params }) => {
-    const room = await getStageRoom({ data: { id: params.roomId } });
-    if (!room) throw notFound();
-    return { room };
-  },
   errorComponent: ({ error, reset }) => (
     <div className="grid min-h-screen place-items-center bg-black text-white p-8">
       <div className="max-w-md text-center">
@@ -57,26 +53,51 @@ function shortId(id: string) {
 }
 
 function StagePage() {
-  const { room } = Route.useLoaderData();
+  const { roomId } = Route.useParams();
   const auth = useAuth();
   const navigate = useNavigate();
   const updateStatus = useServerFn(setStageStatus);
+  const fetchRoom = useServerFn(getStageRoom);
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(true);
   const [busy, setBusy] = useState(false);
 
-  const isHost = auth.user?.id === room.host_id;
-  const isLive = room.status === "live";
-  const isEnded = room.status === "ended";
-  const elapsed = useElapsed((room as { started_at?: string | null }).started_at, isLive);
-
   useEffect(() => {
-    if (!auth.user) {
-      navigate({ to: "/login", search: { redirect: `/stage/${room.id}` } as never });
+    if (!auth.loading && !auth.user) {
+      navigate({ to: "/login", search: { redirect: `/stage/${roomId}` } as never });
     }
-  }, [auth.user, navigate, room.id]);
+  }, [auth.loading, auth.user, navigate, roomId]);
 
-  if (!auth.user) return null;
+  const { data: room, isLoading, error } = useQuery({
+    queryKey: ["stage-room", roomId],
+    queryFn: () => fetchRoom({ data: { id: roomId } }),
+    enabled: !!auth.user,
+  });
+
+  const isHost = !!room && auth.user?.id === room.host_id;
+  const isLive = room?.status === "live";
+  const isEnded = room?.status === "ended";
+  const elapsed = useElapsed(room?.started_at, !!isLive);
+
+  if (auth.loading || !auth.user) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-black text-white">
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-white/40">
+          <div className="w-2 h-2 rounded-full bg-[#C53DFF] animate-pulse" /> Loading stage…
+        </div>
+      </div>
+    );
+  }
+  if (isLoading || !room) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-black text-white">
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-white/40">
+          <div className="w-2 h-2 rounded-full bg-[#C53DFF] animate-pulse" />
+          {error ? "Stage unavailable" : "Loading stage…"}
+        </div>
+      </div>
+    );
+  }
 
   const statusTone = isLive
     ? { dot: "bg-[#FF00A6]", text: "text-[#FF00A6]", border: "border-[#FF00A6]/40", bg: "bg-[#FF00A6]/10", label: "On-Air" }
