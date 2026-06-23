@@ -9,7 +9,7 @@ import {
   Music, Smile, MapPin, User, Clapperboard, Plus,
   Clock, ListVideo, Settings as SettingsIcon,
   Volume2, Maximize, Shuffle, SkipBack, SkipForward, Repeat,
-  Menu, X,
+  Menu, X, Search, ChevronLeft, ChevronRight, Home, Library,
 } from "lucide-react";
 
 export const Route = createFileRoute("/videos")({
