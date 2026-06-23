@@ -500,7 +500,7 @@ function TrackRowImpl({
         }}
         className="hidden sm:block"
       />
-      <div className="grid grid-cols-[56px_56px_16px_44px] items-center justify-items-end gap-2 text-xs text-white/60">
+      <div className="grid grid-cols-[56px_56px_16px] items-center justify-items-end gap-2 text-xs text-white/60">
         <button
           type="button"
           onClick={onToggleLike}
@@ -528,7 +528,6 @@ function TrackRowImpl({
         >
           <span className="block h-3 w-3 bg-current rounded-[2px]" />
         </button>
-        <span className="text-white/40 tabular-nums">{fmtDur(dur)}</span>
       </div>
     </li>
   );
