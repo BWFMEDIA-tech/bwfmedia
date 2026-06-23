@@ -48,6 +48,7 @@ import { Route as ArtistDashboardRouteImport } from './routes/artist-dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
@@ -311,6 +312,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const VideosIndexRoute = VideosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => VideosRoute,
 } as any)
 const PlayIndexRoute = PlayIndexRouteImport.update({
   id: '/play/',
@@ -754,6 +760,7 @@ export interface FileRoutesByFullPath {
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
   '/play/': typeof PlayIndexRoute
+  '/videos/': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -808,7 +815,6 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/videos': typeof VideosRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -862,6 +868,7 @@ export interface FileRoutesByTo {
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
   '/play': typeof PlayIndexRoute
+  '/videos': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -972,6 +979,7 @@ export interface FileRoutesById {
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
   '/play/': typeof PlayIndexRoute
+  '/videos/': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -1083,6 +1091,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin/'
     | '/play/'
+    | '/videos/'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -1137,7 +1146,6 @@ export interface FileRouteTypes {
     | '/studio'
     | '/terms'
     | '/unsubscribe'
-    | '/videos'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1191,6 +1199,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin'
     | '/play'
+    | '/videos'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -1300,6 +1309,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin/'
     | '/play/'
+    | '/videos/'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -1662,6 +1672,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/videos/': {
+      id: '/videos/'
+      path: '/'
+      fullPath: '/videos/'
+      preLoaderRoute: typeof VideosIndexRouteImport
+      parentRoute: typeof VideosRoute
     }
     '/play/': {
       id: '/play/'
@@ -2236,10 +2253,12 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
 
 interface VideosRouteChildren {
   VideosIdRoute: typeof VideosIdRoute
+  VideosIndexRoute: typeof VideosIndexRoute
 }
 
 const VideosRouteChildren: VideosRouteChildren = {
   VideosIdRoute: VideosIdRoute,
+  VideosIndexRoute: VideosIndexRoute,
 }
 
 const VideosRouteWithChildren =
