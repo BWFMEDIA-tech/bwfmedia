@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
-  ListMusic, ThumbsUp,
+  ListMusic, ThumbsUp, Headphones,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar,
 } from "lucide-react";
@@ -15,6 +15,7 @@ import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
+import { incrementTrackPlayCount } from "@/lib/play-counts.functions";
 import {
   getArtistFollowStats,
   getIsFollowingArtist,
@@ -427,7 +428,7 @@ function MiniWaveform({
 }
 
 function TrackRowImpl({
-  id, index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
+  id, index, title, coverUrl, audioUrl, durationSec, likeCount, playCount, liked, isPlaying,
   onTogglePlay, onStop, onToggleLike,
 }: {
   id: string;
@@ -437,6 +438,7 @@ function TrackRowImpl({
   audioUrl: string | null;
   durationSec: number | null;
   likeCount: number;
+  playCount: number;
   liked: boolean;
   isPlaying: boolean;
   onTogglePlay: () => void;
@@ -471,7 +473,7 @@ function TrackRowImpl({
   const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
 
   return (
-    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_120px] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_120px] gap-3 items-center py-2 text-sm group">
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_140px] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_140px] gap-3 items-center py-2 text-sm group">
       <span className="text-white/40 text-xs">{index}</span>
       <button
         type="button"
@@ -503,7 +505,7 @@ function TrackRowImpl({
         }}
         className="hidden sm:block"
       />
-      <div className="grid grid-cols-[56px_16px_44px] items-center justify-items-end gap-2 text-xs text-white/60">
+      <div className="grid grid-cols-[56px_56px_16px_44px] items-center justify-items-end gap-2 text-xs text-white/60">
         <button
           type="button"
           onClick={onToggleLike}
@@ -514,6 +516,14 @@ function TrackRowImpl({
           <Heart className="h-3.5 w-3.5 shrink-0" fill={liked ? "currentColor" : "none"} />
           <span className="tabular-nums">{fmtNum(likeCount)}</span>
         </button>
+        <span
+          className="inline-flex items-center justify-end gap-1 text-white/50"
+          title={`${playCount.toLocaleString()} plays`}
+          aria-label={`${playCount} plays`}
+        >
+          <Headphones className="h-3.5 w-3.5 shrink-0" />
+          <span className="tabular-nums">{fmtNum(playCount)}</span>
+        </span>
         <button
           type="button"
           onClick={onStop}
@@ -529,7 +539,7 @@ function TrackRowImpl({
   );
 }
 
-function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
+function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; play_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
   const preview = !isAuthenticated;
   const [showSignInModal, setShowSignInModal] = useState(false);
@@ -558,6 +568,9 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
   });
   const likedSet = new Set(myLikesQuery.data?.liked ?? []);
   const [likeOverrides, setLikeOverrides] = useState<Record<string, { liked: boolean; count: number }>>({});
+  const [playOverrides, setPlayOverrides] = useState<Record<string, number>>({});
+  const incrementPlay = useServerFn(incrementTrackPlayCount);
+  const playedThisSession = useRef<Set<string>>(new Set());
 
   const likeMutation = useMutation({
     mutationFn: (trackId: string) => toggleTrackLike({ data: { trackId } }),
@@ -619,12 +632,27 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
                 audioUrl={t.audio_url}
                 durationSec={t.duration_seconds}
                 likeCount={likeCount}
+                playCount={playOverrides[t.id] ?? t.play_count ?? 0}
                 liked={liked}
                 isPlaying={isThisPlaying}
                 onTogglePlay={() => {
                   if (!t.audio_url) return;
                   const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds, preview };
-                  if (isCurrent) { player.toggle(); } else { player.play(track, playable); }
+                  if (isCurrent) {
+                    player.toggle();
+                  } else {
+                    player.play(track, playable);
+                    if (isAuthenticated && !playedThisSession.current.has(t.id)) {
+                      playedThisSession.current.add(t.id);
+                      incrementPlay({ data: { trackId: t.id } })
+                        .then((res) => {
+                          setPlayOverrides((m) => ({ ...m, [t.id]: res.play_count }));
+                        })
+                        .catch(() => {
+                          playedThisSession.current.delete(t.id);
+                        });
+                    }
+                  }
                 }}
                 onStop={() => { if (isCurrent) player.pause(); }}
                 onToggleLike={() => {
