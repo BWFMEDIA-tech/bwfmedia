@@ -1,0 +1,1 @@
+UPDATE public.streams SET status='ended', ended_at=COALESCE(ended_at, now()) WHERE id='ca5b8f38-5152-46de-a172-f7db1c04e454';
