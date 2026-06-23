@@ -13,7 +13,7 @@ import {
   Menu, X, Search, ChevronLeft, ChevronRight, Home, Library,
 } from "lucide-react";
 
-export const Route = createFileRoute("/videos")({
+export const Route = createFileRoute("/videos/")({
   component: VideosPage,
   head: () => ({
     meta: [
