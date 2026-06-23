@@ -331,8 +331,45 @@ export function ImmersivePlayer({
   const voteFn = useServerFn(votePlayTrack);
   const advanceFn = useServerFn(advancePlayQueue);
   const playFn = useServerFn(playTrackNow);
+  const reorderFn = useServerFn(reorderPlayQueue);
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
+
+  // Host-only local order overlay for the Up Next list (drag-to-reorder).
+  // Mirrors `upNext` ids; cleared/synced when server data changes.
+  const [localOrder, setLocalOrder] = useState<string[] | null>(null);
+  useEffect(() => { setLocalOrder(null); }, [upNext.map(t => t.id).join("|")]);
+  const orderedUpNext = useMemo(() => {
+    if (!localOrder) return upNext;
+    const byId = new Map(upNext.map(t => [t.id, t]));
+    const out: PlayTrack[] = [];
+    for (const id of localOrder) { const t = byId.get(id); if (t) out.push(t); }
+    for (const t of upNext) if (!localOrder.includes(t.id)) out.push(t);
+    return out;
+  }, [upNext, localOrder]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const onDragEnd = async (e: DragEndEvent) => {
+    if (!isHost || !streamId) return;
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const current = orderedUpNext.map(t => t.id);
+    const from = current.indexOf(String(active.id));
+    const to = current.indexOf(String(over.id));
+    if (from < 0 || to < 0) return;
+    const next = arrayMove(current, from, to);
+    setLocalOrder(next);
+    try {
+      await reorderFn({ data: { streamId, orderedTrackIds: next } });
+      toast.success("Queue reordered");
+    } catch (err: any) {
+      setLocalOrder(null);
+      toast.error(err?.message ?? "Reorder failed");
+    }
+  };
 
   const listeners = useLiveListenerCount(streamId);
   const battle = useLiveBattle(streamId);
