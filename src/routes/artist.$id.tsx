@@ -269,9 +269,10 @@ function fmtDur(s: number | null) {
 }
 
 function TrackRow({
-  index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
+  id, index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
   onTogglePlay, onStop, onToggleLike,
 }: {
+  id: string;
   index: number;
   title: string;
   coverUrl: string | null;
@@ -284,6 +285,11 @@ function TrackRow({
   onStop: () => void;
   onToggleLike: () => void;
 }) {
+  const player = usePlayer();
+  const isCurrent = player.track?.id === id;
+  const progressFrac = isCurrent && player.duration > 0
+    ? Math.min(1, Math.max(0, player.progress / player.duration))
+    : 0;
   const [detectedDur, setDetectedDur] = useState<number | null>(null);
   useEffect(() => {
     if (durationSec && durationSec > 0) return;
@@ -307,7 +313,7 @@ function TrackRow({
   const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
 
   return (
-    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] gap-3 items-center py-2 text-sm group">
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_auto] gap-3 items-center py-2 text-sm group">
       <span className="text-white/40 text-xs">{index}</span>
       <button
         type="button"
@@ -326,6 +332,18 @@ function TrackRow({
         )}
       </button>
       <div className="min-w-0 truncate">{title}</div>
+      <MiniWaveform
+        seed={id}
+        progress={progressFrac}
+        active={isCurrent}
+        disabled={!audioUrl}
+        onSeekFraction={(f) => {
+          if (!isCurrent || !audioUrl) return;
+          const d = player.duration > 0 ? player.duration : (dur ?? 0);
+          if (d > 0) player.seek(f * d);
+        }}
+        className="hidden sm:block"
+      />
       <div className="text-xs text-white/60 flex items-center gap-3">
         <button
           type="button"
