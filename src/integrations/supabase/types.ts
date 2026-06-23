@@ -1795,6 +1795,7 @@ export type Database = {
           duration_seconds: number | null
           id: string
           like_count: number
+          play_count: number
           position: number
           rank_score: number
           rank_updated_at: string
@@ -1818,6 +1819,7 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           like_count?: number
+          play_count?: number
           position?: number
           rank_score?: number
           rank_updated_at?: string
@@ -1841,6 +1843,7 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           like_count?: number
+          play_count?: number
           position?: number
           rank_score?: number
           rank_updated_at?: string
@@ -3132,6 +3135,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_track_play_count: {
+        Args: { _track_id: string }
+        Returns: number
       }
       is_stream_host: {
         Args: { _stream_id: string; _user_id: string }
