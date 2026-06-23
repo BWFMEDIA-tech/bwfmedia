@@ -64,6 +64,7 @@ export const Route = createFileRoute("/artist/$id")({
 const RED = "#ef2b2b";
 
 type ArtistView = {
+  id: string;
   name: string;
   handle: string;
   photo: string | null;
@@ -86,6 +87,7 @@ function ArtistProfilePage() {
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
   const name = meta?.name?.trim() || (isOwner ? "Your Artist Profile" : "Artist");
   const artist: ArtistView = {
+    id,
     name,
     handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, ""),
     photo: meta?.photo ?? null,
