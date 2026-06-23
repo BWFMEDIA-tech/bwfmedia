@@ -269,9 +269,81 @@ function fmtDur(s: number | null) {
 }
 
 function TrackRow({
-  index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
+  ...args
+}: Parameters<typeof TrackRowImpl>[0]) {
+  return <TrackRowImpl {...args} />;
+}
+
+function MiniWaveform({
+  seed, progress, active, disabled, onSeekFraction, className,
+}: {
+  seed: string;
+  progress: number;
+  active: boolean;
+  disabled: boolean;
+  onSeekFraction: (f: number) => void;
+  className?: string;
+}) {
+  const BARS = 36;
+  const heights = useMemo(() => {
+    // Deterministic pseudo-random heights from seed
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < seed.length; i++) {
+      h ^= seed.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    const out: number[] = [];
+    for (let i = 0; i < BARS; i++) {
+      h ^= h << 13; h >>>= 0;
+      h ^= h >>> 17; h >>>= 0;
+      h ^= h << 5;  h >>>= 0;
+      const r = (h & 0xffff) / 0xffff;
+      // Centered envelope so middle bars are a bit taller
+      const env = 0.55 + 0.45 * Math.sin((i / (BARS - 1)) * Math.PI);
+      out.push(Math.max(0.18, Math.min(1, r * env + 0.15)));
+    }
+    return out;
+  }, [seed]);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled || !active) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const f = (e.clientX - rect.left) / rect.width;
+    onSeekFraction(Math.min(1, Math.max(0, f)));
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={disabled}
+      aria-label={active ? "Seek within track" : "Track waveform preview"}
+      className={`relative flex h-7 w-full items-end gap-[2px] ${active ? "cursor-pointer" : "cursor-default"} disabled:opacity-40 ${className ?? ""}`}
+    >
+      {heights.map((h, i) => {
+        const played = (i + 0.5) / BARS <= progress;
+        return (
+          <span
+            key={i}
+            className="flex-1 rounded-[1px] transition-colors"
+            style={{
+              height: `${Math.round(h * 100)}%`,
+              background: active
+                ? (played ? "#FF00A6" : "rgba(255,255,255,0.22)")
+                : "rgba(255,255,255,0.18)",
+            }}
+          />
+        );
+      })}
+    </button>
+  );
+}
+
+function TrackRowImpl({
+  id, index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
   onTogglePlay, onStop, onToggleLike,
 }: {
+  id: string;
   index: number;
   title: string;
   coverUrl: string | null;
@@ -284,6 +356,11 @@ function TrackRow({
   onStop: () => void;
   onToggleLike: () => void;
 }) {
+  const player = usePlayer();
+  const isCurrent = player.track?.id === id;
+  const progressFrac = isCurrent && player.duration > 0
+    ? Math.min(1, Math.max(0, player.progress / player.duration))
+    : 0;
   const [detectedDur, setDetectedDur] = useState<number | null>(null);
   useEffect(() => {
     if (durationSec && durationSec > 0) return;
@@ -307,7 +384,7 @@ function TrackRow({
   const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
 
   return (
-    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] gap-3 items-center py-2 text-sm group">
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_auto] gap-3 items-center py-2 text-sm group">
       <span className="text-white/40 text-xs">{index}</span>
       <button
         type="button"
@@ -326,6 +403,18 @@ function TrackRow({
         )}
       </button>
       <div className="min-w-0 truncate">{title}</div>
+      <MiniWaveform
+        seed={id}
+        progress={progressFrac}
+        active={isCurrent}
+        disabled={!audioUrl}
+        onSeekFraction={(f) => {
+          if (!isCurrent || !audioUrl) return;
+          const d = player.duration > 0 ? player.duration : (dur ?? 0);
+          if (d > 0) player.seek(f * d);
+        }}
+        className="hidden sm:block"
+      />
       <div className="text-xs text-white/60 flex items-center gap-3">
         <button
           type="button"
@@ -437,6 +526,7 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
             return (
               <TrackRow
                 key={t.id}
+                id={t.id}
                 index={i + 1}
                 title={t.title}
                 coverUrl={t.cover_url}
