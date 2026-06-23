@@ -2,18 +2,19 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { useMemo, useState, useEffect } from "react";
 import {
-  BadgeCheck, MapPin, Music2, Play, Heart, Share2, MoreHorizontal,
+  BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
+import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -267,6 +268,92 @@ function fmtDur(s: number | null) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
+function TrackRow({
+  index, title, coverUrl, audioUrl, durationSec, likeCount, liked, isPlaying,
+  onTogglePlay, onStop, onToggleLike,
+}: {
+  index: number;
+  title: string;
+  coverUrl: string | null;
+  audioUrl: string | null;
+  durationSec: number | null;
+  likeCount: number;
+  liked: boolean;
+  isPlaying: boolean;
+  onTogglePlay: () => void;
+  onStop: () => void;
+  onToggleLike: () => void;
+}) {
+  const [detectedDur, setDetectedDur] = useState<number | null>(null);
+  useEffect(() => {
+    if (durationSec && durationSec > 0) return;
+    if (!audioUrl) return;
+    let cancelled = false;
+    const audio = new Audio();
+    audio.preload = "metadata";
+    audio.src = audioUrl;
+    const onMeta = () => {
+      if (!cancelled && isFinite(audio.duration) && audio.duration > 0) {
+        setDetectedDur(Math.round(audio.duration));
+      }
+    };
+    audio.addEventListener("loadedmetadata", onMeta);
+    return () => {
+      cancelled = true;
+      audio.removeEventListener("loadedmetadata", onMeta);
+      audio.src = "";
+    };
+  }, [audioUrl, durationSec]);
+  const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
+
+  return (
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] gap-3 items-center py-2 text-sm group">
+      <span className="text-white/40 text-xs">{index}</span>
+      <button
+        type="button"
+        onClick={onTogglePlay}
+        disabled={!audioUrl}
+        aria-label={isPlaying ? `Pause ${title}` : `Play ${title}`}
+        className="relative h-9 w-9 rounded overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 disabled:opacity-50"
+      >
+        {coverUrl && <img src={coverUrl} alt="" className="h-full w-full object-cover" />}
+        {audioUrl && (
+          <span className={`absolute inset-0 flex items-center justify-center bg-black/55 transition-opacity ${isPlaying ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+            {isPlaying
+              ? <Pause className="h-4 w-4 text-white" fill="currentColor" />
+              : <Play className="h-4 w-4 text-white" fill="currentColor" />}
+          </span>
+        )}
+      </button>
+      <div className="min-w-0 truncate">{title}</div>
+      <div className="text-xs text-white/60 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onToggleLike}
+          aria-pressed={liked}
+          aria-label={liked ? `Unlike ${title}` : `Like ${title}`}
+          className={`flex items-center gap-1 rounded px-1 py-0.5 transition-colors ${liked ? "text-[#FF00A6]" : "text-white/60 hover:text-white"}`}
+        >
+          <Heart className="h-3.5 w-3.5" fill={liked ? "currentColor" : "none"} />
+          <span className="tabular-nums">{fmtNum(likeCount)}</span>
+        </button>
+        {isPlaying && (
+          <button
+            type="button"
+            onClick={onStop}
+            aria-label={`Stop ${title}`}
+            className="text-white/60 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Stop"
+          >
+            <span className="block h-3 w-3 bg-current rounded-[2px]" />
+          </button>
+        )}
+        <span className="text-white/40 tabular-nums">{fmtDur(dur)}</span>
+      </div>
+    </li>
+  );
+}
+
 function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { tracks: Array<{ id: string; title: string; cover_url: string | null; like_count: number; duration_seconds: number | null; audio_url: string | null }>; isOwner: boolean; artistName: string; isAuthenticated: boolean }) {
   const player = usePlayer();
   const preview = !isAuthenticated;
@@ -286,6 +373,40 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
     player.setPreviewLimitHandler(() => setShowSignInModal(true));
     return () => player.setPreviewLimitHandler(null);
   }, [preview, player]);
+
+  const trackIds = tracks.map((t) => t.id);
+  const qc = useQueryClient();
+  const myLikesQuery = useQuery({
+    queryKey: ["my-track-likes", trackIds],
+    queryFn: () => getMyTrackLikes({ data: { trackIds } }),
+    enabled: isAuthenticated && trackIds.length > 0,
+  });
+  const likedSet = new Set(myLikesQuery.data?.liked ?? []);
+  const [likeOverrides, setLikeOverrides] = useState<Record<string, { liked: boolean; count: number }>>({});
+
+  const likeMutation = useMutation({
+    mutationFn: (trackId: string) => toggleTrackLike({ data: { trackId } }),
+    onMutate: async (trackId: string) => {
+      const current = likeOverrides[trackId];
+      const wasLiked = current ? current.liked : likedSet.has(trackId);
+      const baseCount = current ? current.count : (tracks.find((t) => t.id === trackId)?.like_count ?? 0);
+      const optimistic = { liked: !wasLiked, count: Math.max(0, baseCount + (wasLiked ? -1 : 1)) };
+      setLikeOverrides((m) => ({ ...m, [trackId]: optimistic }));
+      return { trackId };
+    },
+    onSuccess: (res, trackId) => {
+      setLikeOverrides((m) => ({ ...m, [trackId]: { liked: res.liked, count: res.like_count } }));
+      qc.invalidateQueries({ queryKey: ["my-track-likes"] });
+    },
+    onError: (_e, trackId) => {
+      setLikeOverrides((m) => {
+        const next = { ...m };
+        delete next[trackId];
+        return next;
+      });
+    },
+  });
+
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
       <div className="flex items-center justify-between mb-3">
@@ -307,34 +428,37 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
         </div>
       ) : (
         <ul className="divide-y divide-white/5">
-          {tracks.map((t, i) => (
-            <li key={t.id} className="grid grid-cols-[20px_36px_minmax(0,1fr)_auto] gap-3 items-center py-2 text-sm">
-              <span className="text-white/40 text-xs">{i + 1}</span>
-              <button
-                type="button"
-                onClick={() => {
+          {tracks.map((t, i) => {
+            const override = likeOverrides[t.id];
+            const liked = override ? override.liked : likedSet.has(t.id);
+            const likeCount = override ? override.count : t.like_count;
+            const isCurrent = player.track?.id === t.id;
+            const isThisPlaying = isCurrent && player.isPlaying;
+            return (
+              <TrackRow
+                key={t.id}
+                index={i + 1}
+                title={t.title}
+                coverUrl={t.cover_url}
+                audioUrl={t.audio_url}
+                durationSec={t.duration_seconds}
+                likeCount={likeCount}
+                liked={liked}
+                isPlaying={isThisPlaying}
+                onTogglePlay={() => {
                   if (!t.audio_url) return;
                   const track = { id: t.id, title: t.title, artist: artistName, audioUrl: t.audio_url, coverUrl: t.cover_url, durationSec: t.duration_seconds, preview };
-                  if (player.track?.id === t.id) { player.toggle(); } else { player.play(track, playable); }
+                  if (isCurrent) { player.toggle(); } else { player.play(track, playable); }
                 }}
-                disabled={!t.audio_url}
-                aria-label={player.track?.id === t.id && player.isPlaying ? `Pause ${t.title}` : `Play ${t.title}`}
-                className="group relative h-9 w-9 rounded overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 disabled:opacity-50"
-              >
-                {t.cover_url && <img src={t.cover_url} alt="" className="h-full w-full object-cover" />}
-                {t.audio_url && (
-                  <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="h-4 w-4 text-white" fill="currentColor" />
-                  </span>
-                )}
-              </button>
-              <div className="min-w-0 truncate">{t.title}</div>
-              <div className="text-xs text-white/60 flex items-center gap-3">
-                <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {fmtNum(t.like_count)}</span>
-                <span className="text-white/40">{fmtDur(t.duration_seconds)}</span>
-              </div>
-            </li>
-          ))}
+                onStop={() => { if (isCurrent) player.pause(); }}
+                onToggleLike={() => {
+                  if (!isAuthenticated) { setShowSignInModal(true); return; }
+                  if (likeMutation.isPending) return;
+                  likeMutation.mutate(t.id);
+                }}
+              />
+            );
+          })}
         </ul>
       )}
       <Dialog open={showSignInModal} onOpenChange={setShowSignInModal}>
