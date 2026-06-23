@@ -34,10 +34,16 @@ function fmt(sec: number): string {
 
 type VisMode = "ring" | "bars" | "particles";
 
-/* ---------- Web Audio shared analyser ---------- */
-function useAnalyser(audioRef: React.RefObject<HTMLAudioElement | null>) {
+/* ---------- Web Audio: analyser + normalizer gain ----------
+   Signal chain: <audio> → MediaElementSource → AnalyserNode → GainNode → destination
+   GainNode is the "auto-level" normalizer (ReplayGain-style approximation).
+   We sample the analyser's time-domain data to estimate short-term RMS and
+   nudge the GainNode toward a target loudness so loud and quiet tracks play
+   at a consistent perceived level. */
+function useAudioGraph(audioRef: React.RefObject<HTMLAudioElement | null>) {
   const ctxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
   const srcRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   useEffect(() => {
@@ -49,13 +55,17 @@ function useAnalyser(audioRef: React.RefObject<HTMLAudioElement | null>) {
       if (!AC) return;
       const ctx = new AC();
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 512;
+      analyser.fftSize = 1024;
       analyser.smoothingTimeConstant = 0.82;
+      const gain = ctx.createGain();
+      gain.gain.value = 1;
       const src = ctx.createMediaElementSource(audio);
       src.connect(analyser);
-      analyser.connect(ctx.destination);
+      analyser.connect(gain);
+      gain.connect(ctx.destination);
       ctxRef.current = ctx;
       analyserRef.current = analyser;
+      gainRef.current = gain;
       srcRef.current = src;
     } catch {
       /* already wired or CORS — visualizer will idle-pulse */
@@ -66,7 +76,72 @@ function useAnalyser(audioRef: React.RefObject<HTMLAudioElement | null>) {
   const resume = () => {
     if (ctxRef.current?.state === "suspended") ctxRef.current.resume().catch(() => {});
   };
-  return { analyserRef, resume };
+  return { analyserRef, gainRef, ctxRef, resume };
+}
+
+/* ---------- Auto-level normalizer ----------
+   Targets ~-14 LUFS-ish (~0.18 RMS). Smooth gain changes (~0.4s attack/release),
+   never boost more than 4x, never duck below 0.25x, hard-limit at output 0.95. */
+function useNormalizer({
+  enabled, analyserRef, gainRef, ctxRef, trackId,
+}: {
+  enabled: boolean;
+  analyserRef: React.RefObject<AnalyserNode | null>;
+  gainRef: React.RefObject<GainNode | null>;
+  ctxRef: React.RefObject<AudioContext | null>;
+  trackId: string | null;
+}) {
+  const rafRef = useRef<number | null>(null);
+  const lastGain = useRef(1);
+
+  useEffect(() => {
+    // Reset baseline on track change so the next track starts at unity.
+    lastGain.current = 1;
+    const g = gainRef.current;
+    const ctx = ctxRef.current;
+    if (g && ctx) g.gain.setTargetAtTime(1, ctx.currentTime, 0.05);
+  }, [trackId, gainRef, ctxRef]);
+
+  useEffect(() => {
+    const analyser = analyserRef.current;
+    const gain = gainRef.current;
+    const ctx = ctxRef.current;
+    if (!analyser || !gain || !ctx) return;
+
+    if (!enabled) {
+      gain.gain.setTargetAtTime(1, ctx.currentTime, 0.15);
+      return;
+    }
+
+    const target = 0.18;       // target RMS (≈ -14 LUFS perceived)
+    const minGain = 0.25;
+    const maxGain = 4.0;
+    const buf = new Float32Array(analyser.fftSize);
+
+    const tick = () => {
+      analyser.getFloatTimeDomainData(buf as unknown as Float32Array);
+      let sum = 0;
+      for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+      const rms = Math.sqrt(sum / buf.length);
+      if (rms > 0.005) {
+        let desired = target / rms;
+        desired = Math.max(minGain, Math.min(maxGain, desired));
+        // Limiter: prevent peak * gain > 0.95
+        let peak = 0;
+        for (let i = 0; i < buf.length; i++) {
+          const a = Math.abs(buf[i]);
+          if (a > peak) peak = a;
+        }
+        if (peak * desired > 0.95) desired = 0.95 / Math.max(peak, 1e-4);
+        // Smooth toward desired (slow attack/release)
+        lastGain.current = lastGain.current + (desired - lastGain.current) * 0.08;
+        gain.gain.setTargetAtTime(lastGain.current, ctx.currentTime, 0.12);
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [enabled, analyserRef, gainRef, ctxRef]);
 }
 
 /* ---------- Visualizer ---------- */
