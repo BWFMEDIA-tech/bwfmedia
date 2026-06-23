@@ -105,6 +105,23 @@ export function NowPlayingHeader({
 
   useEffect(() => { setIsPlaying(false); setProgress(0); setDuration(0); }, [playing?.id]);
 
+  // Auto-play when a new track becomes the playing track. Browsers may reject
+  // autoplay without prior gesture — that's fine, the user can press Play.
+  useEffect(() => {
+    if (!playing?.audio_url) return;
+    const a = audioRef.current;
+    if (!a) return;
+    const tryPlay = async () => {
+      try {
+        await a.play();
+        setIsPlaying(true);
+      } catch {
+        setIsPlaying(false);
+      }
+    };
+    void tryPlay();
+  }, [playing?.id, playing?.audio_url]);
+
   // Resolve mode + display data (single source of truth resolver)
   const livePerformer = liveParticipants[0] ?? null;
   const inBattle = battle?.status === "live";
