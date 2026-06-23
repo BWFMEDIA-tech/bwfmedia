@@ -127,8 +127,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/");
-  const tightTop = pathname.startsWith("/videos");
+  const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/videos");
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
   }));
@@ -140,7 +139,7 @@ function RootComponent() {
         <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
-        <div className={isChrome ? (tightTop ? "pt-16 md:pt-20" : "pt-24 md:pt-28") : ""}>
+        <div className={isChrome ? "pt-24 md:pt-28" : ""}>
           <Outlet />
         </div>
         {isChrome && <SiteFooter />}
