@@ -186,8 +186,8 @@ function BattleView({
   const aScore = (currentRound as any)?.a_weight ?? 0;
   const bScore = (currentRound as any)?.b_weight ?? 0;
   const total = aScore + bScore;
-  const aPct = total > 0 ? Math.round((aScore / total) * 100) : 50;
-  const bPct = 100 - aPct;
+  const aPct = total > 0 ? Math.round((aScore / total) * 100) : 0;
+  const bPct = total > 0 ? 100 - aPct : 0;
 
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
   const canVote = votingStatus === "open" && !myVote;
@@ -253,7 +253,7 @@ function BattleView({
           isPlaying={activeSide === "a"}
           wins={match.a_wins as number}
           pct={aPct}
-          isLeading={aScore > bScore}
+          isLeading={total > 0 && aScore > bScore}
           voted={myVote === "a"}
           canVote={canVote}
           onVote={() => vote("a", false)}
@@ -268,7 +268,7 @@ function BattleView({
           isPlaying={activeSide === "b"}
           wins={match.b_wins as number}
           pct={bPct}
-          isLeading={bScore > aScore}
+          isLeading={total > 0 && bScore > aScore}
           voted={myVote === "b"}
           canVote={canVote}
           onVote={() => vote("b", false)}
