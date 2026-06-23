@@ -247,6 +247,7 @@ function BattleView({
       <div className="grid grid-cols-2 gap-0">
         <ArtistSide
           side="a"
+          artistId={match.artist_a_id as string | null}
           name={match.artist_a_name ?? "Artist A"}
           coverUrl={(aTrack as any)?.cover_url ?? null}
           trackTitle={(aTrack as any)?.title ?? null}
@@ -262,6 +263,7 @@ function BattleView({
         />
         <ArtistSide
           side="b"
+          artistId={match.artist_b_id as string | null}
           name={match.artist_b_name ?? "Artist B"}
           coverUrl={(bTrack as any)?.cover_url ?? null}
           trackTitle={(bTrack as any)?.title ?? null}
