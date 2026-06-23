@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getVideoEmbedUrl } from "@/lib/utils";
 import {
   Upload,
   Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
@@ -224,6 +225,12 @@ function VideosPage() {
   useEffect(() => { load(); }, []);
 
   const hero = videos[activeIndex] ?? videos[0];
+  const heroIsIframe = hero && (hero.category === "sponsored" || !!hero.external_url);
+  const heroIframeSrc = hero
+    ? hero.external_url
+      ? getVideoEmbedUrl(hero.external_url)
+      : publicUrl(hero.storage_path)
+    : "";
   const trending = videos.slice(0, 5);
   const newReleases = videos.slice(0, 5);
   const videoOfWeek = videos[1] ?? hero;
@@ -499,53 +506,67 @@ function VideosPage() {
               <div className="grid md:grid-cols-[1fr_1.4fr] gap-0">
                 {/* Video player */}
                 <div className="relative aspect-video md:aspect-auto md:min-h-[360px] bg-black overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    src={publicUrl(hero.storage_path)}
-                    poster={thumbUrl(hero) ?? undefined}
-                    preload="metadata"
-                    playsInline
-                    controls={nativeControls}
-                    onPlay={() => setPlaying(true)}
-                    onPause={() => setPlaying(false)}
-                    onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-                    onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-                    onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}
-                    onVolumeChange={(e) => {
-                      setVolume(e.currentTarget.volume);
-                      setMuted(e.currentTarget.muted);
-                    }}
-                    onEnded={handleEnded}
-                    className="w-full h-full object-cover"
-                  />
-                  {!playing && (
-                    <button
-                      onClick={togglePlay}
-                      className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
-                      aria-label="Play"
-                    >
-                      <span className="w-16 h-16 rounded-full bg-red-500 hover:scale-105 transition-transform flex items-center justify-center shadow-2xl">
-                        <Play size={26} className="text-white ml-1" />
-                      </span>
-                    </button>
+                  {heroIsIframe ? (
+                    <iframe
+                      width="1280"
+                      height="720"
+                      src={heroIframeSrc}
+                      title={hero.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full bg-black"
+                    />
+                  ) : (
+                    <>
+                      <video
+                        ref={videoRef}
+                        src={publicUrl(hero.storage_path)}
+                        poster={thumbUrl(hero) ?? undefined}
+                        preload="metadata"
+                        playsInline
+                        controls={nativeControls}
+                        onPlay={() => setPlaying(true)}
+                        onPause={() => setPlaying(false)}
+                        onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+                        onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}
+                        onVolumeChange={(e) => {
+                          setVolume(e.currentTarget.volume);
+                          setMuted(e.currentTarget.muted);
+                        }}
+                        onEnded={handleEnded}
+                        className="w-full h-full object-cover"
+                      />
+                      {!playing && (
+                        <button
+                          onClick={togglePlay}
+                          className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
+                          aria-label="Play"
+                        >
+                          <span className="w-16 h-16 rounded-full bg-red-500 hover:scale-105 transition-transform flex items-center justify-center shadow-2xl">
+                            <Play size={26} className="text-white ml-1" />
+                          </span>
+                        </button>
+                      )}
+                      <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            seekVideo(((e.clientX - rect.left) / rect.width) * duration);
+                          }}
+                          className="block h-3 w-full py-1 cursor-pointer"
+                          aria-label="Seek video"
+                        >
+                          <span className="block h-1 bg-white/20 rounded-full">
+                            <span className="block h-full bg-red-500 relative rounded-full" style={{ width: `${progressPercent}%` }}>
+                              <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
+                            </span>
+                          </span>
+                        </button>
+                      </div>
+                    </>
                   )}
-                  <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        seekVideo(((e.clientX - rect.left) / rect.width) * duration);
-                      }}
-                      className="block h-3 w-full py-1 cursor-pointer"
-                      aria-label="Seek video"
-                    >
-                      <span className="block h-1 bg-white/20 rounded-full">
-                        <span className="block h-full bg-red-500 relative rounded-full" style={{ width: `${progressPercent}%` }}>
-                          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
-                        </span>
-                      </span>
-                    </button>
-                  </div>
                 </div>
 
                 {/* Meta panel */}
@@ -564,13 +585,15 @@ function VideosPage() {
                   </div>
 
                   <div className="mt-6 flex flex-wrap items-center gap-3">
-                    <button
-                      onClick={togglePlay}
-                      className="flex items-center gap-2 bg-red-500 hover:bg-red-400 hover:scale-[1.03] transition-transform text-white font-bold pl-5 pr-6 py-3 rounded-full"
-                    >
-                      {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
-                      {playing ? "Pause" : "Play"}
-                    </button>
+                    {!heroIsIframe && (
+                      <button
+                        onClick={togglePlay}
+                        className="flex items-center gap-2 bg-red-500 hover:bg-red-400 hover:scale-[1.03] transition-transform text-white font-bold pl-5 pr-6 py-3 rounded-full"
+                      >
+                        {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
+                        {playing ? "Pause" : "Play"}
+                      </button>
+                    )}
                     <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Like"><Heart size={18} /></button>
                     <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Save"><Bookmark size={18} /></button>
                     <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Share"><Share2 size={18} /></button>
@@ -605,7 +628,7 @@ function VideosPage() {
       </main>
 
       {/* BOTTOM NOW PLAYING BAR */}
-      {hero && (
+      {hero && !heroIsIframe && (
         <div className="fixed bottom-0 inset-x-0 z-40 bg-black/95 backdrop-blur-xl border-t border-white/10">
           {queueOpen && (
             <div className="absolute bottom-full right-4 mb-2 w-80 max-h-96 overflow-y-auto rounded-xl border border-white/10 bg-black/95 p-3 shadow-2xl">

@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ExternalLink, Music2, Megaphone, Calendar } from "lucide-react";
+import { getVideoEmbedUrl } from "@/lib/utils";
 import bwfLogo from "@/assets/bwf-logo.png";
 import grunge from "@/assets/grunge-bg.jpg";
 
@@ -150,7 +151,19 @@ function VideoDetailPage() {
         ) : (
           <article>
             <div className="aspect-video bg-black border border-blood/40 mb-8">
-              <video src={publicUrl} controls autoPlay className="w-full h-full object-contain bg-black" />
+              {video.category === "sponsored" || video.external_url ? (
+                <iframe
+                  width="1280"
+                  height="720"
+                  src={video.external_url ? getVideoEmbedUrl(video.external_url) : publicUrl}
+                  title={video.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full bg-black"
+                />
+              ) : (
+                <video src={publicUrl} controls autoPlay className="w-full h-full object-contain bg-black" />
+              )}
             </div>
 
             <div className="flex items-center gap-3 mb-4">
