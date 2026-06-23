@@ -15,6 +15,7 @@ import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
+import { useAudioPeaks } from "@/lib/useAudioPeaks";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -275,9 +276,10 @@ function TrackRow({
 }
 
 function MiniWaveform({
-  seed, progress, active, disabled, onSeekFraction, className,
+  seed, audioUrl, progress, active, disabled, onSeekFraction, className,
 }: {
   seed: string;
+  audioUrl: string | null;
   progress: number;
   active: boolean;
   disabled: boolean;
@@ -285,7 +287,8 @@ function MiniWaveform({
   className?: string;
 }) {
   const BARS = 36;
-  const heights = useMemo(() => {
+  const realPeaks = useAudioPeaks(audioUrl, BARS);
+  const fallback = useMemo(() => {
     // Deterministic pseudo-random heights from seed
     let h = 2166136261 >>> 0;
     for (let i = 0; i < seed.length; i++) {
@@ -304,6 +307,8 @@ function MiniWaveform({
     }
     return out;
   }, [seed]);
+  const heights = realPeaks ?? fallback;
+  const isReal = !!realPeaks;
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled || !active) return;
@@ -330,7 +335,7 @@ function MiniWaveform({
               height: `${Math.round(h * 100)}%`,
               background: active
                 ? (played ? "#FF00A6" : "rgba(255,255,255,0.22)")
-                : "rgba(255,255,255,0.18)",
+                : (isReal ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.14)"),
             }}
           />
         );
@@ -405,6 +410,7 @@ function TrackRowImpl({
       <div className="min-w-0 truncate">{title}</div>
       <MiniWaveform
         seed={id}
+        audioUrl={audioUrl}
         progress={progressFrac}
         active={isCurrent}
         disabled={!audioUrl}
