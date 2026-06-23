@@ -30,17 +30,13 @@ export const createStageRoom = createServerFn({ method: "POST" })
     return row;
   });
 
-/** Read a single Stage Room. Public. */
+/** Read a single Stage Room. Requires an authenticated viewer (RLS-gated). */
 export const getStageRoom = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
-  .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-    );
-    const { data: row, error } = await sb
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: row, error } = await supabase
       .from("stage_rooms")
       .select("id, host_id, title, description, status, stage_state, audience_count, livekit_room, started_at, ended_at, created_at")
       .eq("id", data.id)
