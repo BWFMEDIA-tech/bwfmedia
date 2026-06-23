@@ -781,6 +781,21 @@ export function ImmersivePlayer({
                 ))}
               </select>
             </label>
+            <button
+              type="button"
+              onClick={() => setNormalize(v => !v)}
+              title="Auto-level: keeps loud and quiet tracks at a consistent volume"
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold transition ${
+                normalize
+                  ? "border-[#00E6FF]/60 bg-[#00E6FF]/10 text-[#00E6FF] shadow-[0_0_15px_-5px_rgba(0,230,255,0.7)]"
+                  : "border-white/10 bg-black/30 text-white/60 hover:text-white"
+              }`}
+              aria-pressed={normalize}
+              aria-label="Toggle auto-level normalization"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              AUTO-LEVEL {normalize ? "ON" : "OFF"}
+            </button>
           </div>
         </div>
 
