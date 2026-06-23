@@ -344,14 +344,7 @@ function PathCard({
 
 /* ---------- Live Arena Status ---------- */
 function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
-  const fallbackQueue = [
-    { id: "1", position: 1, artistName: "NovaRex", artistId: null, avatar: null, status: "playing" as const },
-    { id: "2", position: 2, artistName: "J-Soul", artistId: null, avatar: null, status: "queued" as const },
-    { id: "3", position: 3, artistName: "KJ Blaze", artistId: null, avatar: null, status: "queued" as const },
-    { id: "4", position: 4, artistName: "LexX", artistId: null, avatar: null, status: "queued" as const },
-    { id: "5", position: 5, artistName: "Aura.wav", artistId: null, avatar: null, status: "queued" as const },
-  ];
-  const queue = data.queue.length ? data.queue : fallbackQueue;
+  const queue = data.queue;
   const battle = data.liveBattle;
   const trending = data.trendingStream;
   return (
@@ -374,6 +367,9 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
             <p className="text-sm font-bold">ACTIVE STAGE QUEUE</p>
           </div>
           <p className="text-xs text-white/50 mt-0.5">Who's up next</p>
+          {queue.length === 0 ? (
+            <p className="mt-3 text-xs text-white/50">No artists in queue yet.</p>
+          ) : (
           <ul className="mt-3 space-y-2 text-sm">
             {queue.map((q, i) => {
               const isPlaying = q.status === "playing" || i === 0;
@@ -398,6 +394,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
               );
             })}
           </ul>
+          )}
           <button className="mt-4 w-full rounded-lg border border-white/15 px-3 py-2 text-xs font-bold hover:bg-white/5">
             VIEW FULL QUEUE
           </button>
@@ -418,27 +415,30 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
               <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/60">IDLE</span>
             )}
           </div>
-          <div className="mt-5 flex items-center justify-around">
-            <BattleSide
-              name={battle?.artistA.name ?? "Aura.wav"}
-              avatar={battle?.artistA.avatar ?? null}
-              wins={battle?.aWins ?? 0}
-              accent="from-[#00E6FF] to-[#004BFF] ring-[#00E6FF]/60"
-            />
-            <div className="text-center">
-              <p className="text-2xl font-black text-white/60">VS</p>
-              <p className="mt-2 text-xs text-white/50">
-                Round {battle?.currentRound ?? 2}
-                {battle ? ` / ${battle.totalRounds}` : ""}
-              </p>
+          {battle ? (
+            <div className="mt-5 flex items-center justify-around">
+              <BattleSide
+                name={battle.artistA.name}
+                avatar={battle.artistA.avatar}
+                wins={battle.aWins}
+                accent="from-[#00E6FF] to-[#004BFF] ring-[#00E6FF]/60"
+              />
+              <div className="text-center">
+                <p className="text-2xl font-black text-white/60">VS</p>
+                <p className="mt-2 text-xs text-white/50">
+                  Round {battle.currentRound} / {battle.totalRounds}
+                </p>
+              </div>
+              <BattleSide
+                name={battle.artistB.name}
+                avatar={battle.artistB.avatar}
+                wins={battle.bWins}
+                accent="from-[#FF00A6] to-red-600 ring-red-500/60"
+              />
             </div>
-            <BattleSide
-              name={battle?.artistB.name ?? "KJ Blaze"}
-              avatar={battle?.artistB.avatar ?? null}
-              wins={battle?.bWins ?? 0}
-              accent="from-[#FF00A6] to-red-600 ring-red-500/60"
-            />
-          </div>
+          ) : (
+            <p className="mt-5 text-xs text-white/50 text-center">No battle live right now.</p>
+          )}
           {battle?.roomName ? (
             <Link
               to="/play/$room"
@@ -462,22 +462,26 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
           </div>
           <p className="text-xs text-white/50 mt-0.5">Top event right now</p>
           <div className="mt-3 aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-[#C53DFF]/40 via-[#FF00A6]/30 to-[#004BFF]/40 flex items-end p-3">
-            {trending?.thumbnail && (
+            {trending?.thumbnail ? (
               <img
                 src={trending.thumbnail}
                 alt={trending.title}
                 className="absolute inset-0 h-full w-full object-cover opacity-80"
               />
-            )}
+            ) : null}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-            <p className="relative font-bold drop-shadow">
-              {trending?.title ?? "Weekly Challenge Finals"}
-            </p>
+            {trending ? (
+              <p className="relative font-bold drop-shadow">{trending.title}</p>
+            ) : (
+              <p className="relative text-xs font-semibold text-white/70">No live rooms right now.</p>
+            )}
           </div>
-          <p className="mt-3 text-xs text-white/60 flex items-center gap-1.5">
-            <Eye className="h-3.5 w-3.5" />{" "}
-            {(trending?.viewerCount ?? 1245).toLocaleString()} Watching
-          </p>
+          {trending ? (
+            <p className="mt-3 text-xs text-white/60 flex items-center gap-1.5">
+              <Eye className="h-3.5 w-3.5" />{" "}
+              {trending.viewerCount.toLocaleString()} Watching
+            </p>
+          ) : null}
           {trending ? (
             <Link
               to="/play/$room"
