@@ -360,7 +360,7 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
 function StageTile({ track, label, fallbackImage, placeholder, profile, small }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite; small?: boolean }) {
   const avatar = profile?.avatar_url ?? fallbackImage;
   return (
-    <div className={cn("stage-tile-glow relative aspect-video rounded-2xl p-[2px]", small && "rounded-xl")}>
+    <div className={cn("stage-tile-glow relative aspect-video max-h-[35vh] rounded-2xl p-[2px] md:max-h-none", small && "rounded-xl")}>
       <div className="stage-tile relative h-full w-full overflow-hidden rounded-[14px] bg-[#0d0d18]">
       {track ? (
         <TrackRefContext.Provider value={track}>
