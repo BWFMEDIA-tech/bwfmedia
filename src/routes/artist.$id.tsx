@@ -15,6 +15,13 @@ import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
+import {
+  getArtistFollowStats,
+  getIsFollowingArtist,
+  toggleArtistFollow,
+} from "@/lib/artist-follows.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { useAudioPeaks } from "@/lib/useAudioPeaks";
 
 const artistMetaOptions = (id: string) =>
@@ -185,7 +192,7 @@ function HeroBanner({
           </Link>
         ) : (
           <>
-            <PillButton icon={UserPlus} label="Follow" />
+            <FollowButton artistId={artist.id} />
             <PillButton icon={Share2} label="Share" />
             <button className="grid h-10 w-10 place-items-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10"><MoreHorizontal className="h-4 w-4" /></button>
           </>
@@ -199,6 +206,63 @@ function PillButton({ icon: Icon, label }: { icon: any; label: string }) {
   return (
     <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm border border-white/10 bg-white/[0.04] hover:bg-white/[0.08]">
       <Icon className="h-4 w-4" /> {label}
+    </button>
+  );
+}
+
+function FollowButton({ artistId }: { artistId: string }) {
+  const { isAuthenticated } = useAuth();
+  const qc = useQueryClient();
+  const fetchStats = useServerFn(getArtistFollowStats);
+  const fetchIsFollowing = useServerFn(getIsFollowingArtist);
+  const toggleFn = useServerFn(toggleArtistFollow);
+
+  const statsQ = useQuery({
+    queryKey: ["artist-follow-stats", artistId],
+    queryFn: () => fetchStats({ data: { artistId } }),
+  });
+  const followingQ = useQuery({
+    queryKey: ["artist-following", artistId],
+    queryFn: () => fetchIsFollowing({ data: { artistId } }),
+    enabled: isAuthenticated,
+  });
+
+  const mut = useMutation({
+    mutationFn: () => toggleFn({ data: { artistId } }),
+    onSuccess: (res) => {
+      qc.setQueryData(["artist-follow-stats", artistId], { count: res.count });
+      qc.setQueryData(["artist-following", artistId], { following: res.following });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not update follow"),
+  });
+
+  const following = followingQ.data?.following ?? false;
+  const count = statsQ.data?.count ?? 0;
+
+  const handleClick = () => {
+    if (!isAuthenticated) {
+      toast.error("Sign in to follow artists");
+      return;
+    }
+    mut.mutate();
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={mut.isPending}
+      aria-pressed={following}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm border transition disabled:opacity-60 ${
+        following
+          ? "bg-white text-black border-white hover:bg-white/90"
+          : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white"
+      }`}
+    >
+      <UserPlus className="h-4 w-4" />
+      <span>{following ? "Following" : "Follow"}</span>
+      <span className={`tabular-nums text-xs ${following ? "text-black/60" : "text-white/60"}`}>
+        {fmtNum(count)}
+      </span>
     </button>
   );
 }
