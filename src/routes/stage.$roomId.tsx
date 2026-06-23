@@ -63,7 +63,6 @@ function StagePage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    console.log("[stage] auth state", { loading: auth.loading, user: !!auth.user });
     if (!auth.loading && !auth.user) {
       navigate({ to: "/login", search: { redirect: `/stage/${roomId}` } as never });
     }
