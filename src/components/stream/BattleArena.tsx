@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Swords, Trophy, Zap, Crown, Sparkles, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -33,15 +33,17 @@ export function BattleArena({
   // Single source of truth: the Battle Engine room state. Realtime row changes
   // on battle_matches / battle_rounds simply trigger a re-fetch; we never
   // compute battle state in the UI.
+  const cancelledRef = useRef(false);
+  const refresh = useCallback(async () => {
+    try {
+      const s = await stateFn({ data: { streamId } });
+      if (!cancelledRef.current) setRoomState(s as RoomState);
+    } catch { /* ignore */ }
+  }, [streamId, stateFn]);
+
   useEffect(() => {
     if (!streamId) return;
-    let cancelled = false;
-    const refresh = async () => {
-      try {
-        const s = await stateFn({ data: { streamId } });
-        if (!cancelled) setRoomState(s as RoomState);
-      } catch { /* ignore */ }
-    };
+    cancelledRef.current = false;
     refresh();
     const ch = supabase
       .channel(`battle-room-${streamId}-${Math.random().toString(36).slice(2)}`)
@@ -58,8 +60,8 @@ export function BattleArena({
         { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` },
         refresh)
       .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(ch); };
-  }, [streamId, stateFn]);
+    return () => { cancelledRef.current = true; supabase.removeChannel(ch); };
+  }, [streamId, refresh]);
 
   const match = roomState?.match ?? null;
   const currentRound = roomState?.currentRound ?? null;
@@ -122,6 +124,7 @@ export function BattleArena({
       myVote={myVote}
       isHost={isHost}
       onVoteCast={(c) => setMyVote(c)}
+      onAfterHostEmit={refresh}
     />
   );
 }
@@ -131,11 +134,13 @@ function BattleView({
   myVote,
   isHost,
   onVoteCast,
+  onAfterHostEmit,
 }: {
   roomState: RoomState;
   myVote: "a" | "b" | null;
   isHost: boolean;
   onVoteCast: (c: "a" | "b") => void;
+  onAfterHostEmit?: () => void;
 }) {
   const voteFn = useServerFn(castBattleVote);
   const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack } = roomState;
@@ -305,6 +310,7 @@ function BattleView({
           totalRounds={match.total_rounds as number}
           artistAName={match.artist_a_name ?? "Side A"}
           artistBName={match.artist_b_name ?? "Side B"}
+          onAfterEmit={onAfterHostEmit}
         />
       )}
     </div>
