@@ -31,10 +31,14 @@ import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-conne
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
 
-// Gritty black/red stage theme
-const PURPLE = "#ef4444"; // primary red (kept name for minimal diff)
-const BLUE = "#7f1d1d"; // deep blood red
-const ACCENT = "#f97316"; // ember/orange grit accent
+// BWF cinema palette — "Immersive Stage Cinema"
+const PURPLE = "#C53DFF"; // brand magenta (primary, host)
+const BLUE = "#004BFF"; // brand electric blue (co-host accents)
+const ACCENT = "#00E6FF"; // brand cyan (guest accent)
+const PINK = "#FF00A6"; // brand pink (live / speaking secondary)
+
+// Cap how many empty guest tiles we render — 20 dashed circles is visual noise.
+const VISIBLE_EMPTY_GUESTS = 5;
 
 export function StageRoom({
   streamId,
@@ -184,33 +188,58 @@ export function StageRoom({
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-red-900/40 p-5 shadow-[0_0_60px_-20px_rgba(239,68,68,0.45)]"
+      className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(120% 80% at 0% 0%, rgba(127,29,29,0.35), transparent 60%), radial-gradient(120% 80% at 100% 100%, rgba(239,68,68,0.18), transparent 60%), #07020399",
-        backgroundColor: "#0a0405",
+          "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,75,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
       }}
     >
-      {/* gritty noise overlay */}
+      {/* subtle grid overlay */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
         style={{
           backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "44px 44px, 44px 44px",
         }}
       />
-      <div className="mb-4 flex items-center justify-between">
-        <div className="relative flex items-center gap-2">
-          <Mic className="h-4 w-4" style={{ color: PURPLE }} />
-          <span
-            className="text-sm font-black uppercase tracking-[0.2em] text-white"
-            style={{ textShadow: `0 0 18px ${PURPLE}aa` }}
+      <div className="relative mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl"
+            style={{
+              background: `linear-gradient(135deg, ${PURPLE}, ${PINK})`,
+              boxShadow: `0 0 24px ${PURPLE}80, inset 0 0 12px rgba(255,255,255,0.18)`,
+            }}
           >
-            STAGE ROOM
-          </span>
-          <span className="text-[11px] text-white/50">
-            · {hosts.length}/{MAX_HOSTS} hosts · {guests.length}/{MAX_GUESTS} guests
-          </span>
+            <Mic className="h-4 w-4 text-white" />
+            <span
+              className="absolute -right-1 -top-1 h-3 w-3 rounded-full"
+              style={{ background: PINK, boxShadow: `0 0 12px ${PINK}, 0 0 24px ${PINK}` }}
+            />
+            <span
+              className="absolute -right-1 -top-1 h-3 w-3 animate-ping rounded-full opacity-75"
+              style={{ background: PINK }}
+            />
+          </div>
+          <div className="min-w-0">
+            <div
+              className="text-[11px] font-bold uppercase tracking-[0.32em]"
+              style={{ color: PINK, textShadow: `0 0 14px ${PINK}80` }}
+            >
+              ● ON STAGE
+            </div>
+            <div
+              className="truncate text-xl font-black uppercase leading-none tracking-[0.18em] text-white sm:text-2xl"
+              style={{ textShadow: `0 0 24px ${PURPLE}aa` }}
+            >
+              Stage Room
+            </div>
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2.5">
+          <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
+          <CapacityChip label="Guests" filled={guests.length} total={MAX_GUESTS} color={ACCENT} />
         </div>
       </div>
 
@@ -223,7 +252,7 @@ export function StageRoom({
         onInvite={() => setInvite("host")}
         inviteLabel="Invite Host"
       />
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
         {hosts.map((p) => (
           <SpeakerBubble
             key={p.id}
@@ -257,12 +286,12 @@ export function StageRoom({
           />
         )}
         {Array.from({ length: Math.max(0, MAX_HOSTS - hostSlotsTaken) }).map((_, i) => (
-          <EmptySlot key={`h-${i}`} label="Host slot" />
+          <EmptySlot key={`h-${i}`} label="Host slot" color={PURPLE} />
         ))}
       </div>
 
       {/* Guests row */}
-      <div className="mt-6">
+      <div className="mt-8">
         <SectionHeader
           label="GUESTS"
           count={`${guests.length}/${MAX_GUESTS}`}
@@ -271,7 +300,7 @@ export function StageRoom({
           onInvite={() => setInvite("speaker")}
           inviteLabel="Invite Guest"
         />
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
           {guests.map((p) => (
             <SpeakerBubble
               key={p.id}
@@ -288,9 +317,19 @@ export function StageRoom({
               onToggleMute={() => doToggleMute(p)}
             />
           ))}
-          {Array.from({ length: Math.max(0, MAX_GUESTS - guests.length) }).map((_, i) => (
-            <EmptySlot key={`g-${i}`} label="Guest slot" />
-          ))}
+          {(() => {
+            const remaining = Math.max(0, MAX_GUESTS - guests.length);
+            const visible = Math.min(remaining, VISIBLE_EMPTY_GUESTS);
+            const overflow = remaining - visible;
+            return (
+              <>
+                {Array.from({ length: visible }).map((_, i) => (
+                  <EmptySlot key={`g-${i}`} label="Guest slot" color={ACCENT} />
+                ))}
+                {overflow > 0 && <MoreOpenChip count={overflow} color={ACCENT} />}
+              </>
+            );
+          })()}
         </div>
       </div>
 
@@ -848,11 +887,86 @@ export function AudienceRow({ participants }: { participants: StageParticipant[]
   );
 }
 
-function EmptySlot({ label = "Open slot" }: { label?: string }) {
+function EmptySlot({ label = "Open slot", color = "#ffffff" }: { label?: string; color?: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 opacity-40">
-      <div className="h-20 w-20 rounded-full border-2 border-dashed border-white/20" />
-      <div className="text-[10px] text-white/40">{label}</div>
+    <div className="group flex flex-col items-center gap-2">
+      <div
+        className="relative grid h-20 w-20 place-items-center rounded-full border border-dashed transition group-hover:scale-105"
+        style={{
+          borderColor: `${color}55`,
+          background: `radial-gradient(60% 60% at 50% 50%, ${color}10, transparent 70%)`,
+        }}
+      >
+        <span className="text-lg font-thin" style={{ color: `${color}99` }}>
+          +
+        </span>
+      </div>
+      <div
+        className="text-[10px] font-semibold uppercase tracking-widest"
+        style={{ color: `${color}77` }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function MoreOpenChip({ count, color }: { count: number; color: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2">
+      <div
+        className="grid h-20 w-20 place-items-center rounded-full border text-center"
+        style={{
+          borderColor: `${color}55`,
+          background: `radial-gradient(60% 60% at 50% 50%, ${color}18, transparent 70%)`,
+          boxShadow: `inset 0 0 16px ${color}22`,
+        }}
+      >
+        <div>
+          <div className="text-lg font-black leading-none text-white" style={{ textShadow: `0 0 12px ${color}aa` }}>
+            +{count}
+          </div>
+          <div className="mt-0.5 text-[8px] font-bold uppercase tracking-widest" style={{ color: `${color}cc` }}>
+            open
+          </div>
+        </div>
+      </div>
+      <div className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: `${color}77` }}>
+        more seats
+      </div>
+    </div>
+  );
+}
+
+function CapacityChip({
+  label,
+  filled,
+  total,
+  color,
+}: {
+  label: string;
+  filled: number;
+  total: number;
+  color: string;
+}) {
+  const pct = Math.max(0, Math.min(100, (filled / total) * 100));
+  return (
+    <div
+      className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur"
+      style={{ boxShadow: `inset 0 0 12px ${color}22` }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+      <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">{label}</span>
+      <span className="text-[11px] font-black tabular-nums text-white">
+        {filled}
+        <span className="text-white/40">/{total}</span>
+      </span>
+      <span className="relative h-1 w-10 overflow-hidden rounded-full bg-white/10">
+        <span
+          className="absolute inset-y-0 left-0 rounded-full transition-all"
+          style={{ width: `${pct}%`, background: color, boxShadow: `0 0 10px ${color}` }}
+        />
+      </span>
     </div>
   );
 }
