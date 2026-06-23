@@ -438,6 +438,7 @@ function TrackRowImpl({
   audioUrl: string | null;
   durationSec: number | null;
   likeCount: number;
+  playCount: number;
   liked: boolean;
   isPlaying: boolean;
   onTogglePlay: () => void;
@@ -472,7 +473,7 @@ function TrackRowImpl({
   const dur = durationSec && durationSec > 0 ? durationSec : detectedDur;
 
   return (
-    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_120px] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_120px] gap-3 items-center py-2 text-sm group">
+    <li className="grid grid-cols-[20px_36px_minmax(0,1fr)_140px] sm:grid-cols-[20px_36px_minmax(0,1fr)_140px_140px] gap-3 items-center py-2 text-sm group">
       <span className="text-white/40 text-xs">{index}</span>
       <button
         type="button"
@@ -504,7 +505,7 @@ function TrackRowImpl({
         }}
         className="hidden sm:block"
       />
-      <div className="grid grid-cols-[56px_16px_44px] items-center justify-items-end gap-2 text-xs text-white/60">
+      <div className="grid grid-cols-[56px_56px_16px_44px] items-center justify-items-end gap-2 text-xs text-white/60">
         <button
           type="button"
           onClick={onToggleLike}
@@ -515,6 +516,14 @@ function TrackRowImpl({
           <Heart className="h-3.5 w-3.5 shrink-0" fill={liked ? "currentColor" : "none"} />
           <span className="tabular-nums">{fmtNum(likeCount)}</span>
         </button>
+        <span
+          className="inline-flex items-center justify-end gap-1 text-white/50"
+          title={`${playCount.toLocaleString()} plays`}
+          aria-label={`${playCount} plays`}
+        >
+          <Headphones className="h-3.5 w-3.5 shrink-0" />
+          <span className="tabular-nums">{fmtNum(playCount)}</span>
+        </span>
         <button
           type="button"
           onClick={onStop}
