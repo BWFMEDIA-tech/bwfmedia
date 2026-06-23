@@ -9,6 +9,7 @@ import { TipModal } from "@/components/stream/TipModal";
 import { useServerFn } from "@tanstack/react-start";
 import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions";
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
