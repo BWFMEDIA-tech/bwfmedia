@@ -82,6 +82,7 @@ import { Route as AdminVoteAttemptsRouteImport } from './routes/admin.vote-attem
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTransactionsRouteImport } from './routes/admin.transactions'
 import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
+import { Route as AdminStudioBookingsRouteImport } from './routes/admin.studio-bookings'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSecurityRouteImport } from './routes/admin.security'
@@ -480,6 +481,11 @@ const AdminTicketsRoute = AdminTicketsRouteImport.update({
   path: '/tickets',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStudioBookingsRoute = AdminStudioBookingsRouteImport.update({
+  id: '/studio-bookings',
+  path: '/studio-bookings',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminStreamsRoute = AdminStreamsRouteImport.update({
   id: '/streams',
   path: '/streams',
@@ -706,6 +712,7 @@ export interface FileRoutesByFullPath {
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/studio-bookings': typeof AdminStudioBookingsRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -812,6 +819,7 @@ export interface FileRoutesByTo {
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/studio-bookings': typeof AdminStudioBookingsRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -920,6 +928,7 @@ export interface FileRoutesById {
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
+  '/admin/studio-bookings': typeof AdminStudioBookingsRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -1029,6 +1038,7 @@ export interface FileRouteTypes {
     | '/admin/security'
     | '/admin/settings'
     | '/admin/streams'
+    | '/admin/studio-bookings'
     | '/admin/tickets'
     | '/admin/transactions'
     | '/admin/users'
@@ -1135,6 +1145,7 @@ export interface FileRouteTypes {
     | '/admin/security'
     | '/admin/settings'
     | '/admin/streams'
+    | '/admin/studio-bookings'
     | '/admin/tickets'
     | '/admin/transactions'
     | '/admin/users'
@@ -1242,6 +1253,7 @@ export interface FileRouteTypes {
     | '/admin/security'
     | '/admin/settings'
     | '/admin/streams'
+    | '/admin/studio-bookings'
     | '/admin/tickets'
     | '/admin/transactions'
     | '/admin/users'
@@ -1877,6 +1889,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTicketsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/studio-bookings': {
+      id: '/admin/studio-bookings'
+      path: '/studio-bookings'
+      fullPath: '/admin/studio-bookings'
+      preLoaderRoute: typeof AdminStudioBookingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/streams': {
       id: '/admin/streams'
       path: '/streams'
@@ -2122,6 +2141,7 @@ interface AdminRouteChildren {
   AdminSecurityRoute: typeof AdminSecurityRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
+  AdminStudioBookingsRoute: typeof AdminStudioBookingsRoute
   AdminTicketsRoute: typeof AdminTicketsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -2147,6 +2167,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSecurityRoute: AdminSecurityRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminStreamsRoute: AdminStreamsRoute,
+  AdminStudioBookingsRoute: AdminStudioBookingsRoute,
   AdminTicketsRoute: AdminTicketsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,
   AdminUsersRoute: AdminUsersRoute,
