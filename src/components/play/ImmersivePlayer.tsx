@@ -8,7 +8,17 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
-import { votePlayTrack, advancePlayQueue, playTrackNow } from "@/lib/play.functions";
+import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue } from "@/lib/play.functions";
+import {
+  DndContext, closestCenter, PointerSensor, KeyboardSensor,
+  useSensor, useSensors, type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext, sortableKeyboardCoordinates, arrayMove,
+  useSortable, verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 /* ============================================================
    Brand palette (BWF):
