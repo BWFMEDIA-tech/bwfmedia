@@ -505,7 +505,23 @@ export function ImmersivePlayer({
   }, [sleepMin]);
 
   /* ----- actions ----- */
-  const togglePlay = () => {
+  const togglePlay = async () => {
+    // If nothing is playing yet, the host can promote the first queued track.
+    if (!track) {
+      if (!isHost || !streamId) {
+        toast.message("Waiting for the host to start the next track…");
+        return;
+      }
+      const next = upNext[0];
+      if (!next) { toast.error("Queue is empty — submit a track to start."); return; }
+      try {
+        await playFn({ data: { streamId, trackId: next.id } });
+        toast.success(`Now playing: ${next.title}`);
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed to start track");
+      }
+      return;
+    }
     const a = audioRef.current;
     if (!a) return;
     if (a.paused) a.play().catch(() => {}); else a.pause();
@@ -720,7 +736,7 @@ export function ImmersivePlayer({
             <button
               aria-label={isPlaying ? "Pause" : "Play"}
               onClick={togglePlay}
-              disabled={!track?.audio_url}
+              disabled={!track?.audio_url && !(isHost && upNext.length > 0)}
               className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#004BFF] text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
             >
               {isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7 translate-x-0.5" />}
