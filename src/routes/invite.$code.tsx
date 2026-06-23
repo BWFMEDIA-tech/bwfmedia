@@ -12,6 +12,7 @@ import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { supabase } from "@/integrations/supabase/client";
+import { useStagePresence } from "@/lib/use-stage-presence";
 
 export const Route = createFileRoute("/invite/$code")({
   head: ({ params }) => ({
@@ -284,6 +285,7 @@ function InviteRoom({
   onLeave: () => void;
 }) {
   const { participants } = useStageState(stream.id);
+  useStagePresence(stream.id, auth.user?.id ?? null);
   if (stream.mode === "stage" && auth.user) {
     return (
       <StageAudioShell
@@ -293,6 +295,7 @@ function InviteRoom({
         userId={auth.user.id}
         isHost={role === "host"}
         onLeave={onLeave}
+        autoConnect
       >
         <StageRoom
           streamId={stream.id}
