@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { StageConnectionProvider } from "@/lib/stage-connection-context";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
+import { StageReconnectBanner } from "./StageReconnectBanner";
 import { setRealtimeHealth } from "@/lib/realtime-health";
 
 /**
@@ -175,6 +176,7 @@ export function StageAudioShell({
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
         <ReconnectAudioGuard serverUrl={serverUrl} token={token} />
+        <StageReconnectBanner />
         {children}
         {showHostTools && <StageDiagnostics />}
         {showHostTools && <StageMicBar onLeave={onLeave} />}
