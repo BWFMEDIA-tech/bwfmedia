@@ -202,6 +202,7 @@ export function LiveChat({
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1 text-[11px]">
                 <span className="font-bold text-white">{c.display_name || "Anon"}</span>
+                <RankBadge userId={c.user_id} size="xs" />
                 {c.user_id === auth.user?.id && <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />}
                 {isTip && <Sparkles className="h-3 w-3" style={{ color: PURPLE }} />}
                 <span className="ml-auto text-[10px] text-white/40">
