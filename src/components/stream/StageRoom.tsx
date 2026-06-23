@@ -31,10 +31,14 @@ import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-conne
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
 
-// Gritty black/red stage theme
-const PURPLE = "#ef4444"; // primary red (kept name for minimal diff)
-const BLUE = "#7f1d1d"; // deep blood red
-const ACCENT = "#f97316"; // ember/orange grit accent
+// BWF cinema palette — "Immersive Stage Cinema"
+const PURPLE = "#C53DFF"; // brand magenta (primary, host)
+const BLUE = "#004BFF"; // brand electric blue (co-host accents)
+const ACCENT = "#00E6FF"; // brand cyan (guest accent)
+const PINK = "#FF00A6"; // brand pink (live / speaking secondary)
+
+// Cap how many empty guest tiles we render — 20 dashed circles is visual noise.
+const VISIBLE_EMPTY_GUESTS = 5;
 
 export function StageRoom({
   streamId,
