@@ -41,6 +41,7 @@ export function StageAudioShell({
   children,
   onLeave,
   showHostTools = true,
+  autoConnect = false,
 }: {
   token: string;
   serverUrl: string;
@@ -51,8 +52,10 @@ export function StageAudioShell({
   onLeave?: () => void;
   /** When false (audience/listeners), hides mic bar, device selector, diagnostics, and leave button. */
   showHostTools?: boolean;
+  /** Connect immediately after a Join Live/Invite click instead of showing a second join prompt. */
+  autoConnect?: boolean;
 }) {
-  const [connect, setConnect] = useState(false);
+  const [connect, setConnect] = useState(autoConnect);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
   // Mirror LiveKit health into the global store so chat/queue surfaces can
@@ -71,6 +74,10 @@ export function StageAudioShell({
     setRealtimeHealth("livekit", status, fatal.detail);
   }, [fatal]);
   useEffect(() => () => setRealtimeHealth("livekit", "connected"), []);
+
+  useEffect(() => {
+    if (autoConnect) setConnect(true);
+  }, [autoConnect, token, serverUrl]);
 
   useEffect(() => {
     let active = true;

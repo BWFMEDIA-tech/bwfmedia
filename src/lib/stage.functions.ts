@@ -305,6 +305,47 @@ export const setParticipantMute = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Current user heartbeat. Uses a narrow server-side update so speakers/hosts
+ * can refresh connection_status without granting clients permission to edit
+ * their own stage_role. */
+export const updateMyStagePresence = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      streamId: z.string().uuid(),
+      connectionStatus: z.enum(["connected", "reconnecting", "disconnected"]),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const patch: { connection_status: string; last_seen_at?: string } = { connection_status: data.connectionStatus };
+    if (data.connectionStatus === "connected") patch.last_seen_at = new Date().toISOString();
+
+    const { data: existing } = await supabaseAdmin
+      .from("stage_participants")
+      .select("id")
+      .eq("stream_id", data.streamId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    const { error } = existing
+      ? await supabaseAdmin
+          .from("stage_participants")
+          .update(patch)
+          .eq("stream_id", data.streamId)
+          .eq("user_id", context.userId)
+      : await supabaseAdmin
+          .from("stage_participants")
+          .insert({
+            stream_id: data.streamId,
+            user_id: context.userId,
+            stage_role: "listener",
+            ...patch,
+          });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
 /** Update the stream's host-transfer mode setting (primary host only) */
 export const setHostTransferMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

@@ -39,8 +39,9 @@ function GuestPage() {
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
-  // Heartbeat presence while watching (chat access requires a stage_participants row).
-  useStagePresence(streamId, auth.user?.id ?? null);
+  // Heartbeat presence only after the listener actually joins LiveKit; avoids
+  // ghost stage rows that show as “Reconnecting…” before the guest connects.
+  useStagePresence(lk ? streamId : null, auth.user?.id ?? null);
 
   const myStageRole = auth.user
     ? participants.find((p) => p.user_id === auth.user!.id)?.stage_role ?? "listener"
@@ -178,6 +179,7 @@ function GuestPage() {
               userId={auth.user.id}
               onLeave={() => setLk(null)}
               showHostTools={isHostLike}
+              autoConnect
             >
               <NowPlayingHeader
                 streamId={streamId}
