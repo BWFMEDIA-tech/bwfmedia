@@ -11,6 +11,7 @@ import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
+import { GlobalPlayer } from "@/components/player/GlobalPlayer";
 
 function NotFoundComponent() {
   return (
