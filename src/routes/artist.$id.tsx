@@ -410,6 +410,7 @@ function TrackRowImpl({
       <div className="min-w-0 truncate">{title}</div>
       <MiniWaveform
         seed={id}
+        audioUrl={audioUrl}
         progress={progressFrac}
         active={isCurrent}
         disabled={!audioUrl}
