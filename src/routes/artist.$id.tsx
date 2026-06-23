@@ -2,18 +2,19 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { useMemo, useState, useEffect } from "react";
 import {
-  BadgeCheck, MapPin, Music2, Play, Heart, Share2, MoreHorizontal,
+  BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
+import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
