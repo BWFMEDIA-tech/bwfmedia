@@ -455,6 +455,7 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
             return (
               <TrackRow
                 key={t.id}
+                id={t.id}
                 index={i + 1}
                 title={t.title}
                 coverUrl={t.cover_url}
