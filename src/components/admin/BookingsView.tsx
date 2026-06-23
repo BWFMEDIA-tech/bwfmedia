@@ -121,7 +121,7 @@ export function BookingsView<T extends BaseBooking>({
       .select("*")
       .order("preferred_date", { ascending: false });
     if (error) toast.error(error.message);
-    else setRows((data ?? []) as T[]);
+    else setRows((data ?? []) as unknown as T[]);
     setLoading(false);
   }
 
