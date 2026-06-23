@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.stage_rooms TO authenticated; GRANT ALL ON public.stage_rooms TO service_role;
