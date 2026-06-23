@@ -139,7 +139,7 @@ function RootComponent() {
         <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
-        <div className={isChrome ? (tightTop ? "pt-16 md:pt-20" : "pt-24 md:pt-28") : ""}>
+        <div className={isChrome ? "pt-24 md:pt-28" : ""}>
           <Outlet />
         </div>
         {isChrome && <SiteFooter />}
