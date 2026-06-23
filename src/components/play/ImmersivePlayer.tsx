@@ -116,10 +116,10 @@ function useNormalizer({
     const target = 0.18;       // target RMS (≈ -14 LUFS perceived)
     const minGain = 0.25;
     const maxGain = 4.0;
-    const buf = new Float32Array(analyser.fftSize);
+    const buf = new Float32Array(new ArrayBuffer(analyser.fftSize * 4));
 
     const tick = () => {
-      analyser.getFloatTimeDomainData(buf as unknown as Float32Array);
+      analyser.getFloatTimeDomainData(buf as any);
       let sum = 0;
       for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
       const rms = Math.sqrt(sum / buf.length);
