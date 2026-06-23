@@ -225,6 +225,12 @@ function VideosPage() {
   useEffect(() => { load(); }, []);
 
   const hero = videos[activeIndex] ?? videos[0];
+  const heroIsIframe = hero && (hero.category === "sponsored" || !!hero.external_url);
+  const heroIframeSrc = hero
+    ? hero.external_url
+      ? getVideoEmbedUrl(hero.external_url)
+      : publicUrl(hero.storage_path)
+    : "";
   const trending = videos.slice(0, 5);
   const newReleases = videos.slice(0, 5);
   const videoOfWeek = videos[1] ?? hero;
