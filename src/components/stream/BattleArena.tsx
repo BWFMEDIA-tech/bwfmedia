@@ -432,51 +432,55 @@ function ArtistSide({
           <div className="-mt-1 max-w-[10rem] truncate text-center text-[11px] text-white/60">♪ {trackTitle}</div>
         )
       )}
-      <div className="text-[11px] text-white/50">Rounds won: {wins}</div>
+      {!isEmpty && <div className="text-[11px] text-white/50">Rounds won: {wins}</div>}
 
-      <div className="w-full">
-        <div className="h-2 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full transition-all duration-300"
-            style={{ width: `${pct}%`, background: grad }}
-          />
+      {!isEmpty && (
+        <div className="w-full">
+          <div className="h-2 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full transition-all duration-300"
+              style={{ width: `${pct}%`, background: grad }}
+            />
+          </div>
+          <div className={cn("mt-1 text-center text-xs font-mono tabular-nums", isLeading ? "text-white" : "text-white/50")}>
+            {pct}%
+          </div>
         </div>
-        <div className={cn("mt-1 text-center text-xs font-mono tabular-nums", isLeading ? "text-white" : "text-white/50")}>
-          {pct}%
-        </div>
-      </div>
+      )}
 
-      <div className="flex w-full gap-1.5">
-        <button
-          disabled={!canVote}
-          onClick={onVote}
-          className={cn(
-            "flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition",
-            voted
-              ? "bg-white/20 text-white"
-              : canVote
-                ? "text-white hover:opacity-90"
-                : "cursor-not-allowed bg-white/5 text-white/30",
-          )}
-          style={canVote && !voted ? { background: grad } : undefined}
-        >
-          {voted ? "Voted" : "Vote"}
-        </button>
-        <button
-          disabled={!canVote}
-          onClick={onSuperVote}
-          title="Spend 1 boost credit for a 5x vote"
-          className={cn(
-            "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition",
-            canVote
-              ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
-              : "cursor-not-allowed border-white/10 text-white/30",
-          )}
-        >
-          <Zap className="h-3 w-3" />
-          <span className="ml-1">5x</span>
-        </button>
-      </div>
+      {!isEmpty && (
+        <div className="flex w-full gap-1.5">
+          <button
+            disabled={!canVote}
+            onClick={onVote}
+            className={cn(
+              "flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition",
+              voted
+                ? "bg-white/20 text-white"
+                : canVote
+                  ? "text-white hover:opacity-90"
+                  : "cursor-not-allowed bg-white/5 text-white/30",
+            )}
+            style={canVote && !voted ? { background: grad } : undefined}
+          >
+            {voted ? "Voted" : "Vote"}
+          </button>
+          <button
+            disabled={!canVote}
+            onClick={onSuperVote}
+            title="Spend 1 boost credit for a 5x vote"
+            className={cn(
+              "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition",
+              canVote
+                ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                : "cursor-not-allowed border-white/10 text-white/30",
+            )}
+          >
+            <Zap className="h-3 w-3" />
+            <span className="ml-1">5x</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
