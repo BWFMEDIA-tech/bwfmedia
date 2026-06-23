@@ -144,6 +144,7 @@ function RootComponent() {
         </div>
         {isChrome && <SiteFooter />}
         <CartDrawer />
+        <GlobalPlayer />
         </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>
