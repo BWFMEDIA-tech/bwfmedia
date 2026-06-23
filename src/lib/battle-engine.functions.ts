@@ -292,6 +292,10 @@ export async function runBattleEvent(
         if (round && round.voting_status !== "finalized") {
           invalid("finalize the current round first");
         }
+        // Require both artists' tracks to have played before advancing.
+        if (round && (!round.a_track_finished_at || !round.b_track_finished_at)) {
+          invalid("both artists must play their track before the next round");
+        }
         // Auto-complete the match if we just finished the last round.
         if (m.current_round >= m.total_rounds) {
           const aWins = m.a_wins as number;
