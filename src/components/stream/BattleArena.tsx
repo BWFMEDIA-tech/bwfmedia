@@ -311,6 +311,7 @@ function BattleView({
 
 function ArtistSide({
   side,
+  artistId,
   name,
   coverUrl,
   trackTitle,
@@ -325,6 +326,7 @@ function ArtistSide({
   onSuperVote,
 }: {
   side: "a" | "b";
+  artistId?: string | null;
   name: string;
   coverUrl: string | null;
   trackTitle: string | null;
@@ -342,6 +344,7 @@ function ArtistSide({
     ? "linear-gradient(135deg, #c53dff, #004bff)"
     : "linear-gradient(135deg, #ff00a6, #00e6ff)";
   const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
+  const isEmpty = !artistId;
   return (
     <div className={cn("relative flex flex-col items-center gap-2 p-4", side === "a" ? "border-r border-white/10" : "")}>
       {overallWinner && (
