@@ -821,6 +821,65 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
+function QueueItem({
+  track, index, isHost, onPlayNow,
+}: {
+  track: PlayTrack;
+  index: number;
+  isHost: boolean;
+  onPlayNow: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: track.id, disabled: !isHost });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.7 : 1,
+  };
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`group flex items-center gap-2.5 rounded-xl p-2 transition ${
+        track.boosted ? "border border-[#FF00A6]/40 bg-[#FF00A6]/5" : "border border-white/5 bg-white/[0.02] hover:bg-white/[0.05]"
+      } ${isDragging ? "ring-1 ring-[#C53DFF]" : ""}`}
+    >
+      {isHost ? (
+        <button
+          {...listeners}
+          type="button"
+          className="grid h-6 w-5 cursor-grab place-items-center text-white/40 hover:text-white active:cursor-grabbing"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+      ) : (
+        <span className="w-5 text-center text-[11px] font-black text-white/40">{index + 1}</span>
+      )}
+      <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
+        {track.cover_url && <img src={track.cover_url} alt="" className="h-full w-full object-cover" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1 truncate text-xs font-semibold">
+          {track.boosted && <Zap className="h-3 w-3 flex-shrink-0 text-[#FF00A6]" />}
+          <span className="truncate">{track.title}</span>
+        </div>
+        <div className="truncate text-[10px] text-white/50">{track.artist_name}</div>
+      </div>
+      {isHost && (
+        <button
+          onClick={onPlayNow}
+          className="rounded-full bg-white/10 p-1.5 text-white/80 opacity-0 transition group-hover:opacity-100 hover:bg-white/20"
+          aria-label="Play now"
+        >
+          <Play className="h-3 w-3" />
+        </button>
+      )}
+    </li>
+  );
+}
+
 function BattleSide({ name, wins, active, side }: { name: string; wins: number; active: boolean; side: "a"|"b" }) {
   return (
     <div className={`rounded-xl border p-2.5 text-center transition ${
