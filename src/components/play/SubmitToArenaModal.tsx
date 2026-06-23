@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Rocket, Sparkles, X, Zap } from "lucide-react";
+import { Headphones, Loader2, Rocket, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { listLiveArenas, submitSongToArena } from "@/lib/play-arena-submissions.functions";
 
@@ -11,7 +11,7 @@ export function SubmitToArenaModal({
   onClose,
   onSubmitted,
 }: {
-  song: { id: string; title: string; artist_name?: string | null; cover_url?: string | null };
+  song: { id: string; title: string; artist_name?: string | null; cover_url?: string | null; play_count?: number | null };
   onClose: () => void;
   onSubmitted?: () => void;
 }) {
@@ -64,7 +64,16 @@ export function SubmitToArenaModal({
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-wider text-fuchsia-400">Submit to Play Arena</div>
               <div className="truncate text-base font-bold text-white">{song.title}</div>
-              {song.artist_name && <div className="truncate text-xs text-white/50">{song.artist_name}</div>}
+              <div className="flex items-center gap-2 truncate text-xs text-white/50">
+                {song.artist_name && <span className="truncate">{song.artist_name}</span>}
+                <span
+                  className="inline-flex items-center gap-1 text-white/40"
+                  title={`${(song.play_count ?? 0).toLocaleString()} plays`}
+                >
+                  <Headphones className="h-3 w-3" />
+                  <span className="tabular-nums">{(song.play_count ?? 0).toLocaleString()}</span>
+                </span>
+              </div>
             </div>
           </div>
           <button onClick={onClose} className="rounded-md p-1 text-white/60 hover:bg-white/5 hover:text-white"><X className="h-4 w-4" /></button>
