@@ -661,7 +661,7 @@ function OnAirBar() {
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
       </span>
       <div>
-        <div className="font-bold text-white">BWF Live: Unsigned Artist Review</div>
+        <div className="font-bold text-white">BWF Live: LIVE ARENA</div>
         <div className="text-[10px] text-white/50">Music Review Podcast</div>
       </div>
       <div className="hidden items-center gap-2 sm:flex">
@@ -813,7 +813,7 @@ function StreamStudio() {
     if (going) return;
     setGoing(true);
     try {
-      const s = await startFn({ data: { title: "BWF Live: Unsigned Artist Review" } });
+      const s = await startFn({ data: { title: "BWF Live: LIVE ARENA" } });
       const t = await tokenFn({ data: { roomName: s.room_name } });
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
@@ -875,7 +875,7 @@ function StreamStudio() {
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> {lk ? "LIVE" : "OFFLINE"}
                 </span>
                 <div className="flex items-center gap-1.5 text-base font-bold text-white">
-                  {stream?.title || "BWF Live: Unsigned Artist Review"}
+                  {stream?.title || "BWF Live: LIVE ARENA"}
                   <CheckCircle2 className="h-4 w-4" style={{ color: BLUE }} />
                 </div>
                 <div className="flex gap-1 rounded-lg bg-white/5 p-1">

@@ -1,0 +1,1 @@
+UPDATE public.streams SET title='BWF Live: LIVE ARENA' WHERE title='BWF Live: Unsigned Artist Review';
