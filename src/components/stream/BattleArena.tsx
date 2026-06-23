@@ -354,62 +354,83 @@ function ArtistSide({
           <Crown className="h-3 w-3" /> Winner
         </div>
       )}
-      <div className="text-[10px] uppercase tracking-widest text-white/40">Artist {side.toUpperCase()}</div>
-      <div className="relative h-28 w-28">
-        {isPlaying && (
-          <>
-            <span
-              className="pointer-events-none absolute inset-0 rounded-full animate-ping"
-              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.5 }}
-            />
-            <span
-              className="pointer-events-none absolute -inset-2 rounded-full animate-ping"
-              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.3, animationDelay: "0.4s" }}
-            />
-            <span
-              className="pointer-events-none absolute -inset-4 rounded-full animate-ping"
-              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.2, animationDelay: "0.8s" }}
-            />
-          </>
-        )}
-        <div
-          className={cn(
-            "relative h-full w-full overflow-hidden rounded-full border-2",
-            isPlaying && "shadow-[0_0_30px_rgba(255,0,166,0.6)]",
-          )}
-          style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
-        >
-          {coverUrl ? (
-            <img
-              src={coverUrl}
-              alt={trackTitle ?? name}
-              className={cn("h-full w-full object-cover", isPlaying && "animate-[spin_8s_linear_infinite]")}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-white/5">
-              <Swords className="h-6 w-6 text-white/30" />
-            </div>
-          )}
-        </div>
-        {isPlaying && (
-          <div className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-end gap-0.5 rounded-full bg-black/70 px-2 py-1 backdrop-blur">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span
-                key={i}
-                className="w-0.5 rounded-full"
-                style={{
-                  height: `${6 + (i % 3) * 4}px`,
-                  background: waveColor,
-                  animation: `eq-bounce 0.9s ease-in-out ${i * 0.12}s infinite`,
-                }}
-              />
-            ))}
-          </div>
+      <div className="flex items-center gap-1.5">
+        <span className="text-[10px] uppercase tracking-widest text-white/40">Artist {side.toUpperCase()}</span>
+        {isEmpty ? (
+          <span className="flex h-2 w-2 rounded-full bg-amber-400/60 animate-pulse" title="Not loaded" />
+        ) : (
+          <span className="flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" title="Ready" />
         )}
       </div>
-      <div className="text-center text-sm font-bold text-white">{name}</div>
-      {trackTitle && (
-        <div className="-mt-1 max-w-[10rem] truncate text-center text-[11px] text-white/60">♪ {trackTitle}</div>
+      <div className="relative h-28 w-28">
+        {isEmpty ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-full border-2 border-dashed border-white/15 bg-white/[0.03]">
+            <Loader2 className="h-6 w-6 animate-spin text-white/40" />
+          </div>
+        ) : (
+          <>
+            {isPlaying && (
+              <>
+                <span
+                  className="pointer-events-none absolute inset-0 rounded-full animate-ping"
+                  style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.5 }}
+                />
+                <span
+                  className="pointer-events-none absolute -inset-2 rounded-full animate-ping"
+                  style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.3, animationDelay: "0.4s" }}
+                />
+                <span
+                  className="pointer-events-none absolute -inset-4 rounded-full animate-ping"
+                  style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.2, animationDelay: "0.8s" }}
+                />
+              </>
+            )}
+            <div
+              className={cn(
+                "relative h-full w-full overflow-hidden rounded-full border-2",
+                isPlaying && "shadow-[0_0_30px_rgba(255,0,166,0.6)]",
+              )}
+              style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
+            >
+              {coverUrl ? (
+                <img
+                  src={coverUrl}
+                  alt={trackTitle ?? name}
+                  className={cn("h-full w-full object-cover", isPlaying && "animate-[spin_8s_linear_infinite]")}
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-white/5">
+                  <Swords className="h-6 w-6 text-white/30" />
+                </div>
+              )}
+            </div>
+            {isPlaying && (
+              <div className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-end gap-0.5 rounded-full bg-black/70 px-2 py-1 backdrop-blur">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <span
+                    key={i}
+                    className="w-0.5 rounded-full"
+                    style={{
+                      height: `${6 + (i % 3) * 4}px`,
+                      background: waveColor,
+                      animation: `eq-bounce 0.9s ease-in-out ${i * 0.12}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      <div className={cn("text-center text-sm font-bold", isEmpty ? "text-white/50" : "text-white")}>
+        {isEmpty ? `Artist ${side.toUpperCase()} not loaded` : name}
+      </div>
+      {isEmpty ? (
+        <div className="-mt-1 text-[11px] text-white/40">Waiting for artist…</div>
+      ) : (
+        trackTitle && (
+          <div className="-mt-1 max-w-[10rem] truncate text-center text-[11px] text-white/60">♪ {trackTitle}</div>
+        )
       )}
       <div className="text-[11px] text-white/50">Rounds won: {wins}</div>
 
