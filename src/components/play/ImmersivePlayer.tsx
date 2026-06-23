@@ -391,7 +391,7 @@ export function ImmersivePlayer({
   isHost: boolean;
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { analyserRef, resume } = useAnalyser(audioRef);
+  const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -402,6 +402,8 @@ export function ImmersivePlayer({
   const [showQueue, setShowQueue] = useState(true);
   const [sleepMin, setSleepMin] = useState<number | null>(null);
   const sleepRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [normalize, setNormalize] = useState(true);
+  useNormalizer({ enabled: normalize, analyserRef, gainRef, ctxRef, trackId: track?.id ?? null });
 
   const voteFn = useServerFn(votePlayTrack);
   const advanceFn = useServerFn(advancePlayQueue);
