@@ -207,7 +207,10 @@ const RANKS = [
   { name: "Bronze Performer", floor: 0, cap: 2000 },
   { name: "Silver Artist", floor: 2000, cap: 5000 },
   { name: "Gold Creator", floor: 5000, cap: 10000 },
-  { name: "Diamond Star", floor: 10000, cap: null as number | null },
+  { name: "Diamond Star", floor: 10000, cap: 25000 },
+  { name: "Platinum Icon", floor: 25000, cap: 50000 },
+  { name: "Superstar", floor: 50000, cap: 100000 },
+  { name: "Legend", floor: 100000, cap: null as number | null },
 ];
 
 export const getArenaUserStats = createServerFn({ method: "GET" })
