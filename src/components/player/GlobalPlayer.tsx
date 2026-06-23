@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { usePlayer, type PlayerTrack } from "@/lib/player-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { toggleTrackLike } from "@/lib/track-likes.functions";
+import { useQueryClient } from "@tanstack/react-query";
 
 function fmt(sec: number) {
   if (!isFinite(sec) || sec <= 0) return "0:00";
@@ -17,6 +19,8 @@ export function GlobalPlayer() {
   const [liked, setLiked] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const queueRef = useRef<HTMLDivElement | null>(null);
+  const qc = useQueryClient();
+  const [scrub, setScrub] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
@@ -49,20 +53,28 @@ export function GlobalPlayer() {
   const toggleLike = async () => {
     if (!track) return;
     if (!userId) { toast.error("Sign in to like tracks"); return; }
-    if (liked) {
-      setLiked(false);
-      const { error } = await (supabase as any).from("track_likes")
-        .delete().eq("user_id", userId).eq("track_id", track.id);
-      if (error) { setLiked(true); toast.error("Couldn't unlike"); }
-    } else {
-      setLiked(true);
-      const { error } = await (supabase as any).from("track_likes")
-        .insert({ user_id: userId, track_id: track.id });
-      if (error) { setLiked(false); toast.error("Couldn't like"); }
+    const previous = liked;
+    setLiked(!previous);
+    try {
+      const res = await toggleTrackLike({ data: { trackId: track.id } });
+      setLiked(res.liked);
+      // Keep artist-page like counts and "my likes" caches in sync.
+      qc.invalidateQueries({ queryKey: ["my-track-likes"] });
+      qc.invalidateQueries({ queryKey: ["artist-meta"] });
+    } catch {
+      setLiked(previous);
+      toast.error(previous ? "Couldn't unlike" : "Couldn't like");
     }
   };
 
   const playFromQueue = (t: PlayerTrack) => { p.play(t, p.queue); };
+
+  if (!track) return null;
+
+  const dur = p.duration || 0;
+  const liveTime = scrub ?? p.progress;
+  const pct = dur > 0 ? Math.min(100, Math.max(0, (liveTime / dur) * 100)) : 0;
+  const repeatLabel = p.repeat === "off" ? "Repeat off" : p.repeat === "one" ? "Repeat one" : "Repeat all";
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur-xl">
@@ -122,20 +134,62 @@ export function GlobalPlayer() {
 
         <div className="flex flex-col items-center gap-1.5 flex-[2]">
           <div className="flex items-center gap-3">
-            <button onClick={p.toggleShuffle} aria-label="Shuffle" className={`${p.shuffle ? "text-red-500" : "text-white/50 hover:text-white"}`}><Shuffle className="h-4 w-4" /></button>
+            <button
+              onClick={p.toggleShuffle}
+              aria-label={p.shuffle ? "Shuffle on" : "Shuffle off"}
+              aria-pressed={p.shuffle}
+              className={`relative ${p.shuffle ? "text-[#FF00A6]" : "text-white/50 hover:text-white"}`}
+            >
+              <Shuffle className="h-4 w-4" />
+              {p.shuffle && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#FF00A6]" />}
+            </button>
             <button onClick={p.prev} className="text-white/70 hover:text-white"><SkipBack className="h-5 w-5" /></button>
             <button onClick={p.toggle} className="grid h-10 w-10 place-items-center rounded-full bg-red-600 text-white hover:bg-red-500" disabled={!track}>
               {p.isPlaying ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
             </button>
             <button onClick={p.next} className="text-white/70 hover:text-white"><SkipForward className="h-5 w-5" /></button>
-            <button onClick={p.cycleRepeat} aria-label="Repeat" className={`${p.repeat !== "off" ? "text-red-500" : "text-white/50 hover:text-white"}`}>
+            <button
+              onClick={p.cycleRepeat}
+              aria-label={repeatLabel}
+              title={repeatLabel}
+              className={`relative ${p.repeat !== "off" ? "text-[#FF00A6]" : "text-white/50 hover:text-white"}`}
+            >
               {p.repeat === "one" ? <Repeat1 className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}
+              {p.repeat !== "off" && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#FF00A6]" />}
             </button>
           </div>
-          <div className="flex w-full max-w-xl items-center gap-2 text-[10px] text-white/50">
-            <span className="w-8 text-right tabular-nums">{fmt(p.progress)}</span>
-            <input type="range" min={0} max={p.duration || 0} value={p.progress} onChange={(e) => p.seek(Number(e.target.value))} className="h-1 flex-1 cursor-pointer accent-red-600" />
-            <span className="w-8 tabular-nums">{fmt(p.duration)}</span>
+          <div className="group flex w-full max-w-xl items-center gap-2 text-[11px] text-white/50">
+            <span className="w-9 text-right tabular-nums">{fmt(liveTime)}</span>
+            <div className="relative h-3 flex-1">
+              <div
+                className="pointer-events-none absolute left-0 right-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white/15"
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white group-hover:bg-[#FF00A6]"
+                style={{ width: `${pct}%` }}
+                aria-hidden
+              />
+              <span
+                className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 shadow group-hover:opacity-100"
+                style={{ left: `${pct}%` }}
+                aria-hidden
+              />
+              <input
+                type="range"
+                min={0}
+                max={dur || 0}
+                step={0.1}
+                value={liveTime}
+                onChange={(e) => setScrub(Number(e.target.value))}
+                onMouseUp={(e) => { p.seek(Number((e.target as HTMLInputElement).value)); setScrub(null); }}
+                onTouchEnd={(e) => { p.seek(Number((e.target as HTMLInputElement).value)); setScrub(null); }}
+                onKeyUp={(e) => { p.seek(Number((e.target as HTMLInputElement).value)); setScrub(null); }}
+                aria-label="Seek"
+                className="absolute inset-0 w-full cursor-pointer opacity-0"
+              />
+            </div>
+            <span className="w-9 tabular-nums">{fmt(dur)}</span>
           </div>
         </div>
 
