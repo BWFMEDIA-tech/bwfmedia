@@ -55,12 +55,14 @@ export function BattleHostControls({
     setBusy(type);
     try {
       await dispatchFn({ data: { matchId, type, payload } });
-      onAfterEmit?.();
     } catch (e: any) {
       const msg = String(e?.message ?? "");
       toast.error(msg.replace(/^INVALID_TRANSITION:\s*/, "Cannot: "));
     } finally {
       setBusy(null);
+      // Always resync — recovers from stale state (e.g. match was cancelled
+      // by another client) so the UI flips back to the correct controls.
+      onAfterEmit?.();
     }
   }
 
