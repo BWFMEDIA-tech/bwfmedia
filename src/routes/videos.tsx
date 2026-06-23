@@ -9,7 +9,7 @@ import {
   Music, Smile, MapPin, User, Clapperboard, Plus,
   Clock, ListVideo, Settings as SettingsIcon,
   Volume2, Maximize, Shuffle, SkipBack, SkipForward, Repeat,
-  Menu, X,
+  Menu, X, Search, ChevronLeft, ChevronRight, Home, Library,
 } from "lucide-react";
 
 export const Route = createFileRoute("/videos")({
@@ -193,6 +193,7 @@ function VideosPage() {
   const [nativeControls, setNativeControls] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playAfterLoadRef = useRef(false);
 
@@ -334,276 +335,274 @@ function VideosPage() {
     request?.();
   };
 
+  const filteredVideos = searchQuery.trim()
+    ? videos.filter((v) => {
+        const q = searchQuery.toLowerCase();
+        return (
+          v.title.toLowerCase().includes(q) ||
+          (v.artist?.toLowerCase().includes(q) ?? false)
+        );
+      })
+    : videos;
+
+  const musicVideos = filteredVideos.filter((v) => v.category === "music");
+  const sponsoredVideos = filteredVideos.filter((v) => v.category === "sponsored");
+
+  const sidebarBody = (
+    <>
+      <SidebarSection title="Browse">
+        {SIDEBAR_PRIMARY.map((it) => {
+          const Icon = it.icon;
+          const active = activeFilter === it.key;
+          return (
+            <button
+              key={it.key}
+              onClick={() => { setActiveFilter(it.key); setSidebarOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                active
+                  ? "bg-white/10 text-white"
+                  : "text-white/70 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <Icon size={16} />
+              <span className="flex-1 text-left">{it.label}</span>
+              {it.badge && (
+                <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded">{it.badge}</span>
+              )}
+            </button>
+          );
+        })}
+      </SidebarSection>
+
+      <SidebarSection title="Browse By">
+        {BROWSE_BY.map((it) => {
+          const Icon = it.icon;
+          return (
+            <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/5 hover:text-white">
+              <Icon size={16} />
+              <span>{it.label}</span>
+            </button>
+          );
+        })}
+      </SidebarSection>
+
+      <SidebarSection
+        title="Your Library"
+        action={<button className="text-red-500 hover:text-red-400"><Plus size={14} /></button>}
+      >
+        {MY_PLAYLISTS.map((it) => {
+          const Icon = it.icon;
+          return (
+            <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/5 hover:text-white">
+              <Icon size={16} />
+              <span>{it.label}</span>
+            </button>
+          );
+        })}
+      </SidebarSection>
+
+      {canUpload && (
+        <button
+          onClick={() => { setShowUpload(true); setSidebarOpen(false); }}
+          className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2.5 rounded-full flex items-center justify-center gap-2"
+        >
+          <Upload size={14} /> Upload Video
+        </button>
+      )}
+    </>
+  );
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* MENU TOGGLE */}
+    <div className="min-h-screen bg-black text-white flex">
+      {/* MOBILE MENU TOGGLE */}
       <button
         type="button"
         onClick={() => setSidebarOpen((v) => !v)}
         aria-label={sidebarOpen ? "Close menu" : "Open menu"}
-        className="fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur flex items-center justify-center text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur flex items-center justify-center text-white"
       >
         {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
       </button>
 
-      {/* BACKDROP */}
+      {/* MOBILE BACKDROP */}
       {sidebarOpen && (
         <button
           type="button"
           aria-label="Close menu"
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
         />
       )}
 
-      {/* SLIDE-IN LEFT SIDEBAR */}
+      {/* MOBILE SLIDE-IN SIDEBAR */}
       <aside
-        className={`fixed top-0 left-0 z-40 h-full w-72 bg-black border-r border-white/10 overflow-y-auto transition-transform duration-300 ease-out pt-16 px-3 pb-8 space-y-6 ${
+        className={`lg:hidden fixed top-0 left-0 z-40 h-full w-72 bg-neutral-950 border-r border-white/10 overflow-y-auto transition-transform duration-300 ease-out pt-16 px-3 pb-8 space-y-6 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <SidebarSection title="Music Videos">
-          {SIDEBAR_PRIMARY.map((it) => {
-            const Icon = it.icon;
-            const active = activeFilter === it.key;
-            return (
-              <button
-                key={it.key}
-                onClick={() => { setActiveFilter(it.key); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                  active
-                    ? "bg-red-500/15 text-red-500 border-l-2 border-red-500"
-                    : "text-white/70 hover:bg-white/5 hover:text-white"
-                }`}
-              >
-                <Icon size={16} />
-                <span className="flex-1 text-left">{it.label}</span>
-                {it.badge && (
-                  <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded">
-                    {it.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </SidebarSection>
-
-        <SidebarSection title="Browse By">
-          {BROWSE_BY.map((it) => {
-            const Icon = it.icon;
-            return (
-              <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:bg-white/5 hover:text-white">
-                <Icon size={16} />
-                <span>{it.label}</span>
-              </button>
-            );
-          })}
-        </SidebarSection>
-
-        <SidebarSection
-          title="My Playlists"
-          action={<button className="text-red-500 hover:text-red-400"><Plus size={14} /></button>}
-        >
-          {MY_PLAYLISTS.map((it) => {
-            const Icon = it.icon;
-            return (
-              <button key={it.label} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70 hover:bg-white/5 hover:text-white">
-                <Icon size={16} />
-                <span>{it.label}</span>
-              </button>
-            );
-          })}
-        </SidebarSection>
-
-        {canUpload && (
-          <button
-            onClick={() => { setShowUpload(true); setSidebarOpen(false); }}
-            className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2"
-          >
-            <Upload size={14} /> Upload Video
-          </button>
-        )}
+        {sidebarBody}
       </aside>
 
-      {/* MAIN LAYOUT */}
-      <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 md:px-8 pt-2 pb-32 grid grid-cols-12 gap-6">
-        {/* CENTER */}
-        <main className="col-span-12 lg:col-span-9 space-y-8">
+      {/* DESKTOP PERSISTENT SIDEBAR (Spotify-style) */}
+      <aside className="hidden lg:flex flex-col shrink-0 w-64 sticky top-0 h-screen bg-neutral-950 border-r border-white/5 overflow-y-auto px-3 py-6 gap-6">
+        <div className="px-3">
+          <div className="flex items-center gap-2 text-white">
+            <span className="w-8 h-8 rounded-md bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
+              <Music2 size={16} />
+            </span>
+            <span className="font-bold tracking-tight">BWF Videos</span>
+          </div>
+        </div>
+        {sidebarBody}
+      </aside>
+
+      {/* MAIN CONTENT (Spotify-style) */}
+      <main className="flex-1 min-w-0 pb-40 relative">
+        {/* Gradient backdrop */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-gradient-to-b from-red-900/60 via-red-950/30 to-transparent" />
+
+        {/* TOP BAR */}
+        <div className="sticky top-0 z-20 bg-black/70 backdrop-blur-xl border-b border-white/5">
+          <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-3 flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1">
+              <button type="button" aria-label="Back" className="w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center"><ChevronLeft size={18} /></button>
+              <button type="button" aria-label="Forward" className="w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 flex items-center justify-center"><ChevronRight size={18} /></button>
+            </div>
+            <div className="relative flex-1 max-w-md ml-12 lg:ml-0">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search videos, artists…"
+                aria-label="Search videos"
+                className="w-full bg-white/10 hover:bg-white/15 focus:bg-white/15 border border-transparent focus:border-white/20 rounded-full pl-9 pr-3 py-2 text-sm placeholder:text-white/40 outline-none"
+              />
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <Link to="/" className="hidden sm:flex items-center gap-1.5 text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5">
+                <Home size={14} /> Home
+              </Link>
+              <Link to="/library" className="hidden sm:flex items-center gap-1.5 text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5">
+                <Library size={14} /> Library
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative max-w-[1600px] mx-auto px-4 md:px-8 pt-6 space-y-10">
+          {/* HERO FEATURE CARD */}
           {loading ? (
-            <div className="aspect-video bg-white/5 rounded-2xl animate-pulse" />
+            <div className="h-72 rounded-2xl bg-white/5 animate-pulse" />
           ) : hero ? (
-            <section>
-              <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-white/5 group">
-                <video
-                  ref={videoRef}
-                  src={publicUrl(hero.storage_path)}
-                  poster={thumbUrl(hero) ?? undefined}
-                  preload="metadata"
-                  playsInline
-                  controls={nativeControls}
-                  onPlay={() => setPlaying(true)}
-                  onPause={() => setPlaying(false)}
-                  onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-                  onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-                  onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}
-                  onVolumeChange={(e) => {
-                    setVolume(e.currentTarget.volume);
-                    setMuted(e.currentTarget.muted);
-                  }}
-                  onEnded={handleEnded}
-                  className="w-full h-full object-cover"
-                />
-                {!playing && (
-                  <button
-                    onClick={togglePlay}
-                    className="absolute inset-0 flex items-center justify-center bg-black/30"
-                    aria-label="Play"
-                  >
-                    <span className="w-20 h-20 rounded-full border-2 border-white/80 bg-black/40 backdrop-blur flex items-center justify-center hover:scale-105 transition-transform">
-                      <Play size={32} className="text-white ml-1" />
-                    </span>
-                  </button>
-                )}
-                {/* Progress overlay */}
-                <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      seekVideo(((e.clientX - rect.left) / rect.width) * duration);
+            <section className="relative overflow-hidden rounded-2xl border border-white/5 bg-gradient-to-br from-red-600/40 via-red-900/30 to-black">
+              <div className="grid md:grid-cols-[1fr_1.4fr] gap-0">
+                {/* Video player */}
+                <div className="relative aspect-video md:aspect-auto md:min-h-[360px] bg-black overflow-hidden">
+                  <video
+                    ref={videoRef}
+                    src={publicUrl(hero.storage_path)}
+                    poster={thumbUrl(hero) ?? undefined}
+                    preload="metadata"
+                    playsInline
+                    controls={nativeControls}
+                    onPlay={() => setPlaying(true)}
+                    onPause={() => setPlaying(false)}
+                    onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                    onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+                    onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}
+                    onVolumeChange={(e) => {
+                      setVolume(e.currentTarget.volume);
+                      setMuted(e.currentTarget.muted);
                     }}
-                    className="block h-3 w-full py-1 mb-1 cursor-pointer"
-                    aria-label="Seek video"
-                  >
-                    <span className="block h-1 bg-white/20 rounded-full">
-                      <span className="block h-full bg-red-500 relative rounded-full" style={{ width: `${progressPercent}%` }}>
-                        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
+                    onEnded={handleEnded}
+                    className="w-full h-full object-cover"
+                  />
+                  {!playing && (
+                    <button
+                      onClick={togglePlay}
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
+                      aria-label="Play"
+                    >
+                      <span className="w-16 h-16 rounded-full bg-red-500 hover:scale-105 transition-transform flex items-center justify-center shadow-2xl">
+                        <Play size={26} className="text-white ml-1" />
                       </span>
-                    </span>
-                  </button>
-                  <div className="flex items-center justify-between text-xs text-white/80">
-                    <span>{formatSeconds(currentTime)} / {formatSeconds(duration)}</span>
-                    <div className="flex items-center gap-4">
-                      <button type="button" onClick={toggleMute} aria-label={muted ? "Unmute" : "Mute"}><Volume2 size={16} /></button>
-                      <button type="button" onClick={() => setNativeControls((v) => !v)} aria-label="Toggle video controls"><SettingsIcon size={16} /></button>
-                      <button type="button" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause size={16} /> : <Play size={16} />}</button>
-                      <button type="button" onClick={toggleFullscreen} aria-label="Fullscreen"><Maximize size={16} /></button>
-                    </div>
+                    </button>
+                  )}
+                  <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        seekVideo(((e.clientX - rect.left) / rect.width) * duration);
+                      }}
+                      className="block h-3 w-full py-1 cursor-pointer"
+                      aria-label="Seek video"
+                    >
+                      <span className="block h-1 bg-white/20 rounded-full">
+                        <span className="block h-full bg-red-500 relative rounded-full" style={{ width: `${progressPercent}%` }}>
+                          <span className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full" />
+                        </span>
+                      </span>
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Hero meta */}
-              <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold">{hero.title}</h1>
-                    {hero.category === "sponsored" ? (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white px-2 py-1 rounded">
-                        Sponsored
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-1 rounded">
-                        Exclusive
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mt-2 text-sm text-white/60">
-                    <span className="text-white font-semibold uppercase tracking-wider">{hero.artist ?? "BWF Artist"}</span>
-                    <BadgeCheck size={14} className="text-red-500 fill-red-500/20" />
+                {/* Meta panel */}
+                <div className="p-6 md:p-10 flex flex-col justify-end">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/70 mb-2">
+                    {hero.category === "sponsored" ? "Sponsored Feature" : "Featured Video"}
+                  </p>
+                  <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.05]">{hero.title}</h1>
+                  <div className="flex items-center gap-2 mt-4 text-sm text-white/70">
+                    <span className="font-semibold text-white">{hero.artist ?? "BWF Artist"}</span>
+                    <BadgeCheck size={14} className="text-red-400" />
                     <span>·</span>
-                    <span>{formatViews(pseudoViews(hero.id))} views</span>
+                    <span>{formatViews(pseudoViews(hero.id))} plays</span>
                     <span>·</span>
                     <span>{timeAgo(hero.created_at)}</span>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ActionPill icon={Heart} label="Like" count="10K" />
-                  <ActionPill icon={Bookmark} label="Save" />
-                  <ActionPill icon={Share2} label="Share" />
-                  <button className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center">
-                    <MoreHorizontal size={16} />
-                  </button>
+
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={togglePlay}
+                      className="flex items-center gap-2 bg-red-500 hover:bg-red-400 hover:scale-[1.03] transition-transform text-white font-bold pl-5 pr-6 py-3 rounded-full"
+                    >
+                      {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
+                      {playing ? "Pause" : "Play"}
+                    </button>
+                    <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Like"><Heart size={18} /></button>
+                    <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Save"><Bookmark size={18} /></button>
+                    <button className="w-11 h-11 rounded-full border border-white/20 hover:border-white/60 flex items-center justify-center" aria-label="Share"><Share2 size={18} /></button>
+                    <button className="w-11 h-11 rounded-full hover:bg-white/5 flex items-center justify-center" aria-label="More"><MoreHorizontal size={18} /></button>
+                  </div>
                 </div>
               </div>
             </section>
           ) : (
-            <div className="aspect-video bg-white/5 rounded-2xl flex items-center justify-center text-white/40">
+            <div className="h-72 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 border border-white/5">
               No videos yet
             </div>
           )}
 
-          {/* TRENDING */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold uppercase tracking-[0.2em]">Trending Videos</h2>
-              <button className="text-red-500 text-xs font-semibold hover:text-red-400">View All</button>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {trending.map((v) => (
-                <TrendingCard key={v.id} v={v} />
-              ))}
-              {trending.length === 0 && Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="aspect-video bg-white/5 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          </section>
-        </main>
+          {/* SHELVES */}
+          <Shelf title="Trending Now" videos={filteredVideos.slice(0, 12)} onPlay={(i) => selectVideo(filteredVideos.indexOf(filteredVideos[i]), true)} />
+          <Shelf title="New Releases" videos={filteredVideos.slice(0, 12)} onPlay={(i) => selectVideo(i, true)} />
+          {musicVideos.length > 0 && (
+            <Shelf title="Music Videos" videos={musicVideos.slice(0, 12)} onPlay={(i) => { const idx = videos.indexOf(musicVideos[i]); if (idx >= 0) selectVideo(idx, true); }} />
+          )}
+          {sponsoredVideos.length > 0 && (
+            <Shelf title="Sponsored & Partners" videos={sponsoredVideos.slice(0, 12)} onPlay={(i) => { const idx = videos.indexOf(sponsoredVideos[i]); if (idx >= 0) selectVideo(idx, true); }} />
+          )}
+          <Shelf title="BWF Originals" videos={filteredVideos.slice().reverse().slice(0, 12)} onPlay={(i) => selectVideo(videos.length - 1 - i, true)} />
 
-        {/* RIGHT SIDEBAR */}
-        <aside className="col-span-12 lg:col-span-3 space-y-6">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-red-500">New Releases</h3>
-              <button className="text-red-500 text-xs font-semibold hover:text-red-400">View All</button>
-            </div>
-            <div className="space-y-3">
-              {newReleases.map((v) => (
-                <NewReleaseRow key={v.id} v={v} />
-              ))}
-              {newReleases.length === 0 && Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-16 bg-white/5 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          </div>
-
-          {videoOfWeek && (
-            <div>
-              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-red-500 mb-3">Video of the Week</h3>
-              <div className="rounded-xl overflow-hidden bg-white/5 border border-white/5">
-                <Link to="/videos/$id" params={{ id: videoOfWeek.id }} className="block relative aspect-video bg-black group">
-                  {thumbUrl(videoOfWeek) ? (
-                    <img src={thumbUrl(videoOfWeek)!} alt={videoOfWeek.title} className="w-full h-full object-cover" loading="lazy" />
-                  ) : (
-                    <video src={publicUrl(videoOfWeek.storage_path)} preload="metadata" className="w-full h-full object-cover" />
-                  )}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40">
-                    <span className="w-14 h-14 rounded-full bg-black/50 border-2 border-white/80 flex items-center justify-center">
-                      <Play size={20} className="text-white ml-0.5" />
-                    </span>
-                  </div>
-                </Link>
-                <div className="p-4">
-                  <h4 className="font-bold text-lg">{videoOfWeek.title}</h4>
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center gap-1.5 text-sm text-white/60">
-                      <span className="uppercase tracking-wider font-semibold text-white/80">{videoOfWeek.artist ?? "BWF"}</span>
-                      <BadgeCheck size={12} className="text-red-500" />
-                    </div>
-                    <Link
-                      to="/videos/$id"
-                      params={{ id: videoOfWeek.id }}
-                      className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-md"
-                    >
-                      Watch Now
-                    </Link>
-                  </div>
-                </div>
-              </div>
+          {filteredVideos.length === 0 && !loading && (
+            <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center text-white/50">
+              No videos match your search.
             </div>
           )}
-        </aside>
-      </div>
+        </div>
+      </main>
 
       {/* BOTTOM NOW PLAYING BAR */}
       {hero && (
@@ -715,6 +714,94 @@ function ActionPill({ icon: Icon, label, count }: { icon: any; label: string; co
 }
 
 function TrendingCard({ v }: { v: VideoRow }) {
+  return (
+    <Link to="/videos/$id" params={{ id: v.id }} className="group block">
+      <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
+        {thumbUrl(v) ? (
+          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        )}
+        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 flex items-center justify-center transition-colors">
+          <span className="w-10 h-10 rounded-full bg-black/50 border border-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <Play size={14} className="text-white ml-0.5" />
+          </span>
+        </div>
+        <span className="absolute bottom-2 right-2 text-[10px] bg-black/80 px-1.5 py-0.5 rounded font-medium">
+          {pseudoDuration(v.id)}
+        </span>
+      </div>
+      <div className="mt-2 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold truncate group-hover:text-red-400">{v.title}</p>
+          <p className="text-[11px] uppercase tracking-wider text-white/50 mt-0.5 truncate">{v.artist ?? "BWF"}</p>
+          <p className="text-[11px] text-white/40 mt-1">
+            {formatViews(pseudoViews(v.id))} views · {timeAgo(v.created_at)}
+          </p>
+        </div>
+        <button className="text-white/40 hover:text-white shrink-0"><MoreHorizontal size={14} /></button>
+      </div>
+    </Link>
+  );
+}
+
+function ShelfCard({ v, onPlay }: { v: VideoRow; onPlay?: () => void }) {
+  return (
+    <div className="group relative w-44 sm:w-48 shrink-0">
+      <Link to="/videos/$id" params={{ id: v.id }} className="block">
+        <div className="relative aspect-video rounded-lg overflow-hidden bg-neutral-900 border border-white/5 group-hover:border-white/20 shadow-lg transition-all">
+          {thumbUrl(v) ? (
+            <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+          ) : (
+            <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="absolute bottom-2 right-2 text-[10px] bg-black/80 px-1.5 py-0.5 rounded font-medium">
+            {pseudoDuration(v.id)}
+          </span>
+        </div>
+      </Link>
+      {onPlay && (
+        <button
+          type="button"
+          onClick={onPlay}
+          aria-label={`Play ${v.title}`}
+          className="absolute bottom-16 right-2 w-10 h-10 rounded-full bg-red-500 hover:bg-red-400 hover:scale-110 transition-all flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0"
+        >
+          <Play size={16} className="text-white ml-0.5" />
+        </button>
+      )}
+      <div className="mt-2 px-0.5">
+        <p className="text-sm font-semibold truncate">{v.title}</p>
+        <p className="text-xs text-white/50 mt-0.5 truncate flex items-center gap-1">
+          <span className="truncate">{v.artist ?? "BWF"}</span>
+          <BadgeCheck size={11} className="text-red-500 shrink-0" />
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Shelf({ title, videos, onPlay }: { title: string; videos: VideoRow[]; onPlay?: (i: number) => void }) {
+  if (!videos.length) return null;
+  return (
+    <section>
+      <div className="flex items-end justify-between mb-3">
+        <h2 className="text-xl md:text-2xl font-bold tracking-tight">{title}</h2>
+        <button className="text-xs font-bold uppercase tracking-wider text-white/50 hover:text-white">Show all</button>
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-thin scrollbar-thumb-white/10 snap-x">
+        {videos.map((v, i) => (
+          <div key={`${title}-${v.id}`} className="snap-start">
+            <ShelfCard v={v} onPlay={onPlay ? () => onPlay(i) : undefined} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function _UnusedTrendingCard({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group block">
       <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
