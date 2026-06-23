@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BarChart3, Loader2, Music, Play, Rocket } from "lucide-react";
+import { BarChart3, Headphones, Loader2, Music, Play, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
@@ -22,7 +22,7 @@ function MusicMediaPage() {
     if (!user) return;
     (async () => {
       const [{ data: t }, { data: p }] = await Promise.all([
-        supabase.from("play_tracks").select("id, title, artist_name, audio_url, cover_url").eq("artist_user_id", user.id).order("created_at", { ascending: false }).limit(20),
+        supabase.from("play_tracks").select("id, title, artist_name, audio_url, cover_url, play_count, like_count").eq("artist_user_id", user.id).order("created_at", { ascending: false }).limit(20),
         supabase.from("profiles").select("featured_track_id").eq("id", user.id).maybeSingle(),
       ]);
       setTracks(t ?? []); setFeaturedTrack((p as any)?.featured_track_id ?? null); setLoading(false);
@@ -48,7 +48,13 @@ function MusicMediaPage() {
                 <div className="h-10 w-10 overflow-hidden rounded bg-white/5">{t.cover_url && <img src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
                 <div className="flex-1 min-w-0">
                   <div className="truncate text-sm font-semibold">{t.title}</div>
-                  <div className="truncate text-xs text-white/50">{t.artist_name}</div>
+                  <div className="flex items-center gap-2 truncate text-xs text-white/50">
+                    <span className="truncate">{t.artist_name}</span>
+                    <span className="inline-flex items-center gap-1 text-white/40" title={`${(t.play_count ?? 0).toLocaleString()} plays`}>
+                      <Headphones className="h-3 w-3" />
+                      <span className="tabular-nums">{fmtCount(t.play_count ?? 0)}</span>
+                    </span>
+                  </div>
                 </div>
                 {t.audio_url && <button onClick={() => player.play({ id: t.id, title: t.title, artist: t.artist_name, audioUrl: t.audio_url, coverUrl: t.cover_url }, tracks.filter((x) => x.audio_url).map((x) => ({ id: x.id, title: x.title, artist: x.artist_name, audioUrl: x.audio_url, coverUrl: x.cover_url })))} className="grid h-8 w-8 place-items-center rounded-full bg-red-600 text-white hover:bg-red-500"><Play className="h-3.5 w-3.5" /></button>}
                 <button title="Analytics" className="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 hover:bg-white/5 hover:text-white"><BarChart3 className="h-3.5 w-3.5" /></button>
@@ -72,4 +78,10 @@ function MusicMediaPage() {
       )}
     </SettingsShell>
   );
+}
+
+function fmtCount(n: number) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  return String(n);
 }
