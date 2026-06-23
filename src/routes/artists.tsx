@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useQuery, queryOptions } from "@tanstack/react-query";
 import { Search, MapPin, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -26,12 +26,11 @@ export const Route = createFileRoute("/artists")({
     ],
     links: [{ rel: "canonical", href: "https://bwfnetwork.com/artists" }],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(artistsQuery),
   component: ArtistsPage,
 });
 
 function ArtistsPage() {
-  const { data: artists } = useSuspenseQuery(artistsQuery);
+  const { data: artists = [] } = useQuery(artistsQuery);
   const [q, setQ] = useState("");
   const [genre, setGenre] = useState<string | null>(null);
 
