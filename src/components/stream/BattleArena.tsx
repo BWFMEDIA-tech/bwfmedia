@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Swords, Trophy, Zap, Crown, Sparkles } from "lucide-react";
+import { Swords, Trophy, Zap, Crown, Sparkles, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -247,6 +247,7 @@ function BattleView({
       <div className="grid grid-cols-2 gap-0">
         <ArtistSide
           side="a"
+          artistId={match.artist_a_id as string | null}
           name={match.artist_a_name ?? "Artist A"}
           coverUrl={(aTrack as any)?.cover_url ?? null}
           trackTitle={(aTrack as any)?.title ?? null}
@@ -262,6 +263,7 @@ function BattleView({
         />
         <ArtistSide
           side="b"
+          artistId={match.artist_b_id as string | null}
           name={match.artist_b_name ?? "Artist B"}
           coverUrl={(bTrack as any)?.cover_url ?? null}
           trackTitle={(bTrack as any)?.title ?? null}
@@ -311,6 +313,7 @@ function BattleView({
 
 function ArtistSide({
   side,
+  artistId,
   name,
   coverUrl,
   trackTitle,
@@ -325,6 +328,7 @@ function ArtistSide({
   onSuperVote,
 }: {
   side: "a" | "b";
+  artistId?: string | null;
   name: string;
   coverUrl: string | null;
   trackTitle: string | null;
@@ -342,6 +346,7 @@ function ArtistSide({
     ? "linear-gradient(135deg, #c53dff, #004bff)"
     : "linear-gradient(135deg, #ff00a6, #00e6ff)";
   const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
+  const isEmpty = !artistId;
   return (
     <div className={cn("relative flex flex-col items-center gap-2 p-4", side === "a" ? "border-r border-white/10" : "")}>
       {overallWinner && (
@@ -349,108 +354,133 @@ function ArtistSide({
           <Crown className="h-3 w-3" /> Winner
         </div>
       )}
-      <div className="text-[10px] uppercase tracking-widest text-white/40">Artist {side.toUpperCase()}</div>
+      <div className="flex items-center gap-1.5">
+        <span className="text-[10px] uppercase tracking-widest text-white/40">Artist {side.toUpperCase()}</span>
+        {isEmpty ? (
+          <span className="flex h-2 w-2 rounded-full bg-amber-400/60 animate-pulse" title="Not loaded" />
+        ) : (
+          <span className="flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" title="Ready" />
+        )}
+      </div>
       <div className="relative h-28 w-28">
-        {isPlaying && (
+        {isEmpty ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-full border-2 border-dashed border-white/15 bg-white/[0.03]">
+            <Loader2 className="h-6 w-6 animate-spin text-white/40" />
+          </div>
+        ) : (
           <>
-            <span
-              className="pointer-events-none absolute inset-0 rounded-full animate-ping"
-              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.5 }}
-            />
-            <span
-              className="pointer-events-none absolute -inset-2 rounded-full animate-ping"
-              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.3, animationDelay: "0.4s" }}
-            />
-            <span
-              className="pointer-events-none absolute -inset-4 rounded-full animate-ping"
-              style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.2, animationDelay: "0.8s" }}
-            />
+            {isPlaying && (
+              <>
+                <span
+                  className="pointer-events-none absolute inset-0 rounded-full animate-ping"
+                  style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.5 }}
+                />
+                <span
+                  className="pointer-events-none absolute -inset-2 rounded-full animate-ping"
+                  style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.3, animationDelay: "0.4s" }}
+                />
+                <span
+                  className="pointer-events-none absolute -inset-4 rounded-full animate-ping"
+                  style={{ boxShadow: `0 0 0 2px ${waveColor}`, opacity: 0.2, animationDelay: "0.8s" }}
+                />
+              </>
+            )}
+            <div
+              className={cn(
+                "relative h-full w-full overflow-hidden rounded-full border-2",
+                isPlaying && "shadow-[0_0_30px_rgba(255,0,166,0.6)]",
+              )}
+              style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
+            >
+              {coverUrl ? (
+                <img
+                  src={coverUrl}
+                  alt={trackTitle ?? name}
+                  className={cn("h-full w-full object-cover", isPlaying && "animate-[spin_8s_linear_infinite]")}
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-white/5">
+                  <Swords className="h-6 w-6 text-white/30" />
+                </div>
+              )}
+            </div>
+            {isPlaying && (
+              <div className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-end gap-0.5 rounded-full bg-black/70 px-2 py-1 backdrop-blur">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <span
+                    key={i}
+                    className="w-0.5 rounded-full"
+                    style={{
+                      height: `${6 + (i % 3) * 4}px`,
+                      background: waveColor,
+                      animation: `eq-bounce 0.9s ease-in-out ${i * 0.12}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
-        <div
-          className={cn(
-            "relative h-full w-full overflow-hidden rounded-full border-2",
-            isPlaying && "shadow-[0_0_30px_rgba(255,0,166,0.6)]",
-          )}
-          style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
-        >
-          {coverUrl ? (
-            <img
-              src={coverUrl}
-              alt={trackTitle ?? name}
-              className={cn("h-full w-full object-cover", isPlaying && "animate-[spin_8s_linear_infinite]")}
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-white/5">
-              <Swords className="h-6 w-6 text-white/30" />
-            </div>
-          )}
-        </div>
-        {isPlaying && (
-          <div className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-end gap-0.5 rounded-full bg-black/70 px-2 py-1 backdrop-blur">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span
-                key={i}
-                className="w-0.5 rounded-full"
-                style={{
-                  height: `${6 + (i % 3) * 4}px`,
-                  background: waveColor,
-                  animation: `eq-bounce 0.9s ease-in-out ${i * 0.12}s infinite`,
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
-      <div className="text-center text-sm font-bold text-white">{name}</div>
-      {trackTitle && (
-        <div className="-mt-1 max-w-[10rem] truncate text-center text-[11px] text-white/60">♪ {trackTitle}</div>
+      <div className={cn("text-center text-sm font-bold", isEmpty ? "text-white/50" : "text-white")}>
+        {isEmpty ? `Artist ${side.toUpperCase()} not loaded` : name}
+      </div>
+      {isEmpty ? (
+        <div className="-mt-1 text-[11px] text-white/40">Waiting for artist…</div>
+      ) : (
+        trackTitle && (
+          <div className="-mt-1 max-w-[10rem] truncate text-center text-[11px] text-white/60">♪ {trackTitle}</div>
+        )
       )}
-      <div className="text-[11px] text-white/50">Rounds won: {wins}</div>
+      {!isEmpty && <div className="text-[11px] text-white/50">Rounds won: {wins}</div>}
 
-      <div className="w-full">
-        <div className="h-2 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full transition-all duration-300"
-            style={{ width: `${pct}%`, background: grad }}
-          />
+      {!isEmpty && (
+        <div className="w-full">
+          <div className="h-2 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full transition-all duration-300"
+              style={{ width: `${pct}%`, background: grad }}
+            />
+          </div>
+          <div className={cn("mt-1 text-center text-xs font-mono tabular-nums", isLeading ? "text-white" : "text-white/50")}>
+            {pct}%
+          </div>
         </div>
-        <div className={cn("mt-1 text-center text-xs font-mono tabular-nums", isLeading ? "text-white" : "text-white/50")}>
-          {pct}%
-        </div>
-      </div>
+      )}
 
-      <div className="flex w-full gap-1.5">
-        <button
-          disabled={!canVote}
-          onClick={onVote}
-          className={cn(
-            "flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition",
-            voted
-              ? "bg-white/20 text-white"
-              : canVote
-                ? "text-white hover:opacity-90"
-                : "cursor-not-allowed bg-white/5 text-white/30",
-          )}
-          style={canVote && !voted ? { background: grad } : undefined}
-        >
-          {voted ? "Voted" : "Vote"}
-        </button>
-        <button
-          disabled={!canVote}
-          onClick={onSuperVote}
-          title="Spend 1 boost credit for a 5x vote"
-          className={cn(
-            "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition",
-            canVote
-              ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
-              : "cursor-not-allowed border-white/10 text-white/30",
-          )}
-        >
-          <Zap className="h-3 w-3" />
-          <span className="ml-1">5x</span>
-        </button>
-      </div>
+      {!isEmpty && (
+        <div className="flex w-full gap-1.5">
+          <button
+            disabled={!canVote}
+            onClick={onVote}
+            className={cn(
+              "flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition",
+              voted
+                ? "bg-white/20 text-white"
+                : canVote
+                  ? "text-white hover:opacity-90"
+                  : "cursor-not-allowed bg-white/5 text-white/30",
+            )}
+            style={canVote && !voted ? { background: grad } : undefined}
+          >
+            {voted ? "Voted" : "Vote"}
+          </button>
+          <button
+            disabled={!canVote}
+            onClick={onSuperVote}
+            title="Spend 1 boost credit for a 5x vote"
+            className={cn(
+              "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition",
+              canVote
+                ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                : "cursor-not-allowed border-white/10 text-white/30",
+            )}
+          >
+            <Zap className="h-3 w-3" />
+            <span className="ml-1">5x</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
