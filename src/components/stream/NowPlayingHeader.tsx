@@ -253,6 +253,7 @@ export function NowPlayingHeader({
           key={playing.id}
           ref={audioRef}
           src={playing.audio_url}
+          autoPlay
           preload="metadata"
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
