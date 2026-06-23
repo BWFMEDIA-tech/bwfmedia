@@ -132,10 +132,10 @@ function RootComponent() {
     defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
   }));
   return (
-    <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
       <CartProvider>
         <PlayerProvider>
-        <PaymentTestModeBanner />
+        {isChrome && <PaymentTestModeBanner />}
         <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
