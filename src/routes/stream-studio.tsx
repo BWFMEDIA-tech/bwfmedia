@@ -982,14 +982,6 @@ function StreamStudio() {
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                     )}
 
-                    <NowPlayingHeader
-                      streamId={stream.id}
-                      liveParticipants={participants.map((p) => ({
-                        user_id: p.user_id,
-                        display_name: p.display_name,
-                        avatar_url: p.avatar_url,
-                      }))}
-                    />
                     <StageRoom
                       streamId={stream.id}
                       participants={participants}
