@@ -1,6 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 
-export type LiveKitFatalKind = "quota" | "auth" | "other";
+export type LiveKitFatalKind = "quota" | "auth" | "stage_full" | "other";
 
 export function classifyLiveKitError(error: unknown): LiveKitFatalKind | null {
   const msg = (error instanceof Error ? error.message : String(error ?? "")).toLowerCase();
@@ -18,6 +18,14 @@ export function classifyLiveKitError(error: unknown): LiveKitFatalKind | null {
   }
   if (msg.includes("unauthorized") || msg.includes("invalid token") || msg.includes("token expired") || status === 401) {
     return "auth";
+  }
+  if (
+    msg.includes("max participants") ||
+    msg.includes("room is full") ||
+    msg.includes("stage is full") ||
+    msg.includes("participant limit")
+  ) {
+    return "stage_full";
   }
   // Treat repeated transport failures (1006) as recoverable — not fatal here.
   return null;
@@ -37,13 +45,17 @@ export function LiveKitFatalBanner({
       ? "Live streaming temporarily unavailable"
       : kind === "auth"
         ? "Streaming session expired"
-        : "Streaming connection failed";
+        : kind === "stage_full"
+          ? "Stage is full"
+          : "Streaming connection failed";
   const body =
     kind === "quota"
       ? "The live streaming service has reached its connection limit. Reconnect attempts have been stopped to protect your session. Please try again later or contact the project owner to upgrade capacity."
       : kind === "auth"
         ? "Your streaming credentials are no longer valid. Please refresh the page and rejoin."
-        : "We couldn't reach the streaming server. Reconnect attempts have been stopped.";
+        : kind === "stage_full"
+          ? "This room has reached its participant limit. Wait for someone to leave, or ask the host to free a slot."
+          : "We couldn't reach the streaming server. Reconnect attempts have been stopped.";
   return (
     <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-amber-100">
       <div className="flex items-start gap-3">
