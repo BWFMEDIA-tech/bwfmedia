@@ -188,33 +188,58 @@ export function StageRoom({
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-red-900/40 p-5 shadow-[0_0_60px_-20px_rgba(239,68,68,0.45)]"
+      className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(120% 80% at 0% 0%, rgba(127,29,29,0.35), transparent 60%), radial-gradient(120% 80% at 100% 100%, rgba(239,68,68,0.18), transparent 60%), #07020399",
-        backgroundColor: "#0a0405",
+          "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,75,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
       }}
     >
-      {/* gritty noise overlay */}
+      {/* subtle grid overlay */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
         style={{
           backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "44px 44px, 44px 44px",
         }}
       />
-      <div className="mb-4 flex items-center justify-between">
-        <div className="relative flex items-center gap-2">
-          <Mic className="h-4 w-4" style={{ color: PURPLE }} />
-          <span
-            className="text-sm font-black uppercase tracking-[0.2em] text-white"
-            style={{ textShadow: `0 0 18px ${PURPLE}aa` }}
+      <div className="relative mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl"
+            style={{
+              background: `linear-gradient(135deg, ${PURPLE}, ${PINK})`,
+              boxShadow: `0 0 24px ${PURPLE}80, inset 0 0 12px rgba(255,255,255,0.18)`,
+            }}
           >
-            STAGE ROOM
-          </span>
-          <span className="text-[11px] text-white/50">
-            · {hosts.length}/{MAX_HOSTS} hosts · {guests.length}/{MAX_GUESTS} guests
-          </span>
+            <Mic className="h-4 w-4 text-white" />
+            <span
+              className="absolute -right-1 -top-1 h-3 w-3 rounded-full"
+              style={{ background: PINK, boxShadow: `0 0 12px ${PINK}, 0 0 24px ${PINK}` }}
+            />
+            <span
+              className="absolute -right-1 -top-1 h-3 w-3 animate-ping rounded-full opacity-75"
+              style={{ background: PINK }}
+            />
+          </div>
+          <div className="min-w-0">
+            <div
+              className="text-[11px] font-bold uppercase tracking-[0.32em]"
+              style={{ color: PINK, textShadow: `0 0 14px ${PINK}80` }}
+            >
+              ● ON STAGE
+            </div>
+            <div
+              className="truncate text-xl font-black uppercase leading-none tracking-[0.18em] text-white sm:text-2xl"
+              style={{ textShadow: `0 0 24px ${PURPLE}aa` }}
+            >
+              Stage Room
+            </div>
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2.5">
+          <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
+          <CapacityChip label="Guests" filled={guests.length} total={MAX_GUESTS} color={ACCENT} />
         </div>
       </div>
 
