@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Swords, Trophy, Zap, Crown, Sparkles } from "lucide-react";
+import { Swords, Trophy, Zap, Crown, Sparkles, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
