@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { createBattleMatch, castBattleVote } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
+import { RankBadge } from "@/components/rank/RankBadge";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
