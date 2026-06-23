@@ -241,9 +241,8 @@ export async function runBattleEvent(
             }
           }
         }
-        if (!round.a_playing_track_id || !round.b_playing_track_id) {
-          invalid("both artists must submit a track before voting opens");
-        }
+        // Allow host to open voting even if one or both artists haven't
+        // submitted a track yet. Votes will simply be tallied per side.
         await supabase
           .from("battle_rounds")
           .update({ voting_status: "open" })
