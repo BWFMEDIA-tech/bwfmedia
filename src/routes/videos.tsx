@@ -745,6 +745,94 @@ function TrendingCard({ v }: { v: VideoRow }) {
   );
 }
 
+function ShelfCard({ v, onPlay }: { v: VideoRow; onPlay?: () => void }) {
+  return (
+    <div className="group relative w-44 sm:w-48 shrink-0">
+      <Link to="/videos/$id" params={{ id: v.id }} className="block">
+        <div className="relative aspect-video rounded-lg overflow-hidden bg-neutral-900 border border-white/5 group-hover:border-white/20 shadow-lg transition-all">
+          {thumbUrl(v) ? (
+            <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+          ) : (
+            <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="absolute bottom-2 right-2 text-[10px] bg-black/80 px-1.5 py-0.5 rounded font-medium">
+            {pseudoDuration(v.id)}
+          </span>
+        </div>
+      </Link>
+      {onPlay && (
+        <button
+          type="button"
+          onClick={onPlay}
+          aria-label={`Play ${v.title}`}
+          className="absolute bottom-16 right-2 w-10 h-10 rounded-full bg-red-500 hover:bg-red-400 hover:scale-110 transition-all flex items-center justify-center shadow-xl opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0"
+        >
+          <Play size={16} className="text-white ml-0.5" />
+        </button>
+      )}
+      <div className="mt-2 px-0.5">
+        <p className="text-sm font-semibold truncate">{v.title}</p>
+        <p className="text-xs text-white/50 mt-0.5 truncate flex items-center gap-1">
+          <span className="truncate">{v.artist ?? "BWF"}</span>
+          <BadgeCheck size={11} className="text-red-500 shrink-0" />
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Shelf({ title, videos, onPlay }: { title: string; videos: VideoRow[]; onPlay?: (i: number) => void }) {
+  if (!videos.length) return null;
+  return (
+    <section>
+      <div className="flex items-end justify-between mb-3">
+        <h2 className="text-xl md:text-2xl font-bold tracking-tight">{title}</h2>
+        <button className="text-xs font-bold uppercase tracking-wider text-white/50 hover:text-white">Show all</button>
+      </div>
+      <div className="flex gap-4 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-thin scrollbar-thumb-white/10 snap-x">
+        {videos.map((v, i) => (
+          <div key={`${title}-${v.id}`} className="snap-start">
+            <ShelfCard v={v} onPlay={onPlay ? () => onPlay(i) : undefined} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function _UnusedTrendingCard({ v }: { v: VideoRow }) {
+  return (
+    <Link to="/videos/$id" params={{ id: v.id }} className="group block">
+      <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
+        {thumbUrl(v) ? (
+          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
+        )}
+        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 flex items-center justify-center transition-colors">
+          <span className="w-10 h-10 rounded-full bg-black/50 border border-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <Play size={14} className="text-white ml-0.5" />
+          </span>
+        </div>
+        <span className="absolute bottom-2 right-2 text-[10px] bg-black/80 px-1.5 py-0.5 rounded font-medium">
+          {pseudoDuration(v.id)}
+        </span>
+      </div>
+      <div className="mt-2 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold truncate group-hover:text-red-400">{v.title}</p>
+          <p className="text-[11px] uppercase tracking-wider text-white/50 mt-0.5 truncate">{v.artist ?? "BWF"}</p>
+          <p className="text-[11px] text-white/40 mt-1">
+            {formatViews(pseudoViews(v.id))} views · {timeAgo(v.created_at)}
+          </p>
+        </div>
+        <button className="text-white/40 hover:text-white shrink-0"><MoreHorizontal size={14} /></button>
+      </div>
+    </Link>
+  );
+}
+
 function NewReleaseRow({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5">
