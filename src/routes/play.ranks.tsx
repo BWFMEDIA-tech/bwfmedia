@@ -12,6 +12,7 @@ import {
   Medal,
   Mic2,
   Music2,
+  Rocket,
   Sparkles,
   Swords,
   Target,
@@ -44,11 +45,13 @@ export const Route = createFileRoute("/play/ranks")({
 });
 
 const RANKS = [
-  { icon: Medal, label: "BRONZE PERFORMER", floor: 0, cap: 2000, range: "0 – 1,999 XP", color: "text-amber-600", bg: "from-amber-700/40 to-amber-900/30" },
-  { icon: Award, label: "SILVER ARTIST", floor: 2000, cap: 5000, range: "2,000 – 4,999 XP", color: "text-slate-300", bg: "from-slate-400/30 to-slate-600/20" },
-  { icon: Trophy, label: "GOLD CREATOR", floor: 5000, cap: 10000, range: "5,000 – 9,999 XP", color: "text-amber-400", bg: "from-amber-400/30 to-amber-600/20" },
-  { icon: Gem, label: "DIAMOND STAR", floor: 10000, cap: null as number | null, range: "10,000+ XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#004BFF]/20" },
-  { icon: Crown, label: "LEGEND", floor: Infinity, cap: null, range: "Invite Only · Top 1%", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/40 to-[#FF00A6]/20" },
+  { icon: Medal, label: "BRONZE PERFORMER", floor: 0, cap: 2000, range: "0 – 1,999 XP", color: "text-amber-600", bg: "from-amber-700/40 to-amber-900/30", note: "Starting your journey. Build your audience and prove your talent." },
+  { icon: Award, label: "SILVER ARTIST", floor: 2000, cap: 5000, range: "2,000 – 4,999 XP", color: "text-slate-300", bg: "from-slate-400/30 to-slate-600/20", note: "Your music is gaining traction. Fans are starting to notice." },
+  { icon: Trophy, label: "GOLD CREATOR", floor: 5000, cap: 10000, range: "5,000 – 9,999 XP", color: "text-amber-400", bg: "from-amber-400/30 to-amber-600/20", note: "Established creator with growing influence and engagement." },
+  { icon: Gem, label: "DIAMOND STAR", floor: 10000, cap: 25000, range: "10,000 – 24,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#004BFF]/20", note: "Elite status. Consistent performance and strong fan support." },
+  { icon: Crown, label: "PLATINUM ICON", floor: 25000, cap: 50000, range: "25,000 – 49,999 XP", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/30 to-[#00E6FF]/20", note: "Recognized across the platform. A true standout artist." },
+  { icon: Rocket, label: "SUPERSTAR", floor: 50000, cap: 100000, range: "50,000 – 99,999 XP", color: "text-[#FF00A6]", bg: "from-[#FF00A6]/30 to-[#C53DFF]/20", note: "Massive reach. Dominating battles, streams, and engagement." },
+  { icon: Sparkles, label: "LEGEND", floor: 100000, cap: null as number | null, range: "100,000+ XP", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/40 to-[#FF00A6]/20", note: "Invite Only · Top 1% of BWF NETWORK performers." },
 ];
 
 const XP_RULES = [
@@ -218,6 +221,11 @@ function RankProgression({ currentXp }: { currentXp: number }) {
                   {r.label} {isCurrent && <span className="ml-1 text-[9px] text-white/70">· YOU</span>}
                 </p>
                 <p className="text-[10px] text-white/60">{r.range}</p>
+                {r.note && (
+                  <p className="mt-0.5 text-[10px] leading-snug text-white/40">
+                    {r.note}
+                  </p>
+                )}
               </div>
               <ChevronRight className="h-4 w-4 text-white/30" />
             </li>
