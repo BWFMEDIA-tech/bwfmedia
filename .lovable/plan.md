@@ -1,125 +1,105 @@
-## Refactor Plan — Event-Driven Play Arena Battle Engine
+# Play Arena — Song Submission Routing System
 
-### What exists today
+Extend the existing Play Arena so artists submit songs from their Tunevio library directly into the live arena queue. No re-uploads — submissions are references.
 
-- `src/lib/battles.functions.ts` already routes every host action through server functions (`createBattleMatch`, `startNextRound`, `endRound`, `cancelBattle`, `castBattleVote`, `getActiveBattle`). The UI never writes the DB directly today — it calls RPCs.
-- `src/components/stream/BattleArena.tsx` is the host + audience battle surface. The host buttons call the RPCs above, and the UI subscribes to `battle_matches` + `battle_rounds` realtime for state.
-- The current round model has only two states: `live` and `closed`. There is no separate "voting open / closed" or "finalized" phase, and there is no concept of "currently playing track" inside the battle (track playback is tracked separately on `play_tracks.status`).
-- LiveKit is already pure transport — it carries audio/video; it does not drive battle state.
+## 1. Database layer
 
-### Gap vs. the requested spec
+New migration adds `public.play_arena_submissions` as the routing table between the artist song library (`play_tracks` already serves as the arena queue; the persistent artist library lives in `artist-audio` storage + existing track records) and a live arena (`streams`).
 
-The new vocabulary requires concepts the schema doesn't yet model:
+Columns:
+- `id uuid pk`
+- `artist_id uuid` → `auth.users`
+- `song_id uuid` → existing library track
+- `arena_id uuid` → `streams.id`
+- `status text` check in (`queued`,`playing`,`played`,`skipped`) default `queued`
+- `priority text` check in (`standard`,`boosted`,`featured`) default `standard`
+- `context jsonb` (optional message, boost metadata, etc.)
+- `submitted_at`, `started_at`, `completed_at`, `created_at`, `updated_at`
 
-- `PLAY_SIDE_A_TRACK / PLAY_SIDE_B_TRACK / STOP_TRACK` — need a "currently playing battle track" per side on the match.
-- `OPEN_VOTING / CLOSE_VOTING / FINALIZE_ROUND` — need a `voting_status` ∈ `closed | open | finalized` distinct from round lifecycle.
-- `ROOM_STATE = battle_engine.getState(roomId)` — need a single read endpoint that returns the full machine snapshot.
+Constraints / indexes:
+- Partial unique index on `(arena_id, song_id)` where `status in ('queued','playing')` → prevents duplicate active submissions.
+- Partial unique index on `(arena_id, artist_id, song_id)` where `status = 'queued'` → prevents same artist re-queueing.
+- Index on `(arena_id, status, priority, submitted_at)` for queue ordering.
 
-### Plan
+Grants + RLS:
+- `GRANT SELECT, INSERT, UPDATE ON public.play_arena_submissions TO authenticated;`
+- `GRANT ALL ON public.play_arena_submissions TO service_role;`
+- `GRANT SELECT ON public.play_arena_submissions TO anon;` (queue is publicly viewable for the live arena UI)
+- Enable RLS:
+  - `SELECT`: anyone (public queue visibility).
+  - `INSERT`: `auth.uid() = artist_id` AND ownership of `song_id` validated by server fn (defense in depth — actual ownership check enforced in the server function since `play_tracks` ownership lives across tables).
+  - `UPDATE`: artist (own row, status only) OR stream host (via `is_stream_host`) OR admin (`has_role`).
+- Add to realtime publication: `ALTER PUBLICATION supabase_realtime ADD TABLE public.play_arena_submissions;`
+- `updated_at` trigger reusing `touch_updated_at()`.
 
-#### 1. Schema (migration)
+## 2. Server functions (`src/lib/play-arena-submissions.functions.ts`)
 
-`battle_rounds`:
-- add `voting_status text not null default 'closed' check in ('closed','open','finalized')`
-- add `a_playing_track_id uuid null references play_tracks(id)`
-- add `b_playing_track_id uuid null references play_tracks(id)`
-- add `a_track_finished_at timestamptz`, `b_track_finished_at timestamptz` (used by engine to auto-allow voting once both played)
+All use `requireSupabaseAuth`.
 
-`battle_matches`:
-- add `active_side text null check in ('a','b')` — which side currently has audio playing
-- add `current_round_id uuid null references battle_rounds(id)`
+- `submitSongToArena({ songId, arenaId, message?, priority? })`
+  - Verify caller owns `songId` (lookup in artist library / play_tracks origin).
+  - Verify no active submission exists (`queued`/`playing`) for `(arenaId, songId)`.
+  - Insert into `play_arena_submissions` with `priority` (default `standard`).
+  - Insert mirror row into `play_tracks` so existing queue/now-playing/battle/vote pipeline picks it up unchanged (set `position` from priority weight; `boosted = priority != 'standard'`).
+  - Return submission row.
+- `listArenaSubmissions({ arenaId })` — public read for queue panel.
+- `updateSubmissionStatus({ submissionId, status })` — host-only (assertHost pattern from `battles.functions.ts`); also updates linked `play_tracks` lifecycle (`queued → playing → completed/skipped`).
+- `reorderSubmission({ submissionId, position })` — host-only.
+- `removeSubmission({ submissionId })` — host or owning artist while still `queued`.
 
-No data migration needed; defaults are safe.
+Realtime events are emitted via `arena_events` insert (existing infra) with `type` in: `queue_updated`, `submission_created`, `song_started`, `song_finished`, `voting_started`, `voting_ended`, `leaderboard_updated`.
 
-#### 2. Battle Engine (`src/lib/battle-engine.functions.ts`)
+## 3. UI — Artist library song card
 
-Single dispatch entrypoint:
+Update the existing artist library list (artist dashboard / music-media settings) so each song card shows:
+- Artwork, Title
+- Play button (existing)
+- Analytics button (existing or stub link to artist dashboard analytics)
+- **Submit to Play Arena** button (new)
 
-```text
-dispatchBattleEvent({ matchId, type, payload? })
-```
+No upload control appears in this flow.
 
-Event types (host-only unless noted):
+## 4. Submission modal (`src/components/play/SubmitToArenaModal.tsx`)
 
-```text
-START_ROUND
-PLAY_SIDE_A_TRACK { trackId }
-PLAY_SIDE_B_TRACK { trackId }
-STOP_TRACK
-OPEN_VOTING
-CLOSE_VOTING
-FINALIZE_ROUND
-NEXT_ROUND
-END_ROUND
-CANCEL_BATTLE
-```
+Lightweight dialog:
+- Arena selector (live `streams` list — query active streams the artist can submit to).
+- Optional message (textarea, max 280 chars).
+- Optional priority boost toggle (Standard / Boosted / Featured) — UI only, no Stripe yet; stored in `priority` + `context`.
+- Submit button → `submitSongToArena` mutation; on success invalidate queue queries and close.
 
-Rules enforced in the engine (UI cannot bypass):
+Reuse design language from `SubmitTrackDialog.tsx` but strip all upload code.
 
-- `START_ROUND` requires `match.status in (pending, live)` and `current_round < total_rounds`. Creates / opens next round with `voting_status='closed'`.
-- `PLAY_SIDE_*_TRACK` requires a live round; sets `match.active_side`, writes `play_tracks.status='playing'` for that track, marks others on the stream as `completed`, sets `a_playing_track_id` or `b_playing_track_id` on the round, stamps `*_track_finished_at` on the previously playing side.
-- `STOP_TRACK` clears `active_side` and demotes the current playing `play_track` row.
-- `OPEN_VOTING` requires both `a_playing_track_id` and `b_playing_track_id` set on the round. Sets `voting_status='open'`.
-- `CLOSE_VOTING` sets `voting_status='closed'`.
-- `FINALIZE_ROUND` computes winner from `a_weight`/`b_weight`, sets `voting_status='finalized'`, round `status='closed'`, increments `a_wins` / `b_wins`.
-- `NEXT_ROUND` requires last round finalized; if `current_round === total_rounds`, completes the match and computes overall winner; otherwise opens the next round.
-- `END_ROUND` / `CANCEL_BATTLE` — kept as terminal ops.
+## 5. Play Arena integration
 
-Voting (`castBattleVote`) is updated to require `voting_status='open'` (not the timer). Timer becomes advisory; engine controls truth.
+Because each submission writes a mirror `play_tracks` row, existing systems integrate with no rewrites:
+- Live Queue (`usePlayQueue`)
+- Now Playing (`NowPlayingMini`, `NowPlayingHeader`)
+- Battle eligibility (`battles.functions.ts`)
+- Voting (`play_votes`, `castBattleVote`)
+- Leaderboards (`recompute_play_arena_rankings`)
+- XP (`award_xp` on submission accepted + on votes)
+- Ranks (existing `get_user_rank`)
 
-All event handlers run inside one server function with a switch; each branch enforces host/admin (via existing `assertMatchHost`) and the state-machine preconditions, then performs DB writes. Errors throw `Error("INVALID_TRANSITION: …")` so the UI can surface them.
+Status changes on `play_tracks` are reflected back onto `play_arena_submissions` via a small trigger or by having `updateSubmissionStatus` write both sides.
 
-#### 3. Room state reader
+## 6. Host dashboard
 
-`getBattleRoomState({ streamId })` returns:
+Extend the existing host queue UI (`BackstageQueue.tsx`) with:
+- Submission rows showing artwork, artist, title, priority badge, submission message.
+- Actions: Approve, Skip, Remove, Reorder (drag), with optimistic updates.
+- Current Song panel: artwork, artist name, title, queue position, message.
 
-```text
-{
-  match,                       // battle_matches row or null
-  rounds,                      // all battle_rounds rows
-  currentRound,                // resolved row for match.current_round_id
-  activeSide,                  // 'a' | 'b' | null
-  votingStatus,                // 'closed' | 'open' | 'finalized'
-  aTrack, bTrack,              // joined play_tracks rows for current round
-  battleStatus,                // match.status
-}
-```
+## 7. Realtime
 
-This becomes the single source the UI reads from (initial load + realtime invalidation).
+Subscribe to `play_arena_submissions` and `arena_events` from queue + host components via existing channel pattern. No new infra.
 
-#### 4. Frontend changes
+## 8. Monetization hook (future)
 
-`src/components/stream/BattleArena.tsx`:
-- Replace direct imports of `startNextRound`, `endRound`, `cancelBattle` with a single `emitBattleEvent(type, payload)` helper that calls `dispatchBattleEvent`.
-- Remove local logic that decides "should the Start button show?" based on `match.current_round < total_rounds`; instead show buttons unconditionally and rely on the engine's `INVALID_TRANSITION` error toast — OR derive button enablement from `roomState` only.
-- Replace the ad-hoc `play_tracks` join in `BattleView` with `roomState.aTrack` / `roomState.bTrack` / `roomState.activeSide` from the engine reader.
-- Add host buttons for the new events: Play A / Play B / Stop / Open voting / Close voting / Finalize / Next round (Start/End Battle stay).
+`priority` field + `context.boost` are the extension point. No pricing hardcoded. A later Stripe checkout fn can flip `priority` from `standard → boosted/featured` and reorder.
 
-`src/components/stream/HostControlPanel.tsx` (new, optional split): a thin component that takes `roomState` + `emit` and renders only buttons — zero state.
+## Technical notes
 
-Audience UI: vote button disabled unless `roomState.votingStatus === 'open'` (replaces the timer-based gate).
-
-#### 5. Keep wrappers for backward-compat
-
-`startNextRound`, `endRound`, `cancelBattle` remain exported but become thin wrappers that call `dispatchBattleEvent` internally. This keeps any callers (admin tools, tests) working while the new code paths take over.
-
-#### 6. Out of scope (explicitly)
-
-- No LiveKit changes. LiveKit is already transport-only.
-- No new events bus / queue / pub-sub system; RPC + existing realtime on `battle_matches` / `battle_rounds` is the transport.
-- No audit/event-log table (can be added later if requested).
-- No demo/auto-advance fallbacks exist today; nothing to remove.
-
-### Files touched
-
-- new: `supabase/migrations/<ts>_battle_engine_state.sql`
-- new: `src/lib/battle-engine.functions.ts` (dispatch + getBattleRoomState)
-- edit: `src/lib/battles.functions.ts` (convert host fns to thin wrappers; tighten vote precondition)
-- edit: `src/components/stream/BattleArena.tsx` (read room state, emit events only)
-- new (small): `src/components/stream/BattleHostControls.tsx` (extracted button strip)
-
-### Verification
-
-- Migration applied; new columns visible on `battle_rounds` / `battle_matches`.
-- Smoke: create match → START_ROUND → PLAY_SIDE_A_TRACK → PLAY_SIDE_B_TRACK → OPEN_VOTING → cast vote → CLOSE_VOTING → FINALIZE_ROUND → NEXT_ROUND.
-- Out-of-order events (e.g., OPEN_VOTING before both tracks played) return `INVALID_TRANSITION` and the UI toasts the error without DB drift.
+- Re-use existing patterns: `assertHost` (battles), `requireSupabaseAuth`, `usePlayQueue`, `arena_events`, `play_tracks` lifecycle trigger (`play_tracks_enforce_lifecycle`).
+- Do not change `streams`, `play_tracks` schemas — only add the routing table on top.
+- Mirror-row strategy keeps every downstream module (battles/votes/XP/ranks) untouched.
+- Queue ordering: priority weight (`featured=3, boosted=2, standard=1`) × recency, computed in `listArenaSubmissions`; host can override with `reorderSubmission`.

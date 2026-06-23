@@ -1594,6 +1594,76 @@ export type Database = {
           },
         ]
       }
+      play_arena_submissions: {
+        Row: {
+          arena_id: string
+          artist_id: string
+          completed_at: string | null
+          context: Json
+          created_at: string
+          id: string
+          play_track_id: string | null
+          priority: string
+          song_id: string
+          started_at: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+        }
+        Insert: {
+          arena_id: string
+          artist_id: string
+          completed_at?: string | null
+          context?: Json
+          created_at?: string
+          id?: string
+          play_track_id?: string | null
+          priority?: string
+          song_id: string
+          started_at?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Update: {
+          arena_id?: string
+          artist_id?: string
+          completed_at?: string | null
+          context?: Json
+          created_at?: string
+          id?: string
+          play_track_id?: string | null
+          priority?: string
+          song_id?: string
+          started_at?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_arena_submissions_arena_id_fkey"
+            columns: ["arena_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "play_arena_submissions_play_track_id_fkey"
+            columns: ["play_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "play_arena_submissions_play_track_id_fkey"
+            columns: ["play_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       play_boost_credits: {
         Row: {
           credits: number
