@@ -489,7 +489,7 @@ export function useStreamSpotlight(streamId: string | undefined): string | null 
       if (!cancelled) setUid((data as any)?.spotlight_user_id ?? null);
     })();
     const ch = supabase
-      .channel(`spotlight-${streamId}`)
+      .channel(`spotlight-${streamId}-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
