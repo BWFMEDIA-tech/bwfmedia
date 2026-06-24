@@ -1,6 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Send, Smile, Heart, Users, BarChart3, Eye, DollarSign, Share2, Circle, Sparkles, CheckCircle2, Shield, Trash2, Clock, Ban } from "lucide-react";
+import {
+  Send,
+  Smile,
+  Heart,
+  Users,
+  BarChart3,
+  Eye,
+  DollarSign,
+  Sparkles,
+  CheckCircle2,
+  Shield,
+  Trash2,
+  Clock,
+  Ban,
+  Radio,
+  MessageCircle,
+  Zap,
+  Crown,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -11,8 +29,13 @@ import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions"
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { RankBadge } from "@/components/rank/RankBadge";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+// BWF Immersive Cinema palette
+const PURPLE = "#C53DFF";
+const PINK = "#FF00A6";
+const CYAN = "#00E6FF";
+const BLUE = "#004BFF";
+const GREEN = "#22c55e";
+const AMBER = "#f59e0b";
 
 type ChatRow = {
   id: string;
@@ -171,106 +194,323 @@ export function LiveChat({
   };
 
   return (
-    <aside className="flex w-full flex-col overflow-hidden rounded-2xl border border-white/5 bg-[#0d0d18] lg:w-[320px]">
-      <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
-        <span className="text-xs font-bold tracking-widest text-white">LIVE CHAT</span>
-        <div className="flex items-center gap-2 text-[11px] text-white/60">
-          <Users className="h-3 w-3" /> {viewerCount || 0}
+    <aside
+      className="relative flex w-full flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(197,61,255,0.55)] lg:w-[340px] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
+      style={{
+        background:
+          "radial-gradient(80% 50% at 0% 0%, rgba(197,61,255,0.18), transparent 60%), radial-gradient(80% 50% at 100% 100%, rgba(0,75,255,0.18), transparent 60%), #07070f",
+      }}
+    >
+      {/* subtle grid texture */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "32px 32px, 32px 32px",
+        }}
+      />
+
+      {/* Header */}
+      <div className="relative flex items-center justify-between border-b border-white/10 px-4 py-3.5">
+        <div className="flex items-center gap-2.5">
+          <div
+            className="relative grid h-8 w-8 place-items-center rounded-xl"
+            style={{
+              background: `linear-gradient(135deg, ${PURPLE}, ${PINK})`,
+              boxShadow: `0 0 18px ${PURPLE}80`,
+            }}
+          >
+            <MessageCircle className="h-4 w-4 text-white" />
+            {streamId && (
+              <>
+                <span
+                  className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full"
+                  style={{ background: PINK, boxShadow: `0 0 10px ${PINK}` }}
+                />
+                <span
+                  className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-ping rounded-full opacity-70"
+                  style={{ background: PINK }}
+                />
+              </>
+            )}
+          </div>
+          <div className="leading-tight">
+            <div
+              className="text-[10px] font-bold uppercase tracking-[0.28em]"
+              style={{ color: streamId ? PINK : "rgba(255,255,255,0.4)" }}
+            >
+              {streamId ? "● LIVE CHAT" : "OFF AIR"}
+            </div>
+            <div className="text-[11px] text-white/50">Real-time crowd</div>
+          </div>
+        </div>
+        <div
+          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-bold text-white"
+          style={{ boxShadow: `inset 0 0 10px ${CYAN}22` }}
+        >
+          <Eye className="h-3 w-3" style={{ color: CYAN }} />
+          <span className="tabular-nums">{viewerCount || 0}</span>
         </div>
       </div>
-      <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto p-4 max-h-[420px]">
+
+      {/* Messages */}
+      <div
+        ref={listRef}
+        className="relative flex-1 overflow-y-auto px-3 py-4 max-h-[460px] [scrollbar-width:thin] [scrollbar-color:rgba(197,61,255,0.4)_transparent]"
+      >
         {!streamId && (
-          <div className="text-center text-xs text-white/40">Go live to start the chat.</div>
+          <EmptyState
+            icon={<Radio className="h-6 w-6" style={{ color: PURPLE }} />}
+            title="Off the air"
+            subtitle="Go live to ignite the chat."
+          />
         )}
         {streamId && messages.length === 0 && (
-          <div className="text-center text-xs text-white/40">Say hi to kick off the conversation 👋</div>
+          <EmptyState
+            icon={<Sparkles className="h-6 w-6" style={{ color: PINK }} />}
+            title="Say hi 👋"
+            subtitle="Kick off the conversation. The crowd is listening."
+          />
         )}
+        <div className="space-y-2.5">
         {messages.map((c) => {
           const isTip = c.body.startsWith("💎 TIP");
+          const isHost = !!hostId && c.user_id === hostId;
+          const isSelf = c.user_id === auth.user?.id;
           return (
           <div
             key={c.id}
-            className={cn("flex gap-2 rounded-lg p-2", isTip && "border border-white/10")}
-            style={isTip ? { background: `linear-gradient(135deg, ${PURPLE}33, ${BLUE}33)` } : undefined}
+            className={cn(
+              "group relative flex gap-2.5 rounded-xl p-2.5 transition",
+              isTip
+                ? "border border-transparent"
+                : "border border-transparent hover:border-white/10 hover:bg-white/[0.03]",
+            )}
+            style={
+              isTip
+                ? {
+                    background: `linear-gradient(135deg, ${PURPLE}26, ${PINK}26 50%, ${CYAN}1a)`,
+                    boxShadow: `0 0 20px -8px ${PURPLE}80, inset 0 0 18px ${PINK}1f`,
+                    border: `1px solid ${PURPLE}55`,
+                  }
+                : undefined
+            }
           >
-            <Link to="/user/$id" params={{ id: c.user_id }} className="shrink-0">
-              {c.avatar_url ? (
-                <img src={c.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
-              ) : (
-                <div className="h-7 w-7 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
+            <Link to="/user/$id" params={{ id: c.user_id }} className="relative shrink-0">
+              <div
+                className="rounded-full p-[1.5px]"
+                style={{
+                  background: isHost
+                    ? `conic-gradient(${PURPLE}, ${PINK}, ${CYAN}, ${PURPLE})`
+                    : isSelf
+                      ? `linear-gradient(135deg, ${CYAN}, ${BLUE})`
+                      : "rgba(255,255,255,0.12)",
+                }}
+              >
+                {c.avatar_url ? (
+                  <img
+                    src={c.avatar_url}
+                    alt=""
+                    className="h-8 w-8 rounded-full border border-[#07070f] object-cover"
+                  />
+                ) : (
+                  <div
+                    className="h-8 w-8 rounded-full border border-[#07070f]"
+                    style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+                  />
+                )}
+              </div>
+              {isHost && (
+                <span
+                  className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full border border-[#07070f]"
+                  style={{ background: PURPLE, boxShadow: `0 0 10px ${PURPLE}` }}
+                  title="Host"
+                >
+                  <Crown className="h-2.5 w-2.5 text-white" />
+                </span>
               )}
             </Link>
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-1 text-[11px]">
-                <span className="font-bold text-white">{c.display_name || "Anon"}</span>
+              <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                <span className="truncate font-bold text-white">{c.display_name || "Anon"}</span>
                 <RankBadge userId={c.user_id} size="xs" />
-                {c.user_id === auth.user?.id && <CheckCircle2 className="h-3 w-3" style={{ color: BLUE }} />}
-                {isTip && <Sparkles className="h-3 w-3" style={{ color: PURPLE }} />}
-                <span className="ml-auto text-[10px] text-white/40">
+                {isHost && (
+                  <span
+                    className="rounded px-1 py-px text-[8px] font-black uppercase tracking-widest text-white"
+                    style={{ background: PURPLE, boxShadow: `0 0 10px ${PURPLE}80` }}
+                  >
+                    HOST
+                  </span>
+                )}
+                {isSelf && !isHost && (
+                  <CheckCircle2 className="h-3 w-3" style={{ color: CYAN }} />
+                )}
+                {isTip && (
+                  <span
+                    className="inline-flex items-center gap-0.5 rounded px-1 py-px text-[8px] font-black uppercase tracking-widest text-white"
+                    style={{ background: `linear-gradient(90deg, ${PINK}, ${PURPLE})` }}
+                  >
+                    <Zap className="h-2.5 w-2.5" />
+                    TIP
+                  </span>
+                )}
+                <span className="ml-auto text-[10px] tabular-nums text-white/40">
                   {new Date(c.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
-              <div className={cn("mt-0.5 break-words text-xs", isTip ? "font-semibold text-white" : "text-white/80")}>{c.body}</div>
-              {canMod && c.user_id !== auth.user?.id && (
-                <div className="mt-1 flex items-center gap-2 text-[10px] text-white/40">
+              <div
+                className={cn(
+                  "mt-1 break-words text-[13px] leading-snug",
+                  isTip ? "font-semibold text-white" : "text-white/85",
+                )}
+              >
+                {c.body}
+              </div>
+              {canMod && !isSelf && (
+                <div className="mt-1.5 flex items-center gap-2 text-[10px] text-white/30 opacity-0 transition group-hover:opacity-100">
                   <Shield className="h-3 w-3" />
-                  <button onClick={() => onDelete(c.id)} className="hover:text-white inline-flex items-center gap-0.5"><Trash2 className="h-3 w-3" />Delete</button>
-                  <button onClick={() => onTimeout(c.user_id)} className="hover:text-white inline-flex items-center gap-0.5"><Clock className="h-3 w-3" />Timeout</button>
-                  <button onClick={() => onBan(c.user_id)} className="hover:text-red-400 inline-flex items-center gap-0.5"><Ban className="h-3 w-3" />Ban</button>
+                  <button onClick={() => onDelete(c.id)} className="inline-flex items-center gap-0.5 hover:text-white">
+                    <Trash2 className="h-3 w-3" />
+                    Delete
+                  </button>
+                  <button onClick={() => onTimeout(c.user_id)} className="inline-flex items-center gap-0.5 hover:text-white">
+                    <Clock className="h-3 w-3" />
+                    Timeout
+                  </button>
+                  <button onClick={() => onBan(c.user_id)} className="inline-flex items-center gap-0.5 hover:text-red-400">
+                    <Ban className="h-3 w-3" />
+                    Ban
+                  </button>
                 </div>
               )}
             </div>
-            <button className="self-start"><Heart className="h-3.5 w-3.5 text-white/30" /></button>
+            <button
+              className="self-start opacity-0 transition group-hover:opacity-100"
+              title="React"
+            >
+              <Heart className="h-3.5 w-3.5 text-white/40 hover:text-pink-400" />
+            </button>
           </div>
           );
         })}
+        </div>
       </div>
-      <div className="border-t border-white/5 p-3">
-        <div className="mb-2 flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-2">
+      {/* Composer */}
+      <div className="relative border-t border-white/10 bg-black/30 p-3 backdrop-blur">
+        <div
+          className="group mb-2 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] pl-3 pr-1.5 transition focus-within:border-transparent"
+          style={{
+            boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.02)`,
+          }}
+        >
           <input
             value={msg}
-            onChange={(e) => setMsg(e.target.value)}
+            onChange={(e) => setMsg(e.target.value.slice(0, 280))}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder={auth.isAuthenticated ? "Say something..." : "Sign in to chat"}
+            placeholder={auth.isAuthenticated ? "Drop a message…" : "Sign in to chat"}
             disabled={!auth.isAuthenticated || !streamId}
-            className="flex-1 bg-transparent py-2 text-xs text-white placeholder:text-white/30 focus:outline-none disabled:opacity-50"
+            className="flex-1 bg-transparent py-2.5 text-[13px] text-white placeholder:text-white/30 focus:outline-none disabled:opacity-50"
           />
+          {msg.length > 0 && (
+            <span
+              className={cn(
+                "text-[10px] tabular-nums",
+                msg.length > 240 ? "text-pink-400" : "text-white/30",
+              )}
+            >
+              {280 - msg.length}
+            </span>
+          )}
           <Smile className="h-4 w-4 text-white/40" />
-          <button onClick={send} disabled={!streamId || sending} className="rounded-md p-1.5 disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
-            <Send className="h-3 w-3 text-white" />
+          <button
+            onClick={send}
+            disabled={!streamId || sending || !msg.trim()}
+            className="grid h-8 w-8 place-items-center rounded-xl text-white transition active:scale-95 disabled:opacity-40"
+            style={{
+              background: `linear-gradient(135deg, ${PURPLE}, ${PINK})`,
+              boxShadow: msg.trim() ? `0 0 18px ${PURPLE}80` : "none",
+            }}
+            title="Send"
+          >
+            <Send className="h-3.5 w-3.5" />
           </button>
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-1.5 text-base">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-1 text-base">
             {["🔥", "💯", "👏", "🎵", "❤️", "😂"].map((e) => (
-              <button key={e} onClick={() => setMsg((m) => m + e)} className="rounded-md p-1 hover:bg-white/10">{e}</button>
+              <button
+                key={e}
+                onClick={() => setMsg((m) => (m + e).slice(0, 280))}
+                className="rounded-lg p-1 transition hover:scale-125 hover:bg-white/10"
+                title={`Add ${e}`}
+              >
+                {e}
+              </button>
             ))}
           </div>
           <button
             onClick={() => {
-              if (!streamId) { toast.error("Stream not live yet"); return; }
+              if (!streamId) {
+                toast.error("Stream not live yet");
+                return;
+              }
               setShowTip(true);
             }}
-            className="flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white"
-            style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
+            className="group flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white transition active:scale-95"
+            style={{
+              background: `linear-gradient(135deg, ${PINK}, ${PURPLE} 60%, ${BLUE})`,
+              boxShadow: `0 0 22px -4px ${PINK}aa`,
+            }}
           >
-            <Sparkles className="h-3 w-3" /> Tip
+            <Sparkles className="h-3 w-3 transition group-hover:rotate-12" />
+            Tip
           </button>
         </div>
       </div>
 
-      <div className="border-t border-white/5 p-4">
+      <div className="relative border-t border-white/10 bg-black/20 p-4">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-bold tracking-widest text-white">STREAM ANALYTICS</span>
-          <BarChart3 className="h-3.5 w-3.5 text-white/40" />
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-3.5 w-3.5" style={{ color: CYAN }} />
+            <span
+              className="text-[11px] font-black uppercase tracking-[0.28em] text-white"
+              style={{ textShadow: `0 0 12px ${CYAN}55` }}
+            >
+              Stream Pulse
+            </span>
+          </div>
+          <span
+            className="rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest"
+            style={
+              streamId
+                ? {
+                    borderColor: `${GREEN}55`,
+                    color: GREEN,
+                    background: `${GREEN}1a`,
+                  }
+                : {
+                    borderColor: "rgba(255,255,255,0.15)",
+                    color: "rgba(255,255,255,0.5)",
+                  }
+            }
+          >
+            {streamId ? "● Live" : "Off"}
+          </span>
         </div>
         <div className="grid grid-cols-3 gap-2">
-          <Stat icon={Eye} label="Viewers" value={String(viewerCount || 0)} color={BLUE} />
-          <Stat icon={Heart} label="Messages" value={String(messages.length)} color="#ec4899" />
-          <Stat icon={DollarSign} label="Tips" value={`$${(tipsTotalCents / 100).toFixed(0)}`} color="#22c55e" />
-          <Stat icon={Sparkles} label="Tip Count" value={String(tipsCount)} color={PURPLE} />
-          <Stat icon={Circle} label="Duration" value={durationLabel} color="#f59e0b" />
-          <Stat icon={Circle} label="Status" value={streamId ? "LIVE" : "OFF"} color="#22c55e" />
+          <Stat icon={Eye} label="Viewers" value={String(viewerCount || 0)} color={CYAN} />
+          <Stat icon={MessageCircle} label="Messages" value={String(messages.length)} color={PINK} />
+          <Stat icon={DollarSign} label="Tips" value={`$${(tipsTotalCents / 100).toFixed(0)}`} color={GREEN} />
+          <Stat icon={Sparkles} label="Tippers" value={String(tipsCount)} color={PURPLE} />
+          <Stat icon={Clock} label="Duration" value={durationLabel} color={AMBER} mono />
+          <Stat
+            icon={Radio}
+            label="Status"
+            value={streamId ? "LIVE" : "OFF"}
+            color={streamId ? GREEN : "#6b7280"}
+            pulse={!!streamId}
+          />
         </div>
       </div>
 
@@ -281,12 +521,75 @@ export function LiveChat({
   );
 }
 
-function Stat({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) {
+function Stat({
+  icon: Icon,
+  label,
+  value,
+  color,
+  mono,
+  pulse,
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  color: string;
+  mono?: boolean;
+  pulse?: boolean;
+}) {
   return (
-    <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2">
-      <Icon className="mb-1 h-3 w-3" style={{ color }} />
-      <div className="text-sm font-bold text-white">{value}</div>
-      <div className="text-[9px] text-white/50">{label}</div>
+    <div
+      className="group relative overflow-hidden rounded-xl border border-white/10 p-2.5 transition hover:border-white/20"
+      style={{
+        background: `radial-gradient(120% 80% at 0% 0%, ${color}1a, transparent 60%), rgba(255,255,255,0.02)`,
+      }}
+    >
+      <div className="flex items-center gap-1.5">
+        <Icon className={cn("h-3 w-3", pulse && "animate-pulse")} style={{ color }} />
+        <div
+          className="text-[8px] font-bold uppercase tracking-[0.18em] text-white/50"
+        >
+          {label}
+        </div>
+      </div>
+      <div
+        className={cn(
+          "mt-1 text-base font-black leading-none text-white",
+          mono && "tabular-nums",
+        )}
+        style={{ textShadow: `0 0 14px ${color}55` }}
+      >
+        {value}
+      </div>
+      <span
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
+      />
+    </div>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="flex h-full min-h-[120px] flex-col items-center justify-center gap-2 px-6 text-center">
+      <div
+        className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,0.06), transparent 70%)",
+        }}
+      >
+        {icon}
+      </div>
+      <div className="text-sm font-bold text-white">{title}</div>
+      <div className="max-w-[200px] text-[11px] leading-relaxed text-white/40">{subtitle}</div>
     </div>
   );
 }
