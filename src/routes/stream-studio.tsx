@@ -20,7 +20,7 @@ import { startOrResumeStream, endStream } from "@/lib/streams.functions";
 import { getMyActiveStream } from "@/lib/streams.functions";
 import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
-import { LiveStage, LiveStageContent, CameraPublishSync } from "@/components/stream/LiveStage";
+import { LiveStage, LiveStageContent, CameraPublishSync, useStreamSpotlight } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
@@ -727,6 +727,7 @@ function StreamStudio() {
   const [stageLocked, setStageLocked] = useState(false);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
+  const spotlightUserId = useStreamSpotlight(stream?.id ?? undefined);
   const [thumbOpen, setThumbOpen] = useState(false);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
@@ -1021,6 +1022,7 @@ function StreamStudio() {
                       canManage
                       primaryHostId={auth.user.id}
                       hostTransferMode={hostTransferMode}
+                      spotlightUserId={spotlightUserId}
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
                     {streamMode !== "play" && (
