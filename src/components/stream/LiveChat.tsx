@@ -469,6 +469,7 @@ export function LiveChat({
         </div>
       </div>
 
+      {auth.roles.includes("admin") && (
       <div className="relative border-t border-white/10 bg-black/20 p-4">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -513,6 +514,7 @@ export function LiveChat({
           />
         </div>
       </div>
+      )}
 
       {showTip && streamId && (
         <TipModal streamId={streamId} auth={auth} onClose={() => setShowTip(false)} />
