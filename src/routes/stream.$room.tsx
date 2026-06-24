@@ -5,6 +5,7 @@ import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
+import { LiveChat } from "@/components/stream/LiveChat";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +13,6 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { CrowdPanel } from "@/components/stream/CrowdPanel";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
@@ -35,7 +35,7 @@ function GuestPage() {
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
-  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string } | null>(null);
+  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
@@ -54,7 +54,7 @@ function GuestPage() {
       .then((s: any) => {
         setStreamId(s?.id ?? null);
         if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage" | "play");
-        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id });
+        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id, started_at: (s as any).started_at ?? null });
       })
       .catch(() => {});
   }, [room]);
@@ -169,7 +169,7 @@ function GuestPage() {
 
   return (
     <div className="min-h-screen bg-[#050509] text-white p-4">
-      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
+      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_340px] lg:items-start">
         <div className="flex flex-col gap-4 min-w-0">
           {streamMode === "stage" && streamId && auth.user ? (
             <StageAudioShell
@@ -243,11 +243,15 @@ function GuestPage() {
           )}
         </div>
         <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
-          <CrowdPanel
-            participants={participants as StageParticipant[]}
-            streamId={streamId}
-            viewerCount={viewerCount || participants.length}
-          />
+          {streamId && (
+            <LiveChat
+              streamId={streamId}
+              auth={auth}
+              viewerCount={viewerCount}
+              startedAt={streamMeta?.started_at ?? null}
+              hostId={streamMeta?.host_id ?? null}
+            />
+          )}
         </div>
       </div>
     </div>
