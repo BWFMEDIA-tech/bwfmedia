@@ -24,10 +24,13 @@ export function StageConnectionProvider({ children }: { children: React.ReactNod
   const [speakingIds, setSpeakingIds] = useState<Set<string>>(new Set());
 
   // Track speaking state for EVERY participant (host, co-host, guests, and
-  // the local participant). LiveKit's ActiveSpeakersChanged sometimes omits
-  // the local participant, so we also subscribe per-participant to
-  // IsSpeakingChanged to guarantee the spotlight ring/pulse animation lights
-  // up for whoever is actually talking.
+  // the local participant). For audience viewers, LiveKit fires
+  // ActiveSpeakersChanged on the room as remote hosts start talking — but
+  // the per-participant IsSpeakingChanged event is what we rely on for the
+  // ring/pulse animation, because ActiveSpeakers only includes the loudest
+  // few. We re-wire whenever the remote-participant list or local
+  // participant changes (joins after the viewer, reconnects, etc.) so an
+  // audience viewer sees the animation regardless of who joined first.
   useEffect(() => {
     if (!room) return;
 
@@ -38,31 +41,50 @@ export function StageConnectionProvider({ children }: { children: React.ReactNod
       };
       consider(room.localParticipant);
       room.remoteParticipants.forEach((p) => consider(p));
-      setSpeakingIds(next);
+      setSpeakingIds((prev) => {
+        if (prev.size === next.size) {
+          let same = true;
+          for (const id of next) if (!prev.has(id)) { same = false; break; }
+          if (same) return prev;
+        }
+        return next;
+      });
     };
 
-    const wired = new WeakSet<Participant>();
-    const wire = (p: Participant) => {
-      if (wired.has(p)) return;
-      wired.add(p);
-      p.on(ParticipantEvent.IsSpeakingChanged, recompute);
+    const perParticipantListeners = new Map<Participant, () => void>();
+    const wire = (p: Participant | undefined | null) => {
+      if (!p || perParticipantListeners.has(p)) return;
+      const handler = () => recompute();
+      p.on(ParticipantEvent.IsSpeakingChanged, handler);
+      perParticipantListeners.set(p, handler);
     };
-    const onActive = (_speakers: Participant[]) => recompute();
+    const onActive = () => recompute();
     const onConnected = (p: Participant) => { wire(p); recompute(); };
+    const onDisconnected = (p: Participant) => {
+      const h = perParticipantListeners.get(p);
+      if (h) { p.off(ParticipantEvent.IsSpeakingChanged, h); perParticipantListeners.delete(p); }
+      recompute();
+    };
 
     wire(room.localParticipant);
     room.remoteParticipants.forEach(wire);
     room.on(RoomEvent.ActiveSpeakersChanged, onActive);
     room.on(RoomEvent.ParticipantConnected, onConnected);
+    room.on(RoomEvent.ParticipantDisconnected, onDisconnected);
+    room.on(RoomEvent.TrackSubscribed, onActive);
     recompute();
 
     return () => {
       room.off(RoomEvent.ActiveSpeakersChanged, onActive);
       room.off(RoomEvent.ParticipantConnected, onConnected);
-      // Per-participant listeners detach automatically when participants
-      // disconnect; the WeakSet lets them be GC'd with the participant.
+      room.off(RoomEvent.ParticipantDisconnected, onDisconnected);
+      room.off(RoomEvent.TrackSubscribed, onActive);
+      perParticipantListeners.forEach((h, p) => p.off(ParticipantEvent.IsSpeakingChanged, h));
+      perParticipantListeners.clear();
     };
-  }, [room]);
+    // Re-run when the remote participant list or local participant changes
+    // so newly arrived hosts get per-participant listeners attached.
+  }, [room, remotes, localParticipant]);
 
   const set = useMemo(() => {
     const ids = new Set<string>();
