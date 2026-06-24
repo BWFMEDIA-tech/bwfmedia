@@ -59,7 +59,7 @@ export function SubmitToArenaModal({
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 overflow-hidden rounded-lg bg-white/5">
-              {song.cover_url && <img src={song.cover_url} alt="" className="h-full w-full object-cover" />}
+              {song.cover_url && <SignedImg src={song.cover_url} alt="" className="h-full w-full object-cover" />}
             </div>
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-wider text-fuchsia-400">Submit to Play Arena</div>

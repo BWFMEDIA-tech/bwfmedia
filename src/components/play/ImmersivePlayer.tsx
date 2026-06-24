@@ -22,6 +22,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
+import { SignedImg } from "@/components/ui/signed-img";
 
 /* ============================================================
    Brand palette (BWF):
@@ -599,7 +600,7 @@ export function ImmersivePlayer({
               isPlaying ? "scale-100" : "scale-95"
             }`}>
               {track?.cover_url ? (
-                <img src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
+                <SignedImg src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
               ) : (
                 <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
                   <Sparkles className="h-16 w-16 text-white/60" />
@@ -959,7 +960,7 @@ function QueueItem({
         <span className="w-5 text-center text-[11px] font-black text-white/40">{index + 1}</span>
       )}
       <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
-        {track.cover_url && <img src={track.cover_url} alt="" className="h-full w-full object-cover" />}
+        {track.cover_url && <SignedImg src={track.cover_url} alt="" className="h-full w-full object-cover" />}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1 truncate text-xs font-semibold">

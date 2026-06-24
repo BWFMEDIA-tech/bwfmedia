@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { useAuth } from "@/lib/auth-context";
 import { useStageGateway } from "@/lib/useStageGateway";
+import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/play/audience/$room")({
   head: () => ({
@@ -140,7 +141,7 @@ function AudiencePage() {
 
         <div className="mt-6 relative aspect-square w-full max-w-[320px] rounded-3xl overflow-hidden border-2 border-violet-500/40 shadow-[0_0_80px_-15px_rgba(139,92,246,0.7)] bg-gradient-to-br from-violet-700 to-blue-700">
           {playing?.cover_url ? (
-            <img src={playing.cover_url} alt={`${playing.title} cover`} className="h-full w-full object-cover" />
+            <SignedImg src={playing.cover_url} alt={`${playing.title} cover`} className="h-full w-full object-cover" />
           ) : (
             <div className="h-full w-full flex items-center justify-center">
               <Music className="h-20 w-20 text-white/40" />

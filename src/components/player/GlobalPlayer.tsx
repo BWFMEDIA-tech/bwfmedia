@@ -116,7 +116,7 @@ export function GlobalPlayer() {
       <div className="mx-auto flex max-w-[1600px] items-center gap-4 px-4 py-3 md:px-6">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-white/5">
-            {track?.coverUrl ? <img src={track.coverUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-white/30"><Mic2 className="h-5 w-5" /></div>}
+            {track?.coverUrl ? <SignedImg src={track.coverUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-white/30"><Mic2 className="h-5 w-5" /></div>}
           </div>
           <div className="min-w-0 block">
             <div className="truncate text-sm font-semibold text-white">{track?.title ?? "Nothing playing"}</div>

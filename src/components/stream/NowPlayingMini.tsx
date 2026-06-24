@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Music, Play, Pause, Volume2 } from "lucide-react";
 import { usePlayQueue } from "@/lib/usePlayQueue";
 import { RankBadge } from "@/components/rank/RankBadge";
+import { SignedImg } from "@/components/ui/signed-img";
 
 /**
  * Compact "Now Playing" strip that mirrors the Play Arena's currently-playing
@@ -41,7 +42,7 @@ export function NowPlayingMini({ streamId }: { streamId: string | null }) {
       <div className="flex items-center gap-3">
         <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-violet-500/40 bg-gradient-to-br from-violet-700 to-blue-700">
           {playing.cover_url ? (
-            <img src={playing.cover_url} alt="" className="h-full w-full object-cover" />
+            <SignedImg src={playing.cover_url} alt="" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <Music className="h-5 w-5 text-white/40" />

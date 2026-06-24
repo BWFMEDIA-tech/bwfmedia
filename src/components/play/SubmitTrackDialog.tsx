@@ -213,7 +213,7 @@ export function SubmitTrackDialog({
             />
             <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-md bg-black/50 flex items-center justify-center">
               {coverUrl ? (
-                <img src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
+                <SignedImg src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
               ) : (
                 <ImageIcon className="h-5 w-5 text-white/40" />
               )}
