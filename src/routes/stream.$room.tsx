@@ -55,7 +55,7 @@ function GuestPage() {
       .then((s: any) => {
         setStreamId(s?.id ?? null);
         if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage" | "play");
-        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id });
+        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id, started_at: (s as any).started_at ?? null });
       })
       .catch(() => {});
   }, [room]);
