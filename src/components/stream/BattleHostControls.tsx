@@ -8,6 +8,7 @@ import {
   type BattleEventType,
 } from "@/lib/battle-engine.functions";
 import { cn } from "@/lib/utils";
+import { SignedImg } from "@/components/ui/signed-img";
 
 /**
  * Pure control surface for the battle host. Renders buttons only and emits
@@ -243,7 +244,7 @@ function TrackPicker({
                 className="flex w-full items-center gap-3 rounded-lg border border-white/10 bg-black/30 p-2 text-left hover:bg-white/10"
               >
                 {t.cover_url ? (
-                  <img src={t.cover_url} alt="" className="h-10 w-10 rounded object-cover" />
+                  <SignedImg src={t.cover_url} alt="" className="h-10 w-10 rounded object-cover" />
                 ) : (
                   <div className="h-10 w-10 rounded bg-white/10" />
                 )}

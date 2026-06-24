@@ -3,6 +3,7 @@ import { Music, Play, Pause, Radio, Disc3, Swords, Volume2, Mic, Clock, Trophy }
 import { usePlayQueue } from "@/lib/usePlayQueue";
 import { supabase } from "@/integrations/supabase/client";
 import { RankBadge } from "@/components/rank/RankBadge";
+import { SignedImg } from "@/components/ui/signed-img";
 
 type Mode = "live" | "upload" | "battle-live" | "battle-pending" | "idle";
 
@@ -213,7 +214,7 @@ export function NowPlayingHeader({
         {/* Artwork */}
         <div className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl ring-2 ${badge.ring} bg-gradient-to-br ${badge.cls} ${badge.glow} sm:h-20 sm:w-20`}>
           {coverUrl ? (
-            <img src={coverUrl} alt="" className="h-full w-full object-cover" />
+            <SignedImg src={coverUrl} alt="" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <Music className="h-7 w-7 text-white/60" />
