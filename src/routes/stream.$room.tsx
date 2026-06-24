@@ -169,7 +169,7 @@ function GuestPage() {
 
   return (
     <div className="min-h-screen bg-[#050509] text-white p-4">
-      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_320px] lg:items-start">
+      <div className="mx-auto max-w-7xl grid gap-4 lg:grid-cols-[1fr_340px] lg:items-start">
         <div className="flex flex-col gap-4 min-w-0">
           {streamMode === "stage" && streamId && auth.user ? (
             <StageAudioShell
