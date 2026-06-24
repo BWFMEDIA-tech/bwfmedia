@@ -13,7 +13,7 @@ import { useStageState, type StageParticipant } from "@/lib/useStageState";
 import { AudienceRow } from "@/components/stream/StageRoom";
 import { StageRoom } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { CrowdPanel } from "@/components/stream/CrowdPanel";
+import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
