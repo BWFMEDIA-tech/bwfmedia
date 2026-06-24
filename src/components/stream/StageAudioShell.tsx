@@ -25,7 +25,6 @@ import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { StageReconnectBanner } from "./StageReconnectBanner";
 import { setRealtimeHealth } from "@/lib/realtime-health";
-import { SignedImg } from "@/components/ui/signed-img";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -121,7 +120,7 @@ export function StageAudioShell({
     return (
       <div className="rounded-2xl border border-white/5 bg-[#0d0d18] p-10 text-center">
         {me?.avatar_url ? (
-          <SignedImg
+          <img
             src={me.avatar_url}
             alt=""
             className="mx-auto mb-3 h-16 w-16 rounded-full border-2 border-[#8b5cf6] object-cover shadow-[0_0_24px_rgba(139,92,246,0.4)]"

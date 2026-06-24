@@ -28,7 +28,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions";
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { RankBadge } from "@/components/rank/RankBadge";
-import { SignedImg } from "@/components/ui/signed-img";
 
 // BWF Immersive Cinema palette
 const PURPLE = "#C53DFF";
@@ -310,7 +309,7 @@ export function LiveChat({
                 }}
               >
                 {c.avatar_url ? (
-                  <SignedImg
+                  <img
                     src={c.avatar_url}
                     alt=""
                     className="h-8 w-8 rounded-full border border-[#07070f] object-cover"

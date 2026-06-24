@@ -38,22 +38,7 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
         .select("id, display_name, stage_name, avatar_url, bio")
         .in("id", allIds)
     : { data: [] };
-
-  // Pre-sign private avatar URLs server-side so the client doesn't need to
-  // fire a `signAvatarUrl` POST per avatar after first paint.
-  const PUBLIC_MARKER = "/storage/v1/object/public/avatars/";
-  const PATH_RE = /^[0-9a-fA-F-]{8,}\/.+$/;
-  const signed = await Promise.all(
-    (profilesRes.data ?? []).map(async (p: any) => {
-      const raw: string | null = p.avatar_url ?? null;
-      if (!raw || !raw.includes(PUBLIC_MARKER)) return p;
-      const tail = raw.split(PUBLIC_MARKER)[1]?.split("?")[0] ?? "";
-      if (!PATH_RE.test(tail)) return p;
-      const { data: s } = await sb.storage.from("avatars").createSignedUrl(tail, 3600);
-      return s?.signedUrl ? { ...p, avatar_url: s.signedUrl } : p;
-    }),
-  );
-  const pmap = new Map(signed.map((p: any) => [p.id, p]));
+  const pmap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
 
   // Featured artists: profiles with bio + avatar, capped at 6.
   const featuredArtists = (artistIds

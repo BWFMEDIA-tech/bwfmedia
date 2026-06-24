@@ -28,7 +28,6 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { getHomepageData } from "@/lib/homepage.functions";
 import { CartButton } from "@/components/CartDrawer";
 import { PlayArenaIntro } from "@/components/site/PlayArenaIntro";
-import { SignedBackground } from "@/components/ui/signed-img";
 
 /* ---------- shared ---------- */
 
@@ -306,10 +305,13 @@ function Spotlight({ artists }: { artists: any[] }) {
                   params={{ id: a.id }}
                   className="group block relative rounded-2xl overflow-hidden border border-white/10 bg-[#0d0d18] hover:border-blood/50 transition-colors"
                 >
-                  <SignedBackground
+                  <div
                     className="aspect-[4/5] w-full bg-cover bg-center"
-                    src={a.avatar_url}
-                    fallbackBackground="linear-gradient(135deg, #2a0a10, #0d0d18)"
+                    style={{
+                      backgroundImage: a.avatar_url
+                        ? `url(${a.avatar_url})`
+                        : "linear-gradient(135deg, #2a0a10, #0d0d18)",
+                    }}
                   />
                   <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black via-black/80 to-transparent">
                     <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-blood mb-1">Featured Artist</div>

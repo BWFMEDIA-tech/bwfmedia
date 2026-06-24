@@ -27,7 +27,6 @@ import { useAuth } from "@/lib/auth-context";
 import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
 import { useCart } from "@/contexts/CartContext";
-import { SignedImg } from "@/components/ui/signed-img";
 
 function HeaderCartButton() {
   const { totalCount, openCart } = useCart();
@@ -257,7 +256,7 @@ export function SiteHeader() {
                   className="flex items-center gap-1.5 p-1 pr-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                 >
                   {auth.avatarUrl ? (
-                    <SignedImg src={auth.avatarUrl} alt={auth.displayName} className="w-8 h-8 rounded-full object-cover" />
+                    <img src={auth.avatarUrl} alt={auth.displayName} className="w-8 h-8 rounded-full object-cover" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-blood grid place-items-center text-white text-xs font-bold">
                       {auth.displayName?.charAt(0)?.toUpperCase() || "U"}
@@ -401,7 +400,7 @@ export function SiteHeader() {
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-3 px-1 py-2">
                       {auth.avatarUrl ? (
-                        <SignedImg src={auth.avatarUrl} alt={auth.displayName} className="w-9 h-9 rounded-full object-cover" />
+                        <img src={auth.avatarUrl} alt={auth.displayName} className="w-9 h-9 rounded-full object-cover" />
                       ) : (
                         <div className="w-9 h-9 rounded-full bg-blood grid place-items-center text-white text-sm font-bold">
                           {auth.displayName?.charAt(0)?.toUpperCase() || "U"}

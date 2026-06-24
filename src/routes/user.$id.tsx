@@ -2,7 +2,6 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/user/$id")({
   head: ({ params }) => ({
@@ -69,7 +68,7 @@ function PublicProfilePage() {
         <div className="flex flex-col items-center gap-6 text-center">
           <div className="relative aspect-square w-40 overflow-hidden rounded-full border-2 border-white/10 bg-gradient-to-br from-fuchsia-600/30 to-blue-600/30">
             {profile.avatar_url ? (
-              <SignedImg src={profile.avatar_url} alt={profile.display_name ?? "User"} className="absolute inset-0 h-full w-full object-cover" />
+              <img src={profile.avatar_url} alt={profile.display_name ?? "User"} className="absolute inset-0 h-full w-full object-cover" />
             ) : (
               <div className="absolute inset-0 grid place-items-center text-4xl font-black text-white/30">{initials || "?"}</div>
             )}

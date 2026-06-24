@@ -5,7 +5,6 @@ import { Users, Radio, DollarSign, ShoppingBag, ArrowUp, ArrowDown, Activity, Ey
 import { useAuth } from "@/lib/auth-context";
 import { PageHeader, Card, EmptyState } from "@/components/admin/AdminShell";
 import { getAdminOverview } from "@/lib/admin-overview.functions";
-import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({ meta: [{ title: "Dashboard — Admin" }, { name: "robots", content: "noindex" }] }),
@@ -170,7 +169,7 @@ function Stat({ icon: Icon, color, label, value, delta, loading }: { icon: any; 
 function Avatar({ url, name }: { url?: string | null; name?: string | null }) {
   const initials = (name || "?").split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
   return url ? (
-    <SignedImg src={url} alt="" className="h-9 w-9 rounded-full object-cover" />
+    <img src={url} alt="" className="h-9 w-9 rounded-full object-cover" />
   ) : (
     <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-violet-500 text-xs font-bold">
       {initials}

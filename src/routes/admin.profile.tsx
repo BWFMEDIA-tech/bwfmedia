@@ -7,7 +7,6 @@ import { Mail, Calendar, CheckCircle2, Users, Radio, DollarSign, ShoppingBag, Ar
 import { useAuth } from "@/lib/auth-context";
 import { PageHeader, Card } from "@/components/admin/AdminShell";
 import { getAdminProfile, updateAdminProfile, getAdminOverview } from "@/lib/admin-overview.functions";
-import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/admin/profile")({
   head: () => ({ meta: [{ title: "Admin Profile — BWF Network" }, { name: "robots", content: "noindex" }] }),
@@ -205,7 +204,7 @@ function Mini({ icon: Icon, color, label, value }: { icon: any; color: string; l
 function Avatar({ url, name, size }: { url?: string | null; name: string; size: number }) {
   const initials = (name || "?").split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
   return url ? (
-    <SignedImg src={url} alt="" style={{ width: size, height: size }} className="rounded-full border-2 border-blue-500/60 object-cover" />
+    <img src={url} alt="" style={{ width: size, height: size }} className="rounded-full border-2 border-blue-500/60 object-cover" />
   ) : (
     <div style={{ width: size, height: size }} className="grid place-items-center rounded-full border-2 border-blue-500/60 bg-gradient-to-br from-blue-500 to-violet-500 text-2xl font-bold">
       {initials}

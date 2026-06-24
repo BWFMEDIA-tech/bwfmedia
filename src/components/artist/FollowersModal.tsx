@@ -5,7 +5,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { listArtistFollowers } from "@/lib/artist-follows.functions";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
-import { SignedImg } from "@/components/ui/signed-img";
 
 const PAGE_SIZE = 20;
 
@@ -85,7 +84,7 @@ export function FollowersModal({
                     >
                       <div className="h-9 w-9 rounded-full overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 grid place-items-center text-xs font-bold shrink-0">
                         {f.avatarUrl ? (
-                          <SignedImg src={f.avatarUrl} alt="" className="h-full w-full object-cover" />
+                          <img src={f.avatarUrl} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <span>{initials}</span>
                         )}

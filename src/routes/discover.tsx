@@ -17,7 +17,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import discoverHero from "@/assets/discover-hero.jpg";
 import { getHomepageData } from "@/lib/homepage.functions";
-import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
@@ -112,7 +111,7 @@ function ArtistAvatar({ name, role, src }: { name: string; role: string; src?: s
     <div className="flex flex-col items-center text-center">
       <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blood/40 bg-gradient-to-br from-[#2a0a10] to-[#0d0d18]">
         {src ? (
-          <SignedImg src={src} alt={name} className="w-full h-full object-cover" loading="lazy" />
+          <img src={src} alt={name} className="w-full h-full object-cover" loading="lazy" />
         ) : null}
       </div>
       <div className="mt-2 font-cond font-bold text-[11px] uppercase tracking-wider text-bone">

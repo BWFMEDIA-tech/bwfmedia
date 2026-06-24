@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface PlayTrack {
@@ -25,10 +25,6 @@ export function usePlayQueue(streamId: string | null) {
   useEffect(() => {
     if (!streamId) { setTracks([]); setLoading(false); return; }
     let cancelled = false;
-    // Coalesce realtime bursts: a vote-storm during a peak moment can
-    // fire dozens of events per second. Without this, every event
-    // triggers a full queue re-fetch and a top-level re-render.
-    let pending: ReturnType<typeof setTimeout> | null = null;
     const refresh = async () => {
       const { data } = await supabase
         .from("play_tracks")
@@ -42,39 +38,13 @@ export function usePlayQueue(streamId: string | null) {
         setLoading(false);
       }
     };
-    const schedule = () => {
-      if (pending) return;
-      pending = setTimeout(() => {
-        pending = null;
-        void refresh();
-      }, 250);
-    };
     refresh();
-    // Unique channel name per hook instance. Reusing a stable name
-    // collides with already-subscribed channels (StrictMode double-mount
-    // or multiple consumers of the same streamId), which causes Supabase
-    // to warn "cannot add postgres_changes callbacks ... after subscribe()"
-    // and silently drop the listener.
     const ch = supabase
-      .channel(`play-tracks:${streamId}:${Math.random().toString(36).slice(2, 10)}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` },
-        schedule,
-      )
-      // PERF: vote feed used to subscribe to EVERY play_votes row in the
-      // database (no filter). On a busy platform with many concurrent
-      // streams that is the single largest contributor to CPU + battery
-      // burn on viewer devices. Drop it entirely — play_tracks already
-      // carries the rolled-up like_count / dislike_count / score
-      // columns, and a vote trigger updates those, so the play_tracks
-      // UPDATE feed above already covers vote-driven UI changes.
+      .channel(`play-tracks-${streamId}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "play_votes" }, refresh)
       .subscribe();
-    return () => {
-      cancelled = true;
-      if (pending) clearTimeout(pending);
-      supabase.removeChannel(ch);
-    };
+    return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [streamId]);
 
   const playing = tracks.find((t) => t.status === "playing") ?? null;
@@ -89,10 +59,8 @@ export function usePlayQueue(streamId: string | null) {
 
 export function useMyVote(trackId: string | null, userId: string | null) {
   const [value, setValue] = useState<0 | 1 | -1>(0);
-  const lastRef = useRef<{ trackId: string; userId: string } | null>(null);
   useEffect(() => {
     if (!trackId || !userId) { setValue(0); return; }
-    lastRef.current = { trackId, userId };
     let cancelled = false;
     const refresh = async () => {
       const { data } = await supabase
@@ -103,13 +71,11 @@ export function useMyVote(trackId: string | null, userId: string | null) {
       if (!cancelled) setValue(((data as any)?.value ?? 0) as 0 | 1 | -1);
     };
     refresh();
-    // Filter to this user's own row only — listening to every vote on
-    // the track is wasted bandwidth when we only care about our own.
     const ch = supabase
-      .channel(`my-vote:${trackId}:${userId}:${Math.random().toString(36).slice(2, 10)}`)
+      .channel(`my-vote-${trackId}-${userId}-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", {
         event: "*", schema: "public", table: "play_votes",
-        filter: `user_id=eq.${userId}`,
+        filter: `track_id=eq.${trackId}`,
       }, refresh)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };

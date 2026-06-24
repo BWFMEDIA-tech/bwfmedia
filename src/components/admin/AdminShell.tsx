@@ -6,7 +6,6 @@ import {
   LogOut, User as UserIcon, Crown, Music2, Video, Mic2, Sparkles, ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { SignedImg } from "@/components/ui/signed-img";
 
 type Leaf = { to: string; label: string; search?: Record<string, string> };
 type NavEntry =
@@ -276,7 +275,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 function Avatar({ url, name, size = 36 }: { url: string | null; name: string; size?: number }) {
   const initials = (name || "A").split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
   return url ? (
-    <SignedImg src={url} alt="" style={{ width: size, height: size }} className="rounded-full object-cover" />
+    <img src={url} alt="" style={{ width: size, height: size }} className="rounded-full object-cover" />
   ) : (
     <div
       style={{ width: size, height: size }}
