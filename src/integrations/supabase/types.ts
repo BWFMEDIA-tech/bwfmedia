@@ -2865,6 +2865,27 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
       web_push_subscriptions: {
         Row: {
           auth: string
@@ -3122,6 +3143,7 @@ export type Database = {
       }
       get_user_rank: { Args: { _user_id: string }; Returns: string }
       get_user_xp: { Args: { _user_id: string }; Returns: number }
+      get_waitlist_count: { Args: never; Returns: number }
       grant_boost_credits_purchase: {
         Args: {
           _credits: number
