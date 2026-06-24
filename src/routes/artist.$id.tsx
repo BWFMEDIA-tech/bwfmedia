@@ -478,7 +478,7 @@ function TrackRowImpl({
         aria-label={isPlaying ? `Pause ${title}` : `Play ${title}`}
         className="relative h-9 w-9 rounded overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 disabled:opacity-50"
       >
-        {coverUrl && <img src={coverUrl} alt="" className="h-full w-full object-cover" />}
+        {coverUrl && <SignedImg src={coverUrl} alt="" className="h-full w-full object-cover" />}
         {audioUrl && (
           <span className={`absolute inset-0 flex items-center justify-center bg-black/55 transition-opacity ${isPlaying ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
             {isPlaying
