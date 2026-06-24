@@ -491,7 +491,7 @@ export function useStreamSpotlight(streamId: string | undefined): string | null 
 
     // Unique channel per hook instance so multiple subscribers never share a
     // channel that has already been subscribed.
-    const channelName = `spotlight-${streamId}-${crypto.randomUUID()}`;
+    const channelName = `spotlight-${streamId}-${(crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)}`;
     const channel = supabase.channel(channelName);
 
     // Register postgres_changes callback BEFORE calling subscribe().
