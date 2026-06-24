@@ -19,7 +19,7 @@ export function BoostCheckoutModal({
     return res.clientSecret;
   };
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 backdrop-blur-md bg-black/70">
+    <div className="fixed inset-0 z-[100] flex items-start sm:items-center justify-center overflow-y-auto p-2 sm:p-4 backdrop-blur-md bg-black/70">
       {/* Ambient brand glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#C53DFF]/30 blur-3xl" />
@@ -28,8 +28,8 @@ export function BoostCheckoutModal({
       </div>
 
       {/* Gradient border wrapper */}
-      <div className="relative w-full max-w-xl rounded-3xl p-[1.5px] bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] shadow-[0_20px_80px_-10px_rgba(197,61,255,0.5)]">
-        <div className="relative rounded-[calc(1.5rem-1.5px)] bg-[#08080F] overflow-hidden">
+      <div className="relative w-full max-w-xl my-auto rounded-3xl p-[1.5px] bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] shadow-[0_20px_80px_-10px_rgba(197,61,255,0.5)]">
+        <div className="relative rounded-[calc(1.5rem-1.5px)] bg-[#08080F] overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)]">
           {/* Branded header */}
           <div className="relative flex items-center justify-between px-5 py-4 border-b border-white/5 bg-gradient-to-r from-[#C53DFF]/10 via-transparent to-[#00E6FF]/10">
             <div className="flex items-center gap-3">
@@ -59,7 +59,7 @@ export function BoostCheckoutModal({
           </div>
 
           {/* Stripe iframe — Stripe controls its own styling. */}
-          <div className="bg-white">
+          <div className="bg-white flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
               <EmbeddedCheckout />
             </EmbeddedCheckoutProvider>
