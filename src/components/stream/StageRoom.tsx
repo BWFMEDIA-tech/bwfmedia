@@ -50,6 +50,7 @@ export function StageRoom({
   selfProfile,
   primaryHostId,
   hostTransferMode = "co_host",
+  spotlightUserId,
 }: {
   streamId: string | null;
   participants: StageParticipant[];
@@ -57,6 +58,7 @@ export function StageRoom({
   selfProfile?: { user_id: string; display_name?: string | null; avatar_url?: string | null } | null;
   primaryHostId?: string | null;
   hostTransferMode?: "co_host" | "transfer";
+  spotlightUserId?: string | null;
 }) {
   const setRole = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
@@ -64,6 +66,7 @@ export function StageRoom({
   const revoke = useServerFn(revokeHostPrivileges);
   const demoteSrv = useServerFn(demoteToAudience);
   const muteFn = useServerFn(setParticipantMute);
+  const setSpotlight = useServerFn(setStreamSpotlight);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
   const [confirm, setConfirm] = useState<null | {
     title: string;
