@@ -3109,6 +3109,8 @@ export type Database = {
           tips_cents: number
         }[]
       }
+      get_my_profile_interests: { Args: never; Returns: string[] }
+      get_my_profile_last_seen_at: { Args: never; Returns: string }
       get_my_profile_location: { Args: never; Returns: string }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }
