@@ -474,12 +474,14 @@ function SpeakerBubble({
   isPrimaryHost = false,
   isSelf = false,
   hostTransferMode = "co_host",
+  spotlightUserId,
   onPromote,
   onDemote,
   onRevoke,
   onKick,
   onDemoteToAudience,
   onToggleMute,
+  onSpotlight,
 }: {
   p: StageParticipant;
   kind: "host" | "co_host" | "speaker";
@@ -487,12 +489,14 @@ function SpeakerBubble({
   isPrimaryHost?: boolean;
   isSelf?: boolean;
   hostTransferMode?: "co_host" | "transfer";
+  spotlightUserId?: string | null;
   onPromote?: (mode: "host" | "co_host" | "transfer") => void;
   onDemote?: () => void;
   onRevoke?: () => void;
   onKick?: () => void;
   onDemoteToAudience?: () => void;
   onToggleMute?: () => void;
+  onSpotlight?: (currentlyPinned: boolean) => void;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;
   const connected = useConnectedIdentities();
@@ -510,6 +514,7 @@ function SpeakerBubble({
     (dbStatus === "reconnecting" ||
       (hasLiveKitContext && dbStatus === "connected" && !isConnected));
   const isDisconnected = dbStatus === "disconnected";
+  const isSpotlight = spotlightUserId === p.user_id;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
