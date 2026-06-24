@@ -13,3 +13,25 @@ export const SignedImg = React.forwardRef<
   return <img ref={ref} src={typeof src === "string" ? resolved : src} {...props} />;
 });
 SignedImg.displayName = "SignedImg";
+
+type SignedBackgroundProps = React.HTMLAttributes<HTMLDivElement> & {
+  src?: string | null;
+  fallbackBackground?: string;
+};
+
+export const SignedBackground = React.forwardRef<HTMLDivElement, SignedBackgroundProps>(
+  ({ src, fallbackBackground, style, ...props }, ref) => {
+    const resolved = useSignedAvatarUrl(src ?? undefined);
+    return (
+      <div
+        ref={ref}
+        style={{
+          ...style,
+          backgroundImage: resolved ? `url(${resolved})` : fallbackBackground,
+        }}
+        {...props}
+      />
+    );
+  },
+);
+SignedBackground.displayName = "SignedBackground";
