@@ -36,7 +36,7 @@ function GuestPage() {
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
-  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string } | null>(null);
+  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
 
