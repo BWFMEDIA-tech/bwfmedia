@@ -50,10 +50,13 @@ export function usePlayQueue(streamId: string | null) {
       }, 250);
     };
     refresh();
-    // Stable channel name per stream — multiple mounts coalesce on one
-    // channel instead of opening a new one every time React re-renders.
+    // Unique channel name per hook instance. Reusing a stable name
+    // collides with already-subscribed channels (StrictMode double-mount
+    // or multiple consumers of the same streamId), which causes Supabase
+    // to warn "cannot add postgres_changes callbacks ... after subscribe()"
+    // and silently drop the listener.
     const ch = supabase
-      .channel(`play-tracks:${streamId}`)
+      .channel(`play-tracks:${streamId}:${Math.random().toString(36).slice(2, 10)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` },
@@ -103,7 +106,7 @@ export function useMyVote(trackId: string | null, userId: string | null) {
     // Filter to this user's own row only — listening to every vote on
     // the track is wasted bandwidth when we only care about our own.
     const ch = supabase
-      .channel(`my-vote:${trackId}:${userId}`)
+      .channel(`my-vote:${trackId}:${userId}:${Math.random().toString(36).slice(2, 10)}`)
       .on("postgres_changes", {
         event: "*", schema: "public", table: "play_votes",
         filter: `user_id=eq.${userId}`,
