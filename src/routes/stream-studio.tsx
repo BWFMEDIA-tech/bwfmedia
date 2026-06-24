@@ -727,6 +727,7 @@ function StreamStudio() {
   const [stageLocked, setStageLocked] = useState(false);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
+  const spotlightUserId = useStreamSpotlight(stream?.id ?? undefined);
   const [thumbOpen, setThumbOpen] = useState(false);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
