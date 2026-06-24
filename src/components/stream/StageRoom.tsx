@@ -714,6 +714,18 @@ function SpeakerBubble({
               )}
               {(kind === "host" || kind === "co_host") && (
                 <>
+                  {onSpotlight && (
+                    <MenuItem
+                      icon={isSpotlight ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onSpotlight(isSpotlight);
+                      }}
+                    >
+                      {isSpotlight ? "Remove from video box" : "Bring to video box"}
+                    </MenuItem>
+                  )}
+                  {onSpotlight && <MenuDivider />}
                   {kind === "co_host" && onPromote && (
                     <MenuItem
                       icon={<Crown className="h-3.5 w-3.5" />}
