@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Headphones, Loader2, Rocket, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { listLiveArenas, submitSongToArena } from "@/lib/play-arena-submissions.functions";
+import { SignedImg } from "@/components/ui/signed-img";
 
 type Priority = "standard" | "boosted" | "featured";
 

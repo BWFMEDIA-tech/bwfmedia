@@ -8,6 +8,7 @@ import {
   type BattleEventType,
 } from "@/lib/battle-engine.functions";
 import { cn } from "@/lib/utils";
+import { SignedImg } from "@/components/ui/signed-img";
 
 /**
  * Pure control surface for the battle host. Renders buttons only and emits

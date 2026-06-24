@@ -7,6 +7,7 @@ import { usePlayer } from "@/lib/player-context";
 import { SettingsShell, Card } from "@/components/settings/SettingsShell";
 import { toast } from "sonner";
 import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
+import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/settings/music-media")({ component: MusicMediaPage });
 

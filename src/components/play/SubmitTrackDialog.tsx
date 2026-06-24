@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { submitPlayTrack } from "@/lib/play.functions";
 import { signPlayAudioUrl } from "@/lib/play-audio.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const MAX_BYTES = 50 * 1024 * 1024; // 50 MB
 const MAX_COVER_BYTES = 8 * 1024 * 1024; // 8 MB

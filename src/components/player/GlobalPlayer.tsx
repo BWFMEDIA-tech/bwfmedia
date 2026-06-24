@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { toggleTrackLike } from "@/lib/track-likes.functions";
 import { useQueryClient } from "@tanstack/react-query";
+import { SignedImg } from "@/components/ui/signed-img";
 
 function fmt(sec: number) {
   if (!isFinite(sec) || sec <= 0) return "0:00";
