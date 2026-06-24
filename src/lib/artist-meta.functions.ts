@@ -50,10 +50,33 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const genres: string[] = Array.isArray(p.genres) ? p.genres : [];
       const genre = (p.genre as string | null) ?? (genres[0] ?? null);
 
+      // Pre-sign private avatar-bucket URLs server-side so the client
+      // doesn't fire a `signAvatarUrl` POST per image after first paint.
+      const PUBLIC_MARKER = "/storage/v1/object/public/avatars/";
+      const PATH_RE = /^[0-9a-fA-F-]{8,}\/.+$/;
+      const presign = async (raw: string | null): Promise<string | null> => {
+        if (!raw || !raw.includes(PUBLIC_MARKER)) return raw;
+        const tail = raw.split(PUBLIC_MARKER)[1]?.split("?")[0] ?? "";
+        if (!PATH_RE.test(tail)) return raw;
+        const { data: s } = await sb.storage.from("avatars").createSignedUrl(tail, 3600);
+        return s?.signedUrl ?? raw;
+      };
+
+      const rawPhoto = (p.avatar_url as string | null) ?? (q.photo_url as string | null) ?? null;
+      const rawBanner = (p.banner_url as string | null) ?? null;
+      const trackList = (trackListRes.data ?? []) as Array<any>;
+
+      const [photoSigned, bannerSigned, trackCovers] = await Promise.all([
+        presign(rawPhoto),
+        presign(rawBanner),
+        Promise.all(trackList.map((t) => presign(t.cover_url ?? null))),
+      ]);
+      const tracksSigned = trackList.map((t, i) => ({ ...t, cover_url: trackCovers[i] }));
+
       return {
         name: (p.stage_name as string | null) ?? (p.display_name as string | null) ?? (q.artist_name as string | null) ?? null,
-        photo: (p.avatar_url as string | null) ?? (q.photo_url as string | null) ?? null,
-        banner: (p.banner_url as string | null) ?? null,
+        photo: photoSigned,
+        banner: bannerSigned,
         bio: (p.bio as string | null) ?? null,
         location: (p.location as string | null) ?? null,
         genre,
@@ -65,7 +88,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           tipsCents,
         },
         socials: (socialsRes.data ?? []) as Array<{ provider: string; url: string; handle: string | null }>,
-        tracks: (trackListRes.data ?? []) as Array<{
+        tracks: tracksSigned as Array<{
           id: string; title: string; cover_url: string | null;
           like_count: number; dislike_count: number; play_count: number;
           duration_seconds: number | null; created_at: string;
