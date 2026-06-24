@@ -6,6 +6,7 @@ import { getAudiencePlayState } from "@/lib/play-audience.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { useAuth } from "@/lib/auth-context";
+import { useStageGateway } from "@/lib/useStageGateway";
 
 export const Route = createFileRoute("/play/audience/$room")({
   head: () => ({
@@ -51,31 +52,57 @@ function AudiencePage() {
   );
   useEffect(() => { refresh(); }, [refresh]);
 
-  // Realtime: refresh when tracks or sessions change for this stream.
-  useEffect(() => {
-    const streamId = state?.stream.id;
-    if (!streamId) return;
-    const ch = supabase
-      .channel(`audience-play-${streamId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` }, refresh)
-      .on("postgres_changes", { event: "*", schema: "public", table: "play_sessions", filter: `stream_id=eq.${streamId}` }, refresh)
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [state?.stream.id, refresh]);
+  // PERF: replace the old multi-table postgres_changes subscription with
+  // the role-aware Stage Gateway. As a "viewer" the gateway only listens
+  // for now-playing flips and coalesces bursts; it never opens a vote
+  // feed. That alone removes the largest source of CPU/battery burn on
+  // the audience page during a busy show.
+  useStageGateway({
+    snapshot: state
+      ? {
+          stream: {
+            id: state.stream.id,
+            title: state.stream.title,
+            roomName: state.stream.roomName,
+            status: state.stream.status,
+            mode: state.stream.mode,
+            hostId: null,
+          },
+          playing: state.playing as never,
+          queue: [],
+          votes: {},
+          audienceCount: listeners,
+        }
+      : null,
+    role: "viewer",
+    onRefresh: refresh,
+  });
 
-  // Presence: track audience headcount per stream.
+  // Presence: track audience headcount per stream. Heartbeat every 15 s
+  // (was every render); presence-sync only updates the count.
   useEffect(() => {
     const streamId = state?.stream.id;
     if (!streamId) return;
     const key = `anon-${Math.random().toString(36).slice(2, 10)}`;
-    const ch = supabase.channel(`audience-presence-${streamId}`, { config: { presence: { key } } });
+    const ch = supabase.channel(`audience-presence:${streamId}`, { config: { presence: { key } } });
+    let beat: ReturnType<typeof setInterval> | null = null;
     ch.on("presence", { event: "sync" }, () => {
       const s = ch.presenceState() as Record<string, unknown>;
       setListeners(Object.keys(s).length || 1);
     }).subscribe(async (status) => {
-      if (status === "SUBSCRIBED") await ch.track({ at: Date.now() });
+      if (status === "SUBSCRIBED") {
+        await ch.track({ at: Date.now() });
+        // Refresh our presence entry every 15 s so we don't get GC'd
+        // by the server, without flooding with per-keystroke pings.
+        beat = setInterval(() => {
+          void ch.track({ at: Date.now() });
+        }, 15_000);
+      }
     });
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      if (beat) clearInterval(beat);
+      supabase.removeChannel(ch);
+    };
   }, [state?.stream.id]);
 
   const playing = state?.playing ?? null;
