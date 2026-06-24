@@ -475,7 +475,7 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
  * Real-time hook: returns the current spotlighted user id for the stream,
  * or null. Updates instantly when a host pins/unpins via Postgres realtime.
  */
-function useStreamSpotlight(streamId: string | undefined): string | null {
+export function useStreamSpotlight(streamId: string | undefined): string | null {
   const [uid, setUid] = useState<string | null>(null);
   useEffect(() => {
     if (!streamId) { setUid(null); return; }
