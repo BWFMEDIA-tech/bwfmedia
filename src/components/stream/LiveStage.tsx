@@ -506,20 +506,23 @@ function getSpotlightStore(streamId: string): SpotlightStore {
       }
     });
 
-    supabase
-      .from("streams")
-      .select("spotlight_user_id")
-      .eq("id", streamId)
-      .maybeSingle()
-      .then(({ data }) => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("streams")
+          .select("spotlight_user_id")
+          .eq("id", streamId)
+          .maybeSingle();
         const live = spotlightStores.get(streamId);
         if (!live || live !== store) return;
         const next = (data as any)?.spotlight_user_id ?? null;
         if (live.current === next) return;
         live.current = next;
         live.listeners.forEach((cb) => cb());
-      })
-      .catch((err) => console.error("[useStreamSpotlight] initial fetch failed:", err));
+      } catch (err) {
+        console.error("[useStreamSpotlight] initial fetch failed:", err);
+      }
+    })();
   }
   return store;
 }
