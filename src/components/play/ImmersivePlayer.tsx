@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Heart, Share2,
@@ -20,6 +20,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
+import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
+import { useRenderActive } from "@/lib/useRenderActive";
 
 /* ============================================================
    Brand palette (BWF):
@@ -42,41 +44,17 @@ type VisMode = "ring" | "bars" | "particles";
    nudge the GainNode toward a target loudness so loud and quiet tracks play
    at a consistent perceived level. */
 function useAudioGraph(audioRef: React.RefObject<HTMLAudioElement | null>) {
-  const ctxRef = useRef<AudioContext | null>(null);
+  // PERF: single shared AudioContext + MediaElementSource across every
+  // component that wants to read this audio element. See
+  // src/lib/useSharedAudioGraph.ts for the rationale.
+  const graph = useSharedAudioGraph(audioRef);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const gainRef = useRef<GainNode | null>(null);
-  const srcRef = useRef<MediaElementAudioSourceNode | null>(null);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || srcRef.current) return;
-    try {
-      const AC: typeof AudioContext =
-        (window.AudioContext as any) || (window as any).webkitAudioContext;
-      if (!AC) return;
-      const ctx = new AC();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 1024;
-      analyser.smoothingTimeConstant = 0.82;
-      const gain = ctx.createGain();
-      gain.gain.value = 1;
-      const src = ctx.createMediaElementSource(audio);
-      src.connect(analyser);
-      analyser.connect(gain);
-      gain.connect(ctx.destination);
-      ctxRef.current = ctx;
-      analyserRef.current = analyser;
-      gainRef.current = gain;
-      srcRef.current = src;
-    } catch {
-      /* already wired or CORS — visualizer will idle-pulse */
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioRef.current]);
-
-  const resume = () => {
-    if (ctxRef.current?.state === "suspended") ctxRef.current.resume().catch(() => {});
-  };
+  const ctxRef = useRef<AudioContext | null>(null);
+  analyserRef.current = graph?.analyser ?? null;
+  gainRef.current = graph?.gain ?? null;
+  ctxRef.current = graph?.ctx ?? null;
+  const resume = () => resumeSharedAudio();
   return { analyserRef, gainRef, ctxRef, resume };
 }
 
@@ -146,7 +124,7 @@ function useNormalizer({
 }
 
 /* ---------- Visualizer ---------- */
-function LiveVisualizer({
+function LiveVisualizerImpl({
   analyserRef,
   mode,
   isPlaying,
@@ -158,12 +136,19 @@ function LiveVisualizer({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const tRef = useRef(0);
+  const active = useRenderActive(canvasRef);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx2d = canvas.getContext("2d");
     if (!ctx2d) return;
+    // PERF: skip the rAF loop entirely when the canvas isn't visible
+    // or the device is in a low-power state.
+    if (!active) {
+      ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const resize = () => {
       const r = canvas.getBoundingClientRect();
@@ -272,10 +257,13 @@ function LiveVisualizer({
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [analyserRef, mode, isPlaying]);
+  }, [analyserRef, mode, isPlaying, active]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />;
 }
+
+/** Memoized to avoid re-render on every parent state tick. */
+const LiveVisualizer = memo(LiveVisualizerImpl);
 
 /* ---------- Listener count (stage_participants realtime) ---------- */
 function useLiveListenerCount(streamId: string | null) {
