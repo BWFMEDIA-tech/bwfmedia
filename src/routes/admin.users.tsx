@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { listUsers, assignRole, removeRole } from "@/lib/admin-users.functions";
 import { toast } from "sonner";
 import { Users, ArrowLeft, Plus, X, Search } from "lucide-react";
+import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/admin/users")({
   head: () => ({
@@ -158,7 +159,7 @@ function AdminUsersPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {u.avatar_url ? (
-                        <img src={u.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                        <SignedImg src={u.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
                       ) : (
                         <div className="h-8 w-8 rounded-full bg-white/10" />
                       )}

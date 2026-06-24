@@ -7,6 +7,7 @@ import { deleteStream } from "@/lib/streams.functions";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { SignedImg } from "@/components/ui/signed-img";
 
 type LiveStream = {
   id: string;
@@ -121,7 +122,7 @@ function LivePage() {
                   <h3 className="font-bold text-white line-clamp-2">{s.title}</h3>
                   <div className="mt-3 flex items-center gap-2">
                     {s.host?.avatar_url ? (
-                      <img src={s.host.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+                      <SignedImg src={s.host.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
                     ) : (
                       <div className="h-7 w-7 rounded-full bg-gradient-to-br from-violet-500 to-blue-500" />
                     )}

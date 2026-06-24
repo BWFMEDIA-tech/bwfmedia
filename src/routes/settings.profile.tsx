@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/settings/profile")({
   component: ProfileSettingsPage,
@@ -152,7 +153,7 @@ function ProfileSettingsPage() {
           <Field title="Profile Photo" hint="This is your profile image">
             <div className="flex items-center gap-4">
               <div className="relative h-20 w-20 cursor-pointer overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-red-600/30 to-purple-600/30" onClick={() => avatarInput.current?.click()}>
-                {(avatarPreview || avatarUrl) ? <img src={avatarPreview || avatarUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-xl font-black text-white/30">{initials || "?"}</div>}
+                {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-xl font-black text-white/30">{initials || "?"}</div>}
                 <div className="absolute -bottom-0 -right-0 grid h-6 w-6 place-items-center rounded-full bg-red-600 text-white"><Camera className="h-3 w-3" /></div>
               </div>
               <button onClick={() => avatarInput.current?.click()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"><Upload className="h-4 w-4" /> Upload New Photo</button>
@@ -221,7 +222,7 @@ function ProfileSettingsPage() {
             <div className="mt-3 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-white/10 bg-black/40">
                 {brandAvatarUrl
-                  ? <img src={brandAvatarUrl} alt="" className="h-full w-full object-cover" />
+                  ? <SignedImg src={brandAvatarUrl} alt="" className="h-full w-full object-cover" />
                   : <Sparkles className="h-4 w-4 text-red-400" />}
               </div>
               <div className="min-w-0">
@@ -342,7 +343,7 @@ function ProfileSettingsPage() {
             {(bannerPreview || bannerUrl) ? <img src={bannerPreview || bannerUrl} className="absolute inset-0 h-full w-full object-cover" alt="" /> : <div className="absolute inset-0 bg-gradient-to-br from-red-600/30 to-purple-600/30" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 h-20 w-20 overflow-hidden rounded-full border-4 border-[#0a0a0a] bg-black">
-              {(avatarPreview || avatarUrl) ? <img src={avatarPreview || avatarUrl} className="h-full w-full object-cover" alt="" /> : <div className="grid h-full w-full place-items-center text-2xl font-black text-white/40">{initials}</div>}
+              {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} className="h-full w-full object-cover" alt="" /> : <div className="grid h-full w-full place-items-center text-2xl font-black text-white/40">{initials}</div>}
               <div className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-red-600 text-white"><CheckCircle2 className="h-3 w-3" /></div>
             </div>
           </div>
