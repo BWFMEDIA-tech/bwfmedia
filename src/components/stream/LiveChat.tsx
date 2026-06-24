@@ -156,7 +156,7 @@ export function LiveChat({
 
   // Live duration ticker
   useEffect(() => {
-    if (!startedAt) { setDurationLabel("00:00"); return; }
+    if (!streamId || !startedAt) { setDurationLabel("00:00"); return; }
     const tick = () => {
       const ms = Date.now() - new Date(startedAt).getTime();
       const s = Math.max(0, Math.floor(ms / 1000));
@@ -172,7 +172,7 @@ export function LiveChat({
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [startedAt]);
+  }, [streamId, startedAt]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
