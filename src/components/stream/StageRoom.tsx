@@ -192,6 +192,21 @@ export function StageRoom({
     }
   };
 
+  const doSpotlight = async (uid: string, name: string, currentlyPinned: boolean) => {
+    if (!streamId) return;
+    try {
+      await setSpotlight({
+        data: {
+          streamId,
+          targetUserId: currentlyPinned ? null : uid,
+        },
+      });
+      toast.success(currentlyPinned ? `${name ?? "Guest"} removed from video box` : `${name ?? "Guest"} moved to video box`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
   return (
     <div
       className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
