@@ -1022,6 +1022,7 @@ function StreamStudio() {
                       canManage
                       primaryHostId={auth.user.id}
                       hostTransferMode={hostTransferMode}
+                      spotlightUserId={spotlightUserId}
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
                     {streamMode !== "play" && (
