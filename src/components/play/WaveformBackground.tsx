@@ -1,11 +1,17 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
+import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
+import { useRenderActive } from "@/lib/useRenderActive";
 
 /**
  * Live audio-reactive waveform that sits behind album art.
- * Hooks into an existing <audio> element via a shared ref so it stays in
- * sync with the global player state (no separate audio element).
+ * Hooks into the SHARED audio graph singleton — never spins up its own
+ * AudioContext or MediaElementSource (which would silently fail or, on
+ * older browsers, spawn a duplicate context per tab → big CPU hit).
+ * Pauses its render loop entirely when the tab is hidden, the canvas
+ * is off-screen, the user prefers reduced motion, or the connection
+ * is in `saveData` mode.
  */
-export function WaveformBackground({
+function WaveformBackgroundImpl({
   audioRef,
   isPlaying,
   trackKey,
@@ -17,49 +23,14 @@ export function WaveformBackground({
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const ctxRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const rafRef = useRef<number | null>(null);
   const intensityRef = useRef(0);
-
-  // Wire the audio element into a single AudioContext + Analyser.
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (sourceRef.current) return; // already wired for this element
-
-    try {
-      const AC: typeof AudioContext =
-        (window.AudioContext as any) || (window as any).webkitAudioContext;
-      if (!AC) return;
-      const ctx = new AC();
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.85;
-      const source = ctx.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(ctx.destination);
-      ctxRef.current = ctx;
-      analyserRef.current = analyser;
-      sourceRef.current = source;
-    } catch {
-      // createMediaElementSource throws if already wired or on CORS-tainted media;
-      // we fall back to a silent visualizer that still fades with isPlaying.
-    }
-
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioRef.current]);
+  const graph = useSharedAudioGraph(audioRef);
+  const active = useRenderActive(canvasRef);
 
   // Resume context on play (browsers start it suspended).
   useEffect(() => {
-    if (isPlaying && ctxRef.current?.state === "suspended") {
-      ctxRef.current.resume().catch(() => {});
-    }
+    if (isPlaying) resumeSharedAudio();
   }, [isPlaying, trackKey]);
 
   // Render loop.
@@ -68,6 +39,14 @@ export function WaveformBackground({
     if (!canvas) return;
     const c = canvas.getContext("2d");
     if (!c) return;
+    // PERF: when the loop shouldn't run at all (hidden/off-screen/
+    // reduced-motion/save-data) we paint one static frame and bail.
+    if (!active) {
+      const w = canvas.width;
+      const h = canvas.height;
+      c.clearRect(0, 0, w, h);
+      return;
+    }
 
     let mounted = true;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -81,7 +60,7 @@ export function WaveformBackground({
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
-    const analyser = analyserRef.current;
+    const analyser = graph?.analyser ?? null;
     const bufferLength = analyser?.frequencyBinCount ?? 64;
     const data = new Uint8Array(bufferLength);
     let t = 0;
@@ -171,7 +150,7 @@ export function WaveformBackground({
       ro.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [isPlaying, trackKey]);
+  }, [isPlaying, trackKey, graph, active]);
 
   return (
     <canvas
@@ -184,3 +163,6 @@ export function WaveformBackground({
     />
   );
 }
+
+/** Memoized: re-renders only when its primitive props change. */
+export const WaveformBackground = memo(WaveformBackgroundImpl);
