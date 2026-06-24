@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Send,
@@ -15,7 +15,6 @@ import {
   Clock,
   Ban,
   Radio,
-  ChevronDown,
   MessageCircle,
   Zap,
   Crown,
