@@ -5,6 +5,7 @@ import { reorderQueue, removeFromQueue, setQueueStatus } from "@/lib/queue.funct
 import { toast } from "sonner";
 import { GripVertical, X as XIcon, ChevronRight } from "lucide-react";
 import type { QueueEntry } from "@/lib/useStageState";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -56,7 +57,7 @@ export function BackstageQueue({ streamId, queue, canManage }: { streamId: strin
               <span className="w-4 text-xs font-bold text-white/40">{i + 1}</span>
               <Link to="/user/$id" params={{ id: q.user_id }} className="shrink-0">
                 {q.avatar_url ? (
-                  <img src={q.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />
+                  <SignedImg src={q.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />
                 ) : (
                   <div className="h-9 w-9 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
                 )}

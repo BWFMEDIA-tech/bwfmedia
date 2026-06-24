@@ -30,6 +30,7 @@ import {
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
@@ -447,7 +448,7 @@ function InviteModal({
                     className="shrink-0"
                   >
                     {p.avatar_url ? (
-                      <img src={p.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                      <SignedImg src={p.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
                     ) : (
                       <div
                         className="h-8 w-8 rounded-full"
@@ -550,7 +551,7 @@ function SpeakerBubble({
       >
         <Link to="/artist/$id" params={{ id: p.user_id }}>
           {p.avatar_url ? (
-            <img src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
+            <SignedImg src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
           ) : (
             <div
               className="h-20 w-20 rounded-full border-2 border-[#0d0d18]"
@@ -908,7 +909,7 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
         style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}
       >
         {p.avatar_url ? (
-          <img
+          <SignedImg
             src={p.avatar_url}
             alt={p.display_name ?? "Listener"}
             className="h-12 w-12 rounded-full border border-[#0d0d18] object-cover"

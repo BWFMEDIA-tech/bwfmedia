@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { setStageRole, removeStageParticipant } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import type { StageParticipant } from "@/lib/useStageState";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -39,7 +40,7 @@ export function GreenRoom({ streamId, participants }: { streamId: string | null;
             <div key={p.id} className="flex items-center gap-3">
               <Link to="/user/$id" params={{ id: p.user_id }} className="shrink-0">
                 {p.avatar_url ? (
-                  <img src={p.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  <SignedImg src={p.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
                 ) : (
                   <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
                 )}

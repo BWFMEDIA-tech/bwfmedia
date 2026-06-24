@@ -9,6 +9,7 @@ import { friendlyMediaError } from "@/lib/media-engine/errors";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { StagesAndBroadcasts } from "@/components/studio/StagesAndBroadcasts";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -487,7 +488,7 @@ function ParticipantRow({
     <div className="rounded-lg border border-white/5 bg-white/[0.02]">
       <div className="flex items-center gap-3 p-2">
         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-bold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
-          {avatar ? <img src={avatar} alt={name} className="h-full w-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
+          {avatar ? <SignedImg src={avatar} alt={name} className="h-full w-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">

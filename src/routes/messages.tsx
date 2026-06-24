@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { sendDirectMessage, markConversationRead } from "@/lib/direct-messages.functions";
 import { toast } from "sonner";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const searchSchema = z.object({
   to: z.string().uuid().optional(),
@@ -384,7 +385,7 @@ function MessagesPage() {
 
 function Avatar({ profile }: { profile: ProfileLite }) {
   if (profile.avatar_url) {
-    return <img src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />;
+    return <SignedImg src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />;
   }
   const initial = (profile.display_name || "?").charAt(0).toUpperCase();
   return (
