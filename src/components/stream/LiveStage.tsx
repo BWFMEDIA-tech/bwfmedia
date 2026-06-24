@@ -471,28 +471,22 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
   );
 }
 
-/**
- * Real-time hook: returns the current spotlighted user id for the stream,
- * or null. Updates instantly when a host pins/unpins via Postgres realtime.
- */
-export function useStreamSpotlight(streamId: string | undefined): string | null {
-  const [uid, setUid] = useState<string | null>(null);
-  useEffect(() => {
-    if (!streamId) { setUid(null); return; }
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("streams")
-        .select("spotlight_user_id")
-        .eq("id", streamId)
-        .maybeSingle();
-      if (!cancelled) setUid((data as any)?.spotlight_user_id ?? null);
-    })();
+type SpotlightStore = {
+  current: string | null;
+  channel: ReturnType<typeof supabase.channel> | null;
+  listeners: Set<() => void>;
+};
 
-    // Unique channel per hook instance so multiple subscribers never share a
-    // channel that has already been subscribed.
-    const channelName = `spotlight-${streamId}-${(crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)}`;
-    const channel = supabase.channel(channelName);
+const spotlightStores = new Map<string, SpotlightStore>();
+
+function getSpotlightStore(streamId: string): SpotlightStore {
+  let store = spotlightStores.get(streamId);
+  if (!store) {
+    store = { current: null, channel: null, listeners: new Set() };
+    spotlightStores.set(streamId, store);
+
+    const channel = supabase.channel(`spotlight-${streamId}`);
+    store.channel = channel;
 
     // Register postgres_changes callback BEFORE calling subscribe().
     channel.on(
@@ -500,18 +494,71 @@ export function useStreamSpotlight(streamId: string | undefined): string | null 
       { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
       (payload) => {
         const next = (payload.new as any)?.spotlight_user_id ?? null;
-        if (!cancelled) setUid(next);
+        if (store!.current === next) return;
+        store!.current = next;
+        store!.listeners.forEach((cb) => cb());
       },
     );
 
-    channel.subscribe();
+    channel.subscribe((status, err) => {
+      if (status === "CHANNEL_ERROR") {
+        console.error("[useStreamSpotlight] realtime channel error:", err);
+      }
+    });
 
-    return () => {
-      cancelled = true;
-      supabase.removeChannel(channel);
-    };
-  }, [streamId]);
-  return uid;
+    supabase
+      .from("streams")
+      .select("spotlight_user_id")
+      .eq("id", streamId)
+      .maybeSingle()
+      .then(({ data }) => {
+        const live = spotlightStores.get(streamId);
+        if (!live || live !== store) return;
+        const next = (data as any)?.spotlight_user_id ?? null;
+        if (live.current === next) return;
+        live.current = next;
+        live.listeners.forEach((cb) => cb());
+      })
+      .catch((err) => console.error("[useStreamSpotlight] initial fetch failed:", err));
+  }
+  return store;
+}
+
+function subscribeSpotlight(streamId: string, callback: () => void): () => void {
+  const store = getSpotlightStore(streamId);
+  store.listeners.add(callback);
+  return () => {
+    store.listeners.delete(callback);
+    if (store.listeners.size === 0) {
+      if (store.channel) {
+        supabase.removeChannel(store.channel);
+        store.channel = null;
+      }
+      spotlightStores.delete(streamId);
+    }
+  };
+}
+
+function getSpotlightSnapshot(streamId: string): string | null {
+  return spotlightStores.get(streamId)?.current ?? null;
+}
+
+/**
+ * Real-time hook: returns the current spotlighted user id for the stream,
+ * or null. Updates instantly when a host pins/unpins via Postgres realtime.
+ *
+ * Uses a single shared realtime subscription per streamId so re-renders and
+ * multiple mounted instances never register duplicate postgres_changes listeners.
+ */
+export function useStreamSpotlight(streamId: string | undefined): string | null {
+  return useSyncExternalStore(
+    useCallback(
+      (callback) => (streamId ? subscribeSpotlight(streamId, callback) : () => {}),
+      [streamId],
+    ),
+    useCallback(() => (streamId ? getSpotlightSnapshot(streamId) : null), [streamId]),
+    () => null,
+  );
 }
 
 /**
