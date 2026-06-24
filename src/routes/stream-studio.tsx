@@ -819,6 +819,32 @@ function StreamStudio() {
     return () => { supabase.removeChannel(ch); };
   }, [stream?.id]);
 
+  // Self-heal: if the stream row was ended/deleted out from under us
+  // (closed tab last session, ended elsewhere, DB cleanup), clear local
+  // state so duration stops ticking and the LIVE badge clears.
+  useEffect(() => {
+    if (!stream?.id) return;
+    let cancelled = false;
+    const check = async () => {
+      const { data, error } = await supabase
+        .from("streams")
+        .select("id, ended_at, status")
+        .eq("id", stream.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const gone = !error && (!data || data.ended_at !== null || data.status === "ended");
+      if (gone) {
+        setLk(null);
+        setStream(null);
+        setStartedAt(null);
+        setViewerCount(0);
+      }
+    };
+    void check();
+    const id = setInterval(check, 30000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [stream?.id]);
+
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
   }, [auth.loading, auth.isAuthenticated, nav]);
