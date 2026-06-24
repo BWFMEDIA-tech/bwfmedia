@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const PATH_RE = /^[0-9a-fA-F-]{8,}\/[^/]+$/;
+const PATH_RE = /^[0-9a-fA-F-]{8,}\/.+$/;
 
 function extractAvatarPath(input: string): string | null {
   try {
