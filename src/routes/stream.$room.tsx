@@ -5,6 +5,7 @@ import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
 import { getStreamByRoom } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
+import { LiveChat } from "@/components/stream/LiveChat";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
