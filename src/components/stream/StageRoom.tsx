@@ -8,6 +8,7 @@ import {
   revokeHostPrivileges,
   demoteToAudience,
   setParticipantMute,
+  setStreamSpotlight,
 } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import {
@@ -23,6 +24,8 @@ import {
   UserMinus,
   UserCheck,
   UserX,
+  Pin,
+  PinOff,
 } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
