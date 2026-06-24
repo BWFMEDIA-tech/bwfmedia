@@ -488,20 +488,27 @@ export function useStreamSpotlight(streamId: string | undefined): string | null 
         .maybeSingle();
       if (!cancelled) setUid((data as any)?.spotlight_user_id ?? null);
     })();
-    const ch = supabase
-      .channel(`spotlight-${streamId}-${Math.random().toString(36).slice(2, 10)}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
-        (payload) => {
-          const next = (payload.new as any)?.spotlight_user_id ?? null;
-          setUid(next);
-        },
-      )
-      .subscribe();
+
+    // Unique channel per hook instance so multiple subscribers never share a
+    // channel that has already been subscribed.
+    const channelName = `spotlight-${streamId}-${crypto.randomUUID()}`;
+    const channel = supabase.channel(channelName);
+
+    // Register postgres_changes callback BEFORE calling subscribe().
+    channel.on(
+      "postgres_changes",
+      { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
+      (payload) => {
+        const next = (payload.new as any)?.spotlight_user_id ?? null;
+        if (!cancelled) setUid(next);
+      },
+    );
+
+    channel.subscribe();
+
     return () => {
       cancelled = true;
-      supabase.removeChannel(ch);
+      supabase.removeChannel(channel);
     };
   }, [streamId]);
   return uid;
