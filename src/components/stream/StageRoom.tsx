@@ -636,6 +636,18 @@ function SpeakerBubble({
             <div className="absolute left-1/2 z-30 mt-1 w-56 -translate-x-1/2 overflow-hidden rounded-lg border border-white/10 bg-[#13131f] shadow-xl">
               {kind === "speaker" && onPromote && (
                 <>
+                  {onSpotlight && (
+                    <MenuItem
+                      icon={isSpotlight ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onSpotlight(isSpotlight);
+                      }}
+                    >
+                      {isSpotlight ? "Remove from video box" : "Bring to video box"}
+                    </MenuItem>
+                  )}
+                  <MenuDivider />
                   <MenuItem
                     icon={<Crown className="h-3.5 w-3.5" />}
                     onClick={() => {
