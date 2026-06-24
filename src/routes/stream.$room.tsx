@@ -244,11 +244,15 @@ function GuestPage() {
           )}
         </div>
         <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
-          <CrowdPanel
-            participants={participants as StageParticipant[]}
-            streamId={streamId}
-            viewerCount={viewerCount || participants.length}
-          />
+          {streamId && (
+            <LiveChat
+              streamId={streamId}
+              auth={auth}
+              viewerCount={viewerCount}
+              startedAt={streamMeta?.started_at ?? null}
+              hostId={streamMeta?.host_id ?? null}
+            />
+          )}
         </div>
       </div>
     </div>
