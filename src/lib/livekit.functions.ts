@@ -55,6 +55,7 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
     // listeners (and anyone who hasn't been promoted) cannot publish even
     // by driving the LiveKit SDK directly. Hosts/admins always can.
     let canPublish = isHost;
+    let allowCamera = isHost; // hosts always allowed video
     if (!canPublish && stream) {
       const { data: streamIdRow } = await supabase
         .from("streams")
@@ -64,13 +65,14 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       if (streamIdRow?.id) {
         const { data: sp } = await supabase
           .from("stage_participants")
-          .select("stage_role")
+          .select("stage_role, allow_camera")
           .eq("stream_id", streamIdRow.id)
           .eq("user_id", userId)
           .maybeSingle();
         const role = sp?.stage_role as string | undefined;
         if (role === "host" || role === "co_host" || role === "speaker") {
           canPublish = true;
+          allowCamera = !!sp?.allow_camera || role === "host" || role === "co_host";
         }
       }
     }
@@ -84,12 +86,14 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       room: data.roomName,
       roomJoin: true,
       canPublish,
-      canPublishSources: [
-        TrackSource.MICROPHONE,
-        TrackSource.CAMERA,
-        TrackSource.SCREEN_SHARE,
-        TrackSource.SCREEN_SHARE_AUDIO,
-      ],
+      canPublishSources: allowCamera
+        ? [
+            TrackSource.MICROPHONE,
+            TrackSource.CAMERA,
+            TrackSource.SCREEN_SHARE,
+            TrackSource.SCREEN_SHARE_AUDIO,
+          ]
+        : [TrackSource.MICROPHONE],
       canSubscribe: true,
       canPublishData: true,
       roomAdmin: isHost,

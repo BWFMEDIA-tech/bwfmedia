@@ -2134,6 +2134,7 @@ export type Database = {
       }
       stage_participants: {
         Row: {
+          allow_camera: boolean
           connection_status: string
           id: string
           joined_at: string
@@ -2144,6 +2145,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          allow_camera?: boolean
           connection_status?: string
           id?: string
           joined_at?: string
@@ -2154,6 +2156,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          allow_camera?: boolean
           connection_status?: string
           id?: string
           joined_at?: string

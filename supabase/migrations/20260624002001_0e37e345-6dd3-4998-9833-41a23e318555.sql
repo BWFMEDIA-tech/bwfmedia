@@ -1,0 +1,1 @@
+ALTER TABLE public.stage_participants ADD COLUMN IF NOT EXISTS allow_camera boolean NOT NULL DEFAULT false;
