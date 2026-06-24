@@ -20,7 +20,7 @@ import { startOrResumeStream, endStream } from "@/lib/streams.functions";
 import { getMyActiveStream } from "@/lib/streams.functions";
 import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
-import { LiveStage, LiveStageContent, CameraPublishSync } from "@/components/stream/LiveStage";
+import { LiveStage, LiveStageContent, CameraPublishSync, useStreamSpotlight } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
