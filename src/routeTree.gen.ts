@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TunevioRouteImport } from './routes/tunevio'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
@@ -120,6 +121,11 @@ import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/p
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TunevioRoute = TunevioRouteImport.update({
+  id: '/tunevio',
+  path: '/tunevio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -699,6 +705,7 @@ export interface FileRoutesByFullPath {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
@@ -807,6 +814,7 @@ export interface FileRoutesByTo {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
@@ -917,6 +925,7 @@ export interface FileRoutesById {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
@@ -1028,6 +1037,7 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
+    | '/tunevio'
     | '/unsubscribe'
     | '/admin/analytics'
     | '/admin/artists'
@@ -1136,6 +1146,7 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
+    | '/tunevio'
     | '/unsubscribe'
     | '/admin/analytics'
     | '/admin/artists'
@@ -1245,6 +1256,7 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
+    | '/tunevio'
     | '/unsubscribe'
     | '/admin/analytics'
     | '/admin/artists'
@@ -1355,6 +1367,7 @@ export interface RootRouteChildren {
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
+  TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
@@ -1396,6 +1409,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tunevio': {
+      id: '/tunevio'
+      path: '/tunevio'
+      fullPath: '/tunevio'
+      preLoaderRoute: typeof TunevioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -2284,6 +2304,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
+  TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
