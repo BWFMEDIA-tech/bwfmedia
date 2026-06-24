@@ -333,11 +333,13 @@ export function StageRoom({
               isPrimaryHost={false}
               isSelf={!!selfProfile && selfProfile.user_id === p.user_id}
               hostTransferMode={hostTransferMode}
+              spotlightUserId={spotlightUserId}
               onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Guest", mode)}
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
               onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "Guest")}
               onToggleMute={() => doToggleMute(p)}
+              onSpotlight={(currentlyPinned) => doSpotlight(p.user_id, p.display_name ?? "Guest", currentlyPinned)}
             />
           ))}
           {(() => {
