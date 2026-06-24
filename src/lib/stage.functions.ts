@@ -184,10 +184,11 @@ export const respondHand = createServerFn({ method: "POST" })
     }
 
     const stageRole = data.action === "accept_stage" ? "speaker" : "green_room";
+    const allowCamera = data.action === "accept_stage" ? (data.allowCamera ?? false) : false;
     const { error: spErr } = await supabase
       .from("stage_participants")
       .upsert(
-        { stream_id: req.stream_id, user_id: req.user_id, stage_role: stageRole },
+        { stream_id: req.stream_id, user_id: req.user_id, stage_role: stageRole, allow_camera: allowCamera },
         { onConflict: "stream_id,user_id" },
       );
     if (spErr) throw new Error(spErr.message);
@@ -196,7 +197,7 @@ export const respondHand = createServerFn({ method: "POST" })
       req.stream_id,
       req.user_id,
       stageRole,
-      { allowCamera: data.allowCamera ?? false },
+      { allowCamera },
     );
     await supabase.from("raise_hand_requests").update({ status: "accepted" }).eq("id", req.id);
     return { ok: true };
