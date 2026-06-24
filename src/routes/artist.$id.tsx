@@ -25,6 +25,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useAudioPeaks } from "@/lib/useAudioPeaks";
 import { FollowersModal } from "@/components/artist/FollowersModal";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -161,7 +162,7 @@ function HeroBanner({
           <div className="relative shrink-0">
             <div className="h-28 w-28 md:h-36 md:w-36 rounded-full overflow-hidden ring-4" style={{ borderColor: RED, boxShadow: `0 0 40px ${RED}55`, borderWidth: 0, outline: `3px solid ${RED}` }}>
               {artist.photo ? (
-                <img src={artist.photo} alt={artist.name} className="h-full w-full object-cover" />
+                <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" />
               ) : (
                 <div className="h-full w-full grid place-items-center bg-gradient-to-br from-red-900/60 to-black text-3xl font-black">{initials}</div>
               )}

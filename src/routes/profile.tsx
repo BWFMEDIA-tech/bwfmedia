@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Loader2, MessageSquare, DollarSign, Video, Hand, Mic, 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
+import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -200,7 +201,7 @@ function ProfilePage() {
             >
               <div aria-hidden className="absolute inset-0 opacity-30" style={{ background: "var(--gradient-blood)" }} />
               {currentPhotoUrl ? (
-                <img src={currentPhotoUrl} alt={displayName} className="absolute inset-0 h-full w-full object-cover" />
+                <SignedImg src={currentPhotoUrl} alt={displayName} className="absolute inset-0 h-full w-full object-cover" />
               ) : (
                 <div className="absolute inset-0 grid place-items-center font-cond text-5xl font-black text-bone/70">{initials || "?"}</div>
               )}
