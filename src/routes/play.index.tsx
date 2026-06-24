@@ -28,6 +28,7 @@ import {
   type ArenaUserStats,
 } from "@/lib/play-arena.functions";
 import { useAuth } from "@/lib/auth-context";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const EMPTY_DASHBOARD: ArenaDashboard = {
   liveBattle: null,
@@ -113,7 +114,7 @@ function ProfileHero({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
         <div className="lg:col-span-4 flex items-center gap-4">
           {user?.avatarUrl ? (
-            <img
+            <SignedImg
               src={user.avatarUrl}
               alt={user.displayName}
               className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl object-cover shrink-0"
@@ -379,7 +380,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
                 <li key={q.id} className="flex items-center gap-3">
                   <span className="w-4 text-white/40 text-xs">{q.position}</span>
                   {q.avatar ? (
-                    <img src={q.avatar} alt={q.artistName} className="h-7 w-7 rounded-full object-cover" />
+                    <SignedImg src={q.avatar} alt={q.artistName} className="h-7 w-7 rounded-full object-cover" />
                   ) : (
                     <span className="h-7 w-7 rounded-full bg-gradient-to-br from-[#C53DFF] to-[#004BFF] text-[10px] font-bold flex items-center justify-center">
                       {q.artistName.slice(0, 2).toUpperCase()}
@@ -515,7 +516,7 @@ function BattleSide({
   return (
     <div className="text-center">
       {avatar ? (
-        <img
+        <SignedImg
           src={avatar}
           alt={name}
           className={`h-16 w-16 rounded-full object-cover ring-2 ${accent.split(" ").pop()}`}

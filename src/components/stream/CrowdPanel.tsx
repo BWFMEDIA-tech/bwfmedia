@@ -3,6 +3,7 @@ import { Users, Crown, Mic, Headphones, Shield, Sparkles, Search, X } from "luci
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { StageParticipant } from "@/lib/useStageState";
+import { SignedImg } from "@/components/ui/signed-img";
 
 type AppRole = "admin" | "host" | "artist" | "moderator" | "member" | "listener";
 
@@ -176,7 +177,7 @@ export function CrowdPanel({
               >
                 <Link to="/user/$id" params={{ id: p.user_id }} className="relative shrink-0">
                   {p.avatar_url ? (
-                    <img src={p.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                    <SignedImg src={p.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-[10px] font-bold text-white flex items-center justify-center">
                       {(p.display_name ?? "?").slice(0, 1).toUpperCase()}

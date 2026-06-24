@@ -5,6 +5,7 @@ import { respondHand, setParticipantMute } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import { CheckCircle2, ChevronRight, X as XIcon, Mic, MicOff, Camera, CameraOff, Sofa, Sparkles } from "lucide-react";
 import type { HandRequest } from "@/lib/useStageState";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -91,7 +92,7 @@ export function RaiseHandPanel({ hands, streamId }: { hands: HandRequest[]; stre
             <div key={r.id} className="flex items-center gap-3">
               <Link to="/user/$id" params={{ id: r.user_id }} className="shrink-0">
                 {r.avatar_url ? (
-                  <img src={r.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  <SignedImg src={r.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
                 ) : (
                   <div className="h-10 w-10 shrink-0 rounded-full" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }} />
                 )}
@@ -138,7 +139,7 @@ export function RaiseHandPanel({ hands, streamId }: { hands: HandRequest[]; stre
         >
           <div className="mb-4 flex items-center gap-3">
             {pending.avatar_url ? (
-              <img src={pending.avatar_url} alt="" className="h-11 w-11 rounded-full object-cover" />
+              <SignedImg src={pending.avatar_url} alt="" className="h-11 w-11 rounded-full object-cover" />
             ) : (
               <div
                 className="h-11 w-11 rounded-full"

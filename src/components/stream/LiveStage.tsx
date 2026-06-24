@@ -22,6 +22,7 @@ import { setRealtimeHealth } from "@/lib/realtime-health";
 import { useServerFn } from "@tanstack/react-start";
 import { setStreamSpotlight } from "@/lib/stage.functions";
 import { Pin, PinOff, X as XIcon } from "lucide-react";
+import { SignedImg } from "@/components/ui/signed-img";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -368,7 +369,7 @@ function StageTile({ track, label, fallbackImage, placeholder, profile, small }:
         </TrackRefContext.Provider>
       ) : avatar ? (
         <>
-          <img src={avatar} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+          <SignedImg src={avatar} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs text-white/70">
             {placeholder ?? "Connecting…"}
           </div>
@@ -662,7 +663,7 @@ function SpotlightControls({
                         )}
                       >
                         {prof?.avatar_url ? (
-                          <img src={prof.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                          <SignedImg src={prof.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
                         ) : (
                           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-fuchsia-600 to-blue-600" />
                         )}
