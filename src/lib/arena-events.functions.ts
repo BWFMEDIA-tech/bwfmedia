@@ -69,6 +69,10 @@ export const emitArenaEvent = createServerFn({ method: "POST" })
     }
 
     await supabase.from("arena_events").insert({
+    // Audit-trail insert uses the service-role client so the append is not
+    // blocked by the admin-only SELECT/INSERT RLS policy on arena_events.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("arena_events").insert({
       event_type: data.type,
       stream_id: match.stream_id,
       battle_id: match.id,
