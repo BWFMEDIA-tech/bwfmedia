@@ -2,7 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ExternalLink, Music2, Megaphone, Calendar } from "lucide-react";
-import bwfLogo from "@/assets/bwf-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png";
 import grunge from "@/assets/grunge-bg.jpg";
 
 export const Route = createFileRoute("/videos/$id")({

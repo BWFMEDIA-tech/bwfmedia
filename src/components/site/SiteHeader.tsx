@@ -22,7 +22,7 @@ import {
   Calendar,
   ShoppingCart,
 } from "lucide-react";
-import bwfLogo from "@/assets/bwf-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png";
 import { useAuth } from "@/lib/auth-context";
 import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";

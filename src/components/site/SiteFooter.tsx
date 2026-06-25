@@ -1,6 +1,6 @@
 import { Link as RouterLink } from "@tanstack/react-router";
 import { Youtube, Instagram, Facebook, Twitter, Music2, Linkedin, Mail, MapPin, ArrowRight } from "lucide-react";
-import bwfLogo from "@/assets/bwf-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png";
 import { useAuth } from "@/lib/auth-context";
 
 const socials = [

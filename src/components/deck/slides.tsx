@@ -4,7 +4,7 @@ import camera from "@/assets/camera.png";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import audience from "@/assets/audience.jpg";
 import musicVideo from "@/assets/music-video.jpg";
-import bwfLogo from "@/assets/bwf-logo.jpg";
+import bwfLogo from "@/assets/tunevio-logo.png";
 import {
   Play,
   Mic,

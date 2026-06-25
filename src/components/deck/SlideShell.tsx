@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import logo from "@/assets/bwf-logo.jpg";
+import logo from "@/assets/tunevio-logo.png";
 
 export function SlideShell({
   children,
