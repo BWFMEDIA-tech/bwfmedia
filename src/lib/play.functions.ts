@@ -20,6 +20,18 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    // Enforce that audio_url, when supplied, points to this artist's own
+    // play/<userId>/ prefix in the artist-audio bucket. The bucket's storage
+    // SELECT policy is scoped to that prefix; rejecting other shapes prevents
+    // stream participants from being handed a path that could resolve to
+    // another artist's audio file.
+    if (data.audioUrl) {
+      const required = `/artist-audio/play/${userId}/`;
+      if (!data.audioUrl.includes(required)) {
+        throw new Error("audio_url must reference this artist's play/<uid>/ storage path");
+      }
+    }
+
     // Stream must exist + accept submissions.
     const { data: stream } = await supabase
       .from("streams").select("id, status").eq("id", data.streamId).maybeSingle();
