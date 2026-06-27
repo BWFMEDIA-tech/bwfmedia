@@ -224,9 +224,9 @@ export const getGenreForSeo = createServerFn({ method: "GET" })
     const { data: profs } = await sb
       .from("profiles")
       .select("id, public_id, display_name, stage_name, username, avatar_url, banner_url, bio, genre, genres");
-    const allArtists = (profs ?? []).map(mapProfileToArtist);
+    const allArtists: SeoArtist[] = (profs ?? []).map(mapProfileToArtist);
     let canonicalName = slug;
-    const matchedArtists = allArtists.filter((a) => {
+    const matchedArtists = allArtists.filter((a: SeoArtist) => {
       for (const g of a.genres) {
         if (slugify(g) === slug) { canonicalName = g; return true; }
       }
@@ -234,7 +234,7 @@ export const getGenreForSeo = createServerFn({ method: "GET" })
     });
 
     // Tracks by those artists
-    const ids = matchedArtists.map((a) => a.id);
+    const ids = matchedArtists.map((a: SeoArtist) => a.id);
     let tracks: SeoTrack[] = [];
     if (ids.length) {
       const { data: trackRows } = await sb
