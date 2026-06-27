@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Music, Play, Pause, Radio, Disc3, Swords, Volume2, Mic, Clock, Trophy } from "lucide-react";
+import { Music, Play, Pause, Radio, Disc3, Swords, Volume2, Mic, Clock, Trophy, SkipForward } from "lucide-react";
 import { usePlayQueue } from "@/lib/usePlayQueue";
 import { supabase } from "@/integrations/supabase/client";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
+import { useAuth } from "@/lib/auth-context";
+import { useServerFn } from "@tanstack/react-start";
+import { advancePlayQueue } from "@/lib/play.functions";
+import { toast } from "sonner";
 
 type Mode = "live" | "upload" | "battle-live" | "battle-pending" | "idle";
 
