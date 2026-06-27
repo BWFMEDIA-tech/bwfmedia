@@ -681,6 +681,28 @@ export function ImmersivePlayer({
           />
         )}
 
+        {/* Preload the next track in the background so transitions are seamless.
+            Muted + paused, just warms the browser cache. */}
+        {upNext[0]?.audio_url && upNext[0].audio_url !== track?.audio_url && (
+          <audio
+            key={`preload-${upNext[0].id}`}
+            src={upNext[0].audio_url}
+            preload="auto"
+            muted
+            className="hidden"
+            aria-hidden
+          />
+        )}
+
+        {/* Up Next preview — shown while a track is playing so listeners
+            know what's coming. Updates live as the queue changes. */}
+        {track && upNext[0] && (
+          <UpNextPreview
+            next={upNext[0]}
+            secondsUntil={Math.max(0, Math.round((duration || 0) - progress))}
+          />
+        )}
+
         {/* Progress + transport */}
         <div className="relative z-10 mt-6 w-full">
           {/* Progress */}
