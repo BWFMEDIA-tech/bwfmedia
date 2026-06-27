@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { setPlaybackPlaying } from "@/lib/playback-store";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
 import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack } from "@/lib/play.functions";
+import { castBattleVote } from "@/lib/battles.functions";
 import { RankBadge } from "@/components/rank/RankBadge";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
@@ -332,6 +333,87 @@ function useLiveBattle(streamId: string | null) {
     return () => { cancelled = true; supabase.removeChannel(ch); };
   }, [streamId]);
   return battle;
+}
+
+/* ---------- Battle round vote (A/B) for the currently playing track ----------
+   When the playing track belongs to a live battle (track.battle_match_id +
+   battle_side), any viewer can vote on the active round directly from the
+   immersive player. Pulls the match's current_round_id, artist names, and
+   the viewer's existing choice; subscribes to round updates so tallies stay
+   live without remounting. */
+function useTrackBattleVote(track: PlayTrack | null, userId: string | null) {
+  const matchId = track?.battle_match_id ?? null;
+  const [state, setState] = useState<{
+    matchId: string;
+    roundId: string | null;
+    artistAName: string;
+    artistBName: string;
+    aVotes: number;
+    bVotes: number;
+    myChoice: "a" | "b" | null;
+    canVote: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!matchId) { setState(null); return; }
+    let cancelled = false;
+    const refresh = async () => {
+      const { data: m } = await supabase
+        .from("battle_matches")
+        .select("id,status,current_round_id,artist_a_name,artist_b_name")
+        .eq("id", matchId)
+        .maybeSingle();
+      if (cancelled || !m) { setState(null); return; }
+      const roundId = (m as any).current_round_id as string | null;
+      let aVotes = 0, bVotes = 0, canVote = false;
+      let myChoice: "a" | "b" | null = null;
+      if (roundId) {
+        const { data: r } = await supabase
+          .from("battle_rounds")
+          .select("a_votes,b_votes,status,voting_status")
+          .eq("id", roundId)
+          .maybeSingle();
+        if (r) {
+          aVotes = (r as any).a_votes ?? 0;
+          bVotes = (r as any).b_votes ?? 0;
+          canVote = (r as any).status === "live" && (r as any).voting_status === "open";
+        }
+        if (userId) {
+          const { data: v } = await supabase
+            .from("battle_votes")
+            .select("choice")
+            .eq("round_id", roundId)
+            .eq("voter_id", userId)
+            .maybeSingle();
+          if (v?.choice === "a" || v?.choice === "b") myChoice = v.choice;
+        }
+      }
+      if (cancelled) return;
+      setState({
+        matchId,
+        roundId,
+        artistAName: (m as any).artist_a_name ?? "Artist A",
+        artistBName: (m as any).artist_b_name ?? "Artist B",
+        aVotes, bVotes, myChoice, canVote,
+      });
+    };
+    void refresh();
+    const ch = supabase
+      .channel(`player-battle-${matchId}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_matches", filter: `id=eq.${matchId}` },
+        refresh)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_rounds", filter: `match_id=eq.${matchId}` },
+        refresh)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_votes", filter: `match_id=eq.${matchId}` },
+        refresh)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [matchId, userId]);
+
+  return state;
 }
 
 /* ---------- Like (track_likes) ---------- */
