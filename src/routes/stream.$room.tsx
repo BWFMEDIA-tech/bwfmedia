@@ -6,6 +6,10 @@ import { getStreamByRoom } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
+import { BackstageQueue } from "@/components/stream/BackstageQueue";
+import { GreenRoom } from "@/components/stream/GreenRoom";
+import { Copy, Check } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +42,7 @@ function GuestPage() {
   const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants } = useStageState(lk ? streamId : null);
+  const { hands, queue } = useStageState(lk && isHostLike ? streamId : null);
 
   // Heartbeat presence only after the listener actually joins LiveKit; avoids
   // ghost stage rows that show as “Reconnecting…” before the guest connects.
