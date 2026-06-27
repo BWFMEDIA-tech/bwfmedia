@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { setPlaybackPlaying } from "@/lib/playback-store";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
 import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack } from "@/lib/play.functions";
 import { RankBadge } from "@/components/rank/RankBadge";
