@@ -6,6 +6,10 @@ import { getStreamByRoom } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
+import { BackstageQueue } from "@/components/stream/BackstageQueue";
+import { GreenRoom } from "@/components/stream/GreenRoom";
+import { Copy, Check } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +41,7 @@ function GuestPage() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
-  const { participants } = useStageState(lk ? streamId : null);
+  const { participants, hands, queue } = useStageState(lk ? streamId : null);
 
   // Heartbeat presence only after the listener actually joins LiveKit; avoids
   // ghost stage rows that show as “Reconnecting…” before the guest connects.
@@ -215,6 +219,15 @@ function GuestPage() {
                 </div>
               )}
               <AudienceRow participants={participants as StageParticipant[]} />
+              {streamId && isHostLike && (
+                <HostControls
+                  streamId={streamId}
+                  hands={hands}
+                  queue={queue}
+                  participants={participants as StageParticipant[]}
+                  room={room}
+                />
+              )}
               {streamId && streamMeta && (
                 <PlayArenaView
                   stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
@@ -234,6 +247,54 @@ function GuestPage() {
               hostId={streamMeta?.host_id ?? null}
             />
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HostControls({
+  streamId,
+  hands,
+  queue,
+  participants,
+  room,
+}: {
+  streamId: string;
+  hands: any[];
+  queue: any[];
+  participants: StageParticipant[];
+  room: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const link = typeof window !== "undefined"
+    ? `${window.location.origin}/invite/${room}`
+    : `/invite/${room}`;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      toast.success("Invite link copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Couldn't copy link");
+    }
+  };
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid gap-4 lg:grid-cols-3">
+        <RaiseHandPanel hands={hands} streamId={streamId} />
+        <BackstageQueue streamId={streamId} queue={queue} canManage />
+        <GreenRoom streamId={streamId} participants={participants} />
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/60">Invite Guest</div>
+        <p className="mb-3 text-xs text-white/60">Invite an artist to join your stream. Share the link below.</p>
+        <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 p-1.5">
+          <span className="flex-1 truncate px-2 text-[11px] text-white/80">{link}</span>
+          <button onClick={copy} className="flex items-center gap-1 rounded-md bg-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-white hover:bg-white/20">
+            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} {copied ? "Copied" : "Copy"}
+          </button>
         </div>
       </div>
     </div>
