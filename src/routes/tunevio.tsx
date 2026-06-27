@@ -26,7 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
 import micWalkupVideo from "@/assets/tunevio-mic-walkup-black.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
-import playArena1v1 from "@/assets/play-arena-1v1-battle.png";
+import playArena1v1 from "@/assets/play-arena-1v1-battle.png.asset.json";
 
 
 export const Route = createFileRoute("/tunevio")({
@@ -408,7 +408,7 @@ function TunevioLanding() {
               </p>
 
               <motion.img
-                src={playArena1v1}
+                src={playArena1v1.url}
                 alt="1v1 live music battle"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
