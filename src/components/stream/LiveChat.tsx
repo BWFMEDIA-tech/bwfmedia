@@ -53,12 +53,14 @@ export function LiveChat({
   viewerCount = 0,
   startedAt = null,
   hostId = null,
+  status = null,
 }: {
   streamId: string | null;
   auth: AuthState;
   viewerCount?: number;
   startedAt?: string | null;
   hostId?: string | null;
+  status?: string | null;
 }) {
   const delFn = useServerFn(deleteMessage);
   const toFn = useServerFn(timeoutUser);
@@ -157,7 +159,7 @@ export function LiveChat({
 
   // Live duration ticker
   useEffect(() => {
-    if (!streamId || !startedAt) { setDurationLabel("00:00"); return; }
+    if (!streamId || !startedAt || status !== "live") { setDurationLabel("00:00"); return; }
     const tick = () => {
       const ms = Date.now() - new Date(startedAt).getTime();
       const s = Math.max(0, Math.floor(ms / 1000));
@@ -173,7 +175,7 @@ export function LiveChat({
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [streamId, startedAt]);
+  }, [streamId, startedAt, status]);
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
