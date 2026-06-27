@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
-import { runIdempotent } from "@/lib/idempotency";
+import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
 const CastSchema = z.object({
   match_id: z.string().uuid(),
