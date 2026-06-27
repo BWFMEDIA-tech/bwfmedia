@@ -26,6 +26,8 @@ import { supabase } from "@/integrations/supabase/client";
 import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
 import micWalkupVideo from "@/assets/tunevio-mic-walkup-black.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
+import playArena1v1 from "@/assets/play-arena-1v1-battle.png";
+
 
 export const Route = createFileRoute("/tunevio")({
   head: () => ({
@@ -344,8 +346,8 @@ function TunevioLanding() {
               <span className="font-semibold text-white">{fmt(displayCount)}</span>{" "}
               people already joined the waitlist
             </p>
-          </motion.div>
-        </div>
+            </motion.div>
+          </div>
       </section>
 
       {/* 2. Social Proof */}
@@ -404,6 +406,16 @@ function TunevioLanding() {
                 No algorithm bias. No passive streaming. Just live performance and
                 real outcomes.
               </p>
+
+              <motion.img
+                src={playArena1v1}
+                alt="1v1 live music battle"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="mt-8 w-full max-w-xl rounded-2xl border border-white/10 shadow-[0_0_60px_-15px_rgba(255,0,166,0.45)]"
+              />
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
