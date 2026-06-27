@@ -384,6 +384,8 @@ export function ImmersivePlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
+  const trackAudioSrc = useSignedAudioUrl(track?.audio_url ?? null);
+  const nextAudioSrc = useSignedAudioUrl(upNext[0]?.audio_url ?? null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
