@@ -69,17 +69,28 @@ export const castBattleVote = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: voteId, error } = await (supabase.rpc as any)("cast_battle_vote", {
-      _match_id: data.match_id,
-      _round_id: data.round_id,
-      _choice: data.choice,
-      _weight: data.weight,
-      _ip: ip,
-      _user_agent: ua,
+    // Idempotent per (user, round, choice, weight): repeated retries of the
+    // same vote return the same id; changing choice/weight produces a new key
+    // and is allowed (RPC upserts on (match_id, voter_id)).
+    return runIdempotent<{ id: string }>({
+      supabase,
+      userId,
+      key: `vote:${data.match_id}:${data.round_id}:${data.choice}:${data.weight}`,
+      action: "cast_vote",
+      handler: async () => {
+        const { data: voteId, error } = await (supabase.rpc as any)("cast_battle_vote", {
+          _match_id: data.match_id,
+          _round_id: data.round_id,
+          _choice: data.choice,
+          _weight: data.weight,
+          _ip: ip,
+          _user_agent: ua,
+        });
+        if (error) {
+          // The RPC already logs blocked attempts in battle_vote_attempts.
+          throw new Response(error.message ?? "Vote rejected", { status: 403 });
+        }
+        return { id: voteId as string };
+      },
     });
-    if (error) {
-      // The RPC already logs blocked attempts in battle_vote_attempts.
-      throw new Response(error.message ?? "Vote rejected", { status: 403 });
-    }
-    return { id: voteId as string };
   });
