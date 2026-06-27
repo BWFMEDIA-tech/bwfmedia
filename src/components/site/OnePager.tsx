@@ -361,7 +361,6 @@ export function OnePager() {
     refetchInterval: 60_000,
   });
 
-  const liveStreams = data?.liveStreams ?? [];
   const featuredArtists = data?.featuredArtists ?? [];
   const videos = data?.videos ?? [];
 
