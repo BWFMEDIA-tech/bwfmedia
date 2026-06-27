@@ -21,6 +21,7 @@ import {
   Newspaper,
   Calendar,
   ShoppingCart,
+  Trophy,
 } from "lucide-react";
 import bwfLogo from "@/assets/tunevio-logo.png";
 import { useAuth } from "@/lib/auth-context";
@@ -54,6 +55,7 @@ const PRIMARY: NavItem[] = [
   { to: "/", label: "Home", icon: Home },
   { to: "/play", label: "Play Arena", icon: Music },
   { to: "/live", label: "Live Shows", icon: Radio },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/videos", label: "Videos", icon: Mic },
   { to: "/dashboard", label: "Charts", icon: BarChart3 },
