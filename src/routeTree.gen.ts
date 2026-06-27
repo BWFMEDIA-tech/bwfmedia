@@ -42,7 +42,6 @@ import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as ArtistDashboardRouteImport } from './routes/artist-dashboard'
@@ -51,6 +50,7 @@ import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
@@ -284,11 +284,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
@@ -327,6 +322,11 @@ const VideosIndexRoute = VideosIndexRouteImport.update({
 const PlayIndexRoute = PlayIndexRouteImport.update({
   id: '/play/',
   path: '/play/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -680,7 +680,6 @@ export interface FileRoutesByFullPath {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -766,6 +765,7 @@ export interface FileRoutesByFullPath {
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -790,7 +790,6 @@ export interface FileRoutesByTo {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -876,6 +875,7 @@ export interface FileRoutesByTo {
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -902,7 +902,6 @@ export interface FileRoutesById {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -988,6 +987,7 @@ export interface FileRoutesById {
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -1015,7 +1015,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/blog'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1101,6 +1100,7 @@ export interface FileRouteTypes {
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
+    | '/blog/'
     | '/play/'
     | '/videos/'
     | '/api/public/block-booking'
@@ -1125,7 +1125,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/blog'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1211,6 +1210,7 @@ export interface FileRouteTypes {
     | '/user/$id'
     | '/videos/$id'
     | '/admin'
+    | '/blog'
     | '/play'
     | '/videos'
     | '/api/public/block-booking'
@@ -1236,7 +1236,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/blog'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1322,6 +1321,7 @@ export interface FileRouteTypes {
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
+    | '/blog/'
     | '/play/'
     | '/videos/'
     | '/api/public/block-booking'
@@ -1348,7 +1348,6 @@ export interface RootRouteChildren {
   ArtistDashboardRoute: typeof ArtistDashboardRoute
   ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
-  BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
   CreatorAgreementRoute: typeof CreatorAgreementRoute
@@ -1397,6 +1396,7 @@ export interface RootRouteChildren {
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
@@ -1648,13 +1648,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/artists': {
       id: '/artists'
       path: '/artists'
@@ -1709,6 +1702,13 @@ declare module '@tanstack/react-router' {
       path: '/play'
       fullPath: '/play/'
       preLoaderRoute: typeof PlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -2293,7 +2293,6 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistDashboardRoute: ArtistDashboardRoute,
   ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
-  BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   CookiePolicyRoute: CookiePolicyRoute,
   CreatorAgreementRoute: CreatorAgreementRoute,
@@ -2342,6 +2341,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
+  BlogIndexRoute: BlogIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
