@@ -39,7 +39,7 @@ function GuestPage() {
   const [joining, setJoining] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
-  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null } | null>(null);
+  const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null; status: string | null } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
   const { participants, hands, queue } = useStageState(lk ? streamId : null);
 
@@ -58,7 +58,7 @@ function GuestPage() {
       .then((s: any) => {
         setStreamId(s?.id ?? null);
         if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage" | "play");
-        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id, started_at: (s as any).started_at ?? null });
+        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id, started_at: (s as any).started_at ?? null, status: (s as any).status ?? null });
       })
       .catch(() => {});
   }, [room]);
