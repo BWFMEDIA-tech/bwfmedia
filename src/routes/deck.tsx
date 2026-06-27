@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, type FormEvent } from "react";
 import grunge from "@/assets/grunge-bg.jpg";
-import bwfLogo from "@/assets/tunevio-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyDeckPassword } from "@/lib/deck-gate.functions";

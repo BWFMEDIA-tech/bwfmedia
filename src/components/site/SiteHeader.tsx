@@ -23,7 +23,7 @@ import {
   ShoppingCart,
   Trophy,
 } from "lucide-react";
-import bwfLogo from "@/assets/tunevio-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import { useAuth } from "@/lib/auth-context";
 import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
@@ -150,7 +150,7 @@ export function SiteHeader() {
 
         {/* Logo */}
         <RouterLink to="/" className="flex items-center gap-2 shrink-0 md:ml-12 mr-2">
-          <img src={bwfLogo} alt="BWF Network" className="h-10 md:h-14 lg:h-16 w-auto object-contain" />
+          <img src={bwfLogo.url} alt="BWF Network" className="h-12 md:h-16 lg:h-20 w-auto object-contain" />
         </RouterLink>
 
         {/* Desktop primary nav */}
