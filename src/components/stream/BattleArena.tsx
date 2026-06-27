@@ -648,12 +648,22 @@ function CreateBattleDialog({
       if (side === "a") setLoadingA(true); else setLoadingB(true);
       const { data } = await supabase
         .from("play_tracks")
-        .select("id, title, cover_url, status, created_at")
-        .eq("stream_id", streamId)
+        .select("id, title, cover_url, status, created_at, stream_id")
         .eq("artist_user_id", artistId)
         .neq("status", "removed")
         .order("created_at", { ascending: false });
-      const rows = (data ?? []) as TrackOpt[];
+      // Dedupe by lowercased title so the same song from this stream and the
+      // artist's profile only shows once. Prefer the row belonging to this
+      // battle's stream so playback wiring still works when picked.
+      const seen = new Map<string, TrackOpt>();
+      for (const row of (data ?? []) as (TrackOpt & { stream_id: string })[]) {
+        const key = row.title.trim().toLowerCase();
+        const prev = seen.get(key);
+        if (!prev || (row.stream_id === streamId && prev.id !== row.id)) {
+          seen.set(key, { id: row.id, title: row.title, cover_url: row.cover_url, status: row.status });
+        }
+      }
+      const rows = Array.from(seen.values());
       if (side === "a") {
         setTracksA(rows);
         setTrackA((prev) => (prev && rows.some((r) => r.id === prev) ? prev : rows[0]?.id ?? ""));
