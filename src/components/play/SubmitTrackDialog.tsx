@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon } from "lucide-react";
+import { Crown, X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon, Music2 } from "lucide-react";
 import { toast } from "sonner";
 import { submitPlayTrack } from "@/lib/play.functions";
 import { signPlayAudioUrl } from "@/lib/play-audio.functions";
@@ -37,6 +37,54 @@ export function SubmitTrackDialog({
   const coverRef = useRef<HTMLInputElement>(null);
   const [coverUploading, setCoverUploading] = useState(false);
   const [coverProgress, setCoverProgress] = useState(0);
+  type ProfileTrack = { id: string; title: string; audio_url: string | null; cover_url: string | null };
+  const [profileTracks, setProfileTracks] = useState<ProfileTrack[]>([]);
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [pickedProfileId, setPickedProfileId] = useState<string>("");
+
+  // Load the signed-in artist's existing profile tracks once.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingProfile(true);
+      try {
+        const { data: u } = await supabase.auth.getUser();
+        const uid = u.user?.id;
+        if (!uid) return;
+        const { data } = await supabase
+          .from("play_tracks")
+          .select("id, title, audio_url, cover_url, created_at")
+          .eq("artist_user_id", uid)
+          .neq("status", "removed")
+          .order("created_at", { ascending: false })
+          .limit(100);
+        if (cancelled || !data) return;
+        const seen = new Set<string>();
+        const unique: ProfileTrack[] = [];
+        for (const t of data as any[]) {
+          const key = (t.title ?? "").trim().toLowerCase();
+          if (!key || seen.has(key)) continue;
+          seen.add(key);
+          unique.push({ id: t.id, title: t.title, audio_url: t.audio_url, cover_url: t.cover_url });
+        }
+        setProfileTracks(unique);
+      } finally {
+        if (!cancelled) setLoadingProfile(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  function pickProfileTrack(id: string) {
+    setPickedProfileId(id);
+    if (!id) return;
+    const t = profileTracks.find((x) => x.id === id);
+    if (!t) return;
+    setTitle(t.title);
+    if (t.audio_url) setAudioUrl(t.audio_url);
+    if (t.cover_url) setCoverUrl(t.cover_url);
+    setUploadedName(t.title);
+  }
 
   async function handleUpload(file: File) {
     if (!file.type.startsWith("audio/") && !/\.(mp3|wav|m4a|aac|ogg|oga|flac|webm)$/i.test(file.name)) {
@@ -126,9 +174,11 @@ export function SubmitTrackDialog({
       // Duplicate guard: refuse to submit a track the artist has already
       // uploaded (matched by case-insensitive title across any stream /
       // profile). New songs must be genuinely new.
+      // When the artist picked an existing profile track, skip the duplicate
+      // guard — they're re-queueing their own song into this stream.
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
-      if (uid) {
+      if (uid && !pickedProfileId) {
         const { data: existing } = await supabase
           .from("play_tracks")
           .select("id, title, status")
@@ -169,6 +219,33 @@ export function SubmitTrackDialog({
             className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm" />
           <input value={artistName} onChange={(e) => setArtistName(e.target.value)} placeholder="Artist name"
             className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm" />
+
+          {/* Pick from existing profile tracks */}
+          {profileTracks.length > 0 && (
+            <div className="rounded-lg border border-violet-400/30 bg-violet-500/5 p-3">
+              <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-violet-200">
+                <Music2 className="h-3.5 w-3.5" /> Use a track from your profile
+              </label>
+              <select
+                value={pickedProfileId}
+                onChange={(e) => pickProfileTrack(e.target.value)}
+                className="mt-2 w-full rounded-lg border border-white/10 bg-black/60 px-3 py-2 text-sm"
+              >
+                <option value="">— Upload a new track instead —</option>
+                {profileTracks.map((t) => (
+                  <option key={t.id} value={t.id}>{t.title}</option>
+                ))}
+              </select>
+              {pickedProfileId && (
+                <div className="mt-2 text-[11px] text-white/60">
+                  Using your existing track. Fields below are pre-filled — just hit submit.
+                </div>
+              )}
+            </div>
+          )}
+          {loadingProfile && profileTracks.length === 0 && (
+            <div className="text-[11px] text-white/40">Loading your profile tracks…</div>
+          )}
 
           {/* File upload */}
           <div
