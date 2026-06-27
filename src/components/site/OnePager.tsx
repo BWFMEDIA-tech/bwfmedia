@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import studioHeroVideo from "@/assets/studio-hero.mp4.asset.json";
+import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { getHomepageData } from "@/lib/homepage.functions";
 import { CartButton } from "@/components/CartDrawer";
 import { PlayArenaIntro } from "@/components/site/PlayArenaIntro";
@@ -247,7 +247,7 @@ function BookShoot() {
         <Reveal delay={0.15}>
           <div className="relative rounded-2xl overflow-hidden border border-blood/30 aspect-[4/3]">
             <video
-              src={studioHeroVideo.url}
+              src={heroRapperVideo.url}
               autoPlay
               muted
               loop

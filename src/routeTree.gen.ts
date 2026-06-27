@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TunevioRouteImport } from './routes/tunevio'
-import { Route as TrendingRouteImport } from './routes/trending'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
@@ -43,7 +42,6 @@ import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ChartsRouteImport } from './routes/charts'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as ArtistDashboardRouteImport } from './routes/artist-dashboard'
@@ -56,7 +54,6 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
-import { Route as TrackSlugRouteImport } from './routes/track.$slug'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
 import { Route as StageRoomIdRouteImport } from './routes/stage.$roomId'
 import { Route as SettingsSocialLinksRouteImport } from './routes/settings.social-links'
@@ -77,7 +74,6 @@ import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
-import { Route as GenreSlugRouteImport } from './routes/genre.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
@@ -111,7 +107,6 @@ import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-boo
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as ASlugRouteImport } from './routes/a.$slug'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
@@ -136,11 +131,6 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const TunevioRoute = TunevioRouteImport.update({
   id: '/tunevio',
   path: '/tunevio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrendingRoute = TrendingRouteImport.update({
-  id: '/trending',
-  path: '/trending',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -298,11 +288,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChartsRoute = ChartsRouteImport.update({
-  id: '/charts',
-  path: '/charts',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
@@ -361,11 +346,6 @@ const VideosIdRoute = VideosIdRouteImport.update({
 const UserIdRoute = UserIdRouteImport.update({
   id: '/user/$id',
   path: '/user/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrackSlugRoute = TrackSlugRouteImport.update({
-  id: '/track/$slug',
-  path: '/track/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StreamRoomRoute = StreamRoomRouteImport.update({
@@ -466,11 +446,6 @@ const PayBookingIdRoute = PayBookingIdRouteImport.update({
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenreSlugRoute = GenreSlugRouteImport.update({
-  id: '/genre/$slug',
-  path: '/genre/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
@@ -642,11 +617,6 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
-const ASlugRoute = ASlugRouteImport.update({
-  id: '/a/$slug',
-  path: '/a/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PlayAudienceRoomRoute = PlayAudienceRoomRouteImport.update({
   id: '/play/audience/$room',
   path: '/play/audience/$room',
@@ -738,7 +708,6 @@ export interface FileRoutesByFullPath {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -770,10 +739,8 @@ export interface FileRoutesByFullPath {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
-  '/trending': typeof TrendingRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/a/$slug': typeof ASlugRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -807,7 +774,6 @@ export interface FileRoutesByFullPath {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
-  '/genre/$slug': typeof GenreSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -828,7 +794,6 @@ export interface FileRoutesByFullPath {
   '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
-  '/track/$slug': typeof TrackSlugRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -857,7 +822,6 @@ export interface FileRoutesByTo {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -889,10 +853,8 @@ export interface FileRoutesByTo {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
-  '/trending': typeof TrendingRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/a/$slug': typeof ASlugRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -926,7 +888,6 @@ export interface FileRoutesByTo {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
-  '/genre/$slug': typeof GenreSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -947,7 +908,6 @@ export interface FileRoutesByTo {
   '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
-  '/track/$slug': typeof TrackSlugRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
@@ -978,7 +938,6 @@ export interface FileRoutesById {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -1010,10 +969,8 @@ export interface FileRoutesById {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
-  '/trending': typeof TrendingRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/a/$slug': typeof ASlugRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1047,7 +1004,6 @@ export interface FileRoutesById {
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
-  '/genre/$slug': typeof GenreSlugRoute
   '/invite/$code': typeof InviteCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -1068,7 +1024,6 @@ export interface FileRoutesById {
   '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
-  '/track/$slug': typeof TrackSlugRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -1100,7 +1055,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/charts'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1132,10 +1086,8 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
-    | '/trending'
     | '/tunevio'
     | '/unsubscribe'
-    | '/a/$slug'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1169,7 +1121,6 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
-    | '/genre/$slug'
     | '/invite/$code'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -1190,7 +1141,6 @@ export interface FileRouteTypes {
     | '/settings/social-links'
     | '/stage/$roomId'
     | '/stream/$room'
-    | '/track/$slug'
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
@@ -1219,7 +1169,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/charts'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1251,10 +1200,8 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
-    | '/trending'
     | '/tunevio'
     | '/unsubscribe'
-    | '/a/$slug'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1288,7 +1235,6 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
-    | '/genre/$slug'
     | '/invite/$code'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -1309,7 +1255,6 @@ export interface FileRouteTypes {
     | '/settings/social-links'
     | '/stage/$roomId'
     | '/stream/$room'
-    | '/track/$slug'
     | '/user/$id'
     | '/videos/$id'
     | '/admin'
@@ -1339,7 +1284,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/charts'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1371,10 +1315,8 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
-    | '/trending'
     | '/tunevio'
     | '/unsubscribe'
-    | '/a/$slug'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1408,7 +1350,6 @@ export interface FileRouteTypes {
     | '/checkout/cancel'
     | '/checkout/return'
     | '/email/unsubscribe'
-    | '/genre/$slug'
     | '/invite/$code'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -1429,7 +1370,6 @@ export interface FileRouteTypes {
     | '/settings/social-links'
     | '/stage/$roomId'
     | '/stream/$room'
-    | '/track/$slug'
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
@@ -1460,7 +1400,6 @@ export interface RootRouteChildren {
   ArtistDashboardRoute: typeof ArtistDashboardRoute
   ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
-  ChartsRoute: typeof ChartsRoute
   ContactRoute: typeof ContactRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
   CreatorAgreementRoute: typeof CreatorAgreementRoute
@@ -1492,10 +1431,8 @@ export interface RootRouteChildren {
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
-  TrendingRoute: typeof TrendingRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
-  ASlugRoute: typeof ASlugRoute
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
   BlogCanYouPlayMusicOnLiveStreamRoute: typeof BlogCanYouPlayMusicOnLiveStreamRoute
@@ -1506,7 +1443,6 @@ export interface RootRouteChildren {
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
-  GenreSlugRoute: typeof GenreSlugRoute
   InviteCodeRoute: typeof InviteCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
@@ -1514,7 +1450,6 @@ export interface RootRouteChildren {
   PlayRanksRoute: typeof PlayRanksRoute
   StageRoomIdRoute: typeof StageRoomIdRoute
   StreamRoomRoute: typeof StreamRoomRoute
-  TrackSlugRoute: typeof TrackSlugRoute
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -1550,13 +1485,6 @@ declare module '@tanstack/react-router' {
       path: '/tunevio'
       fullPath: '/tunevio'
       preLoaderRoute: typeof TunevioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trending': {
-      id: '/trending'
-      path: '/trending'
-      fullPath: '/trending'
-      preLoaderRoute: typeof TrendingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1776,13 +1704,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/charts': {
-      id: '/charts'
-      path: '/charts'
-      fullPath: '/charts'
-      preLoaderRoute: typeof ChartsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/artists': {
       id: '/artists'
       path: '/artists'
@@ -1865,13 +1786,6 @@ declare module '@tanstack/react-router' {
       path: '/user/$id'
       fullPath: '/user/$id'
       preLoaderRoute: typeof UserIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/track/$slug': {
-      id: '/track/$slug'
-      path: '/track/$slug'
-      fullPath: '/track/$slug'
-      preLoaderRoute: typeof TrackSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stream/$room': {
@@ -2012,13 +1926,6 @@ declare module '@tanstack/react-router' {
       path: '/invite/$code'
       fullPath: '/invite/$code'
       preLoaderRoute: typeof InviteCodeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/genre/$slug': {
-      id: '/genre/$slug'
-      path: '/genre/$slug'
-      fullPath: '/genre/$slug'
-      preLoaderRoute: typeof GenreSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
@@ -2252,13 +2159,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/a/$slug': {
-      id: '/a/$slug'
-      path: '/a/$slug'
-      fullPath: '/a/$slug'
-      preLoaderRoute: typeof ASlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/play/audience/$room': {
       id: '/play/audience/$room'
       path: '/play/audience/$room'
@@ -2477,7 +2377,6 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistDashboardRoute: ArtistDashboardRoute,
   ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
-  ChartsRoute: ChartsRoute,
   ContactRoute: ContactRoute,
   CookiePolicyRoute: CookiePolicyRoute,
   CreatorAgreementRoute: CreatorAgreementRoute,
@@ -2509,10 +2408,8 @@ const rootRouteChildren: RootRouteChildren = {
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
-  TrendingRoute: TrendingRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
-  ASlugRoute: ASlugRoute,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
   BlogCanYouPlayMusicOnLiveStreamRoute: BlogCanYouPlayMusicOnLiveStreamRoute,
@@ -2525,7 +2422,6 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
-  GenreSlugRoute: GenreSlugRoute,
   InviteCodeRoute: InviteCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
@@ -2533,7 +2429,6 @@ const rootRouteChildren: RootRouteChildren = {
   PlayRanksRoute: PlayRanksRoute,
   StageRoomIdRoute: StageRoomIdRoute,
   StreamRoomRoute: StreamRoomRoute,
-  TrackSlugRoute: TrackSlugRoute,
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
   BlogIndexRoute: BlogIndexRoute,
