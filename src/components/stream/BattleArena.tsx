@@ -454,6 +454,128 @@ function BattleView({
 }
 
 function ArtistSide({
+  // placeholder no-op
+}
+
+function VoteTracker({
+  aPct,
+  bPct,
+  aScore,
+  bScore,
+  myVote,
+  votingStatus,
+}: {
+  aPct: number;
+  bPct: number;
+  aScore: number;
+  bScore: number;
+  myVote: "a" | "b" | null;
+  votingStatus: string;
+}) {
+  return (
+    <div className="relative border-y border-white/10 bg-gradient-to-b from-black/60 to-black/30 px-4 py-4 sm:px-6 sm:py-5">
+      <div className="flex items-end justify-between gap-2 sm:gap-4">
+        {/* Side A stats */}
+        <div className="min-w-0 text-left">
+          <div className="flex items-baseline gap-1">
+            <span
+              className="font-mono text-3xl font-black tabular-nums sm:text-4xl"
+              style={{
+                background: "linear-gradient(135deg,#7c3aed,#3b82f6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {aPct}
+            </span>
+            <span className="text-lg font-bold text-white/70 sm:text-xl">%</span>
+          </div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-white/50 sm:text-xs">
+            {aScore.toLocaleString()} votes
+          </div>
+        </div>
+
+        {/* Center VOTE hexagon */}
+        <div className="relative flex shrink-0 items-center justify-center">
+          <div
+            className="flex h-12 w-20 items-center justify-center text-[11px] font-black tracking-widest text-white shadow-lg sm:h-14 sm:w-24 sm:text-sm"
+            style={{
+              clipPath:
+                "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+              background: "linear-gradient(135deg,#c53dff,#ff00a6)",
+            }}
+          >
+            VOTE
+          </div>
+        </div>
+
+        {/* Side B stats */}
+        <div className="min-w-0 text-right">
+          <div className="flex items-baseline justify-end gap-1">
+            <span
+              className="font-mono text-3xl font-black tabular-nums sm:text-4xl"
+              style={{
+                background: "linear-gradient(135deg,#ff00a6,#ef4444)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {bPct}
+            </span>
+            <span className="text-lg font-bold text-white/70 sm:text-xl">%</span>
+          </div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-white/50 sm:text-xs">
+            {bScore.toLocaleString()} votes
+          </div>
+        </div>
+      </div>
+
+      {/* The bar */}
+      <div className="relative mt-3 h-3 overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10 sm:h-4">
+        <div
+          className="absolute inset-y-0 left-0 transition-[width] duration-700 ease-out"
+          style={{
+            width: `${aPct}%`,
+            background: "linear-gradient(90deg,#7c3aed,#3b82f6)",
+            boxShadow: "0 0 18px rgba(124,58,237,0.6)",
+          }}
+        />
+        <div
+          className="absolute inset-y-0 right-0 transition-[width] duration-700 ease-out"
+          style={{
+            width: `${bPct}%`,
+            background: "linear-gradient(90deg,#ff00a6,#ef4444)",
+            boxShadow: "0 0 18px rgba(239,68,68,0.6)",
+          }}
+        />
+        <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/40" />
+      </div>
+
+      {/* Status line */}
+      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] sm:text-xs">
+        {myVote ? (
+          <span className="flex items-center gap-1.5 font-mono uppercase tracking-widest text-emerald-300">
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="3">
+              <circle cx="12" cy="12" r="10" />
+              <path d="m8 12 3 3 5-6" />
+            </svg>
+            Your vote is locked in
+          </span>
+        ) : votingStatus === "open" ? (
+          <span className="font-mono uppercase tracking-widest text-white/60">
+            Live · cast your vote
+          </span>
+        ) : (
+          <span className="font-mono uppercase tracking-widest text-white/40">
+            Voting {votingStatus}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ArtistSide({
   side,
   artistId,
   name,
