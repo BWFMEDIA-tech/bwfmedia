@@ -1,108 +1,97 @@
+# Tunevio SEO Growth Engine
 
-# Play Arena — Stage Performance & Overheating Fix
-
-Goal: keep CPU, network, battery, and audio stable when many users join a Play Arena room. Current pain points found in the code:
-
-- `usePlayQueue` subscribes to **every** `play_votes` row globally (no `stream_id` filter) and re-fetches the entire queue on every change.
-- `play.audience.$room.tsx` and `ImmersivePlayer` each open their own realtime channels and refresh full state on every change.
-- `WaveformBackground` and `ImmersivePlayer` each create their own `AudioContext`, risking two engines per device.
-- No throttle/debounce on incoming events; presence pings are unbounded; animations run even when the tab is hidden.
+Turn every artist, track, and genre into an indexable, crawlable page with dynamic metadata, internal linking, and an auto-updating sitemap.
 
 ## Scope
 
-Only the Play Arena Stage surface: `src/routes/play.$room.tsx`, `src/routes/play.audience.$room.tsx`, `src/components/play/*`, `src/lib/usePlayQueue.ts`, `src/lib/useArenaLive.ts`. No changes to broadcast/stream-studio realtime wiring.
+### 1. New public, SSR-enabled routes
+Public routes (top-level, NOT under `_authenticated`) so loaders run on the server with full `head()` metadata:
 
-## 1. Snapshot + delta loader
+- `/artist/$slug` — already partially exists at `/artist/$id`; add slug-based public route with SEO template
+- `/track/$slug` — new
+- `/album/$slug` — new (stub if no album table; resolves to track group)
+- `/genre/$slug` — new
+- `/trending` — new
+- `/charts` — new
+- `/blog/$slug` — dynamic blog post route (existing blog index stays)
 
-Add `src/lib/play-arena.functions.ts` with `getPlayArenaSnapshot({ streamId })` (createServerFn, no auth — public read of safe columns) returning:
+Existing `/artist/$id` keeps working; new `/artist/$slug` resolves by `profiles.username` or `public_id` and 301s `$id` to `$slug` when possible.
 
-```
-{ stream, nowPlaying, queue, votes: { trackId: { up, down, score } }, presenceCount, hostId, audienceCount }
-```
+### 2. Slug resolution
+- **Artists**: use `profiles.username` (fallback `public_id`)
+- **Tracks**: derive slug from `play_tracks` → `slugify(title)-{shortid}` to keep unique
+- **Genres**: from `profiles.genres[]` distinct values, slugified
+- No schema changes required for v1 (slugs computed/lookup); add a `slug` column to `play_tracks` only if collisions become an issue (deferred).
 
-Replace the multi-query mount logic in `play.audience.$room.tsx` and the queue fetch in `usePlayQueue` with a single snapshot call on join, then attach delta subscriptions (see §3) instead of refetching the whole queue.
+### 3. Public server fns (no auth)
+Add `src/lib/seo-public.functions.ts` using the **server publishable client** (anon key, RLS-safe). Functions:
+- `getArtistBySlug(slug)` → profile + top tracks + latest tracks + related artists (same genre)
+- `getTrackBySlug(slug)` → track + artist + related tracks (same artist/genre)
+- `getGenre(slug)` → top tracks + artists in that genre
+- `getTrending()` → top tracks by score/likes
+- `getCharts()` → leaderboard view
+- `listAllForSitemap()` → ids + updated_at for sitemap
 
-## 2. Stage Join Gateway (role-scoped subscriptions)
+All read-only, anon-policy compliant. Project only safe columns (no emails, no last_seen_at).
 
-New hook `src/lib/useStageGateway.ts` accepting `{ streamId, role }` where role is derived once:
+### 4. Per-route `head()` metadata
+Every new route defines:
+- `title` (template per spec)
+- `description` (dynamic, ~155 chars)
+- `og:title`, `og:description`, `og:url`, `og:type`, `og:image` (cover/avatar when present)
+- `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`
+- `canonical` link
+- JSON-LD: `MusicGroup` (artist), `MusicRecording` (track), `MusicAlbum`, `CollectionPage` (genre/trending), `Article` (blog)
 
-```
-role = isHost ? "host"
-     : auth.user ? "voter"
-     : "viewer"
-```
+### 5. Internal linking
+Each page renders link blocks:
+- Artist page → top tracks (links to `/track/$slug`), genres (`/genre/$slug`), related artists
+- Track page → artist link, genre links, related tracks
+- Genre page → artists + tracks
+- Trending/charts → all entities
 
-The gateway returns a channel handle and decides what to subscribe to:
+### 6. Sitemap
+Update `src/routes/sitemap[.]xml.ts` to include:
+- All artist slugs (from profiles with `artist` role)
+- All public track slugs (status != removed, has audio)
+- All genres
+- `/trending`, `/charts`
+- Blog posts (existing static list + future DB-backed)
 
-| Role     | now_playing | queue (delta) | votes (delta) | presence | host controls |
-|----------|-------------|---------------|---------------|----------|---------------|
-| viewer   | ✅          | ❌ snapshot only | ❌ throttled counts only | heartbeat only | ❌ |
-| voter    | ✅          | ✅            | ✅ (own + aggregate) | heartbeat | ❌ |
-| host     | ✅          | ✅            | ✅            | full     | ✅ |
+Cache headers stay at 1 hour.
 
-Replaces ad-hoc `supabase.channel()` calls in `usePlayQueue`, `play.audience.$room.tsx`, and `ImmersivePlayer` with one consolidated channel per room per tab. Removes the global `play_votes` subscription entirely.
+### 7. Blog dynamic posts
+- Keep existing static blog routes
+- Add `/blog/$slug` route that first checks static registry, then (future) DB. For now wires through the existing 4 articles via a slug→component map so `/blog/$slug` works and sitemap lists them. No new DB table this pass.
 
-## 3. Throttle + batch realtime events
+### 8. Performance / hygiene
+- All loaders use `ensureQueryData` + `useSuspenseQuery` pattern
+- No `noindex` on any of these routes (root has none either — verified)
+- Canonical points to `https://tunevio.com/<path>` per existing convention
+- Mobile-first uses existing tailwind setup
+- Images use existing `SignedImg` where avatars are private, public covers as `<img loading="lazy">`
 
-Server side: add a Postgres function `arena_broadcast_tick(stream_id)` triggered by `pg_cron` every 500 ms that aggregates the last interval's votes and queue moves, then sends one Realtime broadcast message per stream on channel `arena:<stream_id>` with shape `{ type: "tick", votes, queueOps }`. Existing per-row `postgres_changes` listeners on `play_tracks` / `play_votes` are dropped for non-host roles.
+## Out of scope (this pass)
+- Adding a real `albums` table (album route resolves to artist's track group as a placeholder)
+- DB-backed blog CMS (slug map only)
+- 301 redirect from `/artist/$id` → `/artist/$slug` (both routes coexist; canonical points to slug version)
+- Image generation for og:images (uses existing covers/avatars only)
 
-Client side throttles regardless:
+## Technical Details
 
-- Votes → `requestAnimationFrame`-coalesced reducer, max 1 update / 200 ms.
-- Queue → debounce 1 s.
-- Presence → `useStagePresence`'s heartbeat raised to 15 s; remove per-keystroke pings.
+**Files to add**
+- `src/lib/seo-public.functions.ts` — public server fns using publishable-key client
+- `src/lib/slugify.ts` — shared slug helpers
+- `src/routes/artist.$slug.tsx`
+- `src/routes/track.$slug.tsx`
+- `src/routes/album.$slug.tsx`
+- `src/routes/genre.$slug.tsx`
+- `src/routes/trending.tsx`
+- `src/routes/charts.tsx`
+- `src/routes/blog.$slug.tsx`
+- `src/components/seo/RelatedTracks.tsx`, `RelatedArtists.tsx`, `GenreChips.tsx`
 
-## 4. Render isolation
+**Files to edit**
+- `src/routes/sitemap[.]xml.ts` — pull artists/tracks/genres dynamically
 
-Split `play.$room.tsx`/`play.audience.$room.tsx` content into three memoized islands so a vote update doesn't re-render the player:
-
-- `<NowPlayingIsland />` — track + waveform, subscribed to `nowPlaying` slice.
-- `<VotingIsland />` — vote counts + buttons, subscribed to `votes` slice.
-- `<QueueIsland />` — upcoming list, subscribed to `queue` slice.
-
-Implemented with a Zustand store (`src/lib/play-arena-store.ts`) so each island uses `useStore(s => s.slice)` with `shallow` and renders independently. Wrap heavy children in `React.memo`. `WaveformBackground` already memoizable — add `React.memo` + prop equality.
-
-## 5. Single audio engine
-
-Move `AudioContext` creation out of `ImmersivePlayer` and `WaveformBackground` into the existing `src/lib/media-engine/MediaEngine.ts` singleton. New helper `useSharedAudioGraph(audioElement)` returns `{ ctx, analyser }` from the singleton; both components consume it. Guard against React StrictMode double-init with a module-level ref.
-
-## 6. Visibility-aware animation
-
-`WaveformBackground` and any rAF-driven UI:
-
-- Pause the rAF loop when `document.hidden` (visibilitychange listener).
-- Pause when the `<canvas>` is not in viewport (IntersectionObserver, `threshold: 0`).
-- Honor `navigator.connection?.saveData` and `matchMedia('(prefers-reduced-motion: reduce)')` → render a static gradient instead of animating.
-
-## 7. Load protection / lite mode
-
-In `useStageGateway`, read `audienceCount` from snapshot + presence tick. If `audienceCount > 75` OR client is a `viewer`, enable **lite mode**:
-
-- Switch the broadcast tick consumer to 1 s instead of 500 ms.
-- Skip waveform animation; show static art instead.
-- Drop the per-vote optimistic reducer; only apply tick aggregates.
-
-Expose `useStageMode()` so islands can adapt (e.g. `VotingIsland` shows a count-only view in lite mode).
-
-## Technical details
-
-- New files:
-  - `src/lib/play-arena.functions.ts` — `getPlayArenaSnapshot` server fn (public, narrow columns).
-  - `src/lib/useStageGateway.ts` — role-aware subscription hook.
-  - `src/lib/play-arena-store.ts` — Zustand store with `nowPlaying`, `queue`, `votes`, `presence`, `mode` slices.
-  - `src/lib/useSharedAudioGraph.ts` — wraps `MediaEngine` singleton.
-  - `supabase/migrations/<ts>_arena_broadcast_tick.sql` — `arena_broadcast_tick(stream_id uuid)` function + pg_cron job per active room (started on `streams` → live, stopped on ended).
-- Edited files:
-  - `src/lib/usePlayQueue.ts` — replace direct subscriptions with gateway.
-  - `src/routes/play.$room.tsx`, `src/routes/play.audience.$room.tsx` — load snapshot, mount islands, drop per-row channels.
-  - `src/components/play/ImmersivePlayer.tsx` — use shared audio graph; remove its own `AudioContext` + `postgres_changes` listeners.
-  - `src/components/play/WaveformBackground.tsx` — shared audio graph + visibility/IntersectionObserver pause.
-- Realtime channel naming: one channel per stream `arena:<streamId>` carrying typed broadcast messages; the old direct table subscriptions stay only for the host's studio view.
-- Backwards compat: snapshot endpoint returns the same shapes the islands need; legacy hooks (`usePlayQueue`) keep their public API by reading from the store under the hood.
-- Tests: extend `MediaEngine.test.ts` with a "shared graph reused across two components" case; add a smoke test that a viewer mount opens exactly one Realtime channel.
-
-## Out of scope
-
-- Battle Arena, Stream Studio host view, stage rooms outside Play Arena.
-- Changing LiveKit audio (already singleton inside `StageAudioShell`).
-- Backend rewrite of vote/tip flow — only the broadcast layer changes.
+**No DB migrations.** No auth changes. No edits to generated Supabase files.
