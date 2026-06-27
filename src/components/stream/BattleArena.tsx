@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { usePlaybackPlaying } from "@/lib/playback-store";
 import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
@@ -440,6 +441,12 @@ function ArtistSide({
   const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
   const isEmpty = !artistId;
   const dim = !isEmpty && status !== "playing";
+  const audioPlaying = usePlaybackPlaying();
+  // Spin whenever this side is the active track; freeze the rotation in place
+  // (animation-play-state: paused) when the shared audio element is paused,
+  // so it resumes from the same angle when playback continues.
+  const spinning = isPlaying;
+  const spinPaused = isPlaying && !audioPlaying;
   const statusMeta =
     status === "playing"
       ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#ff00a6] to-[#00e6ff] text-black animate-pulse" }
@@ -502,8 +509,9 @@ function ArtistSide({
               <div
                 className={cn(
                   "relative h-full w-full rounded-full bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_60%,_#000_100%)]",
-                  isPlaying && "animate-[spin_3s_linear_infinite]",
+                  spinning && "animate-[spin_3s_linear_infinite]",
                 )}
+                style={spinning ? { animationPlayState: spinPaused ? "paused" : "running" } : undefined}
               >
                 {/* concentric grooves */}
                 <span className="pointer-events-none absolute inset-[6%] rounded-full border border-white/5" />
