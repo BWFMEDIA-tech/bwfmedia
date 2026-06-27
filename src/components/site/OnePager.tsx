@@ -5,7 +5,6 @@ import {
   Mic,
   ArrowRight,
   Check,
-  Radio,
   Music,
   Headphones,
   Star,
@@ -17,7 +16,6 @@ import {
   Music2,
   Calendar,
   PlayCircle,
-  Compass,
   ChevronRight,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
