@@ -107,6 +107,55 @@ export async function runBattleEvent(
             started_at: m.status === "pending" ? now.toISOString() : undefined,
           })
           .eq("id", m.id);
+
+        // Auto-play the host's pre-picked Side A track for round 1, if one
+        // was attached at match creation. The existing battle-aware
+        // advancePlayQueue logic will then auto-roll into Side B when A ends.
+        if (nextNumber === 1) {
+          const { data: aTrack } = await supabase
+            .from("play_tracks")
+            .select("id")
+            .eq("battle_match_id", m.id)
+            .eq("battle_side", "a")
+            .eq("artist_user_id", m.artist_a_id)
+            .in("status", ["queued", "playing"])
+            .order("created_at", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          if (aTrack?.id) {
+            const { data: nowPlaying } = await supabase
+              .from("play_tracks")
+              .select("id")
+              .eq("stream_id", m.stream_id)
+              .eq("status", "playing");
+            if (nowPlaying && nowPlaying.length) {
+              await supabase
+                .from("play_tracks")
+                .update({ status: "completed" })
+                .in("id", nowPlaying.map((t: any) => t.id));
+            }
+            await supabase
+              .from("play_tracks")
+              .update({ status: "playing" })
+              .eq("id", aTrack.id);
+            await supabase
+              .from("battle_rounds")
+              .update({ a_playing_track_id: aTrack.id } as any)
+              .eq("id", round.id);
+            await supabase
+              .from("battle_matches")
+              .update({ active_side: "a" })
+              .eq("id", m.id);
+            // Keep play_sessions pointer in sync so the shared player
+            // immediately picks up the new track over realtime.
+            await supabase
+              .from("play_sessions")
+              .upsert(
+                { stream_id: m.stream_id, current_track_id: aTrack.id, status: "open" },
+                { onConflict: "stream_id" },
+              );
+          }
+        }
         return { ok: true, round };
       }
 
