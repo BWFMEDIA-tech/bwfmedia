@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
-import { runIdempotent } from "@/lib/idempotency";
+import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
 const CastSchema = z.object({
   match_id: z.string().uuid(),
@@ -75,7 +75,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
     return runIdempotent({
       supabase,
       userId,
-      key: `vote:${data.match_id}:${data.round_id}:${data.choice}:${data.weight}`,
+      key: createIdempotencyKey("vote", data.match_id, userId),
       action: "cast_vote",
       handler: async () => {
         const { data: voteId, error } = await (supabase.rpc as any)("cast_battle_vote", {

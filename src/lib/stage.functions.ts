@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { runIdempotent } from "@/lib/idempotency";
+import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
 async function assertHostOrMod(supabase: any, userId: string, streamId: string) {
   const [{ data: stream }, { data: roles }, { data: sp }] = await Promise.all([
@@ -368,11 +368,10 @@ export const joinStage = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const key = data.idempotencyKey ?? `join_stage:${data.streamId}`;
     return runIdempotent({
       supabase,
       userId,
-      key: `join_stage:${data.streamId}:${key}`,
+      key: createIdempotencyKey("join_stage", data.streamId, userId),
       action: "join_stage",
       handler: async () => {
         const { data: row, error } = await supabase

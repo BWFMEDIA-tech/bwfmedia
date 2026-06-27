@@ -6,6 +6,14 @@ type IdempotentParams = {
   handler: () => Promise<any>;
 };
 
+export function createIdempotencyKey(
+  action: string,
+  entityId: string,
+  userId: string
+) {
+  return `${action}:${entityId}:${userId}`;
+}
+
 export async function runIdempotent({
   supabase,
   userId,

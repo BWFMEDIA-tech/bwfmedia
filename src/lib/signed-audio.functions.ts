@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
-import { runIdempotent } from "@/lib/idempotency";
+import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
 const PATH_RE = /^[A-Za-z0-9_\-./]+$/;
 const BUCKET = "artist-audio";
@@ -150,7 +150,7 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     return runIdempotent({
       supabase,
       userId,
-      key: `sign_audio:${path}:${expiresIn}:${bucket}`,
+      key: createIdempotencyKey("sign_audio", `${path}:${expiresIn}:${bucket}`, userId),
       action: "sign_audio",
       handler: async () => {
         const { data: signed, error } = await supabaseAdmin.storage
