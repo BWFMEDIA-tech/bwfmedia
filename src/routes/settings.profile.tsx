@@ -53,8 +53,9 @@ function ProfileSettingsPage() {
     let cancelled = false;
     (async () => {
       const uid = user.id;
-      const [{ data: p }, { data: ls }, msgRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, location, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
+      const [{ data: p }, { data: acct }, { data: ls }, msgRes] = await Promise.all([
+        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
+        supabase.from("user_accounts").select("location").eq("user_id", uid).maybeSingle(),
         supabase.from("user_social_links").select("id, provider, handle, url, enabled").eq("user_id", uid),
         supabase.from("stream_messages").select("id", { count: "exact", head: true }).eq("user_id", uid),
       ]);
@@ -64,7 +65,7 @@ function ProfileSettingsPage() {
       setBio(p?.bio ?? "");
       setBannerUrl((p as any)?.banner_url ?? "");
       setUsername((p as any)?.username ?? "");
-      setLocation((p as any)?.location ?? "");
+      setLocation((acct as any)?.location ?? "");
       setGenres(((p as any)?.genres ?? []) as string[]);
       setMemberSince((p as any)?.member_since ?? "");
       setBrandName((p as any)?.brand_name ?? "");
@@ -119,12 +120,15 @@ function ProfileSettingsPage() {
       bio: bio.trim() || null,
       banner_url: finalBanner || null,
       username: username.trim() || null,
-      location: location.trim() || null,
       genres,
       brand_name: brandName.trim() || null,
       brand_avatar_url: brandAvatarUrl.trim() || null,
     } as any);
     if (error) { setSaving(false); toast.error(error.message); return; }
+    await supabase.from("user_accounts").upsert({
+      user_id: user.id,
+      location: location.trim() || null,
+    } as any, { onConflict: "user_id" });
     // upsert socials
     for (const s of socials) {
       if (s.id) {
