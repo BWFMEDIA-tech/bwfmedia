@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Crown, Trophy, Medal, Search, Flame, Swords, ThumbsUp, Disc3, Sparkles, ArrowLeft } from "lucide-react";
+import { Crown, Trophy, Medal, Search, Flame, Swords, ThumbsUp, Disc3, Sparkles, ArrowLeft, TrendingUp, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SignedImg } from "@/components/ui/signed-img";
 import { getArtistLeaderboard, type LeaderboardEntry } from "@/lib/leaderboard.functions";
@@ -45,31 +45,76 @@ function LeaderboardPage() {
   const top3 = rows.slice(0, 3);
   const rest = filtered.filter((r) => r.rank > 3);
 
+  const totals = useMemo(() => {
+    return rows.reduce(
+      (a, r) => ({
+        xp: a.xp + r.xp,
+        votes: a.votes + r.totalVotes,
+        wins: a.wins + r.battleWins,
+      }),
+      { xp: 0, votes: 0, wins: 0 },
+    );
+  }, [rows]);
+
   return (
-    <div className="min-h-screen bg-[#05050a] text-white">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 space-y-10">
-        <header className="space-y-4">
-          <Link to="/artists" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white">
-            <ArrowLeft className="h-4 w-4" /> All artists
+    <div className="relative min-h-screen overflow-hidden bg-[#05050a] text-white">
+      {/* Cinematic backdrop */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-[#C53DFF]/25 blur-[140px]" />
+        <div className="absolute top-20 right-[-160px] h-[460px] w-[460px] rounded-full bg-[#FF00A6]/25 blur-[140px]" />
+        <div className="absolute bottom-[-200px] left-1/3 h-[520px] w-[520px] rounded-full bg-[#00E6FF]/20 blur-[160px]" />
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            maskImage: "radial-gradient(ellipse at top, black 30%, transparent 75%)",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 space-y-12">
+        {/* HERO */}
+        <header className="space-y-6">
+          <Link
+            to="/artists"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50 transition hover:text-white"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> All artists
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] p-2.5">
-              <Trophy className="h-7 w-7 text-black" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-black tracking-tight sm:text-5xl">
-                Artist Leaderboard
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-white/70 backdrop-blur">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF00A6] opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#FF00A6]" />
+                </span>
+                Live Rankings · Season 01
+              </div>
+              <h1 className="text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl">
+                <span className="block bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
+                  THE
+                </span>
+                <span className="block bg-gradient-to-r from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] bg-clip-text text-transparent">
+                  LEADERBOARD
+                </span>
               </h1>
-              <p className="text-sm text-white/60 sm:text-base">
-                Ranked by XP, battle wins, and audience votes.
+              <p className="max-w-md text-sm text-white/60 sm:text-base">
+                Every vote, every win, every stream — calculated live. Only the loudest survive.
               </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 sm:w-auto">
+              <HeroStat icon={Sparkles} label="XP" value={totals.xp} accent="#C53DFF" />
+              <HeroStat icon={ThumbsUp} label="Votes" value={totals.votes} accent="#00E6FF" />
+              <HeroStat icon={Swords} label="Wins" value={totals.wins} accent="#FF00A6" />
             </div>
           </div>
         </header>
 
-        {/* Podium */}
+        {/* PODIUM */}
         {top3.length > 0 && (
-          <section className="grid gap-4 sm:grid-cols-3">
+          <section className="grid gap-4 sm:grid-cols-3 sm:items-end">
             {[1, 0, 2].map((idx, i) => {
               const a = top3[idx];
               if (!a) return <div key={i} />;
@@ -78,29 +123,29 @@ function LeaderboardPage() {
           </section>
         )}
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search artists…"
-            className="bg-white/5 border-white/10 pl-10 text-white placeholder:text-white/40"
-          />
+        {/* SEARCH + COUNT */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative max-w-sm flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search the ranks…"
+              className="h-12 rounded-full border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-white/40 focus-visible:ring-[#FF00A6]/50"
+            />
+          </div>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50">
+            <TrendingUp className="h-3.5 w-3.5 text-[#00E6FF]" />
+            {rows.length} artists ranked
+          </div>
         </div>
 
-        {/* List */}
-        <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-          <div className="hidden md:grid grid-cols-[64px_1fr_120px_120px_120px_120px] gap-4 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-xs uppercase tracking-wider text-white/40">
-            <div>Rank</div>
-            <div>Artist</div>
-            <div className="text-right">XP</div>
-            <div className="text-right">Battle Wins</div>
-            <div className="text-right">Votes</div>
-            <div className="text-right">Tracks</div>
-          </div>
+        {/* LIST */}
+        <section className="space-y-2">
           {rest.length === 0 && filtered.length === 0 && (
-            <div className="p-10 text-center text-white/50">No artists match that search.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-12 text-center text-white/50">
+              No artists match that search.
+            </div>
           )}
           {(q ? filtered : rest).map((a) => (
             <LeaderRow key={a.userId} entry={a} />
@@ -111,122 +156,257 @@ function LeaderboardPage() {
   );
 }
 
+function HeroStat({
+  icon: Icon,
+  label,
+  value,
+  accent,
+}: {
+  icon: any;
+  label: string;
+  value: number;
+  accent: string;
+}) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 backdrop-blur"
+    >
+      <div
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+      />
+      <div className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-white/50">
+        <Icon className="h-3 w-3" style={{ color: accent }} />
+        {label}
+      </div>
+      <div className="mt-1 font-mono text-lg font-bold tabular-nums sm:text-xl">
+        {value >= 1000 ? `${(value / 1000).toFixed(1)}k` : value.toLocaleString()}
+      </div>
+    </div>
+  );
+}
+
 function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
+  const isFirst = entry.rank === 1;
   const accent =
     entry.rank === 1
-      ? "from-[#FFD700] via-[#FF00A6] to-[#C53DFF]"
+      ? { from: "#FFD700", via: "#FF00A6", to: "#C53DFF", glow: "rgba(255,0,166,0.55)" }
       : entry.rank === 2
-      ? "from-[#C0C0C0] via-[#00E6FF] to-[#004BFF]"
-      : "from-[#CD7F32] via-[#FF00A6] to-[#C53DFF]";
+      ? { from: "#E5E7EB", via: "#00E6FF", to: "#004BFF", glow: "rgba(0,230,255,0.45)" }
+      : { from: "#CD7F32", via: "#C53DFF", to: "#FF00A6", glow: "rgba(197,61,255,0.45)" };
   const Icon = entry.rank === 1 ? Crown : entry.rank === 2 ? Trophy : Medal;
-  const height = entry.rank === 1 ? "sm:mt-0" : entry.rank === 2 ? "sm:mt-6" : "sm:mt-10";
+  const lift =
+    entry.rank === 1 ? "sm:-translate-y-6 sm:scale-[1.04]" : entry.rank === 2 ? "" : "sm:translate-y-3";
 
   return (
     <Link
       to="/artist/$id"
       params={{ id: entry.publicId }}
-      className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 transition hover:border-white/30 ${height}`}
+      className={`group relative block transition-transform duration-500 hover:-translate-y-1 ${lift}`}
     >
-      <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent}`} />
-      <div className="flex items-start justify-between">
-        <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-black font-black`}>
+      {/* Glow halo */}
+      <div
+        className="absolute -inset-px rounded-3xl opacity-60 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background: `linear-gradient(135deg, ${accent.from}, ${accent.via}, ${accent.to})`,
+        }}
+      />
+      {/* Card */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#0d0d18] to-[#05050a] p-5 sm:p-6">
+        {/* Top accent bar */}
+        <div
+          className="absolute inset-x-0 top-0 h-[3px]"
+          style={{
+            background: `linear-gradient(90deg, ${accent.from}, ${accent.via}, ${accent.to})`,
+          }}
+        />
+        {/* Rank watermark */}
+        <div
+          className="pointer-events-none absolute -right-4 -bottom-10 select-none text-[160px] font-black leading-none tracking-tighter opacity-[0.08]"
+          style={{ color: accent.via }}
+        >
           {entry.rank}
-        </span>
-        <Icon className="h-6 w-6 text-white/80" />
-      </div>
-      <div className="mt-4 flex items-center gap-3">
-        <div className={`rounded-full bg-gradient-to-br ${accent} p-[2px]`}>
-          <div className="rounded-full bg-[#05050a] p-[2px]">
-            {entry.avatarUrl ? (
-              <SignedImg
-                src={entry.avatarUrl}
-                alt={entry.name}
-                className="h-14 w-14 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/10 text-lg font-bold">
-                {entry.name.charAt(0)}
+        </div>
+
+        <div className="relative flex items-start justify-between">
+          <span
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-base font-black text-black"
+            style={{
+              background: `linear-gradient(135deg, ${accent.from}, ${accent.via})`,
+              boxShadow: `0 0 24px ${accent.glow}`,
+            }}
+          >
+            #{entry.rank}
+          </span>
+          <Icon
+            className="h-7 w-7"
+            style={{ color: accent.from, filter: `drop-shadow(0 0 8px ${accent.glow})` }}
+          />
+        </div>
+
+        {/* Avatar */}
+        <div className="relative mt-5 flex items-center gap-4">
+          <div className="relative">
+            <div
+              className="absolute -inset-1 rounded-full opacity-80 blur-md"
+              style={{
+                background: `linear-gradient(135deg, ${accent.from}, ${accent.via}, ${accent.to})`,
+              }}
+            />
+            <div
+              className="relative rounded-full p-[2px]"
+              style={{
+                background: `linear-gradient(135deg, ${accent.from}, ${accent.via}, ${accent.to})`,
+              }}
+            >
+              <div className="rounded-full bg-[#05050a] p-[3px]">
+                {entry.avatarUrl ? (
+                  <SignedImg
+                    src={entry.avatarUrl}
+                    alt={entry.name}
+                    className={`rounded-full object-cover ${isFirst ? "h-20 w-20" : "h-16 w-16"}`}
+                  />
+                ) : (
+                  <div
+                    className={`flex items-center justify-center rounded-full bg-white/10 font-bold ${
+                      isFirst ? "h-20 w-20 text-2xl" : "h-16 w-16 text-xl"
+                    }`}
+                  >
+                    {entry.name.charAt(0)}
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className={`truncate font-black ${isFirst ? "text-2xl" : "text-xl"}`}>
+              {entry.name}
+            </div>
+            {entry.username && (
+              <div className="truncate text-xs text-white/40">@{entry.username}</div>
             )}
+            <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+              <Zap className="h-2.5 w-2.5" style={{ color: accent.via }} />
+              {entry.score.toLocaleString()} pts
+            </div>
           </div>
         </div>
-        <div className="min-w-0">
-          <div className="truncate text-lg font-bold">{entry.name}</div>
-          {entry.username && (
-            <div className="truncate text-xs text-white/50">@{entry.username}</div>
-          )}
+
+        <div className="relative mt-5 grid grid-cols-3 gap-2 text-center">
+          <PodiumStat icon={Sparkles} label="XP" value={entry.xp} accent={accent.via} />
+          <PodiumStat icon={Swords} label="Wins" value={entry.battleWins} accent={accent.via} />
+          <PodiumStat icon={ThumbsUp} label="Votes" value={entry.totalVotes} accent={accent.via} />
         </div>
-      </div>
-      <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-        <Stat icon={Sparkles} label="XP" value={entry.xp} />
-        <Stat icon={Swords} label="Wins" value={entry.battleWins} />
-        <Stat icon={ThumbsUp} label="Votes" value={entry.totalVotes} />
       </div>
     </Link>
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: any; label: string; value: number }) {
+function PodiumStat({
+  icon: Icon,
+  label,
+  value,
+  accent,
+}: {
+  icon: any;
+  label: string;
+  value: number;
+  accent: string;
+}) {
   return (
-    <div className="rounded-lg bg-white/[0.04] py-2">
-      <Icon className="mx-auto h-3.5 w-3.5 text-white/60" />
-      <div className="mt-1 text-sm font-bold">{value.toLocaleString()}</div>
-      <div className="text-[10px] uppercase tracking-wider text-white/40">{label}</div>
+    <div className="rounded-xl border border-white/5 bg-black/40 py-2.5">
+      <Icon className="mx-auto h-3.5 w-3.5" style={{ color: accent }} />
+      <div className="mt-1 font-mono text-sm font-bold tabular-nums">
+        {value.toLocaleString()}
+      </div>
+      <div className="text-[9px] uppercase tracking-[0.15em] text-white/40">{label}</div>
     </div>
   );
 }
 
 function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
-  const rankColor =
-    entry.rank <= 3
-      ? "text-[#FF00A6]"
-      : entry.rank <= 10
-      ? "text-[#00E6FF]"
-      : "text-white/60";
+  const isHot = entry.rank <= 10;
+  const rankAccent =
+    entry.rank <= 10 ? "#FF00A6" : entry.rank <= 25 ? "#00E6FF" : "rgba(255,255,255,0.4)";
+
   return (
     <Link
       to="/artist/$id"
       params={{ id: entry.publicId }}
-      className="grid grid-cols-[40px_1fr_auto] md:grid-cols-[64px_1fr_120px_120px_120px_120px] gap-4 border-b border-white/5 px-4 py-3 transition hover:bg-white/[0.04] sm:px-5"
+      className="group relative block overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur transition-all duration-300 hover:border-white/20 hover:bg-white/[0.05]"
     >
-      <div className={`flex items-center text-lg font-black ${rankColor}`}>
-        {entry.rank <= 10 && <Flame className="mr-1 h-4 w-4" />}#{entry.rank}
-      </div>
-      <div className="flex min-w-0 items-center gap-3">
-        {entry.avatarUrl ? (
-          <SignedImg
-            src={entry.avatarUrl}
-            alt={entry.name}
-            className="h-10 w-10 shrink-0 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 font-bold">
-            {entry.name.charAt(0)}
-          </div>
-        )}
-        <div className="min-w-0">
-          <div className="truncate font-semibold">{entry.name}</div>
-          {entry.username && (
-            <div className="truncate text-xs text-white/40">@{entry.username}</div>
+      {/* Left accent bar */}
+      <div
+        className="absolute inset-y-0 left-0 w-[3px] transition-all duration-300 group-hover:w-1"
+        style={{ background: rankAccent }}
+      />
+      {/* Hover sweep */}
+      <div
+        className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent transition-transform duration-700 group-hover:translate-x-full"
+      />
+
+      <div className="relative grid grid-cols-[48px_1fr_auto] md:grid-cols-[80px_1fr_100px_100px_100px_90px] items-center gap-3 px-4 py-3.5 sm:px-5 md:gap-4">
+        <div className="flex items-center gap-1.5">
+          {isHot && (
+            <Flame
+              className="h-3.5 w-3.5"
+              style={{ color: rankAccent, filter: `drop-shadow(0 0 6px ${rankAccent})` }}
+            />
           )}
+          <span className="font-mono text-base font-black tabular-nums" style={{ color: rankAccent }}>
+            {String(entry.rank).padStart(2, "0")}
+          </span>
+        </div>
+
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="relative shrink-0">
+            {isHot && (
+              <div
+                className="absolute -inset-0.5 rounded-full opacity-60 blur-sm"
+                style={{ background: rankAccent }}
+              />
+            )}
+            {entry.avatarUrl ? (
+              <SignedImg
+                src={entry.avatarUrl}
+                alt={entry.name}
+                className="relative h-11 w-11 rounded-full object-cover ring-1 ring-white/10"
+              />
+            ) : (
+              <div className="relative flex h-11 w-11 items-center justify-center rounded-full bg-white/10 font-bold ring-1 ring-white/10">
+                {entry.name.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="truncate font-bold">{entry.name}</div>
+            {entry.username && (
+              <div className="truncate text-xs text-white/40">@{entry.username}</div>
+            )}
+          </div>
+        </div>
+
+        <RowCell icon={Sparkles} value={entry.xp} color="#C53DFF" />
+        <RowCell icon={Swords} value={entry.battleWins} color="#FF00A6" />
+        <RowCell icon={ThumbsUp} value={entry.totalVotes} color="#00E6FF" />
+        <RowCell icon={Disc3} value={entry.trackCount} color="rgba(255,255,255,0.5)" />
+
+        <div className="md:hidden text-right">
+          <div className="font-mono text-sm font-bold tabular-nums" style={{ color: rankAccent }}>
+            {entry.score.toLocaleString()}
+          </div>
+          <div className="text-[9px] uppercase tracking-wider text-white/40">pts</div>
         </div>
       </div>
-      <div className="hidden text-right font-mono tabular-nums md:block">
-        {entry.xp.toLocaleString()}
-      </div>
-      <div className="hidden text-right font-mono tabular-nums md:block">
-        {entry.battleWins}
-      </div>
-      <div className="hidden text-right font-mono tabular-nums md:block">
-        {entry.totalVotes.toLocaleString()}
-      </div>
-      <div className="hidden items-center justify-end gap-1 md:flex">
-        <Disc3 className="h-3.5 w-3.5 text-white/40" />
-        <span className="font-mono tabular-nums">{entry.trackCount}</span>
-      </div>
-      <div className="md:hidden text-right font-mono text-sm tabular-nums">
-        {entry.score.toLocaleString()}
-      </div>
     </Link>
+  );
+}
+
+function RowCell({ icon: Icon, value, color }: { icon: any; value: number; color: string }) {
+  return (
+    <div className="hidden md:flex items-center justify-end gap-1.5">
+      <Icon className="h-3 w-3" style={{ color }} />
+      <span className="font-mono text-sm tabular-nums">{value.toLocaleString()}</span>
+    </div>
   );
 }
