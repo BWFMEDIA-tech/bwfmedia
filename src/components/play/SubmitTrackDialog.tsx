@@ -123,6 +123,27 @@ export function SubmitTrackDialog({
     if (!title.trim() || !artistName.trim()) return;
     setBusy(true);
     try {
+      // Duplicate guard: refuse to submit a track the artist has already
+      // uploaded (matched by case-insensitive title across any stream /
+      // profile). New songs must be genuinely new.
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user?.id;
+      if (uid) {
+        const { data: existing } = await supabase
+          .from("play_tracks")
+          .select("id, title, status")
+          .eq("artist_user_id", uid)
+          .neq("status", "removed")
+          .ilike("title", title.trim());
+        if (existing && existing.length > 0) {
+          setBusy(false);
+          toast.error("You've already uploaded this track", {
+            description:
+              "Pick it from your profile or rename the file — only brand-new tracks can be submitted.",
+          });
+          return;
+        }
+      }
       const res: any = await submitFn({ data: { streamId, title, artistName, audioUrl, coverUrl, useBoost } });
       if (res?.routedToBattle) {
         toast.success(`Routed to Side ${String(res.battleSide).toUpperCase()} of the live battle`);
