@@ -536,9 +536,23 @@ export function ImmersivePlayer({
     catch (e: any) { toast.error(e?.message ?? "Skip failed"); }
   };
   const hostPlayPrev = async () => {
-    if (!isHost || !streamId) return;
+    // Spotify-style: if we're more than 3s into the track, restart it.
+    const a = audioRef.current;
+    if (a && a.currentTime > 3) {
+      a.currentTime = 0;
+      setProgress(0);
+      return;
+    }
+    // Otherwise host can replay the most recently finished track.
+    if (!isHost || !streamId) {
+      if (a) { a.currentTime = 0; setProgress(0); }
+      return;
+    }
     const prev = leaderboard[0];
-    if (!prev) { toast.error("No previous track"); return; }
+    if (!prev) {
+      if (a) { a.currentTime = 0; setProgress(0); }
+      return;
+    }
     try { await playFn({ data: { streamId, trackId: prev.id } }); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
