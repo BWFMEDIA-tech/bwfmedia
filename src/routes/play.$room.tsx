@@ -13,6 +13,7 @@ import { SubmitTrackDialog } from "@/components/play/SubmitTrackDialog";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { BattleArena } from "@/components/stream/BattleArena";
 import { ImmersivePlayer } from "@/components/play/ImmersivePlayer";
+import { useStageState } from "@/lib/useStageState";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
