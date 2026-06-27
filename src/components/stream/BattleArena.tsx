@@ -197,6 +197,20 @@ function BattleView({
   const voteFn = useServerFn(castBattleVote);
   const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack } = roomState;
 
+  // Optimistic vote bumps keyed by round id. Lets the percentage bars move
+  // the instant a viewer clicks Vote, without waiting for the server round
+  // trip + realtime UPDATE on battle_rounds to propagate back. Reconciled
+  // automatically when `currentRound.id` changes (new round) and clamped
+  // below so the bar never exceeds 100%.
+  const [optimistic, setOptimistic] = useState<{ roundId: string; a: number; b: number }>(
+    { roundId: "", a: 0, b: 0 },
+  );
+  useEffect(() => {
+    if (currentRound?.id && optimistic.roundId !== currentRound.id) {
+      setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
+    }
+  }, [currentRound?.id, optimistic.roundId]);
+
   // Live XP balance for the signed-in viewer (drives the header XP badge).
   const [xp, setXp] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -240,22 +254,48 @@ function BattleView({
     : 0;
   const remainingSec = Math.ceil(remainingMs / 1000);
 
-  const aScore = (currentRound as any)?.a_weight ?? 0;
-  const bScore = (currentRound as any)?.b_weight ?? 0;
+  const serverA = (currentRound as any)?.a_weight ?? 0;
+  const serverB = (currentRound as any)?.b_weight ?? 0;
+  const optA = currentRound && optimistic.roundId === currentRound.id ? optimistic.a : 0;
+  const optB = currentRound && optimistic.roundId === currentRound.id ? optimistic.b : 0;
+  // Take the max of server tally vs (server-at-click + optimistic bump) so
+  // we never double-count once the realtime UPDATE catches up.
+  const aScore = Math.max(serverA, serverA + optA);
+  const bScore = Math.max(serverB, serverB + optB);
   const total = aScore + bScore;
-  const aPct = total > 0 ? Math.round((aScore / total) * 100) : 0;
-  const bPct = total > 0 ? 100 - aPct : 0;
+  const aPct = total > 0 ? Math.min(100, Math.round((aScore / total) * 100)) : 0;
+  const bPct = total > 0 ? Math.min(100, 100 - aPct) : 0;
 
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
   const canVote = votingStatus === "open" && !myVote;
 
   const vote = async (choice: "a" | "b", useBoost = false) => {
     if (!currentRound) return;
+    const bump = useBoost ? 5 : 1;
+    // Optimistically move the bar immediately.
+    setOptimistic((prev) => {
+      const base = prev.roundId === currentRound.id ? prev : { roundId: currentRound.id, a: 0, b: 0 };
+      return {
+        roundId: currentRound.id,
+        a: base.a + (choice === "a" ? bump : 0),
+        b: base.b + (choice === "b" ? bump : 0),
+      };
+    });
     try {
       await voteFn({ data: { roundId: currentRound.id, choice, useBoost } });
       onVoteCast(choice);
       toast.success(useBoost ? "Super vote cast! +5x" : "Vote cast");
     } catch (e: any) {
+      // Roll back the optimistic bump on failure.
+      setOptimistic((prev) =>
+        prev.roundId === currentRound.id
+          ? {
+              roundId: prev.roundId,
+              a: prev.a - (choice === "a" ? bump : 0),
+              b: prev.b - (choice === "b" ? bump : 0),
+            }
+          : prev,
+      );
       toast.error(e?.message || "Vote failed");
     }
   };
