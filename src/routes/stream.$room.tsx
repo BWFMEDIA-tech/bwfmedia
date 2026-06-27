@@ -2,7 +2,7 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
-import { getStreamByRoom } from "@/lib/streams.functions";
+import { getStreamByRoom, endStream } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { LiveChat } from "@/components/stream/LiveChat";
@@ -226,6 +226,7 @@ function GuestPage() {
                   queue={queue}
                   participants={participants as StageParticipant[]}
                   room={room}
+                  onEnded={() => setLk(null)}
                 />
               )}
               {streamId && streamMeta && (
@@ -259,14 +260,31 @@ function HostControls({
   queue,
   participants,
   room,
+  onEnded,
 }: {
   streamId: string;
   hands: any[];
   queue: any[];
   participants: StageParticipant[];
   room: string;
+  onEnded?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
+  const endFn = useServerFn(endStream);
+  const [ending, setEnding] = useState(false);
+  const endLive = async () => {
+    if (!confirm("End the live stream for everyone?")) return;
+    setEnding(true);
+    try {
+      await endFn({ data: { streamId } });
+      toast.success("Stream ended");
+      onEnded?.();
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to end stream");
+    } finally {
+      setEnding(false);
+    }
+  };
   const link = typeof window !== "undefined"
     ? `${window.location.origin}/invite/${room}`
     : `/invite/${room}`;
@@ -297,6 +315,13 @@ function HostControls({
           </button>
         </div>
       </div>
+      <button
+        onClick={endLive}
+        disabled={ending}
+        className="self-start rounded-lg bg-gradient-to-r from-rose-500 to-red-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-red-900/30 hover:opacity-90 disabled:opacity-50"
+      >
+        {ending ? "Ending…" : "End Live Stream"}
+      </button>
     </div>
   );
 }
