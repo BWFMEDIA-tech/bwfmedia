@@ -21,7 +21,6 @@ export const Route = createFileRoute("/leaderboard")({
       { property: "og:description", content: "The top artists on BWF Network ranked by XP, battle wins, and audience votes." },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(leaderboardQuery),
   errorComponent: ({ error }) => (
     <div className="min-h-screen bg-[#05050a] text-white p-10">
       <p className="text-red-400">Couldn't load leaderboard: {error.message}</p>
