@@ -389,8 +389,7 @@ function TunevioLanding() {
                 <span>Live Battles</span>
               </div>
               <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
-                {"Play Arena -\u00A0"}
-                <span
+                {"Play Arena -\u00A0"}<span
                   className="bg-clip-text text-transparent"
                   style={{ backgroundImage: "linear-gradient(90deg,#FF00A6,#00E6FF)" }}
                 >
