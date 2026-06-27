@@ -10,6 +10,7 @@ import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/ba
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
 import { RankBadge } from "@/components/rank/RankBadge";
+import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
