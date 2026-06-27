@@ -13,6 +13,10 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
   const [status, setStatus] = useState<"idle" | "pending" | "accepted" | "declined">("idle");
   const [onStage, setOnStage] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Ref-based in-flight guard. Survives React Strict Mode double-invocation
+  // and rapid double-clicks: setBusy(true) is async, so a second click in the
+  // same tick would otherwise slip through before the disabled state lands.
+  const inFlightRef = useRef(false);
   const [requestedAt, setRequestedAt] = useState<number | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const tickRef = useRef<number | null>(null);
@@ -99,18 +103,27 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
 
   const onClick = async () => {
     if (!auth.isAuthenticated) { toast.error("Sign in to raise your hand"); return; }
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setBusy(true);
     try {
       await raise({ data: { streamId } });
+      // Only commit UI state after the server confirms. Realtime will also
+      // reconcile via the postgres_changes subscription above.
       setStatus("pending");
       setRequestedAt(Date.now());
       toast.success("Hand raised — waiting for host");
     } catch (e: any) {
       toast.error(e?.message || "Could not raise hand");
-    } finally { setBusy(false); }
+    } finally {
+      inFlightRef.current = false;
+      setBusy(false);
+    }
   };
 
   const onLeave = async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setBusy(true);
     try {
       await leave({ data: { streamId } });
@@ -119,10 +132,15 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
       toast.success("Left the stage");
     } catch (e: any) {
       toast.error(e?.message || "Could not leave stage");
-    } finally { setBusy(false); }
+    } finally {
+      inFlightRef.current = false;
+      setBusy(false);
+    }
   };
 
   const onCancel = async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setBusy(true);
     try {
       await cancel({ data: { streamId } });
@@ -131,7 +149,10 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
       toast.info("Request cancelled");
     } catch (e: any) {
       toast.error(e?.message || "Could not cancel");
-    } finally { setBusy(false); }
+    } finally {
+      inFlightRef.current = false;
+      setBusy(false);
+    }
   };
 
   if (onStage) {
