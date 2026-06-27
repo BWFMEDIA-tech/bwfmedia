@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Swords, Trophy, Zap, Crown, Sparkles, Loader2, Lock, Pencil } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Swords, Trophy, Zap, Crown, Sparkles, Loader2, Lock, Pencil, ChevronDown, Check } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -625,6 +625,7 @@ function CreateBattleDialog({
   const [rounds, setRounds] = useState(3);
   const [seconds, setSeconds] = useState(60);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const isEdit = mode === "edit";
 
   // Sync local selections when the underlying match changes via realtime so
@@ -637,6 +638,11 @@ function CreateBattleDialog({
 
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
+    // Pre-stage window confirmation step before persisting an edit.
+    if (isEdit && !confirming) {
+      setConfirming(true);
+      return;
+    }
     setBusy(true);
     const prevA = initialA ?? "";
     const prevB = initialB ?? "";
@@ -665,13 +671,18 @@ function CreateBattleDialog({
       }
       onClose();
     } catch (e: any) {
-      toast.error(e?.message ?? (isEdit ? "Failed to update matchup" : "Failed to create battle"));
       if (isEdit) {
+        toast.error("Matchup update rejected — reverted to previous selection", {
+          description: e?.message ?? "The lock window may have closed.",
+        });
         onOptimistic?.(prevA, prevB);
         onReconcile?.();
+      } else {
+        toast.error(e?.message ?? "Failed to create battle");
       }
     } finally {
       setBusy(false);
+      setConfirming(false);
     }
   };
 
@@ -709,15 +720,23 @@ function CreateBattleDialog({
           )}
         </div>
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5">
-            Cancel
+          {isEdit && confirming && (
+            <span className="mr-auto text-[11px] text-amber-300">
+              Confirm matchup change? This will lock once artists go on stage.
+            </span>
+          )}
+          <button
+            onClick={() => (confirming ? setConfirming(false) : onClose())}
+            className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5"
+          >
+            {confirming ? "Back" : "Cancel"}
           </button>
           <button
             onClick={submit} disabled={busy}
             className="rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, #c53dff, #ff00a6)" }}
           >
-            {busy ? "Saving…" : isEdit ? "Save matchup" : "Create battle"}
+            {busy ? "Saving…" : isEdit ? (confirming ? "Confirm save" : "Save matchup") : "Create battle"}
           </button>
         </div>
       </div>
@@ -733,23 +752,78 @@ function ArtistSelect({
 }) {
   const [filter, setFilter] = useState<"all" | "on_stage" | "submitter">("all");
   const [query, setQuery] = useState("");
-  const available = participants.filter((p) => p.user_id !== exclude);
-  const q = query.trim().toLowerCase();
-  const filtered = available.filter((p) => {
-    if (filter === "on_stage" && !(p.role === "on_stage" || p.role === "both")) return false;
-    if (filter === "submitter" && !(p.role === "submitter" || p.role === "both")) return false;
-    if (!q) return true;
-    const name = (p.display_name || "").toLowerCase();
-    return name.includes(q) || p.user_id.toLowerCase().startsWith(q);
-  });
-  const onStage = filtered.filter((p) => p.role === "on_stage" || p.role === "both");
-  const submitters = filtered.filter((p) => p.role === "submitter");
+  // Debounce the search query so typing stays fluid even with thousands
+  // of participants. 120ms feels instant but coalesces keystrokes.
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 120);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const available = useMemo(
+    () => participants.filter((p) => p.user_id !== exclude),
+    [participants, exclude],
+  );
+  const filtered = useMemo(() => {
+    const q = debouncedQuery.trim().toLowerCase();
+    return available.filter((p) => {
+      if (filter === "on_stage" && !(p.role === "on_stage" || p.role === "both")) return false;
+      if (filter === "submitter" && !(p.role === "submitter" || p.role === "both")) return false;
+      if (!q) return true;
+      const name = (p.display_name || "").toLowerCase();
+      return name.includes(q) || p.user_id.toLowerCase().startsWith(q);
+    });
+  }, [available, filter, debouncedQuery]);
+
   const roleLabel = (p: Participant) => {
     if (p.role === "both") return " · on stage + submitter";
     if (p.role === "on_stage") return p.stage_role ? ` · ${p.stage_role.replace("_", " ")}` : " · on stage";
     if (p.role === "submitter") return " · submitter";
     return "";
   };
+
+  // Build a flat virtualized list of section headers + items so we can
+  // render hundreds/thousands smoothly without painting every row.
+  type Row =
+    | { kind: "header"; key: string; label: string }
+    | { kind: "item"; key: string; p: Participant };
+  const rows = useMemo<Row[]>(() => {
+    const onStage = filtered.filter((p) => p.role === "on_stage" || p.role === "both");
+    const submitters = filtered.filter((p) => p.role === "submitter");
+    const out: Row[] = [];
+    if (onStage.length > 0) {
+      out.push({ kind: "header", key: "h-stage", label: "On stage (host / co-host / speaker)" });
+      for (const p of onStage) out.push({ kind: "item", key: `s-${p.user_id}`, p });
+    }
+    if (submitters.length > 0) {
+      out.push({ kind: "header", key: "h-sub", label: "Track submitters" });
+      for (const p of submitters) out.push({ kind: "item", key: `u-${p.user_id}`, p });
+    }
+    return out;
+  }, [filtered]);
+
+  const [open, setOpen] = useState(false);
+  const selected = available.find((p) => p.user_id === value) || null;
+
+  // Virtualization: fixed 36px row height, 240px viewport, 6-row overscan.
+  const ROW_H = 36;
+  const VIEW_H = 240;
+  const OVERSCAN = 6;
+  const [scrollTop, setScrollTop] = useState(0);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (open && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+      setScrollTop(0);
+    }
+  }, [open, debouncedQuery, filter]);
+
+  const startIdx = Math.max(0, Math.floor(scrollTop / ROW_H) - OVERSCAN);
+  const endIdx = Math.min(rows.length, Math.ceil((scrollTop + VIEW_H) / ROW_H) + OVERSCAN);
+  const visible = rows.slice(startIdx, endIdx);
+  const padTop = startIdx * ROW_H;
+  const totalH = rows.length * ROW_H;
+
   return (
     <label className="block text-xs text-white/70">
       <div className="flex items-center justify-between gap-2">
@@ -774,38 +848,69 @@ function ArtistSelect({
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => setOpen(true)}
         placeholder="Search artists…"
         className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/30"
       />
-      <select
-        value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white"
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="mt-1 flex w-full items-center justify-between rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-left text-sm text-white"
       >
-        <option value="">— select —</option>
-        {onStage.length > 0 && (
-          <optgroup label="On stage (host / co-host / speaker)">
-            {onStage.map((p) => (
-              <option key={p.user_id} value={p.user_id}>
-                {p.display_name || "Artist"}{roleLabel(p)}
-              </option>
-            ))}
-          </optgroup>
-        )}
-        {submitters.length > 0 && (
-          <optgroup label="Track submitters">
-            {submitters.map((p) => (
-              <option key={p.user_id} value={p.user_id}>
-                {p.display_name || "Artist"}{roleLabel(p)}
-              </option>
-            ))}
-          </optgroup>
-        )}
-        {filtered.length === 0 && (
-          <option value="" disabled>
-            No matching artists
-          </option>
-        )}
-      </select>
+        <span className="truncate">
+          {selected ? `${selected.display_name || "Artist"}${roleLabel(selected)}` : "— select —"}
+        </span>
+        <ChevronDown className={cn("h-3.5 w-3.5 text-white/50 transition", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="mt-1 overflow-hidden rounded-md border border-white/10 bg-[#0a0a14]">
+          {rows.length === 0 ? (
+            <div className="px-3 py-4 text-center text-xs text-white/40">No matching artists</div>
+          ) : (
+            <div
+              ref={scrollRef}
+              onScroll={(e) => setScrollTop((e.target as HTMLDivElement).scrollTop)}
+              style={{ height: Math.min(VIEW_H, Math.max(ROW_H * 2, totalH)), overflowY: "auto" }}
+            >
+              <div style={{ height: totalH, position: "relative" }}>
+                <div style={{ position: "absolute", top: padTop, left: 0, right: 0 }}>
+                  {visible.map((row) =>
+                    row.kind === "header" ? (
+                      <div
+                        key={row.key}
+                        style={{ height: ROW_H }}
+                        className="flex items-center px-2 text-[10px] font-bold uppercase tracking-widest text-white/40"
+                      >
+                        {row.label}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        key={row.key}
+                        style={{ height: ROW_H }}
+                        onClick={() => {
+                          onChange(row.p.user_id);
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between px-2 text-left text-sm hover:bg-white/5",
+                          value === row.p.user_id ? "bg-white/10 text-white" : "text-white/80",
+                        )}
+                      >
+                        <span className="truncate">
+                          {row.p.display_name || "Artist"}
+                          <span className="text-white/40">{roleLabel(row.p)}</span>
+                        </span>
+                        {value === row.p.user_id && <Check className="h-3.5 w-3.5 text-emerald-400" />}
+                      </button>
+                    ),
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </label>
   );
 }
