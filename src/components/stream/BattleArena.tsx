@@ -361,6 +361,21 @@ function BattleView({
       <div className="grid grid-cols-2 gap-0">
         <ArtistSide
           side="a"
+          />
+      </div>
+
+      {/* Unified live vote percentage tracker */}
+      <VoteTracker
+        aPct={aPct}
+        bPct={bPct}
+        aScore={aScore}
+        bScore={bScore}
+        myVote={myVote}
+        votingStatus={votingStatus}
+      />
+      <div className="hidden">
+        <ArtistSide
+          side="a"
           artistId={match.artist_a_id as string | null}
           name={match.artist_a_name ?? "Artist A"}
           coverUrl={(aTrack as any)?.cover_url ?? null}
