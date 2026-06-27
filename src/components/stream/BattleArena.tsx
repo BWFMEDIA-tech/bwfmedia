@@ -440,6 +440,12 @@ function ArtistSide({
   const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
   const isEmpty = !artistId;
   const dim = !isEmpty && status !== "playing";
+  const audioPlaying = usePlaybackPlaying();
+  // Spin whenever this side is the active track; freeze the rotation in place
+  // (animation-play-state: paused) when the shared audio element is paused,
+  // so it resumes from the same angle when playback continues.
+  const spinning = isPlaying;
+  const spinPaused = isPlaying && !audioPlaying;
   const statusMeta =
     status === "playing"
       ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#ff00a6] to-[#00e6ff] text-black animate-pulse" }
