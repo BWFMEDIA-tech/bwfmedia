@@ -176,6 +176,17 @@ export function NowPlayingHeader({
     } catch { /* autoplay rejection */ }
   };
 
+  const advanceFn = useServerFn(advancePlayQueue);
+  const handleNext = async () => {
+    if (!streamId || !isHost) return;
+    try {
+      const r = await advanceFn({ data: { streamId } });
+      toast.success(r.next ? "Playing next song" : "Queue empty");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to advance queue");
+    }
+  };
+
   const pct = duration > 0 ? Math.min(100, (progress / duration) * 100) : 0;
 
   return (
