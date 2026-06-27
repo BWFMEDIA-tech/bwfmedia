@@ -1,9 +1,11 @@
+import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { setStageRole, removeStageParticipant } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import type { StageParticipant } from "@/lib/useStageState";
 import { SignedImg } from "@/components/ui/signed-img";
+import { Loader2 } from "lucide-react";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -12,16 +14,43 @@ export function GreenRoom({ streamId, participants }: { streamId: string | null;
   const green = participants.filter((p) => p.stage_role === "green_room");
   const promote = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
+  const [pending, setPending] = useState<Record<string, "promote" | "remove" | undefined>>({});
+  // Per-user in-flight guard so React Strict Mode, rapid double-clicks, or a
+  // websocket-driven re-render cannot fire the mutation twice for the same
+  // participant before the server response lands.
+  const inFlightRef = useRef<Set<string>>(new Set());
 
   const bringOnStage = async (uid: string) => {
     if (!streamId) return;
-    try { await promote({ data: { streamId, targetUserId: uid, stageRole: "speaker" } }); toast.success("On stage"); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    const key = `promote:${uid}`;
+    if (inFlightRef.current.has(key)) return;
+    inFlightRef.current.add(key);
+    setPending((p) => ({ ...p, [uid]: "promote" }));
+    try {
+      await promote({ data: { streamId, targetUserId: uid, stageRole: "speaker" } });
+      toast.success("On stage");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    } finally {
+      inFlightRef.current.delete(key);
+      setPending((p) => { const n = { ...p }; delete n[uid]; return n; });
+    }
   };
   const removeOne = async (uid: string) => {
     if (!streamId) return;
-    try { await remove({ data: { streamId, targetUserId: uid } }); toast.success("Removed"); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    const key = `remove:${uid}`;
+    if (inFlightRef.current.has(key)) return;
+    inFlightRef.current.add(key);
+    setPending((p) => ({ ...p, [uid]: "remove" }));
+    try {
+      await remove({ data: { streamId, targetUserId: uid } });
+      toast.success("Removed");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    } finally {
+      inFlightRef.current.delete(key);
+      setPending((p) => { const n = { ...p }; delete n[uid]; return n; });
+    }
   };
 
   return (
@@ -49,11 +78,22 @@ export function GreenRoom({ streamId, participants }: { streamId: string | null;
                 <div className="text-sm font-semibold text-white">{p.display_name ?? "Guest"}</div>
                 <div className="truncate text-[10px] text-white/50">waiting backstage</div>
               </div>
-              <button onClick={() => bringOnStage(p.user_id)} className="rounded-md px-2.5 py-1 text-[11px] font-semibold text-white" style={{ background: PURPLE }}>
-                Bring On Stage
+              <button
+                onClick={() => bringOnStage(p.user_id)}
+                disabled={!!pending[p.user_id]}
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold text-white disabled:opacity-60"
+                style={{ background: PURPLE }}
+              >
+                {pending[p.user_id] === "promote" && <Loader2 className="h-3 w-3 animate-spin" />}
+                {pending[p.user_id] === "promote" ? "Bringing up…" : "Bring On Stage"}
               </button>
-              <button onClick={() => removeOne(p.user_id)} className="rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/70 hover:bg-white/5">
-                Remove
+              <button
+                onClick={() => removeOne(p.user_id)}
+                disabled={!!pending[p.user_id]}
+                className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/70 hover:bg-white/5 disabled:opacity-60"
+              >
+                {pending[p.user_id] === "remove" && <Loader2 className="h-3 w-3 animate-spin" />}
+                {pending[p.user_id] === "remove" ? "Removing…" : "Remove"}
               </button>
             </div>
           ))}
