@@ -105,6 +105,14 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
     return Array.from(seen.values());
   })();
 
+  // IDs of users currently on stage as performers. Used to lock the
+  // Artist A / Artist B selectors once anyone in the matchup goes live.
+  const onStageIds = new Set(
+    stageState.participants
+      .filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room")
+      .map((p) => p.user_id),
+  );
+
   return (
     <>
       <div className="space-y-5">
@@ -168,7 +176,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
             {/* Battle Arena — 1v1 head-to-head over the play queue */}
             {stream && (
-              <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} />
+              <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} />
             )}
           </div>
 
