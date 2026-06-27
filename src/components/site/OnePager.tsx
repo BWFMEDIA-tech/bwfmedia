@@ -5,8 +5,6 @@ import {
   Mic,
   ArrowRight,
   Check,
-  Radio,
-  Eye,
   Music,
   Headphones,
   Star,
@@ -18,9 +16,7 @@ import {
   Music2,
   Calendar,
   PlayCircle,
-  Camera,
   ChevronRight,
-  Compass,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -91,192 +87,6 @@ function EmptyHint({ icon: Icon, text }: { icon: any; text: string }) {
   );
 }
 
-/* ---------- HERO + LIVE PANEL ---------- */
-
-function Hero({ liveStreams }: { liveStreams: any[] }) {
-  const feature = liveStreams[0];
-  return (
-    <section id="top" className="relative w-full overflow-hidden pt-28 pb-12 md:pt-32 md:pb-20">
-      <video
-        className="absolute inset-0 w-full h-full object-cover opacity-50"
-        src={heroRapperVideo.url}
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/80 to-black" />
-      <div
-        className="absolute inset-0 opacity-40 pointer-events-none"
-        style={{ background: "radial-gradient(60% 50% at 50% 30%, rgba(225,29,42,0.35), transparent 70%)" }}
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 grid lg:grid-cols-[1fr_360px] gap-8">
-        {/* Left: marquee hero card */}
-        <div className="relative rounded-2xl overflow-hidden border border-blood/30 bg-black/40 backdrop-blur-md min-h-[420px] md:min-h-[480px] flex flex-col justify-end p-6 md:p-10">
-          <div
-            className="absolute inset-0 -z-10"
-            style={{
-              backgroundImage: feature?.thumbnailUrl
-                ? `linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%), url(${feature.thumbnailUrl})`
-                : "linear-gradient(135deg, rgba(225,29,42,0.18), rgba(0,0,0,0.6))",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-5">
-            <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-            <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
-              {feature ? "Live Now" : "BWF Network"}
-            </span>
-          </div>
-          {feature ? (
-            <>
-              <p className="font-cond tracking-[0.3em] text-[11px] uppercase text-blood mb-3">Live in Play Arena</p>
-              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9] uppercase text-bone">
-                {feature.host?.stage_name || feature.host?.display_name || feature.title}
-                <br />
-                <span className="inline-flex items-center gap-3">
-                  Live
-                  <span className="h-3 w-3 rounded-full bg-blood animate-pulse" />
-                </span>
-              </h1>
-              <p className="mt-5 max-w-xl text-bone/75 text-sm md:text-base">
-                {feature.title || "Watch the exclusive live session happening right now."}
-              </p>
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                <RouterLink
-                  to="/play/$room"
-                  params={{ room: feature.roomName }}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
-                >
-                  <Play size={14} fill="currentColor" /> Watch Live
-                </RouterLink>
-                <RouterLink
-                  to="/live"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/25 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
-                >
-                  View Details
-                </RouterLink>
-              </div>
-            </>
-          ) : (
-            <>
-              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9] uppercase text-bone">
-                Where Culture
-                <br />
-                <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-blood)" }}>
-                  Goes Live
-                </span>
-              </h1>
-              <p className="mt-5 max-w-xl text-bone/75 text-sm md:text-base">
-                Music. Streams. Reviews. The home stage for the next wave of artists.
-              </p>
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                <RouterLink
-                  to="/studio"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
-                >
-                  <Camera size={14} /> Book a Shoot
-                </RouterLink>
-                <RouterLink
-                  to="/off-the-block"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-blood/40 bg-blood/10 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood/20 transition-colors rounded-md"
-                >
-                  Off Da Block <ArrowRight size={14} />
-                </RouterLink>
-                <RouterLink
-                  to="/discover"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
-                >
-                  <Compass size={14} /> Discover
-                </RouterLink>
-              </div>
-            </>
-          )}
-
-          {feature && (
-            <div className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-black/70 backdrop-blur px-3 py-1.5 border border-white/10">
-              <span className="h-1.5 w-1.5 rounded-full bg-blood animate-pulse" />
-              <span className="font-cond text-[11px] uppercase tracking-widest text-bone/80">LIVE</span>
-              <span className="text-[11px] text-bone/60 inline-flex items-center gap-1">
-                <Eye size={11} /> {feature.viewerCount.toLocaleString()} watching
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Right: live activity rail */}
-        <aside className="space-y-6">
-          <div className="rounded-2xl border border-white/10 bg-[#0d0d18]/90 backdrop-blur p-5">
-            <h3 className="font-bold text-bone mb-4">Live Activity</h3>
-            {liveStreams.length === 0 ? (
-              <EmptyHint icon={Radio} text="Nothing live right now. Check back soon." />
-            ) : (
-              <div className="space-y-3">
-                {liveStreams.slice(0, 3).map((s) => (
-                  <RouterLink
-                    key={s.id}
-                    to="/play/$room"
-                    params={{ room: s.roomName }}
-                    className="group flex items-center gap-3 p-2.5 rounded-lg border border-white/5 hover:border-blood/40 hover:bg-white/[0.02] transition-colors"
-                  >
-                    <div className="inline-flex items-center gap-1.5 rounded bg-blood px-2 py-0.5 text-[10px] font-bold tracking-widest text-white">
-                      LIVE
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-semibold text-bone group-hover:text-blood-glow">
-                        {s.title || "Live session"}
-                      </div>
-                      <div className="truncate text-[11px] text-bone/50">
-                        {s.host?.stage_name || s.host?.display_name || "BWF host"}
-                      </div>
-                    </div>
-                    <span className="text-[11px] text-bone/60 inline-flex items-center gap-1">
-                      <Eye size={11} /> {s.viewerCount}
-                    </span>
-                  </RouterLink>
-                ))}
-              </div>
-            )}
-            <RouterLink
-              to="/live"
-              className="mt-5 block w-full text-center rounded-md bg-blood text-white font-cond font-bold tracking-[0.2em] text-[11px] uppercase py-3 hover:bg-blood-glow transition-colors"
-            >
-              {liveStreams.length ? "Join Live Session" : "Browse Live Shows"}
-            </RouterLink>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#0d0d18]/90 backdrop-blur p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-bone">Quick Actions</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <QuickLink to="/studio" icon={Camera} label="Book a Shoot" />
-              <QuickLink to="/off-the-block" icon={Star} label="Off Da Block" />
-              <QuickLink to="/discover" icon={Compass} label="Discover" />
-              <QuickLink to="/artists" icon={Headphones} label="Artists" />
-            </div>
-          </div>
-        </aside>
-      </div>
-    </section>
-  );
-}
-
-function QuickLink({ to, icon: Icon, label }: { to: string; icon: any; label: string }) {
-  return (
-    <RouterLink
-      to={to}
-      className="group flex flex-col items-start gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-3 hover:border-blood/50 hover:bg-blood/5 transition-colors"
-    >
-      <Icon size={16} className="text-blood" />
-      <span className="font-cond font-bold tracking-[0.2em] text-[10px] uppercase text-bone/80 group-hover:text-bone">
-        {label}
-      </span>
-    </RouterLink>
-  );
-}
 
 /* ---------- SPOTLIGHT (Featured Artists) ---------- */
 
@@ -551,7 +361,6 @@ export function OnePager() {
     refetchInterval: 60_000,
   });
 
-  const liveStreams = data?.liveStreams ?? [];
   const featuredArtists = data?.featuredArtists ?? [];
   const videos = data?.videos ?? [];
 
@@ -569,7 +378,6 @@ export function OnePager() {
     >
       <div className="relative z-10">
         <ScrollProgress />
-        <Hero liveStreams={liveStreams} />
         <PlayArenaIntro />
         <Spotlight artists={featuredArtists} />
         <VideosRow videos={videos} />
