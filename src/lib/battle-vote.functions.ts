@@ -68,7 +68,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: voteId, error } = await supabase.rpc("cast_battle_vote", {
+    const { data: voteId, error } = await (supabase.rpc as any)("cast_battle_vote", {
       _match_id: data.match_id,
       _round_id: data.round_id,
       _choice: data.choice,
