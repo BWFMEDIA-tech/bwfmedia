@@ -973,3 +973,61 @@ function ArtistSelect({
     </label>
   );
 }
+
+function TrackSelect({
+  label,
+  value,
+  onChange,
+  tracks,
+  loading,
+  artistSelected,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  tracks: { id: string; title: string; cover_url: string | null; status: string }[];
+  loading: boolean;
+  artistSelected: boolean;
+}) {
+  const selected = tracks.find((t) => t.id === value) || null;
+  return (
+    <label className="block text-xs text-white/70">
+      <span>{label}</span>
+      {!artistSelected ? (
+        <div className="mt-1 rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white/40">
+          Pick an artist first
+        </div>
+      ) : loading ? (
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white/50">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading tracks…
+        </div>
+      ) : tracks.length === 0 ? (
+        <div className="mt-1 rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white/40">
+          No tracks submitted yet
+        </div>
+      ) : (
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-white/10 bg-black/40 px-2 py-1 pr-2">
+          {selected?.cover_url ? (
+            <img src={selected.cover_url} alt="" className="h-7 w-7 rounded object-cover" />
+          ) : (
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-white/10">
+              <Swords className="h-3.5 w-3.5 text-white/50" />
+            </div>
+          )}
+          <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="flex-1 bg-transparent py-1 text-sm text-white outline-none [&>option]:bg-[#0d0d18]"
+          >
+            {tracks.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.title}
+                {t.status === "playing" ? "  · now playing" : t.status === "played" ? "  · played" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+    </label>
+  );
+}
