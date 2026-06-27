@@ -605,6 +605,14 @@ function CreateBattleDialog({
   const [busy, setBusy] = useState(false);
   const isEdit = mode === "edit";
 
+  // Sync local selections when the underlying match changes via realtime so
+  // an open dialog reflects edits made by other clients in the room.
+  useEffect(() => {
+    if (!isEdit) return;
+    if (initialA !== undefined) setA(initialA);
+    if (initialB !== undefined) setB(initialB);
+  }, [initialA, initialB, isEdit]);
+
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
     setBusy(true);
