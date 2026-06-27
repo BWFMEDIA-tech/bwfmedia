@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Calendar, Clock, Mic, Video, Flame, TrendingUp, Camera, Music2 } from "lucide-react";
 
-export const Route = createFileRoute("/blog")({
+export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
       { title: "Blog — BWF Media TV" },
@@ -38,7 +38,51 @@ const featured = {
   Icon: Flame,
 };
 
-const posts = [
+const posts: Array<{
+  category: string;
+  Icon: typeof Mic;
+  title: string;
+  excerpt: string;
+  date: string;
+  readTime: string;
+  href?: string;
+}> = [
+  {
+    category: "Guide · Pillar",
+    Icon: Video,
+    title: "How to Live Stream Music in 2026",
+    excerpt: "Gear, software, copyright, platforms, and turning live streams into real revenue — the complete artist guide.",
+    date: "Jun 27, 2026",
+    readTime: "9 min read",
+    href: "/blog/how-to-live-stream-music",
+  },
+  {
+    category: "Guide · Platforms",
+    Icon: TrendingUp,
+    title: "Live Streaming Music on Twitch, YouTube & Facebook",
+    excerpt: "Each platform's rules for music — what's allowed, what triggers takedowns, and what to stream instead.",
+    date: "Jun 27, 2026",
+    readTime: "7 min read",
+    href: "/blog/live-stream-music-twitch-youtube-facebook",
+  },
+  {
+    category: "Guide · Revenue",
+    Icon: Flame,
+    title: "How Artists Get Paid for Streaming Music",
+    excerpt: "Real per-stream payouts on Spotify, Apple Music, Amazon, YouTube — and where the math finally favors artists.",
+    date: "Jun 27, 2026",
+    readTime: "8 min read",
+    href: "/blog/how-artists-get-paid-for-streaming-music",
+  },
+  {
+    category: "Guide · Copyright",
+    Icon: Music2,
+    title: "Can You Play Music on a Live Stream?",
+    excerpt: "Plain-English copyright and DMCA rules so your stream doesn't get killed mid-set.",
+    date: "Jun 27, 2026",
+    readTime: "6 min read",
+    href: "/blog/can-you-play-music-on-live-stream",
+  },
   {
     category: "Interview",
     Icon: Mic,
@@ -54,30 +98,6 @@ const posts = [
     excerpt: "From load-in to wrap, what really happens during a BWF interview shoot.",
     date: "Apr 15, 2026",
     readTime: "4 min read",
-  },
-  {
-    category: "Industry",
-    Icon: TrendingUp,
-    title: "Why Independent Media Is Eating the Majors' Lunch",
-    excerpt: "The shift from press releases to platform-native content, and why artists are coming to us first.",
-    date: "Apr 09, 2026",
-    readTime: "7 min read",
-  },
-  {
-    category: "Culture",
-    Icon: Music2,
-    title: "Southern Hip-Hop's Next Wave: 5 Names On Our Radar",
-    excerpt: "The artists building real audiences without label backing, and why they matter right now.",
-    date: "Apr 02, 2026",
-    readTime: "8 min read",
-  },
-  {
-    category: "Music Video",
-    Icon: Video,
-    title: "Shooting Music Videos That Don't Look Like Everything Else",
-    excerpt: "Our directors on lighting, location scouting, and the visual language of street culture.",
-    date: "Mar 26, 2026",
-    readTime: "6 min read",
   },
   {
     category: "Strategy",
@@ -182,28 +202,7 @@ function BlogPage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {posts.map((p, i) => (
-              <article
-                key={i}
-                className="group relative flex flex-col p-6 border-2 cursor-pointer hover:-translate-y-1 transition-transform"
-                style={{ borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" }}
-              >
-                <div className="absolute top-0 left-0 w-full h-1 group-hover:h-1.5 transition-all" style={{ backgroundColor: "var(--blood)" }} />
-                <p.Icon className="w-7 h-7 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
-                <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-3">
-                  {p.category}
-                </div>
-                <h3 className="font-display text-xl md:text-2xl text-bone tracking-tight leading-tight mb-3">
-                  {p.title}
-                </h3>
-                <p className="text-bone/65 text-sm leading-relaxed mb-6">{p.excerpt}</p>
-                <div className="mt-auto flex items-center justify-between text-bone/45 font-cond tracking-[0.2em] text-[10px] uppercase">
-                  <span className="flex items-center gap-2"><Calendar className="w-3 h-3" />{p.date}</span>
-                  <span className="flex items-center gap-2"><Clock className="w-3 h-3" />{p.readTime}</span>
-                </div>
-                <ArrowUpRight
-                  className="absolute top-6 right-6 w-5 h-5 text-bone/40 group-hover:text-bone group-hover:rotate-12 transition-all"
-                />
-              </article>
+              <PostCard key={i} p={p} />
             ))}
           </div>
         </div>
@@ -242,4 +241,37 @@ function BlogPage() {
       </section>
     </div>
   );
+}
+
+function PostCard({ p }: { p: { category: string; Icon: typeof Mic; title: string; excerpt: string; date: string; readTime: string; href?: string } }) {
+  const inner = (
+    <>
+                <div className="absolute top-0 left-0 w-full h-1 group-hover:h-1.5 transition-all" style={{ backgroundColor: "var(--blood)" }} />
+                <p.Icon className="w-7 h-7 mb-4" style={{ color: "var(--blood)" }} strokeWidth={2.5} />
+                <div className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-bone/60 mb-3">
+                  {p.category}
+                </div>
+                <h3 className="font-display text-xl md:text-2xl text-bone tracking-tight leading-tight mb-3">
+                  {p.title}
+                </h3>
+                <p className="text-bone/65 text-sm leading-relaxed mb-6">{p.excerpt}</p>
+                <div className="mt-auto flex items-center justify-between text-bone/45 font-cond tracking-[0.2em] text-[10px] uppercase">
+                  <span className="flex items-center gap-2"><Calendar className="w-3 h-3" />{p.date}</span>
+                  <span className="flex items-center gap-2"><Clock className="w-3 h-3" />{p.readTime}</span>
+                </div>
+                <ArrowUpRight
+                  className="absolute top-6 right-6 w-5 h-5 text-bone/40 group-hover:text-bone group-hover:rotate-12 transition-all"
+                />
+    </>
+  );
+  const className = "group relative flex flex-col p-6 border-2 cursor-pointer hover:-translate-y-1 transition-transform";
+  const style = { borderColor: "var(--border)", backgroundColor: "rgba(0,0,0,0.55)" } as const;
+  if (p.href) {
+    return (
+      <Link to={p.href} className={className} style={style}>
+        {inner}
+      </Link>
+    );
+  }
+  return <article className={className} style={style}>{inner}</article>;
 }

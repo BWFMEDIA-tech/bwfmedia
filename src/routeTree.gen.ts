@@ -42,7 +42,6 @@ import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as ArtistDashboardRouteImport } from './routes/artist-dashboard'
@@ -51,6 +50,7 @@ import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
@@ -78,6 +78,10 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
+import { Route as BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport } from './routes/blog.live-stream-music-twitch-youtube-facebook'
+import { Route as BlogHowToLiveStreamMusicRouteImport } from './routes/blog.how-to-live-stream-music'
+import { Route as BlogHowArtistsGetPaidForStreamingMusicRouteImport } from './routes/blog.how-artists-get-paid-for-streaming-music'
+import { Route as BlogCanYouPlayMusicOnLiveStreamRouteImport } from './routes/blog.can-you-play-music-on-live-stream'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminVoteAttemptsRouteImport } from './routes/admin.vote-attempts'
@@ -284,11 +288,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
@@ -327,6 +326,11 @@ const VideosIndexRoute = VideosIndexRouteImport.update({
 const PlayIndexRoute = PlayIndexRouteImport.update({
   id: '/play/',
   path: '/play/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -464,6 +468,30 @@ const BroadcastBroadcastIdRoute = BroadcastBroadcastIdRouteImport.update({
   path: '/broadcast/$broadcastId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogLiveStreamMusicTwitchYoutubeFacebookRoute =
+  BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport.update({
+    id: '/blog/live-stream-music-twitch-youtube-facebook',
+    path: '/blog/live-stream-music-twitch-youtube-facebook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogHowToLiveStreamMusicRoute =
+  BlogHowToLiveStreamMusicRouteImport.update({
+    id: '/blog/how-to-live-stream-music',
+    path: '/blog/how-to-live-stream-music',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogHowArtistsGetPaidForStreamingMusicRoute =
+  BlogHowArtistsGetPaidForStreamingMusicRouteImport.update({
+    id: '/blog/how-artists-get-paid-for-streaming-music',
+    path: '/blog/how-artists-get-paid-for-streaming-music',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogCanYouPlayMusicOnLiveStreamRoute =
+  BlogCanYouPlayMusicOnLiveStreamRouteImport.update({
+    id: '/blog/can-you-play-music-on-live-stream',
+    path: '/blog/can-you-play-music-on-live-stream',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ArtistUpgradeRoute = ArtistUpgradeRouteImport.update({
   id: '/artist/upgrade',
   path: '/artist/upgrade',
@@ -680,7 +708,6 @@ export interface FileRoutesByFullPath {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -739,6 +766,10 @@ export interface FileRoutesByFullPath {
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/blog/can-you-play-music-on-live-stream': typeof BlogCanYouPlayMusicOnLiveStreamRoute
+  '/blog/how-artists-get-paid-for-streaming-music': typeof BlogHowArtistsGetPaidForStreamingMusicRoute
+  '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
+  '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -766,6 +797,7 @@ export interface FileRoutesByFullPath {
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -790,7 +822,6 @@ export interface FileRoutesByTo {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -849,6 +880,10 @@ export interface FileRoutesByTo {
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/blog/can-you-play-music-on-live-stream': typeof BlogCanYouPlayMusicOnLiveStreamRoute
+  '/blog/how-artists-get-paid-for-streaming-music': typeof BlogHowArtistsGetPaidForStreamingMusicRoute
+  '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
+  '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -876,6 +911,7 @@ export interface FileRoutesByTo {
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -902,7 +938,6 @@ export interface FileRoutesById {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -961,6 +996,10 @@ export interface FileRoutesById {
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/blog/can-you-play-music-on-live-stream': typeof BlogCanYouPlayMusicOnLiveStreamRoute
+  '/blog/how-artists-get-paid-for-streaming-music': typeof BlogHowArtistsGetPaidForStreamingMusicRoute
+  '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
+  '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -988,6 +1027,7 @@ export interface FileRoutesById {
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -1015,7 +1055,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/blog'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1074,6 +1113,10 @@ export interface FileRouteTypes {
     | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/blog/can-you-play-music-on-live-stream'
+    | '/blog/how-artists-get-paid-for-streaming-music'
+    | '/blog/how-to-live-stream-music'
+    | '/blog/live-stream-music-twitch-youtube-facebook'
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -1101,6 +1144,7 @@ export interface FileRouteTypes {
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
+    | '/blog/'
     | '/play/'
     | '/videos/'
     | '/api/public/block-booking'
@@ -1125,7 +1169,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/blog'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1184,6 +1227,10 @@ export interface FileRouteTypes {
     | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/blog/can-you-play-music-on-live-stream'
+    | '/blog/how-artists-get-paid-for-streaming-music'
+    | '/blog/how-to-live-stream-music'
+    | '/blog/live-stream-music-twitch-youtube-facebook'
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -1211,6 +1258,7 @@ export interface FileRouteTypes {
     | '/user/$id'
     | '/videos/$id'
     | '/admin'
+    | '/blog'
     | '/play'
     | '/videos'
     | '/api/public/block-booking'
@@ -1236,7 +1284,6 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
-    | '/blog'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1295,6 +1342,10 @@ export interface FileRouteTypes {
     | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/blog/can-you-play-music-on-live-stream'
+    | '/blog/how-artists-get-paid-for-streaming-music'
+    | '/blog/how-to-live-stream-music'
+    | '/blog/live-stream-music-twitch-youtube-facebook'
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -1322,6 +1373,7 @@ export interface FileRouteTypes {
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
+    | '/blog/'
     | '/play/'
     | '/videos/'
     | '/api/public/block-booking'
@@ -1348,7 +1400,6 @@ export interface RootRouteChildren {
   ArtistDashboardRoute: typeof ArtistDashboardRoute
   ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
-  BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
   CreatorAgreementRoute: typeof CreatorAgreementRoute
@@ -1384,6 +1435,10 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
+  BlogCanYouPlayMusicOnLiveStreamRoute: typeof BlogCanYouPlayMusicOnLiveStreamRoute
+  BlogHowArtistsGetPaidForStreamingMusicRoute: typeof BlogHowArtistsGetPaidForStreamingMusicRoute
+  BlogHowToLiveStreamMusicRoute: typeof BlogHowToLiveStreamMusicRoute
+  BlogLiveStreamMusicTwitchYoutubeFacebookRoute: typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRouteWithChildren
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -1397,6 +1452,7 @@ export interface RootRouteChildren {
   StreamRoomRoute: typeof StreamRoomRoute
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
@@ -1648,13 +1704,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/artists': {
       id: '/artists'
       path: '/artists'
@@ -1709,6 +1758,13 @@ declare module '@tanstack/react-router' {
       path: '/play'
       fullPath: '/play/'
       preLoaderRoute: typeof PlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1898,6 +1954,34 @@ declare module '@tanstack/react-router' {
       path: '/broadcast/$broadcastId'
       fullPath: '/broadcast/$broadcastId'
       preLoaderRoute: typeof BroadcastBroadcastIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/live-stream-music-twitch-youtube-facebook': {
+      id: '/blog/live-stream-music-twitch-youtube-facebook'
+      path: '/blog/live-stream-music-twitch-youtube-facebook'
+      fullPath: '/blog/live-stream-music-twitch-youtube-facebook'
+      preLoaderRoute: typeof BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/how-to-live-stream-music': {
+      id: '/blog/how-to-live-stream-music'
+      path: '/blog/how-to-live-stream-music'
+      fullPath: '/blog/how-to-live-stream-music'
+      preLoaderRoute: typeof BlogHowToLiveStreamMusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/how-artists-get-paid-for-streaming-music': {
+      id: '/blog/how-artists-get-paid-for-streaming-music'
+      path: '/blog/how-artists-get-paid-for-streaming-music'
+      fullPath: '/blog/how-artists-get-paid-for-streaming-music'
+      preLoaderRoute: typeof BlogHowArtistsGetPaidForStreamingMusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/can-you-play-music-on-live-stream': {
+      id: '/blog/can-you-play-music-on-live-stream'
+      path: '/blog/can-you-play-music-on-live-stream'
+      fullPath: '/blog/can-you-play-music-on-live-stream'
+      preLoaderRoute: typeof BlogCanYouPlayMusicOnLiveStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/artist/upgrade': {
@@ -2293,7 +2377,6 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistDashboardRoute: ArtistDashboardRoute,
   ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
-  BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   CookiePolicyRoute: CookiePolicyRoute,
   CreatorAgreementRoute: CreatorAgreementRoute,
@@ -2329,6 +2412,12 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
+  BlogCanYouPlayMusicOnLiveStreamRoute: BlogCanYouPlayMusicOnLiveStreamRoute,
+  BlogHowArtistsGetPaidForStreamingMusicRoute:
+    BlogHowArtistsGetPaidForStreamingMusicRoute,
+  BlogHowToLiveStreamMusicRoute: BlogHowToLiveStreamMusicRoute,
+  BlogLiveStreamMusicTwitchYoutubeFacebookRoute:
+    BlogLiveStreamMusicTwitchYoutubeFacebookRoute,
   BroadcastBroadcastIdRoute: BroadcastBroadcastIdRouteWithChildren,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
@@ -2342,6 +2431,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamRoomRoute: StreamRoomRoute,
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
+  BlogIndexRoute: BlogIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
