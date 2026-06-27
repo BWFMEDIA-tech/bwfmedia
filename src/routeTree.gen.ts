@@ -107,6 +107,7 @@ import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-boo
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as ASlugRouteImport } from './routes/a.$slug'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
@@ -617,6 +618,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const ASlugRoute = ASlugRouteImport.update({
+  id: '/a/$slug',
+  path: '/a/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlayAudienceRoomRoute = PlayAudienceRoomRouteImport.update({
   id: '/play/audience/$room',
   path: '/play/audience/$room',
@@ -741,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/a/$slug': typeof ASlugRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -855,6 +862,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/a/$slug': typeof ASlugRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -971,6 +979,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/a/$slug': typeof ASlugRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1088,6 +1097,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/a/$slug'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1202,6 +1212,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/a/$slug'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1317,6 +1328,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/a/$slug'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1433,6 +1445,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  ASlugRoute: typeof ASlugRoute
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
   BlogCanYouPlayMusicOnLiveStreamRoute: typeof BlogCanYouPlayMusicOnLiveStreamRoute
@@ -2159,6 +2172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/a/$slug': {
+      id: '/a/$slug'
+      path: '/a/$slug'
+      fullPath: '/a/$slug'
+      preLoaderRoute: typeof ASlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/play/audience/$room': {
       id: '/play/audience/$room'
       path: '/play/audience/$room'
@@ -2410,6 +2430,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  ASlugRoute: ASlugRoute,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
   BlogCanYouPlayMusicOnLiveStreamRoute: BlogCanYouPlayMusicOnLiveStreamRoute,

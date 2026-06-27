@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getArtistForSeo } from "@/lib/seo-public.functions";
+import { getArtistForSeo, type SeoArtist, type SeoTrack } from "@/lib/seo-public.functions";
 import { ArtistCard, GenreChips, SectionHeader, TrackCard } from "@/components/seo/SeoLinks";
 
 const SITE = "https://www.bwfnetwork.com";
@@ -52,7 +52,7 @@ function ArtistSeoPage() {
     description: artist.bio || undefined,
     genre: artist.genres,
     sameAs: [],
-    track: topTracks.slice(0, 10).map((t) => ({
+    track: topTracks.slice(0, 10).map((t: SeoTrack) => ({
       "@type": "MusicRecording",
       name: t.title,
       url: `${SITE}/track/${t.slug}`,
@@ -91,7 +91,7 @@ function ArtistSeoPage() {
           <section className="mb-10">
             <SectionHeader title="Top Songs" subtitle="Most loved tracks by fans" />
             <div className="grid gap-3 sm:grid-cols-2">
-              {topTracks.map((t) => <TrackCard key={t.id} track={t} />)}
+              {topTracks.map((t: SeoTrack) => <TrackCard key={t.id} track={t} />)}
             </div>
           </section>
         ) : null}
@@ -100,7 +100,7 @@ function ArtistSeoPage() {
           <section className="mb-10">
             <SectionHeader title="Latest Releases" subtitle="Recently added" />
             <div className="grid gap-3 sm:grid-cols-2">
-              {latestTracks.map((t) => <TrackCard key={t.id} track={t} />)}
+              {latestTracks.map((t: SeoTrack) => <TrackCard key={t.id} track={t} />)}
             </div>
           </section>
         ) : null}
@@ -109,7 +109,7 @@ function ArtistSeoPage() {
           <section className="mb-10">
             <SectionHeader title="Related Artists" subtitle="Similar genres on Tunevio" />
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {relatedArtists.map((a) => <ArtistCard key={a.id} artist={a} />)}
+              {relatedArtists.map((a: SeoArtist) => <ArtistCard key={a.id} artist={a} />)}
             </div>
           </section>
         ) : null}
