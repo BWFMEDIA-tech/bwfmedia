@@ -221,13 +221,13 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
 
     // Fallback: normal queue order (boosted first, then position).
     if (!next) {
-      const { data: any } = await supabase.from("play_tracks")
+      const { data: fallback } = await supabase.from("play_tracks")
         .select("id")
         .eq("stream_id", data.streamId).eq("status", "queued")
         .order("boosted", { ascending: false })
         .order("position", { ascending: true })
         .limit(1).maybeSingle();
-      next = any ?? null;
+      next = fallback ?? null;
     }
     if (!next) {
       await supabase.from("play_sessions")
