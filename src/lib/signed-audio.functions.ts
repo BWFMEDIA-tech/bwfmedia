@@ -52,7 +52,7 @@ export const signAudioUrl = createServerFn({ method: "POST" })
       storagePath: string | null,
       metadata: Record<string, unknown> = {},
     ) => {
-      supabaseAdmin
+      (supabaseAdmin as any)
         .from("signed_audio_access_log")
         .insert({
           user_id: userId,
