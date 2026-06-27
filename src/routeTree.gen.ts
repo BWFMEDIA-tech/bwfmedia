@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TunevioRouteImport } from './routes/tunevio'
+import { Route as TrendingRouteImport } from './routes/trending'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
@@ -134,6 +135,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const TunevioRoute = TunevioRouteImport.update({
   id: '/tunevio',
   path: '/tunevio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrendingRoute = TrendingRouteImport.update({
+  id: '/trending',
+  path: '/trending',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -757,6 +763,7 @@ export interface FileRoutesByFullPath {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/trending': typeof TrendingRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/a/$slug': typeof ASlugRoute
@@ -874,6 +881,7 @@ export interface FileRoutesByTo {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/trending': typeof TrendingRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/a/$slug': typeof ASlugRoute
@@ -993,6 +1001,7 @@ export interface FileRoutesById {
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
+  '/trending': typeof TrendingRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/a/$slug': typeof ASlugRoute
@@ -1113,6 +1122,7 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
+    | '/trending'
     | '/tunevio'
     | '/unsubscribe'
     | '/a/$slug'
@@ -1230,6 +1240,7 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
+    | '/trending'
     | '/tunevio'
     | '/unsubscribe'
     | '/a/$slug'
@@ -1348,6 +1359,7 @@ export interface FileRouteTypes {
     | '/stream-studio'
     | '/studio'
     | '/terms'
+    | '/trending'
     | '/tunevio'
     | '/unsubscribe'
     | '/a/$slug'
@@ -1467,6 +1479,7 @@ export interface RootRouteChildren {
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
+  TrendingRoute: typeof TrendingRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   ASlugRoute: typeof ASlugRoute
@@ -1524,6 +1537,13 @@ declare module '@tanstack/react-router' {
       path: '/tunevio'
       fullPath: '/tunevio'
       preLoaderRoute: typeof TunevioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trending': {
+      id: '/trending'
+      path: '/trending'
+      fullPath: '/trending'
+      preLoaderRoute: typeof TrendingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -2468,6 +2488,7 @@ const rootRouteChildren: RootRouteChildren = {
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
+  TrendingRoute: TrendingRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   ASlugRoute: ASlugRoute,
