@@ -1052,6 +1052,9 @@ function StreamStudio() {
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
                     {streamMode !== "play" && (
+                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
+                    )}
+                    {streamMode !== "play" && (
                       <BattleArena
                         streamId={stream.id}
                         isHost
