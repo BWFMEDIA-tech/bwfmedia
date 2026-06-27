@@ -1957,7 +1957,6 @@ export type Database = {
           genres: string[] | null
           id: string
           interests: string[] | null
-          last_seen_at: string | null
           location: string | null
           member_since: string | null
           public_id: string
@@ -1979,7 +1978,6 @@ export type Database = {
           genres?: string[] | null
           id: string
           interests?: string[] | null
-          last_seen_at?: string | null
           location?: string | null
           member_since?: string | null
           public_id?: string
@@ -2001,7 +1999,6 @@ export type Database = {
           genres?: string[] | null
           id?: string
           interests?: string[] | null
-          last_seen_at?: string | null
           location?: string | null
           member_since?: string | null
           public_id?: string
@@ -2703,6 +2700,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_accounts: {
+        Row: {
+          app_settings: Json
+          created_at: string
+          email: string | null
+          notification_preferences: Json
+          stripe_connect_account_id: string | null
+          stripe_customer_id: string | null
+          subscription_plan: string | null
+          subscription_status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_settings?: Json
+          created_at?: string
+          email?: string | null
+          notification_preferences?: Json
+          stripe_connect_account_id?: string | null
+          stripe_customer_id?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_settings?: Json
+          created_at?: string
+          email?: string | null
+          notification_preferences?: Json
+          stripe_connect_account_id?: string | null
+          stripe_customer_id?: string | null
+          subscription_plan?: string | null
+          subscription_status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_bans: {
         Row: {
           banned_by: string
@@ -2726,6 +2762,27 @@ export type Database = {
           expires_at?: string | null
           id?: string
           reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_presence: {
+        Row: {
+          last_seen_at: string
+          online: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          last_seen_at?: string
+          online?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          last_seen_at?: string
+          online?: boolean
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -3130,8 +3187,8 @@ export type Database = {
           tips_cents: number
         }[]
       }
+      get_my_last_seen_at: { Args: never; Returns: string }
       get_my_profile_interests: { Args: never; Returns: string[] }
-      get_my_profile_last_seen_at: { Args: never; Returns: string }
       get_my_profile_location: { Args: never; Returns: string }
       get_or_create_profile_stream: { Args: never; Returns: string }
       get_stream_tip_totals: {
