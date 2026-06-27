@@ -408,7 +408,7 @@ function TunevioLanding() {
               </p>
 
               <motion.img
-                src={playArena1v1}
+                src={playArena1v1.url}
                 alt="1v1 live music battle"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
