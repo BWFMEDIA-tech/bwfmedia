@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Swords, Trophy, Zap, Crown, Sparkles, Loader2 } from "lucide-react";
+import { Swords, Trophy, Zap, Crown, Sparkles, Loader2, Lock, Pencil } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { createBattleMatch, castBattleVote } from "@/lib/battles.functions";
+import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
 import { RankBadge } from "@/components/rank/RankBadge";
@@ -21,15 +21,18 @@ export function BattleArena({
   streamId,
   isHost,
   participants,
+  onStageIds,
 }: {
   streamId: string;
   isHost: boolean;
   participants: Participant[];
+  onStageIds?: Set<string>;
 }) {
   const stateFn = useServerFn(getBattleRoomState);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [myVote, setMyVote] = useState<"a" | "b" | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   // Single source of truth: the Battle Engine room state. Realtime row changes
   // on battle_matches / battle_rounds simply trigger a re-fetch; we never
@@ -119,14 +122,35 @@ export function BattleArena({
 
   if (!match || !roomState) return null;
 
+  const stageSet = onStageIds ?? new Set<string>();
+  const aOnStage = !!match.artist_a_id && stageSet.has(match.artist_a_id as string);
+  const bOnStage = !!match.artist_b_id && stageSet.has(match.artist_b_id as string);
+  const matchupLocked = match.status !== "pending" || aOnStage || bOnStage;
+
   return (
-    <BattleView
-      roomState={roomState}
-      myVote={myVote}
-      isHost={isHost}
-      onVoteCast={(c) => setMyVote(c)}
-      onAfterHostEmit={refresh}
-    />
+    <>
+      <BattleView
+        roomState={roomState}
+        myVote={myVote}
+        isHost={isHost}
+        matchupLocked={matchupLocked}
+        onEditMatchup={() => setShowEdit(true)}
+        onVoteCast={(c) => setMyVote(c)}
+        onAfterHostEmit={refresh}
+      />
+      {showEdit && isHost && (
+        <CreateBattleDialog
+          streamId={streamId}
+          participants={participants}
+          mode="edit"
+          matchId={match.id as string}
+          initialA={(match.artist_a_id as string | null) ?? ""}
+          initialB={(match.artist_b_id as string | null) ?? ""}
+          onClose={() => setShowEdit(false)}
+          onSaved={refresh}
+        />
+      )}
+    </>
   );
 }
 
@@ -134,12 +158,16 @@ function BattleView({
   roomState,
   myVote,
   isHost,
+  matchupLocked,
+  onEditMatchup,
   onVoteCast,
   onAfterHostEmit,
 }: {
   roomState: RoomState;
   myVote: "a" | "b" | null;
   isHost: boolean;
+  matchupLocked: boolean;
+  onEditMatchup?: () => void;
   onVoteCast: (c: "a" | "b") => void;
   onAfterHostEmit?: () => void;
 }) {
@@ -232,6 +260,23 @@ function BattleView({
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {isHost && match && match.status === "pending" && (
+            matchupLocked ? (
+              <span
+                title="Artist is on stage — matchup is locked"
+                className="flex items-center gap-1 rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white/70"
+              >
+                <Lock className="h-3 w-3" /> Locked
+              </span>
+            ) : (
+              <button
+                onClick={onEditMatchup}
+                className="flex items-center gap-1 rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/20"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
+            )
+          )}
           {userId && xp !== null && (
             <span className="flex items-center gap-1 rounded bg-[#c53dff]/15 px-2 py-0.5 text-[11px] font-mono font-bold text-[#e8b6ff]">
               <Sparkles className="h-3 w-3" /> {xp.toLocaleString()} XP
