@@ -358,12 +358,6 @@ function BattleView({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-0">
-        <ArtistSide
-          side="a"
-          />
-      </div>
-
       {/* Unified live vote percentage tracker */}
       <VoteTracker
         aPct={aPct}
@@ -373,7 +367,7 @@ function BattleView({
         myVote={myVote}
         votingStatus={votingStatus}
       />
-      <div className="hidden">
+      <div className="grid grid-cols-2 gap-0">
         <ArtistSide
           side="a"
           artistId={match.artist_a_id as string | null}
