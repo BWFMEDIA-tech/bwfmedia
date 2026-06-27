@@ -368,11 +368,10 @@ export const joinStage = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const key = data.idempotencyKey ?? `join_stage:${data.streamId}`;
     return runIdempotent({
       supabase,
       userId,
-      key: `join_stage:${data.streamId}:${key}`,
+      key: createIdempotencyKey("join_stage", data.streamId, userId),
       action: "join_stage",
       handler: async () => {
         const { data: row, error } = await supabase
