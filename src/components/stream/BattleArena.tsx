@@ -604,6 +604,8 @@ function CreateBattleDialog({
   initialA,
   initialB,
   onSaved,
+  onOptimistic,
+  onReconcile,
 }: {
   streamId: string;
   participants: Participant[];
@@ -613,6 +615,8 @@ function CreateBattleDialog({
   initialA?: string;
   initialB?: string;
   onSaved?: () => void;
+  onOptimistic?: (a: string, b: string) => void;
+  onReconcile?: () => void;
 }) {
   const createFn = useServerFn(createBattleMatch);
   const updateFn = useServerFn(updateBattleArtists);
@@ -634,11 +638,19 @@ function CreateBattleDialog({
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
     setBusy(true);
+    const prevA = initialA ?? "";
+    const prevB = initialB ?? "";
     try {
       if (isEdit && matchId) {
+        // Optimistic: reflect the new matchup immediately, then call the
+        // server. If the server rejects (e.g. the lock window closed because
+        // an artist just hit the stage), revert and refresh from truth.
+        onOptimistic?.(a, b);
+        onClose();
         await updateFn({ data: { matchId, artistAId: a, artistBId: b } });
         toast.success("Matchup updated");
         onSaved?.();
+        return;
       } else {
         await createFn({
           data: {
@@ -654,6 +666,10 @@ function CreateBattleDialog({
       onClose();
     } catch (e: any) {
       toast.error(e?.message ?? (isEdit ? "Failed to update matchup" : "Failed to create battle"));
+      if (isEdit) {
+        onOptimistic?.(prevA, prevB);
+        onReconcile?.();
+      }
     } finally {
       setBusy(false);
     }
