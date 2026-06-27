@@ -34,7 +34,8 @@ END $$;
 CREATE OR REPLACE FUNCTION pg_temp.reset_role() RETURNS void
 LANGUAGE plpgsql AS $$
 BEGIN
-  PERFORM set_config('role', 'postgres', true);
+  -- Reset to the session's own role (sandbox_exec / postgres / etc.).
+  RESET ROLE;
   PERFORM set_config('request.jwt.claims', '', true);
 END $$;
 
