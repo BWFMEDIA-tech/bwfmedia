@@ -146,8 +146,9 @@ function RootComponent() {
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div
-          className="pt-[calc(var(--bwf-banner-h,0px)+5rem)] md:pt-[calc(var(--bwf-banner-h,0px)+6rem)] lg:pt-[calc(var(--bwf-banner-h,0px)+7rem)]"
+          className="pt-[calc(var(--bwf-banner-h,0px)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+80px)]"
         >
+
           <Outlet />
         </div>
         {isChrome && <SiteFooter />}
