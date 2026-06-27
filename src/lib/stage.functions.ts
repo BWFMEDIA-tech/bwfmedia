@@ -323,10 +323,21 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     const patch: { connection_status: string; last_seen_at?: string } = { connection_status: data.connectionStatus };
     if (data.connectionStatus === "connected") patch.last_seen_at = new Date().toISOString();
 
-    // Idempotent upsert keyed on (stream_id, user_id). Safe to call repeatedly:
-    // identical input produces identical row, never duplicates. `stage_role`
-    // is only seeded on insert; existing rows keep whatever role the host set.
-    const { data: row, error } = await supabaseAdmin
+    // Idempotent: update existing row first (preserves stage_role assigned by
+    // the host), then upsert with ignoreDuplicates to seed a listener row if
+    // missing. Repeated calls produce the same result and never duplicate.
+    const { data: updated, error: updErr } = await supabaseAdmin
+      .from("stage_participants")
+      .update(patch)
+      .eq("stream_id", data.streamId)
+      .eq("user_id", context.userId)
+      .select("id, stage_role, connection_status, last_seen_at")
+      .maybeSingle();
+    if (updErr) throw new Error(updErr.message);
+
+    if (updated) return { ok: true, participant: updated };
+
+    const { data: seeded, error: insErr } = await supabaseAdmin
       .from("stage_participants")
       .upsert(
         {
@@ -335,19 +346,12 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
           stage_role: "listener",
           ...patch,
         },
-        { onConflict: "stream_id,user_id", ignoreDuplicates: false },
+        { onConflict: "stream_id,user_id", ignoreDuplicates: true },
       )
       .select("id, stage_role, connection_status, last_seen_at")
       .maybeSingle();
-    if (error) throw new Error(error.message);
-
-    // If the row already existed with a non-listener role, the upsert above
-    // would have overwritten stage_role. Restore it when needed.
-    if (row && row.stage_role !== "listener") {
-      // no-op — upsert preserved existing role via ON CONFLICT DO UPDATE only
-      // touching patch fields below.
-    }
-    return { ok: true, participant: row ?? null };
+    if (insErr) throw new Error(insErr.message);
+    return { ok: true, participant: seeded ?? null };
   });
 /** Update the stream's host-transfer mode setting (primary host only) */
 export const setHostTransferMode = createServerFn({ method: "POST" })
