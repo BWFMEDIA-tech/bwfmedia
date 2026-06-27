@@ -354,6 +354,45 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     if (insErr) throw new Error(insErr.message);
     return { ok: true, participant: seeded ?? null };
   });
+/** Viewer joins the stage as a listener. Idempotent per (user, stream, key)
+ *  via request_idempotency, so retries / Strict Mode double-invokes / network
+ *  replays return the same cached response and never create duplicate rows.
+ *  The underlying upsert on (stream_id, user_id) is the second line of defense. */
+export const joinStage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      streamId: z.string().uuid(),
+      idempotencyKey: z.string().min(1).max(128).optional(),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const key = data.idempotencyKey ?? `join_stage:${data.streamId}`;
+    return runIdempotent({
+      supabase,
+      userId,
+      key: `join_stage:${data.streamId}:${key}`,
+      action: "join_stage",
+      handler: async () => {
+        const { data: row, error } = await supabase
+          .from("stage_participants")
+          .upsert(
+            {
+              stream_id: data.streamId,
+              user_id: userId,
+              stage_role: "listener",
+            },
+            { onConflict: "stream_id,user_id", ignoreDuplicates: false },
+          )
+          .select("id, stage_role, connection_status")
+          .maybeSingle();
+        if (error) throw new Error(error.message);
+        return { ok: true, participant: row ?? null };
+      },
+    });
+  });
+
 /** Update the stream's host-transfer mode setting (primary host only) */
 export const setHostTransferMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
