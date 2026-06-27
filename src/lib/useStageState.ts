@@ -91,9 +91,13 @@ export function useStageState(streamId: string | null) {
 
     refreshParticipants(); refreshHands(); refreshQueue();
 
-    const ch = supabase
-      .channel(`stage-${streamId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` }, refreshParticipants)
+    // Unique channel name per mount prevents "cannot add postgres_changes
+    // callbacks ... after subscribe()" when a second instance binds to an
+    // already-subscribed channel of the same name.
+    const ch = supabase.channel(
+      `stage-${streamId}-${Math.random().toString(36).slice(2)}`,
+    );
+    ch.on("postgres_changes", { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` }, refreshParticipants)
       .on("postgres_changes", { event: "*", schema: "public", table: "raise_hand_requests", filter: `stream_id=eq.${streamId}` }, refreshHands)
       .on("postgres_changes", { event: "*", schema: "public", table: "stream_queue", filter: `stream_id=eq.${streamId}` }, refreshQueue)
       .subscribe();
