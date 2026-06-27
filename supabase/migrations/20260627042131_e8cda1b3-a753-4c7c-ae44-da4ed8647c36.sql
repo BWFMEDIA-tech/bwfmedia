@@ -1,0 +1,1 @@
+ALTER TABLE public.battle_votes REPLICA IDENTITY FULL; ALTER PUBLICATION supabase_realtime ADD TABLE public.battle_votes;
