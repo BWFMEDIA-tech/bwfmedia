@@ -1054,17 +1054,6 @@ function StreamStudio() {
                     {streamMode !== "play" && (
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                     )}
-                    {streamMode !== "play" && (
-                      <BattleArena
-                        streamId={stream.id}
-                        isHost
-                        participants={participants.map((p) => ({
-                          user_id: p.user_id,
-                          display_name: p.display_name,
-                          avatar_url: p.avatar_url,
-                        }))}
-                      />
-                    )}
                     {streamMode === "stage" && <AudienceRow participants={participants} />}
                   </StageAudioShell>
                 )}
