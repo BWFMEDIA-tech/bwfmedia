@@ -392,11 +392,11 @@ export function ImmersivePlayer({
   // playing through GlobalPlayer at the same time as the battle track —
   // listeners hear two songs at once ("double" audio).
   const globalPlayer = usePlayer();
+  const globalPauseRef = useRef(globalPlayer.pause);
+  globalPauseRef.current = globalPlayer.pause;
   useEffect(() => {
-    if (track?.id && globalPlayer.isPlaying) {
-      globalPlayer.pause();
-    }
-  }, [track?.id, globalPlayer]);
+    if (track?.id) globalPauseRef.current?.();
+  }, [track?.id]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
