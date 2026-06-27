@@ -406,6 +406,16 @@ function TunevioLanding() {
                 No algorithm bias. No passive streaming. Just live performance and
                 real outcomes.
               </p>
+
+              <motion.img
+                src={playArena1v1}
+                alt="1v1 live music battle"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="mt-8 w-full max-w-xl rounded-2xl border border-white/10 shadow-[0_0_60px_-15px_rgba(255,0,166,0.45)]"
+              />
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
