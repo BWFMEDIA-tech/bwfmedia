@@ -4,7 +4,6 @@ import { usePlayQueue } from "@/lib/usePlayQueue";
 import { supabase } from "@/integrations/supabase/client";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
-import { useAuth } from "@/lib/auth-context";
 import { useServerFn } from "@tanstack/react-start";
 import { advancePlayQueue } from "@/lib/play.functions";
 import { toast } from "sonner";
