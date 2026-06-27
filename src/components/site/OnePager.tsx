@@ -381,7 +381,6 @@ export function OnePager() {
     >
       <div className="relative z-10">
         <ScrollProgress />
-        <Hero liveStreams={liveStreams} />
         <PlayArenaIntro />
         <Spotlight artists={featuredArtists} />
         <VideosRow videos={videos} />
