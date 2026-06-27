@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPlayArenaLive } from "@/lib/play-arena-live.functions";
 import { supabase } from "@/integrations/supabase/client";
+import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 const FEATURES = [
   { icon: Swords, label: "Live 1v1 artist battles" },
@@ -54,6 +55,24 @@ export function PlayArenaIntro() {
 
   return (
     <section className="relative border-t border-white/5 bg-black/40 overflow-hidden">
+      {/* Background video */}
+      <video
+        src={heroRapperVideo.url}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.75) 50%, rgba(0,0,0,0.9) 100%)",
+        }}
+      />
       {/* subtle neon glows */}
       <div
         aria-hidden
