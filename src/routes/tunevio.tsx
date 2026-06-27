@@ -20,6 +20,7 @@ import {
   Vote,
   Radio,
   TrendingUp,
+  Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
