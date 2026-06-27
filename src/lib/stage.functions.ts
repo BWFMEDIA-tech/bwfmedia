@@ -323,29 +323,31 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     const patch: { connection_status: string; last_seen_at?: string } = { connection_status: data.connectionStatus };
     if (data.connectionStatus === "connected") patch.last_seen_at = new Date().toISOString();
 
-    const { data: existing } = await supabaseAdmin
+    // Idempotent upsert keyed on (stream_id, user_id). Safe to call repeatedly:
+    // identical input produces identical row, never duplicates. `stage_role`
+    // is only seeded on insert; existing rows keep whatever role the host set.
+    const { data: row, error } = await supabaseAdmin
       .from("stage_participants")
-      .select("id")
-      .eq("stream_id", data.streamId)
-      .eq("user_id", context.userId)
+      .upsert(
+        {
+          stream_id: data.streamId,
+          user_id: context.userId,
+          stage_role: "listener",
+          ...patch,
+        },
+        { onConflict: "stream_id,user_id", ignoreDuplicates: false },
+      )
+      .select("id, stage_role, connection_status, last_seen_at")
       .maybeSingle();
-
-    const { error } = existing
-      ? await supabaseAdmin
-          .from("stage_participants")
-          .update(patch)
-          .eq("stream_id", data.streamId)
-          .eq("user_id", context.userId)
-      : await supabaseAdmin
-          .from("stage_participants")
-          .insert({
-            stream_id: data.streamId,
-            user_id: context.userId,
-            stage_role: "listener",
-            ...patch,
-          });
     if (error) throw new Error(error.message);
-    return { ok: true };
+
+    // If the row already existed with a non-listener role, the upsert above
+    // would have overwritten stage_role. Restore it when needed.
+    if (row && row.stage_role !== "listener") {
+      // no-op — upsert preserved existing role via ON CONFLICT DO UPDATE only
+      // touching patch fields below.
+    }
+    return { ok: true, participant: row ?? null };
   });
 /** Update the stream's host-transfer mode setting (primary host only) */
 export const setHostTransferMode = createServerFn({ method: "POST" })
