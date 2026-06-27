@@ -728,9 +728,8 @@ export function ImmersivePlayer({
             <button
               aria-label="Previous"
               onClick={hostPlayPrev}
-              disabled={!isHost}
               className="grid h-10 w-10 place-items-center rounded-full text-white/70 hover:text-white transition disabled:opacity-30"
-              title={isHost ? "Replay last" : "Host only"}
+              title="Restart / previous"
             ><SkipBack className="h-5 w-5" /></button>
 
             <button
