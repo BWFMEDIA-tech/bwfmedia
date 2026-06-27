@@ -78,6 +78,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
+import { Route as BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport } from './routes/blog.live-stream-music-twitch-youtube-facebook'
 import { Route as BlogHowToLiveStreamMusicRouteImport } from './routes/blog.how-to-live-stream-music'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
@@ -465,6 +466,12 @@ const BroadcastBroadcastIdRoute = BroadcastBroadcastIdRouteImport.update({
   path: '/broadcast/$broadcastId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogLiveStreamMusicTwitchYoutubeFacebookRoute =
+  BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport.update({
+    id: '/blog/live-stream-music-twitch-youtube-facebook',
+    path: '/blog/live-stream-music-twitch-youtube-facebook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogHowToLiveStreamMusicRoute =
   BlogHowToLiveStreamMusicRouteImport.update({
     id: '/blog/how-to-live-stream-music',
@@ -746,6 +753,7 @@ export interface FileRoutesByFullPath {
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
+  '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -857,6 +865,7 @@ export interface FileRoutesByTo {
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
+  '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -970,6 +979,7 @@ export interface FileRoutesById {
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
+  '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -1084,6 +1094,7 @@ export interface FileRouteTypes {
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/how-to-live-stream-music'
+    | '/blog/live-stream-music-twitch-youtube-facebook'
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -1195,6 +1206,7 @@ export interface FileRouteTypes {
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/how-to-live-stream-music'
+    | '/blog/live-stream-music-twitch-youtube-facebook'
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -1307,6 +1319,7 @@ export interface FileRouteTypes {
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/how-to-live-stream-music'
+    | '/blog/live-stream-music-twitch-youtube-facebook'
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
@@ -1397,6 +1410,7 @@ export interface RootRouteChildren {
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
   BlogHowToLiveStreamMusicRoute: typeof BlogHowToLiveStreamMusicRoute
+  BlogLiveStreamMusicTwitchYoutubeFacebookRoute: typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
   BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRouteWithChildren
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -1914,6 +1928,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastBroadcastIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/live-stream-music-twitch-youtube-facebook': {
+      id: '/blog/live-stream-music-twitch-youtube-facebook'
+      path: '/blog/live-stream-music-twitch-youtube-facebook'
+      fullPath: '/blog/live-stream-music-twitch-youtube-facebook'
+      preLoaderRoute: typeof BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/how-to-live-stream-music': {
       id: '/blog/how-to-live-stream-music'
       path: '/blog/how-to-live-stream-music'
@@ -2350,6 +2371,8 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
   BlogHowToLiveStreamMusicRoute: BlogHowToLiveStreamMusicRoute,
+  BlogLiveStreamMusicTwitchYoutubeFacebookRoute:
+    BlogLiveStreamMusicTwitchYoutubeFacebookRoute,
   BroadcastBroadcastIdRoute: BroadcastBroadcastIdRouteWithChildren,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
