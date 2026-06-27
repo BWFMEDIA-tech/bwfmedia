@@ -24,6 +24,7 @@ import { GripVertical, Trash2 } from "lucide-react";
 import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
+import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 
 /* ============================================================
    Brand palette (BWF):
