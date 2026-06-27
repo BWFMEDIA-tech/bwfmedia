@@ -2061,6 +2061,33 @@ export type Database = {
         }
         Relationships: []
       }
+      request_idempotency: {
+        Row: {
+          action: string
+          created_at: string
+          id: number
+          idempotency_key: string
+          response: Json | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: number
+          idempotency_key: string
+          response?: Json | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: number
+          idempotency_key?: string
+          response?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       revenue_events: {
         Row: {
           amount_cents: number
