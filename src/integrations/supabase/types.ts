@@ -1956,8 +1956,6 @@ export type Database = {
           genre: string | null
           genres: string[] | null
           id: string
-          interests: string[] | null
-          location: string | null
           member_since: string | null
           public_id: string
           stage_name: string | null
@@ -1977,8 +1975,6 @@ export type Database = {
           genre?: string | null
           genres?: string[] | null
           id: string
-          interests?: string[] | null
-          location?: string | null
           member_since?: string | null
           public_id?: string
           stage_name?: string | null
@@ -1998,8 +1994,6 @@ export type Database = {
           genre?: string | null
           genres?: string[] | null
           id?: string
-          interests?: string[] | null
-          location?: string | null
           member_since?: string | null
           public_id?: string
           stage_name?: string | null
@@ -2705,6 +2699,8 @@ export type Database = {
           app_settings: Json
           created_at: string
           email: string | null
+          interests: string[] | null
+          location: string | null
           notification_preferences: Json
           stripe_connect_account_id: string | null
           stripe_customer_id: string | null
@@ -2717,6 +2713,8 @@ export type Database = {
           app_settings?: Json
           created_at?: string
           email?: string | null
+          interests?: string[] | null
+          location?: string | null
           notification_preferences?: Json
           stripe_connect_account_id?: string | null
           stripe_customer_id?: string | null
@@ -2729,6 +2727,8 @@ export type Database = {
           app_settings?: Json
           created_at?: string
           email?: string | null
+          interests?: string[] | null
+          location?: string | null
           notification_preferences?: Json
           stripe_connect_account_id?: string | null
           stripe_customer_id?: string | null
@@ -3074,7 +3074,6 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
-          city: string | null
           created_at: string | null
           display_name: string | null
           genre: string | null
@@ -3084,7 +3083,6 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
-          city?: string | null
           created_at?: string | null
           display_name?: string | null
           genre?: string | null
@@ -3094,7 +3092,6 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
-          city?: string | null
           created_at?: string | null
           display_name?: string | null
           genre?: string | null
