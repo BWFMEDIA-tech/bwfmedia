@@ -210,8 +210,13 @@ export async function runBattleEvent(
             .eq("id", round.id);
         }
 
-        // Mark this track playing.
-        if (track.status === "queued") {
+        // Mark this track playing. Use an unconditional flip (except when
+        // it's already playing) so re-pressing "Play <Artist>" after a
+        // STOP_TRACK — which demotes the track to "completed" — still
+        // wakes the Play Arena player. Without this, the play_tracks row
+        // stays "completed", `usePlayQueue` never sees a `playing` row,
+        // and ImmersivePlayer has nothing to load.
+        if (track.status !== "playing") {
           const { error: upErr } = await supabase
             .from("play_tracks")
             .update({ status: "playing" })
@@ -227,6 +232,15 @@ export async function runBattleEvent(
           .from("battle_matches")
           .update({ active_side: side })
           .eq("id", m.id);
+        // Keep the Play Arena session pointer in sync so the immersive
+        // player and any session-driven consumers pick up the new track
+        // immediately over realtime — same pattern as START_ROUND.
+        await supabase
+          .from("play_sessions")
+          .upsert(
+            { stream_id: m.stream_id, current_track_id: trackId!, status: "open" },
+            { onConflict: "stream_id" },
+          );
         return { ok: true, side, trackId };
       }
 
