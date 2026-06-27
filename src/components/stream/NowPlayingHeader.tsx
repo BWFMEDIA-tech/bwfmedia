@@ -219,9 +219,20 @@ export function NowPlayingHeader({
             </span>
           )}
           {mode === "live" && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 tracking-wider">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
-            </span>
+            isHost ? (
+              <button
+                onClick={handleNext}
+                title="Play next song"
+                className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-2 py-0.5 tracking-wider transition hover:bg-white/20 active:scale-95"
+              >
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
+                <SkipForward className="h-3 w-3" />
+              </button>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 tracking-wider">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
+              </span>
+            )
           )}
         </div>
       </div>
