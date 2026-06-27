@@ -323,29 +323,35 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     const patch: { connection_status: string; last_seen_at?: string } = { connection_status: data.connectionStatus };
     if (data.connectionStatus === "connected") patch.last_seen_at = new Date().toISOString();
 
-    const { data: existing } = await supabaseAdmin
+    // Idempotent: update existing row first (preserves stage_role assigned by
+    // the host), then upsert with ignoreDuplicates to seed a listener row if
+    // missing. Repeated calls produce the same result and never duplicate.
+    const { data: updated, error: updErr } = await supabaseAdmin
       .from("stage_participants")
-      .select("id")
+      .update(patch)
       .eq("stream_id", data.streamId)
       .eq("user_id", context.userId)
+      .select("id, stage_role, connection_status, last_seen_at")
       .maybeSingle();
+    if (updErr) throw new Error(updErr.message);
 
-    const { error } = existing
-      ? await supabaseAdmin
-          .from("stage_participants")
-          .update(patch)
-          .eq("stream_id", data.streamId)
-          .eq("user_id", context.userId)
-      : await supabaseAdmin
-          .from("stage_participants")
-          .insert({
-            stream_id: data.streamId,
-            user_id: context.userId,
-            stage_role: "listener",
-            ...patch,
-          });
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    if (updated) return { ok: true, participant: updated };
+
+    const { data: seeded, error: insErr } = await supabaseAdmin
+      .from("stage_participants")
+      .upsert(
+        {
+          stream_id: data.streamId,
+          user_id: context.userId,
+          stage_role: "listener",
+          ...patch,
+        },
+        { onConflict: "stream_id,user_id", ignoreDuplicates: true },
+      )
+      .select("id, stage_role, connection_status, last_seen_at")
+      .maybeSingle();
+    if (insErr) throw new Error(insErr.message);
+    return { ok: true, participant: seeded ?? null };
   });
 /** Update the stream's host-transfer mode setting (primary host only) */
 export const setHostTransferMode = createServerFn({ method: "POST" })
