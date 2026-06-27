@@ -96,7 +96,7 @@ export function SiteFooter() {
             </a>
             <div className="flex items-start gap-2 text-sm text-bone/60">
               <MapPin size={14} className="text-blood mt-0.5" />
-              <span>By appointment only — Book a session online</span>
+              <span>By appointment only - Book a session online</span>
             </div>
           </div>
         </div>

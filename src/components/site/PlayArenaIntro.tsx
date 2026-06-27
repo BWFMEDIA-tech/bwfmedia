@@ -85,8 +85,7 @@ export function PlayArenaIntro() {
                 {isLive ? `${activeBattles} Live ${activeBattles === 1 ? "Battle" : "Battles"}` : "New on BWF"}
               </div>
               <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-bone">
-                Play Arena —{" "}
-                <span
+                {"Play Arena -\u00A0"}<span
                   className="bg-clip-text text-transparent"
                   style={{
                     backgroundImage:
