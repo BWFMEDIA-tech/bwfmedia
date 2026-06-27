@@ -270,7 +270,7 @@ function TunevioLanding() {
       {/* 1. Hero */}
       <section className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
         {/* Hero video background */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
             src={micWalkupVideo.url}
             autoPlay
@@ -278,21 +278,11 @@ function TunevioLanding() {
             loop
             playsInline
             preload="auto"
-            poster=""
-            className="absolute inset-0 h-full w-full object-cover opacity-50"
+            className="absolute inset-0 h-full w-full object-cover opacity-90"
           />
-          <video
-            src={heroVideo.url}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-screen"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black" />
         </div>
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="relative z-10 mx-auto max-w-4xl text-center">
           <motion.img
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
