@@ -25,6 +25,7 @@ import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGrap
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
+import { usePlayer } from "@/lib/player-context";
 
 /* ============================================================
    Brand palette (BWF):
