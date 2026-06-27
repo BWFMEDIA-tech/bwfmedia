@@ -1071,7 +1071,7 @@ function StreamStudio() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} />
+              <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
               <AudienceRow participants={participants} />
             </div>
           </div>
