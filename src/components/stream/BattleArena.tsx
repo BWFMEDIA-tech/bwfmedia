@@ -732,11 +732,15 @@ function ArtistSelect({
   participants: Participant[]; exclude: string;
 }) {
   const [filter, setFilter] = useState<"all" | "on_stage" | "submitter">("all");
+  const [query, setQuery] = useState("");
   const available = participants.filter((p) => p.user_id !== exclude);
+  const q = query.trim().toLowerCase();
   const filtered = available.filter((p) => {
-    if (filter === "all") return true;
-    if (filter === "on_stage") return p.role === "on_stage" || p.role === "both";
-    return p.role === "submitter" || p.role === "both";
+    if (filter === "on_stage" && !(p.role === "on_stage" || p.role === "both")) return false;
+    if (filter === "submitter" && !(p.role === "submitter" || p.role === "both")) return false;
+    if (!q) return true;
+    const name = (p.display_name || "").toLowerCase();
+    return name.includes(q) || p.user_id.toLowerCase().startsWith(q);
   });
   const onStage = filtered.filter((p) => p.role === "on_stage" || p.role === "both");
   const submitters = filtered.filter((p) => p.role === "submitter");
@@ -766,6 +770,13 @@ function ArtistSelect({
           ))}
         </div>
       </div>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search artists…"
+        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/30"
+      />
       <select
         value={value} onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white"
