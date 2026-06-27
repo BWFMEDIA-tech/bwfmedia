@@ -15,6 +15,8 @@ type Participant = {
   user_id: string;
   display_name?: string | null;
   avatar_url?: string | null;
+  role?: "on_stage" | "submitter" | "both";
+  stage_role?: string | null;
 };
 
 export function BattleArena({
@@ -687,21 +689,69 @@ function ArtistSelect({
   label: string; value: string; onChange: (v: string) => void;
   participants: Participant[]; exclude: string;
 }) {
+  const [filter, setFilter] = useState<"all" | "on_stage" | "submitter">("all");
+  const available = participants.filter((p) => p.user_id !== exclude);
+  const filtered = available.filter((p) => {
+    if (filter === "all") return true;
+    if (filter === "on_stage") return p.role === "on_stage" || p.role === "both";
+    return p.role === "submitter" || p.role === "both";
+  });
+  const onStage = filtered.filter((p) => p.role === "on_stage" || p.role === "both");
+  const submitters = filtered.filter((p) => p.role === "submitter");
+  const roleLabel = (p: Participant) => {
+    if (p.role === "both") return " · on stage + submitter";
+    if (p.role === "on_stage") return p.stage_role ? ` · ${p.stage_role.replace("_", " ")}` : " · on stage";
+    if (p.role === "submitter") return " · submitter";
+    return "";
+  };
   return (
     <label className="block text-xs text-white/70">
-      {label}
+      <div className="flex items-center justify-between gap-2">
+        <span>{label}</span>
+        <div className="flex gap-1">
+          {(["all", "on_stage", "submitter"] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={cn(
+                "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                filter === f ? "bg-white/20 text-white" : "bg-white/5 text-white/50 hover:bg-white/10",
+              )}
+            >
+              {f === "all" ? "All" : f === "on_stage" ? "On stage" : "Submitters"}
+            </button>
+          ))}
+        </div>
+      </div>
       <select
         value={value} onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white"
       >
         <option value="">— select —</option>
-        {participants
-          .filter((p) => p.user_id !== exclude)
-          .map((p) => (
-            <option key={p.user_id} value={p.user_id}>
-              {p.display_name || "Artist"}
-            </option>
-          ))}
+        {onStage.length > 0 && (
+          <optgroup label="On stage (host / co-host / speaker)">
+            {onStage.map((p) => (
+              <option key={p.user_id} value={p.user_id}>
+                {p.display_name || "Artist"}{roleLabel(p)}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        {submitters.length > 0 && (
+          <optgroup label="Track submitters">
+            {submitters.map((p) => (
+              <option key={p.user_id} value={p.user_id}>
+                {p.display_name || "Artist"}{roleLabel(p)}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        {filtered.length === 0 && (
+          <option value="" disabled>
+            No matching artists
+          </option>
+        )}
       </select>
     </label>
   );
