@@ -808,7 +808,6 @@ function ArtistSelect({
   label: string; value: string; onChange: (v: string) => void;
   participants: Participant[]; exclude: string;
 }) {
-  void 0;
   const [filter, setFilter] = useState<"all" | "on_stage" | "submitter">("all");
   const [query, setQuery] = useState("");
   // Debounce the search query so typing stays fluid even with thousands
