@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
+import { runIdempotent } from "@/lib/idempotency";
 
 const PATH_RE = /^[A-Za-z0-9_\-./]+$/;
 const BUCKET = "artist-audio";
@@ -142,13 +143,25 @@ export const signAudioUrl = createServerFn({ method: "POST" })
 
     // Cap signed URL lifetime to 10 minutes for listener access.
     const expiresIn = Math.min(Math.max(data.expiresIn ?? 600, 60), 60 * 10);
-    const { data: signed, error } = await supabaseAdmin.storage
-      .from(BUCKET)
-      .createSignedUrl(path, expiresIn);
-    if (error || !signed?.signedUrl) {
-      audit("denied", "sign_failed", path, { error: error?.message });
-      return { url: null as string | null, expiresIn: 0 };
-    }
-    audit("allowed", reason || "ok", path, { expires_in: expiresIn });
-    return { url: signed.signedUrl, expiresIn };
+    // Idempotent per (user, path, 5-minute bucket): duplicate calls within
+    // the bucket return the same signed URL instead of minting a new one.
+    // The bucket keeps cached URLs comfortably inside the 10-minute expiry.
+    const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
+    return runIdempotent<{ url: string | null; expiresIn: number }>({
+      supabase,
+      userId,
+      key: `sign_audio:${path}:${expiresIn}:${bucket}`,
+      action: "sign_audio",
+      handler: async () => {
+        const { data: signed, error } = await supabaseAdmin.storage
+          .from(BUCKET)
+          .createSignedUrl(path, expiresIn);
+        if (error || !signed?.signedUrl) {
+          audit("denied", "sign_failed", path, { error: error?.message });
+          return { url: null as string | null, expiresIn: 0 };
+        }
+        audit("allowed", reason || "ok", path, { expires_in: expiresIn });
+        return { url: signed.signedUrl, expiresIn };
+      },
+    });
   });
