@@ -183,6 +183,7 @@ function GuestPage() {
             >
               <NowPlayingHeader
                 streamId={streamId}
+                isHost={isHostLike}
                 liveParticipants={(participants as StageParticipant[]).map((p) => ({
                   user_id: p.user_id,
                   display_name: p.display_name,
@@ -210,6 +211,7 @@ function GuestPage() {
               {streamId && (
                 <NowPlayingHeader
                   streamId={streamId}
+                  isHost={isHostLike}
                   liveParticipants={(participants as StageParticipant[]).map((p) => ({
                     user_id: p.user_id,
                     display_name: p.display_name,

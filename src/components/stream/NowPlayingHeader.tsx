@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Music, Play, Pause, Radio, Disc3, Swords, Volume2, Mic, Clock, Trophy } from "lucide-react";
+import { Music, Play, Pause, Radio, Disc3, Swords, Volume2, Mic, Clock, Trophy, SkipForward } from "lucide-react";
 import { usePlayQueue } from "@/lib/usePlayQueue";
 import { supabase } from "@/integrations/supabase/client";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
+import { useServerFn } from "@tanstack/react-start";
+import { advancePlayQueue } from "@/lib/play.functions";
+import { toast } from "sonner";
 
 type Mode = "live" | "upload" | "battle-live" | "battle-pending" | "idle";
 
@@ -40,9 +43,11 @@ interface LiveParticipant {
 export function NowPlayingHeader({
   streamId,
   liveParticipants = [],
+  isHost = false,
 }: {
   streamId: string | null;
   liveParticipants?: LiveParticipant[];
+  isHost?: boolean;
 }) {
   const { playing } = usePlayQueue(streamId);
   const [battle, setBattle] = useState<ActiveBattle | null>(null);
@@ -171,6 +176,17 @@ export function NowPlayingHeader({
     } catch { /* autoplay rejection */ }
   };
 
+  const advanceFn = useServerFn(advancePlayQueue);
+  const handleNext = async () => {
+    if (!streamId || !isHost) return;
+    try {
+      const r = await advanceFn({ data: { streamId } });
+      toast.success(r.next ? "Playing next song" : "Queue empty");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to advance queue");
+    }
+  };
+
   const pct = duration > 0 ? Math.min(100, (progress / duration) * 100) : 0;
 
   return (
@@ -203,9 +219,20 @@ export function NowPlayingHeader({
             </span>
           )}
           {mode === "live" && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 tracking-wider">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
-            </span>
+            isHost ? (
+              <button
+                onClick={handleNext}
+                title="Play next song"
+                className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-2 py-0.5 tracking-wider transition hover:bg-white/20 active:scale-95"
+              >
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
+                <SkipForward className="h-3 w-3" />
+              </button>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 tracking-wider">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
+              </span>
+            )
           )}
         </div>
       </div>
