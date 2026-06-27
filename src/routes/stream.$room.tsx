@@ -246,6 +246,7 @@ function GuestPage() {
               viewerCount={viewerCount}
               startedAt={streamMeta?.started_at ?? null}
               hostId={streamMeta?.host_id ?? null}
+              status={streamMeta?.status ?? null}
             />
           )}
         </div>
