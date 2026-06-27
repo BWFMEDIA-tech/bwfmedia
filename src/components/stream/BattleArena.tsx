@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Swords, Trophy, Zap, Crown, Sparkles, Loader2, Lock, Pencil } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Swords, Trophy, Zap, Crown, Sparkles, Loader2, Lock, Pencil, ChevronDown, Check } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -625,6 +625,7 @@ function CreateBattleDialog({
   const [rounds, setRounds] = useState(3);
   const [seconds, setSeconds] = useState(60);
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const isEdit = mode === "edit";
 
   // Sync local selections when the underlying match changes via realtime so
@@ -637,6 +638,11 @@ function CreateBattleDialog({
 
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
+    // Pre-stage window confirmation step before persisting an edit.
+    if (isEdit && !confirming) {
+      setConfirming(true);
+      return;
+    }
     setBusy(true);
     const prevA = initialA ?? "";
     const prevB = initialB ?? "";
@@ -665,13 +671,18 @@ function CreateBattleDialog({
       }
       onClose();
     } catch (e: any) {
-      toast.error(e?.message ?? (isEdit ? "Failed to update matchup" : "Failed to create battle"));
       if (isEdit) {
+        toast.error("Matchup update rejected — reverted to previous selection", {
+          description: e?.message ?? "The lock window may have closed.",
+        });
         onOptimistic?.(prevA, prevB);
         onReconcile?.();
+      } else {
+        toast.error(e?.message ?? "Failed to create battle");
       }
     } finally {
       setBusy(false);
+      setConfirming(false);
     }
   };
 
@@ -709,15 +720,23 @@ function CreateBattleDialog({
           )}
         </div>
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5">
-            Cancel
+          {isEdit && confirming && (
+            <span className="mr-auto text-[11px] text-amber-300">
+              Confirm matchup change? This will lock once artists go on stage.
+            </span>
+          )}
+          <button
+            onClick={() => (confirming ? setConfirming(false) : onClose())}
+            className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5"
+          >
+            {confirming ? "Back" : "Cancel"}
           </button>
           <button
             onClick={submit} disabled={busy}
             className="rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, #c53dff, #ff00a6)" }}
           >
-            {busy ? "Saving…" : isEdit ? "Save matchup" : "Create battle"}
+            {busy ? "Saving…" : isEdit ? (confirming ? "Confirm save" : "Save matchup") : "Create battle"}
           </button>
         </div>
       </div>
