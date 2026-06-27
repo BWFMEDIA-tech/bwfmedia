@@ -192,15 +192,43 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHost(supabase, userId, data.streamId);
+    // Capture the track that just finished so we can keep battle order
+    // (A → B → A → B…) when a live battle is running on this stream.
+    const { data: justPlayed } = await supabase.from("play_tracks")
+      .select("id, battle_match_id, battle_side")
+      .eq("stream_id", data.streamId).eq("status", "playing")
+      .maybeSingle();
     await supabase.from("play_tracks")
       .update({ status: "done" })
       .eq("stream_id", data.streamId).eq("status", "playing");
-    const { data: next } = await supabase.from("play_tracks")
-      .select("id")
-      .eq("stream_id", data.streamId).eq("status", "queued")
-      .order("boosted", { ascending: false })
-      .order("position", { ascending: true })
-      .limit(1).maybeSingle();
+
+    let next: { id: string } | null = null;
+
+    // Battle-aware pick: if the finished track belonged to a battle, prefer
+    // the opposite side's next queued track from the same match.
+    if (justPlayed?.battle_match_id && (justPlayed.battle_side === "a" || justPlayed.battle_side === "b")) {
+      const otherSide = justPlayed.battle_side === "a" ? "b" : "a";
+      const { data: opp } = await supabase.from("play_tracks")
+        .select("id")
+        .eq("stream_id", data.streamId).eq("status", "queued")
+        .eq("battle_match_id", justPlayed.battle_match_id)
+        .eq("battle_side", otherSide)
+        .order("boosted", { ascending: false })
+        .order("position", { ascending: true })
+        .limit(1).maybeSingle();
+      next = opp ?? null;
+    }
+
+    // Fallback: normal queue order (boosted first, then position).
+    if (!next) {
+      const { data: fallback } = await supabase.from("play_tracks")
+        .select("id")
+        .eq("stream_id", data.streamId).eq("status", "queued")
+        .order("boosted", { ascending: false })
+        .order("position", { ascending: true })
+        .limit(1).maybeSingle();
+      next = fallback ?? null;
+    }
     if (!next) {
       await supabase.from("play_sessions")
         .upsert({ stream_id: data.streamId, current_track_id: null }, { onConflict: "stream_id" });
