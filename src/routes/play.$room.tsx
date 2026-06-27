@@ -83,12 +83,22 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
     })();
   }, [stream?.id, auth.user?.id]);
 
-  // Derive unique artist participants from play queue for the battle picker.
+  // Derive unique artist participants for the battle picker — include both
+  // artists who submitted tracks AND anyone currently on stage (host /
+  // co-host / speaker), so the host can pit on-stage performers against
+  // each other even before they've queued a track.
+  const stageState = useStageState(stream?.id ?? null);
   const battleParticipants = (() => {
     const seen = new Map<string, { user_id: string; display_name: string | null; avatar_url: string | null }>();
     for (const t of [...(playing ? [playing] : []), ...queued, ...leaderboard]) {
       if (t.artist_user_id && !seen.has(t.artist_user_id)) {
         seen.set(t.artist_user_id, { user_id: t.artist_user_id, display_name: t.artist_name, avatar_url: t.cover_url });
+      }
+    }
+    for (const p of stageState.participants) {
+      if (p.stage_role === "listener" || p.stage_role === "green_room") continue;
+      if (!seen.has(p.user_id)) {
+        seen.set(p.user_id, { user_id: p.user_id, display_name: p.display_name ?? null, avatar_url: p.avatar_url ?? null });
       }
     }
     return Array.from(seen.values());
