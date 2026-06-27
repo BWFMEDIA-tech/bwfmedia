@@ -21,6 +21,7 @@ import {
   Newspaper,
   Calendar,
   ShoppingCart,
+  Trophy,
 } from "lucide-react";
 import bwfLogo from "@/assets/tunevio-logo.png";
 import { useAuth } from "@/lib/auth-context";
