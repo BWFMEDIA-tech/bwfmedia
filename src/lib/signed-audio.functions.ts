@@ -63,7 +63,7 @@ export const signAudioUrl = createServerFn({ method: "POST" })
           user_agent: ua,
           metadata,
         })
-        .then(({ error }) => {
+        .then(({ error }: { error: unknown }) => {
           if (error) console.error("[signAudioUrl] audit insert failed", error);
         });
     };
