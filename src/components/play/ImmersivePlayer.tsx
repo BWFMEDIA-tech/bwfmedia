@@ -8,7 +8,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
-import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue } from "@/lib/play.functions";
+import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack } from "@/lib/play.functions";
 import { RankBadge } from "@/components/rank/RankBadge";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
@@ -19,7 +19,7 @@ import {
   useSortable, verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Trash2 } from "lucide-react";
 import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -399,6 +399,7 @@ export function ImmersivePlayer({
   const advanceFn = useServerFn(advancePlayQueue);
   const playFn = useServerFn(playTrackNow);
   const reorderFn = useServerFn(reorderPlayQueue);
+  const deleteFn = useServerFn(deletePlayTrack);
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
 
@@ -870,6 +871,12 @@ export function ImmersivePlayer({
                             try { await playFn({ data: { streamId, trackId: t.id } }); toast.success("Playing now"); }
                             catch (e: any) { toast.error(e?.message ?? "Failed"); }
                           }}
+                          onDelete={async () => {
+                            if (!streamId) return;
+                            if (!confirm(`Delete "${t.title}"?`)) return;
+                            try { await deleteFn({ data: { streamId, trackId: t.id } }); toast.success("Track deleted"); }
+                            catch (e: any) { toast.error(e?.message ?? "Delete failed"); }
+                          }}
                         />
                       ))}
                     </ul>
@@ -924,12 +931,13 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
 }
 
 function QueueItem({
-  track, index, isHost, onPlayNow,
+  track, index, isHost, onPlayNow, onDelete,
 }: {
   track: PlayTrack;
   index: number;
   isHost: boolean;
   onPlayNow: () => void;
+  onDelete?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: track.id, disabled: !isHost });
@@ -979,6 +987,15 @@ function QueueItem({
           aria-label="Play now"
         >
           <Play className="h-3 w-3" />
+        </button>
+      )}
+      {isHost && onDelete && (
+        <button
+          onClick={onDelete}
+          className="rounded-full bg-white/10 p-1.5 text-white/60 opacity-0 transition group-hover:opacity-100 hover:bg-red-500/20 hover:text-red-300"
+          aria-label={`Delete ${track.title}`}
+        >
+          <Trash2 className="h-3 w-3" />
         </button>
       )}
     </li>
