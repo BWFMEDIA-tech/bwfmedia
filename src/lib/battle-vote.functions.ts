@@ -75,7 +75,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
     return runIdempotent({
       supabase,
       userId,
-      key: createIdempotencyKey("vote", `${data.match_id}:${data.round_id}:${data.choice}:${data.weight}`, userId),
+      key: createIdempotencyKey("vote", data.match_id, userId),
       action: "cast_vote",
       handler: async () => {
         const { data: voteId, error } = await (supabase.rpc as any)("cast_battle_vote", {
