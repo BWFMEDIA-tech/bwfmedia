@@ -54,6 +54,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as UserIdRouteImport } from './routes/user.$id'
+import { Route as TrackSlugRouteImport } from './routes/track.$slug'
 import { Route as StreamRoomRouteImport } from './routes/stream.$room'
 import { Route as StageRoomIdRouteImport } from './routes/stage.$roomId'
 import { Route as SettingsSocialLinksRouteImport } from './routes/settings.social-links'
@@ -347,6 +348,11 @@ const VideosIdRoute = VideosIdRouteImport.update({
 const UserIdRoute = UserIdRouteImport.update({
   id: '/user/$id',
   path: '/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackSlugRoute = TrackSlugRouteImport.update({
+  id: '/track/$slug',
+  path: '/track/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StreamRoomRoute = StreamRoomRouteImport.update({
@@ -801,6 +807,7 @@ export interface FileRoutesByFullPath {
   '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
+  '/track/$slug': typeof TrackSlugRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -916,6 +923,7 @@ export interface FileRoutesByTo {
   '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
+  '/track/$slug': typeof TrackSlugRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
@@ -1033,6 +1041,7 @@ export interface FileRoutesById {
   '/settings/social-links': typeof SettingsSocialLinksRoute
   '/stage/$roomId': typeof StageRoomIdRoute
   '/stream/$room': typeof StreamRoomRoute
+  '/track/$slug': typeof TrackSlugRoute
   '/user/$id': typeof UserIdRoute
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -1151,6 +1160,7 @@ export interface FileRouteTypes {
     | '/settings/social-links'
     | '/stage/$roomId'
     | '/stream/$room'
+    | '/track/$slug'
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
@@ -1266,6 +1276,7 @@ export interface FileRouteTypes {
     | '/settings/social-links'
     | '/stage/$roomId'
     | '/stream/$room'
+    | '/track/$slug'
     | '/user/$id'
     | '/videos/$id'
     | '/admin'
@@ -1382,6 +1393,7 @@ export interface FileRouteTypes {
     | '/settings/social-links'
     | '/stage/$roomId'
     | '/stream/$room'
+    | '/track/$slug'
     | '/user/$id'
     | '/videos/$id'
     | '/admin/'
@@ -1463,6 +1475,7 @@ export interface RootRouteChildren {
   PlayRanksRoute: typeof PlayRanksRoute
   StageRoomIdRoute: typeof StageRoomIdRoute
   StreamRoomRoute: typeof StreamRoomRoute
+  TrackSlugRoute: typeof TrackSlugRoute
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -1799,6 +1812,13 @@ declare module '@tanstack/react-router' {
       path: '/user/$id'
       fullPath: '/user/$id'
       preLoaderRoute: typeof UserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track/$slug': {
+      id: '/track/$slug'
+      path: '/track/$slug'
+      fullPath: '/track/$slug'
+      preLoaderRoute: typeof TrackSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stream/$room': {
@@ -2450,6 +2470,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlayRanksRoute: PlayRanksRoute,
   StageRoomIdRoute: StageRoomIdRoute,
   StreamRoomRoute: StreamRoomRoute,
+  TrackSlugRoute: TrackSlugRoute,
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
   BlogIndexRoute: BlogIndexRoute,
