@@ -448,10 +448,11 @@ export function ImmersivePlayer({
     if (!a) return;
     const onTime = () => setProgress(a.currentTime);
     const onMeta = () => setDuration(a.duration || 0);
-    const onPlay = () => { setIsPlaying(true); resume(); };
-    const onPause = () => setIsPlaying(false);
+    const onPlay = () => { setIsPlaying(true); setPlaybackPlaying(true); resume(); };
+    const onPause = () => { setIsPlaying(false); setPlaybackPlaying(false); };
     const onEnd = async () => {
       setIsPlaying(false);
+      setPlaybackPlaying(false);
       if (isHost && streamId) {
         try { await advanceFn({ data: { streamId } }); } catch { /* ignore */ }
       }
