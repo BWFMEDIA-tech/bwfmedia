@@ -55,6 +55,8 @@ export const createBattleMatch = createServerFn({ method: "POST" })
         artistBId: z.string().uuid(),
         totalRounds: z.number().int().min(1).max(9).default(3),
         roundSeconds: z.number().int().min(15).max(600).default(60),
+        trackAId: z.string().uuid().optional(),
+        trackBId: z.string().uuid().optional(),
       })
       .refine((d) => d.artistAId !== d.artistBId, { message: "Artists must differ" })
       .parse(input),
@@ -109,6 +111,30 @@ export const createBattleMatch = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+
+    // Wire the host-picked tracks to this match so START_ROUND can auto-play
+    // them. Each track is re-attached to this stream, assigned its side, and
+    // bumped back to `queued` so playback control can flip it to `playing`.
+    const attachTrack = async (trackId: string, side: "a" | "b", artistId: string) => {
+      const { data: t } = await supabase
+        .from("play_tracks")
+        .select("id, artist_user_id")
+        .eq("id", trackId)
+        .maybeSingle();
+      if (!t || t.artist_user_id !== artistId) return;
+      await supabase
+        .from("play_tracks")
+        .update({
+          stream_id: data.streamId,
+          battle_match_id: match.id,
+          battle_side: side,
+          status: "queued",
+        })
+        .eq("id", trackId);
+    };
+    if (data.trackAId) await attachTrack(data.trackAId, "a", data.artistAId);
+    if (data.trackBId) await attachTrack(data.trackBId, "b", data.artistBId);
+
     return match;
   });
 
