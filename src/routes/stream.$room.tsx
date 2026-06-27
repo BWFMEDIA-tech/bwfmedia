@@ -16,7 +16,7 @@ import { StageAudioShell } from "@/components/stream/StageAudioShell";
 import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
-import { NowPlayingHeader } from "@/components/stream/NowPlayingHeader";
+
 import joinBgAsset from "@/assets/bwf-join-bg.jpeg.asset.json";
 
 export const Route = createFileRoute("/stream/$room")({
@@ -181,15 +181,6 @@ function GuestPage() {
               showHostTools={isHostLike}
               autoConnect
             >
-              <NowPlayingHeader
-                streamId={streamId}
-                isHost={isHostLike}
-                liveParticipants={(participants as StageParticipant[]).map((p) => ({
-                  user_id: p.user_id,
-                  display_name: p.display_name,
-                  avatar_url: p.avatar_url,
-                }))}
-              />
               <StageRoom
                 streamId={streamId}
                 participants={participants as StageParticipant[]}
@@ -208,17 +199,6 @@ function GuestPage() {
           ) : (
             <>
               <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} />
-              {streamId && (
-                <NowPlayingHeader
-                  streamId={streamId}
-                  isHost={isHostLike}
-                  liveParticipants={(participants as StageParticipant[]).map((p) => ({
-                    user_id: p.user_id,
-                    display_name: p.display_name,
-                    avatar_url: p.avatar_url,
-                  }))}
-                />
-              )}
               {streamId && (
                 <StageRoom
                   streamId={streamId}
