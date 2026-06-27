@@ -146,8 +146,7 @@ function RootComponent() {
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div
-          className={isChrome ? "pt-24 md:pt-28" : ""}
-          style={isChrome ? { paddingTop: "calc(var(--bwf-banner-h, 0px) + 6rem)" } : undefined}
+          className="pt-[calc(var(--bwf-banner-h,0px)+5rem)] md:pt-[calc(var(--bwf-banner-h,0px)+6rem)] lg:pt-[calc(var(--bwf-banner-h,0px)+7rem)]"
         >
           <Outlet />
         </div>

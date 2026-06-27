@@ -136,7 +136,7 @@ export function SiteHeader() {
           : "backdrop-blur bg-black/50 border-b border-white/5"
       }`}
     >
-      <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-16 md:h-20 flex items-center gap-4">
+      <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-20 md:h-24 lg:h-28 flex items-center gap-4">
         {/* Mobile hamburger (left) */}
         <button
           type="button"
@@ -150,7 +150,7 @@ export function SiteHeader() {
 
         {/* Logo */}
         <RouterLink to="/" className="flex items-center gap-2 shrink-0 md:ml-12 mr-2">
-          <img src={bwfLogo.url} alt="BWF Network" className="h-12 md:h-16 lg:h-20 w-auto object-contain" />
+          <img src={bwfLogo.url} alt="BWF Network" className="h-16 md:h-20 lg:h-24 w-auto object-contain" />
         </RouterLink>
 
         {/* Desktop primary nav */}
