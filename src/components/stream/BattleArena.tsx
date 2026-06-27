@@ -453,10 +453,6 @@ function BattleView({
   );
 }
 
-function ArtistSide({
-  // placeholder no-op
-}
-
 function VoteTracker({
   aPct,
   bPct,
