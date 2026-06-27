@@ -8,7 +8,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
-import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue } from "@/lib/play.functions";
+import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack } from "@/lib/play.functions";
 import { RankBadge } from "@/components/rank/RankBadge";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
@@ -399,6 +399,7 @@ export function ImmersivePlayer({
   const advanceFn = useServerFn(advancePlayQueue);
   const playFn = useServerFn(playTrackNow);
   const reorderFn = useServerFn(reorderPlayQueue);
+  const deleteFn = useServerFn(deletePlayTrack);
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
 
