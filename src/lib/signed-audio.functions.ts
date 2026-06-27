@@ -150,7 +150,7 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     return runIdempotent({
       supabase,
       userId,
-      key: `sign_audio:${path}:${expiresIn}:${bucket}`,
+      key: createIdempotencyKey("sign_audio", `${path}:${expiresIn}:${bucket}`, userId),
       action: "sign_audio",
       handler: async () => {
         const { data: signed, error } = await supabaseAdmin.storage
