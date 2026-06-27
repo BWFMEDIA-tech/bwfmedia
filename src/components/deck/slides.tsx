@@ -4,7 +4,7 @@ import camera from "@/assets/camera.png";
 import viralThumbs from "@/assets/viral-thumbs.jpg";
 import audience from "@/assets/audience.jpg";
 import musicVideo from "@/assets/music-video.jpg";
-import bwfLogo from "@/assets/tunevio-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import {
   Play,
   Mic,
@@ -54,7 +54,7 @@ export function Slide1() {
         >
           <div className="absolute inset-0 blur-3xl opacity-40 -z-10" style={{ backgroundColor: "var(--blood)" }} />
           <img
-            src={bwfLogo}
+            src={bwfLogo.url}
             alt="BWF Media TV"
             className="w-[420px] h-[420px] object-contain mix-blend-screen drop-shadow-[0_0_40px_rgba(220,38,38,0.4)]"
           />

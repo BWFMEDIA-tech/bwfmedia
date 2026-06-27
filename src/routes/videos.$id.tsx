@@ -2,7 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ExternalLink, Music2, Megaphone, Calendar } from "lucide-react";
-import bwfLogo from "@/assets/tunevio-logo.png";
+import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import grunge from "@/assets/grunge-bg.jpg";
 
 export const Route = createFileRoute("/videos/$id")({
@@ -129,7 +129,7 @@ function VideoDetailPage() {
       <nav className="sticky top-0 z-40 backdrop-blur-xl bg-black/85 border-b border-blood/40">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src={bwfLogo} alt="BWF Media" className="w-14 h-14 object-contain" />
+            <img src={bwfLogo.url} alt="BWF Media" className="w-14 h-14 object-contain" />
           </Link>
           <Link
             to="/videos"
