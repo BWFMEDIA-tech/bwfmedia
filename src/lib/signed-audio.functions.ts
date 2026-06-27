@@ -147,7 +147,7 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     // the bucket return the same signed URL instead of minting a new one.
     // The bucket keeps cached URLs comfortably inside the 10-minute expiry.
     const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
-    return runIdempotent<{ url: string | null; expiresIn: number }>({
+    return runIdempotent({
       supabase,
       userId,
       key: `sign_audio:${path}:${expiresIn}:${bucket}`,

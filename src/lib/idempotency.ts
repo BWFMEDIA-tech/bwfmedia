@@ -1,66 +1,41 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+type IdempotentParams = {
+  supabase: any;
+  userId: string;
+  key: string;
+  action: string;
+  handler: () => Promise<any>;
+};
 
-/**
- * Run a handler at-most-once per (userId, key).
- * Concurrent duplicates are protected by the UNIQUE (user_id, idempotency_key)
- * constraint on request_idempotency — on conflict we re-read the winner's
- * cached response so both callers receive the same result.
- */
-export async function runIdempotent<T>({
+export async function runIdempotent({
   supabase,
   userId,
   key,
   action,
   handler,
-}: {
-  supabase: SupabaseClient<any, any, any>;
-  userId: string;
-  key: string;
-  action: string;
-  handler: () => Promise<T>;
-}): Promise<T> {
-  if (!userId) throw new Error("runIdempotent: userId required");
-  if (!key) throw new Error("runIdempotent: key required");
-  if (!action) throw new Error("runIdempotent: action required");
-
-  const { data: existing, error: readErr } = await supabase
+}: IdempotentParams) {
+  // 1. check existing execution
+  const { data: existing } = await supabase
     .from("request_idempotency")
     .select("response")
     .eq("user_id", userId)
     .eq("idempotency_key", key)
     .maybeSingle();
 
-  if (readErr && readErr.code !== "PGRST116") throw readErr;
-  if (existing && existing.response != null) {
-    return existing.response as T;
+  // 2. return cached result if already executed
+  if (existing?.response) {
+    return existing.response;
   }
 
+  // 3. execute real logic
   const result = await handler();
 
-  const { error: insertErr } = await supabase
-    .from("request_idempotency")
-    .insert({
-      user_id: userId,
-      idempotency_key: key,
-      action,
-      response: (result ?? null) as any,
-    });
-
-  if (insertErr) {
-    if (insertErr.code === "23505") {
-      const { data: winner } = await supabase
-        .from("request_idempotency")
-        .select("response")
-        .eq("user_id", userId)
-        .eq("idempotency_key", key)
-        .maybeSingle();
-      if (winner && winner.response != null) {
-        return winner.response as T;
-      }
-    } else {
-      console.error("[runIdempotent] failed to persist response", insertErr);
-    }
-  }
+  // 4. store result for future deduplication
+  await supabase.from("request_idempotency").insert({
+    user_id: userId,
+    idempotency_key: key,
+    action,
+    response: result,
+  });
 
   return result;
 }

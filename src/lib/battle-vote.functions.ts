@@ -72,7 +72,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
     // Idempotent per (user, round, choice, weight): repeated retries of the
     // same vote return the same id; changing choice/weight produces a new key
     // and is allowed (RPC upserts on (match_id, voter_id)).
-    return runIdempotent<{ id: string }>({
+    return runIdempotent({
       supabase,
       userId,
       key: `vote:${data.match_id}:${data.round_id}:${data.choice}:${data.weight}`,
