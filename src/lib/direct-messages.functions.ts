@@ -38,15 +38,23 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
     try {
       const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
-      const { data: recipientProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('id, display_name, last_seen_at')
-        .eq('id', data.recipientId)
-        .maybeSingle()
+      const [{ data: recipientProfile }, { data: recipientPresence }] = await Promise.all([
+        supabaseAdmin
+          .from('profiles')
+          .select('id, display_name')
+          .eq('id', data.recipientId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from('user_presence')
+          .select('last_seen_at')
+          .eq('user_id', data.recipientId)
+          .maybeSingle(),
+      ])
+      void recipientProfile
 
       const now = Date.now()
-      const lastSeen = recipientProfile?.last_seen_at
-        ? new Date(recipientProfile.last_seen_at).getTime()
+      const lastSeen = recipientPresence?.last_seen_at
+        ? new Date(recipientPresence.last_seen_at).getTime()
         : 0
       const isOffline = !lastSeen || now - lastSeen > OFFLINE_THRESHOLD_MS
 
@@ -152,8 +160,10 @@ export const touchPresence = createServerFn({ method: 'POST' })
   .handler(async ({ context }) => {
     const { supabase, userId } = context
     await supabase
-      .from('profiles')
-      .update({ last_seen_at: new Date().toISOString() })
-      .eq('id', userId)
+      .from('user_presence')
+      .upsert(
+        { user_id: userId, online: true, last_seen_at: new Date().toISOString() },
+        { onConflict: 'user_id' },
+      )
     return { ok: true }
   })
