@@ -110,7 +110,7 @@ function DeckNav() {
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur bg-black/70 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
-          <img src={bwfLogo} alt="BWF Media" className="w-8 h-8 object-contain" />
+          <img src={bwfLogo.url} alt="BWF Media" className="w-8 h-8 object-contain" />
           <span className="font-display text-lg md:text-xl tracking-tight text-bone">
             BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
           </span>
@@ -719,7 +719,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
                 className="relative p-3"
                 style={{ border: `1px solid ${HUD_GOLD}66`, boxShadow: `0 0 30px ${HUD_GOLD}55` }}
               >
-                <img src={bwfLogo} alt="BWF Media" className="w-10 h-10 object-contain" />
+                <img src={bwfLogo.url} alt="BWF Media" className="w-10 h-10 object-contain" />
               </div>
             </div>
 
@@ -925,7 +925,7 @@ function DeckGate({ onUnlock }: { onUnlock: () => void }) {
                 className="relative p-3"
                 style={{ border: `1px solid ${HUD_GOLD}66`, boxShadow: `0 0 30px ${HUD_GOLD}55` }}
               >
-                <img src={bwfLogo} alt="BWF Media" className="w-10 h-10 object-contain" />
+                <img src={bwfLogo.url} alt="BWF Media" className="w-10 h-10 object-contain" />
               </div>
             </div>
 
