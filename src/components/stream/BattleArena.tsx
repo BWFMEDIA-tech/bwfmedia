@@ -323,6 +323,15 @@ function BattleView({
           coverUrl={(aTrack as any)?.cover_url ?? null}
           trackTitle={(aTrack as any)?.title ?? null}
           isPlaying={activeSide === "a"}
+          status={
+            activeSide === "a"
+              ? "playing"
+              : activeSide === "b"
+                ? "next"
+                : match.status === "completed" || (currentRound?.status === "closed" && !activeSide)
+                  ? "finished"
+                  : "ready"
+          }
           wins={match.a_wins as number}
           pct={aPct}
           isLeading={total > 0 && aScore > bScore}
@@ -339,6 +348,15 @@ function BattleView({
           coverUrl={(bTrack as any)?.cover_url ?? null}
           trackTitle={(bTrack as any)?.title ?? null}
           isPlaying={activeSide === "b"}
+          status={
+            activeSide === "b"
+              ? "playing"
+              : activeSide === "a"
+                ? "next"
+                : match.status === "completed" || (currentRound?.status === "closed" && !activeSide)
+                  ? "finished"
+                  : "ready"
+          }
           wins={match.b_wins as number}
           pct={bPct}
           isLeading={total > 0 && bScore > aScore}
