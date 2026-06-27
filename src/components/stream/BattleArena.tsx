@@ -10,6 +10,7 @@ import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/ba
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
 import { RankBadge } from "@/components/rank/RankBadge";
+import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -676,6 +677,16 @@ function CreateBattleDialog({
   const [busy, setBusy] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const isEdit = mode === "edit";
+  // Inline "Upload new track" flow. Artists can submit a song from inside
+  // the Create 1v1 Battle dialog and have it auto-selected for whichever
+  // side (A or B) doesn't have a pick yet.
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const uploadingArtistName = useMemo(() => {
+    const me = participants.find((p) => !!p);
+    const aP = participants.find((p) => p.user_id === a);
+    const bP = participants.find((p) => p.user_id === b);
+    return aP?.display_name || bP?.display_name || me?.display_name || "Artist";
+  }, [participants, a, b]);
 
   // Per-artist submitted-track lists, loaded from play_tracks so the host
   // can see which songs each selected artist has queued. Display-only at
@@ -817,6 +828,17 @@ function CreateBattleDialog({
             loading={loadingB}
             artistSelected={!!b}
           />
+          <button
+            type="button"
+            onClick={() => setUploadOpen(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/15 bg-black/30 px-3 py-2 text-xs font-semibold text-white/80 hover:border-[#c53dff]/60 hover:bg-white/5"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-[#00e6ff]" />
+            Upload new track to my profile
+          </button>
+          <p className="text-[10px] leading-snug text-white/40">
+            New tracks attach to whichever side (A or B) is empty. Only the signed-in artist can upload their own songs.
+          </p>
           {!isEdit && (
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-xs text-white/70">
@@ -859,6 +881,36 @@ function CreateBattleDialog({
           </button>
         </div>
       </div>
+      {uploadOpen && (
+        <AddProfileTrackDialog
+          defaultArtistName={uploadingArtistName}
+          onClose={() => setUploadOpen(false)}
+          onAdded={async () => {
+            // Reload both sides' track lists so the freshly uploaded song
+            // shows up, and auto-pick it on whichever side is still empty
+            // (A first, then B). Each loadTracks call already auto-selects
+            // the newest row for that artist when nothing is selected yet.
+            const before = { a: trackA, b: trackB };
+            await Promise.all([loadTracks(a, "a"), loadTracks(b, "b")]);
+            // If both sides already had picks, do nothing — host can change
+            // selection from the dropdown. Otherwise nudge selection to the
+            // newly-uploaded track on the empty side.
+            const { data: latest } = await supabase
+              .from("play_tracks")
+              .select("id, artist_user_id")
+              .in("artist_user_id", [a, b].filter(Boolean))
+              .neq("status", "removed")
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (latest?.id && latest.artist_user_id) {
+              if (!before.a && latest.artist_user_id === a) setTrackA(latest.id);
+              else if (!before.b && latest.artist_user_id === b) setTrackB(latest.id);
+            }
+            toast.success("Track added — ready to pick for the battle");
+          }}
+        />
+      )}
     </div>
   );
 }
