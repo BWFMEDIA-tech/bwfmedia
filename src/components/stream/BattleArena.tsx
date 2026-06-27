@@ -150,6 +150,24 @@ export function BattleArena({
           initialB={(match.artist_b_id as string | null) ?? ""}
           onClose={() => setShowEdit(false)}
           onSaved={refresh}
+          onOptimistic={(a, b) => {
+            setRoomState((prev) => {
+              if (!prev || !prev.match) return prev;
+              const findName = (id: string) =>
+                participants.find((p) => p.user_id === id)?.display_name ?? null;
+              return {
+                ...prev,
+                match: {
+                  ...prev.match,
+                  artist_a_id: a,
+                  artist_b_id: b,
+                  artist_a_name: findName(a) ?? prev.match.artist_a_name,
+                  artist_b_name: findName(b) ?? prev.match.artist_b_name,
+                },
+              } as RoomState;
+            });
+          }}
+          onReconcile={refresh}
         />
       )}
     </>
@@ -586,6 +604,8 @@ function CreateBattleDialog({
   initialA,
   initialB,
   onSaved,
+  onOptimistic,
+  onReconcile,
 }: {
   streamId: string;
   participants: Participant[];
@@ -595,6 +615,8 @@ function CreateBattleDialog({
   initialA?: string;
   initialB?: string;
   onSaved?: () => void;
+  onOptimistic?: (a: string, b: string) => void;
+  onReconcile?: () => void;
 }) {
   const createFn = useServerFn(createBattleMatch);
   const updateFn = useServerFn(updateBattleArtists);
@@ -616,11 +638,19 @@ function CreateBattleDialog({
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
     setBusy(true);
+    const prevA = initialA ?? "";
+    const prevB = initialB ?? "";
     try {
       if (isEdit && matchId) {
+        // Optimistic: reflect the new matchup immediately, then call the
+        // server. If the server rejects (e.g. the lock window closed because
+        // an artist just hit the stage), revert and refresh from truth.
+        onOptimistic?.(a, b);
+        onClose();
         await updateFn({ data: { matchId, artistAId: a, artistBId: b } });
         toast.success("Matchup updated");
         onSaved?.();
+        return;
       } else {
         await createFn({
           data: {
@@ -636,6 +666,10 @@ function CreateBattleDialog({
       onClose();
     } catch (e: any) {
       toast.error(e?.message ?? (isEdit ? "Failed to update matchup" : "Failed to create battle"));
+      if (isEdit) {
+        onOptimistic?.(prevA, prevB);
+        onReconcile?.();
+      }
     } finally {
       setBusy(false);
     }
@@ -698,11 +732,15 @@ function ArtistSelect({
   participants: Participant[]; exclude: string;
 }) {
   const [filter, setFilter] = useState<"all" | "on_stage" | "submitter">("all");
+  const [query, setQuery] = useState("");
   const available = participants.filter((p) => p.user_id !== exclude);
+  const q = query.trim().toLowerCase();
   const filtered = available.filter((p) => {
-    if (filter === "all") return true;
-    if (filter === "on_stage") return p.role === "on_stage" || p.role === "both";
-    return p.role === "submitter" || p.role === "both";
+    if (filter === "on_stage" && !(p.role === "on_stage" || p.role === "both")) return false;
+    if (filter === "submitter" && !(p.role === "submitter" || p.role === "both")) return false;
+    if (!q) return true;
+    const name = (p.display_name || "").toLowerCase();
+    return name.includes(q) || p.user_id.toLowerCase().startsWith(q);
   });
   const onStage = filtered.filter((p) => p.role === "on_stage" || p.role === "both");
   const submitters = filtered.filter((p) => p.role === "submitter");
@@ -732,6 +770,13 @@ function ArtistSelect({
           ))}
         </div>
       </div>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search artists…"
+        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/30"
+      />
       <select
         value={value} onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white"
