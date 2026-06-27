@@ -323,6 +323,15 @@ function BattleView({
           coverUrl={(aTrack as any)?.cover_url ?? null}
           trackTitle={(aTrack as any)?.title ?? null}
           isPlaying={activeSide === "a"}
+          status={
+            activeSide === "a"
+              ? "playing"
+              : activeSide === "b"
+                ? "next"
+                : match.status === "completed" || (currentRound?.status === "closed" && !activeSide)
+                  ? "finished"
+                  : "ready"
+          }
           wins={match.a_wins as number}
           pct={aPct}
           isLeading={total > 0 && aScore > bScore}
@@ -339,6 +348,15 @@ function BattleView({
           coverUrl={(bTrack as any)?.cover_url ?? null}
           trackTitle={(bTrack as any)?.title ?? null}
           isPlaying={activeSide === "b"}
+          status={
+            activeSide === "b"
+              ? "playing"
+              : activeSide === "a"
+                ? "next"
+                : match.status === "completed" || (currentRound?.status === "closed" && !activeSide)
+                  ? "finished"
+                  : "ready"
+          }
           wins={match.b_wins as number}
           pct={bPct}
           isLeading={total > 0 && bScore > aScore}
@@ -390,6 +408,7 @@ function ArtistSide({
   coverUrl,
   trackTitle,
   isPlaying,
+  status = "ready",
   wins,
   pct,
   isLeading,
@@ -405,6 +424,7 @@ function ArtistSide({
   coverUrl: string | null;
   trackTitle: string | null;
   isPlaying?: boolean;
+  status?: "playing" | "next" | "finished" | "ready";
   wins: number;
   pct: number;
   isLeading: boolean;
@@ -419,8 +439,21 @@ function ArtistSide({
     : "linear-gradient(135deg, #ff00a6, #00e6ff)";
   const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
   const isEmpty = !artistId;
+  const dim = !isEmpty && status !== "playing";
+  const statusMeta =
+    status === "playing"
+      ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#ff00a6] to-[#00e6ff] text-black animate-pulse" }
+      : status === "next"
+        ? { label: "Up Next", cls: "bg-white/10 text-white/80" }
+        : status === "finished"
+          ? { label: "Finished", cls: "bg-emerald-500/20 text-emerald-300" }
+          : { label: "Ready", cls: "bg-white/5 text-white/50" };
   return (
-    <div className={cn("relative flex flex-col items-center gap-2 p-4", side === "a" ? "border-r border-white/10" : "")}>
+    <div className={cn(
+      "relative flex flex-col items-center gap-2 p-4 transition-opacity duration-500",
+      side === "a" ? "border-r border-white/10" : "",
+      dim && "opacity-60",
+    )}>
       {overallWinner && (
         <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-200">
           <Crown className="h-3 w-3" /> Winner
@@ -469,9 +502,7 @@ function ArtistSide({
               <div
                 className={cn(
                   "relative h-full w-full rounded-full bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_60%,_#000_100%)]",
-                  isPlaying
-                    ? "animate-[spin_3s_linear_infinite]"
-                    : "animate-[spin_20s_linear_infinite]",
+                  isPlaying && "animate-[spin_3s_linear_infinite]",
                 )}
               >
                 {/* concentric grooves */}
@@ -543,6 +574,15 @@ function ArtistSide({
         )
       )}
       {!isEmpty && <div className="text-[11px] text-white/50">Rounds won: {wins}</div>}
+
+      {!isEmpty && (
+        <span className={cn(
+          "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest",
+          statusMeta.cls,
+        )}>
+          {statusMeta.label}
+        </span>
+      )}
 
       {!isEmpty && (
         <div className="w-full">
