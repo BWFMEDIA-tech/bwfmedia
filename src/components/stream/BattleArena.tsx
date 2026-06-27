@@ -628,6 +628,48 @@ function CreateBattleDialog({
   const [confirming, setConfirming] = useState(false);
   const isEdit = mode === "edit";
 
+  // Per-artist submitted-track lists, loaded from play_tracks so the host
+  // can see which songs each selected artist has queued. Display-only at
+  // this layer; actual round playback is still chosen in BattleHostControls.
+  type TrackOpt = { id: string; title: string; cover_url: string | null; status: string };
+  const [tracksA, setTracksA] = useState<TrackOpt[]>([]);
+  const [tracksB, setTracksB] = useState<TrackOpt[]>([]);
+  const [trackA, setTrackA] = useState<string>("");
+  const [trackB, setTrackB] = useState<string>("");
+  const [loadingA, setLoadingA] = useState(false);
+  const [loadingB, setLoadingB] = useState(false);
+
+  const loadTracks = useCallback(
+    async (artistId: string, side: "a" | "b") => {
+      if (!artistId) {
+        if (side === "a") setTracksA([]); else setTracksB([]);
+        return;
+      }
+      if (side === "a") setLoadingA(true); else setLoadingB(true);
+      const { data } = await supabase
+        .from("play_tracks")
+        .select("id, title, cover_url, status, created_at")
+        .eq("stream_id", streamId)
+        .eq("artist_user_id", artistId)
+        .neq("status", "removed")
+        .order("created_at", { ascending: false });
+      const rows = (data ?? []) as TrackOpt[];
+      if (side === "a") {
+        setTracksA(rows);
+        setTrackA((prev) => (prev && rows.some((r) => r.id === prev) ? prev : rows[0]?.id ?? ""));
+        setLoadingA(false);
+      } else {
+        setTracksB(rows);
+        setTrackB((prev) => (prev && rows.some((r) => r.id === prev) ? prev : rows[0]?.id ?? ""));
+        setLoadingB(false);
+      }
+    },
+    [streamId],
+  );
+
+  useEffect(() => { loadTracks(a, "a"); }, [a, loadTracks]);
+  useEffect(() => { loadTracks(b, "b"); }, [b, loadTracks]);
+
   // Sync local selections when the underlying match changes via realtime so
   // an open dialog reflects edits made by other clients in the room.
   useEffect(() => {
@@ -697,7 +739,23 @@ function CreateBattleDialog({
         </div>
         <div className="space-y-3">
           <ArtistSelect label="Artist A" value={a} onChange={setA} participants={participants} exclude={b} />
+          <TrackSelect
+            label="Artist A track"
+            value={trackA}
+            onChange={setTrackA}
+            tracks={tracksA}
+            loading={loadingA}
+            artistSelected={!!a}
+          />
           <ArtistSelect label="Artist B" value={b} onChange={setB} participants={participants} exclude={a} />
+          <TrackSelect
+            label="Artist B track"
+            value={trackB}
+            onChange={setTrackB}
+            tracks={tracksB}
+            loading={loadingB}
+            artistSelected={!!b}
+          />
           {!isEdit && (
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-xs text-white/70">
@@ -909,6 +967,64 @@ function ArtistSelect({
               </div>
             </div>
           )}
+        </div>
+      )}
+    </label>
+  );
+}
+
+function TrackSelect({
+  label,
+  value,
+  onChange,
+  tracks,
+  loading,
+  artistSelected,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  tracks: { id: string; title: string; cover_url: string | null; status: string }[];
+  loading: boolean;
+  artistSelected: boolean;
+}) {
+  const selected = tracks.find((t) => t.id === value) || null;
+  return (
+    <label className="block text-xs text-white/70">
+      <span>{label}</span>
+      {!artistSelected ? (
+        <div className="mt-1 rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white/40">
+          Pick an artist first
+        </div>
+      ) : loading ? (
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white/50">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading tracks…
+        </div>
+      ) : tracks.length === 0 ? (
+        <div className="mt-1 rounded-md border border-white/10 bg-black/40 px-2 py-1.5 text-sm text-white/40">
+          No tracks submitted yet
+        </div>
+      ) : (
+        <div className="mt-1 flex items-center gap-2 rounded-md border border-white/10 bg-black/40 px-2 py-1 pr-2">
+          {selected?.cover_url ? (
+            <img src={selected.cover_url} alt="" className="h-7 w-7 rounded object-cover" />
+          ) : (
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-white/10">
+              <Swords className="h-3.5 w-3.5 text-white/50" />
+            </div>
+          )}
+          <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="flex-1 bg-transparent py-1 text-sm text-white outline-none [&>option]:bg-[#0d0d18]"
+          >
+            {tracks.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.title}
+                {t.status === "playing" ? "  · now playing" : t.status === "played" ? "  · played" : ""}
+              </option>
+            ))}
+          </select>
         </div>
       )}
     </label>
