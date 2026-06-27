@@ -19,7 +19,7 @@ import {
   useSortable, verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Trash2 } from "lucide-react";
 import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
