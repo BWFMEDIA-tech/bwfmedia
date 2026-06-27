@@ -453,28 +453,34 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          ip: string | null
           match_id: string | null
           metadata: Json
           outcome: string
           reason: string
+          user_agent: string | null
           voter_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          ip?: string | null
           match_id?: string | null
           metadata?: Json
           outcome: string
           reason: string
+          user_agent?: string | null
           voter_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          ip?: string | null
           match_id?: string | null
           metadata?: Json
           outcome?: string
           reason?: string
+          user_agent?: string | null
           voter_id?: string | null
         }
         Relationships: []
@@ -2034,6 +2040,27 @@ export type Database = {
           },
         ]
       }
+      rate_limit_hits: {
+        Row: {
+          action: string
+          bucket_key: string
+          created_at: string
+          id: number
+        }
+        Insert: {
+          action: string
+          bucket_key: string
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          action?: string
+          bucket_key?: string
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       revenue_events: {
         Row: {
           amount_cents: number
@@ -2120,6 +2147,42 @@ export type Database = {
           shop_name?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      signed_audio_access_log: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string | null
+          metadata: Json
+          outcome: string
+          reason: string
+          storage_path: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          outcome: string
+          reason: string
+          storage_path?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          outcome?: string
+          reason?: string
+          storage_path?: string | null
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -3161,6 +3224,30 @@ export type Database = {
       boost_spends_access_check: {
         Args: { _row_user_id: string }
         Returns: boolean
+      }
+      cast_battle_vote: {
+        Args: {
+          _choice: string
+          _ip: string
+          _match_id: string
+          _round_id: string
+          _user_agent: string
+          _weight: number
+        }
+        Returns: string
+      }
+      check_rate_limit: {
+        Args: {
+          _action: string
+          _bucket_key: string
+          _max_hits: number
+          _window_secs: number
+        }
+        Returns: {
+          allowed: boolean
+          hits: number
+          retry_after_secs: number
+        }[]
       }
       consume_play_boost_credit: { Args: never; Returns: boolean }
       delete_email: {

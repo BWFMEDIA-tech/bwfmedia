@@ -1,3 +1,4 @@
+// @auth-exempt: gated by DECK_PASSWORD shared secret verified inside the handler.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { timingSafeEqual } from "crypto";

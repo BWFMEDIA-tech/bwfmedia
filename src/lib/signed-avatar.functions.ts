@@ -1,3 +1,4 @@
+// @auth-exempt: returns short-lived signed URLs for public-readable avatar paths only.
 import { createServerFn } from "@tanstack/react-start";
 
 const PATH_RE = /^[0-9a-fA-F-]{8,}\/.+$/;

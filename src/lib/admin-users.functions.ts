@@ -1,3 +1,4 @@
+// @auth-exempt: admin-only fn; verifies has_role("admin") inside handler before any privileged work.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-guard";
