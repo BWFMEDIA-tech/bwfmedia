@@ -389,6 +389,11 @@ export function ImmersivePlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  // Audio autoplay is blocked by browsers until the user interacts with the
+  // page. When that happens we surface a one-tap "Tap to listen" overlay;
+  // after the first successful play() it stays unlocked for the session so
+  // every subsequent track the host queues plays automatically — no refresh.
+  const [needsUnlock, setNeedsUnlock] = useState(false);
   const [volume, setVolume] = useState(0.85);
   const [muted, setMuted] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -474,6 +479,40 @@ export function ImmersivePlayer({
       a.removeEventListener("ended", onEnd);
     };
   }, [track?.id, isHost, streamId, advanceFn, resume]);
+
+  // Auto-start playback as soon as the audio source is ready. This is what
+  // makes new tracks play for everyone in the room without refreshing —
+  // when realtime delivers a new `playing` track, the <audio> remounts
+  // (key={track.id}) with a fresh src and this effect kicks off play().
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a || !trackAudioSrc) return;
+    let cancelled = false;
+    const tryPlay = async () => {
+      try {
+        resume();
+        await a.play();
+        if (!cancelled) setNeedsUnlock(false);
+      } catch {
+        // NotAllowedError — browser blocked autoplay. Show overlay.
+        if (!cancelled) setNeedsUnlock(true);
+      }
+    };
+    void tryPlay();
+    return () => { cancelled = true; };
+  }, [trackAudioSrc, track?.id, resume]);
+
+  const unlockAndPlay = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+    try {
+      resume();
+      await a.play();
+      setNeedsUnlock(false);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not start audio");
+    }
+  };
 
   useEffect(() => {
     const a = audioRef.current;
