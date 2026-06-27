@@ -965,6 +965,36 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
+function UpNextPreview({ next, secondsUntil }: { next: PlayTrack; secondsUntil: number }) {
+  return (
+    <div className="relative z-10 mx-auto mt-5 flex w-full max-w-[460px] items-center gap-3 rounded-2xl border border-white/10 bg-black/40 p-2.5 pr-3 backdrop-blur transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+      <div className="flex flex-col items-center gap-0.5 px-1">
+        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#00E6FF]">Up Next</span>
+        <span className="text-[10px] font-bold tabular-nums text-white/60">
+          {secondsUntil > 0 ? `in ${fmt(secondsUntil)}` : "any moment"}
+        </span>
+      </div>
+      <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
+        {next.cover_url ? (
+          <SignedImg src={next.cover_url} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="grid h-full w-full place-items-center"><Sparkles className="h-4 w-4 text-white/60" /></div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1 truncate text-sm font-bold text-white">
+          {next.boosted && <Zap className="h-3 w-3 flex-shrink-0 text-[#FF00A6]" />}
+          <span className="truncate">{next.title}</span>
+        </div>
+        <div className="flex items-center gap-1 text-[11px] text-white/60">
+          <span className="truncate">{next.artist_name}</span>
+          <RankBadge userId={next.artist_user_id} size="xs" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function QueueItem({
   track, index, isHost, onPlayNow, onDelete,
 }: {
