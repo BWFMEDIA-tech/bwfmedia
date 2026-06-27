@@ -24,6 +24,7 @@ import { GripVertical, Trash2 } from "lucide-react";
 import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
+import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 
 /* ============================================================
    Brand palette (BWF):
@@ -383,6 +384,8 @@ export function ImmersivePlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
+  const trackAudioSrc = useSignedAudioUrl(track?.audio_url ?? null);
+  const nextAudioSrc = useSignedAudioUrl(upNext[0]?.audio_url ?? null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -672,11 +675,11 @@ export function ImmersivePlayer({
         </div>
 
         {/* Audio element */}
-        {track?.audio_url && (
+        {track?.audio_url && trackAudioSrc && (
           <audio
             key={track.id}
             ref={audioRef}
-            src={track.audio_url}
+            src={trackAudioSrc}
             autoPlay
             crossOrigin="anonymous"
             className="hidden"
@@ -685,10 +688,10 @@ export function ImmersivePlayer({
 
         {/* Preload the next track in the background so transitions are seamless.
             Muted + paused, just warms the browser cache. */}
-        {upNext[0]?.audio_url && upNext[0].audio_url !== track?.audio_url && (
+        {upNext[0]?.audio_url && nextAudioSrc && upNext[0].audio_url !== track?.audio_url && (
           <audio
             key={`preload-${upNext[0].id}`}
-            src={upNext[0].audio_url}
+            src={nextAudioSrc}
             preload="auto"
             muted
             className="hidden"
