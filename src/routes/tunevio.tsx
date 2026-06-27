@@ -198,7 +198,7 @@ const features = [
   {
     icon: Music2,
     title: "Artist-First Revenue",
-    desc: "Higher payouts and transparent splits — built so creators win first.",
+    desc: "Higher payouts and transparent splits - built so creators win first.",
   },
   {
     icon: Compass,
@@ -374,7 +374,7 @@ function TunevioLanding() {
         </div>
       </section>
 
-      {/* 2.5 Play Arena — Live Music Battles */}
+      {/* 2.5 Play Arena - Live Music Battles */}
       <section className="relative px-5 sm:px-10 pb-24">
         <div className="mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -389,7 +389,7 @@ function TunevioLanding() {
                 <span>Live Battles</span>
               </div>
               <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
-                Play Arena —{" "}
+                Play Arena -{" "}
                 <span
                   className="bg-clip-text text-transparent"
                   style={{ backgroundImage: "linear-gradient(90deg,#FF00A6,#00E6FF)" }}
@@ -487,7 +487,7 @@ function TunevioLanding() {
               Different?
             </h2>
             <p className="mt-4 text-white/65">
-              Built from the ground up around creators — not legacy labels.
+              Built from the ground up around creators - not legacy labels.
             </p>
           </div>
 
