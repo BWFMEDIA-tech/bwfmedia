@@ -346,8 +346,18 @@ function TunevioLanding() {
               <span className="font-semibold text-white">{fmt(displayCount)}</span>{" "}
               people already joined the waitlist
             </p>
-          </motion.div>
-        </div>
+            </motion.div>
+
+            <motion.img
+              src={playArena1v1}
+              alt="1v1 live music battle"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7 }}
+              className="mt-8 w-full max-w-lg rounded-2xl border border-white/10 shadow-[0_0_60px_-15px_rgba(255,0,166,0.45)]"
+            />
+          </div>
       </section>
 
       {/* 2. Social Proof */}
