@@ -90,16 +90,40 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
   // each other even before they've queued a track.
   const stageState = useStageState(stream?.id ?? null);
   const battleParticipants = (() => {
-    const seen = new Map<string, { user_id: string; display_name: string | null; avatar_url: string | null }>();
+    type Entry = {
+      user_id: string;
+      display_name: string | null;
+      avatar_url: string | null;
+      role: "on_stage" | "submitter" | "both";
+      stage_role?: string | null;
+    };
+    const seen = new Map<string, Entry>();
     for (const t of [...(playing ? [playing] : []), ...queued, ...leaderboard]) {
       if (t.artist_user_id && !seen.has(t.artist_user_id)) {
-        seen.set(t.artist_user_id, { user_id: t.artist_user_id, display_name: t.artist_name, avatar_url: t.cover_url });
+        seen.set(t.artist_user_id, {
+          user_id: t.artist_user_id,
+          display_name: t.artist_name,
+          avatar_url: t.cover_url,
+          role: "submitter",
+        });
       }
     }
     for (const p of stageState.participants) {
       if (p.stage_role === "listener" || p.stage_role === "green_room") continue;
-      if (!seen.has(p.user_id)) {
-        seen.set(p.user_id, { user_id: p.user_id, display_name: p.display_name ?? null, avatar_url: p.avatar_url ?? null });
+      const existing = seen.get(p.user_id);
+      if (existing) {
+        existing.role = "both";
+        existing.stage_role = p.stage_role;
+        if (!existing.display_name && p.display_name) existing.display_name = p.display_name;
+        if (!existing.avatar_url && p.avatar_url) existing.avatar_url = p.avatar_url;
+      } else {
+        seen.set(p.user_id, {
+          user_id: p.user_id,
+          display_name: p.display_name ?? null,
+          avatar_url: p.avatar_url ?? null,
+          role: "on_stage",
+          stage_role: p.stage_role,
+        });
       }
     }
     return Array.from(seen.values());
