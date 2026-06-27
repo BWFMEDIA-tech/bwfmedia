@@ -828,6 +828,17 @@ function CreateBattleDialog({
             loading={loadingB}
             artistSelected={!!b}
           />
+          <button
+            type="button"
+            onClick={() => setUploadOpen(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/15 bg-black/30 px-3 py-2 text-xs font-semibold text-white/80 hover:border-[#c53dff]/60 hover:bg-white/5"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-[#00e6ff]" />
+            Upload new track to my profile
+          </button>
+          <p className="text-[10px] leading-snug text-white/40">
+            New tracks attach to whichever side (A or B) is empty. Only the signed-in artist can upload their own songs.
+          </p>
           {!isEdit && (
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-xs text-white/70">
