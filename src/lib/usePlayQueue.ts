@@ -16,6 +16,8 @@ export interface PlayTrack {
   like_count: number;
   dislike_count: number;
   created_at: string;
+  battle_match_id?: string | null;
+  battle_side?: "a" | "b" | null;
 }
 
 export function usePlayQueue(streamId: string | null) {
@@ -32,7 +34,7 @@ export function usePlayQueue(streamId: string | null) {
     const refresh = async () => {
       const { data } = await supabase
         .from("play_tracks")
-        .select("id, stream_id, artist_user_id, artist_name, title, audio_url, cover_url, boosted, position, status, score, like_count, dislike_count, created_at")
+        .select("id, stream_id, artist_user_id, artist_name, title, audio_url, cover_url, boosted, position, status, score, like_count, dislike_count, created_at, battle_match_id, battle_side")
         .eq("stream_id", streamId)
         .order("status", { ascending: true })
         .order("boosted", { ascending: false })
