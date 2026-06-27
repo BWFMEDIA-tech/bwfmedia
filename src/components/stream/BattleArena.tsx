@@ -881,6 +881,36 @@ function CreateBattleDialog({
           </button>
         </div>
       </div>
+      {uploadOpen && (
+        <AddProfileTrackDialog
+          defaultArtistName={uploadingArtistName}
+          onClose={() => setUploadOpen(false)}
+          onAdded={async () => {
+            // Reload both sides' track lists so the freshly uploaded song
+            // shows up, and auto-pick it on whichever side is still empty
+            // (A first, then B). Each loadTracks call already auto-selects
+            // the newest row for that artist when nothing is selected yet.
+            const before = { a: trackA, b: trackB };
+            await Promise.all([loadTracks(a, "a"), loadTracks(b, "b")]);
+            // If both sides already had picks, do nothing — host can change
+            // selection from the dropdown. Otherwise nudge selection to the
+            // newly-uploaded track on the empty side.
+            const { data: latest } = await supabase
+              .from("play_tracks")
+              .select("id, artist_user_id")
+              .in("artist_user_id", [a, b].filter(Boolean))
+              .neq("status", "removed")
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (latest?.id && latest.artist_user_id) {
+              if (!before.a && latest.artist_user_id === a) setTrackA(latest.id);
+              else if (!before.b && latest.artist_user_id === b) setTrackB(latest.id);
+            }
+            toast.success("Track added — ready to pick for the battle");
+          }}
+        />
+      )}
     </div>
   );
 }
