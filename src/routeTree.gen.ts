@@ -81,6 +81,7 @@ import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$br
 import { Route as BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport } from './routes/blog.live-stream-music-twitch-youtube-facebook'
 import { Route as BlogHowToLiveStreamMusicRouteImport } from './routes/blog.how-to-live-stream-music'
 import { Route as BlogHowArtistsGetPaidForStreamingMusicRouteImport } from './routes/blog.how-artists-get-paid-for-streaming-music'
+import { Route as BlogCanYouPlayMusicOnLiveStreamRouteImport } from './routes/blog.can-you-play-music-on-live-stream'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as AdminVoteAttemptsRouteImport } from './routes/admin.vote-attempts'
@@ -485,6 +486,12 @@ const BlogHowArtistsGetPaidForStreamingMusicRoute =
     path: '/blog/how-artists-get-paid-for-streaming-music',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogCanYouPlayMusicOnLiveStreamRoute =
+  BlogCanYouPlayMusicOnLiveStreamRouteImport.update({
+    id: '/blog/can-you-play-music-on-live-stream',
+    path: '/blog/can-you-play-music-on-live-stream',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ArtistUpgradeRoute = ArtistUpgradeRouteImport.update({
   id: '/artist/upgrade',
   path: '/artist/upgrade',
@@ -759,6 +766,7 @@ export interface FileRoutesByFullPath {
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/blog/can-you-play-music-on-live-stream': typeof BlogCanYouPlayMusicOnLiveStreamRoute
   '/blog/how-artists-get-paid-for-streaming-music': typeof BlogHowArtistsGetPaidForStreamingMusicRoute
   '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
   '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
@@ -872,6 +880,7 @@ export interface FileRoutesByTo {
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/blog/can-you-play-music-on-live-stream': typeof BlogCanYouPlayMusicOnLiveStreamRoute
   '/blog/how-artists-get-paid-for-streaming-music': typeof BlogHowArtistsGetPaidForStreamingMusicRoute
   '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
   '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
@@ -987,6 +996,7 @@ export interface FileRoutesById {
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
+  '/blog/can-you-play-music-on-live-stream': typeof BlogCanYouPlayMusicOnLiveStreamRoute
   '/blog/how-artists-get-paid-for-streaming-music': typeof BlogHowArtistsGetPaidForStreamingMusicRoute
   '/blog/how-to-live-stream-music': typeof BlogHowToLiveStreamMusicRoute
   '/blog/live-stream-music-twitch-youtube-facebook': typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
@@ -1103,6 +1113,7 @@ export interface FileRouteTypes {
     | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/blog/can-you-play-music-on-live-stream'
     | '/blog/how-artists-get-paid-for-streaming-music'
     | '/blog/how-to-live-stream-music'
     | '/blog/live-stream-music-twitch-youtube-facebook'
@@ -1216,6 +1227,7 @@ export interface FileRouteTypes {
     | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/blog/can-you-play-music-on-live-stream'
     | '/blog/how-artists-get-paid-for-streaming-music'
     | '/blog/how-to-live-stream-music'
     | '/blog/live-stream-music-twitch-youtube-facebook'
@@ -1330,6 +1342,7 @@ export interface FileRouteTypes {
     | '/admin/vote-attempts'
     | '/artist/$id'
     | '/artist/upgrade'
+    | '/blog/can-you-play-music-on-live-stream'
     | '/blog/how-artists-get-paid-for-streaming-music'
     | '/blog/how-to-live-stream-music'
     | '/blog/live-stream-music-twitch-youtube-facebook'
@@ -1422,6 +1435,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
+  BlogCanYouPlayMusicOnLiveStreamRoute: typeof BlogCanYouPlayMusicOnLiveStreamRoute
   BlogHowArtistsGetPaidForStreamingMusicRoute: typeof BlogHowArtistsGetPaidForStreamingMusicRoute
   BlogHowToLiveStreamMusicRoute: typeof BlogHowToLiveStreamMusicRoute
   BlogLiveStreamMusicTwitchYoutubeFacebookRoute: typeof BlogLiveStreamMusicTwitchYoutubeFacebookRoute
@@ -1963,6 +1977,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogHowArtistsGetPaidForStreamingMusicRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/can-you-play-music-on-live-stream': {
+      id: '/blog/can-you-play-music-on-live-stream'
+      path: '/blog/can-you-play-music-on-live-stream'
+      fullPath: '/blog/can-you-play-music-on-live-stream'
+      preLoaderRoute: typeof BlogCanYouPlayMusicOnLiveStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/artist/upgrade': {
       id: '/artist/upgrade'
       path: '/artist/upgrade'
@@ -2391,6 +2412,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
+  BlogCanYouPlayMusicOnLiveStreamRoute: BlogCanYouPlayMusicOnLiveStreamRoute,
   BlogHowArtistsGetPaidForStreamingMusicRoute:
     BlogHowArtistsGetPaidForStreamingMusicRoute,
   BlogHowToLiveStreamMusicRoute: BlogHowToLiveStreamMusicRoute,

@@ -28,6 +28,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/access-denied", changefreq: "yearly", priority: "0.1" },
           { path: "/blog", changefreq: "weekly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.6" },
+          { path: "/blog/how-to-live-stream-music", changefreq: "monthly", priority: "0.7" },
+          { path: "/blog/live-stream-music-twitch-youtube-facebook", changefreq: "monthly", priority: "0.6" },
+          { path: "/blog/how-artists-get-paid-for-streaming-music", changefreq: "monthly", priority: "0.6" },
+          { path: "/blog/can-you-play-music-on-live-stream", changefreq: "monthly", priority: "0.6" },
         ];
 
         try {
