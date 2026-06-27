@@ -27,7 +27,7 @@ import { ModeToggle } from "@/components/stream/ModeToggle";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { setHostTransferMode as setHostTransferModeFn } from "@/lib/stage.functions";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { BattleArena } from "@/components/stream/BattleArena";
+
 
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
@@ -1053,17 +1053,6 @@ function StreamStudio() {
                     />
                     {streamMode !== "play" && (
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
-                    )}
-                    {streamMode !== "play" && (
-                      <BattleArena
-                        streamId={stream.id}
-                        isHost
-                        participants={participants.map((p) => ({
-                          user_id: p.user_id,
-                          display_name: p.display_name,
-                          avatar_url: p.avatar_url,
-                        }))}
-                      />
                     )}
                     {streamMode === "stage" && <AudienceRow participants={participants} />}
                   </StageAudioShell>
