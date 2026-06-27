@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { listForSitemap } from "@/lib/seo-public.functions";
 
 const BASE_URL = "https://www.bwfnetwork.com";
 
@@ -32,6 +33,9 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/blog/live-stream-music-twitch-youtube-facebook", changefreq: "monthly", priority: "0.6" },
           { path: "/blog/how-artists-get-paid-for-streaming-music", changefreq: "monthly", priority: "0.6" },
           { path: "/blog/can-you-play-music-on-live-stream", changefreq: "monthly", priority: "0.6" },
+          { path: "/trending", changefreq: "daily", priority: "0.8" },
+          { path: "/charts", changefreq: "daily", priority: "0.8" },
+          { path: "/tunevio", changefreq: "weekly", priority: "0.9" },
         ];
 
         try {
@@ -51,6 +55,35 @@ export const Route = createFileRoute("/sitemap.xml")({
           }
         } catch {
           // ignore — still serve static entries
+        }
+
+        try {
+          const seo = await listForSitemap();
+          for (const a of seo.artists) {
+            entries.push({
+              path: `/a/${a.slug}`,
+              lastmod: a.updatedAt ? new Date(a.updatedAt).toISOString() : undefined,
+              changefreq: "weekly",
+              priority: "0.7",
+            });
+          }
+          for (const t of seo.tracks) {
+            entries.push({
+              path: `/track/${t.slug}`,
+              lastmod: t.updatedAt ? new Date(t.updatedAt).toISOString() : undefined,
+              changefreq: "weekly",
+              priority: "0.6",
+            });
+          }
+          for (const g of seo.genres) {
+            entries.push({
+              path: `/genre/${g}`,
+              changefreq: "weekly",
+              priority: "0.5",
+            });
+          }
+        } catch (e) {
+          console.error("[sitemap] seo listing failed", e);
         }
 
         const urls = entries.map((e) =>
