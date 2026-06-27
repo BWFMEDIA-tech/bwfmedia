@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { runIdempotent } from "@/lib/idempotency";
+import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
 async function assertHostOrMod(supabase: any, userId: string, streamId: string) {
   const [{ data: stream }, { data: roles }, { data: sp }] = await Promise.all([
