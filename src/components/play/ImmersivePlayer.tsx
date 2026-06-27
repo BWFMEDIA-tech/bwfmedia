@@ -916,6 +916,51 @@ export function ImmersivePlayer({
             >▼ Pass</button>
           </div>
 
+          {/* Battle A/B vote — only shown when this track is part of a
+              live battle round so any listener can pick a side without
+              leaving the player. */}
+          {battleVote && battleVote.roundId && (
+            <div className="mt-3 flex flex-col items-center gap-2">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">
+                Battle Vote {battleVote.canVote ? "" : "(closed)"}
+              </div>
+              <div className="flex w-full max-w-md items-stretch gap-2">
+                <button
+                  type="button"
+                  disabled={!battleVote.canVote || battleVoting !== null}
+                  onClick={() => castBattleSide("a")}
+                  className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
+                    battleVote.myChoice === "a"
+                      ? "border-[#00E6FF] bg-[#00E6FF]/15 text-[#00E6FF] shadow-[0_0_22px_-6px_rgba(0,230,255,0.8)]"
+                      : "border-[#00E6FF]/30 text-[#00E6FF]/85 hover:border-[#00E6FF]"
+                  }`}
+                  title={`Vote for ${battleVote.artistAName}`}
+                >
+                  <div className="truncate">{battleVote.artistAName}</div>
+                  <div className="text-[10px] font-medium opacity-70">
+                    {battleVote.myChoice === "a" ? "Voted" : "Vote A"} · {battleVote.aVotes}
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  disabled={!battleVote.canVote || battleVoting !== null}
+                  onClick={() => castBattleSide("b")}
+                  className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
+                    battleVote.myChoice === "b"
+                      ? "border-[#FF00A6] bg-[#FF00A6]/15 text-[#FF00A6] shadow-[0_0_22px_-6px_rgba(255,0,166,0.8)]"
+                      : "border-[#FF00A6]/30 text-[#FF00A6]/85 hover:border-[#FF00A6]"
+                  }`}
+                  title={`Vote for ${battleVote.artistBName}`}
+                >
+                  <div className="truncate">{battleVote.artistBName}</div>
+                  <div className="text-[10px] font-medium opacity-70">
+                    {battleVote.myChoice === "b" ? "Voted" : "Vote B"} · {battleVote.bVotes}
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Transport */}
           <div className="mt-5 flex items-center justify-center gap-3 sm:gap-5">
             <button
