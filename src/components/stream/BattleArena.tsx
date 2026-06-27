@@ -677,6 +677,16 @@ function CreateBattleDialog({
   const [busy, setBusy] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const isEdit = mode === "edit";
+  // Inline "Upload new track" flow. Artists can submit a song from inside
+  // the Create 1v1 Battle dialog and have it auto-selected for whichever
+  // side (A or B) doesn't have a pick yet.
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const uploadingArtistName = useMemo(() => {
+    const me = participants.find((p) => !!p);
+    const aP = participants.find((p) => p.user_id === a);
+    const bP = participants.find((p) => p.user_id === b);
+    return aP?.display_name || bP?.display_name || me?.display_name || "Artist";
+  }, [participants, a, b]);
 
   // Per-artist submitted-track lists, loaded from play_tracks so the host
   // can see which songs each selected artist has queued. Display-only at
