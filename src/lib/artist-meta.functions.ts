@@ -1,3 +1,4 @@
+// @auth-exempt: public read of non-sensitive data via anon-readable tables / narrow RLS.
 import { createServerFn } from "@tanstack/react-start";
 
 export const getArtistMeta = createServerFn({ method: "GET" })
