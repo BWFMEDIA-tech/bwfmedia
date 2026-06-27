@@ -18,6 +18,8 @@ import {
   Instagram,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
+import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 
 export const Route = createFileRoute("/tunevio")({
   head: () => ({
@@ -253,14 +255,11 @@ function TunevioLanding() {
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between px-5 sm:px-10 py-5">
         <div className="flex items-center gap-2">
-          <div
-            className="h-8 w-8 rounded-lg"
-            style={{
-              background: "linear-gradient(135deg,#C53DFF,#00E6FF)",
-              boxShadow: "0 0 30px rgba(197,61,255,0.6)",
-            }}
+          <img
+            src={tunevioLogo.url}
+            alt="Tunevio"
+            className="h-12 sm:h-14 w-auto drop-shadow-[0_0_25px_rgba(197,61,255,0.55)]"
           />
-          <span className="font-bold tracking-tight text-lg">Tunevio</span>
         </div>
         <span className="text-xs uppercase tracking-[0.2em] text-white/50">
           by BWF Media
@@ -268,8 +267,29 @@ function TunevioLanding() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32">
+      <section className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
+        {/* Hero video background */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <video
+            src={heroVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="absolute inset-0 h-full w-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
+        </div>
         <div className="mx-auto max-w-4xl text-center">
+          <motion.img
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7 }}
+            src={tunevioLogo.url}
+            alt="Tunevio"
+            className="mx-auto mb-6 h-20 sm:h-28 w-auto drop-shadow-[0_0_40px_rgba(0,230,255,0.55)]"
+          />
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
