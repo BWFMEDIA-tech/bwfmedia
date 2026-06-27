@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { setPlaybackPlaying } from "@/lib/playback-store";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
 import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack } from "@/lib/play.functions";
+import { castBattleVote } from "@/lib/battles.functions";
 import { RankBadge } from "@/components/rank/RankBadge";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
@@ -334,6 +335,87 @@ function useLiveBattle(streamId: string | null) {
   return battle;
 }
 
+/* ---------- Battle round vote (A/B) for the currently playing track ----------
+   When the playing track belongs to a live battle (track.battle_match_id +
+   battle_side), any viewer can vote on the active round directly from the
+   immersive player. Pulls the match's current_round_id, artist names, and
+   the viewer's existing choice; subscribes to round updates so tallies stay
+   live without remounting. */
+function useTrackBattleVote(track: PlayTrack | null, userId: string | null) {
+  const matchId = track?.battle_match_id ?? null;
+  const [state, setState] = useState<{
+    matchId: string;
+    roundId: string | null;
+    artistAName: string;
+    artistBName: string;
+    aVotes: number;
+    bVotes: number;
+    myChoice: "a" | "b" | null;
+    canVote: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!matchId) { setState(null); return; }
+    let cancelled = false;
+    const refresh = async () => {
+      const { data: m } = await supabase
+        .from("battle_matches")
+        .select("id,status,current_round_id,artist_a_name,artist_b_name")
+        .eq("id", matchId)
+        .maybeSingle();
+      if (cancelled || !m) { setState(null); return; }
+      const roundId = (m as any).current_round_id as string | null;
+      let aVotes = 0, bVotes = 0, canVote = false;
+      let myChoice: "a" | "b" | null = null;
+      if (roundId) {
+        const { data: r } = await supabase
+          .from("battle_rounds")
+          .select("a_votes,b_votes,status,voting_status")
+          .eq("id", roundId)
+          .maybeSingle();
+        if (r) {
+          aVotes = (r as any).a_votes ?? 0;
+          bVotes = (r as any).b_votes ?? 0;
+          canVote = (r as any).status === "live" && (r as any).voting_status === "open";
+        }
+        if (userId) {
+          const { data: v } = await supabase
+            .from("battle_votes")
+            .select("choice")
+            .eq("round_id", roundId)
+            .eq("voter_id", userId)
+            .maybeSingle();
+          if (v?.choice === "a" || v?.choice === "b") myChoice = v.choice;
+        }
+      }
+      if (cancelled) return;
+      setState({
+        matchId,
+        roundId,
+        artistAName: (m as any).artist_a_name ?? "Artist A",
+        artistBName: (m as any).artist_b_name ?? "Artist B",
+        aVotes, bVotes, myChoice, canVote,
+      });
+    };
+    void refresh();
+    const ch = supabase
+      .channel(`player-battle-${matchId}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_matches", filter: `id=eq.${matchId}` },
+        refresh)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_rounds", filter: `match_id=eq.${matchId}` },
+        refresh)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "battle_votes", filter: `match_id=eq.${matchId}` },
+        refresh)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [matchId, userId]);
+
+  return state;
+}
+
 /* ---------- Like (track_likes) ---------- */
 function useTrackLike(trackId: string | null, userId: string | null) {
   const [liked, setLiked] = useState(false);
@@ -416,12 +498,33 @@ export function ImmersivePlayer({
   useNormalizer({ enabled: normalize, analyserRef, gainRef, ctxRef, trackId: track?.id ?? null });
 
   const voteFn = useServerFn(votePlayTrack);
+  const battleVoteFn = useServerFn(castBattleVote);
   const advanceFn = useServerFn(advancePlayQueue);
   const playFn = useServerFn(playTrackNow);
   const reorderFn = useServerFn(reorderPlayQueue);
   const deleteFn = useServerFn(deletePlayTrack);
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
+
+  // Battle vote: only present when the currently playing track belongs to a
+  // live battle match. Lets ANY listener vote on the active round directly
+  // from the player, without leaving for the BattleArena UI.
+  const battleVote = useTrackBattleVote(track, userId);
+  const [battleVoting, setBattleVoting] = useState<"a" | "b" | null>(null);
+  const castBattleSide = async (choice: "a" | "b") => {
+    if (!battleVote?.roundId) return;
+    if (!userId) { toast.error("Sign in to vote"); return; }
+    if (!battleVote.canVote) { toast.message("Voting is closed for this round"); return; }
+    setBattleVoting(choice);
+    try {
+      await battleVoteFn({ data: { roundId: battleVote.roundId, choice, useBoost: false } });
+      toast.success(`Vote cast for ${choice === "a" ? battleVote.artistAName : battleVote.artistBName}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Vote failed");
+    } finally {
+      setBattleVoting(null);
+    }
+  };
 
   // Host-only local order overlay for the Up Next list (drag-to-reorder).
   // Mirrors `upNext` ids; cleared/synced when server data changes.
@@ -812,6 +915,51 @@ export function ImmersivePlayer({
               }`}
             >▼ Pass</button>
           </div>
+
+          {/* Battle A/B vote — only shown when this track is part of a
+              live battle round so any listener can pick a side without
+              leaving the player. */}
+          {battleVote && battleVote.roundId && (
+            <div className="mt-3 flex flex-col items-center gap-2">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">
+                Battle Vote {battleVote.canVote ? "" : "(closed)"}
+              </div>
+              <div className="flex w-full max-w-md items-stretch gap-2">
+                <button
+                  type="button"
+                  disabled={!battleVote.canVote || battleVoting !== null}
+                  onClick={() => castBattleSide("a")}
+                  className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
+                    battleVote.myChoice === "a"
+                      ? "border-[#00E6FF] bg-[#00E6FF]/15 text-[#00E6FF] shadow-[0_0_22px_-6px_rgba(0,230,255,0.8)]"
+                      : "border-[#00E6FF]/30 text-[#00E6FF]/85 hover:border-[#00E6FF]"
+                  }`}
+                  title={`Vote for ${battleVote.artistAName}`}
+                >
+                  <div className="truncate">{battleVote.artistAName}</div>
+                  <div className="text-[10px] font-medium opacity-70">
+                    {battleVote.myChoice === "a" ? "Voted" : "Vote A"} · {battleVote.aVotes}
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  disabled={!battleVote.canVote || battleVoting !== null}
+                  onClick={() => castBattleSide("b")}
+                  className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
+                    battleVote.myChoice === "b"
+                      ? "border-[#FF00A6] bg-[#FF00A6]/15 text-[#FF00A6] shadow-[0_0_22px_-6px_rgba(255,0,166,0.8)]"
+                      : "border-[#FF00A6]/30 text-[#FF00A6]/85 hover:border-[#FF00A6]"
+                  }`}
+                  title={`Vote for ${battleVote.artistBName}`}
+                >
+                  <div className="truncate">{battleVote.artistBName}</div>
+                  <div className="text-[10px] font-medium opacity-70">
+                    {battleVote.myChoice === "b" ? "Voted" : "Vote B"} · {battleVote.bVotes}
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Transport */}
           <div className="mt-5 flex items-center justify-center gap-3 sm:gap-5">
