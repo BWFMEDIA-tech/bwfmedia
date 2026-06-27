@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { usePlaybackPlaying } from "@/lib/playback-store";
 import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
@@ -508,8 +509,9 @@ function ArtistSide({
               <div
                 className={cn(
                   "relative h-full w-full rounded-full bg-[radial-gradient(circle_at_center,_#1a1a1a_0%,_#0a0a0a_60%,_#000_100%)]",
-                  isPlaying && "animate-[spin_3s_linear_infinite]",
+                  spinning && "animate-[spin_3s_linear_infinite]",
                 )}
+                style={spinning ? { animationPlayState: spinPaused ? "paused" : "running" } : undefined}
               >
                 {/* concentric grooves */}
                 <span className="pointer-events-none absolute inset-[6%] rounded-full border border-white/5" />
