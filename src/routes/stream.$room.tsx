@@ -41,8 +41,7 @@ function GuestPage() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null } | null>(null);
   const [viewerCount, setViewerCount] = useState<number>(0);
-  const { participants } = useStageState(lk ? streamId : null);
-  const { hands, queue } = useStageState(lk && isHostLike ? streamId : null);
+  const { participants, hands, queue } = useStageState(lk ? streamId : null);
 
   // Heartbeat presence only after the listener actually joins LiveKit; avoids
   // ghost stage rows that show as “Reconnecting…” before the guest connects.
