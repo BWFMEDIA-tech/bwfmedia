@@ -498,12 +498,33 @@ export function ImmersivePlayer({
   useNormalizer({ enabled: normalize, analyserRef, gainRef, ctxRef, trackId: track?.id ?? null });
 
   const voteFn = useServerFn(votePlayTrack);
+  const battleVoteFn = useServerFn(castBattleVote);
   const advanceFn = useServerFn(advancePlayQueue);
   const playFn = useServerFn(playTrackNow);
   const reorderFn = useServerFn(reorderPlayQueue);
   const deleteFn = useServerFn(deletePlayTrack);
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
+
+  // Battle vote: only present when the currently playing track belongs to a
+  // live battle match. Lets ANY listener vote on the active round directly
+  // from the player, without leaving for the BattleArena UI.
+  const battleVote = useTrackBattleVote(track, userId);
+  const [battleVoting, setBattleVoting] = useState<"a" | "b" | null>(null);
+  const castBattleSide = async (choice: "a" | "b") => {
+    if (!battleVote?.roundId) return;
+    if (!userId) { toast.error("Sign in to vote"); return; }
+    if (!battleVote.canVote) { toast.message("Voting is closed for this round"); return; }
+    setBattleVoting(choice);
+    try {
+      await battleVoteFn({ data: { roundId: battleVote.roundId, choice, useBoost: false } });
+      toast.success(`Vote cast for ${choice === "a" ? battleVote.artistAName : battleVote.artistBName}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Vote failed");
+    } finally {
+      setBattleVoting(null);
+    }
+  };
 
   // Host-only local order overlay for the Up Next list (drag-to-reorder).
   // Mirrors `upNext` ids; cleared/synced when server data changes.
