@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
+import micWalkupVideo from "@/assets/tunevio-mic-walkup.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 
 export const Route = createFileRoute("/tunevio")({
@@ -271,13 +272,23 @@ function TunevioLanding() {
         {/* Hero video background */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <video
+            src={micWalkupVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster=""
+            className="absolute inset-0 h-full w-full object-cover opacity-50"
+          />
+          <video
             src={heroVideo.url}
             autoPlay
             muted
             loop
             playsInline
             preload="auto"
-            className="absolute inset-0 h-full w-full object-cover opacity-40"
+            className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-screen"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black" />
         </div>
