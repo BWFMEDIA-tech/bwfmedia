@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { usePlaybackPlaying } from "@/lib/playback-store";
+import { SignedImg } from "@/components/ui/signed-img";
 import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
@@ -531,7 +532,7 @@ function ArtistSide({
                   style={{ background: grad }}
                 >
                   {coverUrl ? (
-                    <img
+                    <SignedImg
                       src={coverUrl}
                       alt={trackTitle ?? name}
                       className="h-full w-full object-cover"
