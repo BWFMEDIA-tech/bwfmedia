@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
-import micWalkupVideo from "@/assets/tunevio-mic-walkup.mp4.asset.json";
+import micWalkupVideo from "@/assets/tunevio-mic-walkup-black.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 
 export const Route = createFileRoute("/tunevio")({
