@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Swords, Trophy, Zap, Crown, Sparkles, Loader2 } from "lucide-react";
+import { Swords, Trophy, Zap, Crown, Sparkles, Loader2, Lock, Pencil } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { createBattleMatch, castBattleVote } from "@/lib/battles.functions";
+import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
 import { RankBadge } from "@/components/rank/RankBadge";
@@ -21,15 +21,18 @@ export function BattleArena({
   streamId,
   isHost,
   participants,
+  onStageIds,
 }: {
   streamId: string;
   isHost: boolean;
   participants: Participant[];
+  onStageIds?: Set<string>;
 }) {
   const stateFn = useServerFn(getBattleRoomState);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [myVote, setMyVote] = useState<"a" | "b" | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   // Single source of truth: the Battle Engine room state. Realtime row changes
   // on battle_matches / battle_rounds simply trigger a re-fetch; we never
@@ -119,14 +122,35 @@ export function BattleArena({
 
   if (!match || !roomState) return null;
 
+  const stageSet = onStageIds ?? new Set<string>();
+  const aOnStage = !!match.artist_a_id && stageSet.has(match.artist_a_id as string);
+  const bOnStage = !!match.artist_b_id && stageSet.has(match.artist_b_id as string);
+  const matchupLocked = match.status !== "pending" || aOnStage || bOnStage;
+
   return (
-    <BattleView
-      roomState={roomState}
-      myVote={myVote}
-      isHost={isHost}
-      onVoteCast={(c) => setMyVote(c)}
-      onAfterHostEmit={refresh}
-    />
+    <>
+      <BattleView
+        roomState={roomState}
+        myVote={myVote}
+        isHost={isHost}
+        matchupLocked={matchupLocked}
+        onEditMatchup={() => setShowEdit(true)}
+        onVoteCast={(c) => setMyVote(c)}
+        onAfterHostEmit={refresh}
+      />
+      {showEdit && isHost && (
+        <CreateBattleDialog
+          streamId={streamId}
+          participants={participants}
+          mode="edit"
+          matchId={match.id as string}
+          initialA={(match.artist_a_id as string | null) ?? ""}
+          initialB={(match.artist_b_id as string | null) ?? ""}
+          onClose={() => setShowEdit(false)}
+          onSaved={refresh}
+        />
+      )}
+    </>
   );
 }
 
@@ -134,12 +158,16 @@ function BattleView({
   roomState,
   myVote,
   isHost,
+  matchupLocked,
+  onEditMatchup,
   onVoteCast,
   onAfterHostEmit,
 }: {
   roomState: RoomState;
   myVote: "a" | "b" | null;
   isHost: boolean;
+  matchupLocked: boolean;
+  onEditMatchup?: () => void;
   onVoteCast: (c: "a" | "b") => void;
   onAfterHostEmit?: () => void;
 }) {
@@ -232,6 +260,23 @@ function BattleView({
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {isHost && match && match.status === "pending" && (
+            matchupLocked ? (
+              <span
+                title="Artist is on stage — matchup is locked"
+                className="flex items-center gap-1 rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white/70"
+              >
+                <Lock className="h-3 w-3" /> Locked
+              </span>
+            ) : (
+              <button
+                onClick={onEditMatchup}
+                className="flex items-center gap-1 rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/20"
+              >
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
+            )
+          )}
           {userId && xp !== null && (
             <span className="flex items-center gap-1 rounded bg-[#c53dff]/15 px-2 py-0.5 text-[11px] font-mono font-bold text-[#e8b6ff]">
               <Sparkles className="h-3 w-3" /> {xp.toLocaleString()} XP
@@ -534,35 +579,53 @@ function CreateBattleDialog({
   streamId,
   participants,
   onClose,
+  mode = "create",
+  matchId,
+  initialA,
+  initialB,
+  onSaved,
 }: {
   streamId: string;
   participants: Participant[];
   onClose: () => void;
+  mode?: "create" | "edit";
+  matchId?: string;
+  initialA?: string;
+  initialB?: string;
+  onSaved?: () => void;
 }) {
   const createFn = useServerFn(createBattleMatch);
-  const [a, setA] = useState<string>(participants[0]?.user_id ?? "");
-  const [b, setB] = useState<string>(participants[1]?.user_id ?? "");
+  const updateFn = useServerFn(updateBattleArtists);
+  const [a, setA] = useState<string>(initialA || participants[0]?.user_id || "");
+  const [b, setB] = useState<string>(initialB || participants[1]?.user_id || "");
   const [rounds, setRounds] = useState(3);
   const [seconds, setSeconds] = useState(60);
   const [busy, setBusy] = useState(false);
+  const isEdit = mode === "edit";
 
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
     setBusy(true);
     try {
-      await createFn({
-        data: {
-          streamId,
-          artistAId: a,
-          artistBId: b,
-          totalRounds: rounds,
-          roundSeconds: seconds,
-        },
-      });
-      toast.success("Battle ready — start round 1 when ready");
+      if (isEdit && matchId) {
+        await updateFn({ data: { matchId, artistAId: a, artistBId: b } });
+        toast.success("Matchup updated");
+        onSaved?.();
+      } else {
+        await createFn({
+          data: {
+            streamId,
+            artistAId: a,
+            artistBId: b,
+            totalRounds: rounds,
+            roundSeconds: seconds,
+          },
+        });
+        toast.success("Battle ready — start round 1 when ready");
+      }
       onClose();
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to create battle");
+      toast.error(e?.message ?? (isEdit ? "Failed to update matchup" : "Failed to create battle"));
     } finally {
       setBusy(false);
     }
@@ -575,11 +638,12 @@ function CreateBattleDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
-          <Trophy className="h-4 w-4 text-[#c53dff]" /> Create 1v1 Battle
+          <Trophy className="h-4 w-4 text-[#c53dff]" /> {isEdit ? "Edit Matchup" : "Create 1v1 Battle"}
         </div>
         <div className="space-y-3">
           <ArtistSelect label="Artist A" value={a} onChange={setA} participants={participants} exclude={b} />
           <ArtistSelect label="Artist B" value={b} onChange={setB} participants={participants} exclude={a} />
+          {!isEdit && (
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-xs text-white/70">
               Rounds (best of)
@@ -598,6 +662,7 @@ function CreateBattleDialog({
               />
             </label>
           </div>
+          )}
         </div>
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5">
@@ -608,7 +673,7 @@ function CreateBattleDialog({
             className="rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, #c53dff, #ff00a6)" }}
           >
-            {busy ? "Creating…" : "Create battle"}
+            {busy ? "Saving…" : isEdit ? "Save matchup" : "Create battle"}
           </button>
         </div>
       </div>

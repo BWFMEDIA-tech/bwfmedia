@@ -63,6 +63,19 @@ export const createBattleMatch = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertHost(supabase, userId, data.streamId);
 
+    // Pre-stage window guard: refuse to (re)create a matchup while an
+    // existing match is already `live` — the matchup is locked once a
+    // round has been started. Hosts must cancel the current match first.
+    const { data: liveMatch } = await supabase
+      .from("battle_matches")
+      .select("id, status")
+      .eq("stream_id", data.streamId)
+      .eq("status", "live")
+      .maybeSingle();
+    if (liveMatch) {
+      throw new Error("A battle is already live — cancel it before changing the matchup");
+    }
+
     // Cancel any existing non-completed match on this stream so there is at
     // most one active match at a time.
     await supabase
@@ -97,6 +110,77 @@ export const createBattleMatch = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
     return match;
+  });
+
+/**
+ * Update Artist A / Artist B on an existing matchup. Persists shared state
+ * so all viewers see the same names. Allowed ONLY during the pre-stage
+ * window: match must still be `pending`, and neither the current nor the
+ * proposed artists may already be on stage as host/co-host/speaker. Once
+ * any selected artist is on stage, the matchup is locked.
+ */
+export const updateBattleArtists = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        matchId: z.string().uuid(),
+        artistAId: z.string().uuid(),
+        artistBId: z.string().uuid(),
+      })
+      .refine((d) => d.artistAId !== d.artistBId, { message: "Artists must differ" })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const m = await assertMatchHost(supabase, userId, data.matchId);
+    if (m.status !== "pending") {
+      throw new Error("Matchup is locked — battle has already started");
+    }
+
+    // Lock if any current or proposed artist is already on stage as a
+    // performer (host / co-host / speaker). Listeners and green_room are OK.
+    const candidateIds = Array.from(
+      new Set(
+        [m.artist_a_id, m.artist_b_id, data.artistAId, data.artistBId].filter(
+          (x): x is string => !!x,
+        ),
+      ),
+    );
+    if (candidateIds.length) {
+      const { data: onStage } = await supabase
+        .from("stage_participants")
+        .select("user_id, stage_role")
+        .eq("stream_id", m.stream_id)
+        .in("user_id", candidateIds)
+        .in("stage_role", ["host", "co_host", "speaker"]);
+      if (onStage && onStage.length > 0) {
+        throw new Error("Matchup is locked — an artist is already on stage");
+      }
+    }
+
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, display_name, stage_name")
+      .in("id", [data.artistAId, data.artistBId]);
+    const nameFor = (id: string) => {
+      const p = (profiles ?? []).find((x: any) => x.id === id);
+      return (p?.stage_name as string | null) ?? (p?.display_name as string | null) ?? "Artist";
+    };
+
+    const { data: updated, error } = await supabase
+      .from("battle_matches")
+      .update({
+        artist_a_id: data.artistAId,
+        artist_b_id: data.artistBId,
+        artist_a_name: nameFor(data.artistAId),
+        artist_b_name: nameFor(data.artistBId),
+      })
+      .eq("id", data.matchId)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return updated;
   });
 
 export const startNextRound = createServerFn({ method: "POST" })
