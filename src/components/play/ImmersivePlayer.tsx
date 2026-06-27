@@ -871,6 +871,12 @@ export function ImmersivePlayer({
                             try { await playFn({ data: { streamId, trackId: t.id } }); toast.success("Playing now"); }
                             catch (e: any) { toast.error(e?.message ?? "Failed"); }
                           }}
+                          onDelete={async () => {
+                            if (!streamId) return;
+                            if (!confirm(`Delete "${t.title}"?`)) return;
+                            try { await deleteFn({ data: { streamId, trackId: t.id } }); toast.success("Track deleted"); }
+                            catch (e: any) { toast.error(e?.message ?? "Delete failed"); }
+                          }}
                         />
                       ))}
                     </ul>
