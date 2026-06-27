@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Check,
   Radio,
-  Eye,
   Music,
   Headphones,
   Star,
@@ -18,9 +17,8 @@ import {
   Music2,
   Calendar,
   PlayCircle,
-  Camera,
-  ChevronRight,
   Compass,
+  ChevronRight,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
