@@ -766,9 +766,11 @@ function CreateBattleDialog({
             artistBId: b,
             totalRounds: rounds,
             roundSeconds: seconds,
+            trackAId: trackA || undefined,
+            trackBId: trackB || undefined,
           },
         });
-        toast.success("Battle ready — start round 1 when ready");
+        toast.success("Battle ready — Start Battle to play Artist A's track");
       }
       onClose();
     } catch (e: any) {
