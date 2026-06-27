@@ -25,6 +25,7 @@ import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGrap
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
+import { usePlayer } from "@/lib/player-context";
 
 /* ============================================================
    Brand palette (BWF):
@@ -386,6 +387,16 @@ export function ImmersivePlayer({
   const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
   const trackAudioSrc = useSignedAudioUrl(track?.audio_url ?? null);
   const nextAudioSrc = useSignedAudioUrl(upNext[0]?.audio_url ?? null);
+  // Stop the global mini-player whenever the immersive arena player has a
+  // track. Otherwise a song the user started from an artist page keeps
+  // playing through GlobalPlayer at the same time as the battle track —
+  // listeners hear two songs at once ("double" audio).
+  const globalPlayer = usePlayer();
+  const globalPauseRef = useRef(globalPlayer.pause);
+  globalPauseRef.current = globalPlayer.pause;
+  useEffect(() => {
+    if (track?.id) globalPauseRef.current?.();
+  }, [track?.id]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
