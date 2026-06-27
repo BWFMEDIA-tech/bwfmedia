@@ -666,6 +666,19 @@ export function ImmersivePlayer({
                 </div>
               )}
             </div>
+            {needsUnlock && track && (
+              <button
+                type="button"
+                onClick={unlockAndPlay}
+                className="absolute inset-0 z-20 grid place-items-center rounded-3xl bg-black/60 backdrop-blur-sm"
+                aria-label="Tap to start listening"
+              >
+                <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#004BFF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.9)]">
+                  <Play className="h-8 w-8" />
+                  TAP TO LISTEN
+                </span>
+              </button>
+            )}
           </div>
         </div>
 
