@@ -150,6 +150,24 @@ export function BattleArena({
           initialB={(match.artist_b_id as string | null) ?? ""}
           onClose={() => setShowEdit(false)}
           onSaved={refresh}
+          onOptimistic={(a, b) => {
+            setRoomState((prev) => {
+              if (!prev || !prev.match) return prev;
+              const findName = (id: string) =>
+                participants.find((p) => p.user_id === id)?.display_name ?? null;
+              return {
+                ...prev,
+                match: {
+                  ...prev.match,
+                  artist_a_id: a,
+                  artist_b_id: b,
+                  artist_a_name: findName(a) ?? prev.match.artist_a_name,
+                  artist_b_name: findName(b) ?? prev.match.artist_b_name,
+                },
+              } as RoomState;
+            });
+          }}
+          onReconcile={refresh}
         />
       )}
     </>
