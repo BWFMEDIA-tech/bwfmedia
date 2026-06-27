@@ -371,6 +371,94 @@ function TunevioLanding() {
         </div>
       </section>
 
+      {/* 2.5 Play Arena — Live Music Battles */}
+      <section className="relative px-5 sm:px-10 pb-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur-md">
+                <Swords className="h-3.5 w-3.5 text-[#FF00A6]" />
+                <span>Live Battles</span>
+              </div>
+              <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
+                Play Arena —{" "}
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{ backgroundImage: "linear-gradient(90deg,#FF00A6,#00E6FF)" }}
+                >
+                  Live Music Battles
+                </span>
+              </h2>
+              <p className="mt-4 text-base text-white/65 leading-relaxed max-w-xl">
+                Play Arena is a real-time competition layer where artists go
+                head-to-head in live music battles while audiences vote to decide
+                the winner instantly.
+              </p>
+              <p className="mt-3 text-sm text-white/50 max-w-xl">
+                No algorithm bias. No passive streaming. Just live performance and
+                real outcomes.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                {
+                  icon: Swords,
+                  title: "Live 1v1 artist battles",
+                  desc: "Two artists. One stage. Real-time clash.",
+                },
+                {
+                  icon: Vote,
+                  title: "Real-time audience voting",
+                  desc: "Fans vote as the music plays.",
+                },
+                {
+                  icon: Zap,
+                  title: "Instant winner results",
+                  desc: "Winners are called the moment the battle ends.",
+                },
+                {
+                  icon: Radio,
+                  title: "Host-controlled live arenas",
+                  desc: "Curators run the show and keep energy high.",
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Performance-based ranking",
+                  desc: "Climb the leaderboard with every win.",
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.5, delay: i * 0.05 }}
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl hover:border-[#FF00A6]/50 transition-colors"
+                >
+                  <div
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl"
+                    style={{
+                      background: "linear-gradient(135deg,rgba(255,0,166,0.25),rgba(0,230,255,0.2))",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <item.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="mt-4 font-semibold">{item.title}</h3>
+                  <p className="mt-1 text-sm text-white/60">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 3. Features */}
       <section className="relative px-5 sm:px-10 pb-24">
         <div className="mx-auto max-w-6xl">
