@@ -124,10 +124,19 @@ export async function runBattleEvent(
           .select("id, stream_id, artist_user_id, status")
           .eq("id", trackId!)
           .maybeSingle();
-        if (!track || track.stream_id !== m.stream_id) invalid("track not on stream");
+        if (!track) invalid("track not found");
         const expectedArtist = side === "a" ? m.artist_a_id : m.artist_b_id;
         if (track.artist_user_id !== expectedArtist) {
           invalid(`track is not Artist ${side.toUpperCase()}'s`);
+        }
+        // Auto-attach track to this battle's stream if it was submitted elsewhere
+        // (or has no stream_id). The artist-ownership check above is the
+        // authoritative guard.
+        if (track.stream_id !== m.stream_id) {
+          await supabase
+            .from("play_tracks")
+            .update({ stream_id: m.stream_id })
+            .eq("id", trackId!);
         }
 
         // Demote any currently playing track on the stream to completed and
