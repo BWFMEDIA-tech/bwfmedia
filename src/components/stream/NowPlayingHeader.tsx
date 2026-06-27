@@ -44,9 +44,11 @@ interface LiveParticipant {
 export function NowPlayingHeader({
   streamId,
   liveParticipants = [],
+  isHost = false,
 }: {
   streamId: string | null;
   liveParticipants?: LiveParticipant[];
+  isHost?: boolean;
 }) {
   const { playing } = usePlayQueue(streamId);
   const [battle, setBattle] = useState<ActiveBattle | null>(null);
