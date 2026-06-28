@@ -27,7 +27,7 @@ function AdminMerch() {
   const isAdmin = auth.roles.includes("admin");
 
   useEffect(() => {
-    if (!auth.loading && !isAdmin) navigate({ to: "/access-denied" });
+    if (!auth.loading && !auth.rolesLoading && !isAdmin) navigate({ to: "/access-denied" });
   }, [auth.loading, isAdmin, navigate]);
 
   const storesFn = useServerFn(adminListMerchStores);
