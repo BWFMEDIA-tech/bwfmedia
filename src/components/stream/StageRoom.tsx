@@ -658,15 +658,26 @@ function SpeakerBubble({
               {kind === "speaker" && onPromote && (
                 <>
                   {onSpotlight && (
-                    <MenuItem
-                      icon={isSpotlight ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onSpotlight(isSpotlight);
-                      }}
-                    >
-                      {isSpotlight ? "Remove from video box" : "Bring to video box"}
-                    </MenuItem>
+                    <>
+                      <MenuItem
+                        icon={isHostSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onSpotlight("host", isHostSpot);
+                        }}
+                      >
+                        {isHostSpot ? "Remove from host box" : "Bring to host box"}
+                      </MenuItem>
+                      <MenuItem
+                        icon={isArtistSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onSpotlight("artist", isArtistSpot);
+                        }}
+                      >
+                        {isArtistSpot ? "Remove from artist video box" : "Bring to artist video box"}
+                      </MenuItem>
+                    </>
                   )}
                   <MenuDivider />
                   <MenuItem
@@ -736,15 +747,26 @@ function SpeakerBubble({
               {(kind === "host" || kind === "co_host") && (
                 <>
                   {onSpotlight && (
-                    <MenuItem
-                      icon={isSpotlight ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onSpotlight(isSpotlight);
-                      }}
-                    >
-                      {isSpotlight ? "Remove from video box" : "Bring to video box"}
-                    </MenuItem>
+                    <>
+                      <MenuItem
+                        icon={isHostSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onSpotlight("host", isHostSpot);
+                        }}
+                      >
+                        {isHostSpot ? "Remove from host box" : "Bring to host box"}
+                      </MenuItem>
+                      <MenuItem
+                        icon={isArtistSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onSpotlight("artist", isArtistSpot);
+                        }}
+                      >
+                        {isArtistSpot ? "Remove from artist video box" : "Bring to artist video box"}
+                      </MenuItem>
+                    </>
                   )}
                   {onSpotlight && <MenuDivider />}
                   {kind === "co_host" && onPromote && (
