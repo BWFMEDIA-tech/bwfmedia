@@ -70,15 +70,15 @@ async function recordTip(session: any) {
     return;
   }
 
-  // Revenue pool: record tip
-  await getSupabase().rpc('record_revenue_event', {
-    _source: 'tips',
+  // Revenue: write to the ledger (single source of truth). The ledger
+  // mirrors into revenue_pool_entries internally.
+  await getSupabase().rpc('record_revenue_ledger', {
+    _source_type: 'tip',
+    _source_id: session.id,
     _amount_cents: amount,
     _occurred_at: new Date().toISOString(),
     _user_id: userId,
-    _reference_type: 'stripe_session',
-    _reference_id: session.id,
-    _metadata: { stream_id: streamId },
+    _metadata: { stream_id: streamId, kind: 'tip' },
   });
 
   // Post a system super-chat message in the stream chat so viewers see it.
@@ -288,20 +288,14 @@ async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
       .eq('stripe_subscription_id', subId)
       .eq('environment', env)
       .maybeSingle();
-    const role = subRow?.role;
-    const source = role === 'artist'
-      ? 'artist_subscription'
-      : role === 'listener'
-        ? 'listener_subscription'
-        : 'other';
-    await supabase.rpc('record_revenue_event', {
-      _source: source,
+    const role = subRow?.role ?? 'listener';
+    await supabase.rpc('record_revenue_ledger', {
+      _source_type: 'subscription',
+      _source_id: invoice.id,
       _amount_cents: amountPaid,
       _occurred_at: new Date((invoice?.created ?? Math.floor(Date.now() / 1000)) * 1000).toISOString(),
       _user_id: subRow?.user_id ?? null,
-      _reference_type: 'stripe_invoice',
-      _reference_id: invoice.id,
-      _metadata: { subscription_id: subId, env },
+      _metadata: { subscription_id: subId, env, plan_role: role },
     });
   }
 }
