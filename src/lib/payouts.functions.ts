@@ -319,7 +319,7 @@ export const runRoyaltyCalculation = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin.rpc("calculate_artist_royalties", {
-      _month: data?.month ?? null,
+      _month: data?.month ?? undefined,
     });
     if (error) throw new Error(error.message);
     const row = Array.isArray(rows) ? rows[0] : rows;
