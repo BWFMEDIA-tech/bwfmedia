@@ -661,8 +661,10 @@ export function ImmersivePlayer({
         toast.message("Waiting for the host to start the next track…");
         return;
       }
-      const next = upNext[0];
-      if (!next) { toast.error("Queue is empty — submit a track to start."); return; }
+      // Fall back to the top leaderboard track when the queue is empty so
+      // the host can replay the most-loved track without re-submitting.
+      const next = upNext[0] ?? leaderboard[0];
+      if (!next) { toast.error("No tracks available — submit a track to start."); return; }
       try {
         await playFn({ data: { streamId, trackId: next.id } });
         toast.success(`Now playing: ${next.title}`);
@@ -673,7 +675,18 @@ export function ImmersivePlayer({
     }
     const a = audioRef.current;
     if (!a) return;
-    if (a.paused) a.play().catch(() => {}); else a.pause();
+    try {
+      resume(); // ensure AudioContext is running (user gesture)
+      if (a.paused) {
+        await a.play();
+      } else {
+        a.pause();
+      }
+    } catch (e: any) {
+      // Autoplay blocked or src not yet loaded — surface the unlock overlay.
+      setNeedsUnlock(true);
+      toast.error(e?.message ?? "Tap again to start audio");
+    }
   };
   const seek = (pct: number) => {
     const a = audioRef.current;
