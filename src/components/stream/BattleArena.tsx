@@ -597,6 +597,7 @@ function ArtistSide({
   overallWinner,
   onVote,
   onSuperVote,
+  flash,
 }: {
   side: "a" | "b";
   artistId?: string | null;
@@ -613,6 +614,7 @@ function ArtistSide({
   overallWinner: boolean;
   onVote: () => void;
   onSuperVote: () => void;
+  flash?: { side: "a" | "b"; n: number; key: number } | null;
 }) {
   const grad = side === "a"
     ? "linear-gradient(135deg, #c53dff, #004bff)"
