@@ -604,22 +604,25 @@ function SpotlightControls({
   spotlightUserId,
   participants,
   profiles,
+  slot = "artist",
 }: {
   streamId: string;
   spotlightUserId: string | null;
   participants: ReturnType<typeof useParticipants>;
   profiles: Record<string, ProfileLite>;
+  slot?: "host" | "artist";
 }) {
   const [open, setOpen] = useState(false);
   const setSpotlight = useServerFn(setStreamSpotlight);
   const pinned = spotlightUserId
     ? profiles[spotlightUserId] ?? null
     : null;
+  const slotLabel = slot === "host" ? "host box" : "artist box";
   const pin = async (targetUserId: string | null) => {
     try {
-      await setSpotlight({ data: { streamId, targetUserId } });
+      await setSpotlight({ data: { streamId, targetUserId, slot } });
       setOpen(false);
-      toast.success(targetUserId ? "Pinned to middle box" : "Spotlight cleared");
+      toast.success(targetUserId ? `Pinned to ${slotLabel}` : "Spotlight cleared");
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to update spotlight");
     }
@@ -668,7 +671,7 @@ function SpotlightControls({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <div className="text-sm font-bold text-white">Pin guest to middle box</div>
+              <div className="text-sm font-bold text-white">Pin to {slotLabel}</div>
               <button onClick={() => setOpen(false)} className="text-white/60 hover:text-white">
                 <XIcon className="h-4 w-4" />
               </button>
