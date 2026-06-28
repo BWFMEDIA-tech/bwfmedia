@@ -55,9 +55,19 @@ export const getAdminOverview = createServerFn({ method: "POST" })
     // Count streams per artist for "top artists"
     let topArtists: any[] = [];
     if (artistIds.length) {
-      const counts = await sb.from("streams").select("host_id").in("host_id", artistIds);
+      // Real "top artists" = total valid music streams (plays) per artist
+      // from stream_events, not number of live broadcasts they hosted.
+      const counts = await sb
+        .from("stream_events")
+        .select("artist_id")
+        .in("artist_id", artistIds)
+        .eq("valid_stream", true)
+        .limit(50000);
       const tally = new Map<string, number>();
-      (counts.data ?? []).forEach((s: any) => tally.set(s.host_id, (tally.get(s.host_id) ?? 0) + 1));
+      (counts.data ?? []).forEach((s: any) => {
+        if (!s.artist_id) return;
+        tally.set(s.artist_id, (tally.get(s.artist_id) ?? 0) + 1);
+      });
       topArtists = (artistIds as string[])
         .map((id) => ({ id, streams: tally.get(id) ?? 0, profile: pmap.get(id) }))
         .sort((a, b) => b.streams - a.streams)
