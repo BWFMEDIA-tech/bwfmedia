@@ -492,7 +492,8 @@ function SpeakerBubble({
   isPrimaryHost = false,
   isSelf = false,
   hostTransferMode = "co_host",
-  spotlightUserId,
+  spotlightHostId,
+  spotlightArtistId,
   onPromote,
   onDemote,
   onRevoke,
@@ -507,14 +508,15 @@ function SpeakerBubble({
   isPrimaryHost?: boolean;
   isSelf?: boolean;
   hostTransferMode?: "co_host" | "transfer";
-  spotlightUserId?: string | null;
+  spotlightHostId?: string | null;
+  spotlightArtistId?: string | null;
   onPromote?: (mode: "host" | "co_host" | "transfer") => void;
   onDemote?: () => void;
   onRevoke?: () => void;
   onKick?: () => void;
   onDemoteToAudience?: () => void;
   onToggleMute?: () => void;
-  onSpotlight?: (currentlyPinned: boolean) => void;
+  onSpotlight?: (slot: "host" | "artist", currentlyPinned: boolean) => void;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;
   const connected = useConnectedIdentities();
@@ -532,7 +534,8 @@ function SpeakerBubble({
     (dbStatus === "reconnecting" ||
       (hasLiveKitContext && dbStatus === "connected" && !isConnected));
   const isDisconnected = dbStatus === "disconnected";
-  const isSpotlight = spotlightUserId === p.user_id;
+  const isHostSpot = spotlightHostId === p.user_id;
+  const isArtistSpot = spotlightArtistId === p.user_id;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
