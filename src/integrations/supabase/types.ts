@@ -3101,24 +3101,6 @@ export type Database = {
       }
     }
     Views: {
-      arena_leaderboard: {
-        Row: {
-          avatar_url: string | null
-          losses: number | null
-          name: string | null
-          public_id: string | null
-          rank: number | null
-          total_battles: number | null
-          total_stream_seconds: number | null
-          total_votes: number | null
-          user_id: string | null
-          username: string | null
-          win_rate: number | null
-          wins: number | null
-          xp: number | null
-        }
-        Relationships: []
-      }
       live_queue_public: {
         Row: {
           artist_name: string | null
