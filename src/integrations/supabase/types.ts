@@ -266,6 +266,65 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_royalties: {
+        Row: {
+          artist_id: string
+          artist_pool_cents: number
+          created_at: string
+          id: string
+          metadata: Json
+          month: string
+          paid_at: string | null
+          payout_amount_cents: number
+          payout_request_id: string | null
+          raw_streams: number
+          share_pct: number
+          status: string
+          updated_at: string
+          weighted_streams: number
+        }
+        Insert: {
+          artist_id: string
+          artist_pool_cents?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          month: string
+          paid_at?: string | null
+          payout_amount_cents?: number
+          payout_request_id?: string | null
+          raw_streams?: number
+          share_pct?: number
+          status?: string
+          updated_at?: string
+          weighted_streams?: number
+        }
+        Update: {
+          artist_id?: string
+          artist_pool_cents?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          month?: string
+          paid_at?: string | null
+          payout_amount_cents?: number
+          payout_request_id?: string | null
+          raw_streams?: number
+          share_pct?: number
+          status?: string
+          updated_at?: string
+          weighted_streams?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_royalties_payout_request_id_fkey"
+            columns: ["payout_request_id"]
+            isOneToOne: false
+            referencedRelation: "payout_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       battle_matches: {
         Row: {
           a_wins: number
@@ -1516,6 +1575,7 @@ export type Database = {
       }
       payout_accounts: {
         Row: {
+          auto_payout_enabled: boolean
           charges_enabled: boolean
           country: string | null
           created_at: string
@@ -1523,6 +1583,7 @@ export type Database = {
           details_submitted: boolean
           environment: string
           id: string
+          minimum_payout_cents: number
           payouts_enabled: boolean
           requirements: Json
           stripe_account_id: string
@@ -1530,6 +1591,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_payout_enabled?: boolean
           charges_enabled?: boolean
           country?: string | null
           created_at?: string
@@ -1537,6 +1599,7 @@ export type Database = {
           details_submitted?: boolean
           environment?: string
           id?: string
+          minimum_payout_cents?: number
           payouts_enabled?: boolean
           requirements?: Json
           stripe_account_id: string
@@ -1544,6 +1607,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auto_payout_enabled?: boolean
           charges_enabled?: boolean
           country?: string | null
           created_at?: string
@@ -1551,6 +1615,7 @@ export type Database = {
           details_submitted?: boolean
           environment?: string
           id?: string
+          minimum_payout_cents?: number
           payouts_enabled?: boolean
           requirements?: Json
           stripe_account_id?: string
@@ -3492,6 +3557,13 @@ export type Database = {
         Args: { _row_user_id: string }
         Returns: boolean
       }
+      calculate_artist_royalties: {
+        Args: { _month?: string }
+        Returns: {
+          artists_paid: number
+          total_payout_cents: number
+        }[]
+      }
       calculate_monthly_revenue_pool: {
         Args: { _month?: string }
         Returns: {
@@ -3552,6 +3624,10 @@ export type Database = {
       }
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
+      get_artist_earnings_summary: {
+        Args: { _artist_id: string }
+        Returns: Json
+      }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
