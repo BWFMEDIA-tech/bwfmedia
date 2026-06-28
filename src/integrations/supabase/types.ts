@@ -3021,9 +3021,11 @@ export type Database = {
       tips: {
         Row: {
           amount_cents: number
+          artist_id: string | null
           created_at: string
           display_name: string | null
           id: string
+          kind: string
           message: string | null
           paid_at: string | null
           status: string
@@ -3034,9 +3036,11 @@ export type Database = {
         }
         Insert: {
           amount_cents: number
+          artist_id?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          kind?: string
           message?: string | null
           paid_at?: string | null
           status?: string
@@ -3047,9 +3051,11 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          artist_id?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          kind?: string
           message?: string | null
           paid_at?: string | null
           status?: string
@@ -3059,6 +3065,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tips_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tips_stream_id_fkey"
             columns: ["stream_id"]
@@ -3626,6 +3639,10 @@ export type Database = {
           hits: number
           retry_after_secs: number
         }[]
+      }
+      credit_artist_tip: {
+        Args: { _amount_cents: number; _artist_id: string; _source_id: string }
+        Returns: undefined
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
