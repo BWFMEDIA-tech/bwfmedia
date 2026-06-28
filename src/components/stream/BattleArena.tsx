@@ -214,6 +214,17 @@ function BattleView({
     }
   }, [currentRound?.id, optimistic.roundId]);
 
+  // Once the server confirms this viewer's vote for the current round, drop
+  // the optimistic bump so the tally doesn't get counted twice (server count
+  // + optimistic). Without this, a single vote renders as 2 once the
+  // realtime UPDATE on battle_rounds arrives.
+  useEffect(() => {
+    if (!currentRound?.id || !myVote) return;
+    if (optimistic.roundId === currentRound.id && (optimistic.a > 0 || optimistic.b > 0)) {
+      setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
+    }
+  }, [myVote, currentRound?.id, optimistic.roundId, optimistic.a, optimistic.b]);
+
   // Live XP balance for the signed-in viewer (drives the header XP badge).
   const [xp, setXp] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
