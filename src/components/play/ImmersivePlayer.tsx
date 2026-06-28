@@ -616,6 +616,21 @@ export function ImmersivePlayer({
     return () => { cancelled = true; };
   }, [trackAudioSrc, track?.id, resume]);
 
+  useEffect(() => {
+    setProgress(0);
+    setDuration(0);
+    if (!track?.audio_url || !trackAudioSrc) {
+      const a = audioRef.current;
+      if (a) {
+        a.pause();
+        a.removeAttribute("src");
+        a.load();
+      }
+      setIsPlaying(false);
+      setPlaybackPlaying(false);
+    }
+  }, [track?.id, track?.audio_url, trackAudioSrc]);
+
   const unlockAndPlay = async () => {
     const a = audioRef.current;
     if (!a) return;
@@ -675,6 +690,10 @@ export function ImmersivePlayer({
     }
     const a = audioRef.current;
     if (!a) return;
+    if (track.audio_url && !trackAudioSrc) {
+      toast.message("Loading secure audio… tap again in a moment");
+      return;
+    }
     try {
       resume(); // ensure AudioContext is running (user gesture)
       if (a.paused) {
@@ -853,17 +872,15 @@ export function ImmersivePlayer({
           )}
         </div>
 
-        {/* Audio element */}
-        {track?.audio_url && trackAudioSrc && (
-          <audio
-            key={track.id}
-            ref={audioRef}
-            src={trackAudioSrc}
-            autoPlay
-            crossOrigin="anonymous"
-            className="hidden"
-          />
-        )}
+        {/* Audio element: always mounted so play/pause refs stay stable while signed URLs load. */}
+        <audio
+          ref={audioRef}
+          src={trackAudioSrc ?? ""}
+          autoPlay
+          preload="auto"
+          crossOrigin="anonymous"
+          className="hidden"
+        />
 
         {/* Preload the next track in the background so transitions are seamless.
             Muted + paused, just warms the browser cache. */}

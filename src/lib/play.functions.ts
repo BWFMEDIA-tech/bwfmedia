@@ -168,9 +168,9 @@ export const playTrackNow = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHost(supabase, userId, data.streamId);
-    // Mark any current "playing" as done.
+    // Mark any current "playing" as completed.
     await supabase.from("play_tracks")
-      .update({ status: "done" })
+      .update({ status: "completed" })
       .eq("stream_id", data.streamId).eq("status", "playing");
     const { error } = await supabase.from("play_tracks")
       .update({ status: "playing" })
@@ -199,7 +199,7 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
       .eq("stream_id", data.streamId).eq("status", "playing")
       .maybeSingle();
     await supabase.from("play_tracks")
-      .update({ status: "done" })
+      .update({ status: "completed" })
       .eq("stream_id", data.streamId).eq("status", "playing");
 
     let next: { id: string } | null = null;
@@ -251,7 +251,7 @@ export const endPlaySession = createServerFn({ method: "POST" })
     const { data: top } = await supabase.from("play_tracks")
       .select("id")
       .eq("stream_id", data.streamId)
-      .in("status", ["playing", "done"])
+      .in("status", ["playing", "completed"])
       .order("score", { ascending: false })
       .limit(1).maybeSingle();
     await supabase.from("play_sessions").upsert({
