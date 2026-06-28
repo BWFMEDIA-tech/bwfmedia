@@ -214,6 +214,17 @@ function BattleView({
     }
   }, [currentRound?.id, optimistic.roundId]);
 
+  // Once the server confirms this viewer's vote for the current round, drop
+  // the optimistic bump so the tally doesn't get counted twice (server count
+  // + optimistic). Without this, a single vote renders as 2 once the
+  // realtime UPDATE on battle_rounds arrives.
+  useEffect(() => {
+    if (!currentRound?.id || !myVote) return;
+    if (optimistic.roundId === currentRound.id && (optimistic.a > 0 || optimistic.b > 0)) {
+      setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
+    }
+  }, [myVote, currentRound?.id, optimistic.roundId, optimistic.a, optimistic.b]);
+
   // Live XP balance for the signed-in viewer (drives the header XP badge).
   const [xp, setXp] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -259,12 +270,13 @@ function BattleView({
 
   const serverA = (currentRound as any)?.a_weight ?? 0;
   const serverB = (currentRound as any)?.b_weight ?? 0;
-  const optA = currentRound && optimistic.roundId === currentRound.id ? optimistic.a : 0;
-  const optB = currentRound && optimistic.roundId === currentRound.id ? optimistic.b : 0;
-  // Take the max of server tally vs (server-at-click + optimistic bump) so
-  // we never double-count once the realtime UPDATE catches up.
-  const aScore = Math.max(serverA, serverA + optA);
-  const bScore = Math.max(serverB, serverB + optB);
+  // Suppress the optimistic bump as soon as the server confirms the viewer's
+  // vote (myVote). Without this guard the bar shows server tally + optimistic
+  // and a single vote renders as 2.
+  const optA = currentRound && optimistic.roundId === currentRound.id && myVote !== "a" ? optimistic.a : 0;
+  const optB = currentRound && optimistic.roundId === currentRound.id && myVote !== "b" ? optimistic.b : 0;
+  const aScore = serverA + optA;
+  const bScore = serverB + optB;
   const total = aScore + bScore;
   const aPct = total > 0 ? Math.min(100, Math.round((aScore / total) * 100)) : 0;
   const bPct = total > 0 ? Math.min(100, 100 - aPct) : 0;
@@ -272,11 +284,10 @@ function BattleView({
   // Raw voter counts (super votes count as 1 voter, not 5) for accurate display.
   const serverACount = (currentRound as any)?.a_votes ?? 0;
   const serverBCount = (currentRound as any)?.b_votes ?? 0;
-  // Optimistic adds at least +1 per click regardless of weight.
-  const optACount = currentRound && optimistic.roundId === currentRound.id && optimistic.a > 0 ? 1 : 0;
-  const optBCount = currentRound && optimistic.roundId === currentRound.id && optimistic.b > 0 ? 1 : 0;
-  const aCount = Math.max(serverACount, serverACount + optACount);
-  const bCount = Math.max(serverBCount, serverBCount + optBCount);
+  const optACount = currentRound && optimistic.roundId === currentRound.id && optimistic.a > 0 && myVote !== "a" ? 1 : 0;
+  const optBCount = currentRound && optimistic.roundId === currentRound.id && optimistic.b > 0 && myVote !== "b" ? 1 : 0;
+  const aCount = serverACount + optACount;
+  const bCount = serverBCount + optBCount;
 
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
   const canVote = votingStatus === "open" && !myVote;
