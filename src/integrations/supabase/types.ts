@@ -2652,8 +2652,13 @@ export type Database = {
           current_period_start: string | null
           environment: string
           id: string
+          plan_type: string | null
+          price_cents: number | null
           price_id: string
           product_id: string
+          renewal_date: string | null
+          role: string | null
+          start_date: string | null
           status: string
           stripe_customer_id: string
           stripe_subscription_id: string
@@ -2668,8 +2673,13 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
+          plan_type?: string | null
+          price_cents?: number | null
           price_id: string
           product_id: string
+          renewal_date?: string | null
+          role?: string | null
+          start_date?: string | null
           status?: string
           stripe_customer_id: string
           stripe_subscription_id: string
@@ -2684,8 +2694,13 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           id?: string
+          plan_type?: string | null
+          price_cents?: number | null
           price_id?: string
           product_id?: string
+          renewal_date?: string | null
+          role?: string | null
+          start_date?: string | null
           status?: string
           stripe_customer_id?: string
           stripe_subscription_id?: string
@@ -3347,6 +3362,10 @@ export type Database = {
         Returns: number
       }
       has_active_artist_access: { Args: { _user_id: string }; Returns: boolean }
+      has_active_tunevio_subscription: {
+        Args: { _role?: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
