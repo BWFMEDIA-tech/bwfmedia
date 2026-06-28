@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { User, Mic2, Link2, Music, CreditCard, Bell, Palette, Shield, Receipt, Plug, HelpCircle, ExternalLink, Calendar, ShoppingBag, Radio } from "lucide-react";
+import { User, Mic2, Link2, Music, CreditCard, Bell, Palette, Shield, Receipt, Plug, HelpCircle, ExternalLink, Calendar, ShoppingBag, Radio, Banknote } from "lucide-react";
 
 const items = [
   { to: "/settings/profile", label: "Profile", icon: User },
@@ -9,6 +9,7 @@ const items = [
   { to: "/settings/events", label: "Upcoming Events", icon: Calendar },
   { to: "/settings/merch", label: "Merch Store", icon: ShoppingBag },
   { to: "/settings/membership", label: "Membership", icon: CreditCard },
+  { to: "/settings/payouts", label: "Payouts", icon: Banknote },
   { to: "/settings/notifications", label: "Notifications", icon: Bell },
   { to: "/settings/appearance", label: "Appearance", icon: Palette },
   { to: "/settings/security", label: "Security", icon: Shield },
