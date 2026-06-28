@@ -70,6 +70,17 @@ async function recordTip(session: any) {
     return;
   }
 
+  // Revenue pool: record tip
+  await getSupabase().rpc('record_revenue_event', {
+    _source: 'tips',
+    _amount_cents: amount,
+    _occurred_at: new Date().toISOString(),
+    _user_id: userId,
+    _reference_type: 'stripe_session',
+    _reference_id: session.id,
+    _metadata: { stream_id: streamId },
+  });
+
   // Post a system super-chat message in the stream chat so viewers see it.
   if (userId) {
     const dollars = (amount / 100).toFixed(2);
@@ -254,9 +265,9 @@ async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
   const subId = invoice?.subscription as string | undefined;
   if (!subId) return;
   const periodEnd = invoice?.lines?.data?.[0]?.period?.end;
-  if (!periodEnd) return;
   const supabase = getSupabase();
-  await supabase
+  if (periodEnd) {
+    await supabase
     .from('subscriptions')
     .update({
       status: 'active',
@@ -266,6 +277,33 @@ async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
     })
     .eq('stripe_subscription_id', subId)
     .eq('environment', env);
+  }
+
+  // Revenue pool: record invoice payment, classified by subscription role
+  const amountPaid = invoice?.amount_paid ?? 0;
+  if (amountPaid > 0) {
+    const { data: subRow } = await supabase
+      .from('subscriptions')
+      .select('role,user_id')
+      .eq('stripe_subscription_id', subId)
+      .eq('environment', env)
+      .maybeSingle();
+    const role = subRow?.role;
+    const source = role === 'artist'
+      ? 'artist_subscription'
+      : role === 'listener'
+        ? 'listener_subscription'
+        : 'other';
+    await supabase.rpc('record_revenue_event', {
+      _source: source,
+      _amount_cents: amountPaid,
+      _occurred_at: new Date((invoice?.created ?? Math.floor(Date.now() / 1000)) * 1000).toISOString(),
+      _user_id: subRow?.user_id ?? null,
+      _reference_type: 'stripe_invoice',
+      _reference_id: invoice.id,
+      _metadata: { subscription_id: subId, env },
+    });
+  }
 }
 
 function routeSessionPaid(session: any) {
