@@ -187,16 +187,19 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
-  const spotlightUserId = useStreamSpotlight(streamId);
+  const spotlight = useStreamSpotlight(streamId);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host";
   const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [] };
   for (const t of cameraTracks) {
     const id = t.participant?.identity ?? "";
-    // Spotlight override: pin a specific participant to the middle panel
-    // exclusively, regardless of their stage role.
-    if (spotlightUserId && id === spotlightUserId) {
+    // Spotlight overrides: pin a participant exclusively to a panel.
+    if (spotlight.host && id === spotlight.host) {
+      buckets.admin.push(t);
+      continue;
+    }
+    if (spotlight.artist && id === spotlight.artist) {
       buckets.middle.push(t);
       continue;
     }
@@ -207,9 +210,9 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         : role === "host" || role === "cohost" || role === "co_host"
           ? "host"
           : "middle"; // artist | guest | listener | speaker | unknown
-    // While a spotlight is active, suppress the middle "catch-all" so only
-    // the pinned participant shows in the middle box.
-    if (spotlightUserId && panel === "middle") continue;
+    // When a spotlight is active for a panel, suppress catch-alls there.
+    if (spotlight.artist && panel === "middle") continue;
+    if (spotlight.host && panel === "admin") continue;
     buckets[panel].push(t);
   }
   // Priority: active speaker first within each bucket.
@@ -232,7 +235,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         {panel === "middle" && showHostTools && streamId && (
           <SpotlightControls
             streamId={streamId}
-            spotlightUserId={spotlightUserId}
+            spotlightUserId={spotlight.artist}
             participants={participants}
             profiles={profiles}
           />
@@ -473,7 +476,7 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
 }
 
 type SpotlightStore = {
-  current: string | null;
+  current: { host: string | null; artist: string | null };
   channel: ReturnType<typeof supabase.channel> | null;
   listeners: Set<() => void>;
 };
@@ -483,7 +486,7 @@ const spotlightStores = new Map<string, SpotlightStore>();
 function getSpotlightStore(streamId: string): SpotlightStore {
   let store = spotlightStores.get(streamId);
   if (!store) {
-    store = { current: null, channel: null, listeners: new Set() };
+    store = { current: { host: null, artist: null }, channel: null, listeners: new Set() };
     spotlightStores.set(streamId, store);
 
     const channel = supabase.channel(`spotlight-${streamId}`);
@@ -494,8 +497,16 @@ function getSpotlightStore(streamId: string): SpotlightStore {
       "postgres_changes",
       { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
       (payload) => {
-        const next = (payload.new as any)?.spotlight_user_id ?? null;
-        if (store!.current === next) return;
+        const row = payload.new as any;
+        const next = {
+          artist: row?.spotlight_user_id ?? null,
+          host: row?.spotlight_host_user_id ?? null,
+        };
+        if (
+          store!.current.host === next.host &&
+          store!.current.artist === next.artist
+        )
+          return;
         store!.current = next;
         store!.listeners.forEach((cb) => cb());
       },
@@ -511,13 +522,20 @@ function getSpotlightStore(streamId: string): SpotlightStore {
       try {
         const { data } = await supabase
           .from("streams")
-          .select("spotlight_user_id")
+          .select("spotlight_user_id, spotlight_host_user_id")
           .eq("id", streamId)
           .maybeSingle();
         const live = spotlightStores.get(streamId);
         if (!live || live !== store) return;
-        const next = (data as any)?.spotlight_user_id ?? null;
-        if (live.current === next) return;
+        const next = {
+          artist: (data as any)?.spotlight_user_id ?? null,
+          host: (data as any)?.spotlight_host_user_id ?? null,
+        };
+        if (
+          live.current.host === next.host &&
+          live.current.artist === next.artist
+        )
+          return;
         live.current = next;
         live.listeners.forEach((cb) => cb());
       } catch (err) {
@@ -543,8 +561,10 @@ function subscribeSpotlight(streamId: string, callback: () => void): () => void 
   };
 }
 
-function getSpotlightSnapshot(streamId: string): string | null {
-  return spotlightStores.get(streamId)?.current ?? null;
+const EMPTY_SPOTLIGHT = { host: null, artist: null } as const;
+export type SpotlightState = { host: string | null; artist: string | null };
+function getSpotlightSnapshot(streamId: string): SpotlightState {
+  return spotlightStores.get(streamId)?.current ?? EMPTY_SPOTLIGHT;
 }
 
 /**
@@ -554,14 +574,14 @@ function getSpotlightSnapshot(streamId: string): string | null {
  * Uses a single shared realtime subscription per streamId so re-renders and
  * multiple mounted instances never register duplicate postgres_changes listeners.
  */
-export function useStreamSpotlight(streamId: string | undefined): string | null {
+export function useStreamSpotlight(streamId: string | undefined): SpotlightState {
   return useSyncExternalStore(
     useCallback(
       (callback) => (streamId ? subscribeSpotlight(streamId, callback) : () => {}),
       [streamId],
     ),
-    useCallback(() => (streamId ? getSpotlightSnapshot(streamId) : null), [streamId]),
-    () => null,
+    useCallback(() => (streamId ? getSpotlightSnapshot(streamId) : EMPTY_SPOTLIGHT), [streamId]),
+    () => EMPTY_SPOTLIGHT,
   );
 }
 
