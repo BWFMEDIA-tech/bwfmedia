@@ -22,6 +22,7 @@ import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage, LiveStageContent, CameraPublishSync, useStreamSpotlight } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { LiveEarningsTicker } from "@/components/stream/LiveEarningsTicker";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
@@ -1100,6 +1101,7 @@ function StreamStudio() {
 
             {/* Right rail — sticky console */}
             <aside className="flex flex-col gap-3 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)]">
+              {stream?.id && <LiveEarningsTicker streamId={stream.id} />}
               <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
                 <h3 className="mb-3 text-sm tracking-[0.2em] text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
