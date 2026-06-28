@@ -2132,6 +2132,90 @@ export type Database = {
           },
         ]
       }
+      revenue_pool_entries: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          metadata: Json
+          month: string
+          reference_id: string | null
+          reference_type: string | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          month: string
+          reference_id?: string | null
+          reference_type?: string | null
+          source: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          month?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      revenue_pools: {
+        Row: {
+          ads_revenue_cents: number
+          artist_pool_cents: number
+          artist_revenue_cents: number
+          computed_at: string
+          created_at: string
+          id: string
+          incentive_pool_cents: number
+          listener_revenue_cents: number
+          month: string
+          platform_pool_cents: number
+          tips_revenue_cents: number
+          total_revenue_cents: number
+          updated_at: string
+        }
+        Insert: {
+          ads_revenue_cents?: number
+          artist_pool_cents?: number
+          artist_revenue_cents?: number
+          computed_at?: string
+          created_at?: string
+          id?: string
+          incentive_pool_cents?: number
+          listener_revenue_cents?: number
+          month: string
+          platform_pool_cents?: number
+          tips_revenue_cents?: number
+          total_revenue_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          ads_revenue_cents?: number
+          artist_pool_cents?: number
+          artist_revenue_cents?: number
+          computed_at?: string
+          created_at?: string
+          id?: string
+          incentive_pool_cents?: number
+          listener_revenue_cents?: number
+          month?: string
+          platform_pool_cents?: number
+          tips_revenue_cents?: number
+          total_revenue_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shopify_stores: {
         Row: {
           access_token: string
@@ -3288,6 +3372,30 @@ export type Database = {
         Args: { _row_user_id: string }
         Returns: boolean
       }
+      calculate_monthly_revenue_pool: {
+        Args: { _month?: string }
+        Returns: {
+          ads_revenue_cents: number
+          artist_pool_cents: number
+          artist_revenue_cents: number
+          computed_at: string
+          created_at: string
+          id: string
+          incentive_pool_cents: number
+          listener_revenue_cents: number
+          month: string
+          platform_pool_cents: number
+          tips_revenue_cents: number
+          total_revenue_cents: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "revenue_pools"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       cast_battle_vote: {
         Args: {
           _choice: string
@@ -3345,6 +3453,17 @@ export type Database = {
           total_cents: number
         }[]
       }
+      get_total_revenue: {
+        Args: { _month?: string }
+        Returns: {
+          ads_cents: number
+          artist_cents: number
+          listener_cents: number
+          month: string
+          tips_cents: number
+          total_cents: number
+        }[]
+      }
       get_user_rank: { Args: { _user_id: string }; Returns: string }
       get_user_xp: { Args: { _user_id: string }; Returns: number }
       get_waitlist_count: { Args: never; Returns: number }
@@ -3393,6 +3512,7 @@ export type Database = {
         Args: { _match_id: string; _metadata?: Json; _reason: string }
         Returns: string
       }
+      month_bucket: { Args: { _ts: string }; Returns: string }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -3411,11 +3531,31 @@ export type Database = {
         }[]
       }
       recompute_play_arena_rankings: { Args: never; Returns: number }
+      record_revenue_event: {
+        Args: {
+          _amount_cents: number
+          _metadata?: Json
+          _occurred_at?: string
+          _reference_id?: string
+          _reference_type?: string
+          _source: string
+          _user_id?: string
+        }
+        Returns: string
+      }
       spend_boost_on_track: {
         Args: { _track_id: string; _weight?: number }
         Returns: {
           new_balance: number
           spend_id: string
+        }[]
+      }
+      split_revenue_pool: {
+        Args: { _total_cents: number }
+        Returns: {
+          artist_pool_cents: number
+          incentive_pool_cents: number
+          platform_pool_cents: number
         }[]
       }
     }
