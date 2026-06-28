@@ -2153,50 +2153,6 @@ export type Database = {
         }
         Relationships: []
       }
-      revenue_events: {
-        Row: {
-          amount_cents: number
-          created_at: string
-          currency: string
-          id: string
-          metadata: Json
-          reference_id: string | null
-          source: string
-          stream_id: string | null
-          user_id: string
-        }
-        Insert: {
-          amount_cents?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          metadata?: Json
-          reference_id?: string | null
-          source: string
-          stream_id?: string | null
-          user_id: string
-        }
-        Update: {
-          amount_cents?: number
-          created_at?: string
-          currency?: string
-          id?: string
-          metadata?: Json
-          reference_id?: string | null
-          source?: string
-          stream_id?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "revenue_events_stream_id_fkey"
-            columns: ["stream_id"]
-            isOneToOne: false
-            referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       revenue_ledger: {
         Row: {
           amount_cents: number
@@ -3612,7 +3568,6 @@ export type Database = {
           retry_after_secs: number
         }[]
       }
-      consume_play_boost_credit: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -3751,6 +3706,10 @@ export type Database = {
           _user_id?: string
         }
         Returns: string
+      }
+      spend_boost_credit: {
+        Args: { _amount?: number; _reason?: string; _reference_id?: string }
+        Returns: number
       }
       spend_boost_on_track: {
         Args: { _track_id: string; _weight?: number }
