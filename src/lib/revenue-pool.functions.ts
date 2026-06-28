@@ -61,3 +61,21 @@ export const listRevenuePools = createServerFn({ method: 'GET' })
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
+
+/** Admin: subscriber counts, MRR, per-plan distribution. */
+export const getAdminSubscriptionMetrics = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase.rpc('get_admin_subscription_metrics');
+    if (error) throw new Error(error.message);
+    return data as {
+      active_subscribers: number;
+      mrr_cents: number;
+      listener_count: number;
+      artist_count: number;
+      listener_mrr_cents: number;
+      artist_mrr_cents: number;
+      by_plan: Array<{ price_id: string; role: string; subscriber_count: number; mrr_cents: number }>;
+    };
+  });
