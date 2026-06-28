@@ -786,8 +786,37 @@ function SideCard({ children, className = "" }: { children: React.ReactNode; cla
 }
 
 
-function SupportArtist({ tip, setTip }: { tip: number; setTip: (n: number) => void }) {
+function SupportArtist({
+  tip,
+  setTip,
+  artistId,
+  isOwner,
+  isAuthenticated,
+  auth,
+}: {
+  tip: number;
+  setTip: (n: number) => void;
+  artistId: string;
+  isOwner: boolean;
+  isAuthenticated: boolean;
+  auth: ReturnType<typeof useAuth>;
+}) {
   const options = [5, 10, 25];
+  const [open, setOpen] = useState(false);
+  const [initial, setInitial] = useState<number>(10);
+  const handle = (v: number) => {
+    setTip(v);
+    if (isOwner) {
+      toast.info("You can't tip yourself.");
+      return;
+    }
+    if (!isAuthenticated) {
+      toast.error("Sign in to tip this artist.");
+      return;
+    }
+    setInitial(v);
+    setOpen(true);
+  };
   return (
     <SideCard>
       <h3 className="text-sm font-semibold mb-3">Support This Artist</h3>
@@ -795,7 +824,7 @@ function SupportArtist({ tip, setTip }: { tip: number; setTip: (n: number) => vo
         {options.map((v) => (
           <button
             key={v}
-            onClick={() => setTip(v)}
+            onClick={() => handle(v)}
             className={`rounded-lg py-2 text-center border ${tip === v ? "text-white" : "border-white/10 bg-white/5 text-white/80"}`}
             style={tip === v ? { borderColor: RED, background: `${RED}1f` } : undefined}
           >
@@ -803,11 +832,23 @@ function SupportArtist({ tip, setTip }: { tip: number; setTip: (n: number) => vo
             <div className="text-[10px] text-white/60">Tip</div>
           </button>
         ))}
-        <button className="rounded-lg py-2 border border-white/10 bg-white/5 text-white/80 text-center">
+        <button
+          onClick={() => handle(10)}
+          className="rounded-lg py-2 border border-white/10 bg-white/5 text-white/80 text-center"
+        >
           <div className="text-sm font-bold">Other</div>
           <div className="text-[10px] text-white/60">Tip</div>
         </button>
       </div>
+      {open && (
+        <TipModal
+          artistId={artistId}
+          initialAmount={initial}
+          title="Tip this artist"
+          auth={auth}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </SideCard>
   );
 }
