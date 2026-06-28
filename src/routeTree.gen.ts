@@ -60,6 +60,7 @@ import { Route as StageRoomIdRouteImport } from './routes/stage.$roomId'
 import { Route as SettingsSocialLinksRouteImport } from './routes/settings.social-links'
 import { Route as SettingsSecurityRouteImport } from './routes/settings.security'
 import { Route as SettingsProfileRouteImport } from './routes/settings.profile'
+import { Route as SettingsPayoutsRouteImport } from './routes/settings.payouts'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
 import { Route as SettingsMusicMediaRouteImport } from './routes/settings.music-media'
 import { Route as SettingsMerchRouteImport } from './routes/settings.merch'
@@ -378,6 +379,11 @@ const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
 const SettingsProfileRoute = SettingsProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsPayoutsRoute = SettingsPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
@@ -803,6 +809,7 @@ export interface FileRoutesByFullPath {
   '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payouts': typeof SettingsPayoutsRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/settings/social-links': typeof SettingsSocialLinksRoute
@@ -919,6 +926,7 @@ export interface FileRoutesByTo {
   '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payouts': typeof SettingsPayoutsRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/settings/social-links': typeof SettingsSocialLinksRoute
@@ -1037,6 +1045,7 @@ export interface FileRoutesById {
   '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payouts': typeof SettingsPayoutsRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/settings/social-links': typeof SettingsSocialLinksRoute
@@ -1156,6 +1165,7 @@ export interface FileRouteTypes {
     | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
+    | '/settings/payouts'
     | '/settings/profile'
     | '/settings/security'
     | '/settings/social-links'
@@ -1272,6 +1282,7 @@ export interface FileRouteTypes {
     | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
+    | '/settings/payouts'
     | '/settings/profile'
     | '/settings/security'
     | '/settings/social-links'
@@ -1389,6 +1400,7 @@ export interface FileRouteTypes {
     | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
+    | '/settings/payouts'
     | '/settings/profile'
     | '/settings/security'
     | '/settings/social-links'
@@ -1853,6 +1865,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/settings/profile'
       preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/payouts': {
+      id: '/settings/payouts'
+      path: '/payouts'
+      fullPath: '/settings/payouts'
+      preLoaderRoute: typeof SettingsPayoutsRouteImport
       parentRoute: typeof SettingsRoute
     }
     '/settings/notifications': {
@@ -2375,6 +2394,7 @@ interface SettingsRouteChildren {
   SettingsMerchRoute: typeof SettingsMerchRoute
   SettingsMusicMediaRoute: typeof SettingsMusicMediaRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsPayoutsRoute: typeof SettingsPayoutsRoute
   SettingsProfileRoute: typeof SettingsProfileRoute
   SettingsSecurityRoute: typeof SettingsSecurityRoute
   SettingsSocialLinksRoute: typeof SettingsSocialLinksRoute
@@ -2391,6 +2411,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsMerchRoute: SettingsMerchRoute,
   SettingsMusicMediaRoute: SettingsMusicMediaRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsPayoutsRoute: SettingsPayoutsRoute,
   SettingsProfileRoute: SettingsProfileRoute,
   SettingsSecurityRoute: SettingsSecurityRoute,
   SettingsSocialLinksRoute: SettingsSocialLinksRoute,
