@@ -39,9 +39,10 @@ async function markBookingPaid(session: any) {
 
 async function recordTip(session: any) {
   const meta = session.metadata || {};
-  const streamId = meta.streamId as string | undefined;
-  if (!streamId) {
-    console.warn('Tip webhook missing streamId metadata', session.id);
+  const streamId = (meta.streamId as string) || null;
+  const artistId = (meta.artistId as string) || null;
+  if (!streamId && !artistId) {
+    console.warn('Tip webhook missing streamId/artistId metadata', session.id);
     return;
   }
   const userId = (meta.tipUserId as string) || null;
@@ -54,6 +55,8 @@ async function recordTip(session: any) {
     .from('tips')
     .upsert({
       stream_id: streamId,
+      artist_id: artistId,
+      kind: artistId ? 'artist' : 'stream',
       user_id: userId,
       display_name: displayName,
       amount_cents: amount,
@@ -78,11 +81,22 @@ async function recordTip(session: any) {
     _amount_cents: amount,
     _occurred_at: new Date().toISOString(),
     _user_id: userId,
-    _metadata: { stream_id: streamId, kind: 'tip' },
+    _metadata: { stream_id: streamId, artist_id: artistId, kind: 'tip' },
   });
 
+  // Direct artist tip → credit the artist's current-month royalty bucket
+  // so they can withdraw via the existing payout flow.
+  if (artistId) {
+    const { error: creditErr } = await supabase.rpc('credit_artist_tip', {
+      _artist_id: artistId,
+      _amount_cents: amount,
+      _source_id: session.id,
+    });
+    if (creditErr) console.error('credit_artist_tip failed', creditErr);
+  }
+
   // Post a system super-chat message in the stream chat so viewers see it.
-  if (userId) {
+  if (userId && streamId) {
     const dollars = (amount / 100).toFixed(2);
     const body = `💎 TIP $${dollars}${message ? ` — ${message}` : ''}`;
     await supabase.from('stream_messages').insert({
