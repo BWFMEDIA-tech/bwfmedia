@@ -727,7 +727,7 @@ function StreamStudio() {
   const [stageLocked, setStageLocked] = useState(false);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
-  const spotlightUserId = useStreamSpotlight(stream?.id ?? undefined);
+  const spotlight = useStreamSpotlight(stream?.id ?? undefined);
   const [thumbOpen, setThumbOpen] = useState(false);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
@@ -1076,7 +1076,7 @@ function StreamStudio() {
                       canManage
                       primaryHostId={auth.user.id}
                       hostTransferMode={hostTransferMode}
-                      spotlightUserId={spotlightUserId}
+                      spotlight={spotlight}
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
                     {streamMode !== "play" && (
