@@ -125,7 +125,7 @@ function ArtistDashboardPage() {
           </Button>
           {!account?.payouts_enabled ? (
             <p className="mt-2 text-xs text-amber-300">
-              <Link to="/settings/payouts" className="underline">Finish Stripe Connect onboarding</Link> to unlock payouts.
+              <Link to="/payouts" className="underline">Finish Stripe Connect onboarding</Link> to unlock payouts.
             </p>
           ) : null}
         </div>
