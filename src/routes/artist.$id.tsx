@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useAudioPeaks } from "@/lib/useAudioPeaks";
 import { FollowersModal } from "@/components/artist/FollowersModal";
 import { SignedImg } from "@/components/ui/signed-img";
+import { TipModal } from "@/components/stream/TipModal";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -93,7 +94,8 @@ function ArtistProfilePage() {
   const { id } = useParams({ from: "/artist/$id" });
   const { data: meta } = useSuspenseQuery(artistMetaOptions(id));
   const [tip, setTip] = useState<number>(5);
-  const { user, isAuthenticated } = useAuth();
+  const auth = useAuth();
+  const { user, isAuthenticated } = auth;
   const isOwner = !!user && user.id === id;
 
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
@@ -132,7 +134,14 @@ function ArtistProfilePage() {
           <ArtistMerchSection userId={id} />
         </div>
         <aside className="space-y-4">
-          <SupportArtist tip={tip} setTip={setTip} />
+          <SupportArtist
+            tip={tip}
+            setTip={setTip}
+            artistId={id}
+            isOwner={isOwner}
+            isAuthenticated={isAuthenticated}
+            auth={auth}
+          />
           {isOwner && <OwnerQuickLinks />}
         </aside>
       </main>
