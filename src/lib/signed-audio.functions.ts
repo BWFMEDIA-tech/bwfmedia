@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
@@ -31,10 +30,20 @@ function extractPath(input: string): string | null {
  * bare storage path.
  */
 export const signAudioUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data: { url: string; expiresIn?: number }) => data)
-  .handler(async ({ data, context }) => {
-    const { userId, supabase } = context;
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let userId: string | null = null;
+    try {
+      const authHeader = getRequestHeader("authorization") ?? "";
+      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+      if (token) {
+        const { data: authData } = await supabaseAdmin.auth.getUser(token);
+        userId = authData.user?.id ?? null;
+      }
+    } catch {
+      userId = null;
+    }
     // Capture request metadata for audit logging.
     let ip: string | null = null;
     let ua: string | null = null;
@@ -46,7 +55,6 @@ export const signAudioUrl = createServerFn({ method: "POST" })
       /* outside request context (tests) */
     }
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const audit = (
       outcome: "allowed" | "denied" | "rate_limited" | "invalid",
       reason: string,
@@ -70,15 +78,17 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     };
 
     // Rate limit: 60 calls / minute per user, 120 / minute per IP.
-    const rl = await supabaseAdmin.rpc("check_rate_limit", {
-      _bucket_key: `u:${userId}`,
-      _action: "sign_audio_url",
-      _max_hits: 60,
-      _window_secs: 60,
-    });
-    if (rl.data && Array.isArray(rl.data) && rl.data[0]?.allowed === false) {
-      audit("rate_limited", "rate_limit_user", null, { retry_after_secs: rl.data[0].retry_after_secs });
-      throw new Response("Too Many Requests", { status: 429 });
+    if (userId) {
+      const rl = await supabaseAdmin.rpc("check_rate_limit", {
+        _bucket_key: `u:${userId}`,
+        _action: "sign_audio_url",
+        _max_hits: 60,
+        _window_secs: 60,
+      });
+      if (rl.data && Array.isArray(rl.data) && rl.data[0]?.allowed === false) {
+        audit("rate_limited", "rate_limit_user", null, { retry_after_secs: rl.data[0].retry_after_secs });
+        throw new Response("Too Many Requests", { status: 429 });
+      }
     }
     if (ip) {
       const rlIp = await supabaseAdmin.rpc("check_rate_limit", {
@@ -106,12 +116,12 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     // Authorization: allow if (a) caller owns the path under play/<userId>/,
     // (b) caller is an admin, or (c) path is referenced by a published
     // play_tracks row (queued/playing) so listeners can stream it.
-    const ownsPath = path.startsWith(`play/${userId}/`);
+    const ownsPath = !!userId && path.startsWith(`play/${userId}/`);
     let authorized = ownsPath;
     let reason = ownsPath ? "owner" : "";
 
     if (!authorized) {
-      const { data: adminCheck } = await supabase.rpc("has_role", {
+      const { data: adminCheck } = await supabaseAdmin.rpc("has_role", {
         _user_id: userId,
         _role: "admin",
       });
@@ -123,10 +133,10 @@ export const signAudioUrl = createServerFn({ method: "POST" })
 
     if (!authorized) {
       // Look up a published track whose audio_url contains this path.
-      const { data: track } = await supabase
+      const { data: track } = await supabaseAdmin
         .from("play_tracks")
         .select("id")
-        .in("status", ["queued", "playing"])
+        .in("status", ["queued", "playing", "completed"])
         .ilike("audio_url", `%${path}%`)
         .limit(1)
         .maybeSingle();
@@ -143,25 +153,29 @@ export const signAudioUrl = createServerFn({ method: "POST" })
 
     // Cap signed URL lifetime to 10 minutes for listener access.
     const expiresIn = Math.min(Math.max(data.expiresIn ?? 600, 60), 60 * 10);
+    const sign = async () => {
+      const { data: signed, error } = await supabaseAdmin.storage
+        .from(BUCKET)
+        .createSignedUrl(path, expiresIn);
+      if (error || !signed?.signedUrl) {
+        audit("denied", "sign_failed", path, { error: error?.message });
+        return { url: null as string | null, expiresIn: 0 };
+      }
+      audit("allowed", reason || "ok", path, { expires_in: expiresIn });
+      return { url: signed.signedUrl, expiresIn };
+    };
+
+    if (!userId) return sign();
+
     // Idempotent per (user, path, 5-minute bucket): duplicate calls within
     // the bucket return the same signed URL instead of minting a new one.
     // The bucket keeps cached URLs comfortably inside the 10-minute expiry.
     const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
     return runIdempotent({
-      supabase,
+      supabase: supabaseAdmin,
       userId,
       key: createIdempotencyKey("sign_audio", `${path}:${expiresIn}:${bucket}`, userId),
       action: "sign_audio",
-      handler: async () => {
-        const { data: signed, error } = await supabaseAdmin.storage
-          .from(BUCKET)
-          .createSignedUrl(path, expiresIn);
-        if (error || !signed?.signedUrl) {
-          audit("denied", "sign_failed", path, { error: error?.message });
-          return { url: null as string | null, expiresIn: 0 };
-        }
-        audit("allowed", reason || "ok", path, { expires_in: expiresIn });
-        return { url: signed.signedUrl, expiresIn };
-      },
+      handler: sign,
     });
   });
