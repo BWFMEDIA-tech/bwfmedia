@@ -295,13 +295,16 @@ export function StageRoom({
             isPrimaryHost={!!primaryHostId && p.user_id === primaryHostId}
             isSelf={!!selfProfile && selfProfile.user_id === p.user_id}
             hostTransferMode={hostTransferMode}
-            spotlightUserId={spotlightUserId}
+            spotlightHostId={spotlight?.host ?? null}
+            spotlightArtistId={spotlight?.artist ?? null}
             onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "This user", mode)}
             onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
             onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
             onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "This user")}
             onToggleMute={() => doToggleMute(p)}
-            onSpotlight={(currentlyPinned) => doSpotlight(p.user_id, p.display_name ?? "Guest", currentlyPinned)}
+            onSpotlight={(slot, currentlyPinned) =>
+              doSpotlight(p.user_id, p.display_name ?? "Guest", slot, currentlyPinned)
+            }
           />
         ))}
         {showSelfHostPlaceholder && (
@@ -345,13 +348,16 @@ export function StageRoom({
               isPrimaryHost={false}
               isSelf={!!selfProfile && selfProfile.user_id === p.user_id}
               hostTransferMode={hostTransferMode}
-              spotlightUserId={spotlightUserId}
+              spotlightHostId={spotlight?.host ?? null}
+              spotlightArtistId={spotlight?.artist ?? null}
               onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Guest", mode)}
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
               onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "Guest")}
               onToggleMute={() => doToggleMute(p)}
-              onSpotlight={(currentlyPinned) => doSpotlight(p.user_id, p.display_name ?? "Guest", currentlyPinned)}
+              onSpotlight={(slot, currentlyPinned) =>
+                doSpotlight(p.user_id, p.display_name ?? "Guest", slot, currentlyPinned)
+              }
             />
           ))}
           {(() => {
