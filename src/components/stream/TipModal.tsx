@@ -13,15 +13,21 @@ const PRESETS = [5, 10, 20, 50];
 
 export function TipModal({
   streamId,
+  artistId,
+  initialAmount,
+  title = "Send a tip",
   auth,
   onClose,
 }: {
-  streamId: string;
+  streamId?: string;
+  artistId?: string;
+  initialAmount?: number;
+  title?: string;
   auth: AuthState;
   onClose: () => void;
 }) {
   const tipFn = useServerFn(createTipCheckout);
-  const [amount, setAmount] = useState(10);
+  const [amount, setAmount] = useState(initialAmount ?? 10);
   const [custom, setCustom] = useState("");
   const [message, setMessage] = useState("");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -38,10 +44,11 @@ export function TipModal({
     const result = await tipFn({
       data: {
         streamId,
+        artistId,
         amountCents: Math.round(finalAmount * 100),
         message: message || undefined,
         displayName: auth.displayName || auth.user?.email || "Anonymous",
-        returnUrl: `${window.location.origin}/stream-studio?tip=success`,
+        returnUrl: `${window.location.origin}${window.location.pathname}?tip=success`,
         environment: getStripeEnvironment(),
       },
     });
@@ -64,7 +71,7 @@ export function TipModal({
           <div className="p-6">
             <div className="mb-1 flex items-center gap-2">
               <Sparkles className="h-4 w-4" style={{ color: PURPLE }} />
-              <h2 className="text-lg font-bold text-white">Send a tip</h2>
+              <h2 className="text-lg font-bold text-white">{title}</h2>
             </div>
             <p className="mb-4 text-xs text-white/50">Support the host. Tips appear in chat as super chats.</p>
 
