@@ -208,6 +208,10 @@ function BattleView({
   // Transient "+N" flash shown over the side that was just voted for. Cleared
   // ~900ms after the click so it doesn't pile up on rapid votes.
   const [flash, setFlash] = useState<{ side: "a" | "b"; n: number; key: number } | null>(null);
+  // Disable vote buttons while a vote request is in-flight to prevent
+  // double-submits from rapid clicks. Cleared after the server confirms
+  // (or rejects) the vote.
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     if (currentRound?.id && optimistic.roundId !== currentRound.id) {
       setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
@@ -290,10 +294,12 @@ function BattleView({
   const bCount = serverBCount + optBCount;
 
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
-  const canVote = votingStatus === "open" && !myVote;
+  const canVote = votingStatus === "open" && !myVote && !submitting;
 
   const vote = async (choice: "a" | "b", useBoost = false) => {
     if (!currentRound) return;
+    if (submitting || myVote) return;
+    setSubmitting(true);
     const bump = useBoost ? 5 : 1;
     // Optimistically move the bar immediately.
     setOptimistic((prev) => {
@@ -325,6 +331,8 @@ function BattleView({
           : prev,
       );
       toast.error(e?.message || "Vote failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
