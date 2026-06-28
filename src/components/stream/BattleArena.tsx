@@ -400,6 +400,7 @@ function BattleView({
           onVote={() => vote("a", false)}
           onSuperVote={() => vote("a", true)}
           overallWinner={match.winner_id === match.artist_a_id}
+          flash={flash && flash.side === "a" ? flash : null}
         />
         <ArtistSide
           side="b"
@@ -425,6 +426,7 @@ function BattleView({
           onVote={() => vote("b", false)}
           onSuperVote={() => vote("b", true)}
           overallWinner={match.winner_id === match.artist_b_id}
+          flash={flash && flash.side === "b" ? flash : null}
         />
       </div>
 
