@@ -571,15 +571,18 @@ export const setStreamSpotlight = createServerFn({ method: "POST" })
       .object({
         streamId: z.string().uuid(),
         targetUserId: z.string().uuid().nullable(),
+        slot: z.enum(["host", "artist"]).default("artist"),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
+    const column =
+      data.slot === "host" ? "spotlight_host_user_id" : "spotlight_user_id";
     const { error } = await supabase
       .from("streams")
-      .update({ spotlight_user_id: data.targetUserId })
+      .update({ [column]: data.targetUserId } as any)
       .eq("id", data.streamId);
     if (error) throw new Error(error.message);
     await logHostAction(supabase, {
@@ -590,8 +593,8 @@ export const setStreamSpotlight = createServerFn({ method: "POST" })
       previousRole: null,
       newRole: null,
       summary: data.targetUserId
-        ? `Spotlighted ${data.targetUserId} to middle panel`
-        : `Cleared middle-panel spotlight`,
+        ? `Spotlighted ${data.targetUserId} to ${data.slot} panel`
+        : `Cleared ${data.slot} spotlight`,
     });
     return { ok: true };
   });
