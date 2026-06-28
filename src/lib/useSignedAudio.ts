@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { signAudioUrl } from "@/lib/signed-audio.functions";
 
 type CacheEntry = { url: string; expiresAt: number };
+type ResolvedState = { source: string | null; url: string | undefined };
 const cache = new Map<string, CacheEntry>();
 const inflight = new Map<string, Promise<string | null>>();
 const TTL_SECONDS = 3600;
@@ -48,18 +49,23 @@ export function useSignedAudioUrl(url: string | null | undefined): string | unde
       ? cached.url
       : undefined
     : (url ?? undefined);
-  const [resolved, setResolved] = useState<string | undefined>(initial);
+  const [resolved, setResolved] = useState<ResolvedState>({ source: url ?? null, url: initial });
 
   useEffect(() => {
-    if (!url) { setResolved(undefined); return; }
-    if (!isPrivateAudioUrl(url)) { setResolved(url); return; }
+    if (!url) { setResolved({ source: null, url: undefined }); return; }
+    if (!isPrivateAudioUrl(url)) { setResolved({ source: url, url }); return; }
     let cancelled = false;
     const hit = cache.get(cacheKey(url));
-    if (hit && hit.expiresAt - REFRESH_BUFFER_MS > Date.now()) { setResolved(hit.url); return; }
-    setResolved(undefined);
-    getSignedAudioUrl(url).then((s) => { if (!cancelled) setResolved(s ?? undefined); });
+    if (hit && hit.expiresAt - REFRESH_BUFFER_MS > Date.now()) {
+      setResolved({ source: url, url: hit.url });
+      return;
+    }
+    setResolved({ source: url, url: undefined });
+    getSignedAudioUrl(url).then((s) => {
+      if (!cancelled) setResolved({ source: url, url: s ?? undefined });
+    });
     return () => { cancelled = true; };
   }, [url]);
 
-  return resolved;
+  return resolved.source === (url ?? null) ? resolved.url : undefined;
 }
