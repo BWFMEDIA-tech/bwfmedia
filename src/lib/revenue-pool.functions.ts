@@ -18,7 +18,7 @@ export const calculateMonthlyRevenuePool = createServerFn({ method: 'POST' })
     await ensureAdmin(context);
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const { data: row, error } = await supabaseAdmin.rpc('calculate_monthly_revenue_pool', {
-      _month: data?.month ?? null,
+      _month: data?.month ?? undefined,
     });
     if (error) throw new Error(error.message);
     return row;
@@ -31,7 +31,7 @@ export const getTotalRevenue = createServerFn({ method: 'GET' })
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
     const { data: rows, error } = await context.supabase.rpc('get_total_revenue', {
-      _month: data?.month ?? null,
+      _month: data?.month ?? undefined,
     });
     if (error) throw new Error(error.message);
     return Array.isArray(rows) ? rows[0] : rows;
