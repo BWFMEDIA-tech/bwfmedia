@@ -6,6 +6,7 @@ import { getStreamByRoom, endStream } from "@/lib/streams.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { LiveEarningsTicker } from "@/components/stream/LiveEarningsTicker";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { GreenRoom } from "@/components/stream/GreenRoom";
@@ -203,6 +204,7 @@ function GuestPage() {
           ) : (
             <>
               <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} />
+              {streamId && <LiveEarningsTicker streamId={streamId} />}
               {streamId && (
                 <StageRoom
                   streamId={streamId}
