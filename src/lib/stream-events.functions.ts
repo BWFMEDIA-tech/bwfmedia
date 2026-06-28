@@ -12,7 +12,7 @@ export const recordStreamEvent = createServerFn({ method: 'POST' })
   }) => data)
   .handler(async ({ data, context }) => {
     const duration = Math.max(0, Math.floor(Number(data.duration_played_seconds) || 0));
-    const { data: row, error } = await context.supabase
+    const { data: row, error } = await (context.supabase as any)
       .from('stream_events')
       .insert({
         user_id: context.userId,
