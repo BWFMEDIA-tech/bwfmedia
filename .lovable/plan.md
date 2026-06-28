@@ -1,108 +1,58 @@
+# Tunevio Subscriptions — Phase 2 (Part A: Subscription System)
 
-# Play Arena — Stage Performance & Overheating Fix
+This plan covers the **Stripe subscription system** only. Revenue-pool payouts (the second half of your prompt) should be a separate phase because they need policy decisions (pool formula, payout cadence, minimum thresholds, Stripe Connect onboarding for artists). I'll ask about that after this ships.
 
-Goal: keep CPU, network, battery, and audio stable when many users join a Play Arena room. Current pain points found in the code:
+## What gets built
 
-- `usePlayQueue` subscribes to **every** `play_votes` row globally (no `stream_id` filter) and re-fetches the entire queue on every change.
-- `play.audience.$room.tsx` and `ImmersivePlayer` each open their own realtime channels and refresh full state on every change.
-- `WaveformBackground` and `ImmersivePlayer` each create their own `AudioContext`, risking two engines per device.
-- No throttle/debounce on incoming events; presence pings are unbounded; animations run even when the tab is hidden.
+### 1. Stripe products & prices (7 plans)
+Created via the payments tool (sandbox auto-syncs to live on publish):
 
-## Scope
+Listener:
+- `listener_premium` — $9.99/mo
+- `listener_fan_premium` — $14.99/mo
+- `listener_student` — $4.99/mo
 
-Only the Play Arena Stage surface: `src/routes/play.$room.tsx`, `src/routes/play.audience.$room.tsx`, `src/components/play/*`, `src/lib/usePlayQueue.ts`, `src/lib/useArenaLive.ts`. No changes to broadcast/stream-studio realtime wiring.
+Artist:
+- `artist_starter` — $9.99/mo (picking top of $5–$10 range; tell me if you want $5)
+- `artist_pro` — $19.99/mo
+- `label_plan` — $99/mo (mid of $49–$199; tell me the exact price you want)
 
-## 1. Snapshot + delta loader
+All prices use Stripe `lookup_key` = the id above so they're stable across sandbox/live.
 
-Add `src/lib/play-arena.functions.ts` with `getPlayArenaSnapshot({ streamId })` (createServerFn, no auth — public read of safe columns) returning:
+### 2. Database (migration)
+Extends the existing `subscriptions` table with:
+- `plan_type` text (e.g. `listener_premium`)
+- `role` text check `('listener','artist')`
+- `price_cents` int
+- `start_date`, `renewal_date` timestamps
 
-```
-{ stream, nowPlaying, queue, votes: { trackId: { up, down, score } }, presenceCount, hostId, audienceCount }
-```
+Keeps existing columns (`stripe_subscription_id`, `stripe_customer_id`, `status`, `environment`, `current_period_*`) — those already cover what your spec calls for.
 
-Replace the multi-query mount logic in `play.audience.$room.tsx` and the queue fetch in `usePlayQueue` with a single snapshot call on join, then attach delta subscriptions (see §3) instead of refetching the whole queue.
+Adds a `has_active_tunevio_subscription(user_id, role)` SQL helper for gating.
 
-## 2. Stage Join Gateway (role-scoped subscriptions)
+### 3. Server functions (`src/lib/tunevio-subscriptions.functions.ts`)
+- `createTunevioCheckout({ planId, returnUrl, environment })` — embedded Stripe Checkout, resolves Customer by `metadata.userId`, sets `subscription_data.metadata = { userId, planId, role }`.
+- `createTunevioPortal({ returnUrl, environment })` — Stripe Billing Portal so users can cancel/upgrade.
+- `getMyTunevioSubscription()` — returns current row scoped by env.
 
-New hook `src/lib/useStageGateway.ts` accepting `{ streamId, role }` where role is derived once:
+All protected by `requireSupabaseAuth`. All Stripe calls go through the existing `createStripeClient` gateway.
 
-```
-role = isHost ? "host"
-     : auth.user ? "voter"
-     : "viewer"
-```
+### 4. Webhook handler
+Extends `src/routes/api/public/payments/webhook.ts` to handle:
+- `customer.subscription.created` / `.updated` / `.deleted` → upsert into `subscriptions` with `plan_type` / `role` resolved from `lookup_key`.
+- `invoice.paid` → bump `renewal_date` / log.
 
-The gateway returns a channel handle and decides what to subscribe to:
+Signature verification, idempotent upsert on `stripe_subscription_id`, env-scoped.
 
-| Role     | now_playing | queue (delta) | votes (delta) | presence | host controls |
-|----------|-------------|---------------|---------------|----------|---------------|
-| viewer   | ✅          | ❌ snapshot only | ❌ throttled counts only | heartbeat only | ❌ |
-| voter    | ✅          | ✅            | ✅ (own + aggregate) | heartbeat | ❌ |
-| host     | ✅          | ✅            | ✅            | full     | ✅ |
+### 5. UI
+- `/pricing` route — two tabs (Listeners / Artists), 6 plan cards, "Subscribe" button opens embedded checkout in a modal.
+- `/checkout/return` already exists; reused.
+- "Manage subscription" button in settings → opens Stripe portal in new tab.
 
-Replaces ad-hoc `supabase.channel()` calls in `usePlayQueue`, `play.audience.$room.tsx`, and `ImmersivePlayer` with one consolidated channel per room per tab. Removes the global `play_votes` subscription entirely.
+## Out of scope (next phase)
+- Revenue pool calculation, per-stream payouts, Stripe Connect for artist payouts, payout cadence/thresholds, ad-supported free tier accounting. I'll plan that separately once you confirm the pool formula.
 
-## 3. Throttle + batch realtime events
-
-Server side: add a Postgres function `arena_broadcast_tick(stream_id)` triggered by `pg_cron` every 500 ms that aggregates the last interval's votes and queue moves, then sends one Realtime broadcast message per stream on channel `arena:<stream_id>` with shape `{ type: "tick", votes, queueOps }`. Existing per-row `postgres_changes` listeners on `play_tracks` / `play_votes` are dropped for non-host roles.
-
-Client side throttles regardless:
-
-- Votes → `requestAnimationFrame`-coalesced reducer, max 1 update / 200 ms.
-- Queue → debounce 1 s.
-- Presence → `useStagePresence`'s heartbeat raised to 15 s; remove per-keystroke pings.
-
-## 4. Render isolation
-
-Split `play.$room.tsx`/`play.audience.$room.tsx` content into three memoized islands so a vote update doesn't re-render the player:
-
-- `<NowPlayingIsland />` — track + waveform, subscribed to `nowPlaying` slice.
-- `<VotingIsland />` — vote counts + buttons, subscribed to `votes` slice.
-- `<QueueIsland />` — upcoming list, subscribed to `queue` slice.
-
-Implemented with a Zustand store (`src/lib/play-arena-store.ts`) so each island uses `useStore(s => s.slice)` with `shallow` and renders independently. Wrap heavy children in `React.memo`. `WaveformBackground` already memoizable — add `React.memo` + prop equality.
-
-## 5. Single audio engine
-
-Move `AudioContext` creation out of `ImmersivePlayer` and `WaveformBackground` into the existing `src/lib/media-engine/MediaEngine.ts` singleton. New helper `useSharedAudioGraph(audioElement)` returns `{ ctx, analyser }` from the singleton; both components consume it. Guard against React StrictMode double-init with a module-level ref.
-
-## 6. Visibility-aware animation
-
-`WaveformBackground` and any rAF-driven UI:
-
-- Pause the rAF loop when `document.hidden` (visibilitychange listener).
-- Pause when the `<canvas>` is not in viewport (IntersectionObserver, `threshold: 0`).
-- Honor `navigator.connection?.saveData` and `matchMedia('(prefers-reduced-motion: reduce)')` → render a static gradient instead of animating.
-
-## 7. Load protection / lite mode
-
-In `useStageGateway`, read `audienceCount` from snapshot + presence tick. If `audienceCount > 75` OR client is a `viewer`, enable **lite mode**:
-
-- Switch the broadcast tick consumer to 1 s instead of 500 ms.
-- Skip waveform animation; show static art instead.
-- Drop the per-vote optimistic reducer; only apply tick aggregates.
-
-Expose `useStageMode()` so islands can adapt (e.g. `VotingIsland` shows a count-only view in lite mode).
-
-## Technical details
-
-- New files:
-  - `src/lib/play-arena.functions.ts` — `getPlayArenaSnapshot` server fn (public, narrow columns).
-  - `src/lib/useStageGateway.ts` — role-aware subscription hook.
-  - `src/lib/play-arena-store.ts` — Zustand store with `nowPlaying`, `queue`, `votes`, `presence`, `mode` slices.
-  - `src/lib/useSharedAudioGraph.ts` — wraps `MediaEngine` singleton.
-  - `supabase/migrations/<ts>_arena_broadcast_tick.sql` — `arena_broadcast_tick(stream_id uuid)` function + pg_cron job per active room (started on `streams` → live, stopped on ended).
-- Edited files:
-  - `src/lib/usePlayQueue.ts` — replace direct subscriptions with gateway.
-  - `src/routes/play.$room.tsx`, `src/routes/play.audience.$room.tsx` — load snapshot, mount islands, drop per-row channels.
-  - `src/components/play/ImmersivePlayer.tsx` — use shared audio graph; remove its own `AudioContext` + `postgres_changes` listeners.
-  - `src/components/play/WaveformBackground.tsx` — shared audio graph + visibility/IntersectionObserver pause.
-- Realtime channel naming: one channel per stream `arena:<streamId>` carrying typed broadcast messages; the old direct table subscriptions stay only for the host's studio view.
-- Backwards compat: snapshot endpoint returns the same shapes the islands need; legacy hooks (`usePlayQueue`) keep their public API by reading from the store under the hood.
-- Tests: extend `MediaEngine.test.ts` with a "shared graph reused across two components" case; add a smoke test that a viewer mount opens exactly one Realtime channel.
-
-## Out of scope
-
-- Battle Arena, Stream Studio host view, stage rooms outside Play Arena.
-- Changing LiveKit audio (already singleton inside `StageAudioShell`).
-- Backend rewrite of vote/tip flow — only the broadcast layer changes.
+## Questions before I build
+1. **Artist Starter price** — $5, $7.99, or $9.99?
+2. **Label Plan price** — pick one: $49, $99, $199?
+3. **Free listener tier** — do we create a `listener_free` row in the DB on signup, or just treat "no subscription row" as free? (Recommend: no row = free, simpler.)
