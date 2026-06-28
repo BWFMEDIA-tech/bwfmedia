@@ -206,3 +206,125 @@ export const requestPayout = createServerFn({ method: "POST" })
     if (insErr) return { error: insErr.message };
     return { ok: true, amount_cents: available };
   });
+
+/* =========================================================
+ * Phase 3.3–3.5: Royalty earnings + auto-payout
+ * ========================================================= */
+
+/** Live royalty earnings summary for the signed-in artist. */
+export const getMyRoyaltyEarnings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const [summaryRes, monthsRes] = await Promise.all([
+      supabase.rpc("get_artist_earnings_summary", { _artist_id: userId }),
+      supabase
+        .from("artist_royalties")
+        .select("month, weighted_streams, raw_streams, share_pct, payout_amount_cents, status, paid_at")
+        .eq("artist_id", userId)
+        .order("month", { ascending: false })
+        .limit(12),
+    ]);
+    return {
+      summary: summaryRes.data ?? null,
+      months: monthsRes.data ?? [],
+    };
+  });
+
+/** Toggle the artist's monthly auto-payout preference. */
+export const setAutoPayout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { enabled: boolean; minimumPayoutCents?: number }) => data)
+  .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
+    const { supabase, userId } = context;
+    const env = resolveEnv();
+    const min = Math.max(
+      MIN_PAYOUT_CENTS,
+      Math.floor(Number(data.minimumPayoutCents ?? MIN_PAYOUT_CENTS) || MIN_PAYOUT_CENTS),
+    );
+    const { error } = await supabase
+      .from("payout_accounts")
+      .update({ auto_payout_enabled: !!data.enabled, minimum_payout_cents: min })
+      .eq("user_id", userId)
+      .eq("environment", env);
+    if (error) return { error: error.message };
+    return { ok: true };
+  });
+
+/** Queue a payout for the artist's approved royalty balance. */
+export const requestRoyaltyPayout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ ok: true; amount_cents: number } | { error: string }> => {
+    const { supabase, userId } = context;
+    const env = resolveEnv();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: acct } = await supabase
+      .from("payout_accounts")
+      .select("id, payouts_enabled, default_currency, minimum_payout_cents")
+      .eq("user_id", userId)
+      .eq("environment", env)
+      .maybeSingle();
+    if (!acct) return { error: "Set up your payout account first." };
+    if (!acct.payouts_enabled)
+      return { error: "Your payout account isn't approved yet. Finish onboarding." };
+
+    const { data: summary } = await supabase.rpc("get_artist_earnings_summary", {
+      _artist_id: userId,
+    });
+    const available = Number((summary as any)?.available_cents ?? 0);
+    const minimum = Number(acct.minimum_payout_cents ?? MIN_PAYOUT_CENTS);
+    if (available < minimum) {
+      return {
+        error: `Minimum payout is $${(minimum / 100).toFixed(2)}. You have $${(available / 100).toFixed(2)} available.`,
+      };
+    }
+
+    const { data: inserted, error: insErr } = await supabaseAdmin
+      .from("payout_requests")
+      .insert({
+        user_id: userId,
+        payout_account_id: acct.id,
+        environment: env,
+        amount_cents: available,
+        currency: (acct.default_currency as string) ?? "usd",
+        status: "queued",
+        metadata: { source: "royalty" } as any,
+      })
+      .select("id")
+      .maybeSingle();
+    if (insErr) return { error: insErr.message };
+
+    // Link approved royalties to this request so the cron knows what's settling.
+    if (inserted?.id) {
+      await supabaseAdmin
+        .from("artist_royalties")
+        .update({ payout_request_id: inserted.id })
+        .eq("artist_id", userId)
+        .eq("status", "approved")
+        .is("payout_request_id", null);
+    }
+    return { ok: true, amount_cents: available };
+  });
+
+/** Admin: recompute weighted-stream royalties for a given month. */
+export const runRoyaltyCalculation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { month?: string } | undefined) => data ?? {})
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc("calculate_artist_royalties", {
+      _month: data?.month ?? null,
+    });
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return {
+      artists_paid: Number((row as any)?.artists_paid ?? 0),
+      total_payout_cents: Number((row as any)?.total_payout_cents ?? 0),
+    };
+  });
