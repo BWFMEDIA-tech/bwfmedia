@@ -187,16 +187,19 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
-  const spotlightUserId = useStreamSpotlight(streamId);
+  const spotlight = useStreamSpotlight(streamId);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host";
   const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [] };
   for (const t of cameraTracks) {
     const id = t.participant?.identity ?? "";
-    // Spotlight override: pin a specific participant to the middle panel
-    // exclusively, regardless of their stage role.
-    if (spotlightUserId && id === spotlightUserId) {
+    // Spotlight overrides: pin a participant exclusively to a panel.
+    if (spotlight.host && id === spotlight.host) {
+      buckets.admin.push(t);
+      continue;
+    }
+    if (spotlight.artist && id === spotlight.artist) {
       buckets.middle.push(t);
       continue;
     }
@@ -207,9 +210,9 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         : role === "host" || role === "cohost" || role === "co_host"
           ? "host"
           : "middle"; // artist | guest | listener | speaker | unknown
-    // While a spotlight is active, suppress the middle "catch-all" so only
-    // the pinned participant shows in the middle box.
-    if (spotlightUserId && panel === "middle") continue;
+    // When a spotlight is active for a panel, suppress catch-alls there.
+    if (spotlight.artist && panel === "middle") continue;
+    if (spotlight.host && panel === "admin") continue;
     buckets[panel].push(t);
   }
   // Priority: active speaker first within each bucket.
@@ -232,7 +235,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         {panel === "middle" && showHostTools && streamId && (
           <SpotlightControls
             streamId={streamId}
-            spotlightUserId={spotlightUserId}
+            spotlightUserId={spotlight.artist}
             participants={participants}
             profiles={profiles}
           />
