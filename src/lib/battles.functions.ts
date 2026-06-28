@@ -268,8 +268,12 @@ export const castBattleVote = createServerFn({ method: "POST" })
     // success). Default weight is 1.
     let weight = 1;
     if (data.useBoost) {
-      const { data: ok } = await supabase.rpc("consume_play_boost_credit");
-      if (ok === true) weight = 5;
+      const { error: spendErr } = await supabase.rpc("spend_boost_credit", {
+        _reason: "spend_boost",
+        _reference_id: data.roundId,
+        _amount: 1,
+      });
+      if (!spendErr) weight = 5;
     }
 
     const { data: vote, error } = await supabase
