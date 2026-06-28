@@ -22,7 +22,7 @@ export const getPayoutOverview = createServerFn({ method: "GET" })
       supabase
         .from("payout_accounts")
         .select(
-          "charges_enabled, payouts_enabled, details_submitted, country, default_currency, requirements, updated_at",
+          "charges_enabled, payouts_enabled, details_submitted, country, default_currency, requirements, updated_at, auto_payout_enabled, minimum_payout_cents",
         )
         .eq("user_id", userId)
         .eq("environment", env)
