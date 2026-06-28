@@ -38,6 +38,7 @@ export function BattleArena({
   const [myVote, setMyVote] = useState<"a" | "b" | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [voteFlash, setVoteFlash] = useState<{ side: "a" | "b"; n: number; key: number } | null>(null);
 
   // Single source of truth: the Battle Engine room state. Realtime row changes
   // on battle_matches / battle_rounds simply trigger a re-fetch; we never
