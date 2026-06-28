@@ -53,7 +53,7 @@ function AdminCancellationEmails() {
   const isAdmin = auth.roles.includes('admin');
 
   useEffect(() => {
-    if (!auth.loading && !isAdmin) navigate({ to: '/' });
+    if (!auth.loading && !auth.rolesLoading && !isAdmin) navigate({ to: '/' });
   }, [auth.loading, isAdmin]);
 
   const refresh = useCallback(async () => {

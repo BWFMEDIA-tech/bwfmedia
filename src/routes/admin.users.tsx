@@ -42,7 +42,7 @@ function AdminUsersPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (!auth.loading && !isAdmin) navigate({ to: "/access-denied" });
+    if (!auth.loading && !auth.rolesLoading && !isAdmin) navigate({ to: "/access-denied" });
   }, [auth.loading, isAdmin, navigate]);
 
   const load = async () => {

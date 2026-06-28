@@ -50,7 +50,7 @@ function OpsFeedPage() {
   const seenRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!auth.loading && !isAdmin) navigate({ to: "/access-denied" });
+    if (!auth.loading && !auth.rolesLoading && !isAdmin) navigate({ to: "/access-denied" });
   }, [auth.loading, isAdmin, navigate]);
 
   useEffect(() => {
