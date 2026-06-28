@@ -2132,6 +2132,48 @@ export type Database = {
           },
         ]
       }
+      revenue_ledger: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json
+          month: string
+          processed: boolean
+          source_id: string
+          source_type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json
+          month: string
+          processed?: boolean
+          source_id: string
+          source_type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json
+          month?: string
+          processed?: boolean
+          source_id?: string
+          source_type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       revenue_pool_entries: {
         Row: {
           amount_cents: number
@@ -2392,36 +2434,60 @@ export type Database = {
           client_session_id: string | null
           created_at: string
           duration_played_seconds: number
+          engagement_score: number
+          full_listen: boolean
           id: string
+          liked: boolean
           metadata: Json
+          saved: boolean
+          shared: boolean
           stream_environment: string
           track_id: string
           user_id: string | null
+          user_multiplier: number
+          user_tier: string
           valid_stream: boolean
+          weighted_value: number
         }
         Insert: {
           artist_id?: string | null
           client_session_id?: string | null
           created_at?: string
           duration_played_seconds?: number
+          engagement_score?: number
+          full_listen?: boolean
           id?: string
+          liked?: boolean
           metadata?: Json
+          saved?: boolean
+          shared?: boolean
           stream_environment?: string
           track_id: string
           user_id?: string | null
+          user_multiplier?: number
+          user_tier?: string
           valid_stream?: boolean
+          weighted_value?: number
         }
         Update: {
           artist_id?: string | null
           client_session_id?: string | null
           created_at?: string
           duration_played_seconds?: number
+          engagement_score?: number
+          full_listen?: boolean
           id?: string
+          liked?: boolean
           metadata?: Json
+          saved?: boolean
+          shared?: boolean
           stream_environment?: string
           track_id?: string
           user_id?: string | null
+          user_multiplier?: number
+          user_tier?: string
           valid_stream?: boolean
+          weighted_value?: number
         }
         Relationships: [
           {
@@ -3595,6 +3661,17 @@ export type Database = {
           _reference_id?: string
           _reference_type?: string
           _source: string
+          _user_id?: string
+        }
+        Returns: string
+      }
+      record_revenue_ledger: {
+        Args: {
+          _amount_cents: number
+          _metadata?: Json
+          _occurred_at?: string
+          _source_id: string
+          _source_type: string
           _user_id?: string
         }
         Returns: string
