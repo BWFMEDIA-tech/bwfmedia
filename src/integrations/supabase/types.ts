@@ -3658,6 +3658,7 @@ export type Database = {
       get_my_profile_interests: { Args: never; Returns: string[] }
       get_my_profile_location: { Args: never; Returns: string }
       get_or_create_profile_stream: { Args: never; Returns: string }
+      get_revenue_pool_total: { Args: { _month?: string }; Returns: number }
       get_stream_anomaly_summary: { Args: { _days?: number }; Returns: Json }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }
