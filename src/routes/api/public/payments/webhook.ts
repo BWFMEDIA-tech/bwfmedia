@@ -184,6 +184,90 @@ async function markArtistSubscriptionDeleted(sub: any, env: StripeEnv) {
   if (error) console.error('artist subscriptions cancel failed', error);
 }
 
+const TUNEVIO_PLAN_META: Record<string, { role: 'listener' | 'artist'; priceCents: number }> = {
+  listener_premium:     { role: 'listener', priceCents:  999 },
+  listener_fan_premium: { role: 'listener', priceCents: 1499 },
+  listener_student:     { role: 'listener', priceCents:  499 },
+  artist_starter:       { role: 'artist',   priceCents:  999 },
+  artist_pro:           { role: 'artist',   priceCents: 1999 },
+  label_plan:           { role: 'artist',   priceCents: 9900 },
+};
+
+async function upsertTunevioSubscription(sub: any, env: StripeEnv) {
+  const userId = sub?.metadata?.userId as string | undefined;
+  if (!userId) { console.warn('tunevio sub missing userId', sub?.id); return; }
+  const item = sub.items?.data?.[0];
+  const lookupKey: string | undefined = item?.price?.lookup_key
+    || item?.price?.metadata?.lovable_external_id
+    || (sub?.metadata?.planId as string | undefined);
+  const planMeta = lookupKey ? TUNEVIO_PLAN_META[lookupKey] : undefined;
+  const role = (sub?.metadata?.role as string | undefined) || planMeta?.role || null;
+  const productId = typeof item?.price?.product === 'string'
+    ? item.price.product
+    : item?.price?.product?.id;
+  const periodStart = item?.current_period_start ?? sub.current_period_start;
+  const periodEnd = item?.current_period_end ?? sub.current_period_end;
+  const trialEnd = sub.trial_end ?? null;
+  const startTs = sub.start_date ?? sub.created ?? periodStart;
+  const priceCents = planMeta?.priceCents ?? item?.price?.unit_amount ?? null;
+  const supabase = getSupabase();
+  const { error } = await supabase.from('subscriptions').upsert({
+    user_id: userId,
+    stripe_subscription_id: sub.id,
+    stripe_customer_id: sub.customer,
+    product_id: productId ?? `tunevio_${lookupKey ?? 'unknown'}`,
+    price_id: lookupKey ?? 'tunevio_unknown',
+    plan_type: lookupKey ?? null,
+    role,
+    price_cents: priceCents,
+    start_date: startTs ? new Date(startTs * 1000).toISOString() : null,
+    renewal_date: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    status: sub.status ?? 'active',
+    current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    trial_end: trialEnd ? new Date(trialEnd * 1000).toISOString() : null,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    environment: env,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'stripe_subscription_id' });
+  if (error) console.error('tunevio subscriptions upsert failed', error);
+}
+
+async function markTunevioSubscriptionDeleted(sub: any, env: StripeEnv) {
+  const supabase = getSupabase();
+  const periodEnd = sub.items?.data?.[0]?.current_period_end ?? sub.current_period_end;
+  const { error } = await supabase
+    .from('subscriptions')
+    .update({
+      status: 'canceled',
+      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      renewal_date: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      cancel_at_period_end: !!sub.cancel_at_period_end,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_subscription_id', sub.id)
+    .eq('environment', env);
+  if (error) console.error('tunevio subscriptions cancel failed', error);
+}
+
+async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
+  const subId = invoice?.subscription as string | undefined;
+  if (!subId) return;
+  const periodEnd = invoice?.lines?.data?.[0]?.period?.end;
+  if (!periodEnd) return;
+  const supabase = getSupabase();
+  await supabase
+    .from('subscriptions')
+    .update({
+      status: 'active',
+      current_period_end: new Date(periodEnd * 1000).toISOString(),
+      renewal_date: new Date(periodEnd * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_subscription_id', subId)
+    .eq('environment', env);
+}
+
 function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
   if (meta.kind === 'tip') return recordTip(session);
@@ -224,7 +308,18 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
                 } else {
                   await upsertArtistSubscription(sub, env);
                 }
+              } else if (sub?.metadata?.kind === 'tunevio_subscription') {
+                if (event.type === 'customer.subscription.deleted') {
+                  await markTunevioSubscriptionDeleted(sub, env);
+                } else {
+                  await upsertTunevioSubscription(sub, env);
+                }
               }
+              break;
+            }
+            case 'invoice.paid': {
+              const inv: any = event.data.object;
+              await bumpTunevioRenewalFromInvoice(inv, env);
               break;
             }
             case 'checkout.session.expired': {

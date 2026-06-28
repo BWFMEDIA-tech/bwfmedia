@@ -22,6 +22,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PayoutsRouteImport } from './routes/payouts'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
@@ -186,6 +187,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayoutsRoute = PayoutsRouteImport.update({
@@ -728,6 +734,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/payouts': typeof PayoutsRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -842,6 +849,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/payouts': typeof PayoutsRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -958,6 +966,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
   '/payouts': typeof PayoutsRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/recordings': typeof RecordingsRoute
@@ -1075,6 +1084,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/off-the-block'
     | '/payouts'
+    | '/pricing'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1189,6 +1199,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/off-the-block'
     | '/payouts'
+    | '/pricing'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1304,6 +1315,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/off-the-block'
     | '/payouts'
+    | '/pricing'
     | '/privacy'
     | '/profile'
     | '/recordings'
@@ -1420,6 +1432,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
   PayoutsRoute: typeof PayoutsRoute
+  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RecordingsRoute: typeof RecordingsRoute
@@ -1562,6 +1575,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payouts': {
@@ -2397,6 +2417,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,
   PayoutsRoute: PayoutsRoute,
+  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RecordingsRoute: RecordingsRoute,
