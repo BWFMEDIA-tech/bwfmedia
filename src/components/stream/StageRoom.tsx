@@ -51,7 +51,7 @@ export function StageRoom({
   selfProfile,
   primaryHostId,
   hostTransferMode = "co_host",
-  spotlightUserId,
+  spotlight,
 }: {
   streamId: string | null;
   participants: StageParticipant[];
@@ -59,7 +59,7 @@ export function StageRoom({
   selfProfile?: { user_id: string; display_name?: string | null; avatar_url?: string | null } | null;
   primaryHostId?: string | null;
   hostTransferMode?: "co_host" | "transfer";
-  spotlightUserId?: string | null;
+  spotlight?: { host: string | null; artist: string | null };
 }) {
   const setRole = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
@@ -193,16 +193,27 @@ export function StageRoom({
     }
   };
 
-  const doSpotlight = async (uid: string, name: string, currentlyPinned: boolean) => {
+  const doSpotlight = async (
+    uid: string,
+    name: string,
+    slot: "host" | "artist",
+    currentlyPinned: boolean,
+  ) => {
     if (!streamId) return;
     try {
       await setSpotlight({
         data: {
           streamId,
           targetUserId: currentlyPinned ? null : uid,
+          slot,
         },
       });
-      toast.success(currentlyPinned ? `${name ?? "Guest"} removed from video box` : `${name ?? "Guest"} moved to video box`);
+      const label = slot === "host" ? "host box" : "artist video box";
+      toast.success(
+        currentlyPinned
+          ? `${name ?? "Guest"} removed from ${label}`
+          : `${name ?? "Guest"} moved to ${label}`,
+      );
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
