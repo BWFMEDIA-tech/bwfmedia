@@ -2449,15 +2449,66 @@ export type Database = {
         }
         Relationships: []
       }
+      stream_anomaly_flags: {
+        Row: {
+          anomaly_score: number
+          artist_id: string | null
+          bot_score: number
+          created_at: string
+          id: string
+          metadata: Json
+          reasons: string[]
+          stream_event_id: string | null
+          track_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anomaly_score?: number
+          artist_id?: string | null
+          bot_score?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reasons?: string[]
+          stream_event_id?: string | null
+          track_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anomaly_score?: number
+          artist_id?: string | null
+          bot_score?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reasons?: string[]
+          stream_event_id?: string | null
+          track_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_anomaly_flags_stream_event_id_fkey"
+            columns: ["stream_event_id"]
+            isOneToOne: false
+            referencedRelation: "stream_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_events: {
         Row: {
+          anomaly_reasons: string[]
+          anomaly_score: number
           artist_id: string | null
+          bot_score: number
           client_session_id: string | null
           created_at: string
           duration_played_seconds: number
           engagement_score: number
           full_listen: boolean
           id: string
+          is_suspicious: boolean
           liked: boolean
           metadata: Json
           saved: boolean
@@ -2471,13 +2522,17 @@ export type Database = {
           weighted_value: number
         }
         Insert: {
+          anomaly_reasons?: string[]
+          anomaly_score?: number
           artist_id?: string | null
+          bot_score?: number
           client_session_id?: string | null
           created_at?: string
           duration_played_seconds?: number
           engagement_score?: number
           full_listen?: boolean
           id?: string
+          is_suspicious?: boolean
           liked?: boolean
           metadata?: Json
           saved?: boolean
@@ -2491,13 +2546,17 @@ export type Database = {
           weighted_value?: number
         }
         Update: {
+          anomaly_reasons?: string[]
+          anomaly_score?: number
           artist_id?: string | null
+          bot_score?: number
           client_session_id?: string | null
           created_at?: string
           duration_played_seconds?: number
           engagement_score?: number
           full_listen?: boolean
           id?: string
+          is_suspicious?: boolean
           liked?: boolean
           metadata?: Json
           saved?: boolean
@@ -3599,6 +3658,7 @@ export type Database = {
       get_my_profile_interests: { Args: never; Returns: string[] }
       get_my_profile_location: { Args: never; Returns: string }
       get_or_create_profile_stream: { Args: never; Returns: string }
+      get_stream_anomaly_summary: { Args: { _days?: number }; Returns: Json }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }
         Returns: {
