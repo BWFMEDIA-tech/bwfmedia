@@ -195,11 +195,15 @@ export async function runBattleEvent(
           .select("id, artist_user_id")
           .eq("stream_id", m.stream_id)
           .eq("status", "playing");
-        if (nowPlaying && nowPlaying.length) {
+        // Exclude the target track from the demote sweep — otherwise we'd
+        // flip it to "completed" and then the (stale-snapshot) guard below
+        // would skip the re-promote, leaving the player with no playing row.
+        const toDemote = (nowPlaying ?? []).filter((t: any) => t.id !== trackId);
+        if (toDemote.length) {
           await supabase
             .from("play_tracks")
             .update({ status: "completed" })
-            .in("id", nowPlaying.map((t: any) => t.id));
+            .in("id", toDemote.map((t: any) => t.id));
         }
         if (m.active_side && m.active_side !== side) {
           const stampCol =
@@ -210,19 +214,15 @@ export async function runBattleEvent(
             .eq("id", round.id);
         }
 
-        // Mark this track playing. Use an unconditional flip (except when
-        // it's already playing) so re-pressing "Play <Artist>" after a
-        // STOP_TRACK — which demotes the track to "completed" — still
-        // wakes the Play Arena player. Without this, the play_tracks row
-        // stays "completed", `usePlayQueue` never sees a `playing` row,
-        // and ImmersivePlayer has nothing to load.
-        if (track.status !== "playing") {
-          const { error: upErr } = await supabase
-            .from("play_tracks")
-            .update({ status: "playing" })
-            .eq("id", trackId!);
-          if (upErr) throw new Error(upErr.message);
-        }
+        // Unconditionally mark this track playing. This is idempotent and
+        // also forces a row UPDATE event over realtime even when the row
+        // was already "playing" — which is what wakes the ImmersivePlayer
+        // when the host re-presses "Play <Artist>" to restart the track.
+        const { error: upErr } = await supabase
+          .from("play_tracks")
+          .update({ status: "playing", updated_at: new Date().toISOString() } as any)
+          .eq("id", trackId!);
+        if (upErr) throw new Error(upErr.message);
         const trackCol = side === "a" ? "a_playing_track_id" : "b_playing_track_id";
         await supabase
           .from("battle_rounds")
