@@ -116,6 +116,7 @@ function AdminProfilePage() {
                 { label: "Content Management", desc: "Manage all platform content", to: "/admin/content" },
                 { label: "Live Stream Control", desc: "Monitor and control streams", to: "/admin/streams" },
                 { label: "Financial Management", desc: "View and manage finances", to: "/admin/transactions" },
+                { label: "Revenue Pool", desc: "Monthly pool & 75/20/5 split", to: "/admin/revenue" },
                 { label: "System Settings", desc: "Configure platform settings", to: "/admin/settings" },
                 { label: "Reports & Analytics", desc: "Access all reports and data", to: "/admin/analytics" },
               ].map((perm) => (

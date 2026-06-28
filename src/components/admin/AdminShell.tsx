@@ -61,6 +61,7 @@ const NAV: NavEntry[] = [
   { kind: "link", to: "/admin/settings", label: "Platform Settings", icon: Settings },
   { kind: "link", to: "/admin/users", label: "User Management", icon: Users },
   { kind: "link", to: "/admin/analytics", label: "Revenue & Reporting", icon: BarChart3 },
+  { kind: "link", to: "/admin/revenue", label: "Revenue Pool", icon: BarChart3 },
   {
     kind: "group", key: "trust", label: "Trust & Safety", icon: ShieldCheck,
     children: [
