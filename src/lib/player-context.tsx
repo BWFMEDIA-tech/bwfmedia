@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { getSignedAudioUrl } from "@/lib/useSignedAudio";
 
 export interface PlayerTrack {
   id: string;
@@ -42,6 +43,7 @@ const Ctx = createContext<PlayerApi | null>(null);
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stateRef = useRef<PlayerState | null>(null);
+  const playTokenRef = useRef(0);
   const [state, setState] = useState<PlayerState>({
     track: null,
     queue: [],
@@ -57,6 +59,20 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const previewLimitHandlerRef = useRef<(() => void) | null>(null);
   const setPreviewLimitHandler = useCallback((fn: (() => void) | null) => {
     previewLimitHandlerRef.current = fn;
+  }, []);
+
+  const playAudio = useCallback(async (track: PlayerTrack) => {
+    const a = audioRef.current;
+    if (!a) return;
+    const token = ++playTokenRef.current;
+    const src = (await getSignedAudioUrl(track.audioUrl)) ?? track.audioUrl;
+    if (token !== playTokenRef.current || audioRef.current !== a) return;
+    if (a.src !== src) a.src = src;
+    try {
+      await a.play();
+    } catch {
+      setState((p) => ({ ...p, isPlaying: false }));
+    }
   }, []);
 
   // lazy create audio element on client
@@ -86,7 +102,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       const idx = s.queue.findIndex((t) => t.id === s.track?.id);
       const nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
       if (nxt) {
-        a.src = nxt.audioUrl; a.play().catch(() => {});
+        void playAudio(nxt);
         setState((p) => ({ ...p, track: nxt, progress: 0, isPlaying: true }));
       } else {
         setState((p) => ({ ...p, isPlaying: false }));
@@ -107,25 +123,24 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       a.removeEventListener("pause", onPause);
       a.removeEventListener("ended", onEnd);
     };
-  }, []);
+  }, [playAudio]);
 
   const play = useCallback((track?: PlayerTrack, queue?: PlayerTrack[]) => {
     const a = audioRef.current; if (!a) return;
     const s = stateRef.current!;
     const t = track ?? s.track; if (!t) return;
     const nextQueue = queue ?? (s.queue.length ? s.queue : [t]);
-    if (a.src !== t.audioUrl) { a.src = t.audioUrl; }
-    a.play().catch(() => { setState((p) => ({ ...p, isPlaying: false })); });
+    void playAudio(t);
     setState((p) => ({ ...p, track: t, queue: nextQueue, isPlaying: true, progress: 0 }));
-  }, []);
+  }, [playAudio]);
 
   const pause = useCallback(() => { audioRef.current?.pause(); }, []);
 
   const toggle = useCallback(() => {
     const a = audioRef.current; const s = stateRef.current;
     if (!a || !s?.track) return;
-    if (a.paused) { a.play().catch(() => {}); } else { a.pause(); }
-  }, []);
+    if (a.paused) { void playAudio(s.track); } else { a.pause(); }
+  }, [playAudio]);
 
   const next = useCallback(() => {
     const a = audioRef.current; const s = stateRef.current;
@@ -140,9 +155,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
     }
     if (!nxt) return;
-    a.src = nxt.audioUrl; a.play().catch(() => {});
+    void playAudio(nxt);
     setState((p) => ({ ...p, track: nxt, isPlaying: true, progress: 0 }));
-  }, []);
+  }, [playAudio]);
 
   const prev = useCallback(() => {
     const a = audioRef.current; const s = stateRef.current;
@@ -152,9 +167,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const idx = s.queue.findIndex((t) => t.id === s.track?.id);
     const prv = s.queue[idx - 1] ?? (s.repeat === "all" ? s.queue[s.queue.length - 1] : s.queue[0]);
     if (!prv) return;
-    a.src = prv.audioUrl; a.play().catch(() => {});
+    void playAudio(prv);
     setState((p) => ({ ...p, track: prv, isPlaying: true, progress: 0 }));
-  }, []);
+  }, [playAudio]);
 
   const seek = useCallback((sec: number) => { const a = audioRef.current; if (a) { a.currentTime = sec; setState((s) => ({ ...s, progress: sec })); } }, []);
   const setVolume = useCallback((v: number) => { const a = audioRef.current; if (a) a.volume = v; setState((s) => ({ ...s, volume: v })); }, []);

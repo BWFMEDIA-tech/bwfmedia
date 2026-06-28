@@ -17,7 +17,9 @@ function cacheKey(url: string): string {
   return url.split("?")[0];
 }
 
-async function fetchSigned(url: string): Promise<string | null> {
+export async function getSignedAudioUrl(url: string | null | undefined): Promise<string | null> {
+  if (!url) return null;
+  if (!isPrivateAudioUrl(url)) return url;
   const key = cacheKey(url);
   const existing = cache.get(key);
   const now = Date.now();
@@ -55,7 +57,7 @@ export function useSignedAudioUrl(url: string | null | undefined): string | unde
     const hit = cache.get(cacheKey(url));
     if (hit && hit.expiresAt - REFRESH_BUFFER_MS > Date.now()) { setResolved(hit.url); return; }
     setResolved(undefined);
-    fetchSigned(url).then((s) => { if (!cancelled) setResolved(s ?? undefined); });
+    getSignedAudioUrl(url).then((s) => { if (!cancelled) setResolved(s ?? undefined); });
     return () => { cancelled = true; };
   }, [url]);
 

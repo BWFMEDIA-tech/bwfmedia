@@ -11,7 +11,7 @@ export interface PlayTrack {
   cover_url: string | null;
   boosted: boolean;
   position: number;
-  status: "queued" | "playing" | "done";
+  status: "queued" | "playing" | "completed" | "skipped" | "removed";
   score: number;
   like_count: number;
   dislike_count: number;
@@ -82,7 +82,7 @@ export function usePlayQueue(streamId: string | null) {
   const playing = tracks.find((t) => t.status === "playing") ?? null;
   const queued = tracks.filter((t) => t.status === "queued");
   const leaderboard = [...tracks]
-    .filter((t) => t.status !== "queued")
+    .filter((t) => t.status === "playing" || t.status === "completed")
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 
