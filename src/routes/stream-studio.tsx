@@ -900,50 +900,73 @@ function StreamStudio() {
   if (auth.loading) return <div className="min-h-screen bg-[#050509]" />;
 
   return (
-    <div className="min-h-screen bg-[#050509] text-white">
+    <div className="min-h-screen bg-black text-zinc-300" style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}>
       <MediaEngineProvider>
       <SiteHeader />
       <div className="flex min-h-screen">
         <Sidebar />
         <main className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 lg:flex-row">
+          <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px]">
             {/* Center column */}
-            <div className="flex flex-1 flex-col gap-4">
-              {/* Header */}
-              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-white/5 bg-[#0d0d18] p-4">
-                <span className="flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-widest text-white">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> {lk ? "LIVE" : "OFFLINE"}
-                </span>
-                <div className="flex items-center gap-1.5 text-base font-bold text-white">
-                  {stream?.title || "BWF Live: LIVE ARENA"}
-                  <CheckCircle2 className="h-4 w-4" style={{ color: BLUE }} />
+            <div className="flex min-w-0 flex-col gap-3">
+              {/* Console header */}
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-5 py-3 backdrop-blur">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className={cn(
+                    "flex items-center gap-2 rounded-full px-3 py-1 border",
+                    lk ? "bg-[#FF00A6]/10 border-[#FF00A6]/40" : "bg-zinc-900 border-zinc-800",
+                  )}>
+                    <span className={cn("h-2 w-2 rounded-full", lk ? "bg-[#FF00A6] animate-pulse" : "bg-zinc-600")} />
+                    <span className="text-base tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif", color: lk ? "#FF00A6" : "#a1a1aa" }}>
+                      {lk ? "LIVE" : "OFFLINE"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-white">
+                    {stream?.title || "BWF Live: LIVE ARENA"}
+                    <CheckCircle2 className="h-4 w-4" style={{ color: "#00E6FF" }} />
+                  </div>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => setMode("review")}
+                      className={cn(
+                        "rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
+                        mode === "review"
+                          ? "bg-[#C53DFF]/20 text-[#C53DFF] border-[#C53DFF]/40"
+                          : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
+                      )}
+                    >
+                      <Music2 className="mr-1 inline h-3 w-3" /> Music Review
+                    </button>
+                    <button
+                      onClick={() => setMode("podcast")}
+                      className={cn(
+                        "rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
+                        mode === "podcast"
+                          ? "bg-[#00E6FF]/20 text-[#00E6FF] border-[#00E6FF]/40"
+                          : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
+                      )}
+                    >
+                      <Headphones className="mr-1 inline h-3 w-3" /> Podcast
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-1 rounded-lg bg-white/5 p-1">
-                  <button
-                    onClick={() => setMode("review")}
-                    className={cn("rounded px-2 py-1 text-[11px] font-medium", mode === "review" ? "bg-white/15 text-white" : "text-white/60")}
-                  >
-                    <Music2 className="mr-1 inline h-3 w-3" /> Music Review
-                  </button>
-                  <button
-                    onClick={() => setMode("podcast")}
-                    className={cn("rounded px-2 py-1 text-[11px] font-medium", mode === "podcast" ? "bg-white/15 text-white" : "text-white/60")}
-                  >
-                    <Headphones className="mr-1 inline h-3 w-3" /> Podcast
-                  </button>
-                </div>
-                <div className="ml-auto flex items-center gap-3 text-xs text-white/70">
+                <div className="flex items-center gap-3 text-xs">
                   {!lk && (
-                    <button onClick={goLive} disabled={going} className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+                    <button
+                      onClick={goLive}
+                      disabled={going}
+                      className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-black disabled:opacity-50"
+                      style={{ background: "#00E6FF" }}
+                    >
                       <Radio className="h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live"}
                     </button>
                   )}
-                  <button onClick={copyInvite} className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5">
-                    <Share2 className="h-3 w-3" /> Share
+                  <button onClick={copyInvite} className="text-zinc-500 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">
+                    Share
                   </button>
                   <button
                     onClick={() => setThumbOpen(true)}
-                    className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 hover:bg-white/5"
+                    className="flex items-center gap-1.5 text-zinc-500 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest"
                     title="Stream thumbnail"
                   >
                     {thumbUrl ? (
@@ -953,7 +976,8 @@ function StreamStudio() {
                     )}
                     Thumbnail
                   </button>
-                  <button className="rounded-md border border-white/10 p-1.5 hover:bg-white/5">
+                  <div className="h-6 w-px bg-zinc-800" />
+                  <button className="rounded-md border border-zinc-800 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white">
                     <MoreHorizontal className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -980,8 +1004,8 @@ function StreamStudio() {
               />
 
               {stream?.id && (
-                <div className="flex items-center justify-end gap-2 px-1 text-[11px] text-white/60">
-                  <span>Promotion mode:</span>
+                <div className="flex items-center justify-end gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-[11px] text-zinc-400">
+                  <span className="uppercase tracking-widest text-zinc-500 font-bold">Promotion mode</span>
                   <select
                     value={hostTransferMode}
                     onChange={async (e) => {
@@ -992,7 +1016,7 @@ function StreamStudio() {
                         toast.success(v === "transfer" ? "Ownership transfer enabled" : "Co-host mode enabled");
                       } catch (err: any) { toast.error(err?.message ?? "Failed"); }
                     }}
-                    className="rounded-md border border-white/10 bg-[#0d0d18] px-2 py-1 text-white/80"
+                    className="rounded-md border border-zinc-800 bg-black px-2 py-1 text-white/80"
                   >
                     <option value="co_host">Co-Host (host stays)</option>
                     <option value="transfer">Transfer Ownership</option>
@@ -1006,8 +1030,12 @@ function StreamStudio() {
                   disconnects and we never trigger a reconnect storm / 429. */}
               <>
                 {!lk && (
-                  <div className="flex items-center justify-center rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-white/60">
-                      Click <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-semibold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>{going ? "Starting…" : "Go Live"}</button> to start streaming
+                  <div className="flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 text-xs text-zinc-400">
+                      Click
+                      <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-bold uppercase tracking-wider text-black" style={{ background: "#00E6FF" }}>
+                        {going ? "Starting…" : "Go Live"}
+                      </button>
+                      to start streaming
                   </div>
                 )}
 
@@ -1059,8 +1087,8 @@ function StreamStudio() {
                 )}
               </>
 
-              {/* Three live panels */}
-              <div className="grid gap-4 lg:grid-cols-3">
+              {/* Three live panels — bento row */}
+              <div className="grid gap-3 lg:grid-cols-3">
                 <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />
                 <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />
                 <GreenRoom streamId={stream?.id ?? null} participants={participants} />
@@ -1070,10 +1098,16 @@ function StreamStudio() {
               <InviteGuest />
             </div>
 
-            <div className="flex flex-col gap-4">
+            {/* Right rail — sticky console */}
+            <aside className="flex flex-col gap-3 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)]">
               <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
-              <AudienceRow participants={participants} />
-            </div>
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
+                <h3 className="mb-3 text-sm tracking-[0.2em] text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                  AUDIENCE
+                </h3>
+                <AudienceRow participants={participants} />
+              </div>
+            </aside>
           </div>
         </main>
       </div>
