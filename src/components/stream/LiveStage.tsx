@@ -238,6 +238,16 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
             spotlightUserId={spotlight.artist}
             participants={participants}
             profiles={profiles}
+            slot="artist"
+          />
+        )}
+        {panel === "admin" && showHostTools && streamId && (
+          <SpotlightControls
+            streamId={streamId}
+            spotlightUserId={spotlight.host}
+            participants={participants}
+            profiles={profiles}
+            slot="host"
           />
         )}
       </div>
