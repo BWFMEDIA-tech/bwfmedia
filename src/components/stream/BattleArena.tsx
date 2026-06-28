@@ -205,6 +205,9 @@ function BattleView({
   const [optimistic, setOptimistic] = useState<{ roundId: string; a: number; b: number }>(
     { roundId: "", a: 0, b: 0 },
   );
+  // Transient "+N" flash shown over the side that was just voted for. Cleared
+  // ~900ms after the click so it doesn't pile up on rapid votes.
+  const [flash, setFlash] = useState<{ side: "a" | "b"; n: number; key: number } | null>(null);
   useEffect(() => {
     if (currentRound?.id && optimistic.roundId !== currentRound.id) {
       setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
@@ -281,6 +284,11 @@ function BattleView({
         b: base.b + (choice === "b" ? bump : 0),
       };
     });
+    // Pop a floating "+N" over the chosen side for instant tactile feedback.
+    setFlash({ side: choice, n: bump, key: Date.now() });
+    window.setTimeout(() => {
+      setFlash((cur) => (cur && cur.key && Date.now() - cur.key >= 850 ? null : cur));
+    }, 900);
     try {
       await voteFn({ data: { roundId: currentRound.id, choice, useBoost } });
       onVoteCast(choice);
