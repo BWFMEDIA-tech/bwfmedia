@@ -2386,6 +2386,60 @@ export type Database = {
         }
         Relationships: []
       }
+      stream_events: {
+        Row: {
+          artist_id: string | null
+          client_session_id: string | null
+          created_at: string
+          duration_played_seconds: number
+          id: string
+          metadata: Json
+          stream_environment: string
+          track_id: string
+          user_id: string | null
+          valid_stream: boolean
+        }
+        Insert: {
+          artist_id?: string | null
+          client_session_id?: string | null
+          created_at?: string
+          duration_played_seconds?: number
+          id?: string
+          metadata?: Json
+          stream_environment?: string
+          track_id: string
+          user_id?: string | null
+          valid_stream?: boolean
+        }
+        Update: {
+          artist_id?: string | null
+          client_session_id?: string | null
+          created_at?: string
+          duration_played_seconds?: number
+          id?: string
+          metadata?: Json
+          stream_environment?: string
+          track_id?: string
+          user_id?: string | null
+          valid_stream?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_events_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "stream_events_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_messages: {
         Row: {
           body: string
@@ -3431,6 +3485,7 @@ export type Database = {
         Returns: number
       }
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
+      get_admin_subscription_metrics: { Args: never; Returns: Json }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
@@ -3442,6 +3497,7 @@ export type Database = {
           tips_cents: number
         }[]
       }
+      get_my_artist_dashboard: { Args: never; Returns: Json }
       get_my_last_seen_at: { Args: never; Returns: string }
       get_my_profile_interests: { Args: never; Returns: string[] }
       get_my_profile_location: { Args: never; Returns: string }
