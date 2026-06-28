@@ -10,7 +10,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     try {
       const [profileRes, queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes] = await Promise.all([
         sb.from("profiles")
-          .select("display_name, stage_name, avatar_url, banner_url, bio, location, genre, genres, member_since, created_at")
+          .select("display_name, stage_name, avatar_url, banner_url, bio, genre, genres, member_since, created_at")
           .eq("id", id).maybeSingle(),
         sb.from("live_queue_public").select("artist_name, photo_url").eq("id", id).maybeSingle(),
         sb.from("play_tracks").select("like_count, dislike_count").eq("artist_user_id", id),
@@ -79,7 +79,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         photo: photoSigned,
         banner: bannerSigned,
         bio: (p.bio as string | null) ?? null,
-        location: (p.location as string | null) ?? null,
+        location: null as string | null,
         genre,
         memberSince: (p.member_since as string | null) ?? (p.created_at as string | null) ?? null,
         stats: {
