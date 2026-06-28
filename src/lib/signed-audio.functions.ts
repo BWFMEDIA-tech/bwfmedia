@@ -120,7 +120,7 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     let authorized = ownsPath;
     let reason = ownsPath ? "owner" : "";
 
-    if (!authorized) {
+    if (!authorized && userId) {
       const { data: adminCheck } = await supabaseAdmin.rpc("has_role", {
         _user_id: userId,
         _role: "admin",
