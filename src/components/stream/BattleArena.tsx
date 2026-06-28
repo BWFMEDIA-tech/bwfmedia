@@ -269,6 +269,15 @@ function BattleView({
   const aPct = total > 0 ? Math.min(100, Math.round((aScore / total) * 100)) : 0;
   const bPct = total > 0 ? Math.min(100, 100 - aPct) : 0;
 
+  // Raw voter counts (super votes count as 1 voter, not 5) for accurate display.
+  const serverACount = (currentRound as any)?.a_votes ?? 0;
+  const serverBCount = (currentRound as any)?.b_votes ?? 0;
+  // Optimistic adds at least +1 per click regardless of weight.
+  const optACount = currentRound && optimistic.roundId === currentRound.id && optimistic.a > 0 ? 1 : 0;
+  const optBCount = currentRound && optimistic.roundId === currentRound.id && optimistic.b > 0 ? 1 : 0;
+  const aCount = Math.max(serverACount, serverACount + optACount);
+  const bCount = Math.max(serverBCount, serverBCount + optBCount);
+
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
   const canVote = votingStatus === "open" && !myVote;
 
@@ -370,8 +379,8 @@ function BattleView({
       <VoteTracker
         aPct={aPct}
         bPct={bPct}
-        aScore={Math.min(999, aScore)}
-        bScore={Math.min(999, bScore)}
+        aScore={Math.min(9999, aCount)}
+        bScore={Math.min(9999, bCount)}
         myVote={myVote}
         votingStatus={votingStatus}
       />
