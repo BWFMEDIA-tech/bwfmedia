@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { DollarSign, Users, Music, Megaphone, Sparkles, RefreshCw } from "lucide-react";
+import { DollarSign, Users, Music, Megaphone, Sparkles, RefreshCw, TrendingUp, UserCheck } from "lucide-react";
 import { SectionPage, EmptyState } from "@/components/admin/SectionPage";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -9,6 +9,7 @@ import {
   calculateMonthlyRevenuePool,
   getTotalRevenue,
   listRevenuePools,
+  getAdminSubscriptionMetrics,
 } from "@/lib/revenue-pool.functions";
 
 export const Route = createFileRoute("/admin/revenue")({
@@ -26,6 +27,7 @@ function RevenueAdmin() {
   const fetchTotals = useServerFn(getTotalRevenue);
   const fetchPools = useServerFn(listRevenuePools);
   const recompute = useServerFn(calculateMonthlyRevenuePool);
+  const fetchSubMetrics = useServerFn(getAdminSubscriptionMetrics);
 
   const totals = useQuery({
     queryKey: ["revenue-totals-current"],
@@ -37,12 +39,18 @@ function RevenueAdmin() {
     queryFn: () => fetchPools({ data: {} }),
     enabled: isAdmin,
   });
+  const subs = useQuery({
+    queryKey: ["admin-sub-metrics"],
+    queryFn: () => fetchSubMetrics(),
+    enabled: isAdmin,
+  });
 
   const recomputeMut = useMutation({
     mutationFn: () => recompute({ data: {} }),
     onSuccess: () => {
       totals.refetch();
       pools.refetch();
+      subs.refetch();
     },
   });
 
@@ -107,6 +115,41 @@ function RevenueAdmin() {
         />
       </div>
 
+      <div className="mt-8 grid gap-4 md:grid-cols-4">
+        <PoolCard label="Active Subscribers" cents={(subs.data?.active_subscribers ?? 0) * 100} tint="from-[#3b82f6]/30 to-[#1e3a8a]/20" icon={UserCheck} formatAsCount />
+        <PoolCard label="MRR" cents={subs.data?.mrr_cents ?? 0} tint="from-emerald-500/30 to-emerald-700/20" icon={TrendingUp} />
+        <PoolCard label="Listener MRR" cents={subs.data?.listener_mrr_cents ?? 0} tint="from-[#00E6FF]/30 to-[#004BFF]/20" icon={Users} />
+        <PoolCard label="Artist MRR" cents={subs.data?.artist_mrr_cents ?? 0} tint="from-[#C53DFF]/30 to-[#FF00A6]/20" icon={Music} />
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
+        <h2 className="mb-4 text-lg font-bold">Plan distribution</h2>
+        {!subs.data?.by_plan?.length ? (
+          <EmptyState icon={Users} title="No active subscribers" hint="Plan breakdown will appear after first checkout." />
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="text-left text-[11px] uppercase tracking-wide text-white/40">
+              <tr>
+                <th className="py-2 pr-4">Plan</th>
+                <th className="py-2 pr-4">Role</th>
+                <th className="py-2 pr-4">Subscribers</th>
+                <th className="py-2 pr-4">MRR</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {subs.data.by_plan.map((p) => (
+                <tr key={`${p.price_id}-${p.role}`}>
+                  <td className="py-2 pr-4 font-semibold">{p.price_id}</td>
+                  <td className="py-2 pr-4 capitalize text-white/70">{p.role}</td>
+                  <td className="py-2 pr-4">{p.subscriber_count}</td>
+                  <td className="py-2 pr-4 text-emerald-400">{money(p.mrr_cents)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
       <div className="mt-8 rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
         <h2 className="mb-4 text-lg font-bold">Monthly history</h2>
         {!pools.data?.length ? (
@@ -155,11 +198,13 @@ function PoolCard({
   cents,
   tint,
   icon: Icon,
+  formatAsCount,
 }: {
   label: string;
   cents: number;
   tint: string;
   icon: React.ComponentType<{ className?: string }>;
+  formatAsCount?: boolean;
 }) {
   return (
     <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${tint} p-5`}>
@@ -167,7 +212,7 @@ function PoolCard({
         <span className="text-xs uppercase tracking-wide text-white/70">{label}</span>
         <Icon className="h-5 w-5 text-white/80" />
       </div>
-      <div className="mt-3 text-3xl font-black text-white">{money(cents)}</div>
+      <div className="mt-3 text-3xl font-black text-white">{formatAsCount ? Math.floor(cents / 100).toLocaleString() : money(cents)}</div>
     </div>
   );
 }
