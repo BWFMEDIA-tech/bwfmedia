@@ -379,8 +379,8 @@ function BattleView({
       <VoteTracker
         aPct={aPct}
         bPct={bPct}
-        aScore={Math.min(999, aScore)}
-        bScore={Math.min(999, bScore)}
+        aScore={Math.min(9999, aCount)}
+        bScore={Math.min(9999, bCount)}
         myVote={myVote}
         votingStatus={votingStatus}
       />
