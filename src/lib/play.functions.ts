@@ -80,10 +80,12 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
 
     let boosted = false;
     if (data.useBoost) {
-      const { data: consumed, error: rpcErr } =
-        await supabase.rpc("consume_play_boost_credit");
-      if (rpcErr) throw new Error(rpcErr.message);
-      if (!consumed) throw new Error("No boost credits available");
+      const { error: rpcErr } = await supabase.rpc("spend_boost_credit", {
+        _reason: "spend_boost",
+        _reference_id: data.streamId,
+        _amount: 1,
+      });
+      if (rpcErr) throw new Error(rpcErr.message || "No boost credits available");
       boosted = true;
     }
 
