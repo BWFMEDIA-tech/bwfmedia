@@ -205,6 +205,9 @@ function BattleView({
   const [optimistic, setOptimistic] = useState<{ roundId: string; a: number; b: number }>(
     { roundId: "", a: 0, b: 0 },
   );
+  // Transient "+N" flash shown over the side that was just voted for. Cleared
+  // ~900ms after the click so it doesn't pile up on rapid votes.
+  const [flash, setFlash] = useState<{ side: "a" | "b"; n: number; key: number } | null>(null);
   useEffect(() => {
     if (currentRound?.id && optimistic.roundId !== currentRound.id) {
       setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
@@ -281,6 +284,11 @@ function BattleView({
         b: base.b + (choice === "b" ? bump : 0),
       };
     });
+    // Pop a floating "+N" over the chosen side for instant tactile feedback.
+    setFlash({ side: choice, n: bump, key: Date.now() });
+    window.setTimeout(() => {
+      setFlash((cur) => (cur && cur.key && Date.now() - cur.key >= 850 ? null : cur));
+    }, 900);
     try {
       await voteFn({ data: { roundId: currentRound.id, choice, useBoost } });
       onVoteCast(choice);
@@ -392,6 +400,7 @@ function BattleView({
           onVote={() => vote("a", false)}
           onSuperVote={() => vote("a", true)}
           overallWinner={match.winner_id === match.artist_a_id}
+          flash={flash && flash.side === "a" ? flash : null}
         />
         <ArtistSide
           side="b"
@@ -417,6 +426,7 @@ function BattleView({
           onVote={() => vote("b", false)}
           onSuperVote={() => vote("b", true)}
           overallWinner={match.winner_id === match.artist_b_id}
+          flash={flash && flash.side === "b" ? flash : null}
         />
       </div>
 
@@ -587,6 +597,7 @@ function ArtistSide({
   overallWinner,
   onVote,
   onSuperVote,
+  flash,
 }: {
   side: "a" | "b";
   artistId?: string | null;
@@ -603,6 +614,7 @@ function ArtistSide({
   overallWinner: boolean;
   onVote: () => void;
   onSuperVote: () => void;
+  flash?: { side: "a" | "b"; n: number; key: number } | null;
 }) {
   const grad = side === "a"
     ? "linear-gradient(135deg, #c53dff, #004bff)"
@@ -630,6 +642,18 @@ function ArtistSide({
       side === "a" ? "border-r border-white/10" : "",
       dim && "opacity-60",
     )}>
+      {flash && (
+        <div
+          key={flash.key}
+          className="pointer-events-none absolute left-1/2 top-6 z-20 -translate-x-1/2 font-mono text-2xl font-black animate-[voteFloat_0.9s_ease-out_forwards]"
+          style={{
+            color: side === "a" ? "#a78bfa" : "#ff6ab1",
+            textShadow: `0 0 12px ${side === "a" ? "rgba(124,58,237,0.9)" : "rgba(255,0,166,0.9)"}`,
+          }}
+        >
+          +{flash.n}
+        </div>
+      )}
       {overallWinner && (
         <div className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-200">
           <Crown className="h-3 w-3" /> Winner
@@ -781,7 +805,7 @@ function ArtistSide({
             disabled={!canVote}
             onClick={onVote}
             className={cn(
-              "flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition",
+              "flex-1 rounded-md px-2 py-1.5 text-xs font-semibold transition-transform duration-150 active:scale-95",
               voted
                 ? "bg-white/20 text-white"
                 : canVote
@@ -797,7 +821,7 @@ function ArtistSide({
             onClick={onSuperVote}
             title="Spend 1 boost credit for a 5x vote"
             className={cn(
-              "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition",
+              "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition-transform duration-150 active:scale-95",
               canVote
                 ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
                 : "cursor-not-allowed border-white/10 text-white/30",

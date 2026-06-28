@@ -300,3 +300,9 @@
   0%, 100% { transform: scaleY(0.4); }
   50% { transform: scaleY(1.4); }
 }
+
+@keyframes voteFloat {
+  0%   { opacity: 0; transform: translate(-50%, 8px) scale(0.7); }
+  20%  { opacity: 1; transform: translate(-50%, 0px) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -36px) scale(1); }
+}
