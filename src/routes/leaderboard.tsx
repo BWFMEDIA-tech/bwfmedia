@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, queryOptions } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useQuery, queryOptions, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Crown, Trophy, Medal, Search, Flame, Swords, ThumbsUp, Disc3, Sparkles, ArrowLeft, TrendingUp, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -32,7 +33,31 @@ export const Route = createFileRoute("/leaderboard")({
 
 function LeaderboardPage() {
   const { data: rows = [] } = useQuery(leaderboardQuery);
+  const queryClient = useQueryClient();
   const [q, setQ] = useState("");
+
+  // Realtime: refetch the leaderboard whenever votes, matches, or streams change.
+  useEffect(() => {
+    let pending = false;
+    const invalidate = () => {
+      if (pending) return;
+      pending = true;
+      setTimeout(() => {
+        pending = false;
+        queryClient.invalidateQueries({ queryKey: ["artist-leaderboard"] });
+      }, 400);
+    };
+    const channel = supabase
+      .channel("arena-leaderboard-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "battle_votes" }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "battle_matches" }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "battle_rounds" }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "streams" }, invalidate)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
