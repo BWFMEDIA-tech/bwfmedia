@@ -90,6 +90,50 @@ BEGIN
      AND column_name IN ('ip','user_agent');
   PERFORM pg_temp.assert(v_count = 2, 'battle_vote_attempts captures ip + user_agent');
 
+  -- 8. battle_reactions: RLS on, one-reaction unique constraint, no client write path
+  SELECT relrowsecurity INTO ok FROM pg_class
+   WHERE oid = 'public.battle_reactions'::regclass;
+  PERFORM pg_temp.assert(ok, 'battle_reactions has RLS enabled');
+
+  SELECT count(*) INTO v_count FROM pg_constraint
+   WHERE conrelid = 'public.battle_reactions'::regclass
+     AND contype = 'u' AND conname = 'battle_reactions_one_per_artist';
+  PERFORM pg_temp.assert(v_count = 1, 'battle_reactions enforces one reaction per (user, battle, artist)');
+
+  SELECT count(*) INTO v_count FROM pg_policy
+   WHERE polrelid = 'public.battle_reactions'::regclass
+     AND polcmd IN ('a', 'w', 'd');
+  PERFORM pg_temp.assert(v_count = 0, 'battle_reactions has no client write policies (RPC-only writes)');
+
+  -- 9. battle_scores: RLS on, no client write path
+  SELECT relrowsecurity INTO ok FROM pg_class
+   WHERE oid = 'public.battle_scores'::regclass;
+  PERFORM pg_temp.assert(ok, 'battle_scores has RLS enabled');
+
+  SELECT count(*) INTO v_count FROM pg_policy
+   WHERE polrelid = 'public.battle_scores'::regclass
+     AND polcmd IN ('a', 'w', 'd');
+  PERFORM pg_temp.assert(v_count = 0, 'battle_scores has no client write policies (RPC-only writes)');
+
+  -- 10. react_to_battle() exists and is not executable by anon
+  SELECT count(*) INTO v_count
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+   WHERE n.nspname='public' AND p.proname='react_to_battle';
+  PERFORM pg_temp.assert(v_count = 1, 'react_to_battle() exists');
+
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.routine_privileges
+    WHERE routine_schema='public' AND routine_name='react_to_battle'
+      AND grantee='anon'
+  ) INTO ok;
+  PERFORM pg_temp.assert(NOT ok, 'react_to_battle() not executable by anon');
+
+  -- 11. battle_scores broadcasts score changes on battle:{battle_id}
+  SELECT count(*) INTO v_count FROM pg_trigger
+   WHERE tgrelid = 'public.battle_scores'::regclass
+     AND tgname = 'battle_scores_broadcast' AND NOT tgisinternal;
+  PERFORM pg_temp.assert(v_count = 1, 'battle_scores has the realtime broadcast trigger');
+
   RAISE NOTICE 'RLS regression suite passed';
 END $$;
 

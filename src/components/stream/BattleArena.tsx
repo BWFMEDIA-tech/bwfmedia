@@ -9,6 +9,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { BattleHostControls } from "./BattleHostControls";
+import { HypePassPanel } from "./HypePassPanel";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 
@@ -438,6 +439,15 @@ function BattleView({
           flash={flash && flash.side === "b" ? flash : null}
         />
       </div>
+
+      <HypePassPanel
+        battleId={match.id as string}
+        artists={[
+          { id: match.artist_a_id as string, name: (match.artist_a_name as string) ?? "Artist A" },
+          { id: match.artist_b_id as string, name: (match.artist_b_name as string) ?? "Artist B" },
+        ]}
+        live={match.status === "live"}
+      />
 
       {lastClosed && lastClosed.id !== currentRound?.id && (
         <div className="border-t border-white/10 bg-black/30 px-4 py-2 text-[11px] text-white/60">

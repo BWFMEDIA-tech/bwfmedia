@@ -116,6 +116,7 @@ import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadca
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
+import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -667,6 +668,11 @@ const ApiPublicBlockBookingRoute = ApiPublicBlockBookingRouteImport.update({
   path: '/api/public/block-booking',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBattleReactRoute = ApiBattleReactRouteImport.update({
+  id: '/api/battle/react',
+  path: '/api/battle/react',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -821,6 +827,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
+  '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -938,6 +945,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
+  '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -1057,6 +1065,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
+  '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
@@ -1177,6 +1186,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/play/'
     | '/videos/'
+    | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -1294,6 +1304,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/play'
     | '/videos'
+    | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -1412,6 +1423,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/play/'
     | '/videos/'
+    | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
@@ -1492,6 +1504,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
+  ApiBattleReactRoute: typeof ApiBattleReactRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
@@ -2259,6 +2272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBlockBookingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/battle/react': {
+      id: '/api/battle/react'
+      path: '/api/battle/react'
+      fullPath: '/api/battle/react'
+      preLoaderRoute: typeof ApiBattleReactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -2497,6 +2517,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
+  ApiBattleReactRoute: ApiBattleReactRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
