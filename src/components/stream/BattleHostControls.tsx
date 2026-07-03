@@ -79,8 +79,18 @@ export function BattleHostControls({
 
         {!currentRoundExists && (
           <ControlButton
-            label={currentRound === 0 ? "Start Battle" : `Start Round ${currentRound + 1}`}
-            icon={<Play className="h-3 w-3" />}
+            label={
+              currentRound === 0
+                ? "Start Battle"
+                : isFinalRound
+                  ? "Complete Match"
+                  : `Start Round ${currentRound + 1}`
+            }
+            icon={
+              isFinalRound && currentRound > 0
+                ? <CheckCircle2 className="h-3 w-3" />
+                : <Play className="h-3 w-3" />
+            }
             primary
             loading={busy === "START_ROUND"}
             onClick={() => emit("START_ROUND")}
