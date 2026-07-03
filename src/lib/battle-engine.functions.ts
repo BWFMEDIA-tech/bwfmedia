@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  buildVoteTotals,
+  emptyVoteTotals,
+  validateVoteTotals,
+  type VoteTotals,
+} from "@/lib/vote-math";
 
 /**
  * Battle Engine — single authoritative event dispatcher for Play Arena 1v1
@@ -51,6 +57,13 @@ function invalid(msg: string): never {
   throw new Error(`INVALID_TRANSITION: ${msg}`);
 }
 
+/** Live weighted totals for a round, recalculated from accepted votes. */
+async function loadRoundVoteTotals(sb: any, roundId: string): Promise<VoteTotals> {
+  const { data, error } = await sb.rpc("get_round_vote_totals", { _round_id: roundId });
+  if (error) throw new Error(error.message);
+  return buildVoteTotals(Array.isArray(data) ? data[0] : data);
+}
+
 /** Pure handler so wrappers in battles.functions.ts can call into the engine
  *  without going back through the server-fn RPC boundary. */
 export async function runBattleEvent(
@@ -97,6 +110,14 @@ export async function runBattleEvent(
           .select("*")
           .single();
         if (error) throw new Error(error.message);
+        // A (re)started round begins at zero — no votes may carry over from a
+        // previous incarnation of this round row.
+        {
+          const { error: resetErr } = await supabase.rpc("reset_round_votes", {
+            _round_id: round.id,
+          });
+          if (resetErr) throw new Error(resetErr.message);
+        }
         await supabase
           .from("battle_matches")
           .update({
@@ -338,8 +359,10 @@ export async function runBattleEvent(
         if (round.voting_status === "finalized" && round.status === "closed") {
           return { ok: true, already: true };
         }
-        const aScore = (round.a_weight as number) || 0;
-        const bScore = (round.b_weight as number) || 0;
+        // Winner from live accepted votes, not the denormalized columns.
+        const totals = await loadRoundVoteTotals(supabase, round.id);
+        const aScore = totals.aWeight;
+        const bScore = totals.bWeight;
         const winner: "a" | "b" | "tie" =
           aScore === bScore ? "tie" : aScore > bScore ? "a" : "b";
         await supabase
@@ -409,6 +432,13 @@ export async function runBattleEvent(
           .select("*")
           .single();
         if (error) throw new Error(error.message);
+        // Fresh round starts at zero — no carryover votes.
+        {
+          const { error: resetErr } = await supabase.rpc("reset_round_votes", {
+            _round_id: nextRound.id,
+          });
+          if (resetErr) throw new Error(resetErr.message);
+        }
         await supabase
           .from("battle_matches")
           .update({
@@ -424,8 +454,10 @@ export async function runBattleEvent(
         // Same as FINALIZE but doesn't require voting to have opened first.
         const round = await loadCurrentRound();
         if (!round) invalid("no current round");
-        const aScore = (round.a_weight as number) || 0;
-        const bScore = (round.b_weight as number) || 0;
+        // Winner from live accepted votes, not the denormalized columns.
+        const totals = await loadRoundVoteTotals(supabase, round!.id);
+        const aScore = totals.aWeight;
+        const bScore = totals.bWeight;
         const winner: "a" | "b" | "tie" =
           aScore === bScore ? "tie" : aScore > bScore ? "a" : "b";
         await supabase
@@ -534,6 +566,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
         aTrack: null,
         bTrack: null,
         battleStatus: null,
+        voteTotals: emptyVoteTotals(),
       };
     }
     const { data: rounds } = await sb
@@ -587,6 +620,32 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       }
     }
 
+    // Percentages are computed HERE, from live accepted votes of the current
+    // round only — never client-side, never from viewer counts, never carried
+    // over from previous rounds. Validated before it reaches any client; a
+    // failed validation recalculates from the database once and, if still
+    // inconsistent, ships zeros rather than wrong numbers.
+    let voteTotals = emptyVoteTotals();
+    if (currentRound) {
+      voteTotals = await loadRoundVoteTotals(sb, currentRound.id as string);
+      if (
+        currentRound.a_weight !== voteTotals.aWeight ||
+        currentRound.b_weight !== voteTotals.bWeight
+      ) {
+        console.error(
+          `[battle] tally drift on round ${currentRound.id}: columns=(${currentRound.a_weight},${currentRound.b_weight}) live=(${voteTotals.aWeight},${voteTotals.bWeight}) — serving live totals`,
+        );
+      }
+      if (!validateVoteTotals(voteTotals)) {
+        console.error(`[battle] invalid vote totals for round ${currentRound.id} — recalculating`);
+        voteTotals = await loadRoundVoteTotals(sb, currentRound.id as string);
+        if (!validateVoteTotals(voteTotals)) {
+          console.error(`[battle] vote totals still invalid for round ${currentRound.id} — serving zeros`);
+          voteTotals = emptyVoteTotals();
+        }
+      }
+    }
+
     return {
       match,
       rounds: rounds ?? [],
@@ -597,6 +656,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       aTrack,
       bTrack,
       battleStatus: match.status as string,
+      voteTotals,
     };
   });
 

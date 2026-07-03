@@ -31,18 +31,32 @@ BEGIN
    WHERE oid = 'public.battle_votes'::regclass;
   PERFORM pg_temp.assert(ok, 'battle_votes has RLS enabled');
 
-  -- 2. battle_votes insert policy enforces weight=5 boost + self-vote block
-  SELECT pg_get_expr(polwithcheck, polrelid) INTO qual
-    FROM pg_policy WHERE polrelid='public.battle_votes'::regclass
-     AND polname='battle_votes_insert_strict';
-  PERFORM pg_temp.assert(
-    qual ILIKE '%arena_power_up_activations%'
-      AND qual ILIKE '%weight = 5%'
-      AND qual ILIKE '%voter_id = auth.uid()%',
-    'battle_votes insert policy enforces voter=self + boost activation for weight=5');
-  PERFORM pg_temp.assert(
-    qual ILIKE '%artist_a_id%' AND qual ILIKE '%artist_b_id%',
-    'battle_votes insert policy blocks competitors from self-voting');
+  -- 2. battle_votes is RPC-only and immutable: no client write policies, no
+  --    client write grants, one locked vote per (round_id, voter_id), and no
+  --    match-level unique (which broke multi-round voting).
+  SELECT count(*) INTO v_count FROM pg_policy
+   WHERE polrelid='public.battle_votes'::regclass AND polcmd IN ('a','w','d');
+  PERFORM pg_temp.assert(v_count = 0, 'battle_votes has no client write policies (RPC-only writes)');
+
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.role_table_grants
+    WHERE table_schema='public' AND table_name='battle_votes'
+      AND grantee='authenticated' AND privilege_type IN ('INSERT','UPDATE','DELETE')
+  ) INTO ok;
+  PERFORM pg_temp.assert(NOT ok, 'battle_votes has no client write grants');
+
+  SELECT count(*) INTO v_count FROM pg_constraint
+   WHERE conrelid='public.battle_votes'::regclass AND contype='u';
+  PERFORM pg_temp.assert(v_count = 1, 'battle_votes has exactly one unique constraint');
+
+  SELECT count(*) INTO v_count FROM pg_indexes
+   WHERE schemaname='public' AND tablename='battle_votes'
+     AND indexname='battle_votes_match_voter_uniq';
+  PERFORM pg_temp.assert(v_count = 0, 'battle_votes match-level unique index removed');
+
+  SELECT pg_get_constraintdef(oid) INTO qual FROM pg_constraint
+   WHERE conrelid='public.battle_votes'::regclass AND conname='battle_votes_weight_check';
+  PERFORM pg_temp.assert(qual ILIKE '%1, 5%', 'battle_votes weight limited to 1 or 5');
 
   -- 3. cast_battle_vote function exists and is locked down
   SELECT count(*) INTO v_count
@@ -133,6 +147,25 @@ BEGIN
    WHERE tgrelid = 'public.battle_scores'::regclass
      AND tgname = 'battle_scores_broadcast' AND NOT tgisinternal;
   PERFORM pg_temp.assert(v_count = 1, 'battle_scores has the realtime broadcast trigger');
+
+  -- 12. vote engine helper functions: live totals readable, reset host-gated
+  SELECT count(*) INTO v_count
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+   WHERE n.nspname='public' AND p.proname='get_round_vote_totals';
+  PERFORM pg_temp.assert(v_count = 1, 'get_round_vote_totals() exists');
+
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.routine_privileges
+    WHERE routine_schema='public' AND routine_name='reset_round_votes'
+      AND grantee='anon'
+  ) INTO ok;
+  PERFORM pg_temp.assert(NOT ok, 'reset_round_votes() not executable by anon');
+
+  -- 13. battle_votes tally trigger is the single recompute authority
+  SELECT count(*) INTO v_count FROM pg_trigger
+   WHERE tgrelid = 'public.battle_votes'::regclass
+     AND tgname = 'battle_votes_recalc_trg' AND NOT tgisinternal;
+  PERFORM pg_temp.assert(v_count = 1, 'battle_votes has the tally recompute trigger');
 
   RAISE NOTICE 'RLS regression suite passed';
 END $$;
