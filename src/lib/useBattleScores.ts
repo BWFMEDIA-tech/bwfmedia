@@ -26,7 +26,7 @@ export function useBattleScores(battleId: string | null) {
     if (!battleId) return;
     let cancelled = false;
 
-    (async () => {
+    const fetchScores = async () => {
       const { data } = await supabase
         .from("battle_scores" as any)
         .select("artist_id, hype_score, pass_score")
@@ -38,7 +38,8 @@ export function useBattleScores(battleId: string | null) {
           prev,
         ),
       );
-    })();
+    };
+    void fetchScores();
 
     const channel = supabase
       .channel(`battle:${battleId}`)
@@ -58,7 +59,14 @@ export function useBattleScores(battleId: string | null) {
           if (row?.artist_id) applyUpdate(row);
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        // Heal missed events: refetch on every (re)join — the monotonic
+        // merge makes replays harmless. Errors surface for diagnostics.
+        if (status === "SUBSCRIBED") void fetchScores();
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error(`[battle:${battleId}] realtime channel ${status}`);
+        }
+      });
 
     return () => {
       cancelled = true;

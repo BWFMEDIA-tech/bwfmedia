@@ -90,7 +90,15 @@ export function slotPositionAt(schedule: ScheduledSlot[], tMs: number): SlotPosi
   return { index: -1, slot: null, offsetSec: 0, remainingSec: 0, notStarted: false, ended: false };
 }
 
-/** Voting is open during [slot start, slot end) — locked exactly at 60s. */
+/**
+ * Voting is open during [slot start, slot end) — locked exactly at 60s.
+ *
+ * NOTE: this window is CLIENT-ADVISORY (drives UI state). Authoritative vote
+ * acceptance stays server-side: battle votes are gated by
+ * battle_rounds.voting_status inside the cast_battle_vote RPC. When slots are
+ * wired to drive server voting, the server must derive the same window from
+ * arena_playback_state rather than trusting the client's clock.
+ */
 export function isVotingOpenAt(slot: ScheduledSlot, tMs: number): boolean {
   return tMs >= slot.votingOpensAtMs && tMs < slot.votingLocksAtMs;
 }

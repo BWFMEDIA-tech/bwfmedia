@@ -1,4 +1,7 @@
-import { ArenaAudioClock } from "./audio-clock";
+import type { ArenaAudioClock } from "./audio-clock";
+
+/** Minimal clock surface the engine needs — injectable for tests. */
+export type SlotClock = Pick<ArenaAudioClock, "serverNowMs" | "ctxTimeForServerMs">;
 import {
   SLOT_SECONDS,
   buildSlotSchedule,
@@ -64,7 +67,7 @@ export class ArenaSlotEngine {
 
   constructor(
     private readonly ctx: AudioContext,
-    private readonly clock: ArenaAudioClock,
+    private readonly clock: SlotClock,
     opts: SlotEngineOptions = {},
     private readonly events: SlotEngineEvents = {},
   ) {
@@ -138,10 +141,24 @@ export class ArenaSlotEngine {
 
       if (slot.startsAtMs <= nowMs) {
         // Late join: enter the active slot at the correct offset.
-        const offsetSec = Math.min((nowMs - slot.startsAtMs) / 1000, buffer.duration);
+        const elapsedSec = (nowMs - slot.startsAtMs) / 1000;
+        if (elapsedSec >= buffer.duration) {
+          // The track already finished for on-time listeners; the temporally
+          // correct late-join experience is silence until the slot ends.
+          source.disconnect();
+          gain.disconnect();
+          continue;
+        }
         const nowCtx = this.ctx.currentTime;
-        source.start(nowCtx, offsetSec);
-        applyMidSlotEnvelope(gain.gain, nowCtx, endCtx);
+        // The envelope (and source stop) must end when the AUDIO ends, not at
+        // the slot boundary — a track shorter than the slot goes silent early
+        // for everyone, and the envelope must not outlive it.
+        const audioEndCtx = Math.min(endCtx, nowCtx + (buffer.duration - elapsedSec));
+        source.start(nowCtx, elapsedSec);
+        applyMidSlotEnvelope(gain.gain, nowCtx, audioEndCtx);
+        source.stop(audioEndCtx + 0.05);
+        this.nodes.push({ index: slot.index, source, gain });
+        continue;
       } else {
         source.start(startCtx);
         if (this.energyCurve) {

@@ -95,14 +95,15 @@ export function subscribeSlotEpoch(
 ): () => void {
   let cancelled = false;
 
-  (async () => {
+  const fetchState = async () => {
     const { data } = await supabase
       .from("arena_playback_state")
       .select("stream_id, current_track_id, position_seconds, is_playing, last_sync_at, updated_at")
       .eq("stream_id", streamId)
       .maybeSingle();
     if (!cancelled) onState(rowToState(data));
-  })();
+  };
+  void fetchState();
 
   const channel = supabase
     .channel(`arena-slots:${streamId}`)
@@ -118,7 +119,14 @@ export function subscribeSlotEpoch(
         onState(rowToState(payload.new));
       },
     )
-    .subscribe();
+    .subscribe((status) => {
+      // Heal missed epochs: re-read the row on every (re)join so a client
+      // that dropped offline mid-battle converges as soon as it reconnects.
+      if (status === "SUBSCRIBED") void fetchState();
+      else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error(`[arena-slots:${streamId}] realtime channel ${status}`);
+      }
+    });
 
   return () => {
     cancelled = true;
