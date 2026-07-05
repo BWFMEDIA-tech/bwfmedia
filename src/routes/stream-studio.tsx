@@ -944,24 +944,24 @@ function StreamStudio() {
                     <button
                       onClick={() => setMode("review")}
                       className={cn(
-                        "rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
+                        "inline-flex items-center gap-1 whitespace-nowrap rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
                         mode === "review"
                           ? "bg-[#C53DFF]/20 text-[#C53DFF] border-[#C53DFF]/40"
                           : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
                       )}
                     >
-                      <Music2 className="mr-1 inline h-3 w-3" /> Music Review
+                      <Music2 className="h-3 w-3" /> Music Review
                     </button>
                     <button
                       onClick={() => setMode("podcast")}
                       className={cn(
-                        "rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
+                        "inline-flex items-center gap-1 whitespace-nowrap rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
                         mode === "podcast"
                           ? "bg-[#00E6FF]/20 text-[#00E6FF] border-[#00E6FF]/40"
                           : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
                       )}
                     >
-                      <Headphones className="mr-1 inline h-3 w-3" /> Podcast
+                      <Headphones className="h-3 w-3" /> Podcast
                     </button>
                   </div>
                 </div>
