@@ -43,6 +43,10 @@ import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { StreamThumbnailDialog } from "@/components/stream/StreamThumbnailDialog";
 import { ImageIcon } from "lucide-react";
+import { ConnectedPlatformsSection } from "@/components/stream/ConnectedPlatformsSection";
+import { StreamDestinationSelector } from "@/components/stream/StreamDestinationSelector";
+import { setStreamDestinations } from "@/lib/stream-platforms.functions";
+import type { StreamPlatformKey } from "@/lib/stream-platforms/registry";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -719,6 +723,9 @@ function StreamStudio() {
   const resumeFn = useServerFn(getMyActiveStream);
   const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
+  const setDestinationsFn = useServerFn(setStreamDestinations);
+  const [selectedDestinations, setSelectedDestinations] = useState<StreamPlatformKey[]>([]);
+  const platformsSectionRef = useRef<HTMLDivElement | null>(null);
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [going, setGoing] = useState(false);
@@ -867,6 +874,13 @@ function StreamStudio() {
         );
       }
       toast.success("You're live");
+      // Record which external platforms the creator picked. Actual RTMP
+      // fan-out is a follow-up — for now we capture intent + status.
+      if (selectedDestinations.length > 0) {
+        setDestinationsFn({ data: { streamId: s.id, platforms: selectedDestinations } }).catch(
+          (err: any) => console.error("save destinations failed", err),
+        );
+      }
       // Fan-out notifications to all members + artists (non-blocking).
       broadcastFn({ data: { streamId: s.id } })
         .then((r: any) => {
