@@ -345,26 +345,55 @@ function ProfileSettingsPage() {
         <Section title="Upcoming Events" icon={<Calendar className="h-4 w-4 text-red-500" />}>
           <div className="mb-3 flex items-center justify-between">
             <p className="text-xs text-white/50">Add and manage your upcoming shows and events.</p>
-            <a href="/settings/events" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Event</a>
+            <button onClick={newEvent} className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Event</button>
           </div>
+          {editingEvent && (
+            <div className="mb-3 space-y-2 rounded-lg border border-red-600/30 bg-red-600/[0.03] p-3">
+              <div className="text-xs font-semibold uppercase tracking-wider text-red-400">{editingEvent.id ? "Edit event" : "New event"}</div>
+              <input value={editingEvent.title ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })} placeholder="Event title" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+              <div className="grid grid-cols-2 gap-2">
+                <input type="datetime-local" value={editingEvent.starts_at ? new Date(editingEvent.starts_at).toISOString().slice(0, 16) : ""} onChange={(e) => setEditingEvent({ ...editingEvent, starts_at: e.target.value })} className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+                <input value={editingEvent.location ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, location: e.target.value })} placeholder="Location (e.g. Atlanta, GA)" className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+              </div>
+              <input value={editingEvent.link_url ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, link_url: e.target.value })} placeholder="Ticket / info link (optional)" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+              <textarea value={editingEvent.description ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })} placeholder="Description (optional)" rows={2} className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+              <div className="flex justify-end gap-2 pt-1">
+                <button onClick={() => setEditingEvent(null)} className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Cancel</button>
+                <button onClick={saveEvent} disabled={savingEvent} className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500 disabled:opacity-50">
+                  {savingEvent && <Loader2 className="h-3 w-3 animate-spin" />} {editingEvent.id ? "Save changes" : "Add event"}
+                </button>
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
-            {SAMPLE_EVENTS.map((e) => (
-              <div key={e.title} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <DateBlock month={e.month} day={e.day} />
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold">{e.title}</div>
-                    <div className="truncate text-xs text-white/50">{e.location} • {e.time}</div>
+            {events.length === 0 && !editingEvent && (
+              <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-xs text-white/50">
+                No events yet. Click <span className="text-red-400 font-semibold">Add Event</span> to create your first show.
+              </div>
+            )}
+            {events.map((e) => {
+              const d = new Date(e.starts_at);
+              const month = d.toLocaleString("en-US", { month: "short" }).toUpperCase();
+              const day = String(d.getDate()).padStart(2, "0");
+              const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+              return (
+                <div key={e.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <DateBlock month={month} day={day} />
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold">{e.title}</div>
+                      <div className="truncate text-xs text-white/50">{e.location || "TBA"} • {time}</div>
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button onClick={() => setEditingEvent(e)} className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"><Pencil className="h-3 w-3 inline mr-1" />Edit</button>
+                    <button onClick={() => removeEvent(e.id)} className="grid h-8 w-8 place-items-center rounded-md border border-red-600/30 text-red-500 hover:bg-red-600/10"><Trash2 className="h-3.5 w-3.5" /></button>
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <button className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"><Pencil className="h-3 w-3 inline mr-1" />Edit</button>
-                  <button className="grid h-8 w-8 place-items-center rounded-md border border-red-600/30 text-red-500 hover:bg-red-600/10"><Trash2 className="h-3.5 w-3.5" /></button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <div className="mt-3 text-center"><a href="/settings/events" className="text-xs font-semibold text-red-500 hover:underline">View All Events</a></div>
+          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-red-500 hover:underline">View public events →</a></div>
         </Section>
 
         <Section title="Merch Store" icon={<ShoppingBag className="h-4 w-4 text-red-500" />}>
