@@ -6,6 +6,8 @@ import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { SignedImg } from "@/components/ui/signed-img";
+import { useServerFn } from "@tanstack/react-start";
+import { listMyEvents, createMyEvent, updateMyEvent, deleteMyEvent, type EventRow } from "@/lib/events.functions";
 
 export const Route = createFileRoute("/settings/profile")({
   component: ProfileSettingsPage,
