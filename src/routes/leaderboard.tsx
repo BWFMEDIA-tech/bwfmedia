@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Crown, Trophy, Medal, Search, Flame, Swords, ThumbsUp, Disc3, Sparkles, ArrowLeft, TrendingUp, Zap } from "lucide-react";
+import { Crown, Trophy, Medal, Search, Flame, Swords, ThumbsUp, Disc3, Sparkles, ArrowLeft, TrendingUp, Zap, Headphones } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SignedImg } from "@/components/ui/signed-img";
 import { getArtistLeaderboard, type LeaderboardEntry } from "@/lib/leaderboard.functions";
@@ -380,15 +380,19 @@ function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
           </div>
           <div className="min-w-0">
             <div className="truncate font-bold">{entry.name}</div>
-            {entry.username && (
-              <div className="truncate text-xs text-white/40">@{entry.username}</div>
-            )}
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              {entry.username && <span className="truncate">@{entry.username}</span>}
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-semibold text-white/70">
+                <Headphones className="h-2.5 w-2.5 text-[#00E6FF]" />
+                {entry.streamCount.toLocaleString()} streams
+              </span>
+            </div>
           </div>
         </div>
 
         <RowCell icon={Sparkles} value={entry.xp} color="#C53DFF" />
         <RowCell icon={Swords} value={entry.battleWins} color="#FF00A6" />
-        <RowCell icon={ThumbsUp} value={entry.totalVotes} color="#00E6FF" />
+        <RowCell icon={ThumbsUp} value={entry.battleVotes} color="#00E6FF" />
         <RowCell icon={Disc3} value={entry.trackCount} color="rgba(255,255,255,0.5)" />
 
         <div className="md:hidden text-right">
