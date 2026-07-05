@@ -155,7 +155,7 @@ function RootComponent() {
 
           <Outlet />
         </div>
-        {isChrome && <SiteFooter />}
+        {isChrome && pathname === "/" && <SiteFooter />}
         <CartDrawer />
         <GlobalPlayer />
         </PlayerProvider>
