@@ -295,7 +295,14 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
         <div className="relative mt-5 grid grid-cols-3 gap-2 text-center">
           <PodiumStat icon={Sparkles} label="XP" value={entry.xp} accent={accent.via} />
           <PodiumStat icon={Swords} label="Wins" value={entry.battleWins} accent={accent.via} />
-          <PodiumStat icon={ThumbsUp} label="Votes" value={entry.totalVotes} accent={accent.via} />
+          <PodiumStat icon={ThumbsUp} label="Votes" value={entry.battleVotes} accent={accent.via} />
+        </div>
+        <div className="relative mt-2 flex items-center justify-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-white/60">
+          <Headphones className="h-3 w-3 text-[#00E6FF]" />
+          <span className="font-mono font-bold tabular-nums text-white/80">
+            {entry.streamCount.toLocaleString()}
+          </span>
+          streams
         </div>
       </div>
     </Link>
