@@ -2409,9 +2409,34 @@ export type Database = {
         }
         Relationships: []
       }
-      shopify_stores: {
+      shopify_store_credentials: {
         Row: {
           access_token: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_store_credentials_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "shopify_stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopify_stores: {
+        Row: {
           connected_at: string
           created_at: string
           currency: string | null
@@ -2425,7 +2450,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          access_token: string
           connected_at?: string
           created_at?: string
           currency?: string | null
@@ -2439,7 +2463,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          access_token?: string
           connected_at?: string
           created_at?: string
           currency?: string | null
