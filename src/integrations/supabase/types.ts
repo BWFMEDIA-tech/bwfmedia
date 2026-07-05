@@ -3968,6 +3968,21 @@ export type Database = {
         Args: { _artist_id: string }
         Returns: Json
       }
+      get_artists_directory: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          banner_url: string
+          bio: string
+          display_name: string
+          genre: string
+          genres: string[]
+          id: string
+          public_id: string
+          stage_name: string
+          username: string
+        }[]
+      }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
