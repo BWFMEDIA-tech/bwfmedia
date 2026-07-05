@@ -104,22 +104,31 @@ export function PlayArenaIntro() {
                 {isLive ? `${activeBattles} Live ${activeBattles === 1 ? "Battle" : "Battles"}` : "New on BWF"}
               </div>
               <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-bone">
-                {"Play Arena -\u00A0"}<span
+                Where Artists Get Seen.
+                <br />
+                <span
                   className="bg-clip-text text-transparent"
                   style={{
                     backgroundImage:
                       "linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #22d3ee 100%)",
                   }}
                 >
-                  Live Music Battles
+                  Where Fans Shape the Future of Music.
                 </span>
               </h2>
               <p className="mt-5 max-w-xl text-base md:text-lg text-white/70 leading-relaxed">
-                Play Arena is a real-time competition layer where artists go head-to-head in live
-                music battles while audiences vote to decide the winner instantly.
+                Tunevio is more than a music streaming platform — it's an interactive music ecosystem
+                built to help independent artists break through the noise and connect directly with
+                their audience.
               </p>
               <p className="mt-3 max-w-xl text-sm md:text-base text-white/50 leading-relaxed">
-                No algorithm bias. No passive streaming. Just live performance and real outcomes.
+                Discover new music through live artist battles, community voting, exclusive releases,
+                curated playlists, and real-time fan engagement. Every stream, vote, and interaction
+                helps artists gain exposure while giving fans a voice in who rises to the top.
+              </p>
+              <p className="mt-3 max-w-xl text-sm md:text-base text-white/50 leading-relaxed">
+                Unlike traditional platforms that rely mostly on algorithms, Tunevio puts discovery in
+                the hands of the community. Real artists. Real fans. Real opportunities.
               </p>
 
               <ul className="mt-8 grid sm:grid-cols-2 gap-3">
