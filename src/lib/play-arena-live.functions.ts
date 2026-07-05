@@ -64,6 +64,20 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
       bVotes = round?.b_votes ?? 0;
     }
 
+    // Derive true round wins from completed battle_rounds instead of trusting the cached column.
+    let trueAWins = featuredMatch?.a_wins ?? 0;
+    let trueBWins = featuredMatch?.b_wins ?? 0;
+    if (featuredMatch?.id) {
+      const { data: decidedRounds } = await sb
+        .from("battle_rounds")
+        .select("winner_choice")
+        .eq("match_id", featuredMatch.id)
+        .not("winner_choice", "is", null);
+      const rows = (decidedRounds ?? []) as { winner_choice: string | null }[];
+      trueAWins = rows.filter((r) => r.winner_choice === "a").length;
+      trueBWins = rows.filter((r) => r.winner_choice === "b").length;
+    }
+
     return {
       activeBattles,
       viewers,
@@ -74,8 +88,8 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
             roomName: streamMeta?.room_name ?? null,
             artistA: featuredMatch.artist_a_name ?? "Artist A",
             artistB: featuredMatch.artist_b_name ?? "Artist B",
-            aWins: featuredMatch.a_wins ?? 0,
-            bWins: featuredMatch.b_wins ?? 0,
+            aWins: trueAWins,
+            bWins: trueBWins,
             currentRound: featuredMatch.current_round ?? 1,
             totalRounds: featuredMatch.total_rounds ?? 3,
             aVotes,
