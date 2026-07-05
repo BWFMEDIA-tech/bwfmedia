@@ -36,6 +36,20 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const tracks = (tracksRes.data ?? []) as Array<{ like_count: number; dislike_count: number }>;
       const streamIds = ((streamsRes.data ?? []) as Array<{ id: string }>).map((s) => s.id);
 
+      // Real likes across the platform: play_votes upvotes (mirrored into
+      // play_tracks.like_count by trigger) + hearts from track_likes.
+      const trackIdsRes = await sb
+        .from("play_tracks").select("id").eq("artist_user_id", id);
+      const trackIds = ((trackIdsRes.data ?? []) as Array<{ id: string }>).map((t) => t.id);
+      let heartLikes = 0;
+      if (trackIds.length) {
+        const { count } = await sb
+          .from("track_likes")
+          .select("track_id", { count: "exact", head: true })
+          .in("track_id", trackIds);
+        heartLikes = count ?? 0;
+      }
+
       let tipsCents = 0;
       if (streamIds.length) {
         const { data: tipsRows } = await sb
@@ -47,7 +61,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       }
 
       const songCount = tracks.length;
-      const likeCount = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
+      const voteLikes = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
+      const likeCount = voteLikes + heartLikes;
       const genres: string[] = Array.isArray(p.genres) ? p.genres : [];
       const genre = (p.genre as string | null) ?? (genres[0] ?? null);
 
