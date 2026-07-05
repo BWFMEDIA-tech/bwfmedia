@@ -409,6 +409,41 @@ export type Database = {
           },
         ]
       }
+      battle_reactions: {
+        Row: {
+          action: Database["public"]["Enums"]["battle_reaction_action"]
+          artist_id: string
+          battle_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["battle_reaction_action"]
+          artist_id: string
+          battle_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["battle_reaction_action"]
+          artist_id?: string
+          battle_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_reactions_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       battle_rounds: {
         Row: {
           a_playing_track_id: string | null
@@ -502,6 +537,41 @@ export type Database = {
           {
             foreignKeyName: "battle_rounds_match_id_fkey"
             columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      battle_scores: {
+        Row: {
+          artist_id: string
+          battle_id: string
+          hype_score: number
+          id: string
+          pass_score: number
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          battle_id: string
+          hype_score?: number
+          id?: string
+          pass_score?: number
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          battle_id?: string
+          hype_score?: number
+          id?: string
+          pass_score?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_scores_battle_id_fkey"
+            columns: ["battle_id"]
             isOneToOne: false
             referencedRelation: "battle_matches"
             referencedColumns: ["id"]
@@ -3619,13 +3689,12 @@ export type Database = {
       cast_battle_vote: {
         Args: {
           _choice: string
-          _ip: string
-          _match_id: string
+          _ip?: string
           _round_id: string
-          _user_agent: string
-          _weight: number
+          _use_boost?: boolean
+          _user_agent?: string
         }
-        Returns: string
+        Returns: Json
       }
       check_rate_limit: {
         Args: {
@@ -3649,6 +3718,7 @@ export type Database = {
         Returns: boolean
       }
       dequeue_matchmaking: { Args: never; Returns: boolean }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -3676,6 +3746,15 @@ export type Database = {
       get_my_profile_location: { Args: never; Returns: string }
       get_or_create_profile_stream: { Args: never; Returns: string }
       get_revenue_pool_total: { Args: { _month?: string }; Returns: number }
+      get_round_vote_totals: {
+        Args: { _round_id: string }
+        Returns: {
+          a_votes: number
+          a_weight: number
+          b_votes: number
+          b_weight: number
+        }[]
+      }
       get_stream_anomaly_summary: { Args: { _days?: number }; Returns: Json }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }
@@ -3753,6 +3832,16 @@ export type Database = {
         }
         Returns: number
       }
+      react_to_battle: {
+        Args: {
+          _action: string
+          _artist_id: string
+          _battle_id: string
+          _ip?: string
+          _user_agent?: string
+        }
+        Returns: Json
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -3785,6 +3874,7 @@ export type Database = {
         }
         Returns: string
       }
+      reset_round_votes: { Args: { _round_id: string }; Returns: undefined }
       spend_boost_credit: {
         Args: { _amount?: number; _reason?: string; _reference_id?: string }
         Returns: number
@@ -3815,6 +3905,7 @@ export type Database = {
         | "member"
         | "listener"
         | "manager"
+      battle_reaction_action: "hype" | "pass"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3952,6 +4043,7 @@ export const Constants = {
         "listener",
         "manager",
       ],
+      battle_reaction_action: ["hype", "pass"],
     },
   },
 } as const
