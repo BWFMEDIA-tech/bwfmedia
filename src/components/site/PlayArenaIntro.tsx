@@ -101,34 +101,25 @@ export function PlayArenaIntro() {
                   <span className={`absolute inset-0 animate-ping rounded-full ${isLive ? "bg-red-400/80" : "bg-fuchsia-400/70"}`} />
                   <span className={`relative h-2 w-2 rounded-full ${isLive ? "bg-red-500" : "bg-fuchsia-400"}`} />
                 </span>
-                {isLive ? `${activeBattles} Live ${activeBattles === 1 ? "Battle" : "Battles"}` : "New on Tunevio"}
+                {isLive ? `${activeBattles} Live ${activeBattles === 1 ? "Battle" : "Battles"}` : "New on BWF"}
               </div>
               <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-bone">
-                Where Artists Get Seen.
-                <br />
-                <span
+                {"Play Arena -\u00A0"}<span
                   className="bg-clip-text text-transparent"
                   style={{
                     backgroundImage:
                       "linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #22d3ee 100%)",
                   }}
                 >
-                  Where Fans Shape the Future of Music.
+                  Live Music Battles
                 </span>
               </h2>
               <p className="mt-5 max-w-xl text-base md:text-lg text-white/70 leading-relaxed">
-                Tunevio is more than a music streaming platform — it's an interactive music ecosystem
-                built to help independent artists break through the noise and connect directly with
-                their audience.
+                Play Arena is a real-time competition layer where artists go head-to-head in live
+                music battles while audiences vote to decide the winner instantly.
               </p>
               <p className="mt-3 max-w-xl text-sm md:text-base text-white/50 leading-relaxed">
-                Discover new music through live artist battles, community voting, exclusive releases,
-                curated playlists, and real-time fan engagement. Every stream, vote, and interaction
-                helps artists gain exposure while giving fans a voice in who rises to the top.
-              </p>
-              <p className="mt-3 max-w-xl text-sm md:text-base text-white/50 leading-relaxed">
-                Unlike traditional platforms that rely mostly on algorithms, Tunevio puts discovery in
-                the hands of the community. Real artists. Real fans. Real opportunities.
+                No algorithm bias. No passive streaming. Just live performance and real outcomes.
               </p>
 
               <ul className="mt-8 grid sm:grid-cols-2 gap-3">
@@ -174,7 +165,7 @@ export function PlayArenaIntro() {
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <span className="text-xs uppercase tracking-[0.2em] text-white/40">
-                  {isLive ? "Free to watch · Vote live" : "Join the movement · Experience the future of music discovery"}
+                  {isLive ? "Free to watch · Vote live" : "Battles coming soon"}
                 </span>
               </div>
             </motion.div>

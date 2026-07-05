@@ -5,14 +5,14 @@ import { TrendingMerch } from "@/components/merch/TrendingMerch";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tunevio | Where Artists Get Seen & Fans Shape the Future of Music" },
-      { name: "description", content: "Tunevio is an interactive music ecosystem where independent artists break through the noise. Discover live battles, community voting, exclusive releases, and real-time fan engagement." },
-      { property: "og:title", content: "Tunevio | Where Artists Get Seen. Where Fans Shape the Future of Music." },
-      { property: "og:description", content: "Discover new music through live artist battles, community voting, exclusive releases, and real-time fan engagement." },
+      { title: "BWF Media TV, Real Content. Real People. Real Views." },
+      { name: "description", content: "BWF Media TV, 686M+ views, 324K+ subscribers. Hip-hop media, viral interviews, music videos, and culture. Book a shoot or partner with us." },
+      { property: "og:title", content: "BWF Media TV, Where Culture Goes Viral" },
+      { property: "og:description", content: "Where culture goes viral. 686M+ views and counting." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://tunevio.lovable.app/" },
+      { property: "og:url", content: "https://bwfmedia.company/" },
     ],
-    links: [{ rel: "canonical", href: "https://tunevio.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/" }],
   }),
   component: Index,
 });
