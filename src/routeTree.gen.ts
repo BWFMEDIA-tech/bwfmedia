@@ -114,6 +114,7 @@ import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$ro
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
+import { Route as ApiPublicConnectDiagnoseRouteImport } from './routes/api/public/connect-diagnose'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
 import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
@@ -657,6 +658,12 @@ const ApiPublicStudioBookingRoute = ApiPublicStudioBookingRouteImport.update({
   path: '/api/public/studio-booking',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicConnectDiagnoseRoute =
+  ApiPublicConnectDiagnoseRouteImport.update({
+    id: '/api/public/connect-diagnose',
+    path: '/api/public/connect-diagnose',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCheckoutCancellationEmailRoute =
   ApiPublicCheckoutCancellationEmailRouteImport.update({
     id: '/api/public/checkout-cancellation-email',
@@ -830,6 +837,7 @@ export interface FileRoutesByFullPath {
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
+  '/api/public/connect-diagnose': typeof ApiPublicConnectDiagnoseRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -948,6 +956,7 @@ export interface FileRoutesByTo {
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
+  '/api/public/connect-diagnose': typeof ApiPublicConnectDiagnoseRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -1068,6 +1077,7 @@ export interface FileRoutesById {
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
+  '/api/public/connect-diagnose': typeof ApiPublicConnectDiagnoseRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -1189,6 +1199,7 @@ export interface FileRouteTypes {
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
+    | '/api/public/connect-diagnose'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
@@ -1307,6 +1318,7 @@ export interface FileRouteTypes {
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
+    | '/api/public/connect-diagnose'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
@@ -1426,6 +1438,7 @@ export interface FileRouteTypes {
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
+    | '/api/public/connect-diagnose'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
@@ -1507,6 +1520,7 @@ export interface RootRouteChildren {
   ApiBattleReactRoute: typeof ApiBattleReactRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
+  ApiPublicConnectDiagnoseRoute: typeof ApiPublicConnectDiagnoseRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
@@ -2258,6 +2272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStudioBookingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/connect-diagnose': {
+      id: '/api/public/connect-diagnose'
+      path: '/api/public/connect-diagnose'
+      fullPath: '/api/public/connect-diagnose'
+      preLoaderRoute: typeof ApiPublicConnectDiagnoseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/checkout-cancellation-email': {
       id: '/api/public/checkout-cancellation-email'
       path: '/api/public/checkout-cancellation-email'
@@ -2521,6 +2542,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
+  ApiPublicConnectDiagnoseRoute: ApiPublicConnectDiagnoseRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
