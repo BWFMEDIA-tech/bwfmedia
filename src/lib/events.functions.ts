@@ -160,7 +160,7 @@ export const updateMyEvent = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { id, ...patch } = data;
-    const update: Record<string, unknown> = {};
+    const update: Database["public"]["Tables"]["events"]["Update"] = {};
     if (patch.title !== undefined) update.title = patch.title?.trim();
     if (patch.description !== undefined) update.description = patch.description;
     if (patch.event_type !== undefined) update.event_type = patch.event_type;
