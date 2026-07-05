@@ -325,6 +325,57 @@ export type Database = {
           },
         ]
       }
+      artist_vote_rollups: {
+        Row: {
+          artist_id: string
+          bucket: string
+          bucket_date: string
+          updated_at: string
+          votes: number
+          weight: number
+        }
+        Insert: {
+          artist_id: string
+          bucket: string
+          bucket_date: string
+          updated_at?: string
+          votes?: number
+          weight?: number
+        }
+        Update: {
+          artist_id?: string
+          bucket?: string
+          bucket_date?: string
+          updated_at?: string
+          votes?: number
+          weight?: number
+        }
+        Relationships: []
+      }
+      artist_vote_totals: {
+        Row: {
+          artist_id: string
+          last_vote_at: string | null
+          lifetime_votes: number
+          lifetime_weight: number
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          last_vote_at?: string | null
+          lifetime_votes?: number
+          lifetime_weight?: number
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          last_vote_at?: string | null
+          lifetime_votes?: number
+          lifetime_weight?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       battle_matches: {
         Row: {
           a_wins: number
@@ -619,8 +670,11 @@ export type Database = {
           choice: string
           created_at: string
           id: string
+          ip_address: unknown
           match_id: string
           round_id: string
+          session_id: string | null
+          user_agent: string | null
           voter_id: string
           weight: number
         }
@@ -628,8 +682,11 @@ export type Database = {
           choice: string
           created_at?: string
           id?: string
+          ip_address?: unknown
           match_id: string
           round_id: string
+          session_id?: string | null
+          user_agent?: string | null
           voter_id: string
           weight?: number
         }
@@ -637,8 +694,11 @@ export type Database = {
           choice?: string
           created_at?: string
           id?: string
+          ip_address?: unknown
           match_id?: string
           round_id?: string
+          session_id?: string | null
+          user_agent?: string | null
           voter_id?: string
           weight?: number
         }
@@ -3651,6 +3711,10 @@ export type Database = {
         }
         Returns: number
       }
+      battle_vote_target_artist: {
+        Args: { _choice: string; _match_id: string }
+        Returns: string
+      }
       boost_spends_access_check: {
         Args: { _row_user_id: string }
         Returns: boolean
@@ -3850,6 +3914,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      rebuild_artist_vote_stats: { Args: never; Returns: Json }
       recompute_play_arena_rankings: { Args: never; Returns: number }
       record_revenue_event: {
         Args: {
@@ -3873,6 +3938,10 @@ export type Database = {
           _user_id?: string
         }
         Returns: string
+      }
+      refresh_artist_vote_rollups: {
+        Args: { _since?: string }
+        Returns: number
       }
       reset_round_votes: { Args: { _round_id: string }; Returns: undefined }
       spend_boost_credit: {
