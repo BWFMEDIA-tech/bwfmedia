@@ -43,6 +43,10 @@ import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { StreamThumbnailDialog } from "@/components/stream/StreamThumbnailDialog";
 import { ImageIcon } from "lucide-react";
+import { ConnectedPlatformsSection } from "@/components/stream/ConnectedPlatformsSection";
+import { StreamDestinationSelector } from "@/components/stream/StreamDestinationSelector";
+import { setStreamDestinations } from "@/lib/stream-platforms.functions";
+import type { StreamPlatformKey } from "@/lib/stream-platforms/registry";
 
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
@@ -719,6 +723,9 @@ function StreamStudio() {
   const resumeFn = useServerFn(getMyActiveStream);
   const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
+  const setDestinationsFn = useServerFn(setStreamDestinations);
+  const [selectedDestinations, setSelectedDestinations] = useState<StreamPlatformKey[]>([]);
+  const platformsSectionRef = useRef<HTMLDivElement | null>(null);
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [going, setGoing] = useState(false);
@@ -867,6 +874,13 @@ function StreamStudio() {
         );
       }
       toast.success("You're live");
+      // Record which external platforms the creator picked. Actual RTMP
+      // fan-out is a follow-up — for now we capture intent + status.
+      if (selectedDestinations.length > 0) {
+        setDestinationsFn({ data: { streamId: s.id, platforms: selectedDestinations } }).catch(
+          (err: any) => console.error("save destinations failed", err),
+        );
+      }
       // Fan-out notifications to all members + artists (non-blocking).
       broadcastFn({ data: { streamId: s.id } })
         .then((r: any) => {
@@ -1031,12 +1045,30 @@ function StreamStudio() {
                   disconnects and we never trigger a reconnect storm / 429. */}
               <>
                 {!lk && (
-                  <div className="flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 text-xs text-zinc-400">
-                      Click
-                      <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-bold uppercase tracking-wider text-black" style={{ background: "#00E6FF" }}>
-                        {going ? "Starting…" : "Go Live"}
-                      </button>
-                      to start streaming
+                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-2">
+                    <div ref={platformsSectionRef}>
+                      <ConnectedPlatformsSection />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <StreamDestinationSelector
+                        selected={selectedDestinations}
+                        onChange={setSelectedDestinations}
+                        onWantsConnect={() =>
+                          platformsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+                        }
+                      />
+                      <div className="flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-black/40 p-3 text-xs text-zinc-400">
+                        Ready when you are —
+                        <button
+                          onClick={goLive}
+                          disabled={going}
+                          className="rounded-md px-3 py-1.5 font-bold uppercase tracking-wider text-black disabled:opacity-50"
+                          style={{ background: "#00E6FF" }}
+                        >
+                          {going ? "Starting…" : "Go Live"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 

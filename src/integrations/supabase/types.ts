@@ -2649,6 +2649,53 @@ export type Database = {
           },
         ]
       }
+      stream_destinations: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          error_message: string | null
+          id: string
+          platform: string
+          started_at: string | null
+          status: string
+          stream_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          error_message?: string | null
+          id?: string
+          platform: string
+          started_at?: string | null
+          status?: string
+          stream_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          error_message?: string | null
+          id?: string
+          platform?: string
+          started_at?: string | null
+          status?: string
+          stream_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_destinations_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_events: {
         Row: {
           anomaly_reasons: string[]
@@ -2767,6 +2814,77 @@ export type Database = {
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stream_platform_connections: {
+        Row: {
+          account_label: string | null
+          connected_at: string
+          external_account_id: string | null
+          id: string
+          platform: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_label?: string | null
+          connected_at?: string
+          external_account_id?: string | null
+          id?: string
+          platform: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_label?: string | null
+          connected_at?: string
+          external_account_id?: string | null
+          id?: string
+          platform?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      stream_platform_credentials: {
+        Row: {
+          access_token: string | null
+          connection_id: string
+          expires_at: string | null
+          refresh_token: string | null
+          rtmp_key: string | null
+          rtmp_url: string | null
+          scope: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token?: string | null
+          connection_id: string
+          expires_at?: string | null
+          refresh_token?: string | null
+          rtmp_key?: string | null
+          rtmp_url?: string | null
+          scope?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string | null
+          connection_id?: string
+          expires_at?: string | null
+          refresh_token?: string | null
+          rtmp_key?: string | null
+          rtmp_url?: string | null
+          scope?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_platform_credentials_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "stream_platform_connections"
             referencedColumns: ["id"]
           },
         ]
