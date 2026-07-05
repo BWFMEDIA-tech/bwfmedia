@@ -174,7 +174,7 @@ export function PlayArenaIntro() {
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <span className="text-xs uppercase tracking-[0.2em] text-white/40">
-                  {isLive ? "Free to watch · Vote live" : "Battles coming soon"}
+                  {isLive ? "Free to watch · Vote live" : "Join the movement · Experience the future of music discovery"}
                 </span>
               </div>
             </motion.div>
