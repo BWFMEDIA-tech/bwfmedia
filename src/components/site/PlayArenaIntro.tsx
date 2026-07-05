@@ -101,7 +101,7 @@ export function PlayArenaIntro() {
                   <span className={`absolute inset-0 animate-ping rounded-full ${isLive ? "bg-red-400/80" : "bg-fuchsia-400/70"}`} />
                   <span className={`relative h-2 w-2 rounded-full ${isLive ? "bg-red-500" : "bg-fuchsia-400"}`} />
                 </span>
-                {isLive ? `${activeBattles} Live ${activeBattles === 1 ? "Battle" : "Battles"}` : "New on BWF"}
+                {isLive ? `${activeBattles} Live ${activeBattles === 1 ? "Battle" : "Battles"}` : "New on Tunevio"}
               </div>
               <h2 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-bone">
                 Where Artists Get Seen.
