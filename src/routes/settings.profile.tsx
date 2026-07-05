@@ -458,17 +458,24 @@ function ProfileSettingsPage() {
           <div className="text-sm font-semibold">Upcoming Events Preview</div>
           <p className="text-xs text-white/50 mt-0.5">Your next 3 upcoming events.</p>
           <div className="mt-3 space-y-2">
-            {SAMPLE_EVENTS.map((e) => (
-              <div key={e.title} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-2">
-                <DateBlock month={e.month} day={e.day} />
-                <div className="min-w-0">
-                  <div className="truncate text-xs font-semibold">{e.title}</div>
-                  <div className="truncate text-[11px] text-white/50">{e.location} • {e.time}</div>
+            {events.length === 0 && <div className="text-xs text-white/40">No upcoming events.</div>}
+            {events.slice(0, 3).map((e) => {
+              const d = new Date(e.starts_at);
+              const month = d.toLocaleString("en-US", { month: "short" }).toUpperCase();
+              const day = String(d.getDate()).padStart(2, "0");
+              const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+              return (
+                <div key={e.id} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-2">
+                  <DateBlock month={month} day={day} />
+                  <div className="min-w-0">
+                    <div className="truncate text-xs font-semibold">{e.title}</div>
+                    <div className="truncate text-[11px] text-white/50">{e.location || "TBA"} • {time}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <div className="mt-3 text-center"><a href="/settings/events" className="text-xs font-semibold text-red-500 hover:underline">View All Events</a></div>
+          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-red-500 hover:underline">View Public Calendar</a></div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
