@@ -38,19 +38,30 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
     const activeBattles = live.length;
     const featuredMatch = live[0] ?? null;
 
-    let viewers = 0;
     let streamMeta: any = null;
     const streamIds = live.map((m) => m.stream_id).filter(Boolean);
+    let featuredStreamViewers = 0;
     if (streamIds.length) {
       const { data: streams } = await sb
         .from("streams")
         .select("id, room_name, viewer_count")
         .in("id", streamIds);
       for (const s of (streams ?? []) as any[]) {
-        viewers += s.viewer_count ?? 0;
-        if (featuredMatch && s.id === featuredMatch.stream_id) streamMeta = s;
+        if (featuredMatch && s.id === featuredMatch.stream_id) {
+          streamMeta = s;
+          featuredStreamViewers = s.viewer_count ?? 0;
+        }
       }
     }
+
+    // True viewers online = users marked online with a recent heartbeat.
+    const since = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    const { count: presenceCount } = await sb
+      .from("user_presence")
+      .select("user_id", { count: "exact", head: true })
+      .eq("online", true)
+      .gte("last_seen_at", since);
+    const viewers = presenceCount ?? 0;
 
     let aVotes = 0;
     let bVotes = 0;
@@ -94,7 +105,7 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
             totalRounds: featuredMatch.total_rounds ?? 3,
             aVotes,
             bVotes,
-            viewers: streamMeta?.viewer_count ?? 0,
+            viewers: featuredStreamViewers,
             startedAt: featuredMatch.started_at ?? null,
           }
         : null,
