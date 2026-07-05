@@ -1,5 +1,4 @@
 import { SiteHeader } from "./SiteHeader";
-import { SiteFooter } from "./SiteFooter";
 import type { ReactNode } from "react";
 
 export function LegalPage({
@@ -27,7 +26,6 @@ export function LegalPage({
           {children}
         </article>
       </main>
-      <SiteFooter />
     </div>
   );
 }
