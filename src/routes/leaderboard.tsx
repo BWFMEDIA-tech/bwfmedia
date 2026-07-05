@@ -201,7 +201,7 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
   return (
     <Link
       to="/artist/$id"
-      params={{ id: entry.publicId }}
+      params={{ id: entry.userId }}
       className={`group relative block transition-transform duration-500 hover:-translate-y-1 ${lift}`}
     >
       {/* Glow halo */}
@@ -339,7 +339,7 @@ function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
   return (
     <Link
       to="/artist/$id"
-      params={{ id: entry.publicId }}
+      params={{ id: entry.userId }}
       className="group relative block overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur transition-all duration-300 hover:border-white/20 hover:bg-white/[0.05]"
     >
       {/* Left accent bar */}
