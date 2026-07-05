@@ -50,6 +50,65 @@ function ProfileSettingsPage() {
   const [genreOpen, setGenreOpen] = useState(false);
   const [stats, setStats] = useState({ followers: 0, monthly: 0, streams: 0 });
 
+  // Events state
+  const listEventsFn = useServerFn(listMyEvents);
+  const createEventFn = useServerFn(createMyEvent);
+  const updateEventFn = useServerFn(updateMyEvent);
+  const deleteEventFn = useServerFn(deleteMyEvent);
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [editingEvent, setEditingEvent] = useState<Partial<EventRow> | null>(null);
+  const [savingEvent, setSavingEvent] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    listEventsFn().then((rows) => { if (!cancelled) setEvents(rows); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [user, listEventsFn]);
+
+  function newEvent() {
+    setEditingEvent({ title: "", location: "", starts_at: "", event_type: "event", status: "scheduled", link_url: "", description: "" });
+  }
+  async function saveEvent() {
+    if (!editingEvent?.title?.trim() || !editingEvent.starts_at) { toast.error("Title and date required"); return; }
+    setSavingEvent(true);
+    try {
+      const payload = {
+        title: editingEvent.title!,
+        starts_at: new Date(editingEvent.starts_at).toISOString(),
+        location: editingEvent.location || null,
+        event_type: editingEvent.event_type || "event",
+        status: editingEvent.status || "scheduled",
+        link_url: editingEvent.link_url || null,
+        description: editingEvent.description || null,
+      };
+      if (editingEvent.id) {
+        const updated = await updateEventFn({ data: { id: editingEvent.id, ...payload } });
+        setEvents((cur) => cur.map((e) => e.id === updated.id ? updated : e));
+        toast.success("Event updated");
+      } else {
+        const created = await createEventFn({ data: payload });
+        setEvents((cur) => [...cur, created].sort((a, b) => a.starts_at.localeCompare(b.starts_at)));
+        toast.success("Event added");
+      }
+      setEditingEvent(null);
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to save event");
+    } finally {
+      setSavingEvent(false);
+    }
+  }
+  async function removeEvent(id: string) {
+    if (!confirm("Delete this event?")) return;
+    try {
+      await deleteEventFn({ data: { id } });
+      setEvents((cur) => cur.filter((e) => e.id !== id));
+      toast.success("Event deleted");
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to delete");
+    }
+  }
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
