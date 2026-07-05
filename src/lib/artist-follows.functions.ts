@@ -50,10 +50,14 @@ export const listArtistFollowers = createServerFn({ method: "GET" })
     let profilesById = new Map<string, { id: string; display_name: string | null; avatar_url: string | null }>();
     if (ids.length > 0) {
       const { data: profs } = await sb
-        .from("profiles")
+        .from("public_profiles")
         .select("id, display_name, avatar_url")
         .in("id", ids);
-      profilesById = new Map((profs ?? []).map((p) => [p.id, p]));
+      profilesById = new Map(
+        (profs ?? [])
+          .filter((p): p is { id: string; display_name: string | null; avatar_url: string | null } => !!p.id)
+          .map((p) => [p.id, { id: p.id, display_name: p.display_name, avatar_url: p.avatar_url }]),
+      );
     }
 
     const followers = (rows ?? []).map((r) => {

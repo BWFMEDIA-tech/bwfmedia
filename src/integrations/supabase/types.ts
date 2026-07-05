@@ -3226,6 +3226,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tips_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tips_stream_id_fkey"
             columns: ["stream_id"]
             isOneToOne: false
@@ -3649,29 +3656,56 @@ export type Database = {
       public_profiles: {
         Row: {
           avatar_url: string | null
+          banner_url: string | null
           bio: string | null
+          brand_avatar_url: string | null
+          brand_name: string | null
           created_at: string | null
           display_name: string | null
+          featured_track_id: string | null
+          featured_video_id: string | null
           genre: string | null
+          genres: string[] | null
+          id: string | null
+          member_since: string | null
           public_id: string | null
+          stage_name: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
+          brand_avatar_url?: string | null
+          brand_name?: string | null
           created_at?: string | null
           display_name?: string | null
+          featured_track_id?: string | null
+          featured_video_id?: string | null
           genre?: string | null
+          genres?: string[] | null
+          id?: string | null
+          member_since?: string | null
           public_id?: string | null
+          stage_name?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
+          brand_avatar_url?: string | null
+          brand_name?: string | null
           created_at?: string | null
           display_name?: string | null
+          featured_track_id?: string | null
+          featured_video_id?: string | null
           genre?: string | null
+          genres?: string[] | null
+          id?: string | null
+          member_since?: string | null
           public_id?: string | null
+          stage_name?: string | null
           username?: string | null
         }
         Relationships: []

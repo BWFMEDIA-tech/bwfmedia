@@ -87,7 +87,7 @@ export const createBattleMatch = createServerFn({ method: "POST" })
       .in("status", ["pending", "live"]);
 
     const { data: profiles } = await supabase
-      .from("profiles")
+      .from("public_profiles")
       .select("id, display_name, stage_name")
       .in("id", [data.artistAId, data.artistBId]);
     const nameFor = (id: string) => {
@@ -186,7 +186,7 @@ export const updateBattleArtists = createServerFn({ method: "POST" })
     }
 
     const { data: profiles } = await supabase
-      .from("profiles")
+      .from("public_profiles")
       .select("id, display_name, stage_name")
       .in("id", [data.artistAId, data.artistBId]);
     const nameFor = (id: string) => {
