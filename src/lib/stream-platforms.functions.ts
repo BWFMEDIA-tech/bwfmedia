@@ -2,6 +2,48 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// Build the authorize URL for an OAuth-based streaming platform. The user
+// browser is then redirected to this URL. We generate a signed HMAC `state`
+// carrying the current user id + a nonce so the callback can trust who is
+// completing the flow without a session lookup.
+export const getStreamPlatformAuthorizeUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        platform: z.enum(["twitch", "youtube", "facebook"]),
+        origin: z.string().url(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { OAUTH_PROVIDERS, providerConfigured, providerRedirectUri } = await import(
+      "./stream-platforms/oauth-providers.server"
+    );
+    const { signOAuthState } = await import("./stream-platforms/state.server");
+    const cfg = OAUTH_PROVIDERS[data.platform];
+    if (!cfg) throw new Error("Unknown platform");
+    if (!providerConfigured(cfg)) {
+      return { ok: false as const, reason: "not_configured", envVars: [cfg.clientIdEnv, cfg.clientSecretEnv] };
+    }
+    const clientId = process.env[cfg.clientIdEnv]!;
+    const redirectUri = providerRedirectUri(data.origin, data.platform);
+    const state = await signOAuthState({ userId: context.userId, platform: data.platform });
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: cfg.scope,
+      state,
+    });
+    // Google requires offline access + consent prompt to get a refresh_token.
+    if (data.platform === "youtube") {
+      params.set("access_type", "offline");
+      params.set("prompt", "consent");
+    }
+    return { ok: true as const, url: `${cfg.authorizeUrl}?${params.toString()}` };
+  });
+
 // List the current user's linked streaming platforms (metadata only —
 // tokens/keys never leave the server).
 export const listMyStreamPlatformConnections = createServerFn({ method: "GET" })
