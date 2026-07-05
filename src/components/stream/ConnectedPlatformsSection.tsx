@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Plug, Radio } from "lucide-react";
+import { Check, Copy, Loader2, Plug, Radio } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -11,6 +11,77 @@ import {
 import { STREAM_PLATFORMS, type StreamPlatformKey } from "@/lib/stream-platforms/registry";
 
 type Connection = { id: string; platform: string; account_label: string | null };
+
+function CallbackUrlList() {
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState<string | null>(null);
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+  const rows = [
+    { key: "twitch", label: "Twitch", path: "/api/oauth/twitch/callback" },
+    { key: "youtube", label: "YouTube (Google)", path: "/api/oauth/youtube/callback" },
+    { key: "facebook", label: "Facebook (Meta)", path: "/api/oauth/facebook/callback" },
+    { key: "kick", label: "Kick", path: null },
+  ];
+  async function copy(key: string, value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(key);
+      toast.success("Copied");
+      setTimeout(() => setCopied((c) => (c === key ? null : c)), 1500);
+    } catch {
+      toast.error("Copy failed");
+    }
+  }
+  return (
+    <div className="mt-4 rounded-md border border-white/10 bg-black/30 p-3">
+      <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-white/70">
+        OAuth Redirect URIs
+      </div>
+      <p className="mb-2 text-[10px] text-white/40">
+        Paste these exactly into each provider's OAuth app settings when registering credentials.
+      </p>
+      <div className="space-y-1.5">
+        {rows.map((r) => {
+          const url = r.path && origin ? `${origin}${r.path}` : null;
+          return (
+            <div
+              key={r.key}
+              className="flex items-center gap-2 rounded border border-white/5 bg-black/40 px-2 py-1.5"
+            >
+              <span className="w-28 shrink-0 text-[11px] font-semibold text-white/70">
+                {r.label}
+              </span>
+              {url ? (
+                <>
+                  <code className="min-w-0 flex-1 truncate font-mono text-[11px] text-[#00E6FF]">
+                    {url}
+                  </code>
+                  <button
+                    onClick={() => copy(r.key, url)}
+                    className="shrink-0 rounded border border-white/10 p-1 text-white/60 hover:bg-white/5 hover:text-white"
+                    title="Copy"
+                  >
+                    {copied === r.key ? (
+                      <Check className="h-3 w-3 text-[#00E6FF]" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </button>
+                </>
+              ) : (
+                <span className="text-[11px] text-white/40">
+                  Manual RTMP — no OAuth callback needed
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function ConnectedPlatformsSection() {
   const [conns, setConns] = useState<Connection[]>([]);
@@ -145,6 +216,7 @@ export function ConnectedPlatformsSection() {
         <Radio className="h-3 w-3" /> Linking stores your account. Automatic restream fan-out is
         coming — for now, use the link as your simulcast handoff.
       </p>
+      <CallbackUrlList />
       {kickOpen && <KickRtmpModal onClose={() => setKickOpen(false)} onSaved={refresh} />}
     </div>
   );
