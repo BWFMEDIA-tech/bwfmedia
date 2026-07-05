@@ -1045,12 +1045,30 @@ function StreamStudio() {
                   disconnects and we never trigger a reconnect storm / 429. */}
               <>
                 {!lk && (
-                  <div className="flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 text-xs text-zinc-400">
-                      Click
-                      <button onClick={goLive} disabled={going} className="mx-2 rounded-md px-3 py-1.5 font-bold uppercase tracking-wider text-black" style={{ background: "#00E6FF" }}>
-                        {going ? "Starting…" : "Go Live"}
-                      </button>
-                      to start streaming
+                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-2">
+                    <div ref={platformsSectionRef}>
+                      <ConnectedPlatformsSection />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <StreamDestinationSelector
+                        selected={selectedDestinations}
+                        onChange={setSelectedDestinations}
+                        onWantsConnect={() =>
+                          platformsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+                        }
+                      />
+                      <div className="flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-black/40 p-3 text-xs text-zinc-400">
+                        Ready when you are —
+                        <button
+                          onClick={goLive}
+                          disabled={going}
+                          className="rounded-md px-3 py-1.5 font-bold uppercase tracking-wider text-black disabled:opacity-50"
+                          style={{ background: "#00E6FF" }}
+                        >
+                          {going ? "Starting…" : "Go Live"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 
