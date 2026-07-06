@@ -2,9 +2,9 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
-import { listUsers, assignRole, removeRole } from "@/lib/admin-users.functions";
+import { listUsers, assignRole, removeRole, deleteUser } from "@/lib/admin-users.functions";
 import { toast } from "sonner";
-import { Users, ArrowLeft, Plus, X, Search } from "lucide-react";
+import { Users, ArrowLeft, Plus, X, Search, Trash2 } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/admin/users")({
