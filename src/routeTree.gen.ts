@@ -46,6 +46,7 @@ import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as CreatorAgreementRouteImport } from './routes/creator-agreement'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ChartsRouteImport } from './routes/charts'
 import { Route as ArtistsRouteImport } from './routes/artists'
 import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as ArtistDashboardRouteImport } from './routes/artist-dashboard'
@@ -317,6 +318,11 @@ const CookiePolicyRoute = CookiePolicyRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChartsRoute = ChartsRouteImport.update({
+  id: '/charts',
+  path: '/charts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArtistsRoute = ArtistsRouteImport.update({
@@ -778,6 +784,7 @@ export interface FileRoutesByFullPath {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
+  '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -903,6 +910,7 @@ export interface FileRoutesByTo {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
+  '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -1030,6 +1038,7 @@ export interface FileRoutesById {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
+  '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
   '/creator-agreement': typeof CreatorAgreementRoute
@@ -1158,6 +1167,7 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
+    | '/charts'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1283,6 +1293,7 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
+    | '/charts'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1409,6 +1420,7 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
+    | '/charts'
     | '/contact'
     | '/cookie-policy'
     | '/creator-agreement'
@@ -1536,6 +1548,7 @@ export interface RootRouteChildren {
   ArtistDashboardRoute: typeof ArtistDashboardRoute
   ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
+  ChartsRoute: typeof ChartsRoute
   ContactRoute: typeof ContactRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
   CreatorAgreementRoute: typeof CreatorAgreementRoute
@@ -1875,6 +1888,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/charts': {
+      id: '/charts'
+      path: '/charts'
+      fullPath: '/charts'
+      preLoaderRoute: typeof ChartsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/artists': {
@@ -2603,6 +2623,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistDashboardRoute: ArtistDashboardRoute,
   ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
+  ChartsRoute: ChartsRoute,
   ContactRoute: ContactRoute,
   CookiePolicyRoute: CookiePolicyRoute,
   CreatorAgreementRoute: CreatorAgreementRoute,
