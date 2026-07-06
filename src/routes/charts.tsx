@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
 import { BarChart3, Flame, Heart, Play, Sparkles, Star, TrendingUp, Trophy, Music } from "lucide-react";
@@ -171,7 +171,18 @@ function ChartRow({ track, index, queue }: { track: ChartTrack; index: number; q
         </div>
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold">{track.title}</div>
-          <div className="truncate text-xs text-white/50">{track.artistName}</div>
+          {track.artistUserId ? (
+            <Link
+              to="/artist/$id"
+              params={{ id: track.artistUserId }}
+              onClick={(e) => e.stopPropagation()}
+              className="block truncate text-xs text-white/50 hover:text-primary transition"
+            >
+              {track.artistName}
+            </Link>
+          ) : (
+            <div className="truncate text-xs text-white/50">{track.artistName}</div>
+          )}
         </div>
       </button>
 
