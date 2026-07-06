@@ -135,7 +135,7 @@ export const deleteUser = createServerFn({ method: "POST" })
     await logAudit({
       actorId: (context as any).userId,
       action: "user.delete",
-      category: "user",
+      category: "admin",
       targetType: "user",
       targetId: data.userId,
       summary: "Deleted user account",
