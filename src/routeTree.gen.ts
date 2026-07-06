@@ -18,6 +18,7 @@ import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RecordingsRouteImport } from './routes/recordings'
@@ -176,6 +177,11 @@ const SignupRoute = SignupRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -799,6 +805,7 @@ export interface FileRoutesByFullPath {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -923,6 +930,7 @@ export interface FileRoutesByTo {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1049,6 +1057,7 @@ export interface FileRoutesById {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1176,6 +1185,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
@@ -1300,6 +1310,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
@@ -1425,6 +1436,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
@@ -1551,6 +1563,7 @@ export interface RootRouteChildren {
   RecordingsRoute: typeof RecordingsRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1666,6 +1679,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -2610,6 +2630,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecordingsRoute: RecordingsRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
