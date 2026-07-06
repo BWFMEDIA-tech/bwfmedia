@@ -50,7 +50,7 @@ function ChartsPage() {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3">
-            <BarChart3 className="h-7 w-7 text-amber-400" />
+            <BarChart3 className="h-7 w-7 text-primary" />
             <h1 className="text-3xl md:text-4xl font-black tracking-tight">Charts</h1>
           </div>
           <p className="mt-1 text-sm text-white/60">
@@ -69,7 +69,7 @@ function ChartsPage() {
                 onClick={() => setTab(t.id)}
                 className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
                   isActive
-                    ? "bg-amber-500 text-black shadow shadow-amber-500/30"
+                    ? "bg-primary text-black shadow shadow-primary/30"
                     : "text-white/70 hover:bg-white/5 hover:text-white"
                 }`}
               >
@@ -83,7 +83,7 @@ function ChartsPage() {
         {/* Section title */}
         <div className="mb-3 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-amber-400" />
+            <TrendingUp className="h-4 w-4 text-primary" />
             <h2 className="text-lg font-bold">{active.label}</h2>
           </div>
           <div className="text-xs uppercase tracking-widest text-white/40">
@@ -145,7 +145,7 @@ function ChartRow({ track, index, queue }: { track: ChartTrack; index: number; q
   }
 
   const rank =
-    index === 1 ? "text-amber-400" : index === 2 ? "text-white/80" : index === 3 ? "text-amber-700" : "text-white/40";
+    index === 1 ? "text-primary" : index === 2 ? "text-white/80" : index === 3 ? "text-accent" : "text-white/40";
 
   return (
     <li className="grid grid-cols-[36px_1fr_auto] md:grid-cols-[48px_1fr_80px_120px_80px_80px] items-center gap-3 md:gap-4 px-3 md:px-4 py-3 hover:bg-white/[0.03]">
@@ -181,8 +181,8 @@ function ChartRow({ track, index, queue }: { track: ChartTrack; index: number; q
       <div className="hidden md:flex items-center justify-end gap-1 text-xs tabular-nums">
         {track.ratingCount > 0 ? (
           <>
-            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-            <span className="font-bold text-amber-400">{track.rating.toFixed(1)}</span>
+            <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+            <span className="font-bold text-primary">{track.rating.toFixed(1)}</span>
             <span className="text-white/40">({track.ratingCount})</span>
           </>
         ) : (
@@ -199,8 +199,8 @@ function ChartRow({ track, index, queue }: { track: ChartTrack; index: number; q
       {/* Mobile compact stats */}
       <div className="md:hidden flex items-center gap-3 text-[11px] tabular-nums text-white/50">
         {track.ratingCount > 0 && (
-          <span className="inline-flex items-center gap-1 text-amber-400">
-            <Star className="h-3 w-3 fill-amber-400" />
+          <span className="inline-flex items-center gap-1 text-primary">
+            <Star className="h-3 w-3 fill-primary" />
             {track.rating.toFixed(1)}
           </span>
         )}
