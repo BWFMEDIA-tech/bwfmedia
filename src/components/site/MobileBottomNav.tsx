@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Swords, PlusCircle, Search, User } from "lucide-react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 type Tab = {
@@ -19,6 +20,11 @@ const TABS: Tab[] = [
 
 export function MobileBottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--bwf-mobile-nav-h", "64px");
+    return () => root.style.removeProperty("--bwf-mobile-nav-h");
+  }, []);
   return (
     <nav
       aria-label="Primary"
