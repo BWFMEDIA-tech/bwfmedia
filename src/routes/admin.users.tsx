@@ -109,6 +109,26 @@ function AdminUsersPage() {
     }
   };
 
+  const onDelete = async (userId: string) => {
+    const target = rows.find((r) => r.id === userId);
+    const label = target?.display_name || target?.email || userId.slice(0, 8);
+    const answer = prompt(
+      `PERMANENTLY DELETE ${label}? This removes their account and cannot be undone. Type "DELETE" to confirm.`,
+      "",
+    );
+    if (answer !== "DELETE") {
+      toast.message("Cancelled — confirmation phrase didn't match.");
+      return;
+    }
+    try {
+      await destroy({ data: { userId } });
+      toast.success(`Deleted ${label} (audit logged)`);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
   if (auth.loading || !isAdmin) return null;
 
   return (
