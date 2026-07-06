@@ -119,3 +119,26 @@ export const removeRole = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const deleteUser = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .inputValidator((input) =>
+    z.object({ userId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    if (data.userId === (context as any).userId) {
+      throw new Error("Cannot delete your own account");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as any).auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
+    await logAudit({
+      actorId: (context as any).userId,
+      action: "user.delete",
+      category: "admin",
+      targetType: "user",
+      targetId: data.userId,
+      summary: "Deleted user account",
+    });
+    return { ok: true };
+  });
