@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadRouteImport } from './routes/upload'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TunevioRouteImport } from './routes/tunevio'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -17,6 +18,7 @@ import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RecordingsRouteImport } from './routes/recordings'
@@ -132,6 +134,11 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
 
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
@@ -170,6 +177,11 @@ const SignupRoute = SignupRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -793,6 +805,7 @@ export interface FileRoutesByFullPath {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -801,6 +814,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/upload': typeof UploadRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -916,6 +930,7 @@ export interface FileRoutesByTo {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -924,6 +939,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/upload': typeof UploadRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1041,6 +1057,7 @@ export interface FileRoutesById {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1049,6 +1066,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/upload': typeof UploadRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1167,6 +1185,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
@@ -1175,6 +1194,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/upload'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
@@ -1290,6 +1310,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
@@ -1298,6 +1319,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/upload'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
@@ -1414,6 +1436,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/search'
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
@@ -1422,6 +1445,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/upload'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
@@ -1539,6 +1563,7 @@ export interface RootRouteChildren {
   RecordingsRoute: typeof RecordingsRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1547,6 +1572,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  UploadRoute: typeof UploadRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ArtistIdRoute: typeof ArtistIdRoute
@@ -1592,6 +1618,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/unsubscribe': {
       id: '/unsubscribe'
       path: '/unsubscribe'
@@ -1646,6 +1679,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -2590,6 +2630,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecordingsRoute: RecordingsRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -2598,6 +2639,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  UploadRoute: UploadRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
