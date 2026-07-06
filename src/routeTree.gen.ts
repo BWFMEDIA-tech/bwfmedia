@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadRouteImport } from './routes/upload'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TunevioRouteImport } from './routes/tunevio'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -132,6 +133,11 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
 
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
@@ -801,6 +807,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/upload': typeof UploadRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -924,6 +931,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/upload': typeof UploadRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1049,6 +1057,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/upload': typeof UploadRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1175,6 +1184,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/upload'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
@@ -1298,6 +1308,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/upload'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
@@ -1422,6 +1433,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
+    | '/upload'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
@@ -1547,6 +1559,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  UploadRoute: typeof UploadRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ArtistIdRoute: typeof ArtistIdRoute
@@ -1592,6 +1605,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/unsubscribe': {
       id: '/unsubscribe'
       path: '/unsubscribe'
@@ -2598,6 +2618,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  UploadRoute: UploadRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
