@@ -168,13 +168,14 @@ function AdminUsersPage() {
                 <th className="px-4 py-3">Roles</th>
                 <th className="px-4 py-3">Last sign-in</th>
                 <th className="px-4 py-3 text-right">Assign</th>
+                <th className="px-4 py-3 text-right">Delete</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={4} className="px-4 py-8 text-center text-white/50">Loading…</td></tr>
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-white/50">Loading…</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={4} className="px-4 py-8 text-center text-white/50">No users.</td></tr>
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-white/50">No users.</td></tr>
               ) : rows.map((u) => (
                 <tr key={u.id} className="border-t border-white/5 align-top">
                   <td className="px-4 py-3">
@@ -233,6 +234,15 @@ function AdminUsersPage() {
                         <option key={r} value={r}>{r}</option>
                       ))}
                     </select>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => onDelete(u.id)}
+                      className="inline-flex items-center gap-1 rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs text-red-200 hover:bg-red-500/20"
+                      aria-label="Delete user"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Delete
+                    </button>
                   </td>
                 </tr>
               ))}
