@@ -23,7 +23,9 @@ export function MobileBottomNav() {
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty("--bwf-mobile-nav-h", "64px");
-    return () => root.style.removeProperty("--bwf-mobile-nav-h");
+    return () => {
+      root.style.removeProperty("--bwf-mobile-nav-h");
+    };
   }, []);
   return (
     <nav
