@@ -35,6 +35,7 @@ function AdminUsersPage() {
   const list = useServerFn(listUsers);
   const assign = useServerFn(assignRole);
   const remove = useServerFn(removeRole);
+  const destroy = useServerFn(deleteUser);
   const isAdmin = auth.roles.includes("admin");
 
   const [rows, setRows] = useState<UserRow[]>([]);
