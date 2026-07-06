@@ -119,7 +119,6 @@ export const deleteStream = createServerFn({ method: "POST" })
   });
 
 export const getStreamByRoom = createServerFn({ method: "POST" })
-*** placeholder ***
   .inputValidator((input) =>
     z.object({ roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/) }).parse(input),
   )
