@@ -1045,11 +1045,11 @@ function StreamStudio() {
                   disconnects and we never trigger a reconnect storm / 429. */}
               <>
                 {!lk && (
-                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-2">
-                    <div ref={platformsSectionRef}>
+                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                    <div ref={platformsSectionRef} className="min-w-0">
                       <ConnectedPlatformsSection />
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex min-w-0 flex-col gap-3">
                       <StreamDestinationSelector
                         selected={selectedDestinations}
                         onChange={setSelectedDestinations}
