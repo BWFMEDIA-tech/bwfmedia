@@ -277,7 +277,7 @@ function TunevioLanding() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
+      <section id="tunevio-hero" className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
         {/* Hero video background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
