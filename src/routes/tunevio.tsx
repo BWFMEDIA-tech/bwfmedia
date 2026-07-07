@@ -352,6 +352,9 @@ function TunevioLanding() {
           </div>
       </section>
 
+      {/* 1.5 For Artists */}
+      <ForArtistsSection />
+
       {/* 2. Social Proof */}
       <section className="relative px-5 sm:px-10 pb-20">
         <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-10 backdrop-blur-xl">
