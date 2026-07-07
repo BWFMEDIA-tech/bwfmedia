@@ -159,7 +159,7 @@ export function ConnectedPlatformsSection() {
   }
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
+    <div className="min-w-0 rounded-lg border border-white/10 bg-white/[0.02] p-4">
       <div className="mb-3 flex items-center gap-2">
         <Plug className="h-4 w-4 text-[#00E6FF]" />
         <h3 className="text-sm font-bold uppercase tracking-wider">Connected Platforms</h3>
