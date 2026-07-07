@@ -27,6 +27,8 @@ import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
 import micWalkupVideo from "@/assets/tunevio-mic-walkup-black.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import playArena1v1 from "@/assets/play-arena-1v1-battle.png.asset.json";
+import { ForArtistsSection } from "@/components/site/ForArtistsSection";
+
 
 
 export const Route = createFileRoute("/tunevio")({
