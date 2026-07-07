@@ -27,6 +27,8 @@ import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
 import micWalkupVideo from "@/assets/tunevio-mic-walkup-black.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import playArena1v1 from "@/assets/play-arena-1v1-battle.png.asset.json";
+import { ForArtistsSection } from "@/components/site/ForArtistsSection";
+
 
 
 export const Route = createFileRoute("/tunevio")({
@@ -275,7 +277,7 @@ function TunevioLanding() {
       </header>
 
       {/* 1. Hero */}
-      <section className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
+      <section id="tunevio-hero" className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
         {/* Hero video background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
@@ -349,6 +351,9 @@ function TunevioLanding() {
             </motion.div>
           </div>
       </section>
+
+      {/* 1.5 For Artists */}
+      <ForArtistsSection />
 
       {/* 2. Social Proof */}
       <section className="relative px-5 sm:px-10 pb-20">
