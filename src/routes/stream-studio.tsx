@@ -918,15 +918,15 @@ function StreamStudio() {
     <div className="min-h-screen bg-black text-zinc-300" style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}>
       <MediaEngineProvider>
       <SiteHeader />
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen w-full min-w-0">
         <Sidebar />
-        <main className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px]">
+        <main className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col gap-3 p-3 sm:p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px] xl:overflow-y-auto">
             {/* Center column */}
             <div className="flex min-w-0 flex-col gap-3">
               {/* Console header */}
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-5 py-3 backdrop-blur">
-                <div className="flex flex-wrap items-center gap-3">
+              <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-3 py-3 backdrop-blur sm:px-5">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
                   <div className={cn(
                     "flex items-center gap-2 rounded-full px-3 py-1 border",
                     lk ? "bg-[#FF00A6]/10 border-[#FF00A6]/40" : "bg-zinc-900 border-zinc-800",
@@ -1045,11 +1045,11 @@ function StreamStudio() {
                   disconnects and we never trigger a reconnect storm / 429. */}
               <>
                 {!lk && (
-                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-2">
-                    <div ref={platformsSectionRef}>
+                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                    <div ref={platformsSectionRef} className="min-w-0">
                       <ConnectedPlatformsSection />
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex min-w-0 flex-col gap-3">
                       <StreamDestinationSelector
                         selected={selectedDestinations}
                         onChange={setSelectedDestinations}
