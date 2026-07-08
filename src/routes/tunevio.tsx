@@ -263,15 +263,6 @@ export function TunevioLanding() {
       </div>
 
       {/* Top bar */}
-      <header className="relative z-10 flex items-center justify-between px-5 sm:px-10 py-5">
-        <div className="flex items-center gap-2">
-          <img
-            src={tunevioLogo.url}
-            alt="Tunevio"
-            className="h-12 sm:h-14 w-auto drop-shadow-[0_0_25px_rgba(197,61,255,0.55)]"
-          />
-        </div>
-      </header>
 
       {/* 1. Hero */}
       <section id="tunevio-hero" className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
