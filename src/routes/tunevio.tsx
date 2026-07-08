@@ -271,9 +271,6 @@ export function TunevioLanding() {
             className="h-12 sm:h-14 w-auto drop-shadow-[0_0_25px_rgba(197,61,255,0.55)]"
           />
         </div>
-        <span className="text-xs uppercase tracking-[0.2em] text-white/50">
-          by BWF Media
-        </span>
       </header>
 
       {/* 1. Hero */}
