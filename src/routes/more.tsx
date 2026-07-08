@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState, useCallback } from "react";
+
 import {
   Compass, TrendingUp, Sparkles, Music2, BarChart2, ListMusic,
   Upload, Sliders, LineChart, DollarSign, Megaphone, Users,
@@ -22,9 +24,93 @@ export const Route = createFileRoute("/more")({
 type Item = { label: string; to?: string; icon: LucideIcon; soon?: boolean; onClick?: () => void; danger?: boolean };
 type Section = { title: string; items: Item[] };
 
+const SWIPE_THRESHOLD = 96;
+const VELOCITY_THRESHOLD = 0.45;
+
+function useSwipeToClose(onClose: () => void) {
+  const startY = useRef(0);
+  const startX = useRef(0);
+  const currentY = useRef(0);
+  const currentX = useRef(0);
+  const startTime = useRef(0);
+  const [offset, setOffset] = useState(0);
+  const rafRef = useRef<number | null>(null);
+
+  const updateOffset = useCallback((value: number) => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => setOffset(value));
+  }, []);
+
+  useEffect(() => {
+    const el = document.documentElement;
+    let dragging = false;
+
+    const touchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      // Only start from the top 140px to avoid conflicting with vertical scroll
+      if (t.clientY > 140) return;
+      dragging = true;
+      startY.current = t.clientY;
+      startX.current = t.clientX;
+      currentY.current = t.clientY;
+      currentX.current = t.clientX;
+      startTime.current = performance.now();
+      updateOffset(0);
+    };
+
+    const touchMove = (e: TouchEvent) => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      currentY.current = t.clientY;
+      currentX.current = t.clientX;
+      const dy = currentY.current - startY.current;
+      const dx = currentX.current - startX.current;
+      if (dy > 0 && dy > Math.abs(dx) * 0.6) {
+        updateOffset(Math.min(dy * 0.55, 160));
+        if (e.cancelable) e.preventDefault();
+      }
+    };
+
+    const touchEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      const dy = currentY.current - startY.current;
+      const dt = performance.now() - startTime.current;
+      const velocity = dy / (dt || 1);
+      if (dy > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+        updateOffset(0);
+        onClose();
+      } else {
+        updateOffset(0);
+      }
+    };
+
+    el.addEventListener("touchstart", touchStart, { passive: true });
+    el.addEventListener("touchmove", touchMove, { passive: false });
+    el.addEventListener("touchend", touchEnd, { passive: true });
+    el.addEventListener("touchcancel", touchEnd, { passive: true });
+
+    return () => {
+      el.removeEventListener("touchstart", touchStart);
+      el.removeEventListener("touchmove", touchMove);
+      el.removeEventListener("touchend", touchEnd);
+      el.removeEventListener("touchcancel", touchEnd);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [onClose, updateOffset]);
+
+  return offset;
+}
+
 function MorePage() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+
+  const handleSwipeClose = useCallback(() => {
+    navigate({ to: "/" });
+  }, [navigate]);
+
+  const offset = useSwipeToClose(handleSwipeClose);
 
   const sections: Section[] = [
     {
@@ -93,11 +179,17 @@ function MorePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050509] text-white pb-28">
+    <div
+      className="min-h-screen bg-[#050509] text-white pb-28"
+      style={{ transform: `translateY(${Math.round(offset)}px)`, transition: offset === 0 ? "transform 250ms ease" : "none" }}
+    >
       <header className="sticky top-0 z-10 border-b border-white/10 bg-[#050509]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
-          <h1 className="text-2xl font-black tracking-tight">More</h1>
-          <Link to="/search" className="text-xs font-semibold text-white/60 hover:text-white">Search</Link>
+        <div className="mx-auto flex max-w-3xl flex-col items-center px-5 pt-2 pb-4">
+          <div className="mb-2 h-1 w-10 rounded-full bg-white/20" aria-hidden="true" />
+          <div className="flex w-full items-center justify-between">
+            <h1 className="text-2xl font-black tracking-tight">More</h1>
+            <Link to="/search" className="text-xs font-semibold text-white/60 hover:text-white">Search</Link>
+          </div>
         </div>
       </header>
 
