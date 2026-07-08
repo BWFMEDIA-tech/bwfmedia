@@ -92,7 +92,7 @@ function MessagesPage() {
       if (search.to) others.add(search.to);
       if (others.size) {
         const { data: ps } = await supabase
-          .from("public_profiles")
+          .from("profiles")
           .select("id, display_name, avatar_url")
           .in("id", [...others]);
         if (!cancelled) {
@@ -183,7 +183,7 @@ function MessagesPage() {
     let cancelled = false;
     (async () => {
       const { data } = await supabase
-        .from("public_profiles")
+        .from("profiles")
         .select("id, display_name, avatar_url")
         .ilike("display_name", `%${q}%`)
         .neq("id", auth.user?.id ?? "")

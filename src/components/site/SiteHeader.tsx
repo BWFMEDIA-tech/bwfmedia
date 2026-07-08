@@ -58,7 +58,7 @@ const PRIMARY: NavItem[] = [
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/videos", label: "Videos", icon: Mic },
-  { to: "/charts", label: "Charts", icon: BarChart3 },
+  { to: "/dashboard", label: "Charts", icon: BarChart3 },
 ];
 
 const BROWSE: NavItem[] = [

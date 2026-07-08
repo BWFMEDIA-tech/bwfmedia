@@ -39,7 +39,7 @@ export type QueueEntry = {
 async function hydrateProfiles<T extends { user_id: string }>(rows: T[]): Promise<T[]> {
   const ids = [...new Set(rows.map((r) => r.user_id))];
   if (!ids.length) return rows;
-  const { data } = await supabase.from("public_profiles").select(IDENTITY_COLUMNS).in("id", ids);
+  const { data } = await supabase.from("profiles").select(IDENTITY_COLUMNS).in("id", ids);
   const map = new Map<string, { display_name: string | null; avatar_url: string | null }>();
   (data ?? []).forEach((p: any) => {
     const eff = effectiveIdentity(p);
