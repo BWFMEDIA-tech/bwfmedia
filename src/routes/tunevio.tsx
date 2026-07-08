@@ -235,7 +235,7 @@ function fmt(n: number) {
   return n.toLocaleString("en-US");
 }
 
-function TunevioLanding() {
+export function TunevioLanding() {
   const { count, setCount } = useWaitlistCount();
   const onJoined = () =>
     setCount((c) => (typeof c === "number" ? c + 1 : c));
