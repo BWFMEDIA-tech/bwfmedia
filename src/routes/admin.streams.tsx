@@ -4,9 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { endStreamAdmin } from "@/lib/moderation.functions";
-import { deleteStreamsBulk } from "@/lib/streams.functions";
 import { toast } from "sonner";
-import { Radio, Square, ArrowLeft, ExternalLink, Trash2 } from "lucide-react";
+import { Radio, Square, ArrowLeft, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/admin/streams")({
   head: () => ({
@@ -34,7 +33,6 @@ function NetworkStreamsPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const endFn = useServerFn(endStreamAdmin);
-  const bulkDelFn = useServerFn(deleteStreamsBulk);
   const isAdmin = auth.roles.includes("admin");
 
   const [tab, setTab] = useState<"live" | "ended" | "all">("live");
@@ -70,23 +68,6 @@ function NetworkStreamsPage() {
     }
   };
 
-  const [deleting, setDeleting] = useState(false);
-  const handleDeleteAll = async () => {
-    const scope = tab === "all" ? "ALL streams (live + ended)" : `all ${tab} streams`;
-    if (!confirm(`Delete ${scope}? This cannot be undone.`)) return;
-    if (!confirm(`Really delete ${scope}? Type-check: this is permanent.`)) return;
-    setDeleting(true);
-    try {
-      const res = await bulkDelFn({ data: { status: tab } });
-      toast.success(`Deleted ${res.deleted} stream${res.deleted === 1 ? "" : "s"}`);
-      load();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Delete failed");
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   if (auth.loading || !isAdmin) return null;
 
   return (
@@ -100,7 +81,7 @@ function NetworkStreamsPage() {
         </h1>
         <p className="mt-1 text-white/55">Manage every live and archived broadcast across BWFNetwork.</p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2">
+        <div className="mt-6 flex gap-2">
           {(["live", "ended", "all"] as const).map((t) => (
             <button
               key={t}
@@ -112,14 +93,6 @@ function NetworkStreamsPage() {
               {t}
             </button>
           ))}
-          <button
-            onClick={handleDeleteAll}
-            disabled={deleting || rows.length === 0}
-            className="ml-auto inline-flex items-center gap-2 rounded-lg bg-red-600/90 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Trash2 className="h-4 w-4" />
-            {deleting ? "Deleting…" : `Delete all ${tab}`}
-          </button>
         </div>
 
         <div className="mt-6 overflow-hidden rounded-xl border border-white/10">

@@ -98,7 +98,7 @@ export function LiveProductionDashboard({
       <SourceTogglePanel />
 
       {/* Main two-panel layout */}
-      <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid gap-4 lg:grid-cols-2">
         <StagePanel
           participants={participants}
           onInvite={onInvite}

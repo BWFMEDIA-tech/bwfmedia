@@ -118,29 +118,6 @@ export const deleteStream = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const deleteStreamsBulk = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({
-      status: z.enum(["live", "ended", "all"]).optional(),
-      ids: z.array(z.string().uuid()).max(1000).optional(),
-    }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: adm } = await supabase
-      .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
-    if (!adm) throw new Error("Not authorized");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from("streams").delete({ count: "exact" });
-    if (data.ids && data.ids.length) q = q.in("id", data.ids);
-    else if (data.status && data.status !== "all") q = q.eq("status", data.status);
-    else q = q.not("id", "is", null);
-    const { error, count } = await q;
-    if (error) throw new Error(error.message);
-    return { ok: true, deleted: count ?? 0 };
-  });
-
 export const getStreamByRoom = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({ roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/) }).parse(input),

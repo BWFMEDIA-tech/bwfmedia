@@ -9,7 +9,6 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { MobileBottomNav } from "@/components/site/MobileBottomNav";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
 import { GlobalPlayer } from "@/components/player/GlobalPlayer";
@@ -40,12 +39,7 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0b0b12" },
-      { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "BWF" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "BWF Network — Music, Live Streams, and Creator Platform" },
       { name: "description", content: "BWF Network is the creator-powered entertainment platform for independent artists: stream music, host live audio and video, sell merch, and grow your fanbase." },
       { name: "author", content: "BWF Media TV" },
@@ -101,7 +95,6 @@ export const Route = createRootRoute({
       },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
-      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -145,19 +138,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
-  const showBottomNav =
-    isChrome &&
-    !pathname.startsWith("/admin") &&
-    !pathname.startsWith("/settings") &&
-    !pathname.startsWith("/artist-dashboard") &&
-    !pathname.startsWith("/dashboard") &&
-    !pathname.startsWith("/checkout") &&
-    !pathname.startsWith("/broadcast/") &&
-    !pathname.startsWith("/play/") &&
-    !pathname.startsWith("/invite/") &&
-    !pathname.startsWith("/forgot-password") &&
-    !pathname.startsWith("/access-denied") &&
-    !pathname.startsWith("/deck");
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
   }));
@@ -170,10 +150,7 @@ function RootComponent() {
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div
-          className={
-            "pt-[calc(var(--bwf-banner-h,0px)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+80px)]" +
-            (showBottomNav ? " pb-[calc(env(safe-area-inset-bottom)+64px)] md:pb-0" : "")
-          }
+          className="pt-[calc(var(--bwf-banner-h,0px)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+80px)]"
         >
 
           <Outlet />
@@ -181,7 +158,6 @@ function RootComponent() {
         {isChrome && pathname === "/" && <SiteFooter />}
         <CartDrawer />
         <GlobalPlayer />
-        {showBottomNav && <MobileBottomNav />}
         </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>

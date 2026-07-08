@@ -35,7 +35,7 @@ function CallbackUrlList() {
     }
   }
   return (
-    <div className="mt-4 min-w-0 rounded-md border border-white/10 bg-black/30 p-3">
+    <div className="mt-4 rounded-md border border-white/10 bg-black/30 p-3">
       <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-white/70">
         OAuth Redirect URIs
       </div>
@@ -48,7 +48,7 @@ function CallbackUrlList() {
           return (
             <div
               key={r.key}
-              className="flex min-w-0 items-center gap-2 rounded border border-white/5 bg-black/40 px-2 py-1.5"
+              className="flex items-center gap-2 rounded border border-white/5 bg-black/40 px-2 py-1.5"
             >
               <span className="w-28 shrink-0 text-[11px] font-semibold text-white/70">
                 {r.label}
@@ -159,7 +159,7 @@ export function ConnectedPlatformsSection() {
   }
 
   return (
-    <div className="min-w-0 rounded-lg border border-white/10 bg-white/[0.02] p-4">
+    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
       <div className="mb-3 flex items-center gap-2">
         <Plug className="h-4 w-4 text-[#00E6FF]" />
         <h3 className="text-sm font-bold uppercase tracking-wider">Connected Platforms</h3>
