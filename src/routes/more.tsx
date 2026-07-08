@@ -56,7 +56,6 @@ function useSwipeToClose(onClose: () => void) {
       currentX.current = t.clientX;
       startTime.current = performance.now();
       updateOffset(0);
-      console.log("TS", t.clientY);
     };
 
     const touchMove = (e: TouchEvent) => {
@@ -66,7 +65,6 @@ function useSwipeToClose(onClose: () => void) {
       currentX.current = t.clientX;
       const dy = currentY.current - startY.current;
       const dx = currentX.current - startX.current;
-      console.log("TM", dy, dx);
       if (dy > 0 && dy > Math.abs(dx) * 0.6) {
         updateOffset(Math.min(dy * 0.55, 160));
         if (e.cancelable) e.preventDefault();
