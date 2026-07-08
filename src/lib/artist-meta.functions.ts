@@ -36,18 +36,18 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const tracks = (tracksRes.data ?? []) as Array<{ like_count: number; dislike_count: number }>;
       const streamIds = ((streamsRes.data ?? []) as Array<{ id: string }>).map((s) => s.id);
 
-      // Real likes across the platform: play_votes upvotes (mirrored into
-      // play_tracks.like_count by trigger) + hearts from track_likes.
-      const trackIdsRes = await sb
-        .from("play_tracks").select("id").eq("artist_user_id", id);
-      const trackIds = ((trackIdsRes.data ?? []) as Array<{ id: string }>).map((t) => t.id);
-      let heartLikes = 0;
-      if (trackIds.length) {
-        const { count } = await sb
-          .from("track_likes")
-          .select("track_id", { count: "exact", head: true })
-          .in("track_id", trackIds);
-        heartLikes = count ?? 0;
+      // If we found no profile row AND nothing else references this id,
+      // the artist genuinely doesn't exist — signal not-found to the route
+      // instead of silently returning the placeholder "Artist" shell.
+      const profileExists = !!profileRes.data;
+      const hasAnyContent =
+        profileExists ||
+        !!queueRes.data ||
+        (tracks.length > 0) ||
+        (videosRes.count ?? 0) > 0 ||
+        streamIds.length > 0;
+      if (!hasAnyContent) {
+        return { exists: false as const };
       }
 
       let tipsCents = 0;
@@ -61,8 +61,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       }
 
       const songCount = tracks.length;
-      const voteLikes = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
-      const likeCount = voteLikes + heartLikes;
+      const likeCount = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
       const genres: string[] = Array.isArray(p.genres) ? p.genres : [];
       const genre = (p.genre as string | null) ?? (genres[0] ?? null);
 
@@ -90,6 +89,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const tracksSigned = trackList.map((t, i) => ({ ...t, cover_url: trackCovers[i] }));
 
       return {
+        exists: true as const,
         name: (p.stage_name as string | null) ?? (p.display_name as string | null) ?? (q.artist_name as string | null) ?? null,
         photo: photoSigned,
         banner: bannerSigned,
@@ -117,6 +117,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       };
     } catch {
       return {
+        exists: true as const,
         name: null as string | null, photo: null as string | null,
         banner: null as string | null, bio: null as string | null,
         location: null as string | null, genre: null as string | null,

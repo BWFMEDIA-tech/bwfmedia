@@ -3,6 +3,7 @@ import { Music, Play, Pause, Volume2 } from "lucide-react";
 import { usePlayQueue } from "@/lib/usePlayQueue";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
+import { registerAudioElement } from "@/lib/audio-bus";
 
 /**
  * Compact "Now Playing" strip that mirrors the Play Arena's currently-playing
@@ -19,6 +20,12 @@ export function NowPlayingMini({ streamId }: { streamId: string | null }) {
   // Reset playing state when the track changes
   useEffect(() => {
     setIsPlaying(false);
+  }, [playing?.id]);
+
+  // Register with the single-active playback bus so this mini player
+  // pauses if any other audio source in the app starts (and vice versa).
+  useEffect(() => {
+    return registerAudioElement(audioRef.current);
   }, [playing?.id]);
 
   if (!playing) return null;

@@ -29,7 +29,6 @@ import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NetworkRouteImport } from './routes/network'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
 import { Route as MessagesRouteImport } from './routes/messages'
-import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -111,16 +110,12 @@ import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-boo
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
-import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -130,7 +125,6 @@ import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public
 import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify/callback'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
-import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -230,11 +224,6 @@ const MicDropRoute = MicDropRouteImport.update({
 const MessagesRoute = MessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -646,18 +635,6 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const PlayAudienceRoomRoute = PlayAudienceRoomRouteImport.update({
   id: '/play/audience/$room',
   path: '/play/audience/$room',
@@ -690,17 +667,6 @@ const ApiPublicBlockBookingRoute = ApiPublicBlockBookingRouteImport.update({
   path: '/api/public/block-booking',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBattleReactRoute = ApiBattleReactRouteImport.update({
-  id: '/api/battle/react',
-  path: '/api/battle/react',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -752,12 +718,6 @@ const ApiPublicHooksProcessPayoutsRoute =
     path: '/api/public/hooks/process-payouts',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiOauthPlatformCallbackRoute =
-  ApiOauthPlatformCallbackRouteImport.update({
-    id: '/api/oauth/$platform/callback',
-    path: '/api/oauth/$platform/callback',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -780,7 +740,6 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
-  '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
   '/network': typeof NetworkRoute
@@ -801,8 +760,6 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -864,15 +821,12 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
-  '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
@@ -903,7 +857,6 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
-  '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
   '/network': typeof NetworkRoute
@@ -924,8 +877,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -987,15 +938,12 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
-  '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
@@ -1028,7 +976,6 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
-  '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
   '/network': typeof NetworkRoute
@@ -1049,8 +996,6 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
-  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
-  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1112,15 +1057,12 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
-  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
-  '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
@@ -1154,7 +1096,6 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/live'
     | '/login'
-    | '/mcp'
     | '/messages'
     | '/mic-drop'
     | '/network'
@@ -1175,8 +1116,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1238,15 +1177,12 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/play/'
     | '/videos/'
-    | '/.mcp/invoke-tool/$tool'
-    | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
-    | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
@@ -1277,7 +1213,6 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/live'
     | '/login'
-    | '/mcp'
     | '/messages'
     | '/mic-drop'
     | '/network'
@@ -1298,8 +1233,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1361,15 +1294,12 @@ export interface FileRouteTypes {
     | '/blog'
     | '/play'
     | '/videos'
-    | '/.mcp/invoke-tool/$tool'
-    | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
-    | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
@@ -1401,7 +1331,6 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/live'
     | '/login'
-    | '/mcp'
     | '/messages'
     | '/mic-drop'
     | '/network'
@@ -1422,8 +1351,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
-    | '/.mcp/list-tools'
-    | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
     | '/admin/artists'
     | '/admin/audit'
@@ -1485,15 +1412,12 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/play/'
     | '/videos/'
-    | '/.mcp/invoke-tool/$tool'
-    | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
-    | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/callback'
@@ -1526,7 +1450,6 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
-  McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRoute
   MicDropRoute: typeof MicDropRoute
   NetworkRoute: typeof NetworkRoute
@@ -1547,8 +1470,6 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
-  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
-  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ArtistIdRoute: typeof ArtistIdRoute
   ArtistUpgradeRoute: typeof ArtistUpgradeRoute
   BlogCanYouPlayMusicOnLiveStreamRoute: typeof BlogCanYouPlayMusicOnLiveStreamRoute
@@ -1571,14 +1492,11 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
-  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
-  ApiBattleReactRoute: typeof ApiBattleReactRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
-  ApiOauthPlatformCallbackRoute: typeof ApiOauthPlatformCallbackRoute
   ApiPublicHooksProcessPayoutsRoute: typeof ApiPublicHooksProcessPayoutsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
@@ -1730,13 +1648,6 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof MessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -2306,20 +2217,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/play/audience/$room': {
       id: '/play/audience/$room'
       path: '/play/audience/$room'
@@ -2360,20 +2257,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/block-booking'
       fullPath: '/api/public/block-booking'
       preLoaderRoute: typeof ApiPublicBlockBookingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/battle/react': {
-      id: '/api/battle/react'
-      path: '/api/battle/react'
-      fullPath: '/api/battle/react'
-      preLoaderRoute: typeof ApiBattleReactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/transactional/send': {
@@ -2437,13 +2320,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hooks/process-payouts'
       fullPath: '/api/public/hooks/process-payouts'
       preLoaderRoute: typeof ApiPublicHooksProcessPayoutsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/oauth/$platform/callback': {
-      id: '/api/oauth/$platform/callback'
-      path: '/api/oauth/$platform/callback'
-      fullPath: '/api/oauth/$platform/callback'
-      preLoaderRoute: typeof ApiOauthPlatformCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -2577,7 +2453,6 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
-  McpRoute: McpRoute,
   MessagesRoute: MessagesRoute,
   MicDropRoute: MicDropRoute,
   NetworkRoute: NetworkRoute,
@@ -2598,9 +2473,6 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
-  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
-  Char91DotwellKnownChar93OauthProtectedResourceRoute:
-    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ArtistIdRoute: ArtistIdRoute,
   ArtistUpgradeRoute: ArtistUpgradeRoute,
   BlogCanYouPlayMusicOnLiveStreamRoute: BlogCanYouPlayMusicOnLiveStreamRoute,
@@ -2625,15 +2497,12 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
-  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
-  ApiBattleReactRoute: ApiBattleReactRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
-  ApiOauthPlatformCallbackRoute: ApiOauthPlatformCallbackRoute,
   ApiPublicHooksProcessPayoutsRoute: ApiPublicHooksProcessPayoutsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
@@ -2647,13 +2516,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

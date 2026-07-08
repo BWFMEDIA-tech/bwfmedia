@@ -6,8 +6,6 @@ import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { SignedImg } from "@/components/ui/signed-img";
-import { useServerFn } from "@tanstack/react-start";
-import { listMyEvents, createMyEvent, updateMyEvent, deleteMyEvent, type EventRow } from "@/lib/events.functions";
 
 export const Route = createFileRoute("/settings/profile")({
   component: ProfileSettingsPage,
@@ -49,65 +47,6 @@ function ProfileSettingsPage() {
 
   const [genreOpen, setGenreOpen] = useState(false);
   const [stats, setStats] = useState({ followers: 0, monthly: 0, streams: 0 });
-
-  // Events state
-  const listEventsFn = useServerFn(listMyEvents);
-  const createEventFn = useServerFn(createMyEvent);
-  const updateEventFn = useServerFn(updateMyEvent);
-  const deleteEventFn = useServerFn(deleteMyEvent);
-  const [events, setEvents] = useState<EventRow[]>([]);
-  const [editingEvent, setEditingEvent] = useState<Partial<EventRow> | null>(null);
-  const [savingEvent, setSavingEvent] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    listEventsFn().then((rows) => { if (!cancelled) setEvents(rows); }).catch(() => {});
-    return () => { cancelled = true; };
-  }, [user, listEventsFn]);
-
-  function newEvent() {
-    setEditingEvent({ title: "", location: "", starts_at: "", event_type: "event", status: "scheduled", link_url: "", description: "" });
-  }
-  async function saveEvent() {
-    if (!editingEvent?.title?.trim() || !editingEvent.starts_at) { toast.error("Title and date required"); return; }
-    setSavingEvent(true);
-    try {
-      const payload = {
-        title: editingEvent.title!,
-        starts_at: new Date(editingEvent.starts_at).toISOString(),
-        location: editingEvent.location || null,
-        event_type: editingEvent.event_type || "event",
-        status: editingEvent.status || "scheduled",
-        link_url: editingEvent.link_url || null,
-        description: editingEvent.description || null,
-      };
-      if (editingEvent.id) {
-        const updated = await updateEventFn({ data: { id: editingEvent.id, ...payload } });
-        setEvents((cur) => cur.map((e) => e.id === updated.id ? updated : e));
-        toast.success("Event updated");
-      } else {
-        const created = await createEventFn({ data: payload });
-        setEvents((cur) => [...cur, created].sort((a, b) => a.starts_at.localeCompare(b.starts_at)));
-        toast.success("Event added");
-      }
-      setEditingEvent(null);
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to save event");
-    } finally {
-      setSavingEvent(false);
-    }
-  }
-  async function removeEvent(id: string) {
-    if (!confirm("Delete this event?")) return;
-    try {
-      await deleteEventFn({ data: { id } });
-      setEvents((cur) => cur.filter((e) => e.id !== id));
-      toast.success("Event deleted");
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to delete");
-    }
-  }
 
   useEffect(() => {
     if (!user) return;
@@ -345,55 +284,26 @@ function ProfileSettingsPage() {
         <Section title="Upcoming Events" icon={<Calendar className="h-4 w-4 text-red-500" />}>
           <div className="mb-3 flex items-center justify-between">
             <p className="text-xs text-white/50">Add and manage your upcoming shows and events.</p>
-            <button onClick={newEvent} className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Event</button>
+            <a href="/settings/events" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Event</a>
           </div>
-          {editingEvent && (
-            <div className="mb-3 space-y-2 rounded-lg border border-red-600/30 bg-red-600/[0.03] p-3">
-              <div className="text-xs font-semibold uppercase tracking-wider text-red-400">{editingEvent.id ? "Edit event" : "New event"}</div>
-              <input value={editingEvent.title ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })} placeholder="Event title" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-              <div className="grid grid-cols-2 gap-2">
-                <input type="datetime-local" value={editingEvent.starts_at ? new Date(editingEvent.starts_at).toISOString().slice(0, 16) : ""} onChange={(e) => setEditingEvent({ ...editingEvent, starts_at: e.target.value })} className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-                <input value={editingEvent.location ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, location: e.target.value })} placeholder="Location (e.g. Atlanta, GA)" className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-              </div>
-              <input value={editingEvent.link_url ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, link_url: e.target.value })} placeholder="Ticket / info link (optional)" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-              <textarea value={editingEvent.description ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })} placeholder="Description (optional)" rows={2} className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-              <div className="flex justify-end gap-2 pt-1">
-                <button onClick={() => setEditingEvent(null)} className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Cancel</button>
-                <button onClick={saveEvent} disabled={savingEvent} className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500 disabled:opacity-50">
-                  {savingEvent && <Loader2 className="h-3 w-3 animate-spin" />} {editingEvent.id ? "Save changes" : "Add event"}
-                </button>
-              </div>
-            </div>
-          )}
           <div className="space-y-2">
-            {events.length === 0 && !editingEvent && (
-              <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-xs text-white/50">
-                No events yet. Click <span className="text-red-400 font-semibold">Add Event</span> to create your first show.
-              </div>
-            )}
-            {events.map((e) => {
-              const d = new Date(e.starts_at);
-              const month = d.toLocaleString("en-US", { month: "short" }).toUpperCase();
-              const day = String(d.getDate()).padStart(2, "0");
-              const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-              return (
-                <div key={e.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <DateBlock month={month} day={day} />
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold">{e.title}</div>
-                      <div className="truncate text-xs text-white/50">{e.location || "TBA"} • {time}</div>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button onClick={() => setEditingEvent(e)} className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"><Pencil className="h-3 w-3 inline mr-1" />Edit</button>
-                    <button onClick={() => removeEvent(e.id)} className="grid h-8 w-8 place-items-center rounded-md border border-red-600/30 text-red-500 hover:bg-red-600/10"><Trash2 className="h-3.5 w-3.5" /></button>
+            {SAMPLE_EVENTS.map((e) => (
+              <div key={e.title} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <DateBlock month={e.month} day={e.day} />
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold">{e.title}</div>
+                    <div className="truncate text-xs text-white/50">{e.location} • {e.time}</div>
                   </div>
                 </div>
-              );
-            })}
+                <div className="flex shrink-0 items-center gap-2">
+                  <button className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"><Pencil className="h-3 w-3 inline mr-1" />Edit</button>
+                  <button className="grid h-8 w-8 place-items-center rounded-md border border-red-600/30 text-red-500 hover:bg-red-600/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-red-500 hover:underline">View public events →</a></div>
+          <div className="mt-3 text-center"><a href="/settings/events" className="text-xs font-semibold text-red-500 hover:underline">View All Events</a></div>
         </Section>
 
         <Section title="Merch Store" icon={<ShoppingBag className="h-4 w-4 text-red-500" />}>
@@ -458,24 +368,17 @@ function ProfileSettingsPage() {
           <div className="text-sm font-semibold">Upcoming Events Preview</div>
           <p className="text-xs text-white/50 mt-0.5">Your next 3 upcoming events.</p>
           <div className="mt-3 space-y-2">
-            {events.length === 0 && <div className="text-xs text-white/40">No upcoming events.</div>}
-            {events.slice(0, 3).map((e) => {
-              const d = new Date(e.starts_at);
-              const month = d.toLocaleString("en-US", { month: "short" }).toUpperCase();
-              const day = String(d.getDate()).padStart(2, "0");
-              const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-              return (
-                <div key={e.id} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-2">
-                  <DateBlock month={month} day={day} />
-                  <div className="min-w-0">
-                    <div className="truncate text-xs font-semibold">{e.title}</div>
-                    <div className="truncate text-[11px] text-white/50">{e.location || "TBA"} • {time}</div>
-                  </div>
+            {SAMPLE_EVENTS.map((e) => (
+              <div key={e.title} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-2">
+                <DateBlock month={e.month} day={e.day} />
+                <div className="min-w-0">
+                  <div className="truncate text-xs font-semibold">{e.title}</div>
+                  <div className="truncate text-[11px] text-white/50">{e.location} • {e.time}</div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-red-500 hover:underline">View Public Calendar</a></div>
+          <div className="mt-3 text-center"><a href="/settings/events" className="text-xs font-semibold text-red-500 hover:underline">View All Events</a></div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">

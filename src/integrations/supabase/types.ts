@@ -325,57 +325,6 @@ export type Database = {
           },
         ]
       }
-      artist_vote_rollups: {
-        Row: {
-          artist_id: string
-          bucket: string
-          bucket_date: string
-          updated_at: string
-          votes: number
-          weight: number
-        }
-        Insert: {
-          artist_id: string
-          bucket: string
-          bucket_date: string
-          updated_at?: string
-          votes?: number
-          weight?: number
-        }
-        Update: {
-          artist_id?: string
-          bucket?: string
-          bucket_date?: string
-          updated_at?: string
-          votes?: number
-          weight?: number
-        }
-        Relationships: []
-      }
-      artist_vote_totals: {
-        Row: {
-          artist_id: string
-          last_vote_at: string | null
-          lifetime_votes: number
-          lifetime_weight: number
-          updated_at: string
-        }
-        Insert: {
-          artist_id: string
-          last_vote_at?: string | null
-          lifetime_votes?: number
-          lifetime_weight?: number
-          updated_at?: string
-        }
-        Update: {
-          artist_id?: string
-          last_vote_at?: string | null
-          lifetime_votes?: number
-          lifetime_weight?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
       battle_matches: {
         Row: {
           a_wins: number
@@ -456,41 +405,6 @@ export type Database = {
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      battle_reactions: {
-        Row: {
-          action: Database["public"]["Enums"]["battle_reaction_action"]
-          artist_id: string
-          battle_id: string
-          created_at: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          action: Database["public"]["Enums"]["battle_reaction_action"]
-          artist_id: string
-          battle_id: string
-          created_at?: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          action?: Database["public"]["Enums"]["battle_reaction_action"]
-          artist_id?: string
-          battle_id?: string
-          created_at?: string
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "battle_reactions_battle_id_fkey"
-            columns: ["battle_id"]
-            isOneToOne: false
-            referencedRelation: "battle_matches"
             referencedColumns: ["id"]
           },
         ]
@@ -594,41 +508,6 @@ export type Database = {
           },
         ]
       }
-      battle_scores: {
-        Row: {
-          artist_id: string
-          battle_id: string
-          hype_score: number
-          id: string
-          pass_score: number
-          updated_at: string
-        }
-        Insert: {
-          artist_id: string
-          battle_id: string
-          hype_score?: number
-          id?: string
-          pass_score?: number
-          updated_at?: string
-        }
-        Update: {
-          artist_id?: string
-          battle_id?: string
-          hype_score?: number
-          id?: string
-          pass_score?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "battle_scores_battle_id_fkey"
-            columns: ["battle_id"]
-            isOneToOne: false
-            referencedRelation: "battle_matches"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       battle_vote_attempts: {
         Row: {
           created_at: string
@@ -670,11 +549,8 @@ export type Database = {
           choice: string
           created_at: string
           id: string
-          ip_address: unknown
           match_id: string
           round_id: string
-          session_id: string | null
-          user_agent: string | null
           voter_id: string
           weight: number
         }
@@ -682,11 +558,8 @@ export type Database = {
           choice: string
           created_at?: string
           id?: string
-          ip_address?: unknown
           match_id: string
           round_id: string
-          session_id?: string | null
-          user_agent?: string | null
           voter_id: string
           weight?: number
         }
@@ -694,11 +567,8 @@ export type Database = {
           choice?: string
           created_at?: string
           id?: string
-          ip_address?: unknown
           match_id?: string
           round_id?: string
-          session_id?: string | null
-          user_agent?: string | null
           voter_id?: string
           weight?: number
         }
@@ -2409,34 +2279,9 @@ export type Database = {
         }
         Relationships: []
       }
-      shopify_store_credentials: {
-        Row: {
-          access_token: string
-          store_id: string
-          updated_at: string
-        }
-        Insert: {
-          access_token: string
-          store_id: string
-          updated_at?: string
-        }
-        Update: {
-          access_token?: string
-          store_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shopify_store_credentials_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: true
-            referencedRelation: "shopify_stores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       shopify_stores: {
         Row: {
+          access_token: string
           connected_at: string
           created_at: string
           currency: string | null
@@ -2450,6 +2295,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_token: string
           connected_at?: string
           created_at?: string
           currency?: string | null
@@ -2463,6 +2309,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_token?: string
           connected_at?: string
           created_at?: string
           currency?: string | null
@@ -2649,53 +2496,6 @@ export type Database = {
           },
         ]
       }
-      stream_destinations: {
-        Row: {
-          created_at: string
-          ended_at: string | null
-          error_message: string | null
-          id: string
-          platform: string
-          started_at: string | null
-          status: string
-          stream_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          ended_at?: string | null
-          error_message?: string | null
-          id?: string
-          platform: string
-          started_at?: string | null
-          status?: string
-          stream_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          ended_at?: string | null
-          error_message?: string | null
-          id?: string
-          platform?: string
-          started_at?: string | null
-          status?: string
-          stream_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stream_destinations_stream_id_fkey"
-            columns: ["stream_id"]
-            isOneToOne: false
-            referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       stream_events: {
         Row: {
           anomaly_reasons: string[]
@@ -2814,77 +2614,6 @@ export type Database = {
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      stream_platform_connections: {
-        Row: {
-          account_label: string | null
-          connected_at: string
-          external_account_id: string | null
-          id: string
-          platform: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          account_label?: string | null
-          connected_at?: string
-          external_account_id?: string | null
-          id?: string
-          platform: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          account_label?: string | null
-          connected_at?: string
-          external_account_id?: string | null
-          id?: string
-          platform?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      stream_platform_credentials: {
-        Row: {
-          access_token: string | null
-          connection_id: string
-          expires_at: string | null
-          refresh_token: string | null
-          rtmp_key: string | null
-          rtmp_url: string | null
-          scope: string | null
-          updated_at: string
-        }
-        Insert: {
-          access_token?: string | null
-          connection_id: string
-          expires_at?: string | null
-          refresh_token?: string | null
-          rtmp_key?: string | null
-          rtmp_url?: string | null
-          scope?: string | null
-          updated_at?: string
-        }
-        Update: {
-          access_token?: string | null
-          connection_id?: string
-          expires_at?: string | null
-          refresh_token?: string | null
-          rtmp_key?: string | null
-          rtmp_url?: string | null
-          scope?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stream_platform_credentials_connection_id_fkey"
-            columns: ["connection_id"]
-            isOneToOne: true
-            referencedRelation: "stream_platform_connections"
             referencedColumns: ["id"]
           },
         ]
@@ -3344,13 +3073,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tips_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tips_stream_id_fkey"
             columns: ["stream_id"]
             isOneToOne: false
@@ -3774,56 +3496,29 @@ export type Database = {
       public_profiles: {
         Row: {
           avatar_url: string | null
-          banner_url: string | null
           bio: string | null
-          brand_avatar_url: string | null
-          brand_name: string | null
           created_at: string | null
           display_name: string | null
-          featured_track_id: string | null
-          featured_video_id: string | null
           genre: string | null
-          genres: string[] | null
-          id: string | null
-          member_since: string | null
           public_id: string | null
-          stage_name: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
-          banner_url?: string | null
           bio?: string | null
-          brand_avatar_url?: string | null
-          brand_name?: string | null
           created_at?: string | null
           display_name?: string | null
-          featured_track_id?: string | null
-          featured_video_id?: string | null
           genre?: string | null
-          genres?: string[] | null
-          id?: string | null
-          member_since?: string | null
           public_id?: string | null
-          stage_name?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
-          banner_url?: string | null
           bio?: string | null
-          brand_avatar_url?: string | null
-          brand_name?: string | null
           created_at?: string | null
           display_name?: string | null
-          featured_track_id?: string | null
-          featured_video_id?: string | null
           genre?: string | null
-          genres?: string[] | null
-          id?: string | null
-          member_since?: string | null
           public_id?: string | null
-          stage_name?: string | null
           username?: string | null
         }
         Relationships: []
@@ -3886,10 +3581,6 @@ export type Database = {
         }
         Returns: number
       }
-      battle_vote_target_artist: {
-        Args: { _choice: string; _match_id: string }
-        Returns: string
-      }
       boost_spends_access_check: {
         Args: { _row_user_id: string }
         Returns: boolean
@@ -3928,12 +3619,13 @@ export type Database = {
       cast_battle_vote: {
         Args: {
           _choice: string
-          _ip?: string
+          _ip: string
+          _match_id: string
           _round_id: string
-          _use_boost?: boolean
-          _user_agent?: string
+          _user_agent: string
+          _weight: number
         }
-        Returns: Json
+        Returns: string
       }
       check_rate_limit: {
         Args: {
@@ -3968,21 +3660,6 @@ export type Database = {
         Args: { _artist_id: string }
         Returns: Json
       }
-      get_artists_directory: {
-        Args: never
-        Returns: {
-          avatar_url: string
-          banner_url: string
-          bio: string
-          display_name: string
-          genre: string
-          genres: string[]
-          id: string
-          public_id: string
-          stage_name: string
-          username: string
-        }[]
-      }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
@@ -4000,15 +3677,6 @@ export type Database = {
       get_my_profile_location: { Args: never; Returns: string }
       get_or_create_profile_stream: { Args: never; Returns: string }
       get_revenue_pool_total: { Args: { _month?: string }; Returns: number }
-      get_round_vote_totals: {
-        Args: { _round_id: string }
-        Returns: {
-          a_votes: number
-          a_weight: number
-          b_votes: number
-          b_weight: number
-        }[]
-      }
       get_stream_anomaly_summary: { Args: { _days?: number }; Returns: Json }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }
@@ -4086,16 +3754,6 @@ export type Database = {
         }
         Returns: number
       }
-      react_to_battle: {
-        Args: {
-          _action: string
-          _artist_id: string
-          _battle_id: string
-          _ip?: string
-          _user_agent?: string
-        }
-        Returns: Json
-      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -4104,7 +3762,6 @@ export type Database = {
           read_ct: number
         }[]
       }
-      rebuild_artist_vote_stats: { Args: never; Returns: Json }
       recompute_play_arena_rankings: { Args: never; Returns: number }
       record_revenue_event: {
         Args: {
@@ -4129,11 +3786,6 @@ export type Database = {
         }
         Returns: string
       }
-      refresh_artist_vote_rollups: {
-        Args: { _since?: string }
-        Returns: number
-      }
-      reset_round_votes: { Args: { _round_id: string }; Returns: undefined }
       spend_boost_credit: {
         Args: { _amount?: number; _reason?: string; _reference_id?: string }
         Returns: number
@@ -4164,7 +3816,6 @@ export type Database = {
         | "member"
         | "listener"
         | "manager"
-      battle_reaction_action: "hype" | "pass"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4302,7 +3953,6 @@ export const Constants = {
         "listener",
         "manager",
       ],
-      battle_reaction_action: ["hype", "pass"],
     },
   },
 } as const

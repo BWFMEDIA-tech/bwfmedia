@@ -20,23 +20,28 @@ export type ArtistDirectoryItem = {
  */
 export const getArtistsDirectory = createServerFn({ method: "GET" }).handler(
   async (): Promise<ArtistDirectoryItem[]> => {
-    // Use publishable-key client + a SECURITY DEFINER RPC that returns only
-    // safe columns for users with the `artist` role. Avoids the admin/Data-API
-    // JWT format mismatch on Lovable Cloud (which returns 0 rows silently).
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
 
-    const { data, error } = await sb.rpc("get_artists_directory");
-    if (error) {
-      console.error("[getArtistsDirectory] rpc error", error);
-      return [];
-    }
+    const rolesRes = await sb
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "artist")
+      .limit(500);
 
-    const items: ArtistDirectoryItem[] = (data ?? []).map((p: any) => {
+    const ids = Array.from(
+      new Set((rolesRes.data ?? []).map((r: any) => r.user_id).filter(Boolean)),
+    ) as string[];
+    if (ids.length === 0) return [];
+
+    const profRes = await sb
+      .from("profiles")
+      .select(
+        "id, public_id, display_name, stage_name, username, avatar_url, banner_url, bio, location, genre, genres",
+      )
+      .in("id", ids);
+
+    const items: ArtistDirectoryItem[] = (profRes.data ?? []).map((p: any) => {
       const genres: string[] = Array.isArray(p.genres) && p.genres.length
         ? p.genres
         : p.genre
@@ -50,7 +55,7 @@ export const getArtistsDirectory = createServerFn({ method: "GET" }).handler(
         avatarUrl: p.avatar_url ?? null,
         bannerUrl: p.banner_url ?? null,
         bio: p.bio ?? null,
-        location: null,
+        location: p.location ?? null,
         genres,
         featured: Boolean(p.avatar_url && p.bio),
       };

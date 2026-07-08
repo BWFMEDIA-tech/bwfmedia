@@ -8,6 +8,7 @@ import { useMediaEngine } from "@/lib/media-engine/MediaEngineContext";
 import { friendlyMediaError } from "@/lib/media-engine/errors";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { StagesAndBroadcasts } from "@/components/studio/StagesAndBroadcasts";
 import { SignedImg } from "@/components/ui/signed-img";
 
 const PURPLE = "#8b5cf6";
@@ -108,6 +109,9 @@ export function LiveProductionDashboard({
         />
         <BroadcastPanel />
       </div>
+
+      {/* Stage Rooms and Broadcasts — independent entities (separate database records) */}
+      <StagesAndBroadcasts />
 
     </div>
   );

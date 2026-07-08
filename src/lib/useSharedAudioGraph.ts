@@ -15,8 +15,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
  * `AnalyserNode` + master `GainNode` that every consumer reads from.
  */
 
-import { getSharedAudioContext, resumeAudioContext } from "@/lib/audio/audio-clock";
-
 type Graph = {
   ctx: AudioContext;
   source: MediaElementAudioSourceNode;
@@ -24,12 +22,18 @@ type Graph = {
   gain: GainNode;
 };
 
+let sharedCtx: AudioContext | null = null;
 const graphs = new WeakMap<HTMLMediaElement, Graph>();
 
-// The AudioContext singleton now lives in audio-clock.ts so the Arena slot
-// engine and this media-element graph share ONE context.
 function getSharedCtx(): AudioContext | null {
-  return getSharedAudioContext();
+  if (typeof window === "undefined") return null;
+  if (sharedCtx) return sharedCtx;
+  const Ctor: typeof AudioContext | undefined =
+    window.AudioContext ??
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Ctor) return null;
+  sharedCtx = new Ctor();
+  return sharedCtx;
 }
 
 /**
@@ -83,5 +87,8 @@ export function useSharedAudioGraph(
 
 /** Resume the shared context — call from a user gesture (play/tap). */
 export function resumeSharedAudio(): void {
-  resumeAudioContext();
+  const ctx = sharedCtx;
+  if (ctx && ctx.state === "suspended") {
+    void ctx.resume();
+  }
 }

@@ -168,6 +168,15 @@ function SettingsPayoutsPage() {
   const minPayout = d.minPayoutCents;
   const canCashOut = ready && d.balance.available_cents >= minPayout;
   const autoEnabled = !!acct?.auto_payout_enabled;
+  const stripeStatus = (d as any).stripeStatus as
+    | {
+        status: "NOT_CONNECTED" | "ACTION_REQUIRED" | "PENDING_VERIFICATION" | "ACTIVE";
+        requirements_due: number;
+        currently_due: string[];
+        past_due: string[];
+        disabled_reason: string | null;
+      }
+    | undefined;
 
   return (
     <div className="space-y-8">
@@ -191,6 +200,17 @@ function SettingsPayoutsPage() {
         >
           {error ?? notice}
         </div>
+      )}
+
+      {/* Stripe Connect status card — self-serve remediation */}
+      {stripeStatus && stripeStatus.status !== "ACTIVE" && (
+        <PayoutStatusCard
+          status={stripeStatus.status}
+          requirementsDue={stripeStatus.requirements_due}
+          disabledReason={stripeStatus.disabled_reason}
+          busy={busy === "onboard"}
+          onAction={handleOnboard}
+        />
       )}
 
       {/* Balance + Cashout */}
@@ -363,4 +383,73 @@ function statusColor(status: string) {
   if (status === "paid") return "text-emerald-400";
   if (status === "failed" || status === "canceled") return "text-red-400";
   return "text-amber-400";
+}
+
+function PayoutStatusCard({
+  status,
+  requirementsDue,
+  disabledReason,
+  busy,
+  onAction,
+}: {
+  status: "NOT_CONNECTED" | "ACTION_REQUIRED" | "PENDING_VERIFICATION" | "ACTIVE";
+  requirementsDue: number;
+  disabledReason: string | null;
+  busy: boolean;
+  onAction: () => void;
+}) {
+  const cfg =
+    status === "ACTION_REQUIRED"
+      ? {
+          tone: "border-amber-500/40 bg-amber-500/10 text-amber-200",
+          dot: "bg-amber-400",
+          title: "Action required",
+          message:
+            requirementsDue > 0
+              ? `Stripe needs ${requirementsDue} more detail${requirementsDue === 1 ? "" : "s"} from you to keep your payouts enabled.`
+              : disabledReason
+                ? `Stripe paused your payouts: ${disabledReason.replace(/_/g, " ")}. Finish verification to resume.`
+                : "Your payout setup needs attention to continue earning.",
+          cta: "Complete Verification",
+          disabled: false,
+        }
+      : status === "PENDING_VERIFICATION"
+        ? {
+            tone: "border-sky-500/40 bg-sky-500/10 text-sky-200",
+            dot: "bg-sky-400",
+            title: "Pending verification",
+            message:
+              "Your account is being verified by Stripe. This usually takes a few minutes.",
+            cta: "Check Status",
+            disabled: false,
+          }
+        : {
+            tone: "border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-200",
+            dot: "bg-fuchsia-400",
+            title: "Connect your bank",
+            message:
+              "Set up Stripe Connect to start receiving tips, merch sales, and royalty payouts.",
+            cta: "Connect bank account",
+            disabled: false,
+          };
+
+  return (
+    <div className={`rounded-xl border p-5 flex items-center justify-between gap-4 ${cfg.tone}`}>
+      <div className="flex items-start gap-3">
+        <span className={`mt-1.5 h-2.5 w-2.5 rounded-full ${cfg.dot} animate-pulse`} />
+        <div>
+          <div className="text-sm font-semibold uppercase tracking-wider">{cfg.title}</div>
+          <p className="text-sm mt-1 opacity-90">{cfg.message}</p>
+        </div>
+      </div>
+      <button
+        onClick={onAction}
+        disabled={busy || cfg.disabled}
+        className="shrink-0 inline-flex items-center gap-2 rounded-md bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+        {cfg.cta}
+      </button>
+    </div>
+  );
 }

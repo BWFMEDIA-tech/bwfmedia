@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { useMemo, useState, useEffect, useRef } from "react";
 import {
@@ -35,7 +35,37 @@ const artistMetaOptions = (id: string) =>
   });
 
 export const Route = createFileRoute("/artist/$id")({
-  loader: ({ params }) => getArtistMeta({ data: { id: params.id } }),
+  loader: async ({ params }) => {
+    const meta = await getArtistMeta({ data: { id: params.id } });
+    if (meta && (meta as any).exists === false) throw notFound();
+    return meta;
+  },
+  notFoundComponent: () => (
+    <div className="min-h-screen bg-[#070708] text-white grid place-items-center px-6">
+      <div className="text-center max-w-md">
+        <h1 className="font-anton text-5xl uppercase tracking-tight">Artist not found</h1>
+        <p className="mt-3 text-sm text-white/60">
+          This artist profile doesn't exist or hasn't been set up yet.
+        </p>
+        <Link
+          to="/artists"
+          className="mt-6 inline-block rounded-full px-5 py-2.5 text-sm font-semibold"
+          style={{ background: "#ef2b2b", boxShadow: "0 6px 24px #ef2b2b55" }}
+        >
+          Browse Artists
+        </Link>
+      </div>
+    </div>
+  ),
+  errorComponent: ({ error, reset }) => (
+    <div className="min-h-screen bg-[#070708] text-white grid place-items-center px-6">
+      <div className="text-center max-w-md">
+        <h1 className="font-anton text-4xl uppercase tracking-tight">Couldn't load artist</h1>
+        <p className="mt-3 text-sm text-white/60">{error?.message ?? "Unknown error"}</p>
+        <button onClick={() => reset()} className="mt-6 rounded-full px-5 py-2.5 text-sm font-semibold bg-white text-black">Retry</button>
+      </div>
+    </div>
+  ),
   head: ({ params, loaderData }) => {
     const name = loaderData?.name?.trim() || "Artist Profile";
     const title = `${name} — BWF Network`;

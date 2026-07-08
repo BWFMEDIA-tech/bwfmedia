@@ -354,7 +354,7 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
     (async () => {
       const { IDENTITY_COLUMNS, effectiveIdentity } = await import("@/lib/host-identity");
       const { data } = await supabase
-        .from("public_profiles")
+        .from("profiles")
         .select(IDENTITY_COLUMNS)
         .in("id", ids);
       if (cancelled) return;

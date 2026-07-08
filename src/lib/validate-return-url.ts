@@ -1,9 +1,4 @@
 const ALLOWED_HOSTS = [
-  // Current production domain (Stripe return URLs are built from
-  // window.location.origin, which is https://tunevio.com in production).
-  'tunevio.com',
-  'www.tunevio.com',
-  // Legacy / alternate branding domains still pointed at this app.
   'bwfmedia.company',
   'www.bwfmedia.company',
   'bwfmedia.lovable.app',

@@ -10,8 +10,6 @@ export type LeaderboardEntry = {
   xp: number;
   battleWins: number;
   totalVotes: number;
-  battleVotes: number;
-  streamCount: number;
   trackCount: number;
   score: number;
   rank: number;
@@ -84,38 +82,11 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
       );
     }
 
-    // 6. Arena battle votes — lifetime weighted totals from artist_vote_totals
-    const battleVotesByUser = new Map<string, number>();
-    const bvRes = await sb
-      .from("artist_vote_totals")
-      .select("artist_id, lifetime_weight")
-      .in("artist_id", ids);
-    for (const row of bvRes.data ?? []) {
-      battleVotesByUser.set(row.artist_id, Number(row.lifetime_weight ?? 0));
-    }
-
-    // 7. Stream counts — valid, non-suspicious stream_events per artist
-    const streamsByUser = new Map<string, number>();
-    const seRes = await sb
-      .from("stream_events")
-      .select("artist_id")
-      .in("artist_id", ids)
-      .eq("valid_stream", true)
-      .eq("is_suspicious", false)
-      .limit(100000);
-    for (const row of seRes.data ?? []) {
-      if (!row.artist_id) continue;
-      streamsByUser.set(row.artist_id, (streamsByUser.get(row.artist_id) ?? 0) + 1);
-    }
-
     const entries: LeaderboardEntry[] = ids.map((uid) => {
       const p = profiles.get(uid);
       const xp = xpByUser.get(uid) ?? 0;
       const battleWins = winsByUser.get(uid) ?? 0;
-      const playVotes = votesByUser.get(uid) ?? 0;
-      const battleVotes = battleVotesByUser.get(uid) ?? 0;
-      const totalVotes = playVotes + battleVotes;
-      const streamCount = streamsByUser.get(uid) ?? 0;
+      const totalVotes = votesByUser.get(uid) ?? 0;
       const trackCount = trackCountByUser.get(uid) ?? 0;
       return {
         userId: uid,
@@ -126,8 +97,6 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
         xp,
         battleWins,
         totalVotes,
-        battleVotes,
-        streamCount,
         trackCount,
         score: xp + battleWins * 500 + totalVotes * 10,
         rank: 0,

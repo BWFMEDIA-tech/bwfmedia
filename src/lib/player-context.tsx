@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getSignedAudioUrl } from "@/lib/useSignedAudio";
+import { registerAudioElement, stopAndResetAllAudio } from "@/lib/audio-bus";
 
 export interface PlayerTrack {
   id: string;
@@ -44,6 +45,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stateRef = useRef<PlayerState | null>(null);
   const playTokenRef = useRef(0);
+  const playPromiseRef = useRef<Promise<void> | null>(null);
+  const toggleChainRef = useRef<Promise<void>>(Promise.resolve());
   const [state, setState] = useState<PlayerState>({
     track: null,
     queue: [],
@@ -61,15 +64,28 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     previewLimitHandlerRef.current = fn;
   }, []);
 
-  const playAudio = useCallback(async (track: PlayerTrack) => {
+  const playAudio = useCallback(async (track: PlayerTrack, opts: { reset?: boolean } = {}) => {
     const a = audioRef.current;
     if (!a) return;
     const token = ++playTokenRef.current;
     const src = (await getSignedAudioUrl(track.audioUrl)) ?? track.audioUrl;
     if (token !== playTokenRef.current || audioRef.current !== a) return;
-    if (a.src !== src) a.src = src;
+    if (playPromiseRef.current) {
+      try { await playPromiseRef.current; } catch { /* ignore stale play rejection */ }
+    }
+    const sourceChanged = a.src !== src;
+    if (sourceChanged || opts.reset) {
+      try { a.pause(); } catch { /* ignore */ }
+      if (sourceChanged) a.src = src;
+      try { a.currentTime = 0; } catch { /* ignore */ }
+    }
+    // Kill every other audio element in the app before this one starts, so a
+    // rapid double-click or another mounted player can never create doubled audio.
+    stopAndResetAllAudio(a);
     try {
-      await a.play();
+      const p = a.play();
+      playPromiseRef.current = p;
+      try { await p; } finally { if (playPromiseRef.current === p) playPromiseRef.current = null; }
     } catch {
       setState((p) => ({ ...p, isPlaying: false }));
     }
@@ -82,6 +98,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     a.preload = "metadata";
     a.volume = stateRef.current?.volume ?? 0.8;
     audioRef.current = a;
+    const unregister = registerAudioElement(a);
     const onTime = () => {
       const s = stateRef.current;
       if (s?.track?.preview && a.currentTime >= PREVIEW_LIMIT_SEC) {
@@ -115,13 +132,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     a.addEventListener("pause", onPause);
     a.addEventListener("ended", onEnd);
     return () => {
+      ++playTokenRef.current;
+      playPromiseRef.current = null;
       a.pause();
+      try { a.currentTime = 0; } catch { /* ignore */ }
       a.removeEventListener("timeupdate", onTime);
       a.removeEventListener("loadedmetadata", onMeta);
       a.removeEventListener("durationchange", onMeta);
       a.removeEventListener("play", onPlay);
       a.removeEventListener("pause", onPause);
       a.removeEventListener("ended", onEnd);
+      unregister();
     };
   }, [playAudio]);
 
@@ -130,16 +151,30 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const s = stateRef.current!;
     const t = track ?? s.track; if (!t) return;
     const nextQueue = queue ?? (s.queue.length ? s.queue : [t]);
-    void playAudio(t);
+    void playAudio(t, { reset: true });
     setState((p) => ({ ...p, track: t, queue: nextQueue, isPlaying: true, progress: 0 }));
   }, [playAudio]);
 
-  const pause = useCallback(() => { audioRef.current?.pause(); }, []);
+  const pause = useCallback(async () => {
+    if (playPromiseRef.current) {
+      try { await playPromiseRef.current; } catch { /* ignore */ }
+    }
+    audioRef.current?.pause();
+  }, []);
 
   const toggle = useCallback(() => {
-    const a = audioRef.current; const s = stateRef.current;
-    if (!a || !s?.track) return;
-    if (a.paused) { void playAudio(s.track); } else { a.pause(); }
+    toggleChainRef.current = toggleChainRef.current.then(async () => {
+      const a = audioRef.current; const s = stateRef.current;
+      if (!a || !s?.track) return;
+      if (playPromiseRef.current) {
+        try { await playPromiseRef.current; } catch { /* ignore */ }
+      }
+      if (a.paused) { await playAudio(s.track); } else { a.pause(); }
+    }, async () => {
+      const a = audioRef.current; const s = stateRef.current;
+      if (!a || !s?.track) return;
+      if (a.paused) { await playAudio(s.track); } else { a.pause(); }
+    });
   }, [playAudio]);
 
   const next = useCallback(() => {
@@ -155,7 +190,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       nxt = s.queue[idx + 1] ?? (s.repeat === "all" ? s.queue[0] : null);
     }
     if (!nxt) return;
-    void playAudio(nxt);
+    void playAudio(nxt, { reset: true });
     setState((p) => ({ ...p, track: nxt, isPlaying: true, progress: 0 }));
   }, [playAudio]);
 
@@ -167,7 +202,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const idx = s.queue.findIndex((t) => t.id === s.track?.id);
     const prv = s.queue[idx - 1] ?? (s.repeat === "all" ? s.queue[s.queue.length - 1] : s.queue[0]);
     if (!prv) return;
-    void playAudio(prv);
+    void playAudio(prv, { reset: true });
     setState((p) => ({ ...p, track: prv, isPlaying: true, progress: 0 }));
   }, [playAudio]);
 

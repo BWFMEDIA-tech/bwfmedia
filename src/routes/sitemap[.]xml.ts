@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const BASE_URL = "https://tunevio.com";
+const BASE_URL = "https://www.bwfnetwork.com";
 
 interface SitemapEntry {
   path: string;
@@ -17,17 +17,15 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
-          { path: "/play", changefreq: "weekly", priority: "0.9" },
-          { path: "/live", changefreq: "daily", priority: "0.9" },
-          { path: "/leaderboard", changefreq: "daily", priority: "0.8" },
-          { path: "/discover", changefreq: "daily", priority: "0.8" },
-          { path: "/studio", changefreq: "weekly", priority: "0.8" },
-          { path: "/off-the-block", changefreq: "weekly", priority: "0.8" },
+          { path: "/studio", changefreq: "weekly", priority: "0.9" },
+          { path: "/off-the-block", changefreq: "weekly", priority: "0.9" },
           { path: "/videos", changefreq: "weekly", priority: "0.8" },
           { path: "/artists", changefreq: "weekly", priority: "0.8" },
           { path: "/events", changefreq: "weekly", priority: "0.7" },
-          { path: "/pricing", changefreq: "monthly", priority: "0.7" },
-          { path: "/tunevio", changefreq: "monthly", priority: "0.6" },
+          { path: "/deck", changefreq: "monthly", priority: "0.5" },
+          { path: "/dashboard", changefreq: "monthly", priority: "0.4" },
+          { path: "/earnings", changefreq: "monthly", priority: "0.4" },
+          { path: "/access-denied", changefreq: "yearly", priority: "0.1" },
           { path: "/blog", changefreq: "weekly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.6" },
           { path: "/blog/how-to-live-stream-music", changefreq: "monthly", priority: "0.7" },
