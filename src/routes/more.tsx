@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState, useCallback } from "react";
+
 import {
   Compass, TrendingUp, Sparkles, Music2, BarChart2, ListMusic,
   Upload, Sliders, LineChart, DollarSign, Megaphone, Users,
