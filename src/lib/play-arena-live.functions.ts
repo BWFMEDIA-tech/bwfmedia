@@ -38,19 +38,30 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
     const activeBattles = live.length;
     const featuredMatch = live[0] ?? null;
 
-    let viewers = 0;
     let streamMeta: any = null;
     const streamIds = live.map((m) => m.stream_id).filter(Boolean);
+    let featuredStreamViewers = 0;
     if (streamIds.length) {
       const { data: streams } = await sb
         .from("streams")
         .select("id, room_name, viewer_count")
         .in("id", streamIds);
       for (const s of (streams ?? []) as any[]) {
-        viewers += s.viewer_count ?? 0;
-        if (featuredMatch && s.id === featuredMatch.stream_id) streamMeta = s;
+        if (featuredMatch && s.id === featuredMatch.stream_id) {
+          streamMeta = s;
+          featuredStreamViewers = s.viewer_count ?? 0;
+        }
       }
     }
+
+    // True viewers online = users marked online with a recent heartbeat.
+    const since = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    const { count: presenceCount } = await sb
+      .from("user_presence")
+      .select("user_id", { count: "exact", head: true })
+      .eq("online", true)
+      .gte("last_seen_at", since);
+    const viewers = presenceCount ?? 0;
 
     let aVotes = 0;
     let bVotes = 0;
@@ -64,6 +75,20 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
       bVotes = round?.b_votes ?? 0;
     }
 
+    // Derive true round wins from completed battle_rounds instead of trusting the cached column.
+    let trueAWins = featuredMatch?.a_wins ?? 0;
+    let trueBWins = featuredMatch?.b_wins ?? 0;
+    if (featuredMatch?.id) {
+      const { data: decidedRounds } = await sb
+        .from("battle_rounds")
+        .select("winner_choice")
+        .eq("match_id", featuredMatch.id)
+        .not("winner_choice", "is", null);
+      const rows = (decidedRounds ?? []) as { winner_choice: string | null }[];
+      trueAWins = rows.filter((r) => r.winner_choice === "a").length;
+      trueBWins = rows.filter((r) => r.winner_choice === "b").length;
+    }
+
     return {
       activeBattles,
       viewers,
@@ -74,13 +99,13 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
             roomName: streamMeta?.room_name ?? null,
             artistA: featuredMatch.artist_a_name ?? "Artist A",
             artistB: featuredMatch.artist_b_name ?? "Artist B",
-            aWins: featuredMatch.a_wins ?? 0,
-            bWins: featuredMatch.b_wins ?? 0,
+            aWins: trueAWins,
+            bWins: trueBWins,
             currentRound: featuredMatch.current_round ?? 1,
             totalRounds: featuredMatch.total_rounds ?? 3,
             aVotes,
             bVotes,
-            viewers: streamMeta?.viewer_count ?? 0,
+            viewers: featuredStreamViewers,
             startedAt: featuredMatch.started_at ?? null,
           }
         : null,

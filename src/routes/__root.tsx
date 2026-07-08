@@ -9,6 +9,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { MobileBottomNav } from "@/components/site/MobileBottomNav";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
 import { GlobalPlayer } from "@/components/player/GlobalPlayer";
@@ -39,7 +40,12 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0b0b12" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "BWF" },
       { title: "BWF Network — Music, Live Streams, and Creator Platform" },
       { name: "description", content: "BWF Network is the creator-powered entertainment platform for independent artists: stream music, host live audio and video, sell merch, and grow your fanbase." },
       { name: "author", content: "BWF Media TV" },
@@ -47,17 +53,17 @@ export const Route = createRootRoute({
       { property: "og:description", content: "Stream music, go live, and monetize your audience on BWF Network — the creator-powered entertainment platform from BWF Media TV." },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "BWF Media TV" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@bwfmediatv" },
       { name: "twitter:title", content: "BWF Network — Music, Live Streams, and Creator Platform" },
       { name: "twitter:description", content: "Stream music, go live, and monetize your audience on BWF Network." },
       {
         property: "og:image",
-        content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png",
+        content: "https://tunevio.com/og-image.png",
       },
       {
         name: "twitter:image",
-        content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2dd29924-3a7b-47ad-b473-ec1294de78a1/id-preview-818080f5--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app-1779975630971.png",
+        content: "https://tunevio.com/og-image.png",
       },
     ],
     scripts: [
@@ -71,18 +77,18 @@ export const Route = createRootRoute({
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://bwfnetwork.com/#organization",
+              "@id": "https://tunevio.com/#organization",
               name: "BWF Media TV",
-              url: "https://bwfnetwork.com",
-              logo: "https://bwfnetwork.com/favicon.png",
+              url: "https://tunevio.com",
+              logo: "https://tunevio.com/favicon.png",
               sameAs: ["https://youtube.com/@bwfmedia", "https://instagram.com/bwfmediatv"],
             },
             {
               "@type": "WebSite",
-              "@id": "https://bwfnetwork.com/#website",
-              url: "https://bwfnetwork.com",
+              "@id": "https://tunevio.com/#website",
+              url: "https://tunevio.com",
               name: "BWF Media TV",
-              publisher: { "@id": "https://bwfnetwork.com/#organization" },
+              publisher: { "@id": "https://tunevio.com/#organization" },
             },
           ],
         }),
@@ -95,6 +101,7 @@ export const Route = createRootRoute({
       },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -138,6 +145,19 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
+  const showBottomNav =
+    isChrome &&
+    !pathname.startsWith("/admin") &&
+    !pathname.startsWith("/settings") &&
+    !pathname.startsWith("/artist-dashboard") &&
+    !pathname.startsWith("/dashboard") &&
+    !pathname.startsWith("/checkout") &&
+    !pathname.startsWith("/broadcast/") &&
+    !pathname.startsWith("/play/") &&
+    !pathname.startsWith("/invite/") &&
+    !pathname.startsWith("/forgot-password") &&
+    !pathname.startsWith("/access-denied") &&
+    !pathname.startsWith("/deck");
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
   }));
@@ -150,14 +170,18 @@ function RootComponent() {
         {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div
-          className="pt-[calc(var(--bwf-banner-h,0px)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+80px)]"
+          className={
+            "pt-[calc(var(--bwf-banner-h,0px)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+80px)]" +
+            (showBottomNav ? " pb-[calc(env(safe-area-inset-bottom)+64px)] md:pb-0" : "")
+          }
         >
 
           <Outlet />
         </div>
-        {isChrome && <SiteFooter />}
+        {isChrome && pathname === "/" && <SiteFooter />}
         <CartDrawer />
-        {isChrome && <GlobalPlayer />}
+        <GlobalPlayer />
+        {showBottomNav && <MobileBottomNav />}
         </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>

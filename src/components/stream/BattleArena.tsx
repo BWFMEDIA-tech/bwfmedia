@@ -8,7 +8,9 @@ import { usePlaybackPlaying } from "@/lib/playback-store";
 import { SignedImg } from "@/components/ui/signed-img";
 import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
+import { validateVoteTotals } from "@/lib/vote-math";
 import { BattleHostControls } from "./BattleHostControls";
+import { HypePassPanel } from "./HypePassPanel";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 
@@ -45,7 +47,16 @@ export function BattleArena({
   const cancelledRef = useRef(false);
   const refresh = useCallback(async () => {
     try {
-      const s = await stateFn({ data: { streamId } });
+      let s = await stateFn({ data: { streamId } });
+      // Broadcast gate: never render totals that fail the consistency check.
+      // Re-pull once so values are recalculated from the database; if they
+      // are still inconsistent, keep the previous state rather than showing
+      // wrong percentages.
+      if ((s as any)?.voteTotals && !validateVoteTotals((s as any).voteTotals)) {
+        console.error("[battle] inconsistent vote totals received — recalculating from DB");
+        s = await stateFn({ data: { streamId } });
+        if ((s as any)?.voteTotals && !validateVoteTotals((s as any).voteTotals)) return;
+      }
       if (!cancelledRef.current) setRoomState(s as RoomState);
     } catch { /* ignore */ }
   }, [streamId, stateFn]);
@@ -195,24 +206,17 @@ function BattleView({
   onAfterHostEmit?: () => void;
 }) {
   const voteFn = useServerFn(castBattleVote);
-  const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack } = roomState;
+  const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack, voteTotals } =
+    roomState;
 
-  // Optimistic vote bumps keyed by round id. Lets the percentage bars move
-  // the instant a viewer clicks Vote, without waiting for the server round
-  // trip + realtime UPDATE on battle_rounds to propagate back. Reconciled
-  // automatically when `currentRound.id` changes (new round) and clamped
-  // below so the bar never exceeds 100%.
-  const [optimistic, setOptimistic] = useState<{ roundId: string; a: number; b: number }>(
-    { roundId: "", a: 0, b: 0 },
-  );
-  // Transient "+N" flash shown over the side that was just voted for. Cleared
-  // ~900ms after the click so it doesn't pile up on rapid votes.
+  // Transient "+N" flash shown over the side that was just voted for — pure
+  // visual feedback. The bars ONLY render server-computed totals
+  // (roomState.voteTotals); nothing is bumped or estimated locally. The old
+  // optimistic increment displayed on top of the realtime-updated server
+  // tally, which is what made a single vote count as two on screen.
   const [flash, setFlash] = useState<{ side: "a" | "b"; n: number; key: number } | null>(null);
-  useEffect(() => {
-    if (currentRound?.id && optimistic.roundId !== currentRound.id) {
-      setOptimistic({ roundId: currentRound.id, a: 0, b: 0 });
-    }
-  }, [currentRound?.id, optimistic.roundId]);
+  // Single-flight guard so a double-click can't fire the vote request twice.
+  const voteInFlightRef = useRef(false);
 
   // Live XP balance for the signed-in viewer (drives the header XP badge).
   const [xp, setXp] = useState<number | null>(null);
@@ -257,44 +261,26 @@ function BattleView({
     : 0;
   const remainingSec = Math.ceil(remainingMs / 1000);
 
-  const serverA = (currentRound as any)?.a_weight ?? 0;
-  const serverB = (currentRound as any)?.b_weight ?? 0;
-  const optA = currentRound && optimistic.roundId === currentRound.id ? optimistic.a : 0;
-  const optB = currentRound && optimistic.roundId === currentRound.id ? optimistic.b : 0;
-  // Take the max of server tally vs (server-at-click + optimistic bump) so
-  // we never double-count once the realtime UPDATE catches up.
-  const aScore = Math.max(serverA, serverA + optA);
-  const bScore = Math.max(serverB, serverB + optB);
-  const total = aScore + bScore;
-  const aPct = total > 0 ? Math.min(100, Math.round((aScore / total) * 100)) : 0;
-  const bPct = total > 0 ? Math.min(100, 100 - aPct) : 0;
-
+  // Server-computed totals, recalculated from the current round's accepted
+  // votes in the database and validated before render — displayed verbatim.
+  const aScore = voteTotals.aWeight;
+  const bScore = voteTotals.bWeight;
+  const total = voteTotals.totalWeight;
+  const aPct = voteTotals.aPctDisplay;
+  const bPct = voteTotals.bPctDisplay;
   // Raw voter counts (super votes count as 1 voter, not 5) for accurate display.
-  const serverACount = (currentRound as any)?.a_votes ?? 0;
-  const serverBCount = (currentRound as any)?.b_votes ?? 0;
-  // Optimistic adds at least +1 per click regardless of weight.
-  const optACount = currentRound && optimistic.roundId === currentRound.id && optimistic.a > 0 ? 1 : 0;
-  const optBCount = currentRound && optimistic.roundId === currentRound.id && optimistic.b > 0 ? 1 : 0;
-  const aCount = Math.max(serverACount, serverACount + optACount);
-  const bCount = Math.max(serverBCount, serverBCount + optBCount);
+  const aCount = voteTotals.aVotes;
+  const bCount = voteTotals.bVotes;
 
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
   const canVote = votingStatus === "open" && !myVote;
 
   const vote = async (choice: "a" | "b", useBoost = false) => {
-    if (!currentRound) return;
-    const bump = useBoost ? 5 : 1;
-    // Optimistically move the bar immediately.
-    setOptimistic((prev) => {
-      const base = prev.roundId === currentRound.id ? prev : { roundId: currentRound.id, a: 0, b: 0 };
-      return {
-        roundId: currentRound.id,
-        a: base.a + (choice === "a" ? bump : 0),
-        b: base.b + (choice === "b" ? bump : 0),
-      };
-    });
+    if (!currentRound || voteInFlightRef.current) return;
+    voteInFlightRef.current = true;
     // Pop a floating "+N" over the chosen side for instant tactile feedback.
-    setFlash({ side: choice, n: bump, key: Date.now() });
+    // Feedback only — the bars move when the server broadcasts new totals.
+    setFlash({ side: choice, n: useBoost ? 5 : 1, key: Date.now() });
     window.setTimeout(() => {
       setFlash((cur) => (cur && cur.key && Date.now() - cur.key >= 850 ? null : cur));
     }, 900);
@@ -303,17 +289,29 @@ function BattleView({
       onVoteCast(choice);
       toast.success(useBoost ? "Super vote cast! +5x" : "Vote cast");
     } catch (e: any) {
-      // Roll back the optimistic bump on failure.
-      setOptimistic((prev) =>
-        prev.roundId === currentRound.id
-          ? {
-              roundId: prev.roundId,
-              a: prev.a - (choice === "a" ? bump : 0),
-              b: prev.b - (choice === "b" ? bump : 0),
-            }
-          : prev,
-      );
-      toast.error(e?.message || "Vote failed");
+      const msg = typeof e?.message === "string" ? e.message : "";
+      if (msg.includes("locked in")) {
+        // Already voted this round — surface the vote actually on record.
+        toast.info("Your vote is locked in.");
+        try {
+          const { data: auth } = await supabase.auth.getUser();
+          if (auth?.user) {
+            const { data: mine } = await supabase
+              .from("battle_votes")
+              .select("choice")
+              .eq("round_id", currentRound.id)
+              .eq("voter_id", auth.user.id)
+              .maybeSingle();
+            if (mine?.choice) onVoteCast(mine.choice as "a" | "b");
+          }
+        } catch { /* display-only */ }
+      } else {
+        toast.error(msg || "Vote failed");
+      }
+    } finally {
+      voteInFlightRef.current = false;
+      // Pull fresh DB-recalculated totals now (realtime refresh also fires).
+      onAfterHostEmit?.();
     }
   };
 
@@ -379,8 +377,11 @@ function BattleView({
       <VoteTracker
         aPct={aPct}
         bPct={bPct}
-        aScore={Math.min(9999, aCount)}
-        bScore={Math.min(9999, bCount)}
+        aScore={aCount}
+        bScore={bCount}
+        aWeight={aScore}
+        bWeight={bScore}
+        boosted={voteTotals.boosted}
         myVote={myVote}
         votingStatus={votingStatus}
       />
@@ -439,6 +440,15 @@ function BattleView({
         />
       </div>
 
+      <HypePassPanel
+        battleId={match.id as string}
+        artists={[
+          { id: match.artist_a_id as string, name: (match.artist_a_name as string) ?? "Artist A" },
+          { id: match.artist_b_id as string, name: (match.artist_b_name as string) ?? "Artist B" },
+        ]}
+        live={match.status === "live"}
+      />
+
       {lastClosed && lastClosed.id !== currentRound?.id && (
         <div className="border-t border-white/10 bg-black/30 px-4 py-2 text-[11px] text-white/60">
           Round {lastClosed.round_number} winner:{" "}
@@ -479,6 +489,9 @@ function VoteTracker({
   bScore,
   myVote,
   votingStatus,
+  aWeight,
+  bWeight,
+  boosted = false,
 }: {
   aPct: number;
   bPct: number;
@@ -486,6 +499,9 @@ function VoteTracker({
   bScore: number;
   myVote: "a" | "b" | null;
   votingStatus: string;
+  aWeight?: number;
+  bWeight?: number;
+  boosted?: boolean;
 }) {
   return (
     <div className="relative border-y border-white/10 bg-gradient-to-b from-black/60 to-black/30 px-4 py-4 sm:px-6 sm:py-5">
@@ -565,6 +581,16 @@ function VoteTracker({
         />
         <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/40" />
       </div>
+
+      {/* Investor Boost transparency: percentages are weighted, so show the
+          weighted totals next to the raw vote counts whenever a boost has
+          influenced them. */}
+      {boosted && (
+        <div className="mt-1.5 flex items-center justify-center gap-1 text-[10px] font-mono uppercase tracking-widest text-amber-300/90">
+          <Zap className="h-3 w-3" />
+          Investor Boost active · weighted {aWeight ?? 0} vs {bWeight ?? 0} · raw votes {aScore} vs {bScore}
+        </div>
+      )}
 
       {/* Status line */}
       <div className="mt-2 flex items-center justify-center gap-2 text-[11px] sm:text-xs">

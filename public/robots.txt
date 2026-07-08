@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /lovable/
 
-Sitemap: https://www.bwfnetwork.com/sitemap.xml
+Sitemap: https://tunevio.com/sitemap.xml

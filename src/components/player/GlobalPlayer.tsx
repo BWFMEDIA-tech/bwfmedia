@@ -78,7 +78,7 @@ export function GlobalPlayer() {
   const repeatLabel = p.repeat === "off" ? "Repeat off" : p.repeat === "one" ? "Repeat one" : "Repeat all";
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur-xl">
+    <div className="fixed bottom-[var(--bwf-mobile-nav-h,0px)] md:bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0a0a0a]/95 backdrop-blur-xl">
       {queueOpen && (
         <div
           ref={queueRef}

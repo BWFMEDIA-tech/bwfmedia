@@ -108,7 +108,7 @@ export function LiveChat({
       if (cancelled || !data) return;
       const userIds = [...new Set(data.map((r: any) => r.user_id))];
       if (userIds.length) {
-        const { data: profs } = await supabase.from("profiles").select(IDENTITY_COLUMNS).in("id", userIds);
+        const { data: profs } = await supabase.from("public_profiles").select(IDENTITY_COLUMNS).in("id", userIds);
         profs?.forEach((p: any) => {
           const eff = effectiveIdentity(p);
           profileCache.current[p.id] = { display_name: eff.display_name ?? "Anon", avatar_url: eff.avatar_url };
@@ -126,7 +126,7 @@ export function LiveChat({
           const row = payload.new as any;
           let cached = profileCache.current[row.user_id];
           if (!cached) {
-            const { data } = await supabase.from("profiles").select(IDENTITY_COLUMNS).eq("id", row.user_id).maybeSingle();
+            const { data } = await supabase.from("public_profiles").select(IDENTITY_COLUMNS).eq("id", row.user_id).maybeSingle();
             const eff = effectiveIdentity(data as any);
             cached = { display_name: eff.display_name ?? "Anon", avatar_url: eff.avatar_url };
             profileCache.current[row.user_id] = cached;

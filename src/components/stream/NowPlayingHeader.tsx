@@ -7,7 +7,6 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { useServerFn } from "@tanstack/react-start";
 import { advancePlayQueue } from "@/lib/play.functions";
 import { toast } from "sonner";
-import { registerAudioElement } from "@/lib/audio-bus";
 
 type Mode = "live" | "upload" | "battle-live" | "battle-pending" | "idle";
 
@@ -58,11 +57,6 @@ export function NowPlayingHeader({
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-
-  // Single-active playback guard
-  useEffect(() => {
-    return registerAudioElement(audioRef.current);
-  }, [playing?.id]);
 
   // Subscribe to active battle for this stream
   useEffect(() => {

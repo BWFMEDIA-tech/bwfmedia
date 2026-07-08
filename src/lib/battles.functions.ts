@@ -87,7 +87,7 @@ export const createBattleMatch = createServerFn({ method: "POST" })
       .in("status", ["pending", "live"]);
 
     const { data: profiles } = await supabase
-      .from("profiles")
+      .from("public_profiles")
       .select("id, display_name, stage_name")
       .in("id", [data.artistAId, data.artistBId]);
     const nameFor = (id: string) => {
@@ -186,7 +186,7 @@ export const updateBattleArtists = createServerFn({ method: "POST" })
     }
 
     const { data: profiles } = await supabase
-      .from("profiles")
+      .from("public_profiles")
       .select("id, display_name, stage_name")
       .in("id", [data.artistAId, data.artistBId]);
     const nameFor = (id: string) => {
@@ -241,6 +241,15 @@ export const cancelBattle = createServerFn({ method: "POST" })
     });
   });
 
+/**
+ * Cast a battle vote. Single write path for the whole app:
+ *  - rate-limited per user and per IP
+ *  - the cast_battle_vote() RPC enforces one locked vote per (round, user)
+ *    at the DB level, charges the boost atomically with the insert, and
+ *    returns live totals recalculated from accepted votes
+ *  - rejections come back as structured results ("Your vote is locked in.",
+ *    "No boost credits available", ...) with the audit row already written
+ */
 export const castBattleVote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -254,46 +263,91 @@ export const castBattleVote = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { getRequest, getRequestHeader, getRequestIP } = await import(
+      "@tanstack/react-start/server"
+    );
+    const { buildVoteTotals, validateVoteTotals, formatVoteDebugLog } = await import(
+      "@/lib/vote-math"
+    );
 
-    const { data: round } = await supabase
-      .from("battle_rounds")
-      .select("id, match_id, status, ends_at, voting_status")
-      .eq("id", data.roundId)
-      .maybeSingle();
-    if (!round) throw new Error("Round not found");
-    if (round.status !== "live") throw new Error("Voting is closed");
-    if (round.voting_status !== "open") throw new Error("Voting is closed");
-
-    // Boost weight = consume 1 boost credit via existing RPC (returns true on
-    // success). Default weight is 1.
-    let weight = 1;
-    if (data.useBoost) {
-      const { error: spendErr } = await supabase.rpc("spend_boost_credit", {
-        _reason: "spend_boost",
-        _reference_id: data.roundId,
-        _amount: 1,
-      });
-      if (!spendErr) weight = 5;
+    let ip: string | null = null;
+    let ua: string | null = null;
+    try {
+      getRequest();
+      ip = getRequestIP({ xForwardedFor: true }) ?? null;
+      ua = getRequestHeader("user-agent") ?? null;
+    } catch {
+      /* no request context */
     }
 
-    const { data: vote, error } = await supabase
-      .from("battle_votes")
-      .upsert(
-        {
-          round_id: data.roundId,
-          match_id: round.match_id,
-          voter_id: userId,
-          choice: data.choice,
-          weight,
-        },
-        { onConflict: "round_id,voter_id" },
-      )
-      .select("*")
-      .single();
-    if (error) throw new Error(error.message);
+    // Rate limit: 20 votes/min per user; 60/min per IP.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const denied = (rl: { data: unknown }) =>
+      Array.isArray(rl.data) && rl.data[0]?.allowed === false;
+    const rlUser = await supabaseAdmin.rpc("check_rate_limit", {
+      _bucket_key: `u:${userId}`,
+      _action: "cast_battle_vote",
+      _max_hits: 20,
+      _window_secs: 60,
+    });
+    if (denied(rlUser)) throw new Response("Too Many Requests", { status: 429 });
+    if (ip) {
+      const rlIp = await supabaseAdmin.rpc("check_rate_limit", {
+        _bucket_key: `ip:${ip}`,
+        _action: "cast_battle_vote",
+        _max_hits: 60,
+        _window_secs: 60,
+      });
+      if (denied(rlIp)) throw new Response("Too Many Requests", { status: 429 });
+    }
+
+    const { data: res, error } = await (supabase.rpc as any)("cast_battle_vote", {
+      _round_id: data.roundId,
+      _choice: data.choice,
+      _use_boost: data.useBoost,
+      _ip: ip,
+      _user_agent: ua,
+    });
+    if (error) {
+      // Concurrent-duplicate race path raises instead of returning; log it
+      // out-of-band (the tx that would have held the audit row rolled back).
+      if ((error.message ?? "").includes("locked in")) {
+        try {
+          await supabase.rpc("log_battle_vote_blocked", {
+            _match_id: null as any,
+            _reason: "already_voted_race",
+            _metadata: { round_id: data.roundId, choice: data.choice, ip, ua },
+          });
+        } catch { /* non-fatal */ }
+        throw new Response("Your vote is locked in.", { status: 409 });
+      }
+      throw new Response(error.message ?? "Vote failed", { status: 400 });
+    }
+
+    if (!res?.ok) {
+      const message = (res?.message as string) ?? "Vote rejected";
+      const status = res?.reason === "already_voted" ? 409 : 403;
+      throw new Response(message, { status });
+    }
+
+    // Requirement 4 + 7: validate totals before handing them to any client;
+    // on failure recalculate straight from the database and re-validate.
+    let totals = buildVoteTotals(res);
+    if (!validateVoteTotals(totals)) {
+      console.error(`[battle-vote] inconsistent totals from RPC for round ${data.roundId} — recalculating`);
+      const { data: live } = await (supabase.rpc as any)("get_round_vote_totals", {
+        _round_id: data.roundId,
+      });
+      totals = buildVoteTotals(Array.isArray(live) ? live[0] : live);
+      if (!validateVoteTotals(totals)) {
+        throw new Response("Vote recorded but totals are inconsistent — refresh", { status: 500 });
+      }
+    }
+    console.log(formatVoteDebugLog(data.roundId, totals));
 
     // Award XP for casting a vote (idempotent per round via reference_id).
     // Base vote = 5 XP, boosted vote = 25 XP.
+    const weight = (res.weight as number) ?? 1;
     let xpBalance: number | null = null;
     try {
       const { data: bal } = await supabase.rpc("award_xp", {
@@ -306,7 +360,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
       if (typeof bal === "number") xpBalance = bal;
     } catch { /* non-fatal */ }
 
-    return { ok: true, vote, weight, xpBalance };
+    return { ok: true, weight, boosted: weight === 5, totals, xpBalance };
   });
 
 export const getActiveBattle = createServerFn({ method: "GET" })

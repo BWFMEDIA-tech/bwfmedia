@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Heart, Share2,
@@ -27,7 +27,6 @@ import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { usePlayer } from "@/lib/player-context";
-import { registerAudioElement, stopAndResetAllAudio, stopAndResetAudio } from "@/lib/audio-bus";
 
 /* ============================================================
    Brand palette (BWF):
@@ -60,7 +59,7 @@ function useAudioGraph(audioRef: React.RefObject<HTMLAudioElement | null>) {
   analyserRef.current = graph?.analyser ?? null;
   gainRef.current = graph?.gain ?? null;
   ctxRef.current = graph?.ctx ?? null;
-  const resume = useCallback(() => resumeSharedAudio(), []);
+  const resume = () => resumeSharedAudio();
   return { analyserRef, gainRef, ctxRef, resume };
 }
 
@@ -468,17 +467,6 @@ export function ImmersivePlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
-  // Monotonically-increasing token bumped every time the active track
-  // changes. Used to abort stale play() attempts when the user skips
-  // tracks faster than signed-URL resolution / decode can complete.
-  const playTokenRef = useRef(0);
-  // Tracks the currently in-flight play() promise so a rapid pause click
-  // waits for the browser to resolve play() before calling pause(). Without
-  // this, pause() during a pending play() is ignored (the play resolves
-  // afterwards and audio keeps going), and multiple rapid clicks can spawn
-  // overlapping play() calls that produce doubled audio.
-  const playPromiseRef = useRef<Promise<void> | null>(null);
-  const toggleChainRef = useRef<Promise<void>>(Promise.resolve());
   const trackAudioSrc = useSignedAudioUrl(track?.audio_url ?? null);
   const nextAudioSrc = useSignedAudioUrl(upNext[0]?.audio_url ?? null);
   // Stop the global mini-player whenever the immersive arena player has a
@@ -489,17 +477,7 @@ export function ImmersivePlayer({
   const globalPauseRef = useRef(globalPlayer.pause);
   globalPauseRef.current = globalPlayer.pause;
   useEffect(() => {
-    // Always pause every other audio source in the app whenever the
-    // arena's current track changes — the bus-level guard is what keeps
-    // mini-players, podcast mode, audience preview, and the global
-    // player from doubling up with the arena.
-    stopAndResetAllAudio(audioRef.current);
-    globalPauseRef.current?.();
-  }, [track?.id]);
-
-  // Register the arena <audio> with the single-active playback bus.
-  useEffect(() => {
-    return registerAudioElement(audioRef.current);
+    if (track?.id) globalPauseRef.current?.();
   }, [track?.id]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -623,32 +601,15 @@ export function ImmersivePlayer({
   useEffect(() => {
     const a = audioRef.current;
     if (!a || !trackAudioSrc) return;
-    const token = ++playTokenRef.current;
     let cancelled = false;
     const tryPlay = async () => {
       try {
-        // Hard reset: stop whatever the element was doing before so the
-        // previous track's tail can never bleed into the new track.
-        try {
-          if (playPromiseRef.current) { try { await playPromiseRef.current; } catch { /* ignore */ } }
-          a.pause();
-        } catch { /* ignore */ }
-        try { a.currentTime = 0; } catch { /* ignore */ }
-        // Pause every other registered audio source (global mini-player,
-        // NowPlayingMini, podcast mode, etc.) so the arena owns audio.
-        stopAndResetAllAudio(a);
-        globalPauseRef.current?.();
-        // If the user skipped again while we were still resetting, abort
-        // before issuing play() so we don't briefly start the stale track.
-        if (cancelled || token !== playTokenRef.current) return;
         resume();
-        const p = a.play();
-        playPromiseRef.current = p;
-        try { await p; } finally { if (playPromiseRef.current === p) playPromiseRef.current = null; }
-        if (!cancelled && token === playTokenRef.current) setNeedsUnlock(false);
+        await a.play();
+        if (!cancelled) setNeedsUnlock(false);
       } catch {
         // NotAllowedError — browser blocked autoplay. Show overlay.
-        if (!cancelled && token === playTokenRef.current) setNeedsUnlock(true);
+        if (!cancelled) setNeedsUnlock(true);
       }
     };
     void tryPlay();
@@ -661,7 +622,7 @@ export function ImmersivePlayer({
     if (!track?.audio_url || !trackAudioSrc) {
       const a = audioRef.current;
       if (a) {
-        stopAndResetAudio(a);
+        a.pause();
         a.removeAttribute("src");
         a.load();
       }
@@ -675,11 +636,7 @@ export function ImmersivePlayer({
     if (!a) return;
     try {
       resume();
-      stopAndResetAllAudio(a);
-      globalPauseRef.current?.();
-      const p = a.play();
-      playPromiseRef.current = p;
-      try { await p; } finally { if (playPromiseRef.current === p) playPromiseRef.current = null; }
+      await a.play();
       setNeedsUnlock(false);
     } catch (e: any) {
       toast.error(e?.message ?? "Could not start audio");
@@ -712,7 +669,7 @@ export function ImmersivePlayer({
   }, [sleepMin]);
 
   /* ----- actions ----- */
-  const runTogglePlay = async () => {
+  const togglePlay = async () => {
     // If nothing is playing yet, the host can promote the first queued track.
     if (!track) {
       if (!isHost || !streamId) {
@@ -739,19 +696,8 @@ export function ImmersivePlayer({
     }
     try {
       resume(); // ensure AudioContext is running (user gesture)
-      // Always await any in-flight play() before pausing — otherwise the
-      // pause is silently overridden when play() resolves.
-      if (playPromiseRef.current) {
-        try { await playPromiseRef.current; } catch { /* ignore */ }
-      }
       if (a.paused) {
-        // Stop and reset any other registered audio + reset our element so
-        // we never spawn a second concurrent stream from the same source.
-        stopAndResetAllAudio(a);
-        globalPauseRef.current?.();
-        const p = a.play();
-        playPromiseRef.current = p;
-        try { await p; } finally { if (playPromiseRef.current === p) playPromiseRef.current = null; }
+        await a.play();
       } else {
         a.pause();
       }
@@ -760,9 +706,6 @@ export function ImmersivePlayer({
       setNeedsUnlock(true);
       toast.error(e?.message ?? "Tap again to start audio");
     }
-  };
-  const togglePlay = () => {
-    toggleChainRef.current = toggleChainRef.current.then(runTogglePlay, runTogglePlay);
   };
   const seek = (pct: number) => {
     const a = audioRef.current;
@@ -932,7 +875,8 @@ export function ImmersivePlayer({
         {/* Audio element: always mounted so play/pause refs stay stable while signed URLs load. */}
         <audio
           ref={audioRef}
-          src={trackAudioSrc}
+          src={trackAudioSrc ?? ""}
+          autoPlay
           preload="auto"
           crossOrigin="anonymous"
           className="hidden"

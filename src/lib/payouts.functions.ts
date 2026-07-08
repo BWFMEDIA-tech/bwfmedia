@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { validateReturnUrl } from "@/lib/validate-return-url";
 
 const MIN_PAYOUT_CENTS = 2500; // $25 minimum
 
@@ -42,44 +43,10 @@ export const getPayoutOverview = createServerFn({ method: "GET" })
       ? balanceRes.data[0]
       : balanceRes.data;
 
-    // Derive a single status the UI can switch on. Stripe's `requirements`
-    // payload is the source of truth — `currently_due` lists fields the
-    // artist must submit before Stripe will enable payouts again, and
-    // `disabled_reason` explains why payouts are paused (when set).
-    const acct = accountRes.data as any;
-    const requirements = (acct?.requirements ?? {}) as {
-      currently_due?: string[];
-      past_due?: string[];
-      eventually_due?: string[];
-      disabled_reason?: string | null;
-    };
-    const currentlyDue = Array.isArray(requirements.currently_due)
-      ? requirements.currently_due
-      : [];
-    const pastDue = Array.isArray(requirements.past_due) ? requirements.past_due : [];
-    const disabledReason = requirements.disabled_reason ?? null;
-
-    let status: "NOT_CONNECTED" | "ACTION_REQUIRED" | "PENDING_VERIFICATION" | "ACTIVE";
-    if (!acct) status = "NOT_CONNECTED";
-    else if (currentlyDue.length > 0 || pastDue.length > 0 || disabledReason)
-      status = "ACTION_REQUIRED";
-    else if (!acct.payouts_enabled) status = "PENDING_VERIFICATION";
-    else status = "ACTIVE";
-
     return {
       environment: env,
       minPayoutCents: MIN_PAYOUT_CENTS,
       account: accountRes.data ?? null,
-      stripeStatus: {
-        status,
-        charges_enabled: !!acct?.charges_enabled,
-        payouts_enabled: !!acct?.payouts_enabled,
-        details_submitted: !!acct?.details_submitted,
-        requirements_due: currentlyDue.length + pastDue.length,
-        currently_due: currentlyDue,
-        past_due: pastDue,
-        disabled_reason: disabledReason,
-      },
       balance: {
         earned_cents: Number(balanceRow?.earned_cents ?? 0),
         tips_cents: Number(balanceRow?.tips_cents ?? 0),
@@ -98,7 +65,12 @@ export const getPayoutOverview = createServerFn({ method: "GET" })
  */
 export const startConnectOnboarding = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl: string; refreshUrl: string }) => data)
+  .inputValidator((data: { returnUrl: string; refreshUrl: string }) => ({
+    // Same open-redirect guard as checkout: Stripe will send the user to
+    // these URLs after onboarding, so they must be on our domains.
+    returnUrl: validateReturnUrl(data.returnUrl),
+    refreshUrl: validateReturnUrl(data.refreshUrl),
+  }))
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { supabase, userId, claims } = context as any;
     const env = resolveEnv();
@@ -152,7 +124,23 @@ export const startConnectOnboarding = createServerFn({ method: "POST" })
       return { url: link.url };
     } catch (error) {
       console.error("[payouts] onboarding failed", error);
-      return { error: getStripeErrorMessage(error) };
+      const raw = getStripeErrorMessage(error);
+      // Map the two known-fatal platform-level causes to actionable guidance
+      // instead of a cryptic Stripe/gateway message. payout_accounts being
+      // empty in production means every onboarding attempt has died here.
+      if (/sign(ed)? up for Connect|Connect.*not.*enabled|platform.*profile/i.test(raw)) {
+        return {
+          error:
+            "Stripe Connect isn't activated on the platform account yet. An admin must enable it in the Stripe dashboard (Connect → Get started), then try again.",
+        };
+      }
+      if (/unauthorized|not allowed|unsupported|forbidden|no such (endpoint|resource)/i.test(raw)) {
+        return {
+          error:
+            "The payment gateway rejected the Connect request. Verify Stripe Connect is enabled for this Stripe connection in Lovable (Cloud → Payments).",
+        };
+      }
+      return { error: raw };
     }
   });
 
@@ -237,7 +225,13 @@ export const requestPayout = createServerFn({ method: "POST" })
       currency: (acct.default_currency as string) ?? "usd",
       status: "queued",
     });
-    if (insErr) return { error: insErr.message };
+    if (insErr) {
+      // Unique partial index: one in-flight request per user.
+      if ((insErr as any).code === "23505") {
+        return { error: "A payout is already in progress. It settles within ~10 minutes." };
+      }
+      return { error: insErr.message };
+    }
     return { ok: true, amount_cents: available };
   });
 
@@ -327,7 +321,12 @@ export const requestRoyaltyPayout = createServerFn({ method: "POST" })
       })
       .select("id")
       .maybeSingle();
-    if (insErr) return { error: insErr.message };
+    if (insErr) {
+      if ((insErr as any).code === "23505") {
+        return { error: "A payout is already in progress. It settles within ~10 minutes." };
+      }
+      return { error: insErr.message };
+    }
 
     // Link approved royalties to this request so the cron knows what's settling.
     if (inserted?.id) {

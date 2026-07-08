@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  buildVoteTotals,
+  emptyVoteTotals,
+  validateVoteTotals,
+  type VoteTotals,
+} from "@/lib/vote-math";
 
 /**
  * Battle Engine — single authoritative event dispatcher for Play Arena 1v1
@@ -51,6 +57,13 @@ function invalid(msg: string): never {
   throw new Error(`INVALID_TRANSITION: ${msg}`);
 }
 
+/** Live weighted totals for a round, recalculated from accepted votes. */
+async function loadRoundVoteTotals(sb: any, roundId: string): Promise<VoteTotals> {
+  const { data, error } = await sb.rpc("get_round_vote_totals", { _round_id: roundId });
+  if (error) throw new Error(error.message);
+  return buildVoteTotals(Array.isArray(data) ? data[0] : data);
+}
+
 /** Pure handler so wrappers in battles.functions.ts can call into the engine
  *  without going back through the server-fn RPC boundary. */
 export async function runBattleEvent(
@@ -75,7 +88,42 @@ export async function runBattleEvent(
 
     switch (data.type) {
       case "START_ROUND": {
-        if (m.current_round >= m.total_rounds) invalid("all rounds played");
+        if (m.current_round >= m.total_rounds) {
+          // All rounds are played — drive the match to its terminal state
+          // instead of dead-ending. This state used to throw
+          // INVALID_TRANSITION while the host UI only offered START_ROUND
+          // (the round row was closed, hiding the Complete Match button), so
+          // matches sat "live" forever. Any client still emitting START_ROUND
+          // here now heals the match.
+          const cur = await loadCurrentRound();
+          if (cur && cur.status === "live") invalid("a round is already live");
+          if (cur && (cur.status !== "closed" || cur.voting_status !== "finalized")) {
+            // Final round closed but never finalized: END_ROUND finalizes it
+            // and completes the match in one transition.
+            return runBattleEvent(supabase, userId, {
+              matchId: data.matchId,
+              type: "END_ROUND",
+            });
+          }
+          const aWins = m.a_wins as number;
+          const bWins = m.b_wins as number;
+          const overallWinner =
+            aWins === bWins
+              ? null
+              : aWins > bWins
+                ? (m.artist_a_id as string)
+                : (m.artist_b_id as string);
+          await supabase
+            .from("battle_matches")
+            .update({
+              status: "completed",
+              winner_id: overallWinner,
+              ended_at: new Date().toISOString(),
+              active_side: null,
+            })
+            .eq("id", m.id);
+          return { ok: true, completed: true, winnerUserId: overallWinner };
+        }
         const cur = await loadCurrentRound();
         if (cur && cur.status === "live") invalid("a round is already live");
         const nextNumber = m.current_round + 1;
@@ -97,6 +145,14 @@ export async function runBattleEvent(
           .select("*")
           .single();
         if (error) throw new Error(error.message);
+        // A (re)started round begins at zero — no votes may carry over from a
+        // previous incarnation of this round row.
+        {
+          const { error: resetErr } = await supabase.rpc("reset_round_votes", {
+            _round_id: round.id,
+          });
+          if (resetErr) throw new Error(resetErr.message);
+        }
         await supabase
           .from("battle_matches")
           .update({
@@ -338,8 +394,10 @@ export async function runBattleEvent(
         if (round.voting_status === "finalized" && round.status === "closed") {
           return { ok: true, already: true };
         }
-        const aScore = (round.a_weight as number) || 0;
-        const bScore = (round.b_weight as number) || 0;
+        // Winner from live accepted votes, not the denormalized columns.
+        const totals = await loadRoundVoteTotals(supabase, round.id);
+        const aScore = totals.aWeight;
+        const bScore = totals.bWeight;
         const winner: "a" | "b" | "tie" =
           aScore === bScore ? "tie" : aScore > bScore ? "a" : "b";
         await supabase
@@ -364,12 +422,16 @@ export async function runBattleEvent(
         if (round && round.voting_status !== "finalized") {
           invalid("finalize the current round first");
         }
-        // Require both artists' tracks to have played before advancing.
-        if (round && (!round.a_track_finished_at || !round.b_track_finished_at)) {
+        // Require both artists' tracks to have played before advancing to
+        // ANOTHER round. Completing the match after the last round must not
+        // be gated on track-finish stamps — that deadlocked matches whose
+        // final round ended without both stamps set.
+        const willComplete = m.current_round >= m.total_rounds;
+        if (!willComplete && round && (!round.a_track_finished_at || !round.b_track_finished_at)) {
           invalid("both artists must play their track before the next round");
         }
         // Auto-complete the match if we just finished the last round.
-        if (m.current_round >= m.total_rounds) {
+        if (willComplete) {
           const aWins = m.a_wins as number;
           const bWins = m.b_wins as number;
           const overallWinner =
@@ -409,6 +471,13 @@ export async function runBattleEvent(
           .select("*")
           .single();
         if (error) throw new Error(error.message);
+        // Fresh round starts at zero — no carryover votes.
+        {
+          const { error: resetErr } = await supabase.rpc("reset_round_votes", {
+            _round_id: nextRound.id,
+          });
+          if (resetErr) throw new Error(resetErr.message);
+        }
         await supabase
           .from("battle_matches")
           .update({
@@ -424,8 +493,34 @@ export async function runBattleEvent(
         // Same as FINALIZE but doesn't require voting to have opened first.
         const round = await loadCurrentRound();
         if (!round) invalid("no current round");
-        const aScore = (round.a_weight as number) || 0;
-        const bScore = (round.b_weight as number) || 0;
+        if (round.voting_status === "finalized" && round.status === "closed") {
+          // Idempotent re-entry: the round's wins were already counted
+          // (FINALIZE_ROUND or a prior END_ROUND). Never increment again —
+          // just make sure a finished last round reaches the terminal state.
+          const isLastAlready =
+            (m.current_round as number) >= (m.total_rounds as number);
+          if (isLastAlready && m.status !== "completed") {
+            const aW = m.a_wins as number;
+            const bW = m.b_wins as number;
+            const overallWinner =
+              aW === bW ? null : aW > bW ? (m.artist_a_id as string) : (m.artist_b_id as string);
+            await supabase
+              .from("battle_matches")
+              .update({
+                status: "completed",
+                winner_id: overallWinner,
+                ended_at: new Date().toISOString(),
+                active_side: null,
+              })
+              .eq("id", m.id);
+            return { ok: true, already: true, completed: true };
+          }
+          return { ok: true, already: true };
+        }
+        // Winner from live accepted votes, not the denormalized columns.
+        const totals = await loadRoundVoteTotals(supabase, round!.id);
+        const aScore = totals.aWeight;
+        const bScore = totals.bWeight;
         const winner: "a" | "b" | "tie" =
           aScore === bScore ? "tie" : aScore > bScore ? "a" : "b";
         await supabase
@@ -534,6 +629,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
         aTrack: null,
         bTrack: null,
         battleStatus: null,
+        voteTotals: emptyVoteTotals(),
       };
     }
     const { data: rounds } = await sb
@@ -587,6 +683,32 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       }
     }
 
+    // Percentages are computed HERE, from live accepted votes of the current
+    // round only — never client-side, never from viewer counts, never carried
+    // over from previous rounds. Validated before it reaches any client; a
+    // failed validation recalculates from the database once and, if still
+    // inconsistent, ships zeros rather than wrong numbers.
+    let voteTotals = emptyVoteTotals();
+    if (currentRound) {
+      voteTotals = await loadRoundVoteTotals(sb, currentRound.id as string);
+      if (
+        currentRound.a_weight !== voteTotals.aWeight ||
+        currentRound.b_weight !== voteTotals.bWeight
+      ) {
+        console.error(
+          `[battle] tally drift on round ${currentRound.id}: columns=(${currentRound.a_weight},${currentRound.b_weight}) live=(${voteTotals.aWeight},${voteTotals.bWeight}) — serving live totals`,
+        );
+      }
+      if (!validateVoteTotals(voteTotals)) {
+        console.error(`[battle] invalid vote totals for round ${currentRound.id} — recalculating`);
+        voteTotals = await loadRoundVoteTotals(sb, currentRound.id as string);
+        if (!validateVoteTotals(voteTotals)) {
+          console.error(`[battle] vote totals still invalid for round ${currentRound.id} — serving zeros`);
+          voteTotals = emptyVoteTotals();
+        }
+      }
+    }
+
     return {
       match,
       rounds: rounds ?? [],
@@ -597,6 +719,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       aTrack,
       bTrack,
       battleStatus: match.status as string,
+      voteTotals,
     };
   });
 

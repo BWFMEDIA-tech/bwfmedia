@@ -112,15 +112,6 @@ function AudiencePage() {
   // Reset element when track changes.
   useEffect(() => { setIsPlaying(false); }, [playing?.id]);
 
-  // Single-active playback guard: pause/get-paused by other app audio.
-  useEffect(() => {
-    let cleanup = () => {};
-    import("@/lib/audio-bus").then(({ registerAudioElement }) => {
-      cleanup = registerAudioElement(audioRef.current);
-    });
-    return () => cleanup();
-  }, [playing?.id]);
-
   const togglePlay = async () => {
     const el = audioRef.current;
     if (!el) return;

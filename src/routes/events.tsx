@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { Calendar as CalendarIcon, MapPin, Clock, ExternalLink, Radio } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPublicEvents, type EventRow } from "@/lib/events.functions";
 
 export const Route = createFileRoute("/events")({
@@ -118,7 +117,6 @@ function EventsPage() {
           </div>
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }

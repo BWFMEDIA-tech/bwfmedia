@@ -156,15 +156,6 @@ export function PodcastStudio({ queue }: { queue: LiveQueueRow[] }) {
   const currentAudio = guestsWithAudio[audioIdx] ?? null;
 
   useEffect(() => {
-    // Lazy import to avoid SSR pull of bus before audio exists.
-    let cleanup = () => {};
-    import("@/lib/audio-bus").then(({ registerAudioElement }) => {
-      cleanup = registerAudioElement(audioRef.current);
-    });
-    return () => cleanup();
-  }, [currentAudio?.id]);
-
-  useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
     el.muted = muted;

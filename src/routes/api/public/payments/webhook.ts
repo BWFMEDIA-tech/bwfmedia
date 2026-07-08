@@ -340,6 +340,15 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
           switch (event.type) {
             case 'checkout.session.completed':
             case 'checkout.session.async_payment_succeeded':
+              // Environment fence: tips / boosts / bookings live in ONE
+              // production database with no environment column, so a
+              // signature-valid SANDBOX event (test-card payment) must never
+              // grant real goods or mark real bookings paid. Subscriptions
+              // are environment-aware (env column) and handled below.
+              if (env !== 'live') {
+                console.log('Webhook: ignoring sandbox session grant', (event.data.object as any)?.id);
+                break;
+              }
               await routeSessionPaid(event.data.object);
               break;
             case 'customer.subscription.created':

@@ -48,7 +48,6 @@ export const Route = createFileRoute("/api/public/shopify/callback")({
             {
               user_id: userId,
               shop_domain: shop,
-              access_token,
               scope,
               shop_name: info?.name ?? null,
               shop_email: info?.email ?? null,
@@ -64,6 +63,18 @@ export const Route = createFileRoute("/api/public/shopify/callback")({
         if (storeErr || !storeRow) {
           console.error("[shopify] store upsert failed", storeErr);
           return new Response("Failed to save store", { status: 500 });
+        }
+
+        // Store the OAuth access token in the server-only credentials table
+        const { error: credErr } = await supabaseAdmin
+          .from("shopify_store_credentials" as any)
+          .upsert(
+            { store_id: storeRow.id, access_token, updated_at: new Date().toISOString() } as any,
+            { onConflict: "store_id" },
+          );
+        if (credErr) {
+          console.error("[shopify] credential upsert failed", credErr);
+          return new Response("Failed to save credentials", { status: 500 });
         }
 
         // Initial product sync (best-effort)
