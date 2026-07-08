@@ -77,7 +77,6 @@ function useSwipeToClose(onClose: () => void) {
       const dy = currentY.current - startY.current;
       const dt = performance.now() - startTime.current;
       const velocity = dy / (dt || 1);
-      console.log("TE", dy, dt, velocity);
       if (dy > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
         updateOffset(0);
         onClose();
