@@ -181,13 +181,20 @@ function MorePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050509] text-white pb-28">
+    <div
+      className="min-h-screen bg-[#050509] text-white pb-28"
+      style={{ transform: `translateY(${Math.round(offset)}px)`, transition: offset === 0 ? "transform 250ms ease" : "none" }}
+    >
       <header className="sticky top-0 z-10 border-b border-white/10 bg-[#050509]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
-          <h1 className="text-2xl font-black tracking-tight">More</h1>
-          <Link to="/search" className="text-xs font-semibold text-white/60 hover:text-white">Search</Link>
+        <div className="mx-auto flex max-w-3xl flex-col items-center px-5 pt-2 pb-4">
+          <div className="mb-2 h-1 w-10 rounded-full bg-white/20" aria-hidden="true" />
+          <div className="flex w-full items-center justify-between">
+            <h1 className="text-2xl font-black tracking-tight">More</h1>
+            <Link to="/search" className="text-xs font-semibold text-white/60 hover:text-white">Search</Link>
+          </div>
         </div>
       </header>
+
 
       <div className="mx-auto max-w-3xl px-4 py-6 space-y-8">
         {sections.map((section) => (
