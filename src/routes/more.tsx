@@ -56,6 +56,7 @@ function useSwipeToClose(onClose: () => void) {
       currentX.current = t.clientX;
       startTime.current = performance.now();
       updateOffset(0);
+      console.log("TS", t.clientY);
     };
 
     const touchMove = (e: TouchEvent) => {
