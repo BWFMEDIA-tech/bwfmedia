@@ -180,7 +180,6 @@ function MorePage() {
 
   return (
     <div
-      data-offset={offset}
       className="min-h-screen bg-[#050509] text-white pb-28"
       style={{ transform: `translateY(${Math.round(offset)}px)`, transition: offset === 0 ? "transform 250ms ease" : "none" }}
     >
