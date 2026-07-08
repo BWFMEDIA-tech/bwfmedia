@@ -193,7 +193,6 @@ function MorePage() {
         </div>
       </header>
 
-
       <div className="mx-auto max-w-3xl px-4 py-6 space-y-8">
         {sections.map((section) => (
           <section key={section.title} className="animate-fade-in">
