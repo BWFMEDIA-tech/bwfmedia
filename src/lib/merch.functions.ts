@@ -60,13 +60,21 @@ export const syncShopifyProducts = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: store } = await supabaseAdmin
       .from("shopify_stores")
-      .select("id, shop_domain, access_token, currency")
+      .select("id, shop_domain, currency")
       .eq("user_id", context.userId)
       .maybeSingle();
     if (!store) throw new Error("No connected store");
 
+    const { data: cred } = await supabaseAdmin
+      .from("shopify_store_credentials" as any)
+      .select("access_token")
+      .eq("store_id", store.id)
+      .maybeSingle();
+    const accessToken = (cred as any)?.access_token as string | undefined;
+    if (!accessToken) throw new Error("Missing store credentials");
+
     const { fetchAllProducts, toCents } = await import("@/lib/shopify.server");
-    const products = await fetchAllProducts(store.shop_domain, store.access_token);
+    const products = await fetchAllProducts(store.shop_domain, accessToken);
     let count = 0;
     for (const p of products) {
       const prices = p.variants.map((v) => toCents(v.price)).filter((n) => n > 0);
