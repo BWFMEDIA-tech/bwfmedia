@@ -1,21 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TunevioLanding } from "./tunevio";
+import { OnePager } from "@/components/site/OnePager";
+import { TrendingMerch } from "@/components/merch/TrendingMerch";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tunevio — The Future of Independent Music" },
-      { name: "description", content: "Join Tunevio and use fan engagement, competition, and community to grow your audience. Early access open now." },
-      { property: "og:title", content: "Tunevio — The Future of Independent Music" },
-      { property: "og:description", content: "Discover music, compete in Play Arena, and support artists. Join the early access waitlist." },
+      { title: "BWF Media TV, Real Content. Real People. Real Views." },
+      { name: "description", content: "BWF Media TV, 686M+ views, 324K+ subscribers. Hip-hop media, viral interviews, music videos, and culture. Book a shoot or partner with us." },
+      { property: "og:title", content: "BWF Media TV, Where Culture Goes Viral" },
+      { property: "og:description", content: "Where culture goes viral. 686M+ views and counting." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://tunevio.com/" },
+      { property: "og:url", content: "https://bwfmedia.company/" },
     ],
-    links: [{ rel: "canonical", href: "https://tunevio.com/" }],
+    links: [{ rel: "canonical", href: "https://bwfmedia.company/" }],
   }),
   component: Index,
 });
 
 function Index() {
-  return <TunevioLanding />;
+  return (
+    <>
+      <OnePager />
+      <div className="bg-black text-white"><TrendingMerch /></div>
+    </>
+  );
 }

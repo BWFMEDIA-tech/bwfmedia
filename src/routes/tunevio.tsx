@@ -27,8 +27,6 @@ import heroVideo from "@/assets/hero-rapper.mp4.asset.json";
 import micWalkupVideo from "@/assets/tunevio-mic-walkup-black.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import playArena1v1 from "@/assets/play-arena-1v1-battle.png.asset.json";
-import { ForArtistsSection } from "@/components/site/ForArtistsSection";
-
 
 
 export const Route = createFileRoute("/tunevio")({
@@ -235,7 +233,7 @@ function fmt(n: number) {
   return n.toLocaleString("en-US");
 }
 
-export function TunevioLanding() {
+function TunevioLanding() {
   const { count, setCount } = useWaitlistCount();
   const onJoined = () =>
     setCount((c) => (typeof c === "number" ? c + 1 : c));
@@ -263,9 +261,21 @@ export function TunevioLanding() {
       </div>
 
       {/* Top bar */}
+      <header className="relative z-10 flex items-center justify-between px-5 sm:px-10 py-5">
+        <div className="flex items-center gap-2">
+          <img
+            src={tunevioLogo.url}
+            alt="Tunevio"
+            className="h-12 sm:h-14 w-auto drop-shadow-[0_0_25px_rgba(197,61,255,0.55)]"
+          />
+        </div>
+        <span className="text-xs uppercase tracking-[0.2em] text-white/50">
+          by BWF Media
+        </span>
+      </header>
 
       {/* 1. Hero */}
-      <section id="tunevio-hero" className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
+      <section className="relative px-5 sm:px-10 pt-10 pb-24 sm:pt-16 sm:pb-32 overflow-hidden">
         {/* Hero video background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
@@ -339,9 +349,6 @@ export function TunevioLanding() {
             </motion.div>
           </div>
       </section>
-
-      {/* 1.5 For Artists */}
-      <ForArtistsSection />
 
       {/* 2. Social Proof */}
       <section className="relative px-5 sm:px-10 pb-20">

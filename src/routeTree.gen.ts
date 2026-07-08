@@ -29,7 +29,6 @@ import { Route as PayoutsRouteImport } from './routes/payouts'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NetworkRouteImport } from './routes/network'
-import { Route as MoreRouteImport } from './routes/more'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -234,11 +233,6 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const NetworkRoute = NetworkRouteImport.update({
   id: '/network',
   path: '/network',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MoreRoute = MoreRouteImport.update({
-  id: '/more',
-  path: '/more',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MicDropRoute = MicDropRouteImport.update({
@@ -808,7 +802,6 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
-  '/more': typeof MoreRoute
   '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
@@ -935,7 +928,6 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
-  '/more': typeof MoreRoute
   '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
@@ -1064,7 +1056,6 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
-  '/more': typeof MoreRoute
   '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
@@ -1194,7 +1185,6 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/mic-drop'
-    | '/more'
     | '/network'
     | '/notifications'
     | '/off-the-block'
@@ -1321,7 +1311,6 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/mic-drop'
-    | '/more'
     | '/network'
     | '/notifications'
     | '/off-the-block'
@@ -1449,7 +1438,6 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/mic-drop'
-    | '/more'
     | '/network'
     | '/notifications'
     | '/off-the-block'
@@ -1578,7 +1566,6 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRoute
   MicDropRoute: typeof MicDropRoute
-  MoreRoute: typeof MoreRoute
   NetworkRoute: typeof NetworkRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
@@ -1782,13 +1769,6 @@ declare module '@tanstack/react-router' {
       path: '/network'
       fullPath: '/network'
       preLoaderRoute: typeof NetworkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/more': {
-      id: '/more'
-      path: '/more'
-      fullPath: '/more'
-      preLoaderRoute: typeof MoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mic-drop': {
@@ -2661,7 +2641,6 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MessagesRoute: MessagesRoute,
   MicDropRoute: MicDropRoute,
-  MoreRoute: MoreRoute,
   NetworkRoute: NetworkRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,

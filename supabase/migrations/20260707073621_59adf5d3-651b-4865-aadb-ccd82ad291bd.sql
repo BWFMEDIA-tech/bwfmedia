@@ -1,1 +1,0 @@
-CREATE POLICY "Admins can delete tips" ON public.tips FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
