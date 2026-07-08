@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Swords, PlusCircle, Search, User } from "lucide-react";
+import { Home, Swords, PlusCircle, Search, Menu } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,7 @@ const TABS: Tab[] = [
   { to: "/play", label: "Arena", icon: Swords, match: (p) => p === "/play" || p.startsWith("/play/") || p.startsWith("/play.") },
   { to: "/upload", label: "Upload", icon: PlusCircle, match: (p) => p.startsWith("/upload") },
   { to: "/search", label: "Search", icon: Search, match: (p) => p.startsWith("/search") },
-  { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") },
+  { to: "/more", label: "More", icon: Menu, match: (p) => p.startsWith("/more") },
 ];
 
 export function MobileBottomNav() {
