@@ -105,14 +105,12 @@ function useSwipeToClose(onClose: () => void) {
 function MorePage() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const [swipeOffset, setSwipeOffset] = useState(0);
 
   const handleSwipeClose = useCallback(() => {
     navigate({ to: "/" });
   }, [navigate]);
 
   const offset = useSwipeToClose(handleSwipeClose);
-
 
   const sections: Section[] = [
     {
