@@ -107,6 +107,7 @@ function useSwipeToClose(onClose: () => void) {
 }
 
 function MorePage() {
+  console.log("MorePage render");
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
