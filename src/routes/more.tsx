@@ -42,7 +42,6 @@ function useSwipeToClose(onClose: () => void) {
   }, []);
 
   useEffect(() => {
-    console.log("SWIPE MOUNT");
     const el = document.documentElement;
     let dragging = false;
 
