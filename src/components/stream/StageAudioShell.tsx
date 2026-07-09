@@ -456,6 +456,25 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
     };
     const onMediaFailure = (failure: unknown) => {
       console.warn("[stage-audio] Media device failure", failure);
+      const name = (failure as { name?: string } | null)?.name ?? "";
+      // Don't retry when the browser has denied permission or there is no
+      // device — retries without a user gesture are guaranteed to fail and
+      // just spam the console. Prompt the user to fix it and tap the mic.
+      if (
+        name === "NotAllowedError" ||
+        name === "PermissionDeniedError" ||
+        name === "NotFoundError" ||
+        name === "OverconstrainedError" ||
+        name === "SecurityError"
+      ) {
+        toast.error(
+          name === "NotFoundError"
+            ? "No microphone found. Connect one and tap the mic button."
+            : "Microphone blocked. Allow mic access in your browser, then tap the mic button.",
+          { id: "stage-mic-permission" },
+        );
+        return;
+      }
       setTimeout(() => {
         room.localParticipant
           ?.setMicrophoneEnabled(true)
