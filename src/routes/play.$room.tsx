@@ -14,6 +14,9 @@ import { LiveChat } from "@/components/stream/LiveChat";
 import { BattleArena } from "@/components/stream/BattleArena";
 import { ImmersivePlayer } from "@/components/play/ImmersivePlayer";
 import { useStageState } from "@/lib/useStageState";
+import { useListeningSession } from "@/lib/useListeningSession";
+import { ListeningSessionPanel } from "@/components/player/ListeningSessionPanel";
+import type { PlayerTrack } from "@/lib/player-context";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -62,6 +65,28 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
   const { playing, queued, leaderboard } = usePlayQueue(stream?.id ?? null);
   const isHost = !!stream && auth.user?.id === stream.host_id;
+
+  // ---- Synchronized listening session (host-authoritative) ----
+  const resolveTrack = (trackId: string): PlayerTrack | null => {
+    const all = [...(playing ? [playing] : []), ...queued, ...leaderboard];
+    const t = all.find((x) => x.id === trackId);
+    if (!t || !t.audio_url) return null;
+    return {
+      id: t.id,
+      title: t.title,
+      artist: t.artist_name,
+      audioUrl: t.audio_url,
+      coverUrl: t.cover_url,
+    };
+  };
+  const session = useListeningSession({
+    streamId: stream?.id ?? null,
+    hostUserId: stream?.host_id ?? null,
+    me: auth.user
+      ? { userId: auth.user.id, displayName: auth.displayName ?? null, avatarUrl: null }
+      : null,
+    resolveTrack,
+  });
 
   // Register presence as a listener so chat/queue RLS policies that require
   // stage_participant membership accept this viewer. Matches /stream/$room.
@@ -207,6 +232,17 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
           {/* Right column */}
           <div className="space-y-5">
             {showChat && <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />}
+            {stream && (
+              <ListeningSessionPanel
+                isHost={session.isHost}
+                hostPresent={session.hostPresent}
+                listenerCount={session.listenerCount}
+                participants={session.participants}
+                currentTrackTitle={playing?.title ?? null}
+                currentArtist={playing?.artist_name ?? null}
+                playbackState={session.snapshot?.playbackState ?? "stopped"}
+              />
+            )}
             <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
         </div>
