@@ -74,7 +74,15 @@ export function StageConnectionProvider({ children }: { children: React.ReactNod
     room.on(RoomEvent.TrackSubscribed, onActive);
     recompute();
 
+    // Fallback poller. Some browsers (notably iOS Safari and Firefox on
+    // Linux) don't fire `IsSpeakingChanged` reliably for the local
+    // participant, and `ActiveSpeakersChanged` only lists the loudest
+    // couple of talkers. Poll every 200 ms so the pulse ring always
+    // reflects the current `isSpeaking` state for everyone in the room.
+    const pollId = window.setInterval(recompute, 200);
+
     return () => {
+      window.clearInterval(pollId);
       room.off(RoomEvent.ActiveSpeakersChanged, onActive);
       room.off(RoomEvent.ParticipantConnected, onConnected);
       room.off(RoomEvent.ParticipantDisconnected, onDisconnected);

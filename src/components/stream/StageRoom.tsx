@@ -562,13 +562,27 @@ function SpeakerBubble({
       <div
         className={cn(
           "relative rounded-full p-1 transition-transform duration-150",
-          isSpeaking && "scale-110 animate-pulse",
+          isSpeaking && "scale-110",
         )}
         style={{
-          boxShadow: isSpeaking ? `0 0 40px ${ringColor}, 0 0 80px ${ringColor}aa` : `0 0 24px ${ringColor}66`,
+          boxShadow: isSpeaking
+            ? `0 0 48px ${ringColor}, 0 0 96px ${ringColor}cc, 0 0 160px ${ringColor}88`
+            : `0 0 24px ${ringColor}66`,
           background: `conic-gradient(${ringColor}, transparent 70%, ${ringColor})`,
         }}
       >
+        {isSpeaking && (
+          <>
+            <span
+              className="pointer-events-none absolute inset-0 rounded-full animate-ping"
+              style={{ boxShadow: `0 0 0 4px ${ringColor}`, opacity: 0.75 }}
+            />
+            <span
+              className="pointer-events-none absolute -inset-2 rounded-full animate-ping"
+              style={{ boxShadow: `0 0 0 2px ${ringColor}aa`, animationDuration: "1.4s" }}
+            />
+          </>
+        )}
         <Link to="/artist/$id" params={{ id: p.user_id }}>
           {p.avatar_url ? (
             <SignedImg src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
