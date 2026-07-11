@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
+import { LocalSpeakingSignalPublisher, StageConnectionProvider } from "@/lib/stage-connection-context";
 import { useServerFn } from "@tanstack/react-start";
 import { setStreamSpotlight } from "@/lib/stage.functions";
 import { Pin, PinOff, X as XIcon } from "lucide-react";
@@ -93,8 +94,11 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       className="contents"
     >
       <RoomAudioRenderer />
-      <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
-      <PublishSync publish={publish} />
+      <StageConnectionProvider>
+        <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
+        <PublishSync publish={publish} />
+        <LocalSpeakingSignalPublisher />
+      </StageConnectionProvider>
     </LiveKitRoom>
   );
 }
