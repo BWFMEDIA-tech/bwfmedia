@@ -20,7 +20,7 @@ import type { LocalAudioTrack } from "livekit-client";
 import { Mic, MicOff, Radio, PhoneOff, Activity, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { StageConnectionProvider } from "@/lib/stage-connection-context";
+import { LocalSpeakingSignalPublisher, StageConnectionProvider } from "@/lib/stage-connection-context";
 import { DeviceSelector } from "./DeviceSelector";
 import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
 import { StageReconnectBanner } from "./StageReconnectBanner";
@@ -174,6 +174,7 @@ export function StageAudioShell({
       <StageConnectionProvider>
         <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
+        <LocalSpeakingSignalPublisher />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
         <ReconnectAudioGuard serverUrl={serverUrl} token={token} />
