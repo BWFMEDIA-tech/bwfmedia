@@ -124,6 +124,7 @@ import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
 import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -719,6 +720,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -885,6 +891,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -1011,6 +1018,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -1139,6 +1147,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
@@ -1268,6 +1277,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/play/'
     | '/videos/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/battle/react'
     | '/api/public/block-booking'
@@ -1394,6 +1404,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/play'
     | '/videos'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/battle/react'
     | '/api/public/block-booking'
@@ -1521,6 +1532,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/play/'
     | '/videos/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/battle/react'
     | '/api/public/block-booking'
@@ -1610,6 +1622,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiBattleReactRoute: typeof ApiBattleReactRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
@@ -2436,6 +2449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -2688,6 +2708,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiBattleReactRoute: ApiBattleReactRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
