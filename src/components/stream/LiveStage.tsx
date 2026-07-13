@@ -9,7 +9,7 @@ import {
   RoomAudioRenderer,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track, ConnectionQuality, RoomEvent, type Participant } from "livekit-client";
+import { Track, ConnectionQuality, ConnectionState, RoomEvent, type Participant } from "livekit-client";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -104,10 +104,186 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
 }
 
 function PublishSync({ publish }: { publish: boolean }) {
+  const prev = useRef<boolean | null>(null);
+  useResilientLocalMediaPublish({
+    publish,
+    microphone: true,
+    camera: true,
+    onDisabled: () => {
+      if (prev.current === true) toast.info("You're back in the crowd");
+      prev.current = false;
+    },
+    onPublished: () => {
+      if (prev.current === false && publish) toast.success("You're on stage");
+      prev.current = publish;
+    },
+  });
+  return null;
+}
+
+function useResilientLocalMediaPublish({
+  publish,
+  microphone,
+  camera,
+  onPublished,
+  onDisabled,
+}: {
+  publish: boolean;
+  microphone?: boolean;
+  camera?: boolean;
+  onPublished?: () => void;
+  onDisabled?: () => void;
+}) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
-  const prev = useRef<boolean | null>(null);
   const [permissionTick, setPermissionTick] = useState(0);
+  const publishRef = useRef(publish);
+  const inFlightRef = useRef(false);
+  const queuedRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const retryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const lastErrorRef = useRef<Record<"camera" | "microphone" | "permission", string | null>>({
+    camera: null,
+    microphone: null,
+    permission: null,
+  });
+
+  useEffect(() => {
+    publishRef.current = publish;
+  }, [publish]);
+
+  const clearRetries = useCallback(() => {
+    retryTimersRef.current.forEach((id) => clearTimeout(id));
+    retryTimersRef.current = [];
+  }, []);
+
+  useEffect(() => clearRetries, [clearRetries]);
+
+  const hasLiveLocalTrack = useCallback(
+    (source: Track.Source, kind: Track.Kind) => {
+      if (!localParticipant) return false;
+      return Array.from(localParticipant.trackPublications.values()).some((publication) => {
+        const pub = publication as unknown as {
+          source?: Track.Source;
+          kind?: Track.Kind;
+          track?: { isMuted?: boolean; mediaStreamTrack?: MediaStreamTrack } | null;
+        };
+        const matchesSource = pub.source === source || (!pub.source && pub.kind === kind);
+        if (!matchesSource) return false;
+        const mediaTrack = pub.track?.mediaStreamTrack;
+        return !!pub.track && pub.track.isMuted !== true && mediaTrack?.readyState !== "ended";
+      });
+    },
+    [localParticipant],
+  );
+
+  const showDeviceError = useCallback((kind: "camera" | "microphone", error: unknown) => {
+    const msg = friendlyDeviceError(error);
+    console.warn(`[live-stage] ${kind} publish failed`, error);
+    if (lastErrorRef.current[kind] !== msg) {
+      lastErrorRef.current[kind] = msg;
+      toast.error(msg);
+    }
+  }, []);
+
+  const ensureMedia = useCallback(
+    async (reason: string) => {
+      if (!localParticipant) return;
+      if (inFlightRef.current) {
+        queuedRef.current = true;
+        return;
+      }
+      inFlightRef.current = true;
+      queuedRef.current = false;
+
+      try {
+        if (!publishRef.current) {
+          clearRetries();
+          retryCountRef.current = 0;
+          await Promise.allSettled([
+            microphone ? localParticipant.setMicrophoneEnabled(false) : Promise.resolve(),
+            camera ? localParticipant.setCameraEnabled(false) : Promise.resolve(),
+          ]);
+          onDisabled?.();
+          return;
+        }
+
+        if (localParticipant.permissions?.canPublish === false) {
+          const msg = camera && !microphone
+            ? "You don't have permission to publish video on this stage."
+            : "You don't have permission to publish media on this stage.";
+          if (lastErrorRef.current.permission !== msg) {
+            lastErrorRef.current.permission = msg;
+            toast.error(msg);
+          }
+          return;
+        }
+
+        const jobs: Array<Promise<void>> = [];
+        const labels: Array<"microphone" | "camera"> = [];
+
+        if (microphone && !hasLiveLocalTrack(Track.Source.Microphone, Track.Kind.Audio)) {
+          labels.push("microphone");
+          jobs.push(localParticipant.setMicrophoneEnabled(true).then(() => undefined));
+        }
+
+        if (camera && !hasLiveLocalTrack(Track.Source.Camera, Track.Kind.Video)) {
+          labels.push("camera");
+          // Clear a stale/ended camera publication first. On mobile Safari and
+          // spotty Wi-Fi the SDK can keep the publication object while the
+          // underlying MediaStreamTrack is ended, so a plain enable can no-op.
+          jobs.push(
+            localParticipant
+              .setCameraEnabled(false)
+              .catch(() => undefined)
+              .then(() => localParticipant.setCameraEnabled(true))
+              .then(() => undefined),
+          );
+        }
+
+        if (!jobs.length) return;
+
+        console.log("[live-stage] restoring local media", { reason, labels });
+        const results = await Promise.allSettled(jobs);
+        let restored = false;
+        let retryableFailure = false;
+
+        results.forEach((result, index) => {
+          const label = labels[index];
+          if (result.status === "fulfilled") {
+            lastErrorRef.current[label] = null;
+            restored = true;
+            return;
+          }
+          showDeviceError(label, result.reason);
+          if (isRetryableDeviceError(result.reason)) retryableFailure = true;
+        });
+
+        if (restored) {
+          retryCountRef.current = 0;
+          onPublished?.();
+        }
+
+        if (retryableFailure && publishRef.current && retryCountRef.current < 4) {
+          retryCountRef.current += 1;
+          const delay = Math.min(5000, 750 * retryCountRef.current);
+          const timer = setTimeout(() => {
+            retryTimersRef.current = retryTimersRef.current.filter((id) => id !== timer);
+            void ensureMedia(`retry-${retryCountRef.current}`);
+          }, delay);
+          retryTimersRef.current.push(timer);
+        }
+      } finally {
+        inFlightRef.current = false;
+        if (queuedRef.current) {
+          queuedRef.current = false;
+          setTimeout(() => void ensureMedia("queued"), 100);
+        }
+      }
+    },
+    [camera, clearRetries, hasLiveLocalTrack, localParticipant, microphone, onDisabled, onPublished, showDeviceError],
+  );
+
   useEffect(() => {
     if (!room) return;
     const onPermissionsChanged = (_prev: unknown, participant: Participant) => {
@@ -122,39 +298,43 @@ function PublishSync({ publish }: { publish: boolean }) {
   }, [room, localParticipant?.identity]);
 
   useEffect(() => {
-    if (!localParticipant) return;
-    (async () => {
-      if (!publish) {
-        await Promise.allSettled([
-          localParticipant.setMicrophoneEnabled(false),
-          localParticipant.setCameraEnabled(false),
-        ]);
-        if (prev.current === true) toast.info("You're back in the crowd");
-        prev.current = false;
-        return;
-      }
-      if (localParticipant.permissions?.canPublish === false) return;
+    void ensureMedia("publish-state");
+  }, [ensureMedia, permissionTick, publish]);
 
-      const [micResult, cameraResult] = await Promise.allSettled([
-        localParticipant.setMicrophoneEnabled(true),
-        localParticipant.setCameraEnabled(true),
-      ]);
+  useEffect(() => {
+    if (!room) return;
+    const scheduleRestore = (reason: string) => {
+      if (!publishRef.current) return;
+      [0, 750, 2000].forEach((delay) => {
+        const timer = setTimeout(() => {
+          retryTimersRef.current = retryTimersRef.current.filter((id) => id !== timer);
+          void ensureMedia(reason);
+        }, delay);
+        retryTimersRef.current.push(timer);
+      });
+    };
+    const onConnected = () => scheduleRestore("room-reconnected");
+    const onState = (state: ConnectionState) => {
+      if (state === ConnectionState.Connected) scheduleRestore("connection-state-connected");
+    };
+    const onMediaDevicesChanged = () => scheduleRestore("media-devices-changed");
 
-      if (micResult.status === "rejected") {
-        toast.error(friendlyDeviceError(micResult.reason));
-      }
-      if (cameraResult.status === "rejected") {
-        toast.error(friendlyDeviceError(cameraResult.reason));
-      }
-      if (micResult.status === "fulfilled" || cameraResult.status === "fulfilled") {
-        if (prev.current === false && publish) {
-          toast.success("You're on stage");
-        }
-        prev.current = publish;
-      }
-    })();
-  }, [publish, localParticipant, permissionTick]);
-  return null;
+    room.on(RoomEvent.Reconnected, onConnected);
+    room.on(RoomEvent.SignalConnected, onConnected);
+    room.on(RoomEvent.ConnectionStateChanged, onState);
+    room.on(RoomEvent.MediaDevicesChanged, onMediaDevicesChanged);
+    return () => {
+      room.off(RoomEvent.Reconnected, onConnected);
+      room.off(RoomEvent.SignalConnected, onConnected);
+      room.off(RoomEvent.ConnectionStateChanged, onState);
+      room.off(RoomEvent.MediaDevicesChanged, onMediaDevicesChanged);
+    };
+  }, [room, ensureMedia]);
+}
+
+function isRetryableDeviceError(error: unknown) {
+  const message = error instanceof Error ? `${error.name} ${error.message}` : String(error ?? "");
+  return !/notallowed|permission|denied|notfound|no device|overconstrained|security/i.test(message);
 }
 
 function friendlyDeviceError(error: unknown) {
