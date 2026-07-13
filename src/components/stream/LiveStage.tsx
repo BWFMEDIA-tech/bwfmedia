@@ -471,29 +471,11 @@ const StageInner = LiveStageContent;
  * WITHOUT touching the microphone or the room connection.
  */
 export function CameraPublishSync({ publish }: { publish: boolean }) {
-  const { localParticipant } = useLocalParticipant();
-  const lastErrorRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!localParticipant) return;
-    if (publish && localParticipant.permissions?.canPublish === false) {
-      toast.error("You don't have permission to publish video on this stage.");
-      return;
-    }
-    localParticipant
-      .setCameraEnabled(publish)
-      .then(() => {
-        lastErrorRef.current = null;
-      })
-      .catch((err) => {
-        const msg = friendlyDeviceError(err);
-        console.warn("[live-stage] setCameraEnabled failed", err);
-        // Only toast once per distinct failure so we don't spam on re-renders.
-        if (publish && lastErrorRef.current !== msg) {
-          lastErrorRef.current = msg;
-          toast.error(msg);
-        }
-      });
-  }, [publish, localParticipant]);
+  useResilientLocalMediaPublish({
+    publish,
+    camera: true,
+    microphone: false,
+  });
   return null;
 }
 
