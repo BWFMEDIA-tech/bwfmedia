@@ -6,7 +6,7 @@ import {
   useRoomContext,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   RoomEvent,
   Track,
@@ -366,7 +366,15 @@ function ParticipantAudioLogger() {
  */
 function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: string }) {
   const room = useRoomContext();
-  const { localParticipant } = useLocalParticipant();
+
+  // Keep serverUrl/token in refs so we never rebind the room listeners
+  // when they change (token refresh, region hop). Rebinding tears down
+  // the pending rejoin timer and resets the backoff/mic-intent state
+  // mid-reconnect, which is what caused "won't stay connected".
+  const serverUrlRef = useRef(serverUrl);
+  const tokenRef = useRef(token);
+  useEffect(() => { serverUrlRef.current = serverUrl; }, [serverUrl]);
+  useEffect(() => { tokenRef.current = token; }, [token]);
 
   useEffect(() => {
     if (!room) return;
@@ -507,7 +515,7 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       if (rejoinTimer) clearTimeout(rejoinTimer);
       rejoinTimer = setTimeout(async () => {
         try {
-          await room.connect(serverUrl, token);
+          await room.connect(serverUrlRef.current, tokenRef.current);
           console.log("[stage-audio] Rejoined room");
           rejoinAttempt = 0;
           resubscribeAllRemoteAudio();
@@ -542,7 +550,7 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       room.off(RoomEvent.LocalTrackPublished, onLocalTrackPublished);
       if (rejoinTimer) clearTimeout(rejoinTimer);
     };
-  }, [room, localParticipant, serverUrl, token]);
+  }, [room]);
 
   return null;
 }
