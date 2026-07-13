@@ -142,6 +142,8 @@ function useResilientLocalMediaPublish({
   const queuedRef = useRef(false);
   const retryCountRef = useRef(0);
   const retryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const onPublishedRef = useRef(onPublished);
+  const onDisabledRef = useRef(onDisabled);
   const lastErrorRef = useRef<Record<"camera" | "microphone" | "permission", string | null>>({
     camera: null,
     microphone: null,
@@ -151,6 +153,12 @@ function useResilientLocalMediaPublish({
   useEffect(() => {
     publishRef.current = publish;
   }, [publish]);
+  useEffect(() => {
+    onPublishedRef.current = onPublished;
+  }, [onPublished]);
+  useEffect(() => {
+    onDisabledRef.current = onDisabled;
+  }, [onDisabled]);
 
   const clearRetries = useCallback(() => {
     retryTimersRef.current.forEach((id) => clearTimeout(id));
@@ -204,7 +212,7 @@ function useResilientLocalMediaPublish({
             microphone ? localParticipant.setMicrophoneEnabled(false) : Promise.resolve(),
             camera ? localParticipant.setCameraEnabled(false) : Promise.resolve(),
           ]);
-          onDisabled?.();
+          onDisabledRef.current?.();
           return;
         }
 
@@ -261,7 +269,7 @@ function useResilientLocalMediaPublish({
 
         if (restored) {
           retryCountRef.current = 0;
-          onPublished?.();
+          onPublishedRef.current?.();
         }
 
         if (retryableFailure && publishRef.current && retryCountRef.current < 4) {
@@ -281,7 +289,7 @@ function useResilientLocalMediaPublish({
         }
       }
     },
-    [camera, clearRetries, hasLiveLocalTrack, localParticipant, microphone, onDisabled, onPublished, showDeviceError],
+    [camera, clearRetries, hasLiveLocalTrack, localParticipant, microphone, showDeviceError],
   );
 
   useEffect(() => {
