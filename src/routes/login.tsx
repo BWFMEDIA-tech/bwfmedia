@@ -8,14 +8,14 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 export const Route = createFileRoute("/login")({
   ssr: false,
   head: () => ({ meta: [{ title: "Sign in — BWF Network" }] }),
-  validateSearch: (s: Record<string, unknown>) => {
+  validateSearch: (s: Record<string, unknown>): { next?: string } => {
     const raw =
       (typeof s.next === "string" && s.next) ||
       (typeof s.redirect === "string" && s.redirect) ||
       "";
     // Same-origin relative paths only — never an absolute/off-site URL.
-    const next = raw.startsWith("/") && !raw.startsWith("//") ? raw : "";
-    return { next };
+    const next = raw.startsWith("/") && !raw.startsWith("//") ? raw : undefined;
+    return next ? { next } : {};
   },
   component: LoginPage,
 });
