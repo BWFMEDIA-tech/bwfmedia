@@ -423,7 +423,7 @@ function BookingCalendar() {
       return;
     }
     toast.success("Booking locked in. Redirecting to checkout…");
-    navigate({ to: "/pay/$bookingId", params: { bookingId }, search: { table: "block_bookings" } });
+    navigate({ to: "/pay/$bookingId", params: { bookingId }, search: { table: "block_bookings", pkg: undefined } });
   }
 
   return (

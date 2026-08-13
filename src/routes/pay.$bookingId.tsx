@@ -33,7 +33,7 @@ function PayPage() {
       navigate({
         to: '/pay/$bookingId',
         params: { bookingId },
-        search: { table },
+        search: { table, pkg: undefined },
         replace: true,
       });
     }
