@@ -409,7 +409,7 @@ function StudioBookingCalendar() {
     navigate({
       to: "/pay/$bookingId",
       params: { bookingId },
-      search: { table: "studio_bookings", ...(selected?.pkg ? { pkg: selected.pkg } : {}) },
+      search: { table: "studio_bookings", pkg: selected?.pkg },
     });
   }
 

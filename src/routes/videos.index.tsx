@@ -483,7 +483,7 @@ function VideosPage() {
               <Link to="/" className="hidden sm:flex items-center gap-1.5 text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5">
                 <Home size={14} /> Home
               </Link>
-              <Link to="/library" className="hidden sm:flex items-center gap-1.5 text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5">
+              <Link to="/recordings" className="hidden sm:flex items-center gap-1.5 text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5">
                 <Library size={14} /> Library
               </Link>
             </div>

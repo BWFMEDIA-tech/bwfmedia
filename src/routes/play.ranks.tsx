@@ -162,7 +162,7 @@ function CurrentRankCard({
     return (
       <div className="mt-5 rounded-xl border border-white/10 bg-black/30 p-4 flex flex-wrap items-center gap-3 justify-between">
         <p className="text-sm text-white/70">Sign in to track your XP, rank, and active boosts.</p>
-        <Link to="/auth" className="rounded-lg bg-white text-black text-xs font-bold px-3 py-2">
+        <Link to="/login" className="rounded-lg bg-white text-black text-xs font-bold px-3 py-2">
           Sign In
         </Link>
       </div>
