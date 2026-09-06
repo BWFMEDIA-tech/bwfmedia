@@ -6,7 +6,7 @@ import {
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp, Headphones,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
-  DollarSign as Dollar,
+  DollarSign as Dollar, Trophy, Flame, Crown,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
