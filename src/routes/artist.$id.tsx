@@ -128,7 +128,7 @@ function ArtistProfilePage() {
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
-          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
+          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
           <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
           <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
           <ArtistMerchSection userId={id} />
@@ -321,7 +321,7 @@ function AboutBlock({ name, bio, socials }: { name: string; bio: string | null; 
   );
 }
 
-function StatsRow({ stats }: { stats: { songs: number; videos: number; likes: number; tipsCents: number } }) {
+function StatsRow({ stats, title }: { stats: { songs: number; videos: number; likes: number; tipsCents: number; battleWins: number; currentStreak: number; bestStreak: number }; title: { key: string; label: string; minWins: number; color: string } | null }) {
   const fmt = (n: number) => {
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
     if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
