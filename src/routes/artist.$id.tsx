@@ -335,18 +335,46 @@ function StatsRow({ stats, title }: { stats: { songs: number; videos: number; li
     { icon: VideoIcon,  label: "Videos",          value: fmt(stats.videos) },
     { icon: ThumbsUp,   label: "Likes Received",  value: fmt(stats.likes) },
     { icon: Dollar,     label: "Tips Received",   value: tips },
+    { icon: Trophy,     label: "Battle Wins",     value: fmt(stats.battleWins) },
+    { icon: Flame,      label: "Win Streak",      value: fmt(stats.currentStreak) },
   ];
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {items.map((s) => (
-        <div key={s.label} className="flex items-center gap-3">
-          <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-widest text-white/50 truncate">{s.label}</div>
-            <div className="text-lg font-bold leading-tight">{s.value}</div>
-          </div>
+    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 space-y-4">
+      {(title || stats.currentStreak > 0) && (
+        <div className="flex flex-wrap items-center gap-2">
+          {title && (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider"
+              style={{ borderColor: `${title.color}66`, color: title.color, background: `${title.color}14` }}
+              title={`${stats.battleWins} battle wins`}
+            >
+              <Crown className="h-3 w-3" />
+              {title.label}
+            </span>
+          )}
+          {[25, 10, 5].filter((m) => stats.currentStreak >= m).slice(0, 1).map((m) => (
+            <span
+              key={m}
+              className="inline-flex items-center gap-1.5 rounded-full border border-orange-400/40 bg-orange-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-300"
+              title={`Best streak: ${stats.bestStreak}`}
+            >
+              <Flame className="h-3 w-3" />
+              {m} Win Streak
+            </span>
+          ))}
         </div>
-      ))}
+      )}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+        {items.map((s) => (
+          <div key={s.label} className="flex items-center gap-3">
+            <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-widest text-white/50 truncate">{s.label}</div>
+              <div className="text-lg font-bold leading-tight">{s.value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
