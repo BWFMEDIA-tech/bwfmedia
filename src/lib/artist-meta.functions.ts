@@ -1,5 +1,6 @@
 // @auth-exempt: public read of non-sensitive data via anon-readable tables / narrow RLS.
 import { createServerFn } from "@tanstack/react-start";
+import { computeStreaks, getArtistTitle } from "@/lib/artist-titles";
 
 export const getArtistMeta = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => data)
@@ -60,6 +61,22 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         );
       }
 
+      // Arena title + win streaks from completed battle matches
+      const matchesRes = await sb
+        .from("battle_matches")
+        .select("winner_id, ended_at, updated_at, created_at")
+        .eq("status", "complete")
+        .or(`artist_a_id.eq.${id},artist_b_id.eq.${id}`)
+        .order("ended_at", { ascending: true })
+        .limit(5000);
+      const timeline = (matchesRes.data ?? []).map((m: any) => ({
+        winnerId: m.winner_id as string | null,
+        at: (m.ended_at ?? m.updated_at ?? m.created_at) as string,
+      }));
+      const battleWins = timeline.filter((m: any) => m.winnerId === id).length;
+      const { currentStreak, bestStreak } = computeStreaks(timeline, id);
+      const title = getArtistTitle(battleWins);
+
       const songCount = tracks.length;
       const voteLikes = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
       const likeCount = voteLikes + heartLikes;
@@ -102,7 +119,11 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           videos: videosRes.count ?? 0,
           likes: likeCount,
           tipsCents,
+          battleWins,
+          currentStreak,
+          bestStreak,
         },
+        title,
         socials: (socialsRes.data ?? []) as Array<{ provider: string; url: string; handle: string | null }>,
         tracks: tracksSigned as Array<{
           id: string; title: string; cover_url: string | null;
@@ -121,7 +142,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         banner: null as string | null, bio: null as string | null,
         location: null as string | null, genre: null as string | null,
         memberSince: null as string | null,
-        stats: { songs: 0, videos: 0, likes: 0, tipsCents: 0 },
+        stats: { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 },
+        title: null,
         socials: [] as Array<{ provider: string; url: string; handle: string | null }>,
         tracks: [] as Array<{ id: string; title: string; cover_url: string | null; like_count: number; dislike_count: number; play_count: number; duration_seconds: number | null; created_at: string; audio_url: string | null }>,
         videos: [] as Array<{ id: string; title: string; thumbnail_path: string | null; external_url: string | null; created_at: string }>,

@@ -6,7 +6,7 @@ import {
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp, Headphones,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
-  DollarSign as Dollar,
+  DollarSign as Dollar, Trophy, Flame, Crown,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
@@ -128,7 +128,7 @@ function ArtistProfilePage() {
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
-          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0 }} />
+          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
           <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
           <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
           <ArtistMerchSection userId={id} />
@@ -321,7 +321,7 @@ function AboutBlock({ name, bio, socials }: { name: string; bio: string | null; 
   );
 }
 
-function StatsRow({ stats }: { stats: { songs: number; videos: number; likes: number; tipsCents: number } }) {
+function StatsRow({ stats, title }: { stats: { songs: number; videos: number; likes: number; tipsCents: number; battleWins: number; currentStreak: number; bestStreak: number }; title: { key: string; label: string; minWins: number; color: string } | null }) {
   const fmt = (n: number) => {
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
     if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
@@ -335,18 +335,46 @@ function StatsRow({ stats }: { stats: { songs: number; videos: number; likes: nu
     { icon: VideoIcon,  label: "Videos",          value: fmt(stats.videos) },
     { icon: ThumbsUp,   label: "Likes Received",  value: fmt(stats.likes) },
     { icon: Dollar,     label: "Tips Received",   value: tips },
+    { icon: Trophy,     label: "Battle Wins",     value: fmt(stats.battleWins) },
+    { icon: Flame,      label: "Win Streak",      value: fmt(stats.currentStreak) },
   ];
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {items.map((s) => (
-        <div key={s.label} className="flex items-center gap-3">
-          <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-widest text-white/50 truncate">{s.label}</div>
-            <div className="text-lg font-bold leading-tight">{s.value}</div>
-          </div>
+    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 space-y-4">
+      {(title || stats.currentStreak > 0) && (
+        <div className="flex flex-wrap items-center gap-2">
+          {title && (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider"
+              style={{ borderColor: `${title.color}66`, color: title.color, background: `${title.color}14` }}
+              title={`${stats.battleWins} battle wins`}
+            >
+              <Crown className="h-3 w-3" />
+              {title.label}
+            </span>
+          )}
+          {[25, 10, 5].filter((m) => stats.currentStreak >= m).slice(0, 1).map((m) => (
+            <span
+              key={m}
+              className="inline-flex items-center gap-1.5 rounded-full border border-orange-400/40 bg-orange-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-300"
+              title={`Best streak: ${stats.bestStreak}`}
+            >
+              <Flame className="h-3 w-3" />
+              {m} Win Streak
+            </span>
+          ))}
         </div>
-      ))}
+      )}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+        {items.map((s) => (
+          <div key={s.label} className="flex items-center gap-3">
+            <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-widest text-white/50 truncate">{s.label}</div>
+              <div className="text-lg font-bold leading-tight">{s.value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
