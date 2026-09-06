@@ -30,86 +30,100 @@ function LoginPage() {
   const [failed, setFailed] = useState(false);
 
   // If a session already exists (e.g. returning from Google OAuth), move on.
+  // Do not call another auth method from onAuthStateChange: doing so can block
+  // the auth client's internal session lock and leave the form stuck loading.
   useEffect(() => {
     let cancelled = false;
     const go = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (cancelled || !data.session) return;
-      if (next) {
-        window.location.href = next;
-        return;
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (cancelled || !data.session) return;
+        const saved = sessionStorage.getItem("bwf:post-login");
+        sessionStorage.removeItem("bwf:post-login");
+        const destination = next ?? saved;
+        if (destination) {
+          window.location.assign(destination);
+          return;
+        }
+        nav({ to: "/" });
+      } catch {
+        // Keep the sign-in form available when a stale browser session cannot
+        // be restored; submitting the form will establish a fresh session.
       }
-      nav({ to: "/" });
     };
     void go();
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") void go();
-    });
     return () => {
       cancelled = true;
-      sub.subscription.unsubscribe();
     };
   }, [next, nav]);
 
   const onGoogle = async () => {
     setFailed(false);
     setGoogleLoading(true);
-    if (next) sessionStorage.setItem("bwf:post-login", next);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/login",
-    });
-    if (result.error) {
+    try {
+      if (next) sessionStorage.setItem("bwf:post-login", next);
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/login",
+      });
+      if (result.error) {
+        setGoogleLoading(false);
+        toast.error(result.error.message ?? "Google sign-in failed");
+        return;
+      }
+      if (result.redirected) return;
+      const saved = sessionStorage.getItem("bwf:post-login");
+      sessionStorage.removeItem("bwf:post-login");
+      if (saved) window.location.assign(saved);
+      else nav({ to: "/" });
+    } catch {
       setGoogleLoading(false);
-      toast.error(result.error.message ?? "Google sign-in failed");
-      return;
+      toast.error("Unable to connect to Google. Please try again.");
     }
-    if (result.redirected) return;
-    const saved = sessionStorage.getItem("bwf:post-login");
-    sessionStorage.removeItem("bwf:post-login");
-    if (saved) window.location.href = saved;
-    else nav({ to: "/" });
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setFailed(false);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      // Generic message — never reveal whether the email exists
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        setLoading(false);
+        // Generic message — never reveal whether the email exists
+        setFailed(true);
+        return toast.error("Incorrect email or password.");
+      }
+      toast.success("Signed in");
+      if (next) {
+        window.location.assign(next);
+        return;
+      }
+      const uid = data.user?.id;
+      let dest: "/stream-studio" | "/" | "/artist-dashboard" = "/stream-studio";
+      if (uid) {
+        const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
+        const list = (roles ?? []).map((r: { role: string }) => r.role);
+        // Admins must use the dedicated /admin/login surface so admin sessions
+        // never leak into the member-facing app. Reject here and redirect.
+        if (list.includes("admin")) {
+          await supabase.auth.signOut();
+          toast.error("Admin accounts must sign in at /admin/login.");
+          setLoading(false);
+          return nav({ to: "/admin/login" });
+        }
+        if (list.includes("listener") && !list.includes("artist")) dest = "/";
+        // Artists do not get Stream Now / hosting tools — only hosts/managers
+        // do. Send artist-only accounts to their dashboard, from which they
+        // can join existing stages as guests.
+        const isPrivileged = list.includes("manager") || list.includes("host");
+        if (list.includes("artist") && !isPrivileged) dest = "/artist-dashboard";
+      }
+      nav({ to: dest });
+    } catch {
+      setLoading(false);
       setFailed(true);
-      return toast.error("Incorrect email or password.");
+      toast.error("Unable to reach sign-in. Please check your connection and try again.");
     }
-    toast.success("Signed in");
-    if (next) {
-      window.location.href = next;
-      return;
-    }
-    const uid = data.user?.id;
-    let dest: "/stream-studio" | "/" = "/stream-studio";
-    if (uid) {
-      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
-      const list = (roles ?? []).map((r: any) => r.role);
-      // Admins must use the dedicated /admin/login surface so admin sessions
-      // never leak into the member-facing app. Reject here and redirect.
-      if (list.includes("admin")) {
-        await supabase.auth.signOut();
-        toast.error("Admin accounts must sign in at /admin/login.");
-        return nav({ to: "/admin/login" });
-      }
-      if (list.includes("listener") && !list.includes("artist")) dest = "/";
-      // Artists do not get Stream Now / hosting tools — only hosts/managers
-      // do. Send artist-only accounts to their dashboard, from which they
-      // can join existing stages as guests.
-      const isPrivileged =
-        list.includes("manager") || list.includes("host");
-      if (list.includes("artist") && !isPrivileged) {
-        // @ts-expect-error widen dest to the artist destination
-        dest = "/artist-dashboard";
-      }
-    }
-    nav({ to: dest });
   };
 
   return (
