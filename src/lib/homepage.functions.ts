@@ -60,7 +60,7 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
   const featuredArtists = (artistIds
     .map((id) => pmap.get(id))
     .filter((p: any) => p && (p.avatar_url || p.bio))
-    .slice(0, 10)) as any[];)
+    .slice(0, 10)) as any[];
 
   // Resolve thumbnail URLs for videos.
   const videos = await Promise.all(
