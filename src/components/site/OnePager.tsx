@@ -108,7 +108,7 @@ function Spotlight({ artists }: { artists: any[] }) {
             text="No featured artists yet. Join the network to claim your spotlight."
           />
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             {artists.map((a, i) => (
               <Reveal key={a.id} delay={i * 0.05}>
                 <RouterLink
