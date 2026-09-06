@@ -5,6 +5,7 @@ import { Crown, Trophy, Medal, Search, Flame, Swords, ThumbsUp, Disc3, Sparkles,
 import { Input } from "@/components/ui/input";
 import { SignedImg } from "@/components/ui/signed-img";
 import { getArtistLeaderboard, type LeaderboardEntry } from "@/lib/leaderboard.functions";
+import { getStreakMilestone } from "@/lib/artist-titles";
 
 const leaderboardQuery = queryOptions({
   queryKey: ["artist-leaderboard"],
@@ -285,9 +286,13 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
             {entry.username && (
               <div className="truncate text-xs text-white/40">@{entry.username}</div>
             )}
-            <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-              <Zap className="h-2.5 w-2.5" style={{ color: accent.via }} />
-              {entry.score.toLocaleString()} pts
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                <Zap className="h-2.5 w-2.5" style={{ color: accent.via }} />
+                {entry.score.toLocaleString()} pts
+              </span>
+              <TitleBadge entry={entry} />
+              <StreakBadge entry={entry} />
             </div>
           </div>
         </div>
@@ -387,12 +392,14 @@ function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
           </div>
           <div className="min-w-0">
             <div className="truncate font-bold">{entry.name}</div>
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-white/40">
               {entry.username && <span className="truncate">@{entry.username}</span>}
               <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-semibold text-white/70">
                 <Headphones className="h-2.5 w-2.5 text-[#00E6FF]" />
                 {entry.streamCount.toLocaleString()} streams
               </span>
+              <TitleBadge entry={entry} />
+              <StreakBadge entry={entry} />
             </div>
           </div>
         </div>
@@ -419,5 +426,35 @@ function RowCell({ icon: Icon, value, color }: { icon: any; value: number; color
       <Icon className="h-3 w-3" style={{ color }} />
       <span className="font-mono text-sm tabular-nums">{value.toLocaleString()}</span>
     </div>
+  );
+}
+function TitleBadge({ entry }: { entry: LeaderboardEntry }) {
+  if (!entry.title) return null;
+  const c = entry.title.color;
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+      style={{ borderColor: `${c}66`, color: c, background: `${c}14` }}
+      title={`${entry.title.label} — ${entry.battleWins} battle wins`}
+    >
+      <Crown className="h-2.5 w-2.5" />
+      {entry.title.label}
+    </span>
+  );
+}
+
+function StreakBadge({ entry }: { entry: LeaderboardEntry }) {
+  const milestone = getStreakMilestone(entry.currentStreak);
+  if (!milestone) return null;
+  const c = milestone >= 25 ? "#FFD700" : milestone >= 10 ? "#FF00A6" : "#00E6FF";
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+      style={{ borderColor: `${c}66`, color: c, background: `${c}14` }}
+      title={`${entry.currentStreak} straight wins (best: ${entry.bestStreak})`}
+    >
+      <Flame className="h-2.5 w-2.5" />
+      {milestone} win streak
+    </span>
   );
 }

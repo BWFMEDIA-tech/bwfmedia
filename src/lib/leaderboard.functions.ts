@@ -1,5 +1,10 @@
 // @auth-exempt: public read of non-sensitive data via anon-readable tables / narrow RLS.
 import { createServerFn } from "@tanstack/react-start";
+import {
+  computeStreaks,
+  getArtistTitle,
+  type ArtistTitle,
+} from "@/lib/artist-titles";
 
 export type LeaderboardEntry = {
   userId: string;
@@ -15,6 +20,9 @@ export type LeaderboardEntry = {
   trackCount: number;
   score: number;
   rank: number;
+  title: ArtistTitle | null;
+  currentStreak: number;
+  bestStreak: number;
 };
 
 /**
@@ -67,6 +75,30 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
     const winsByUser = new Map<string, number>();
     for (const row of winsRes.data ?? []) {
       winsByUser.set(row.winner_id, (winsByUser.get(row.winner_id) ?? 0) + 1);
+    }
+
+    // 4b. Win streaks — completed match timeline for these artists
+    const streakByUser = new Map<string, { currentStreak: number; bestStreak: number }>();
+    const matchesRes = await sb
+      .from("battle_matches")
+      .select("artist_a_id, artist_b_id, winner_id, ended_at, updated_at, created_at")
+      .eq("status", "complete")
+      .or(`artist_a_id.in.(${ids.join(",")}),artist_b_id.in.(${ids.join(",")})`)
+      .order("ended_at", { ascending: true })
+      .limit(20000);
+    const timelineByUser = new Map<string, { winnerId: string | null; at: string }[]>();
+    for (const m of matchesRes.data ?? []) {
+      const at = m.ended_at ?? m.updated_at ?? m.created_at;
+      for (const pid of [m.artist_a_id, m.artist_b_id]) {
+        if (!pid || !ids.includes(pid)) continue;
+        const arr = timelineByUser.get(pid) ?? [];
+        arr.push({ winnerId: m.winner_id, at });
+        timelineByUser.set(pid, arr);
+      }
+    }
+    for (const [uid, tl] of timelineByUser) {
+      tl.sort((a, b) => a.at.localeCompare(b.at));
+      streakByUser.set(uid, computeStreaks(tl, uid));
     }
 
     // 5. Tracks + vote totals
@@ -131,6 +163,9 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
         trackCount,
         score: xp + battleWins * 500 + totalVotes * 10,
         rank: 0,
+        title: getArtistTitle(battleWins),
+        currentStreak: streakByUser.get(uid)?.currentStreak ?? 0,
+        bestStreak: streakByUser.get(uid)?.bestStreak ?? 0,
       };
     });
 
