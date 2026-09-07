@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, X, Rocket, ChevronDown, ChevronUp, Music2, Disc3 } from "lucide-react";
+import { Check, X, Rocket, ChevronDown, ChevronUp, Music2, Disc3, Fingerprint, ShieldCheck, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { listDistributionQueue, reviewRelease, type ReleaseStatus } from "@/lib/distribution.functions";
+import { listDistributionQueue, reviewRelease, assignReleaseIdentifiers, type ReleaseStatus } from "@/lib/distribution.functions";
 import { Card, EmptyState } from "./AdminShell";
 
 const FILTERS: { key: ReleaseStatus | "all"; label: string }[] = [
@@ -76,6 +76,20 @@ async function signAsset(ref: string | null): Promise<string | null> {
 
 function QueueCard({ release, onChanged }: { release: any; onChanged: () => void }) {
   const review = useServerFn(reviewRelease);
+  const assignIds = useServerFn(assignReleaseIdentifiers);
+
+  async function issueIdentifiers() {
+    setBusy(true);
+    try {
+      const res: any = await assignIds({ data: { id: release.id } });
+      toast.success(`UPC ${res?.upc} · ${res?.tracks_assigned ?? 0} ISRC(s) issued`);
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not issue identifiers");
+    } finally {
+      setBusy(false);
+    }
+  }
   const [open, setOpen] = useState(release.status === "submitted");
   const [notes, setNotes] = useState(release.review_notes ?? "");
   const [busy, setBusy] = useState(false);
@@ -154,6 +168,45 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
             {release.producers?.length > 0 && <div className="col-span-2">Producers: <span className="text-white/80">{release.producers.join(", ")}</span></div>}
           </div>
 
+          <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-xs">
+            <div className="mb-2 flex items-center gap-2 font-bold">
+              {release.rights_confirmed ? (
+                <ShieldCheck className="h-4 w-4 text-emerald-400" />
+              ) : (
+                <ShieldAlert className="h-4 w-4 text-amber-400" />
+              )}
+              Rights &amp; identity
+              <span className={release.rights_confirmed ? "text-emerald-300" : "text-amber-300"}>
+                {release.rights_confirmed ? "ownership confirmed" : "not confirmed"}
+              </span>
+              {release.samples_cleared && <span className="text-white/50">· samples cleared</span>}
+            </div>
+            <div className="grid grid-cols-1 gap-1 text-white/50 sm:grid-cols-2">
+              <div>℗ <span className="text-white/80">{release.p_line_year ?? "—"} {release.p_line_holder ?? ""}</span></div>
+              <div>© <span className="text-white/80">{release.c_line_year ?? "—"} {release.c_line_holder ?? ""}</span></div>
+              <div>Publisher: <span className="text-white/80">{release.publisher_name || "self-published"}</span></div>
+              <div>PRO: <span className="text-white/80">{release.pro_affiliation || "—"}</span></div>
+              <div className="sm:col-span-2">
+                Territories:{" "}
+                <span className="text-white/80">
+                  {release.territory_mode === "selected"
+                    ? (release.territories ?? []).join(", ") || "none selected"
+                    : "Worldwide"}
+                </span>
+              </div>
+              {Array.isArray(release.writer_credits) && release.writer_credits.length > 0 && (
+                <div className="sm:col-span-2">
+                  Writers:{" "}
+                  <span className="text-white/80">
+                    {release.writer_credits
+                      .map((w: any) => `${w.name} ${w.share}%${w.pro ? ` (${w.pro}${w.ipi ? ` ${w.ipi}` : ""})` : ""}`)
+                      .join(", ")}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="space-y-2">
             {release.tracks.map((t: any) => (
               <div key={t.id} className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
@@ -197,6 +250,15 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
                   <X className="h-3.5 w-3.5" /> Reject
                 </button>
               </>
+            )}
+            {(release.status === "approved" || release.status === "live") && (
+              <button
+                onClick={issueIdentifiers}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-4 py-2 text-xs font-bold text-white/80 hover:text-white disabled:opacity-50"
+              >
+                <Fingerprint className="h-3.5 w-3.5" /> Issue missing identifiers
+              </button>
             )}
             {release.status === "approved" && (
               <button

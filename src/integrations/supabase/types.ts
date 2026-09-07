@@ -1165,6 +1165,7 @@ export type Database = {
           featured_artists: string[] | null
           id: string
           isrc: string | null
+          isrc_assigned_at: string | null
           release_id: string
           splits: Json
           title: string
@@ -1178,6 +1179,7 @@ export type Database = {
           featured_artists?: string[] | null
           id?: string
           isrc?: string | null
+          isrc_assigned_at?: string | null
           release_id: string
           splits?: Json
           title: string
@@ -1191,6 +1193,7 @@ export type Database = {
           featured_artists?: string[] | null
           id?: string
           isrc?: string | null
+          isrc_assigned_at?: string | null
           release_id?: string
           splits?: Json
           title?: string
@@ -1211,6 +1214,8 @@ export type Database = {
         Row: {
           artist_name: string
           artwork_url: string | null
+          c_line_holder: string | null
+          c_line_year: number | null
           created_at: string
           dsp_targets: string[]
           genre: string | null
@@ -1218,23 +1223,36 @@ export type Database = {
           is_explicit: boolean
           label_name: string | null
           language: string
+          p_line_holder: string | null
+          p_line_year: number | null
+          pro_affiliation: string | null
           producers: string[] | null
+          publisher_name: string | null
           release_date: string | null
           release_type: string
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          rights_confirmed: boolean
+          rights_confirmed_at: string | null
+          samples_cleared: boolean
           songwriters: string[] | null
           status: string
           submitted_at: string | null
+          territories: string[]
+          territory_mode: string
           title: string
           upc: string | null
+          upc_assigned_at: string | null
           updated_at: string
           user_id: string
+          writer_credits: Json
         }
         Insert: {
           artist_name: string
           artwork_url?: string | null
+          c_line_holder?: string | null
+          c_line_year?: number | null
           created_at?: string
           dsp_targets?: string[]
           genre?: string | null
@@ -1242,23 +1260,36 @@ export type Database = {
           is_explicit?: boolean
           label_name?: string | null
           language?: string
+          p_line_holder?: string | null
+          p_line_year?: number | null
+          pro_affiliation?: string | null
           producers?: string[] | null
+          publisher_name?: string | null
           release_date?: string | null
           release_type?: string
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          rights_confirmed?: boolean
+          rights_confirmed_at?: string | null
+          samples_cleared?: boolean
           songwriters?: string[] | null
           status?: string
           submitted_at?: string | null
+          territories?: string[]
+          territory_mode?: string
           title: string
           upc?: string | null
+          upc_assigned_at?: string | null
           updated_at?: string
           user_id: string
+          writer_credits?: Json
         }
         Update: {
           artist_name?: string
           artwork_url?: string | null
+          c_line_holder?: string | null
+          c_line_year?: number | null
           created_at?: string
           dsp_targets?: string[]
           genre?: string | null
@@ -1266,19 +1297,30 @@ export type Database = {
           is_explicit?: boolean
           label_name?: string | null
           language?: string
+          p_line_holder?: string | null
+          p_line_year?: number | null
+          pro_affiliation?: string | null
           producers?: string[] | null
+          publisher_name?: string | null
           release_date?: string | null
           release_type?: string
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          rights_confirmed?: boolean
+          rights_confirmed_at?: string | null
+          samples_cleared?: boolean
           songwriters?: string[] | null
           status?: string
           submitted_at?: string | null
+          territories?: string[]
+          territory_mode?: string
           title?: string
           upc?: string | null
+          upc_assigned_at?: string | null
           updated_at?: string
           user_id?: string
+          writer_credits?: Json
         }
         Relationships: []
       }
@@ -4000,6 +4042,10 @@ export type Database = {
           expires_at: string
           new_balance: number
         }[]
+      }
+      assign_release_identifiers: {
+        Args: { _release_id: string }
+        Returns: Json
       }
       award_xp: {
         Args: {
