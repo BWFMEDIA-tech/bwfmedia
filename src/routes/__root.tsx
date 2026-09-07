@@ -181,7 +181,7 @@ function RootComponent() {
         <CartDrawer />
         {(pathname === "/charts" || pathname.startsWith("/artist/")) && <GlobalPlayer />}
         {showBottomNav && <MobileBottomNav />}
-        <Toaster position="top-center" richColors />ns
+        <Toaster position="top-center" richColors />
         </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>
