@@ -1212,6 +1212,7 @@ export type Database = {
           artist_name: string
           artwork_url: string | null
           created_at: string
+          dsp_targets: string[]
           genre: string | null
           id: string
           is_explicit: boolean
@@ -1235,6 +1236,7 @@ export type Database = {
           artist_name: string
           artwork_url?: string | null
           created_at?: string
+          dsp_targets?: string[]
           genre?: string | null
           id?: string
           is_explicit?: boolean
@@ -1258,6 +1260,7 @@ export type Database = {
           artist_name?: string
           artwork_url?: string | null
           created_at?: string
+          dsp_targets?: string[]
           genre?: string | null
           id?: string
           is_explicit?: boolean
