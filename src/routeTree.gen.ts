@@ -82,6 +82,7 @@ import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
+import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -504,6 +505,11 @@ const LabelsLabelIdRoute = LabelsLabelIdRouteImport.update({
   path: '/labels/$labelId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabelInviteCodeRoute = LabelInviteCodeRouteImport.update({
+  id: '/label-invite/$code',
+  path: '/label-invite/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
@@ -884,6 +890,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -1014,6 +1021,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -1146,6 +1154,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
@@ -1279,6 +1288,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -1409,6 +1419,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -1540,6 +1551,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
@@ -1648,6 +1660,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
+  LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
@@ -2192,6 +2205,13 @@ declare module '@tanstack/react-router' {
       path: '/labels/$labelId'
       fullPath: '/labels/$labelId'
       preLoaderRoute: typeof LabelsLabelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/label-invite/$code': {
+      id: '/label-invite/$code'
+      path: '/label-invite/$code'
+      fullPath: '/label-invite/$code'
+      preLoaderRoute: typeof LabelInviteCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$code': {
@@ -2758,6 +2778,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
+  LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
