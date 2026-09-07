@@ -4413,6 +4413,17 @@ export type Database = {
           tips_cents: number
         }[]
       }
+      get_label_earnings: {
+        Args: { _label_id: string }
+        Returns: {
+          artist_id: string
+          months: number
+          paid_cents: number
+          pending_cents: number
+          total_cents: number
+          total_streams: number
+        }[]
+      }
       get_my_artist_dashboard: { Args: never; Returns: Json }
       get_my_labels: {
         Args: never
