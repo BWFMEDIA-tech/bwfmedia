@@ -39,6 +39,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EarningsRouteImport } from './routes/earnings'
 import { Route as DmcaRouteImport } from './routes/dmca'
+import { Route as DistributionRouteImport } from './routes/distribution'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DeckRouteImport } from './routes/deck'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -284,6 +285,11 @@ const EarningsRoute = EarningsRouteImport.update({
 const DmcaRoute = DmcaRouteImport.update({
   id: '/dmca',
   path: '/dmca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DistributionRoute = DistributionRouteImport.update({
+  id: '/distribution',
+  path: '/distribution',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -798,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
+  '/distribution': typeof DistributionRoute
   '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
@@ -925,6 +932,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
+  '/distribution': typeof DistributionRoute
   '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
@@ -1054,6 +1062,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/deck': typeof DeckRoute
   '/discover': typeof DiscoverRoute
+  '/distribution': typeof DistributionRoute
   '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
@@ -1184,6 +1193,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/deck'
     | '/discover'
+    | '/distribution'
     | '/dmca'
     | '/earnings'
     | '/events'
@@ -1311,6 +1321,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/deck'
     | '/discover'
+    | '/distribution'
     | '/dmca'
     | '/earnings'
     | '/events'
@@ -1439,6 +1450,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/deck'
     | '/discover'
+    | '/distribution'
     | '/dmca'
     | '/earnings'
     | '/events'
@@ -1568,6 +1580,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DeckRoute: typeof DeckRoute
   DiscoverRoute: typeof DiscoverRoute
+  DistributionRoute: typeof DistributionRoute
   DmcaRoute: typeof DmcaRoute
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
@@ -1852,6 +1865,13 @@ declare module '@tanstack/react-router' {
       path: '/dmca'
       fullPath: '/dmca'
       preLoaderRoute: typeof DmcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/distribution': {
+      id: '/distribution'
+      path: '/distribution'
+      fullPath: '/distribution'
+      preLoaderRoute: typeof DistributionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -2651,6 +2671,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DeckRoute: DeckRoute,
   DiscoverRoute: DiscoverRoute,
+  DistributionRoute: DistributionRoute,
   DmcaRoute: DmcaRoute,
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
