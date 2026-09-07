@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, X, Rocket, ChevronDown, ChevronUp, Music2, Disc3, Fingerprint, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Check, X, Rocket, ChevronDown, ChevronUp, Music2, Disc3, Fingerprint, ShieldCheck, ShieldAlert, Radio, PackageX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { listDistributionQueue, reviewRelease, assignReleaseIdentifiers, type ReleaseStatus } from "@/lib/distribution.functions";
+import { listDistributionQueue, reviewRelease, assignReleaseIdentifiers, deliverRelease, approveReleaseTakedown, type ReleaseStatus } from "@/lib/distribution.functions";
 import { Card, EmptyState } from "./AdminShell";
 
 const FILTERS: { key: ReleaseStatus | "all"; label: string }[] = [
@@ -77,6 +77,34 @@ async function signAsset(ref: string | null): Promise<string | null> {
 function QueueCard({ release, onChanged }: { release: any; onChanged: () => void }) {
   const review = useServerFn(reviewRelease);
   const assignIds = useServerFn(assignReleaseIdentifiers);
+  const deliver = useServerFn(deliverRelease);
+  const approveTakedown = useServerFn(approveReleaseTakedown);
+
+  async function runDelivery() {
+    setBusy(true);
+    try {
+      const res: any = await deliver({ data: { id: release.id } });
+      toast.success(`Delivered ${res?.tracks_published ?? 0} track(s) to ${res?.destinations ?? 0} destination(s)`);
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Delivery failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function runTakedown() {
+    setBusy(true);
+    try {
+      const res: any = await approveTakedown({ data: { id: release.id } });
+      toast.success(`Taken down — ${res?.tracks_removed ?? 0} track(s) removed from the catalog`);
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Takedown failed");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function issueIdentifiers() {
     setBusy(true);
@@ -168,6 +196,12 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
             {release.producers?.length > 0 && <div className="col-span-2">Producers: <span className="text-white/80">{release.producers.join(", ")}</span></div>}
           </div>
 
+          {release.takedown_status === "requested" && (
+            <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
+              <span className="font-bold">Takedown requested:</span> {release.takedown_reason || "no reason given"}
+            </div>
+          )}
+
           <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 text-xs">
             <div className="mb-2 flex items-center gap-2 font-bold">
               {release.rights_confirmed ? (
@@ -258,6 +292,24 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
                 className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-4 py-2 text-xs font-bold text-white/80 hover:text-white disabled:opacity-50"
               >
                 <Fingerprint className="h-3.5 w-3.5" /> Issue missing identifiers
+              </button>
+            )}
+            {(release.status === "approved" || release.status === "live") && (
+              <button
+                onClick={runDelivery}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-md bg-[#C53DFF] px-4 py-2 text-xs font-bold text-black hover:bg-[#d566ff] disabled:opacity-50"
+              >
+                <Radio className="h-3.5 w-3.5" /> {release.status === "live" ? "Re-deliver" : "Deliver to Tunevio"}
+              </button>
+            )}
+            {release.takedown_status === "requested" && (
+              <button
+                onClick={runTakedown}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-md bg-amber-600 px-4 py-2 text-xs font-bold hover:bg-amber-500 disabled:opacity-50"
+              >
+                <PackageX className="h-3.5 w-3.5" /> Approve takedown
               </button>
             )}
             {release.status === "approved" && (
