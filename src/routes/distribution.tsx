@@ -397,9 +397,9 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
 }
 
 function TrackRow({
-  track, editable, onChanged, neighbours,
+  track, userId, editable, onChanged, neighbours,
 }: {
-  track: any; editable: boolean; onChanged: () => void;
+  track: any; userId: string; editable: boolean; onChanged: () => void;
   neighbours?: { prev: any | null; next: any | null };
 }) {
   const remove = useServerFn(deleteReleaseTrack);
@@ -417,46 +417,62 @@ function TrackRow({
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm">
-      {editable && (
-        <div className="flex flex-col">
-          <button
-            onClick={() => swap(neighbours?.prev)}
-            disabled={!neighbours?.prev}
-            className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
-            aria-label="Move track up"
-          >
-            <ArrowUp className="h-3 w-3" />
-          </button>
-          <button
-            onClick={() => swap(neighbours?.next)}
-            disabled={!neighbours?.next}
-            className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
-            aria-label="Move track down"
-          >
-            <ArrowDown className="h-3 w-3" />
-          </button>
+    <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm">
+      <div className="flex items-center gap-3">
+        {editable && (
+          <div className="flex flex-col">
+            <button
+              onClick={() => swap(neighbours?.prev)}
+              disabled={!neighbours?.prev}
+              className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
+              aria-label="Move track up"
+            >
+              <ArrowUp className="h-3 w-3" />
+            </button>
+            <button
+              onClick={() => swap(neighbours?.next)}
+              disabled={!neighbours?.next}
+              className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
+              aria-label="Move track down"
+            >
+              <ArrowDown className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+        <span className="w-6 text-center text-xs text-white/40">{track.track_number}</span>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-semibold">{track.title}</div>
+          <div className="text-[11px] text-white/40">
+            {track.featured_artists?.length ? `feat. ${track.featured_artists.join(", ")} · ` : ""}
+            {track.isrc ? `ISRC ${track.isrc} · ` : ""}
+            {track.audio_url ? `master ${formatDuration(track.duration_secs)}` : "no master audio"}
+            {track.splits?.length ? ` · splits: ${track.splits.map((s: any) => `${s.name} ${s.percent}%`).join(", ")}` : ""}
+          </div>
         </div>
-      )}
-      <span className="w-6 text-center text-xs text-white/40">{track.track_number}</span>
-      <div className="min-w-0 flex-1">
-        <div className="truncate font-semibold">{track.title}</div>
-        <div className="text-[11px] text-white/40">
-          {track.featured_artists?.length ? `feat. ${track.featured_artists.join(", ")} · ` : ""}
-          {track.isrc ? `ISRC ${track.isrc} · ` : ""}
-          {track.audio_url ? "audio attached" : "no audio"}
-          {track.splits?.length ? ` · splits: ${track.splits.map((s: any) => `${s.name} ${s.percent}%`).join(", ")}` : ""}
-        </div>
+        {editable && (
+          <button
+            onClick={async () => { await remove({ data: { id: track.id } }); onChanged(); }}
+            className="text-white/30 hover:text-red-300"
+            aria-label="Remove track"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
-      {editable && (
-        <button
-          onClick={async () => { await remove({ data: { id: track.id } }); onChanged(); }}
-          className="text-white/30 hover:text-red-300"
-          aria-label="Remove track"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      )}
+
+      <div className="mt-2 pl-1">
+        <AudioUploader
+          userId={userId}
+          value={track.audio_url ?? null}
+          durationSecs={track.duration_secs}
+          disabled={!editable}
+          compact
+          onUploaded={async ({ ref, durationSecs }) => {
+            await patch({ data: { id: track.id, patch: { audio_url: ref, duration_secs: durationSecs ?? null } } });
+            onChanged();
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -467,7 +483,8 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ title: "", isrc: "", featured: "" });
   const [splits, setSplits] = useState<{ name: string; percent: number }[]>([]);
-  const [audio, setAudio] = useState<File | null>(null);
+  const [audio, setAudio] = useState<{ ref: string; durationSecs: number | null } | null>(null);
+
 
   async function submit() {
     if (!form.title.trim()) { toast.error("Track title required"); return; }
