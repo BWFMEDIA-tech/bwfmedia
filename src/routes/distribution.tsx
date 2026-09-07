@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   Disc3, Plus, Upload, Trash2, Send, ChevronDown, ChevronUp, Music2, X,
-  Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock, Image as ImageIcon,
+  Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock, Image as ImageIcon, ShieldCheck,
 } from "lucide-react";
 import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distribution/AssetUploads";
 import { formatDuration } from "@/lib/distribution-upload";
