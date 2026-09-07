@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   Disc3, Plus, Upload, Trash2, Send, ChevronDown, ChevronUp, Music2, X,
-  Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock,
+  Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock, Image as ImageIcon,
 } from "lucide-react";
 import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distribution/AssetUploads";
 import { formatDuration } from "@/lib/distribution-upload";
@@ -14,7 +14,7 @@ import {
   listMyReleases, createRelease, updateRelease, deleteRelease,
   submitReleaseForReview, addReleaseTrack, updateReleaseTrack, deleteReleaseTrack,
   getDistributionOverview, setReleaseDspTargets,
-  RELEASE_TYPES, DSP_PLATFORMS,
+  RELEASE_TYPES,
 } from "@/lib/distribution.functions";
 
 export const Route = createFileRoute("/distribution")({
@@ -702,6 +702,15 @@ function EditReleaseForm({ release, onDone }: { release: any; onDone: () => void
   );
 }
 
+const TUNEVIO_DESTINATIONS = [
+  { id: "tunevio-streaming", label: "Tunevio Streaming" },
+  { id: "tunevio-charts", label: "Tunevio Charts" },
+  { id: "tunevio-radio", label: "Tunevio Live Radio" },
+  { id: "tunevio-arena", label: "Mic Drop Arena" },
+  { id: "tunevio-artist-profile", label: "Artist Profile" },
+  { id: "tunevio-video", label: "Video Network" },
+] as const;
+
 function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => void }) {
   const setTargets = useServerFn(setReleaseDspTargets);
   const [saving, setSaving] = useState(false);
@@ -715,7 +724,7 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
     { label: "At least one track with audio", done: tracks.some((t) => t.audio_url) },
     { label: "ISRC on every track", done: tracks.length > 0 && tracks.every((t) => t.isrc) },
     { label: "UPC assigned", done: !!release.upc },
-    { label: "Delivery platforms selected", done: targets.length > 0 },
+    { label: "Tunevio destinations selected", done: targets.length > 0 },
   ];
 
   async function toggle(id: string) {
