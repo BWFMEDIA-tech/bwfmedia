@@ -5,15 +5,16 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   Disc3, Plus, Upload, Trash2, Send, ChevronDown, ChevronUp, Music2, X,
-  Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock,
+  Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock, Image as ImageIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distribution/AssetUploads";
+import { formatDuration } from "@/lib/distribution-upload";
 import { useAuth } from "@/lib/auth-context";
 import {
   listMyReleases, createRelease, updateRelease, deleteRelease,
   submitReleaseForReview, addReleaseTrack, updateReleaseTrack, deleteReleaseTrack,
   getDistributionOverview, setReleaseDspTargets,
-  RELEASE_TYPES, DSP_PLATFORMS,
+  RELEASE_TYPES,
 } from "@/lib/distribution.functions";
 
 export const Route = createFileRoute("/distribution")({
@@ -176,12 +177,6 @@ function DistributionPage() {
   );
 }
 
-async function uploadAsset(userId: string, file: File) {
-  const path = `${userId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const { error } = await supabase.storage.from("distribution-assets").upload(path, file);
-  if (error) throw new Error(error.message);
-  return `distribution-assets:${path}`;
-}
 
 function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
   const auth = useAuth();
@@ -193,7 +188,7 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
     release_date: "", label_name: "", language: "en", is_explicit: false,
     songwriters: "", producers: "",
   });
-  const [artwork, setArtwork] = useState<File | null>(null);
+  const [artworkRef, setArtworkRef] = useState<string | null>(null);
 
   async function submit() {
     if (!form.title.trim() || !form.artist_name.trim()) {
@@ -202,8 +197,8 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
     }
     setSaving(true);
     try {
-      let artwork_url: string | null = null;
-      if (artwork && auth.user) artwork_url = await uploadAsset(auth.user.id, artwork);
+      const artwork_url: string | null = artworkRef;
+
       await create({
         data: {
           title: form.title.trim(),
@@ -222,7 +217,7 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
       toast.success("Release created — now add your tracks");
       setOpen(false);
       setForm({ title: "", artist_name: "", release_type: "single", genre: "", release_date: "", label_name: "", language: "en", is_explicit: false, songwriters: "", producers: "" });
-      setArtwork(null);
+      setArtworkRef(null);
       onCreated();
     } catch (e: any) {
       toast.error(e.message ?? "Failed to create release");
@@ -260,9 +255,13 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
         <Field label="Release date"><input type="date" value={form.release_date} onChange={(e) => setForm({ ...form, release_date: e.target.value })} className={inputCls} /></Field>
         <Field label="Label name"><input value={form.label_name} onChange={(e) => setForm({ ...form, label_name: e.target.value })} className={inputCls} /></Field>
         <Field label="Language"><input value={form.language} onChange={(e) => setForm({ ...form, language: e.target.value })} className={inputCls} placeholder="en" /></Field>
-        <Field label="Artwork">
-          <input type="file" accept="image/*" onChange={(e) => setArtwork(e.target.files?.[0] ?? null)} className="text-xs text-white/60 file:mr-3 file:rounded-full file:border-0 file:bg-[#00E6FF] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-black" />
-        </Field>
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-white/50">Cover artwork</span>
+          {auth.user && (
+            <ArtworkUploader userId={auth.user.id} value={artworkRef} onChange={setArtworkRef} />
+          )}
+        </div>
+
         <Field label="Songwriters (comma separated)"><input value={form.songwriters} onChange={(e) => setForm({ ...form, songwriters: e.target.value })} className={inputCls} /></Field>
         <Field label="Producers (comma separated)"><input value={form.producers} onChange={(e) => setForm({ ...form, producers: e.target.value })} className={inputCls} /></Field>
       </div>
@@ -292,9 +291,13 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="grid h-12 w-12 place-items-center rounded-lg bg-white/5">
-          <Music2 className="h-5 w-5 text-[#00E6FF]" />
-        </div>
+        {release.artwork_url ? (
+          <ArtworkThumb value={release.artwork_url} className="h-12 w-12 rounded-lg object-cover" />
+        ) : (
+          <div className="grid h-12 w-12 place-items-center rounded-lg bg-white/5">
+            <Music2 className="h-5 w-5 text-[#00E6FF]" />
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <div className="truncate font-bold">{release.title}</div>
           <div className="text-xs text-white/50">
@@ -330,6 +333,8 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
             <EditReleaseForm release={release} onDone={() => { setEditing(false); onChanged(); }} />
           )}
 
+          <ArtworkPanel release={release} editable={editable} onChanged={onChanged} />
+
           <DeliveryPanel release={release} onChanged={onChanged} />
 
           <div className="mt-4 space-y-2">
@@ -337,6 +342,7 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
               <TrackRow
                 key={t.id}
                 track={t}
+                userId={auth.user!.id}
                 editable={editable}
                 onChanged={onChanged}
                 neighbours={{ prev: release.tracks[i - 1] ?? null, next: release.tracks[i + 1] ?? null }}
@@ -392,9 +398,9 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
 }
 
 function TrackRow({
-  track, editable, onChanged, neighbours,
+  track, userId, editable, onChanged, neighbours,
 }: {
-  track: any; editable: boolean; onChanged: () => void;
+  track: any; userId: string; editable: boolean; onChanged: () => void;
   neighbours?: { prev: any | null; next: any | null };
 }) {
   const remove = useServerFn(deleteReleaseTrack);
@@ -412,46 +418,62 @@ function TrackRow({
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm">
-      {editable && (
-        <div className="flex flex-col">
-          <button
-            onClick={() => swap(neighbours?.prev)}
-            disabled={!neighbours?.prev}
-            className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
-            aria-label="Move track up"
-          >
-            <ArrowUp className="h-3 w-3" />
-          </button>
-          <button
-            onClick={() => swap(neighbours?.next)}
-            disabled={!neighbours?.next}
-            className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
-            aria-label="Move track down"
-          >
-            <ArrowDown className="h-3 w-3" />
-          </button>
+    <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm">
+      <div className="flex items-center gap-3">
+        {editable && (
+          <div className="flex flex-col">
+            <button
+              onClick={() => swap(neighbours?.prev)}
+              disabled={!neighbours?.prev}
+              className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
+              aria-label="Move track up"
+            >
+              <ArrowUp className="h-3 w-3" />
+            </button>
+            <button
+              onClick={() => swap(neighbours?.next)}
+              disabled={!neighbours?.next}
+              className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
+              aria-label="Move track down"
+            >
+              <ArrowDown className="h-3 w-3" />
+            </button>
+          </div>
+        )}
+        <span className="w-6 text-center text-xs text-white/40">{track.track_number}</span>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-semibold">{track.title}</div>
+          <div className="text-[11px] text-white/40">
+            {track.featured_artists?.length ? `feat. ${track.featured_artists.join(", ")} · ` : ""}
+            {track.isrc ? `ISRC ${track.isrc} · ` : ""}
+            {track.audio_url ? `master ${formatDuration(track.duration_secs)}` : "no master audio"}
+            {track.splits?.length ? ` · splits: ${track.splits.map((s: any) => `${s.name} ${s.percent}%`).join(", ")}` : ""}
+          </div>
         </div>
-      )}
-      <span className="w-6 text-center text-xs text-white/40">{track.track_number}</span>
-      <div className="min-w-0 flex-1">
-        <div className="truncate font-semibold">{track.title}</div>
-        <div className="text-[11px] text-white/40">
-          {track.featured_artists?.length ? `feat. ${track.featured_artists.join(", ")} · ` : ""}
-          {track.isrc ? `ISRC ${track.isrc} · ` : ""}
-          {track.audio_url ? "audio attached" : "no audio"}
-          {track.splits?.length ? ` · splits: ${track.splits.map((s: any) => `${s.name} ${s.percent}%`).join(", ")}` : ""}
-        </div>
+        {editable && (
+          <button
+            onClick={async () => { await remove({ data: { id: track.id } }); onChanged(); }}
+            className="text-white/30 hover:text-red-300"
+            aria-label="Remove track"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
-      {editable && (
-        <button
-          onClick={async () => { await remove({ data: { id: track.id } }); onChanged(); }}
-          className="text-white/30 hover:text-red-300"
-          aria-label="Remove track"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      )}
+
+      <div className="mt-2 pl-1">
+        <AudioUploader
+          userId={userId}
+          value={track.audio_url ?? null}
+          durationSecs={track.duration_secs}
+          disabled={!editable}
+          compact
+          onUploaded={async ({ ref, durationSecs }) => {
+            await patch({ data: { id: track.id, patch: { audio_url: ref, duration_secs: durationSecs ?? null } } });
+            onChanged();
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -462,7 +484,8 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ title: "", isrc: "", featured: "" });
   const [splits, setSplits] = useState<{ name: string; percent: number }[]>([]);
-  const [audio, setAudio] = useState<File | null>(null);
+  const [audio, setAudio] = useState<{ ref: string; durationSecs: number | null } | null>(null);
+
 
   async function submit() {
     if (!form.title.trim()) { toast.error("Track title required"); return; }
@@ -470,8 +493,6 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
     if (total > 100) { toast.error(`Splits total ${total}% — must not exceed 100%`); return; }
     setSaving(true);
     try {
-      let audio_url: string | null = null;
-      if (audio) audio_url = await uploadAsset(userId, audio);
       await add({
         data: {
           release_id: releaseId,
@@ -481,7 +502,8 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
             isrc: form.isrc || null,
             featured_artists: form.featured ? form.featured.split(",").map((s) => s.trim()).filter(Boolean) : [],
             splits: splits.filter((s) => s.name.trim() && s.percent > 0),
-            audio_url,
+            audio_url: audio?.ref ?? null,
+            duration_secs: audio?.durationSecs ?? null,
           },
         },
       });
@@ -516,9 +538,16 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
         <Field label="Track title *"><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputCls} /></Field>
         <Field label="ISRC (optional)"><input value={form.isrc} onChange={(e) => setForm({ ...form, isrc: e.target.value })} className={inputCls} placeholder="US-XXX-00-00000" /></Field>
         <Field label="Featured artists (comma separated)"><input value={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.value })} className={inputCls} /></Field>
-        <Field label="Audio file">
-          <input type="file" accept="audio/*" onChange={(e) => setAudio(e.target.files?.[0] ?? null)} className="text-xs text-white/60 file:mr-3 file:rounded-full file:border-0 file:bg-[#00E6FF] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-black" />
-        </Field>
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-white/50">Master audio</span>
+          <AudioUploader
+            userId={userId}
+            value={audio?.ref ?? null}
+            durationSecs={audio?.durationSecs ?? null}
+            compact
+            onUploaded={({ ref, durationSecs }) => setAudio({ ref, durationSecs })}
+          />
+        </div>
       </div>
 
       <div className="mt-3">
@@ -673,6 +702,15 @@ function EditReleaseForm({ release, onDone }: { release: any; onDone: () => void
   );
 }
 
+const TUNEVIO_DESTINATIONS = [
+  { id: "tunevio-streaming", label: "Tunevio Streaming" },
+  { id: "tunevio-charts", label: "Tunevio Charts" },
+  { id: "tunevio-radio", label: "Tunevio Live Radio" },
+  { id: "tunevio-arena", label: "Mic Drop Arena" },
+  { id: "tunevio-artist-profile", label: "Artist Profile" },
+  { id: "tunevio-video", label: "Video Network" },
+] as const;
+
 function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => void }) {
   const setTargets = useServerFn(setReleaseDspTargets);
   const [saving, setSaving] = useState(false);
@@ -686,7 +724,7 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
     { label: "At least one track with audio", done: tracks.some((t) => t.audio_url) },
     { label: "ISRC on every track", done: tracks.length > 0 && tracks.every((t) => t.isrc) },
     { label: "UPC assigned", done: !!release.upc },
-    { label: "Delivery platforms selected", done: targets.length > 0 },
+    { label: "Tunevio destinations selected", done: targets.length > 0 },
   ];
 
   async function toggle(id: string) {
@@ -740,10 +778,10 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
 
       <div className="mt-4">
         <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
-          Delivery platforms {locked && <span className="text-white/30">(locked while in review / live)</span>}
+          Tunevio destinations {locked && <span className="text-white/30">(locked while in review / live)</span>}
         </div>
         <div className="flex flex-wrap gap-2">
-          {DSP_PLATFORMS.map((p) => {
+          {TUNEVIO_DESTINATIONS.map((p) => {
             const on = targets.includes(p.id);
             return (
               <button
@@ -761,7 +799,43 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
             );
           })}
         </div>
+        <p className="mt-2 text-[11px] text-white/35">
+          Tunevio delivers to its own native network. External store delivery is not part of this release pipeline.
+        </p>
       </div>
     </div>
   );
 }
+
+// ---------- Phase 3: artwork panel ----------
+
+function ArtworkPanel({ release, editable, onChanged }: { release: any; editable: boolean; onChanged: () => void }) {
+  const auth = useAuth();
+  const update = useServerFn(updateRelease);
+  if (!auth.user) return null;
+
+  async function save(ref: string | null) {
+    try {
+      await update({ data: { id: release.id, patch: { artwork_url: ref } } });
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not update artwork");
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-2 flex items-center gap-2 text-sm font-bold">
+        <ImageIcon className="h-4 w-4 text-[#00E6FF]" /> Cover artwork
+      </div>
+      {editable ? (
+        <ArtworkUploader userId={auth.user.id} value={release.artwork_url ?? null} onChange={save} />
+      ) : release.artwork_url ? (
+        <ArtworkThumb value={release.artwork_url} className="h-24 w-24 rounded-xl object-cover" />
+      ) : (
+        <div className="text-xs text-white/40">No artwork uploaded.</div>
+      )}
+    </div>
+  );
+}
+
