@@ -282,6 +282,18 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
   );
 }
 
+function missingForSubmit(release: any): string[] {
+  const out: string[] = [];
+  const tracks: any[] = release.tracks ?? [];
+  if (tracks.length === 0) out.push("Add at least one track");
+  else if (!tracks.some((t) => t.audio_url)) out.push("Upload a master audio file for at least one track");
+  if (!release.rights_confirmed) out.push("Confirm the rights declaration");
+  if (!release.p_line_year || !release.p_line_holder) out.push("Add the sound recording copyright line (\u2117)");
+  if (!release.c_line_year || !release.c_line_holder) out.push("Add the composition copyright line (\u00a9)");
+  if (release.territory_mode === "selected" && !(release.territories ?? []).length) out.push("Pick at least one territory, or choose worldwide");
+  return out;
+}
+
 function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => void }) {
   const auth = useAuth();
   const [open, setOpen] = useState(false);
