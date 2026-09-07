@@ -290,9 +290,13 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="grid h-12 w-12 place-items-center rounded-lg bg-white/5">
-          <Music2 className="h-5 w-5 text-[#00E6FF]" />
-        </div>
+        {release.artwork_url ? (
+          <ArtworkThumb value={release.artwork_url} className="h-12 w-12 rounded-lg object-cover" />
+        ) : (
+          <div className="grid h-12 w-12 place-items-center rounded-lg bg-white/5">
+            <Music2 className="h-5 w-5 text-[#00E6FF]" />
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <div className="truncate font-bold">{release.title}</div>
           <div className="text-xs text-white/50">
