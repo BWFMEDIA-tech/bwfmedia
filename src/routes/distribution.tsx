@@ -97,26 +97,79 @@ function DistributionPage() {
     );
   }
 
+  const ov = overview.data as any;
+  const counts = ov?.counts ?? {};
+  const earnings = ov?.earnings ?? null;
+
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <header className="mb-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <header className="mb-6">
         <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#00E6FF]">Tunevio Distribution</div>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Your Releases</h1>
+        <h1 className="mt-1 text-3xl font-black tracking-tight">Distribution Dashboard</h1>
         <p className="mt-1 text-sm text-white/50">
-          Build your release, add tracks and splits, then submit it for review by our team.
+          Track every release, manage delivery details, and submit new music for review.
         </p>
       </header>
 
-      <NewReleaseForm onCreated={() => qc.invalidateQueries({ queryKey: ["my-distribution-releases"] })} />
+      {/* Status overview */}
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard icon={Disc3} label="Releases" value={String(ov?.total ?? 0)} sub={`${ov?.trackCount ?? 0} tracks`} />
+        <StatCard icon={Clock} label="In review" value={String(counts.submitted ?? 0)} sub={`${counts.draft ?? 0} drafts`} />
+        <StatCard icon={CheckCircle2} label="Live" value={String(counts.live ?? 0)} sub={`${counts.approved ?? 0} approved · ${counts.rejected ?? 0} rejected`} />
+        <StatCard
+          icon={Wallet}
+          label="Available earnings"
+          value={`$${(Number(earnings?.available_cents ?? 0) / 100).toFixed(2)}`}
+          sub={`Pending $${(Number(earnings?.pending_cents ?? 0) / 100).toFixed(2)}`}
+        />
+      </div>
 
-      <div className="mt-8 space-y-4">
+      <PipelineBar counts={counts} total={ov?.total ?? 0} />
+
+      <div className="mt-6">
+        <NewReleaseForm onCreated={refresh} />
+      </div>
+
+      {/* Release manager toolbar */}
+      <div className="mt-8 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search releases or tracks…"
+            className={`${inputCls} pl-9`}
+          />
+        </div>
+        {["all", "draft", "submitted", "approved", "live", "rejected"].map((s) => (
+          <button
+            key={s}
+            onClick={() => setStatusFilter(s)}
+            className={`rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider transition ${
+              statusFilter === s
+                ? "border-[#00E6FF]/50 bg-[#00E6FF]/15 text-[#00E6FF]"
+                : "border-white/10 text-white/50 hover:text-white"
+            }`}
+          >
+            {s}
+            {s !== "all" && counts[s] ? ` ${counts[s]}` : ""}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 space-y-4">
         {releases.data?.length === 0 && (
           <div className="rounded-2xl border border-dashed border-white/10 py-14 text-center text-sm text-white/40">
             No releases yet — create your first one above.
           </div>
         )}
-        {releases.data?.map((r: any) => (
-          <ReleaseCard key={r.id} release={r} onChanged={() => qc.invalidateQueries({ queryKey: ["my-distribution-releases"] })} />
+        {releases.data && releases.data.length > 0 && visible.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-white/10 py-14 text-center text-sm text-white/40">
+            No releases match your search.
+          </div>
+        )}
+        {visible.map((r: any) => (
+          <ReleaseCard key={r.id} release={r} onChanged={refresh} />
         ))}
       </div>
     </div>
