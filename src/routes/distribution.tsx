@@ -284,6 +284,7 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
 function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => void }) {
   const auth = useAuth();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
   const submitReview = useServerFn(submitReleaseForReview);
   const remove = useServerFn(deleteRelease);
   const editable = release.status === "draft" || release.status === "rejected";
