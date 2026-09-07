@@ -769,10 +769,10 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
 
       <div className="mt-4">
         <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
-          Delivery platforms {locked && <span className="text-white/30">(locked while in review / live)</span>}
+          Tunevio destinations {locked && <span className="text-white/30">(locked while in review / live)</span>}
         </div>
         <div className="flex flex-wrap gap-2">
-          {DSP_PLATFORMS.map((p) => {
+          {TUNEVIO_DESTINATIONS.map((p) => {
             const on = targets.includes(p.id);
             return (
               <button
@@ -790,7 +790,43 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
             );
           })}
         </div>
+        <p className="mt-2 text-[11px] text-white/35">
+          Tunevio delivers to its own native network. External store delivery is not part of this release pipeline.
+        </p>
       </div>
     </div>
   );
 }
+
+// ---------- Phase 3: artwork panel ----------
+
+function ArtworkPanel({ release, editable, onChanged }: { release: any; editable: boolean; onChanged: () => void }) {
+  const auth = useAuth();
+  const update = useServerFn(updateRelease);
+  if (!auth.user) return null;
+
+  async function save(ref: string | null) {
+    try {
+      await update({ data: { id: release.id, patch: { artwork_url: ref } } });
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not update artwork");
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-2 flex items-center gap-2 text-sm font-bold">
+        <ImageIcon className="h-4 w-4 text-[#00E6FF]" /> Cover artwork
+      </div>
+      {editable ? (
+        <ArtworkUploader userId={auth.user.id} value={release.artwork_url ?? null} onChange={save} />
+      ) : release.artwork_url ? (
+        <ArtworkThumb value={release.artwork_url} className="h-24 w-24 rounded-xl object-cover" />
+      ) : (
+        <div className="text-xs text-white/40">No artwork uploaded.</div>
+      )}
+    </div>
+  );
+}
+
