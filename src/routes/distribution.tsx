@@ -492,8 +492,6 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
     if (total > 100) { toast.error(`Splits total ${total}% — must not exceed 100%`); return; }
     setSaving(true);
     try {
-      let audio_url: string | null = null;
-      if (audio) audio_url = await uploadAsset(userId, audio);
       await add({
         data: {
           release_id: releaseId,
@@ -503,7 +501,8 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
             isrc: form.isrc || null,
             featured_artists: form.featured ? form.featured.split(",").map((s) => s.trim()).filter(Boolean) : [],
             splits: splits.filter((s) => s.name.trim() && s.percent > 0),
-            audio_url,
+            audio_url: audio?.ref ?? null,
+            duration_secs: audio?.durationSecs ?? null,
           },
         },
       });
@@ -538,9 +537,16 @@ function AddTrackForm({ releaseId, userId, nextNumber, onAdded }: { releaseId: s
         <Field label="Track title *"><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputCls} /></Field>
         <Field label="ISRC (optional)"><input value={form.isrc} onChange={(e) => setForm({ ...form, isrc: e.target.value })} className={inputCls} placeholder="US-XXX-00-00000" /></Field>
         <Field label="Featured artists (comma separated)"><input value={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.value })} className={inputCls} /></Field>
-        <Field label="Audio file">
-          <input type="file" accept="audio/*" onChange={(e) => setAudio(e.target.files?.[0] ?? null)} className="text-xs text-white/60 file:mr-3 file:rounded-full file:border-0 file:bg-[#00E6FF] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-black" />
-        </Field>
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-white/50">Master audio</span>
+          <AudioUploader
+            userId={userId}
+            value={audio?.ref ?? null}
+            durationSecs={audio?.durationSecs ?? null}
+            compact
+            onUploaded={({ ref, durationSecs }) => setAudio({ ref, durationSecs })}
+          />
+        </div>
       </div>
 
       <div className="mt-3">
