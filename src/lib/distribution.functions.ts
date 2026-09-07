@@ -290,6 +290,11 @@ export const reviewRelease = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Release not found");
+    await logAdminAction(context, {
+      action: `release_${data.decision}`,
+      releaseId: data.id,
+      summary: `${row.title} — marked ${data.decision}${data.notes ? `: ${data.notes}` : ""}`,
+    });
     if (data.decision === "approved") {
       // Tunevio issues the release identity on approval.
       await context.supabase.rpc("assign_release_identifiers", { _release_id: data.id });
