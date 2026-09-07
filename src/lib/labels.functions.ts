@@ -149,7 +149,7 @@ export const getLabel = createServerFn({ method: "GET" })
 
     const activeArtistIds = rosterRows.filter((r) => r.status === "active").map((r) => r.artist_id);
     let releases: any[] = [];
-    if (activeArtistIds.length) {
+    if (labelCan(role, "viewReleases") && activeArtistIds.length) {
       const { data: rel } = await context.supabase
         .from("distribution_releases")
         .select("id, title, artist_name, status, release_type, artwork_url, release_date, user_id, created_at")
