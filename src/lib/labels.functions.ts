@@ -88,10 +88,10 @@ export const createLabel = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: id, error } = await context.supabase.rpc("create_label", {
       _name: data.name,
-      _slug: data.slug ?? null,
-      _bio: data.bio ?? null,
-      _website: data.website ?? null,
-      _logo_url: data.logo_url ?? null,
+      _slug: data.slug ?? undefined,
+      _bio: data.bio ?? undefined,
+      _website: data.website ?? undefined,
+      _logo_url: data.logo_url ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { id: id as string };
