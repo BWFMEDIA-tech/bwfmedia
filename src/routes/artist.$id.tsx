@@ -75,7 +75,7 @@ export const Route = createFileRoute("/artist/$id")({
   component: ArtistProfilePage,
 });
 
-const RED = "#ef2b2b";
+const RED = "#00E6FF";
 
 type ArtistView = {
   id: string;
@@ -100,11 +100,14 @@ function ArtistProfilePage() {
   const isOwner = !!user && user.id === id;
 
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
+  const isBlank = !meta?.name && !meta?.photo && !meta?.bio
+    && (meta?.tracks?.length ?? 0) === 0 && (meta?.videos?.length ?? 0) === 0;
+  const notFound = (meta as any)?.exists === false;
   const name = meta?.name?.trim() || (isOwner ? "Your Artist Profile" : "Artist");
   const artist: ArtistView = {
     id,
     name,
-    handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, ""),
+    handle: meta?.name ? "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, "") : "",
     photo: meta?.photo ?? null,
     banner: meta?.banner ?? null,
   };
@@ -112,6 +115,20 @@ function ArtistProfilePage() {
     () => name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase(),
     [name],
   );
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-[#070708] text-white grid place-items-center px-6">
+        <div className="max-w-md w-full rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+          <h1 className="font-anton text-3xl uppercase">Profile not found</h1>
+          <p className="mt-2 text-sm text-white/60">This artist page doesn’t exist or has been removed.</p>
+          <Link to="/artists" className="mt-5 inline-block rounded-full px-5 py-2 text-sm font-semibold text-black" style={{ background: RED }}>
+            Browse artists
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#070708] text-white pb-28">
@@ -130,12 +147,21 @@ function ArtistProfilePage() {
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
-          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
-          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
-          <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
-          <ArtistMerchSection userId={id} />
+          {isBlank && !isOwner ? (
+            <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+              <p className="text-sm text-white/70">This artist hasn’t set up their profile yet.</p>
+              <p className="mt-1 text-xs text-white/40">Music, videos and stats will show up here once they do.</p>
+            </section>
+          ) : (
+            <>
+              <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
+              <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
+              <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
+              <ArtistMerchSection userId={id} />
+            </>
+          )}
         </div>
-        <aside className="space-y-4">
+        <aside className={`space-y-4${isBlank && !isOwner ? " hidden" : ""}`}>
           <SupportArtist
             tip={tip}
             setTip={setTip}
@@ -161,7 +187,7 @@ function HeroBanner({
     ? new Date(memberSince).toLocaleDateString(undefined, { month: "short", year: "numeric" })
     : null;
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0606] via-[#0e0e10] to-[#0a0a0c]">
+    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#04151c] via-[#0e0e10] to-[#0a0a0c]">
       {artist.banner ? (
         <img src={artist.banner} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
       ) : (
@@ -175,7 +201,7 @@ function HeroBanner({
               {artist.photo ? (
                 <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="h-full w-full grid place-items-center bg-gradient-to-br from-red-900/60 to-black text-3xl font-black">{initials}</div>
+                <div className="h-full w-full grid place-items-center bg-gradient-to-br from-[#00E6FF]/25 to-black text-3xl font-black">{initials}</div>
               )}
             </div>
           </div>
@@ -184,7 +210,7 @@ function HeroBanner({
               <h1 className="font-anton text-4xl md:text-5xl uppercase tracking-tight truncate">{artist.name}</h1>
               <RankBadge userId={artist.id} size="xl" />
             </div>
-            <div className="text-sm text-white/60 mt-1">{artist.handle}</div>
+            {artist.handle && <div className="text-sm text-white/60 mt-1">{artist.handle}</div>}
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
               {location && (
                 <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> {location}</span>
