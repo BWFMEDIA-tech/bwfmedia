@@ -373,7 +373,7 @@ function DiscoverPage() {
             label="Charts"
             blurb="See what's trending across the network."
             icon={BarChart3}
-            to="/dashboard"
+            to="/charts"
           />
           <NetworkTile
             label="Browse"
