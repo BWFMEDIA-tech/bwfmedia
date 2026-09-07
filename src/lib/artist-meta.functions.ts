@@ -139,6 +139,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       };
     } catch {
       return {
+        exists: false,
         name: null as string | null, photo: null as string | null,
         banner: null as string | null, bio: null as string | null,
         location: null as string | null, genre: null as string | null,
