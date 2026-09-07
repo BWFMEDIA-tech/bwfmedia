@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   Disc3, Plus, Upload, Trash2, Send, ChevronDown, ChevronUp, Music2, X,
   Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock, Image as ImageIcon, ShieldCheck,
+  Radio, AlertTriangle,
 } from "lucide-react";
 import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distribution/AssetUploads";
 import { formatDuration } from "@/lib/distribution-upload";
@@ -15,6 +16,7 @@ import {
   submitReleaseForReview, addReleaseTrack, updateReleaseTrack, deleteReleaseTrack,
   getDistributionOverview, setReleaseDspTargets,
   RELEASE_TYPES, PRO_OPTIONS,
+  listReleaseDeliveries, requestReleaseTakedown,
 } from "@/lib/distribution.functions";
 
 export const Route = createFileRoute("/distribution")({
@@ -336,6 +338,8 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
           <ArtworkPanel release={release} editable={editable} onChanged={onChanged} />
 
           <RightsPanel release={release} editable={editable} onChanged={onChanged} />
+
+          <DeliveryEnginePanel release={release} onChanged={onChanged} />
 
           <DeliveryPanel release={release} onChanged={onChanged} />
 
@@ -1087,6 +1091,110 @@ function RightsPanel({ release, editable, onChanged }: { release: any; editable:
       </fieldset>
 
       {identity}
+    </div>
+  );
+}
+
+// ---------- Phase 5: delivery engine (artist view) ----------
+
+const DELIVERY_STYLES: Record<string, string> = {
+  delivered: "bg-emerald-500/15 text-emerald-300",
+  pending: "bg-amber-500/15 text-amber-300",
+  failed: "bg-red-500/15 text-red-300",
+  taken_down: "bg-white/10 text-white/50",
+};
+
+function DeliveryEnginePanel({ release, onChanged }: { release: any; onChanged: () => void }) {
+  const listDeliveries = useServerFn(listReleaseDeliveries);
+  const requestTakedown = useServerFn(requestReleaseTakedown);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const { data: deliveries = [] } = useQuery({
+    queryKey: ["distribution-deliveries", release.id],
+    queryFn: () => listDeliveries({ data: { release_id: release.id } }) as Promise<any[]>,
+  });
+
+  const live = release.status === "live";
+  const requested = release.takedown_status === "requested";
+
+  async function submitTakedown() {
+    setBusy(true);
+    try {
+      await requestTakedown({ data: { id: release.id, reason } });
+      toast.success("Takedown requested — an admin will review it");
+      setReason("");
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not request takedown");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-3 flex items-center gap-2 text-sm font-bold">
+        <Radio className="h-4 w-4 text-[#00E6FF]" /> Delivery status
+      </div>
+
+      {deliveries.length === 0 ? (
+        <p className="text-xs text-white/40">
+          Not delivered yet. Tunevio publishes your tracks to the network once the release is approved.
+        </p>
+      ) : (
+        <div className="space-y-1.5">
+          {deliveries.map((d) => (
+            <div key={d.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-black/30 px-3 py-2 text-[11px]">
+              <span className="font-semibold text-white/85">{d.destination}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${DELIVERY_STYLES[d.status] ?? "bg-white/10 text-white/50"}`}>
+                {String(d.status).replace("_", " ")}
+              </span>
+              <span className="text-white/40">
+                {d.tracks_published} track{d.tracks_published === 1 ? "" : "s"}
+                {d.delivered_at && ` · ${new Date(d.delivered_at).toLocaleDateString()}`}
+              </span>
+              {d.last_error && <span className="text-red-300">{d.last_error}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {live && !requested && (
+        <div className="mt-3 border-t border-white/10 pt-3">
+          <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-400" /> Request takedown
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <input
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              maxLength={1000}
+              placeholder="Why should this come down?"
+              className={`${inputCls} flex-1 min-w-[200px]`}
+            />
+            <button
+              onClick={submitTakedown}
+              disabled={busy}
+              className="rounded-md border border-amber-500/40 px-4 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/10 disabled:opacity-50"
+            >
+              Request takedown
+            </button>
+          </div>
+        </div>
+      )}
+
+      {requested && (
+        <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
+          Takedown requested{release.takedown_requested_at ? ` on ${new Date(release.takedown_requested_at).toLocaleDateString()}` : ""} — waiting for admin review.
+        </div>
+      )}
+
+      {release.takedown_status === "approved" && (
+        <div className="mt-3 rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/60">
+          This release was taken down and removed from the Tunevio catalog.
+        </div>
+      )}
     </div>
   );
 }

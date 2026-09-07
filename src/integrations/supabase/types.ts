@@ -1157,6 +1157,56 @@ export type Database = {
         }
         Relationships: []
       }
+      distribution_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          destination: string
+          id: string
+          last_error: string | null
+          release_id: string
+          status: string
+          taken_down_at: string | null
+          tracks_published: number
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          destination: string
+          id?: string
+          last_error?: string | null
+          release_id: string
+          status?: string
+          taken_down_at?: string | null
+          tracks_published?: number
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          destination?: string
+          id?: string
+          last_error?: string | null
+          release_id?: string
+          status?: string
+          taken_down_at?: string | null
+          tracks_published?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_deliveries_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distribution_release_tracks: {
         Row: {
           audio_url: string | null
@@ -1166,6 +1216,7 @@ export type Database = {
           id: string
           isrc: string | null
           isrc_assigned_at: string | null
+          published_track_id: string | null
           release_id: string
           splits: Json
           title: string
@@ -1180,6 +1231,7 @@ export type Database = {
           id?: string
           isrc?: string | null
           isrc_assigned_at?: string | null
+          published_track_id?: string | null
           release_id: string
           splits?: Json
           title: string
@@ -1194,6 +1246,7 @@ export type Database = {
           id?: string
           isrc?: string | null
           isrc_assigned_at?: string | null
+          published_track_id?: string | null
           release_id?: string
           splits?: Json
           title?: string
@@ -1217,6 +1270,7 @@ export type Database = {
           c_line_holder: string | null
           c_line_year: number | null
           created_at: string
+          delivered_at: string | null
           dsp_targets: string[]
           genre: string | null
           id: string
@@ -1239,6 +1293,10 @@ export type Database = {
           songwriters: string[] | null
           status: string
           submitted_at: string | null
+          takedown_reason: string | null
+          takedown_requested_at: string | null
+          takedown_status: string
+          taken_down_at: string | null
           territories: string[]
           territory_mode: string
           title: string
@@ -1254,6 +1312,7 @@ export type Database = {
           c_line_holder?: string | null
           c_line_year?: number | null
           created_at?: string
+          delivered_at?: string | null
           dsp_targets?: string[]
           genre?: string | null
           id?: string
@@ -1276,6 +1335,10 @@ export type Database = {
           songwriters?: string[] | null
           status?: string
           submitted_at?: string | null
+          takedown_reason?: string | null
+          takedown_requested_at?: string | null
+          takedown_status?: string
+          taken_down_at?: string | null
           territories?: string[]
           territory_mode?: string
           title: string
@@ -1291,6 +1354,7 @@ export type Database = {
           c_line_holder?: string | null
           c_line_year?: number | null
           created_at?: string
+          delivered_at?: string | null
           dsp_targets?: string[]
           genre?: string | null
           id?: string
@@ -1313,6 +1377,10 @@ export type Database = {
           songwriters?: string[] | null
           status?: string
           submitted_at?: string | null
+          takedown_reason?: string | null
+          takedown_requested_at?: string | null
+          takedown_status?: string
+          taken_down_at?: string | null
           territories?: string[]
           territory_mode?: string
           title?: string
@@ -4043,6 +4111,7 @@ export type Database = {
           new_balance: number
         }[]
       }
+      approve_release_takedown: { Args: { _release_id: string }; Returns: Json }
       assign_release_identifiers: {
         Args: { _release_id: string }
         Returns: Json
@@ -4127,6 +4196,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      deliver_release: { Args: { _release_id: string }; Returns: Json }
       dequeue_matchmaking: { Args: never; Returns: boolean }
       email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
@@ -4134,6 +4204,7 @@ export type Database = {
         Returns: number
       }
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
+      ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
       get_artist_earnings_summary: {
         Args: { _artist_id: string }
@@ -4303,6 +4374,10 @@ export type Database = {
       refresh_artist_vote_rollups: {
         Args: { _since?: string }
         Returns: number
+      }
+      request_release_takedown: {
+        Args: { _reason: string; _release_id: string }
+        Returns: undefined
       }
       reset_round_votes: { Args: { _round_id: string }; Returns: undefined }
       spend_boost_credit: {

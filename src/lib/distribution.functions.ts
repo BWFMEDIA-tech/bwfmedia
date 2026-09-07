@@ -385,3 +385,59 @@ export const getDistributionOverview = createServerFn({ method: "GET" })
       earnings,
     };
   });
+
+// ---------- Phase 5: distribution engine ----------
+
+export const listReleaseDeliveries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ release_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("distribution_deliveries")
+      .select("*")
+      .eq("release_id", data.release_id)
+      .order("destination", { ascending: true });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+/** Admin: publish an approved release into the Tunevio catalog. */
+export const deliverRelease = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: result, error } = await context.supabase.rpc("deliver_release", {
+      _release_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return result as { tracks_published: number; destinations: number };
+  });
+
+/** Artist: request a takedown of their own live release. */
+export const requestReleaseTakedown = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.string().uuid(), reason: z.string().max(1000).optional() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("request_release_takedown", {
+      _release_id: data.id,
+      _reason: data.reason ?? "",
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Admin: approve a takedown and pull the release out of the catalog. */
+export const approveReleaseTakedown = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: result, error } = await context.supabase.rpc("approve_release_takedown", {
+      _release_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return result as { tracks_removed: number };
+  });
