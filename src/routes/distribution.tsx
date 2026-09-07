@@ -326,9 +326,21 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
             {release.producers?.length > 0 && <div className="col-span-2">Producers: <span className="text-white/80">{release.producers.join(", ")}</span></div>}
           </div>
 
-          <div className="space-y-2">
-            {release.tracks.map((t: any) => (
-              <TrackRow key={t.id} track={t} editable={editable} onChanged={onChanged} />
+          {editing && (
+            <EditReleaseForm release={release} onDone={() => { setEditing(false); onChanged(); }} />
+          )}
+
+          <DeliveryPanel release={release} onChanged={onChanged} />
+
+          <div className="mt-4 space-y-2">
+            {release.tracks.map((t: any, i: number) => (
+              <TrackRow
+                key={t.id}
+                track={t}
+                editable={editable}
+                onChanged={onChanged}
+                neighbours={{ prev: release.tracks[i - 1] ?? null, next: release.tracks[i + 1] ?? null }}
+              />
             ))}
           </div>
 
