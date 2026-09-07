@@ -349,6 +349,14 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
           <div className="mt-4 flex flex-wrap gap-2">
             {editable && (
               <button
+                onClick={() => setEditing((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-4 py-1.5 text-xs font-bold text-white/80 hover:bg-white/5"
+              >
+                <Pencil className="h-3 w-3" /> {editing ? "Close editor" : "Edit details"}
+              </button>
+            )}
+            {editable && (
+              <button
                 onClick={async () => {
                   try {
                     await submitReview({ data: { id: release.id } });
