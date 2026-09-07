@@ -100,6 +100,9 @@ function ArtistProfilePage() {
   const isOwner = !!user && user.id === id;
 
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
+  const isBlank = !meta?.name && !meta?.photo && !meta?.bio
+    && (meta?.tracks?.length ?? 0) === 0 && (meta?.videos?.length ?? 0) === 0;
+  const notFound = (meta as any)?.exists === false;
   const name = meta?.name?.trim() || (isOwner ? "Your Artist Profile" : "Artist");
   const artist: ArtistView = {
     id,
