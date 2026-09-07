@@ -33,15 +33,15 @@ const NAV: Entry[] = [
     children: [
       { to: "/settings/music-media", label: "Music Videos", search: { type: "video" } },
       { to: "/settings/music-media", label: "Shorts", search: { type: "short" } },
-      { to: "/dashboard", label: "Video Analytics", search: { tab: "video" } },
+      { to: "/artist-dashboard", label: "Video Analytics", search: { tab: "video" } },
     ],
   },
   {
     kind: "group", key: "analytics", label: "Analytics", icon: BarChart3,
     children: [
-      { to: "/dashboard", label: "Streams", search: { tab: "streams" } },
-      { to: "/dashboard", label: "Followers", search: { tab: "followers" } },
-      { to: "/dashboard", label: "Audience Insights", search: { tab: "audience" } },
+      { to: "/artist-dashboard", label: "Streams", search: { tab: "streams" } },
+      { to: "/artist-dashboard", label: "Followers", search: { tab: "followers" } },
+      { to: "/artist-dashboard", label: "Audience Insights", search: { tab: "audience" } },
       { to: "/earnings", label: "Revenue Reports" },
     ],
   },
