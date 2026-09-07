@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mic, Music2, Radio, Swords } from "lucide-react";
+import { Mic, Music2, Package, Radio, Swords } from "lucide-react";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -25,6 +25,12 @@ const OPTIONS = [
     icon: Music2,
     title: "Add Music to Profile",
     desc: "Upload tracks and manage your catalog.",
+  },
+  {
+    to: "/distribution",
+    icon: Package,
+    title: "Distribution",
+    desc: "Release music to the Tunevio network with artwork, masters and rights.",
   },
   {
     to: "/artist-dashboard",
