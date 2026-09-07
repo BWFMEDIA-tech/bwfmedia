@@ -75,7 +75,7 @@ export const Route = createFileRoute("/artist/$id")({
   component: ArtistProfilePage,
 });
 
-const RED = "#ef2b2b";
+const RED = "#00E6FF";
 
 type ArtistView = {
   id: string;
@@ -161,7 +161,7 @@ function HeroBanner({
     ? new Date(memberSince).toLocaleDateString(undefined, { month: "short", year: "numeric" })
     : null;
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0606] via-[#0e0e10] to-[#0a0a0c]">
+    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#04151c] via-[#0e0e10] to-[#0a0a0c]">
       {artist.banner ? (
         <img src={artist.banner} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
       ) : (
@@ -175,7 +175,7 @@ function HeroBanner({
               {artist.photo ? (
                 <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="h-full w-full grid place-items-center bg-gradient-to-br from-red-900/60 to-black text-3xl font-black">{initials}</div>
+                <div className="h-full w-full grid place-items-center bg-gradient-to-br from-[#00E6FF]/25 to-black text-3xl font-black">{initials}</div>
               )}
             </div>
           </div>
