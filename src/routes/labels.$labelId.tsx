@@ -9,7 +9,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import {
   getLabel, updateLabel, createLabelInvite, revokeLabelInvite,
-  setMemberRole, removeMember, setRosterStatus,
+  setMemberRole, removeMember, setRosterStatus, getLabelEarnings,
   LABEL_ROLES, LABEL_ROLE_META, labelCan, type LabelRole,
 } from "@/lib/labels.functions";
 
@@ -41,7 +41,7 @@ function LabelWorkspace() {
   const auth = useAuth();
   const qc = useQueryClient();
   const fetchLabel = useServerFn(getLabel);
-  const [tab, setTab] = useState<"team" | "roster" | "releases" | "settings">("team");
+  const [tab, setTab] = useState<"team" | "roster" | "releases" | "earnings" | "settings">("team");
 
   const q = useQuery({
     queryKey: ["label", labelId],
