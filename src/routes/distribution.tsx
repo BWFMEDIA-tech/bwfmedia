@@ -187,7 +187,7 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
     release_date: "", label_name: "", language: "en", is_explicit: false,
     songwriters: "", producers: "",
   });
-  const [artwork, setArtwork] = useState<File | null>(null);
+  const [artworkRef, setArtworkRef] = useState<string | null>(null);
 
   async function submit() {
     if (!form.title.trim() || !form.artist_name.trim()) {
@@ -196,8 +196,8 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
     }
     setSaving(true);
     try {
-      let artwork_url: string | null = null;
-      if (artwork && auth.user) artwork_url = await uploadAsset(auth.user.id, artwork);
+      const artwork_url: string | null = artworkRef;
+
       await create({
         data: {
           title: form.title.trim(),
@@ -216,7 +216,7 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
       toast.success("Release created — now add your tracks");
       setOpen(false);
       setForm({ title: "", artist_name: "", release_type: "single", genre: "", release_date: "", label_name: "", language: "en", is_explicit: false, songwriters: "", producers: "" });
-      setArtwork(null);
+      setArtworkRef(null);
       onCreated();
     } catch (e: any) {
       toast.error(e.message ?? "Failed to create release");
@@ -254,9 +254,13 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
         <Field label="Release date"><input type="date" value={form.release_date} onChange={(e) => setForm({ ...form, release_date: e.target.value })} className={inputCls} /></Field>
         <Field label="Label name"><input value={form.label_name} onChange={(e) => setForm({ ...form, label_name: e.target.value })} className={inputCls} /></Field>
         <Field label="Language"><input value={form.language} onChange={(e) => setForm({ ...form, language: e.target.value })} className={inputCls} placeholder="en" /></Field>
-        <Field label="Artwork">
-          <input type="file" accept="image/*" onChange={(e) => setArtwork(e.target.files?.[0] ?? null)} className="text-xs text-white/60 file:mr-3 file:rounded-full file:border-0 file:bg-[#00E6FF] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-black" />
-        </Field>
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-white/50">Cover artwork</span>
+          {auth.user && (
+            <ArtworkUploader userId={auth.user.id} value={artworkRef} onChange={setArtworkRef} />
+          )}
+        </div>
+
         <Field label="Songwriters (comma separated)"><input value={form.songwriters} onChange={(e) => setForm({ ...form, songwriters: e.target.value })} className={inputCls} /></Field>
         <Field label="Producers (comma separated)"><input value={form.producers} onChange={(e) => setForm({ ...form, producers: e.target.value })} className={inputCls} /></Field>
       </div>
