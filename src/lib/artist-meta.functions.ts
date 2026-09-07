@@ -107,6 +107,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const tracksSigned = trackList.map((t, i) => ({ ...t, cover_url: trackCovers[i] }));
 
       return {
+        exists: !!profileRes.data,
         name: (p.stage_name as string | null) ?? (p.display_name as string | null) ?? (q.artist_name as string | null) ?? null,
         photo: photoSigned,
         banner: bannerSigned,
