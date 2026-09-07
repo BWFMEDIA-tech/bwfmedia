@@ -41,11 +41,40 @@ function DistributionPage() {
   const qc = useQueryClient();
   const fetchReleases = useServerFn(listMyReleases);
 
+  const fetchOverview = useServerFn(getDistributionOverview);
+  const [q, setQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
   const releases = useQuery({
     queryKey: ["my-distribution-releases"],
     queryFn: () => fetchReleases(),
     enabled: !!auth.user,
   });
+  const overview = useQuery({
+    queryKey: ["my-distribution-overview"],
+    queryFn: () => fetchOverview(),
+    enabled: !!auth.user,
+  });
+
+  const visible = useMemo(() => {
+    const list = (releases.data ?? []) as any[];
+    const term = q.trim().toLowerCase();
+    return list.filter((r) => {
+      if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (!term) return true;
+      return (
+        r.title?.toLowerCase().includes(term) ||
+        r.artist_name?.toLowerCase().includes(term) ||
+        r.tracks?.some((t: any) => t.title?.toLowerCase().includes(term))
+      );
+    });
+  }, [releases.data, q, statusFilter]);
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["my-distribution-releases"] });
+    qc.invalidateQueries({ queryKey: ["my-distribution-overview"] });
+  };
+
 
   if (auth.loading) {
     return <div className="grid min-h-screen place-items-center text-white/50 text-sm">Loading…</div>;
