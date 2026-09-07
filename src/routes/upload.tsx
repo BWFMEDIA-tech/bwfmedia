@@ -33,11 +33,12 @@ const OPTIONS = [
     desc: "Release music to the Tunevio network with artwork, masters and rights.",
   },
   {
-    to: "/artist-dashboard",
+    to: "/go-live",
     icon: Radio,
     title: "Go Live",
-    desc: "Start a live stream or audio room.",
+    desc: "Start a live video stream on your profile — fans watch and chat.",
   },
+
   {
     to: "/settings/artist-info",
     icon: Mic,
