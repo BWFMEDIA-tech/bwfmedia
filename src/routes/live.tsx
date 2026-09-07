@@ -83,19 +83,35 @@ function LivePage() {
           </span>
           <h1 className="text-3xl font-bold">Live on BWF Network</h1>
         </div>
-        <p className="text-white/60 mb-8">Drop into any active stream. Listen, react, or request the stage.</p>
+        <p className="text-white/60 mb-4">Drop into any active stream. Listen, react, or request the stage.</p>
+
+        <div className="mb-8 flex flex-wrap gap-2">
+          {[{ id: "all", label: "All" }, ...LIVE_CATEGORIES].map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setActiveCategory(c.id)}
+              className={`rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
+                activeCategory === c.id
+                  ? "border-[#FF00A6]/50 bg-[#FF00A6]/20 text-[#FF00A6]"
+                  : "border-white/10 bg-white/5 text-white/60 hover:text-white"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
 
         {loading ? (
           <p className="text-white/50">Loading live streams…</p>
-        ) : streams.length === 0 ? (
+        ) : visibleStreams.length === 0 ? (
           <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-16 text-center">
             <Radio className="mx-auto h-10 w-10 text-white/30 mb-3" />
-            <p className="text-white/60 mb-2">No one's live right now.</p>
+            <p className="text-white/60 mb-2">No one's live right now{activeCategory !== "all" ? ` in ${liveCategoryLabel(activeCategory)}` : ""}.</p>
             <p className="text-white/40 text-sm">Check back soon — or start your own stream.</p>
           </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {streams.map((s) => (
+            {visibleStreams.map((s) => (
               <Link
                 key={s.id}
                 to="/stream/$room"
