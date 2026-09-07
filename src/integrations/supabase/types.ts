@@ -1568,6 +1568,168 @@ export type Database = {
           },
         ]
       }
+      label_artists: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          invited_by: string | null
+          label_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          label_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          label_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "label_artists_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      label_invites: {
+        Row: {
+          accepted_by: string | null
+          code: string
+          created_at: string
+          created_by: string
+          email: string | null
+          expires_at: string
+          id: string
+          kind: string
+          label_id: string
+          role: Database["public"]["Enums"]["label_role"]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_by?: string | null
+          code: string
+          created_at?: string
+          created_by: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          kind?: string
+          label_id: string
+          role?: Database["public"]["Enums"]["label_role"]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_by?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          kind?: string
+          label_id?: string
+          role?: Database["public"]["Enums"]["label_role"]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "label_invites_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      label_members: {
+        Row: {
+          created_at: string
+          id: string
+          label_id: string
+          role: Database["public"]["Enums"]["label_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label_id: string
+          role?: Database["public"]["Enums"]["label_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label_id?: string
+          role?: Database["public"]["Enums"]["label_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "label_members_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labels: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          owner_id: string
+          slug: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          slug?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          slug?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       live_submissions: {
         Row: {
           amount_cents: number
@@ -4103,6 +4265,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_label_invite: { Args: { _code: string }; Returns: Json }
       activate_power_up: {
         Args: { _slug: string }
         Returns: {
@@ -4192,6 +4355,16 @@ export type Database = {
           retry_after_secs: number
         }[]
       }
+      create_label: {
+        Args: {
+          _bio?: string
+          _logo_url?: string
+          _name: string
+          _slug?: string
+          _website?: string
+        }
+        Returns: string
+      }
       credit_artist_tip: {
         Args: { _amount_cents: number; _artist_id: string; _source_id: string }
         Returns: undefined
@@ -4241,6 +4414,18 @@ export type Database = {
         }[]
       }
       get_my_artist_dashboard: { Args: never; Returns: Json }
+      get_my_labels: {
+        Args: never
+        Returns: {
+          label_id: string
+          logo_url: string
+          member_count: number
+          name: string
+          role: Database["public"]["Enums"]["label_role"]
+          roster_count: number
+          slug: string
+        }[]
+      }
       get_my_last_seen_at: { Args: never; Returns: string }
       get_my_profile_interests: { Args: never; Returns: string[] }
       get_my_profile_location: { Args: never; Returns: string }
@@ -4295,6 +4480,10 @@ export type Database = {
         Args: { _role?: string; _user_id: string }
         Returns: boolean
       }
+      has_label_access: {
+        Args: { _label_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4317,6 +4506,14 @@ export type Database = {
       is_stream_participant: {
         Args: { _stream_id: string; _user_id: string }
         Returns: boolean
+      }
+      label_manages_artist: {
+        Args: { _artist_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
+      label_role_of: {
+        Args: { _label_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["label_role"]
       }
       log_battle_vote_blocked: {
         Args: { _match_id: string; _metadata?: Json; _reason: string }
@@ -4415,6 +4612,7 @@ export type Database = {
         | "listener"
         | "manager"
       battle_reaction_action: "hype" | "pass"
+      label_role: "owner" | "manager" | "anr" | "finance"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4553,6 +4751,7 @@ export const Constants = {
         "manager",
       ],
       battle_reaction_action: ["hype", "pass"],
+      label_role: ["owner", "manager", "anr", "finance"],
     },
   },
 } as const

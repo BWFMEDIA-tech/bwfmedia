@@ -56,6 +56,7 @@ import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
+import { Route as LabelsIndexRouteImport } from './routes/labels.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
@@ -80,6 +81,8 @@ import { Route as PlayRanksRouteImport } from './routes/play.ranks'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
+import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
+import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -372,6 +375,11 @@ const PlayIndexRoute = PlayIndexRouteImport.update({
   path: '/play/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabelsIndexRoute = LabelsIndexRouteImport.update({
+  id: '/labels/',
+  path: '/labels/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -490,6 +498,16 @@ const PayReturnRoute = PayReturnRouteImport.update({
 const PayBookingIdRoute = PayBookingIdRouteImport.update({
   id: '/pay/$bookingId',
   path: '/pay/$bookingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabelsLabelIdRoute = LabelsLabelIdRouteImport.update({
+  id: '/labels/$labelId',
+  path: '/labels/$labelId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabelInviteCodeRoute = LabelInviteCodeRouteImport.update({
+  id: '/label-invite/$code',
+  path: '/label-invite/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
@@ -872,6 +890,8 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/label-invite/$code': typeof LabelInviteCodeRoute
+  '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -896,6 +916,7 @@ export interface FileRoutesByFullPath {
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1000,6 +1021,8 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/label-invite/$code': typeof LabelInviteCodeRoute
+  '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1024,6 +1047,7 @@ export interface FileRoutesByTo {
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/labels': typeof LabelsIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1130,6 +1154,8 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/label-invite/$code': typeof LabelInviteCodeRoute
+  '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1154,6 +1180,7 @@ export interface FileRoutesById {
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1261,6 +1288,8 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/label-invite/$code'
+    | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1285,6 +1314,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin/'
     | '/blog/'
+    | '/labels/'
     | '/play/'
     | '/videos/'
     | '/.lovable/oauth/consent'
@@ -1389,6 +1419,8 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/label-invite/$code'
+    | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1413,6 +1445,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin'
     | '/blog'
+    | '/labels'
     | '/play'
     | '/videos'
     | '/.lovable/oauth/consent'
@@ -1518,6 +1551,8 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/label-invite/$code'
+    | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1542,6 +1577,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin/'
     | '/blog/'
+    | '/labels/'
     | '/play/'
     | '/videos/'
     | '/.lovable/oauth/consent'
@@ -1624,6 +1660,8 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
+  LabelInviteCodeRoute: typeof LabelInviteCodeRoute
+  LabelsLabelIdRoute: typeof LabelsLabelIdRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
@@ -1633,6 +1671,7 @@ export interface RootRouteChildren {
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  LabelsIndexRoute: typeof LabelsIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -1986,6 +2025,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/labels/': {
+      id: '/labels/'
+      path: '/labels'
+      fullPath: '/labels/'
+      preLoaderRoute: typeof LabelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -2152,6 +2198,20 @@ declare module '@tanstack/react-router' {
       path: '/pay/$bookingId'
       fullPath: '/pay/$bookingId'
       preLoaderRoute: typeof PayBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/labels/$labelId': {
+      id: '/labels/$labelId'
+      path: '/labels/$labelId'
+      fullPath: '/labels/$labelId'
+      preLoaderRoute: typeof LabelsLabelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/label-invite/$code': {
+      id: '/label-invite/$code'
+      path: '/label-invite/$code'
+      fullPath: '/label-invite/$code'
+      preLoaderRoute: typeof LabelInviteCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$code': {
@@ -2718,6 +2778,8 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
+  LabelInviteCodeRoute: LabelInviteCodeRoute,
+  LabelsLabelIdRoute: LabelsLabelIdRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
@@ -2727,6 +2789,7 @@ const rootRouteChildren: RootRouteChildren = {
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
   BlogIndexRoute: BlogIndexRoute,
+  LabelsIndexRoute: LabelsIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
