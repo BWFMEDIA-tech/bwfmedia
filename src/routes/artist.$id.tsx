@@ -107,7 +107,7 @@ function ArtistProfilePage() {
   const artist: ArtistView = {
     id,
     name,
-    handle: "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, ""),
+    handle: meta?.name ? "@" + name.toLowerCase().replace(/[^a-z0-9]+/g, "") : "",
     photo: meta?.photo ?? null,
     banner: meta?.banner ?? null,
   };
@@ -161,7 +161,7 @@ function ArtistProfilePage() {
             </>
           )}
         </div>
-        <aside className="space-y-4">
+        <aside className={`space-y-4${isBlank && !isOwner ? " hidden" : ""}`}>
           <SupportArtist
             tip={tip}
             setTip={setTip}
@@ -210,7 +210,7 @@ function HeroBanner({
               <h1 className="font-anton text-4xl md:text-5xl uppercase tracking-tight truncate">{artist.name}</h1>
               <RankBadge userId={artist.id} size="xl" />
             </div>
-            <div className="text-sm text-white/60 mt-1">{artist.handle}</div>
+            {artist.handle && <div className="text-sm text-white/60 mt-1">{artist.handle}</div>}
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
               {location && (
                 <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> {location}</span>
