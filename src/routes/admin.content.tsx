@@ -54,7 +54,7 @@ function ContentAdmin() {
           <div className="mt-3 font-bold">Stream Recordings</div>
           <div className="text-xs text-white/50">Past live broadcasts and replays.</div>
         </Link>
-        <Link to="/admin/content" search={{ tab: "distribution" }} className="rounded-2xl border border-white/10 bg-[#0d0d18] p-6 transition hover:border-cyan-500/40">
+        <Link to="/admin/content" search={{ tab: "distribution", type: undefined }} className="rounded-2xl border border-white/10 bg-[#0d0d18] p-6 transition hover:border-cyan-500/40">
           <Disc3 className="h-6 w-6 text-cyan-400" />
           <div className="mt-3 font-bold">Distribution Queue</div>
           <div className="text-xs text-white/50">Review artist release submissions.</div>
