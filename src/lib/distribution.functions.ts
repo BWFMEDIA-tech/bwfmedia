@@ -34,6 +34,7 @@ const ReleaseSchema = z.object({
   songwriters: z.array(z.string().min(1).max(120)).max(30).optional(),
   producers: z.array(z.string().min(1).max(120)).max(30).optional(),
   upc: z.string().max(30).nullable().optional(),
+  dsp_targets: z.array(z.string().max(40)).max(20).optional(),
 });
 
 function validateSplits(splits: z.infer<typeof SplitSchema>[] | undefined) {
@@ -244,4 +245,75 @@ export const reviewRelease = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Release not found");
     return row;
+  });
+
+// ---------- Phase 2: artist distribution dashboard ----------
+
+export const DSP_PLATFORMS = [
+  { id: "spotify", label: "Spotify" },
+  { id: "apple-music", label: "Apple Music" },
+  { id: "amazon-music", label: "Amazon Music" },
+  { id: "youtube-music", label: "YouTube Music" },
+  { id: "tidal", label: "TIDAL" },
+  { id: "deezer", label: "Deezer" },
+] as const;
+
+export const setReleaseDspTargets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.string().uuid(), dsp_targets: z.array(z.string().max(40)).max(20) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase
+      .from("distribution_releases")
+      .update({ dsp_targets: data.dsp_targets })
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .select()
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Release not found");
+    return row;
+  });
+
+export const getDistributionOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: releases, error } = await context.supabase
+      .from("distribution_releases")
+      .select("id, status, upc, submitted_at, created_at, reviewed_at")
+      .eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+
+    const ids = (releases ?? []).map((r: any) => r.id);
+    let trackCount = 0;
+    if (ids.length) {
+      const { count } = await context.supabase
+        .from("distribution_release_tracks")
+        .select("id", { count: "exact", head: true })
+        .in("release_id", ids);
+      trackCount = count ?? 0;
+    }
+
+    const counts: Record<string, number> = { draft: 0, submitted: 0, approved: 0, rejected: 0, live: 0 };
+    for (const r of releases ?? []) counts[r.status] = (counts[r.status] ?? 0) + 1;
+
+    let earnings: any = null;
+    const { data: bal } = await context.supabase.rpc("get_creator_balance_cents", { _user_id: context.userId });
+    if (Array.isArray(bal)) earnings = bal[0] ?? null;
+    else if (bal) earnings = bal;
+
+    const lastActivity = (releases ?? [])
+      .map((r: any) => r.reviewed_at || r.submitted_at || r.created_at)
+      .filter(Boolean)
+      .sort()
+      .pop() ?? null;
+
+    return {
+      total: releases?.length ?? 0,
+      counts,
+      trackCount,
+      lastActivity,
+      earnings,
+    };
   });

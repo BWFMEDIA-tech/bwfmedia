@@ -164,6 +164,7 @@ function ArtistDashboardPage() {
             <li>• <Link to="/settings/profile" className="hover:text-white">Complete your profile</Link></li>
             <li>• <Link to="/settings/music-media" className="hover:text-white">Upload your first single</Link></li>
             <li>• <Link to="/settings/social-links" className="hover:text-white">Connect social links</Link></li>
+            <li>• <Link to="/distribution" className="hover:text-white">Distribute your music to streaming platforms</Link></li>
           </ul>
         </div>
         <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
