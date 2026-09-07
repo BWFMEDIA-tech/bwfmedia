@@ -116,6 +116,20 @@ function ArtistProfilePage() {
     [name],
   );
 
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-[#070708] text-white grid place-items-center px-6">
+        <div className="max-w-md w-full rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+          <h1 className="font-anton text-3xl uppercase">Profile not found</h1>
+          <p className="mt-2 text-sm text-white/60">This artist page doesn’t exist or has been removed.</p>
+          <Link to="/artists" className="mt-5 inline-block rounded-full px-5 py-2 text-sm font-semibold text-black" style={{ background: RED }}>
+            Browse artists
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#070708] text-white pb-28">
       <main className="mx-auto max-w-[1400px] px-4 md:px-6 py-6 grid gap-6 lg:grid-cols-[1fr_340px]">
