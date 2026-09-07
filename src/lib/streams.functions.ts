@@ -11,14 +11,14 @@ async function assertCanBroadcast(supabase: any, userId: string) {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId);
-  // Artists are NOT broadcasters — they may only join existing stages as
-  // guests via stage_participants. Starting/ending a stream is restricted to
-  // platform staff (admin / host / manager).
+  // Artists can go live from their own profile (Instagram/TikTok style).
+  // Platform staff (admin / host / manager) keep full studio broadcasting.
   const ok = (roles ?? []).some((r: any) =>
-    r.role === "admin" || r.role === "host" || r.role === "manager",
+    r.role === "admin" || r.role === "host" || r.role === "manager" || r.role === "artist",
   );
   if (!ok) throw new Error("Not authorized to start streams");
 }
+
 
 export const startOrResumeStream = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

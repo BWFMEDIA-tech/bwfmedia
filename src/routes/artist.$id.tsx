@@ -27,6 +27,7 @@ import { useAudioPeaks } from "@/lib/useAudioPeaks";
 import { FollowersModal } from "@/components/artist/FollowersModal";
 import { SignedImg } from "@/components/ui/signed-img";
 import { TipModal } from "@/components/stream/TipModal";
+import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -124,6 +125,7 @@ function ArtistProfilePage() {
             memberSince={meta?.memberSince ?? null}
             isOwner={isOwner}
           />
+          <ProfileLiveBar artistId={id} isOwner={isOwner} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
