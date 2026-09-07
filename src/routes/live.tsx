@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
 import { deleteStream } from "@/lib/streams.functions";
 import { useAuth } from "@/lib/auth-context";
+import { LIVE_CATEGORIES, liveCategoryLabel } from "@/lib/live-categories";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -40,6 +41,10 @@ function LivePage() {
   const isAdmin = auth.roles?.includes("admin");
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const visibleStreams = activeCategory === "all"
+    ? streams
+    : streams.filter((s) => (s.category ?? "") === activeCategory);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,8 +136,8 @@ function LivePage() {
                     </span>
                   </div>
                   {s.category && (
-                    <span className="mt-3 inline-block rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold text-white/60">
-                      {s.category}
+                    <span className="mt-3 inline-block rounded-md bg-[#C53DFF]/15 border border-[#C53DFF]/30 px-2 py-1 text-[10px] font-semibold text-[#C53DFF]">
+                      {liveCategoryLabel(s.category)}
                     </span>
                   )}
                 </div>
