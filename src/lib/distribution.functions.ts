@@ -450,6 +450,12 @@ export const approveReleaseTakedown = createServerFn({ method: "POST" })
       _release_id: data.id,
     });
     if (error) throw new Error(error.message);
+    await logAdminAction(context, {
+      action: "takedown_approved",
+      releaseId: data.id,
+      summary: "Artist takedown request approved",
+      metadata: result as Record<string, unknown>,
+    });
     return result as { tracks_removed: number };
   });
 
