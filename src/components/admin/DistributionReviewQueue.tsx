@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Check, X, Rocket, ChevronDown, ChevronUp, Music2, Disc3, Fingerprint, ShieldCheck, ShieldAlert, Radio, PackageX } from "lucide-react";
+import { Check, X, Rocket, ChevronDown, ChevronUp, Music2, Disc3, Fingerprint, ShieldCheck, ShieldAlert, Radio, PackageX, Search, History, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { listDistributionQueue, reviewRelease, assignReleaseIdentifiers, deliverRelease, approveReleaseTakedown, type ReleaseStatus } from "@/lib/distribution.functions";
+import { listDistributionQueue, reviewRelease, assignReleaseIdentifiers, deliverRelease, approveReleaseTakedown, getDistributionAdminStats, listReleaseAuditLog, adminTakedownRelease, type ReleaseStatus } from "@/lib/distribution.functions";
 import { Card, EmptyState } from "./AdminShell";
 
 const FILTERS: { key: ReleaseStatus | "all"; label: string }[] = [
@@ -26,16 +26,55 @@ const STATUS_STYLES: Record<string, string> = {
 export function DistributionReviewQueue() {
   const qc = useQueryClient();
   const fetchQueue = useServerFn(listDistributionQueue);
+  const fetchStats = useServerFn(getDistributionAdminStats);
   const [filter, setFilter] = useState<ReleaseStatus | "all">("submitted");
+  const [search, setSearch] = useState("");
 
   const queue = useQuery({
     queryKey: ["admin-distribution-queue", filter],
     queryFn: () => fetchQueue({ data: { status: filter === "all" ? undefined : filter } }),
   });
 
+  const stats = useQuery({
+    queryKey: ["admin-distribution-stats"],
+    queryFn: () => fetchStats(),
+  });
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["admin-distribution-queue"] });
+    qc.invalidateQueries({ queryKey: ["admin-distribution-stats"] });
+  };
+
+  const term = search.trim().toLowerCase();
+  const rows = (queue.data ?? []).filter((r: any) =>
+    !term ||
+    r.title?.toLowerCase().includes(term) ||
+    r.artist_name?.toLowerCase().includes(term) ||
+    r.upc?.toLowerCase().includes(term),
+  );
+
+  const s = stats.data as any;
+
   return (
     <div>
-      <div className="mb-4 flex flex-wrap gap-2">
+      {s && (
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <StatTile label="Pending review" value={s.counts?.submitted ?? 0} accent="text-amber-300" />
+          <StatTile label="Approved" value={s.counts?.approved ?? 0} accent="text-emerald-300" />
+          <StatTile label="Live" value={s.counts?.live ?? 0} accent="text-cyan-300" />
+          <StatTile label="Rejected" value={s.counts?.rejected ?? 0} accent="text-red-300" />
+          <StatTile label="Takedown requests" value={s.takedowns ?? 0} accent="text-[#FF00A6]" />
+        </div>
+      )}
+
+      {s?.oldestPending && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          <Clock className="h-3.5 w-3.5" />
+          Oldest release still waiting: submitted {new Date(s.oldestPending).toLocaleDateString()}
+        </div>
+      )}
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -47,21 +86,35 @@ export function DistributionReviewQueue() {
             {f.label}
           </button>
         ))}
+        <div className="relative ml-auto min-w-[200px] flex-1 sm:max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/30" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search title, artist or UPC…"
+            className="w-full rounded-full border border-white/10 bg-white/5 py-1.5 pl-9 pr-3 text-xs outline-none placeholder:text-white/30 focus:border-cyan-500/50"
+          />
+        </div>
       </div>
 
-      {queue.data?.length === 0 && (
+      {rows.length === 0 && (
         <EmptyState icon={Disc3} title="Nothing here" hint="No releases match this filter yet." />
       )}
 
       <div className="space-y-4">
-        {queue.data?.map((r: any) => (
-          <QueueCard
-            key={r.id}
-            release={r}
-            onChanged={() => qc.invalidateQueries({ queryKey: ["admin-distribution-queue"] })}
-          />
+        {rows.map((r: any) => (
+          <QueueCard key={r.id} release={r} onChanged={refresh} />
         ))}
       </div>
+    </div>
+  );
+}
+
+function StatTile({ label, value, accent }: { label: string; value: number; accent: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-[#0d0d18] px-3 py-2.5">
+      <div className={`text-xl font-black ${accent}`}>{value}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">{label}</div>
     </div>
   );
 }
@@ -79,6 +132,34 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
   const assignIds = useServerFn(assignReleaseIdentifiers);
   const deliver = useServerFn(deliverRelease);
   const approveTakedown = useServerFn(approveReleaseTakedown);
+  const forceTakedown = useServerFn(adminTakedownRelease);
+  const fetchHistory = useServerFn(listReleaseAuditLog);
+  const [showHistory, setShowHistory] = useState(false);
+  const [forcing, setForcing] = useState(false);
+  const [forceReason, setForceReason] = useState("");
+
+  const history = useQuery({
+    queryKey: ["release-audit", release.id],
+    queryFn: () => fetchHistory({ data: { release_id: release.id } }),
+    enabled: showHistory,
+  });
+
+  async function runForceTakedown() {
+    setBusy(true);
+    try {
+      const res: any = await forceTakedown({ data: { id: release.id, reason: forceReason.trim() } });
+      toast.success(`Release removed — ${res?.tracks_removed ?? 0} track(s) pulled from the catalog`);
+      setForcing(false);
+      setForceReason("");
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Takedown failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+
 
   async function runDelivery() {
     setBusy(true);
@@ -321,7 +402,64 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
                 <Rocket className="h-3.5 w-3.5" /> Mark as Live
               </button>
             )}
+            {release.status === "live" && release.takedown_status !== "requested" && (
+              <button
+                onClick={() => setForcing((v) => !v)}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-md border border-[#FF00A6]/40 px-4 py-2 text-xs font-bold text-[#FF00A6] hover:bg-[#FF00A6]/10 disabled:opacity-50"
+              >
+                <PackageX className="h-3.5 w-3.5" /> Take down
+              </button>
+            )}
+            <button
+              onClick={() => setShowHistory((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-4 py-2 text-xs font-bold text-white/70 hover:text-white"
+            >
+              <History className="h-3.5 w-3.5" /> {showHistory ? "Hide history" : "History"}
+            </button>
           </div>
+
+          {forcing && (
+            <div className="mt-3 rounded-lg border border-[#FF00A6]/30 bg-[#FF00A6]/5 p-3">
+              <div className="mb-2 text-xs font-bold text-[#FF00A6]">Remove this release from Tunevio</div>
+              <textarea
+                value={forceReason}
+                onChange={(e) => setForceReason(e.target.value)}
+                rows={2}
+                placeholder="Reason (shown to the artist) — e.g. copyright claim, policy violation…"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none placeholder:text-white/30 focus:border-[#FF00A6]/50"
+              />
+              <button
+                onClick={runForceTakedown}
+                disabled={busy || forceReason.trim().length < 3}
+                className="mt-2 rounded-md bg-[#FF00A6] px-4 py-2 text-xs font-bold text-black hover:bg-[#ff33b8] disabled:opacity-40"
+              >
+                Confirm takedown
+              </button>
+            </div>
+          )}
+
+          {showHistory && (
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-white/40">Moderation history</div>
+              {history.isLoading && <div className="text-xs text-white/40">Loading…</div>}
+              {history.data?.length === 0 && <div className="text-xs text-white/40">No recorded actions yet.</div>}
+              <div className="space-y-1.5">
+                {(history.data ?? []).map((h: any) => (
+                  <div key={h.id} className="flex flex-wrap items-baseline gap-2 text-xs">
+                    <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/70">
+                      {h.action.replace(/_/g, " ")}
+                    </span>
+                    <span className="text-white/70">{h.summary}</span>
+                    <span className="ml-auto text-[10px] text-white/35">
+                      {h.actor_email ? `${h.actor_email} · ` : ""}
+                      {new Date(h.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Card>
