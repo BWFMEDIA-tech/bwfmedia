@@ -124,6 +124,7 @@ function ArtistProfilePage() {
             memberSince={meta?.memberSince ?? null}
             isOwner={isOwner}
           />
+          <ProfileLiveBar artistId={id} isOwner={isOwner} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
