@@ -236,7 +236,7 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
             {release.genre && <div>Genre: <span className="text-white/80">{release.genre}</span></div>}
             {release.release_date && <div>Date: <span className="text-white/80">{release.release_date}</span></div>}
             {release.label_name && <div>Label: <span className="text-white/80">{release.label_name}</span></div>}
-            <div>Explicit: <span className="text-white/80">{release.is_explicit ? "Yes" : "No"}</span></div>}
+            <div>Explicit: <span className="text-white/80">{release.is_explicit ? "Yes" : "No"}</span></div>
             {release.songwriters?.length > 0 && <div className="col-span-2">Writers: <span className="text-white/80">{release.songwriters.join(", ")}</span></div>}
             {release.producers?.length > 0 && <div className="col-span-2">Producers: <span className="text-white/80">{release.producers.join(", ")}</span></div>}
           </div>
