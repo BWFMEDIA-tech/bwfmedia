@@ -6,10 +6,10 @@ export const LABEL_ROLES = ["owner", "manager", "anr", "finance"] as const;
 export type LabelRole = (typeof LABEL_ROLES)[number];
 
 export const LABEL_ROLE_META: Record<LabelRole, { label: string; blurb: string; color: string }> = {
-  owner: { label: "Owner", blurb: "Full control of the label, team and roster", color: "#C53DFF" },
-  manager: { label: "Manager", blurb: "Edit and submit releases, manage roster", color: "#00E6FF" },
-  anr: { label: "A&R", blurb: "View releases and manage the roster", color: "#FF00A6" },
-  finance: { label: "Finance", blurb: "View releases and earnings only", color: "#4ade80" },
+  owner: { label: "Owner", blurb: "Everything — full control of the label, team, roster and releases", color: "#C53DFF" },
+  manager: { label: "Manager", blurb: "Edit and submit releases, manage the roster", color: "#00E6FF" },
+  anr: { label: "A&R", blurb: "View releases, view and manage artist relationships — no release editing, no financial access", color: "#FF00A6" },
+  finance: { label: "Finance", blurb: "Earnings and royalties only — no release editing, no roster management", color: "#4ade80" },
 };
 
 export const LABEL_PERMISSIONS = {
@@ -17,6 +17,7 @@ export const LABEL_PERMISSIONS = {
   manageTeam: ["owner", "manager"],
   manageRoster: ["owner", "manager", "anr"],
   editReleases: ["owner", "manager"],
+  viewReleases: ["owner", "manager", "anr"],
   viewEarnings: ["owner", "manager", "finance"],
 } as const;
 
