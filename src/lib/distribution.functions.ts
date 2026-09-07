@@ -416,6 +416,12 @@ export const deliverRelease = createServerFn({ method: "POST" })
       _release_id: data.id,
     });
     if (error) throw new Error(error.message);
+    await logAdminAction(context, {
+      action: "release_delivered",
+      releaseId: data.id,
+      summary: `Delivered to the Tunevio network`,
+      metadata: result as Record<string, unknown>,
+    });
     return result as { tracks_published: number; destinations: number };
   });
 
