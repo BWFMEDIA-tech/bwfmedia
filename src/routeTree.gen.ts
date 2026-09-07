@@ -35,6 +35,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as GoLiveRouteImport } from './routes/go-live'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EarningsRouteImport } from './routes/earnings'
@@ -268,6 +269,11 @@ const LiveRoute = LiveRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoLiveRoute = GoLiveRouteImport.update({
+  id: '/go-live',
+  path: '/go-live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -827,6 +833,7 @@ export interface FileRoutesByFullPath {
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/go-live': typeof GoLiveRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -958,6 +965,7 @@ export interface FileRoutesByTo {
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/go-live': typeof GoLiveRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -1091,6 +1099,7 @@ export interface FileRoutesById {
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/go-live': typeof GoLiveRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -1225,6 +1234,7 @@ export interface FileRouteTypes {
     | '/earnings'
     | '/events'
     | '/forgot-password'
+    | '/go-live'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1356,6 +1366,7 @@ export interface FileRouteTypes {
     | '/earnings'
     | '/events'
     | '/forgot-password'
+    | '/go-live'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1488,6 +1499,7 @@ export interface FileRouteTypes {
     | '/earnings'
     | '/events'
     | '/forgot-password'
+    | '/go-live'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1621,6 +1633,7 @@ export interface RootRouteChildren {
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  GoLiveRoute: typeof GoLiveRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
@@ -1876,6 +1889,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/go-live': {
+      id: '/go-live'
+      path: '/go-live'
+      fullPath: '/go-live'
+      preLoaderRoute: typeof GoLiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -2736,6 +2756,7 @@ const rootRouteChildren: RootRouteChildren = {
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  GoLiveRoute: GoLiveRoute,
   LeaderboardRoute: LeaderboardRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
