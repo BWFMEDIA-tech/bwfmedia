@@ -634,8 +634,8 @@ function EditReleaseForm({ release, onDone }: { release: any; onDone: () => void
             language: form.language || "en",
             upc: form.upc || null,
             is_explicit: form.is_explicit,
-            songwriters: form.songwriters ? form.songwriters.split(",").map((s) => s.trim()).filter(Boolean) : [],
-            producers: form.producers ? form.producers.split(",").map((s) => s.trim()).filter(Boolean) : [],
+            songwriters: form.songwriters ? String(form.songwriters).split(",").map((s: string) => s.trim()).filter(Boolean) : [],
+            producers: form.producers ? String(form.producers).split(",").map((s: string) => s.trim()).filter(Boolean) : [],
           },
         },
       });
