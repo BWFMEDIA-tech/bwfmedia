@@ -115,7 +115,7 @@ export const updateRelease = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid(), patch: ReleaseSchema.partial() }).parse(input))
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = { ...data.patch };
+    const patch: any = { ...data.patch };
     if (Array.isArray(data.patch.writer_credits)) {
       const total = data.patch.writer_credits.reduce((sum, w) => sum + w.share, 0);
       if (total > 100.0001) throw new Error(`Writer shares total ${total}% — must not exceed 100%`);
