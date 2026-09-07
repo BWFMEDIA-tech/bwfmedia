@@ -441,3 +441,105 @@ export const approveReleaseTakedown = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return result as { tracks_removed: number };
   });
+
+// ---------- Phase 7: admin moderation, approvals & takedowns ----------
+
+async function logAdminAction(
+  ctx: { supabase: any; userId: string; claims?: any },
+  args: { action: string; releaseId: string; summary: string; metadata?: Record<string, unknown> },
+) {
+  try {
+    await ctx.supabase.from("admin_audit_log").insert({
+      actor_id: ctx.userId,
+      actor_email: ctx.claims?.email ?? null,
+      action: args.action,
+      category: "distribution",
+      target_type: "distribution_release",
+      target_id: args.releaseId,
+      summary: args.summary,
+      metadata: args.metadata ?? {},
+    });
+  } catch {
+    // logging must never block a moderation action
+  }
+}
+
+/** Admin: counts for the distribution review queue. */
+export const getDistributionAdminStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context);
+    const { data: rows, error } = await context.supabase
+      .from("distribution_releases")
+      .select("status, takedown_status, submitted_at");
+    if (error) throw new Error(error.message);
+
+    const counts: Record<string, number> = { draft: 0, submitted: 0, approved: 0, rejected: 0, live: 0 };
+    let takedowns = 0;
+    let oldestPending: string | null = null;
+    for (const r of rows ?? []) {
+      counts[r.status] = (counts[r.status] ?? 0) + 1;
+      if (r.takedown_status === "requested") takedowns += 1;
+      if (r.status === "submitted" && r.submitted_at) {
+        if (!oldestPending || r.submitted_at < oldestPending) oldestPending = r.submitted_at;
+      }
+    }
+    return { total: rows?.length ?? 0, counts, takedowns, oldestPending };
+  });
+
+/** Admin: moderation history for one release. */
+export const listReleaseAuditLog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ release_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: rows, error } = await context.supabase
+      .from("admin_audit_log")
+      .select("id, action, summary, actor_email, created_at, metadata")
+      .eq("category", "distribution")
+      .eq("target_id", data.release_id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+/** Admin: pull a live release out of the catalog without waiting for an artist request. */
+export const adminTakedownRelease = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.string().uuid(), reason: z.string().min(3).max(1000) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: result, error } = await context.supabase.rpc("admin_takedown_release", {
+      _release_id: data.id,
+      _reason: data.reason,
+    });
+    if (error) throw new Error(error.message);
+    await logAdminAction(context, {
+      action: "takedown_forced",
+      releaseId: data.id,
+      summary: `Admin takedown: ${data.reason}`,
+      metadata: result as Record<string, unknown>,
+    });
+    return result as { tracks_removed: number };
+  });
+
+/** Admin: record a moderation action from the review queue. */
+export const recordDistributionAction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        action: z.string().min(1).max(60),
+        summary: z.string().max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    await logAdminAction(context, { action: data.action, releaseId: data.id, summary: data.summary });
+    return { ok: true };
+  });
