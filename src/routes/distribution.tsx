@@ -176,12 +176,6 @@ function DistributionPage() {
   );
 }
 
-async function uploadAsset(userId: string, file: File) {
-  const path = `${userId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-  const { error } = await supabase.storage.from("distribution-assets").upload(path, file);
-  if (error) throw new Error(error.message);
-  return `distribution-assets:${path}`;
-}
 
 function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
   const auth = useAuth();
