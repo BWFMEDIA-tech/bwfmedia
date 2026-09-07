@@ -391,10 +391,48 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
   );
 }
 
-function TrackRow({ track, editable, onChanged }: { track: any; editable: boolean; onChanged: () => void }) {
+function TrackRow({
+  track, editable, onChanged, neighbours,
+}: {
+  track: any; editable: boolean; onChanged: () => void;
+  neighbours?: { prev: any | null; next: any | null };
+}) {
   const remove = useServerFn(deleteReleaseTrack);
+  const patch = useServerFn(updateReleaseTrack);
+
+  async function swap(other: any) {
+    if (!other) return;
+    try {
+      await patch({ data: { id: track.id, patch: { track_number: other.track_number } } });
+      await patch({ data: { id: other.id, patch: { track_number: track.track_number } } });
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not reorder");
+    }
+  }
+
   return (
     <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm">
+      {editable && (
+        <div className="flex flex-col">
+          <button
+            onClick={() => swap(neighbours?.prev)}
+            disabled={!neighbours?.prev}
+            className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
+            aria-label="Move track up"
+          >
+            <ArrowUp className="h-3 w-3" />
+          </button>
+          <button
+            onClick={() => swap(neighbours?.next)}
+            disabled={!neighbours?.next}
+            className="text-white/30 hover:text-[#00E6FF] disabled:opacity-20"
+            aria-label="Move track down"
+          >
+            <ArrowDown className="h-3 w-3" />
+          </button>
+        </div>
+      )}
       <span className="w-6 text-center text-xs text-white/40">{track.track_number}</span>
       <div className="min-w-0 flex-1">
         <div className="truncate font-semibold">{track.title}</div>
