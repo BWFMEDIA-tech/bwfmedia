@@ -9,7 +9,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import {
   getLabel, updateLabel, createLabelInvite, revokeLabelInvite,
-  setMemberRole, removeMember, setRosterStatus,
+  setMemberRole, removeMember, setRosterStatus, getLabelEarnings,
   LABEL_ROLES, LABEL_ROLE_META, labelCan, type LabelRole,
 } from "@/lib/labels.functions";
 
@@ -41,7 +41,7 @@ function LabelWorkspace() {
   const auth = useAuth();
   const qc = useQueryClient();
   const fetchLabel = useServerFn(getLabel);
-  const [tab, setTab] = useState<"team" | "roster" | "releases" | "settings">("team");
+  const [tab, setTab] = useState<"team" | "roster" | "releases" | "earnings" | "settings">("team");
 
   const q = useQuery({
     queryKey: ["label", labelId],
@@ -76,6 +76,17 @@ function LabelWorkspace() {
   const { label, role, members, roster, invites, releases } = q.data as any;
   const myRole = role as LabelRole;
 
+  const visibleTabs = (
+    [
+      { id: "team", show: myRole !== "finance" },
+      { id: "roster", show: myRole !== "finance" },
+      { id: "releases", show: labelCan(myRole, "viewReleases") },
+      { id: "earnings", show: labelCan(myRole, "viewEarnings") },
+      { id: "settings", show: labelCan(myRole, "editLabel") },
+    ] as const
+  ).filter((t) => t.show);
+  const activeTab = visibleTabs.some((t) => t.id === tab) ? tab : visibleTabs[0]?.id ?? "earnings";
+
   return (
     <div className="min-h-screen bg-[#050509] text-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -96,35 +107,99 @@ function LabelWorkspace() {
             <span
               className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
               style={{ background: `${LABEL_ROLE_META[myRole].color}22`, color: LABEL_ROLE_META[myRole].color }}
+              title={LABEL_ROLE_META[myRole].blurb}
             >
               <ShieldCheck className="w-3 h-3" /> {LABEL_ROLE_META[myRole].label}
             </span>
+            <p className="text-[11px] text-white/40 mt-1">{LABEL_ROLE_META[myRole].blurb}</p>
           </div>
         </div>
 
         <div className="flex gap-2 mb-6 overflow-x-auto">
-          {(["team", "roster", "releases", "settings"] as const).map((t) => (
+          {visibleTabs.map((t) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={t.id}
+              onClick={() => setTab(t.id as typeof tab)}
               className={`px-4 py-2 rounded-full text-sm font-semibold capitalize whitespace-nowrap transition ${
-                tab === t ? "bg-[#C53DFF] text-white" : "bg-white/5 text-white/60 hover:text-white"
+                activeTab === t.id ? "bg-[#C53DFF] text-white" : "bg-white/5 text-white/60 hover:text-white"
               }`}
             >
-              {t}
+              {t.id}
             </button>
           ))}
         </div>
 
-        {tab === "team" && (
+        {activeTab === "team" && (
           <TeamTab labelId={labelId} myRole={myRole} members={members} invites={invites} onChanged={refresh} />
         )}
-        {tab === "roster" && (
+        {activeTab === "roster" && (
           <RosterTab labelId={labelId} myRole={myRole} roster={roster} invites={invites} onChanged={refresh} />
         )}
-        {tab === "releases" && <ReleasesTab releases={releases} myRole={myRole} />}
-        {tab === "settings" && <SettingsTab label={label} myRole={myRole} onChanged={refresh} />}
+        {activeTab === "releases" && <ReleasesTab releases={releases} myRole={myRole} />}
+        {activeTab === "earnings" && <EarningsTab labelId={labelId} myRole={myRole} />}
+        {activeTab === "settings" && <SettingsTab label={label} myRole={myRole} onChanged={refresh} />}
       </div>
+    </div>
+  );
+}
+
+function EarningsTab({ labelId, myRole }: { labelId: string; myRole: LabelRole }) {
+  const fetchEarnings = useServerFn(getLabelEarnings);
+  const q = useQuery({
+    queryKey: ["label-earnings", labelId],
+    queryFn: () => fetchEarnings({ data: { id: labelId } }),
+    retry: false,
+  });
+  if (!labelCan(myRole, "viewEarnings")) {
+    return <p className="text-sm text-white/50">Your role does not include financial access.</p>;
+  }
+  if (q.isError) {
+    return <p className="text-sm text-red-400">{(q.error as any)?.message ?? "Could not load earnings"}</p>;
+  }
+  if (!q.data) return <p className="text-sm text-white/50">Loading earnings…</p>;
+  const { artists, totals } = q.data as any;
+  const money = (c: number) => `$${(c / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Total royalties", value: money(totals.total_cents), color: "#C53DFF" },
+          { label: "Paid out", value: money(totals.paid_cents), color: "#4ade80" },
+          { label: "Pending", value: money(totals.pending_cents), color: "#fbbf24" },
+          { label: "Streams", value: Number(totals.total_streams).toLocaleString(), color: "#00E6FF" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <p className="text-[11px] uppercase tracking-wider text-white/40">{s.label}</p>
+            <p className="text-xl font-black mt-1" style={{ color: s.color }}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+        <h3 className="font-bold mb-3">Per-artist royalties</h3>
+        {artists.length === 0 && (
+          <p className="text-sm text-white/50">No royalty activity for your roster yet. Earnings appear here once streams generate revenue.</p>
+        )}
+        <div className="space-y-2">
+          {artists.map((a: any) => (
+            <div key={a.artist_id} className="flex items-center gap-3 rounded-xl bg-black/30 border border-white/5 p-3">
+              {a.profile?.avatar_url ? (
+                <img src={a.profile.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-white/10" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold truncate">{a.profile?.display_name ?? "Artist"}</p>
+                <p className="text-[11px] text-white/40">{Number(a.total_streams).toLocaleString()} streams · {a.months} month{a.months === 1 ? "" : "s"}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-[#4ade80]">{money(a.total_cents)}</p>
+                <p className="text-[11px] text-white/40">{money(a.pending_cents)} pending</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="text-[11px] text-white/30">Finance seats are read-only: earnings and royalties only, no release editing or roster management.</p>
     </div>
   );
 }

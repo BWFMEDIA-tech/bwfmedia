@@ -6,10 +6,10 @@ export const LABEL_ROLES = ["owner", "manager", "anr", "finance"] as const;
 export type LabelRole = (typeof LABEL_ROLES)[number];
 
 export const LABEL_ROLE_META: Record<LabelRole, { label: string; blurb: string; color: string }> = {
-  owner: { label: "Owner", blurb: "Full control of the label, team and roster", color: "#C53DFF" },
-  manager: { label: "Manager", blurb: "Edit and submit releases, manage roster", color: "#00E6FF" },
-  anr: { label: "A&R", blurb: "View releases and manage the roster", color: "#FF00A6" },
-  finance: { label: "Finance", blurb: "View releases and earnings only", color: "#4ade80" },
+  owner: { label: "Owner", blurb: "Everything — full control of the label, team, roster and releases", color: "#C53DFF" },
+  manager: { label: "Manager", blurb: "Edit and submit releases, manage the roster", color: "#00E6FF" },
+  anr: { label: "A&R", blurb: "View releases, view and manage artist relationships — no release editing, no financial access", color: "#FF00A6" },
+  finance: { label: "Finance", blurb: "Earnings and royalties only — no release editing, no roster management", color: "#4ade80" },
 };
 
 export const LABEL_PERMISSIONS = {
@@ -17,6 +17,7 @@ export const LABEL_PERMISSIONS = {
   manageTeam: ["owner", "manager"],
   manageRoster: ["owner", "manager", "anr"],
   editReleases: ["owner", "manager"],
+  viewReleases: ["owner", "manager", "anr"],
   viewEarnings: ["owner", "manager", "finance"],
 } as const;
 
@@ -148,7 +149,7 @@ export const getLabel = createServerFn({ method: "GET" })
 
     const activeArtistIds = rosterRows.filter((r) => r.status === "active").map((r) => r.artist_id);
     let releases: any[] = [];
-    if (activeArtistIds.length) {
+    if (labelCan(role, "viewReleases") && activeArtistIds.length) {
       const { data: rel } = await context.supabase
         .from("distribution_releases")
         .select("id, title, artist_name, status, release_type, artwork_url, release_date, user_id, created_at")
@@ -314,4 +315,35 @@ export const leaveLabel = createServerFn({ method: "POST" })
       .eq("artist_id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+// ---------- Earnings ----------
+
+export const getLabelEarnings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => uuid.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireRole(context, data.id, "viewEarnings");
+    const { data: rows, error } = await context.supabase.rpc("get_label_earnings", { _label_id: data.id });
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as Array<{
+      artist_id: string;
+      total_cents: number;
+      paid_cents: number;
+      pending_cents: number;
+      total_streams: number;
+      months: number;
+    }>;
+    const profiles = await profileMap(context, list.map((r) => r.artist_id));
+    const artists = list.map((r) => ({ ...r, profile: profiles.get(r.artist_id) ?? null }));
+    const totals = artists.reduce(
+      (acc, r) => ({
+        total_cents: acc.total_cents + Number(r.total_cents),
+        paid_cents: acc.paid_cents + Number(r.paid_cents),
+        pending_cents: acc.pending_cents + Number(r.pending_cents),
+        total_streams: acc.total_streams + Number(r.total_streams),
+      }),
+      { total_cents: 0, paid_cents: 0, pending_cents: 0, total_streams: 0 },
+    );
+    return { artists, totals };
   });
