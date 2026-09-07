@@ -316,3 +316,34 @@ export const leaveLabel = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- Earnings ----------
+
+export const getLabelEarnings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => uuid.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireRole(context, data.id, "viewEarnings");
+    const { data: rows, error } = await context.supabase.rpc("get_label_earnings", { _label_id: data.id });
+    if (error) throw new Error(error.message);
+    const list = (rows ?? []) as Array<{
+      artist_id: string;
+      total_cents: number;
+      paid_cents: number;
+      pending_cents: number;
+      total_streams: number;
+      months: number;
+    }>;
+    const profiles = await profileMap(context, list.map((r) => r.artist_id));
+    const artists = list.map((r) => ({ ...r, profile: profiles.get(r.artist_id) ?? null }));
+    const totals = artists.reduce(
+      (acc, r) => ({
+        total_cents: acc.total_cents + Number(r.total_cents),
+        paid_cents: acc.paid_cents + Number(r.paid_cents),
+        pending_cents: acc.pending_cents + Number(r.pending_cents),
+        total_streams: acc.total_streams + Number(r.total_streams),
+      }),
+      { total_cents: 0, paid_cents: 0, pending_cents: 0, total_streams: 0 },
+    );
+    return { artists, totals };
+  });
