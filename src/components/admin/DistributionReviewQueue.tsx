@@ -132,6 +132,34 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
   const assignIds = useServerFn(assignReleaseIdentifiers);
   const deliver = useServerFn(deliverRelease);
   const approveTakedown = useServerFn(approveReleaseTakedown);
+  const forceTakedown = useServerFn(adminTakedownRelease);
+  const fetchHistory = useServerFn(listReleaseAuditLog);
+  const [showHistory, setShowHistory] = useState(false);
+  const [forcing, setForcing] = useState(false);
+  const [forceReason, setForceReason] = useState("");
+
+  const history = useQuery({
+    queryKey: ["release-audit", release.id],
+    queryFn: () => fetchHistory({ data: { release_id: release.id } }),
+    enabled: showHistory,
+  });
+
+  async function runForceTakedown() {
+    setBusy(true);
+    try {
+      const res: any = await forceTakedown({ data: { id: release.id, reason: forceReason.trim() } });
+      toast.success(`Release removed — ${res?.tracks_removed ?? 0} track(s) pulled from the catalog`);
+      setForcing(false);
+      setForceReason("");
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Takedown failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+
 
   async function runDelivery() {
     setBusy(true);
