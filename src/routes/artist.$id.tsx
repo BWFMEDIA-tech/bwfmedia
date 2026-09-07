@@ -147,10 +147,19 @@ function ArtistProfilePage() {
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
           )}
-          <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
-          <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
-          <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
-          <ArtistMerchSection userId={id} />
+          {isBlank && !isOwner ? (
+            <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
+              <p className="text-sm text-white/70">This artist hasn’t set up their profile yet.</p>
+              <p className="mt-1 text-xs text-white/40">Music, videos and stats will show up here once they do.</p>
+            </section>
+          ) : (
+            <>
+              <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
+              <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
+              <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
+              <ArtistMerchSection userId={id} />
+            </>
+          )}
         </div>
         <aside className="space-y-4">
           <SupportArtist
