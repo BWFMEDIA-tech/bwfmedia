@@ -13,6 +13,7 @@ import { MobileBottomNav } from "@/components/site/MobileBottomNav";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
 import { GlobalPlayer } from "@/components/player/GlobalPlayer";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -181,6 +182,7 @@ function RootComponent() {
         <CartDrawer />
         {(pathname === "/charts" || pathname.startsWith("/artist/")) && <GlobalPlayer />}
         {showBottomNav && <MobileBottomNav />}
+        <Toaster position="top-center" richColors />
         </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>
