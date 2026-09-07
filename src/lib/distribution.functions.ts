@@ -34,6 +34,7 @@ const ReleaseSchema = z.object({
   songwriters: z.array(z.string().min(1).max(120)).max(30).optional(),
   producers: z.array(z.string().min(1).max(120)).max(30).optional(),
   upc: z.string().max(30).nullable().optional(),
+  dsp_targets: z.array(z.string().max(40)).max(20).optional(),
 });
 
 function validateSplits(splits: z.infer<typeof SplitSchema>[] | undefined) {
