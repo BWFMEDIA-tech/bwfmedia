@@ -150,7 +150,6 @@ function RootComponent() {
     !pathname.startsWith("/admin") &&
     !pathname.startsWith("/settings") &&
     !pathname.startsWith("/artist-dashboard") &&
-    !pathname.startsWith("/dashboard") &&
     !pathname.startsWith("/checkout") &&
     !pathname.startsWith("/broadcast/") &&
     !pathname.startsWith("/play/") &&
