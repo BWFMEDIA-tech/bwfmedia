@@ -17,6 +17,7 @@ import guestImg from "@/assets/stream-guest.jpg";
 import { useAuth } from "@/lib/auth-context";
 import { useServerFn } from "@tanstack/react-start";
 import { startOrResumeStream, endStream } from "@/lib/streams.functions";
+import { LIVE_CATEGORIES } from "@/lib/live-categories";
 import { getMyActiveStream } from "@/lib/streams.functions";
 import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
@@ -733,6 +734,7 @@ function StreamStudio() {
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
+  const [streamCategory, setStreamCategory] = useState<string>(LIVE_CATEGORIES[0].id);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
   const spotlight = useStreamSpotlight(stream?.id ?? undefined);
@@ -788,6 +790,7 @@ function StreamStudio() {
         setStreamMode((existing.mode ?? "broadcast") as "broadcast" | "stage" | "play");
         setStageLocked(!!existing.stage_locked);
         setHostTransferMode(((existing as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
+        if ((existing as any).category) setStreamCategory((existing as any).category);
         // Re-register stage participant. If ownership was transferred while we
         // were away, preserve the existing role (e.g. co_host) instead of
         // forcing back to host.
@@ -861,7 +864,7 @@ function StreamStudio() {
     if (going) return;
     setGoing(true);
     try {
-      const s = await startFn({ data: { title: "BWF Live: LIVE ARENA" } });
+      const s = await startFn({ data: { title: "BWF Live: LIVE ARENA", category: streamCategory } });
       const t = await tokenFn({ data: { roomName: s.room_name } });
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
@@ -963,6 +966,25 @@ function StreamStudio() {
                     >
                       <Headphones className="h-3 w-3" /> Podcast
                     </button>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Category</span>
+                    {LIVE_CATEGORIES.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setStreamCategory(c.id)}
+                        disabled={!!lk}
+                        title={lk ? "Category is set when you go live" : c.label}
+                        className={cn(
+                          "whitespace-nowrap rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border disabled:opacity-60",
+                          streamCategory === c.id
+                            ? "bg-[#FF00A6]/20 text-[#FF00A6] border-[#FF00A6]/40"
+                            : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
+                        )}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-xs">
