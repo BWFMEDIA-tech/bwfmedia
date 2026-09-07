@@ -358,6 +358,15 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
 
           {editable && <AddTrackForm releaseId={release.id} userId={auth.user!.id} nextNumber={release.tracks.length + 1} onAdded={onChanged} />}
 
+          {editable && missingForSubmit(release).length > 0 && (
+            <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
+              <div className="font-bold">Before you can submit for review:</div>
+              <ul className="mt-1 list-disc pl-4">
+                {missingForSubmit(release).map((m) => <li key={m}>{m}</li>)}
+              </ul>
+            </div>
+          )}
+
           <div className="mt-4 flex flex-wrap gap-2">
             {editable && (
               <button
