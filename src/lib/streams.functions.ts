@@ -166,7 +166,7 @@ export const getMyActiveStream = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data } = await supabase
       .from("streams")
-      .select("id, room_name, title, status, mode, stage_locked, started_at, host_id, host_transfer_mode")
+      .select("id, room_name, title, status, mode, stage_locked, started_at, host_id, host_transfer_mode, category")
       .eq("host_id", userId)
       .in("status", ["idle", "live"])
       .order("created_at", { ascending: false })
