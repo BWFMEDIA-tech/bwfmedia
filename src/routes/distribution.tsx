@@ -332,6 +332,8 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
             <EditReleaseForm release={release} onDone={() => { setEditing(false); onChanged(); }} />
           )}
 
+          <ArtworkPanel release={release} editable={editable} onChanged={onChanged} />
+
           <DeliveryPanel release={release} onChanged={onChanged} />
 
           <div className="mt-4 space-y-2">
@@ -339,6 +341,7 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
               <TrackRow
                 key={t.id}
                 track={t}
+                userId={auth.user!.id}
                 editable={editable}
                 onChanged={onChanged}
                 neighbours={{ prev: release.tracks[i - 1] ?? null, next: release.tracks[i + 1] ?? null }}
