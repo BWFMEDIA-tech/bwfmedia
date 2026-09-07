@@ -14,7 +14,7 @@ import {
   listMyReleases, createRelease, updateRelease, deleteRelease,
   submitReleaseForReview, addReleaseTrack, updateReleaseTrack, deleteReleaseTrack,
   getDistributionOverview, setReleaseDspTargets,
-  RELEASE_TYPES,
+  RELEASE_TYPES, PRO_OPTIONS,
 } from "@/lib/distribution.functions";
 
 export const Route = createFileRoute("/distribution")({
@@ -334,6 +334,8 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
           )}
 
           <ArtworkPanel release={release} editable={editable} onChanged={onChanged} />
+
+          <RightsPanel release={release} editable={editable} onChanged={onChanged} />
 
           <DeliveryPanel release={release} onChanged={onChanged} />
 
@@ -839,3 +841,252 @@ function ArtworkPanel({ release, editable, onChanged }: { release: any; editable
   );
 }
 
+
+// ---------- Phase 4: metadata, rights & release identity ----------
+
+const TERRITORY_OPTIONS = [
+  { code: "US", label: "United States" }, { code: "CA", label: "Canada" },
+  { code: "GB", label: "United Kingdom" }, { code: "IE", label: "Ireland" },
+  { code: "FR", label: "France" }, { code: "DE", label: "Germany" },
+  { code: "ES", label: "Spain" }, { code: "IT", label: "Italy" },
+  { code: "NL", label: "Netherlands" }, { code: "SE", label: "Sweden" },
+  { code: "NG", label: "Nigeria" }, { code: "GH", label: "Ghana" },
+  { code: "ZA", label: "South Africa" }, { code: "KE", label: "Kenya" },
+  { code: "JM", label: "Jamaica" }, { code: "BR", label: "Brazil" },
+  { code: "MX", label: "Mexico" }, { code: "JP", label: "Japan" },
+  { code: "KR", label: "South Korea" }, { code: "AU", label: "Australia" },
+] as const;
+
+type WriterCredit = { name: string; share: number; pro?: string; ipi?: string };
+
+function RightsPanel({ release, editable, onChanged }: { release: any; editable: boolean; onChanged: () => void }) {
+  const update = useServerFn(updateRelease);
+  const [saving, setSaving] = useState(false);
+  const year = new Date().getFullYear();
+  const [form, setForm] = useState({
+    p_line_year: release.p_line_year ? String(release.p_line_year) : String(year),
+    p_line_holder: release.p_line_holder ?? "",
+    c_line_year: release.c_line_year ? String(release.c_line_year) : String(year),
+    c_line_holder: release.c_line_holder ?? "",
+    publisher_name: release.publisher_name ?? "",
+    pro_affiliation: release.pro_affiliation ?? "None",
+    rights_confirmed: !!release.rights_confirmed,
+    samples_cleared: !!release.samples_cleared,
+    territory_mode: (release.territory_mode ?? "worldwide") as "worldwide" | "selected",
+  });
+  const [territories, setTerritories] = useState<string[]>(release.territories ?? []);
+  const [writers, setWriters] = useState<WriterCredit[]>(
+    Array.isArray(release.writer_credits) ? release.writer_credits : [],
+  );
+
+  const writerTotal = writers.reduce((sum, w) => sum + (Number(w.share) || 0), 0);
+
+  async function save() {
+    if (writerTotal > 100.0001) { toast.error("Writer shares can't exceed 100%"); return; }
+    if (form.rights_confirmed && (!form.p_line_holder.trim() || !form.c_line_holder.trim())) {
+      toast.error("Both copyright holders are required before confirming rights");
+      return;
+    }
+    setSaving(true);
+    try {
+      await update({
+        data: {
+          id: release.id,
+          patch: {
+            p_line_year: Number(form.p_line_year) || null,
+            p_line_holder: form.p_line_holder.trim() || null,
+            c_line_year: Number(form.c_line_year) || null,
+            c_line_holder: form.c_line_holder.trim() || null,
+            publisher_name: form.publisher_name.trim() || null,
+            pro_affiliation: form.pro_affiliation || null,
+            rights_confirmed: form.rights_confirmed,
+            samples_cleared: form.samples_cleared,
+            territory_mode: form.territory_mode,
+            territories: form.territory_mode === "selected" ? territories : [],
+            writer_credits: writers
+              .filter((w) => w.name.trim())
+              .map((w) => ({
+                name: w.name.trim().slice(0, 120),
+                share: Number(w.share) || 0,
+                pro: w.pro || undefined,
+                ipi: w.ipi?.trim().slice(0, 20) || undefined,
+              })),
+          },
+        },
+      });
+      toast.success("Rights saved");
+      onChanged();
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not save rights");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const identity = (
+    <div className="mt-3 grid gap-2 rounded-lg border border-white/10 bg-black/30 p-3 text-[11px] sm:grid-cols-2">
+      <div>
+        UPC: <span className="font-mono text-white/85">{release.upc || "issued by Tunevio on approval"}</span>
+      </div>
+      <div>
+        ISRCs:{" "}
+        <span className="font-mono text-white/85">
+          {(release.tracks ?? []).filter((t: any) => t.isrc).length}/{(release.tracks ?? []).length} assigned
+        </span>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-3 flex items-center gap-2 text-sm font-bold">
+        <ShieldCheck className="h-4 w-4 text-[#FF00A6]" /> Rights &amp; release identity
+        {release.rights_confirmed && (
+          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+            confirmed
+          </span>
+        )}
+      </div>
+
+      <fieldset disabled={!editable || saving} className="space-y-3 disabled:opacity-60">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="℗ Sound recording year">
+            <input value={form.p_line_year} onChange={(e) => setForm({ ...form, p_line_year: e.target.value })} className={inputCls} inputMode="numeric" />
+          </Field>
+          <Field label="℗ Sound recording owner">
+            <input value={form.p_line_holder} onChange={(e) => setForm({ ...form, p_line_holder: e.target.value })} className={inputCls} placeholder="Label or artist name" maxLength={200} />
+          </Field>
+          <Field label="© Composition year">
+            <input value={form.c_line_year} onChange={(e) => setForm({ ...form, c_line_year: e.target.value })} className={inputCls} inputMode="numeric" />
+          </Field>
+          <Field label="© Composition owner">
+            <input value={form.c_line_holder} onChange={(e) => setForm({ ...form, c_line_holder: e.target.value })} className={inputCls} placeholder="Publisher or writer" maxLength={200} />
+          </Field>
+          <Field label="Publisher">
+            <input value={form.publisher_name} onChange={(e) => setForm({ ...form, publisher_name: e.target.value })} className={inputCls} placeholder="Self-published" maxLength={200} />
+          </Field>
+          <Field label="Performing rights organisation">
+            <select value={form.pro_affiliation} onChange={(e) => setForm({ ...form, pro_affiliation: e.target.value })} className={inputCls}>
+              {PRO_OPTIONS.map((o) => <option key={o} value={o} className="bg-[#0d0d18]">{o}</option>)}
+            </select>
+          </Field>
+        </div>
+
+        <div>
+          <div className="mb-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-white/50">
+            <span>Writer credits</span>
+            <span className={writerTotal > 100 ? "text-red-400" : "text-white/40"}>{writerTotal}% of 100%</span>
+          </div>
+          <div className="space-y-2">
+            {writers.map((w, i) => (
+              <div key={i} className="grid grid-cols-12 gap-2">
+                <input
+                  value={w.name}
+                  onChange={(e) => setWriters(writers.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))}
+                  placeholder="Writer name"
+                  className={`${inputCls} col-span-5`}
+                  maxLength={120}
+                />
+                <input
+                  value={String(w.share ?? "")}
+                  onChange={(e) => setWriters(writers.map((x, j) => (j === i ? { ...x, share: Number(e.target.value) || 0 } : x)))}
+                  placeholder="%"
+                  inputMode="decimal"
+                  className={`${inputCls} col-span-2`}
+                />
+                <select
+                  value={w.pro ?? ""}
+                  onChange={(e) => setWriters(writers.map((x, j) => (j === i ? { ...x, pro: e.target.value } : x)))}
+                  className={`${inputCls} col-span-2`}
+                >
+                  <option value="" className="bg-[#0d0d18]">PRO</option>
+                  {PRO_OPTIONS.map((o) => <option key={o} value={o} className="bg-[#0d0d18]">{o}</option>)}
+                </select>
+                <input
+                  value={w.ipi ?? ""}
+                  onChange={(e) => setWriters(writers.map((x, j) => (j === i ? { ...x, ipi: e.target.value } : x)))}
+                  placeholder="IPI"
+                  className={`${inputCls} col-span-2`}
+                  maxLength={20}
+                />
+                <button
+                  type="button"
+                  onClick={() => setWriters(writers.filter((_, j) => j !== i))}
+                  className="col-span-1 rounded-md border border-white/10 text-white/40 hover:text-red-400"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setWriters([...writers, { name: "", share: 0 }])}
+            className="mt-2 rounded-md border border-white/10 px-3 py-1.5 text-[11px] font-bold text-white/60 hover:text-white"
+          >
+            + Add writer
+          </button>
+        </div>
+
+        <div>
+          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50">Territory rights</div>
+          <div className="flex gap-2">
+            {(["worldwide", "selected"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setForm({ ...form, territory_mode: m })}
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-bold capitalize transition ${
+                  form.territory_mode === m
+                    ? "border-[#00E6FF]/40 bg-[#00E6FF]/15 text-[#00E6FF]"
+                    : "border-white/10 text-white/50 hover:text-white"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+          {form.territory_mode === "selected" && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {TERRITORY_OPTIONS.map((t) => {
+                const on = territories.includes(t.code);
+                return (
+                  <button
+                    key={t.code}
+                    type="button"
+                    onClick={() => setTerritories(on ? territories.filter((c) => c !== t.code) : [...territories, t.code])}
+                    className={`rounded-full border px-2.5 py-1 text-[10px] font-bold transition ${
+                      on ? "border-[#C53DFF]/40 bg-[#C53DFF]/15 text-[#C53DFF]" : "border-white/10 text-white/45 hover:text-white"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <label className="flex items-start gap-2 text-xs text-white/70">
+          <input type="checkbox" checked={form.samples_cleared} onChange={(e) => setForm({ ...form, samples_cleared: e.target.checked })} className="mt-0.5" />
+          All samples, interpolations and features in this release are cleared.
+        </label>
+        <label className="flex items-start gap-2 text-xs text-white/70">
+          <input type="checkbox" checked={form.rights_confirmed} onChange={(e) => setForm({ ...form, rights_confirmed: e.target.checked })} className="mt-0.5" />
+          I own or control all rights to this release and have permission to distribute it on Tunevio.
+        </label>
+
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving}
+          className="rounded-md bg-[#FF00A6] px-4 py-2 text-xs font-bold text-black hover:bg-[#ff33b8] disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save rights"}
+        </button>
+      </fieldset>
+
+      {identity}
+    </div>
+  );
+}
