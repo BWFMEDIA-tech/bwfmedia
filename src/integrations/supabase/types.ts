@@ -4111,6 +4111,10 @@ export type Database = {
           new_balance: number
         }[]
       }
+      admin_takedown_release: {
+        Args: { _reason?: string; _release_id: string }
+        Returns: Json
+      }
       approve_release_takedown: { Args: { _release_id: string }; Returns: Json }
       assign_release_identifiers: {
         Args: { _release_id: string }
