@@ -26,16 +26,55 @@ const STATUS_STYLES: Record<string, string> = {
 export function DistributionReviewQueue() {
   const qc = useQueryClient();
   const fetchQueue = useServerFn(listDistributionQueue);
+  const fetchStats = useServerFn(getDistributionAdminStats);
   const [filter, setFilter] = useState<ReleaseStatus | "all">("submitted");
+  const [search, setSearch] = useState("");
 
   const queue = useQuery({
     queryKey: ["admin-distribution-queue", filter],
     queryFn: () => fetchQueue({ data: { status: filter === "all" ? undefined : filter } }),
   });
 
+  const stats = useQuery({
+    queryKey: ["admin-distribution-stats"],
+    queryFn: () => fetchStats(),
+  });
+
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["admin-distribution-queue"] });
+    qc.invalidateQueries({ queryKey: ["admin-distribution-stats"] });
+  };
+
+  const term = search.trim().toLowerCase();
+  const rows = (queue.data ?? []).filter((r: any) =>
+    !term ||
+    r.title?.toLowerCase().includes(term) ||
+    r.artist_name?.toLowerCase().includes(term) ||
+    r.upc?.toLowerCase().includes(term),
+  );
+
+  const s = stats.data as any;
+
   return (
     <div>
-      <div className="mb-4 flex flex-wrap gap-2">
+      {s && (
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <StatTile label="Pending review" value={s.counts?.submitted ?? 0} accent="text-amber-300" />
+          <StatTile label="Approved" value={s.counts?.approved ?? 0} accent="text-emerald-300" />
+          <StatTile label="Live" value={s.counts?.live ?? 0} accent="text-cyan-300" />
+          <StatTile label="Rejected" value={s.counts?.rejected ?? 0} accent="text-red-300" />
+          <StatTile label="Takedown requests" value={s.takedowns ?? 0} accent="text-[#FF00A6]" />
+        </div>
+      )}
+
+      {s?.oldestPending && (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          <Clock className="h-3.5 w-3.5" />
+          Oldest release still waiting: submitted {new Date(s.oldestPending).toLocaleDateString()}
+        </div>
+      )}
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -47,21 +86,35 @@ export function DistributionReviewQueue() {
             {f.label}
           </button>
         ))}
+        <div className="relative ml-auto min-w-[200px] flex-1 sm:max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/30" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search title, artist or UPC…"
+            className="w-full rounded-full border border-white/10 bg-white/5 py-1.5 pl-9 pr-3 text-xs outline-none placeholder:text-white/30 focus:border-cyan-500/50"
+          />
+        </div>
       </div>
 
-      {queue.data?.length === 0 && (
+      {rows.length === 0 && (
         <EmptyState icon={Disc3} title="Nothing here" hint="No releases match this filter yet." />
       )}
 
       <div className="space-y-4">
-        {queue.data?.map((r: any) => (
-          <QueueCard
-            key={r.id}
-            release={r}
-            onChanged={() => qc.invalidateQueries({ queryKey: ["admin-distribution-queue"] })}
-          />
+        {rows.map((r: any) => (
+          <QueueCard key={r.id} release={r} onChanged={refresh} />
         ))}
       </div>
+    </div>
+  );
+}
+
+function StatTile({ label, value, accent }: { label: string; value: number; accent: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-[#0d0d18] px-3 py-2.5">
+      <div className={`text-xl font-black ${accent}`}>{value}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">{label}</div>
     </div>
   );
 }
