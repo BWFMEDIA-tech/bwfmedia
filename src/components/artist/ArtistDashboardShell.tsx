@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
-  User, Music2, Video, BarChart3, Bell, ChevronRight, Menu,
+  User, Music2, Video, BarChart3, Bell, ChevronRight, Menu, Disc3,
 } from "lucide-react";
 
 type Leaf = { to: string; label: string; search?: Record<string, string> };
@@ -45,6 +45,7 @@ const NAV: Entry[] = [
       { to: "/earnings", label: "Revenue Reports" },
     ],
   },
+  { kind: "link", to: "/distribution", label: "Distribution", icon: Disc3 },
   { kind: "link", to: "/settings/notifications", label: "Notifications", icon: Bell },
 ];
 
