@@ -27,6 +27,7 @@ import { useAudioPeaks } from "@/lib/useAudioPeaks";
 import { FollowersModal } from "@/components/artist/FollowersModal";
 import { SignedImg } from "@/components/ui/signed-img";
 import { TipModal } from "@/components/stream/TipModal";
+import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
