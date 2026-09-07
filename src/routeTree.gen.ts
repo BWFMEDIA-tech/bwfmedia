@@ -81,6 +81,7 @@ import { Route as PlayRanksRouteImport } from './routes/play.ranks'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
+import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -498,6 +499,11 @@ const PayBookingIdRoute = PayBookingIdRouteImport.update({
   path: '/pay/$bookingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabelsLabelIdRoute = LabelsLabelIdRouteImport.update({
+  id: '/labels/$labelId',
+  path: '/labels/$labelId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
@@ -878,6 +884,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1007,6 +1014,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1138,6 +1146,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1270,6 +1279,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1399,6 +1409,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1529,6 +1540,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/labels/$labelId'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1636,6 +1648,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
+  LabelsLabelIdRoute: typeof LabelsLabelIdRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
@@ -2172,6 +2185,13 @@ declare module '@tanstack/react-router' {
       path: '/pay/$bookingId'
       fullPath: '/pay/$bookingId'
       preLoaderRoute: typeof PayBookingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/labels/$labelId': {
+      id: '/labels/$labelId'
+      path: '/labels/$labelId'
+      fullPath: '/labels/$labelId'
+      preLoaderRoute: typeof LabelsLabelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$code': {
@@ -2738,6 +2758,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
+  LabelsLabelIdRoute: LabelsLabelIdRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
