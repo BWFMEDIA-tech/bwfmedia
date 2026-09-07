@@ -1157,6 +1157,128 @@ export type Database = {
         }
         Relationships: []
       }
+      distribution_release_tracks: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          duration_secs: number | null
+          featured_artists: string[] | null
+          id: string
+          isrc: string | null
+          release_id: string
+          splits: Json
+          title: string
+          track_number: number
+          updated_at: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          duration_secs?: number | null
+          featured_artists?: string[] | null
+          id?: string
+          isrc?: string | null
+          release_id: string
+          splits?: Json
+          title: string
+          track_number?: number
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          duration_secs?: number | null
+          featured_artists?: string[] | null
+          id?: string
+          isrc?: string | null
+          release_id?: string
+          splits?: Json
+          title?: string
+          track_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_release_tracks_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      distribution_releases: {
+        Row: {
+          artist_name: string
+          artwork_url: string | null
+          created_at: string
+          genre: string | null
+          id: string
+          is_explicit: boolean
+          label_name: string | null
+          language: string
+          producers: string[] | null
+          release_date: string | null
+          release_type: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          songwriters: string[] | null
+          status: string
+          submitted_at: string | null
+          title: string
+          upc: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          artist_name: string
+          artwork_url?: string | null
+          created_at?: string
+          genre?: string | null
+          id?: string
+          is_explicit?: boolean
+          label_name?: string | null
+          language?: string
+          producers?: string[] | null
+          release_date?: string | null
+          release_type?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          songwriters?: string[] | null
+          status?: string
+          submitted_at?: string | null
+          title: string
+          upc?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          artist_name?: string
+          artwork_url?: string | null
+          created_at?: string
+          genre?: string | null
+          id?: string
+          is_explicit?: boolean
+          label_name?: string | null
+          language?: string
+          producers?: string[] | null
+          release_date?: string | null
+          release_type?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          songwriters?: string[] | null
+          status?: string
+          submitted_at?: string | null
+          title?: string
+          upc?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
