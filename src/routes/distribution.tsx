@@ -7,7 +7,8 @@ import {
   Disc3, Plus, Upload, Trash2, Send, ChevronDown, ChevronUp, Music2, X,
   Search, Pencil, ArrowUp, ArrowDown, Globe2, Wallet, CheckCircle2, Clock,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distribution/AssetUploads";
+import { formatDuration } from "@/lib/distribution-upload";
 import { useAuth } from "@/lib/auth-context";
 import {
   listMyReleases, createRelease, updateRelease, deleteRelease,
