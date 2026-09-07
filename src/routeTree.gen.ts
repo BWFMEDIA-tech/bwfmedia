@@ -56,6 +56,7 @@ import { Route as AccessDeniedRouteImport } from './routes/access-denied'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
+import { Route as LabelsIndexRouteImport } from './routes/labels.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
@@ -370,6 +371,11 @@ const VideosIndexRoute = VideosIndexRouteImport.update({
 const PlayIndexRoute = PlayIndexRouteImport.update({
   id: '/play/',
   path: '/play/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabelsIndexRoute = LabelsIndexRouteImport.update({
+  id: '/labels/',
+  path: '/labels/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -896,6 +902,7 @@ export interface FileRoutesByFullPath {
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1024,6 +1031,7 @@ export interface FileRoutesByTo {
   '/videos/$id': typeof VideosIdRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/labels': typeof LabelsIndexRoute
   '/play': typeof PlayIndexRoute
   '/videos': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1154,6 +1162,7 @@ export interface FileRoutesById {
   '/videos/$id': typeof VideosIdRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1285,6 +1294,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin/'
     | '/blog/'
+    | '/labels/'
     | '/play/'
     | '/videos/'
     | '/.lovable/oauth/consent'
@@ -1413,6 +1423,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin'
     | '/blog'
+    | '/labels'
     | '/play'
     | '/videos'
     | '/.lovable/oauth/consent'
@@ -1542,6 +1553,7 @@ export interface FileRouteTypes {
     | '/videos/$id'
     | '/admin/'
     | '/blog/'
+    | '/labels/'
     | '/play/'
     | '/videos/'
     | '/.lovable/oauth/consent'
@@ -1633,6 +1645,7 @@ export interface RootRouteChildren {
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  LabelsIndexRoute: typeof LabelsIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -1984,6 +1997,13 @@ declare module '@tanstack/react-router' {
       path: '/play'
       fullPath: '/play/'
       preLoaderRoute: typeof PlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/labels/': {
+      id: '/labels/'
+      path: '/labels'
+      fullPath: '/labels/'
+      preLoaderRoute: typeof LabelsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -2727,6 +2747,7 @@ const rootRouteChildren: RootRouteChildren = {
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
   BlogIndexRoute: BlogIndexRoute,
+  LabelsIndexRoute: LabelsIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
