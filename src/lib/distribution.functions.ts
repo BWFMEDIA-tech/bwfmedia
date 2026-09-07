@@ -21,6 +21,15 @@ const TrackSchema = z.object({
   splits: z.array(SplitSchema).max(20).optional(),
 });
 
+export const PRO_OPTIONS = ["ASCAP", "BMI", "SESAC", "SOCAN", "PRS", "GEMA", "SACEM", "APRA", "Other", "None"] as const;
+
+const WriterCreditSchema = z.object({
+  name: z.string().min(1).max(120),
+  share: z.number().min(0).max(100),
+  pro: z.string().max(40).optional(),
+  ipi: z.string().max(20).optional(),
+});
+
 const ReleaseSchema = z.object({
   title: z.string().min(1).max(200),
   artist_name: z.string().min(1).max(200),
@@ -35,6 +44,18 @@ const ReleaseSchema = z.object({
   producers: z.array(z.string().min(1).max(120)).max(30).optional(),
   upc: z.string().max(30).nullable().optional(),
   dsp_targets: z.array(z.string().max(40)).max(20).optional(),
+  // Phase 4 — rights & release identity
+  p_line_year: z.number().int().min(1900).max(2100).nullable().optional(),
+  p_line_holder: z.string().max(200).nullable().optional(),
+  c_line_year: z.number().int().min(1900).max(2100).nullable().optional(),
+  c_line_holder: z.string().max(200).nullable().optional(),
+  publisher_name: z.string().max(200).nullable().optional(),
+  pro_affiliation: z.string().max(60).nullable().optional(),
+  writer_credits: z.array(WriterCreditSchema).max(30).optional(),
+  rights_confirmed: z.boolean().optional(),
+  samples_cleared: z.boolean().optional(),
+  territory_mode: z.enum(["worldwide", "selected"]).optional(),
+  territories: z.array(z.string().min(2).max(2)).max(250).optional(),
 });
 
 function validateSplits(splits: z.infer<typeof SplitSchema>[] | undefined) {
@@ -94,9 +115,18 @@ export const updateRelease = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid(), patch: ReleaseSchema.partial() }).parse(input))
   .handler(async ({ data, context }) => {
+    const patch: Record<string, unknown> = { ...data.patch };
+    if (Array.isArray(data.patch.writer_credits)) {
+      const total = data.patch.writer_credits.reduce((sum, w) => sum + w.share, 0);
+      if (total > 100.0001) throw new Error(`Writer shares total ${total}% — must not exceed 100%`);
+    }
+    if (data.patch.rights_confirmed !== undefined) {
+      patch["rights_confirmed_at"] = data.patch.rights_confirmed ? new Date().toISOString() : null;
+    }
+    if (data.patch.territory_mode === "worldwide") patch["territories"] = [];
     const { data: row, error } = await context.supabase
       .from("distribution_releases")
-      .update(data.patch)
+      .update(patch)
       .eq("id", data.id)
       .eq("user_id", context.userId)
       .in("status", ["draft", "rejected"])
@@ -133,6 +163,22 @@ export const submitReleaseForReview = createServerFn({ method: "POST" })
     if (terr) throw new Error(terr.message);
     if (!tracks?.length) throw new Error("Add at least one track before submitting");
     if (!tracks.some((t: any) => t.audio_url)) throw new Error("At least one track needs an audio file");
+
+    // Rights gate: the artist must confirm ownership before review.
+    const { data: rel, error: rerr } = await context.supabase
+      .from("distribution_releases")
+      .select("rights_confirmed, p_line_year, p_line_holder, c_line_year, c_line_holder, territory_mode, territories")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (rerr) throw new Error(rerr.message);
+    if (!rel) throw new Error("Release not found");
+    if (!rel.rights_confirmed) throw new Error("Confirm the rights declaration before submitting");
+    if (!rel.p_line_year || !rel.p_line_holder) throw new Error("Add the sound recording copyright line (\u2117)");
+    if (!rel.c_line_year || !rel.c_line_holder) throw new Error("Add the composition copyright line (\u00a9)");
+    if (rel.territory_mode === "selected" && !(rel.territories ?? []).length) {
+      throw new Error("Pick at least one territory, or choose worldwide");
+    }
 
     const { data: row, error } = await context.supabase
       .from("distribution_releases")
@@ -244,7 +290,29 @@ export const reviewRelease = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Release not found");
+    if (data.decision === "approved") {
+      // Tunevio issues the release identity on approval.
+      await context.supabase.rpc("assign_release_identifiers", { _release_id: data.id });
+      const { data: fresh } = await context.supabase
+        .from("distribution_releases")
+        .select("*")
+        .eq("id", data.id)
+        .maybeSingle();
+      return fresh ?? row;
+    }
     return row;
+  });
+
+export const assignReleaseIdentifiers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { data: result, error } = await context.supabase.rpc("assign_release_identifiers", {
+      _release_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    return result as { upc: string; tracks_assigned: number };
   });
 
 // ---------- Phase 2: artist distribution dashboard ----------
