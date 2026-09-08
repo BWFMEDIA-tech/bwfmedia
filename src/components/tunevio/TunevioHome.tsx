@@ -174,6 +174,7 @@ export function TunevioHome() {
                   key={q.title}
                   title={q.title}
                   icon={q.icon}
+                  imageUrl={"imageUrl" in q ? q.imageUrl : undefined}
                   gradient={q.gradient}
                   to={q.to}
                   onClick={q.section ? () => scrollTo(q.section!) : undefined}
