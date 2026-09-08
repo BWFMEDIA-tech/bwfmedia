@@ -10,6 +10,7 @@ import {
   setParticipantMute,
   setStreamSpotlight,
 } from "@/lib/stage.functions";
+import { listModerators } from "@/lib/moderation.functions";
 import { toast } from "sonner";
 import {
   Mic,
@@ -298,6 +299,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         </div>
         <div className="flex shrink-0 items-center gap-2.5">
           <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
+          <CapacityChip label="Mods" filled={Math.min(moderators.length, MAX_MODS)} total={MAX_MODS} color={BLUE} />
           <CapacityChip label="Guests" filled={guestSlotsTaken} total={MAX_GUESTS} color={ACCENT} />
         </div>
       </div>
