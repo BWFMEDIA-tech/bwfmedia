@@ -158,7 +158,9 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
   }
 
   const sortedArtists = [...artists].sort((a, b) => b.monthlyListeners - a.monthlyListeners);
-  const newArtistIds = new Set(newReleases.map((t) => t.artistUserId).filter(Boolean) as string[]);
+  const newArtistIds = new Set(
+    (newReleases as FeedTrack[]).map((t) => t.artistUserId).filter(Boolean) as string[],
+  );
   const rising = artists.filter((a) => newArtistIds.has(a.id)).slice(0, LIMIT);
 
   const streamRows = (streamRes.data ?? []) as any[];
