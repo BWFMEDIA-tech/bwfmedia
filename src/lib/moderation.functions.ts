@@ -3,6 +3,31 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { logAudit } from "@/lib/audit.server";
 
+// Public-safe read: list platform moderators with public profile identity only.
+export const listModerators = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: roleRows, error } = await supabaseAdmin
+    .from("user_roles")
+    .select("user_id")
+    .eq("role", "moderator")
+    .limit(20);
+  if (error) throw new Error(error.message);
+  const ids = [...new Set((roleRows ?? []).map((r: any) => r.user_id))].slice(0, 5);
+  if (!ids.length) return { moderators: [] as { user_id: string; display_name: string | null; avatar_url: string | null }[] };
+  const { data: profiles } = await supabaseAdmin
+    .from("public_profiles")
+    .select("id, display_name, avatar_url")
+    .in("id", ids);
+  const byId = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+  return {
+    moderators: ids.map((id) => ({
+      user_id: id,
+      display_name: (byId.get(id) as any)?.display_name ?? null,
+      avatar_url: (byId.get(id) as any)?.avatar_url ?? null,
+    })),
+  };
+});
+
 async function assertModOrHost(supabase: any, userId: string, streamId?: string) {
   const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
   const isMod = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");

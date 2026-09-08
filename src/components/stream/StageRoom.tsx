@@ -10,6 +10,7 @@ import {
   setParticipantMute,
   setStreamSpotlight,
 } from "@/lib/stage.functions";
+import { listModerators } from "@/lib/moderation.functions";
 import { toast } from "sonner";
 import {
   Mic,
@@ -34,6 +35,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
+const MAX_MODS = 5;
 
 // BWF cinema palette — "Immersive Stage Cinema"
 const PURPLE = "#C53DFF"; // brand magenta (primary, host)
@@ -69,6 +71,14 @@ export function StageRoom({
   const muteFn = useServerFn(setParticipantMute);
   const setSpotlight = useServerFn(setStreamSpotlight);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
+  const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    listModerators()
+      .then((res) => { if (!cancelled) setModerators(res.moderators); })
+      .catch(() => { if (!cancelled) setModerators([]); });
+    return () => { cancelled = true; };
+  }, []);
   const [confirm, setConfirm] = useState<null | {
     title: string;
     description: string;
@@ -289,6 +299,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         </div>
         <div className="flex shrink-0 items-center gap-2.5">
           <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
+          <CapacityChip label="Mods" filled={Math.min(moderators.length, MAX_MODS)} total={MAX_MODS} color={BLUE} />
           <CapacityChip label="Guests" filled={guestSlotsTaken} total={MAX_GUESTS} color={ACCENT} />
         </div>
       </div>
@@ -343,6 +354,29 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         {Array.from({ length: Math.max(0, MAX_HOSTS - hostSlotsTaken) }).map((_, i) => (
           <EmptySlot key={`h-${i}`} label="Host slot" color={PURPLE} />
         ))}
+      </div>
+
+      {/* Moderators row */}
+      <div className="mt-8">
+        <SectionHeader
+          label="MODERATORS"
+          count={`${Math.min(moderators.length, MAX_MODS)}/${MAX_MODS}`}
+          color={BLUE}
+          canInvite={false}
+          onInvite={() => {}}
+        />
+        <p className="-mt-1 mb-3 text-[10px] leading-snug text-white/40">
+          Moderators monitor live rooms, remove inappropriate users, handle reports, stop harassment,
+          monitor cheating, enforce community rules, and assist hosts. Moderators are assigned by BWF admins.
+        </p>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
+          {moderators.slice(0, MAX_MODS).map((m) => (
+            <ModBubble key={m.user_id} m={m} />
+          ))}
+          {Array.from({ length: Math.max(0, MAX_MODS - Math.min(moderators.length, MAX_MODS)) }).map((_, i) => (
+            <EmptySlot key={`m-${i}`} label="Mod slot" color={BLUE} />
+          ))}
+        </div>
       </div>
 
       {/* Guests row */}
@@ -421,6 +455,57 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         />
       )}
       {confirm && <ConfirmDialog {...confirm} onClose={() => setConfirm(null)} />}
+    </div>
+  );
+}
+
+function ModBubble({
+  m,
+}: {
+  m: { user_id: string; display_name: string | null; avatar_url: string | null };
+}) {
+  return (
+    <div className="group relative flex flex-col items-center gap-2 pt-3">
+      <div className="relative">
+        <div
+          className="absolute -inset-1 rounded-full opacity-70 blur-md"
+          style={{ background: `radial-gradient(circle, ${BLUE}66, transparent 70%)` }}
+        />
+        <div
+          className="relative shrink-0 rounded-full p-[2px]"
+          style={{ background: `linear-gradient(135deg, ${BLUE}, ${ACCENT})` }}
+        >
+          {m.avatar_url ? (
+            <SignedImg
+              src={m.avatar_url}
+              alt={m.display_name ?? "Moderator"}
+              className="h-16 w-16 shrink-0 rounded-full border border-[#0d0d18] object-cover"
+            />
+          ) : (
+            <div
+              className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#0d0d18] text-lg font-bold text-white"
+              style={{ background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})` }}
+            >
+              {(m.display_name ?? "M").charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <span
+          className="absolute -top-0.5 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white shadow-lg shadow-black/50 ring-1 ring-black/40"
+          style={{ background: `linear-gradient(135deg, ${BLUE}, ${ACCENT})` }}
+        >
+          MOD
+        </span>
+        <span
+          className="absolute -bottom-1 -right-1 z-30 grid h-5 w-5 place-items-center rounded-full ring-2 ring-[#05050b]"
+          style={{ background: BLUE }}
+        >
+          <Shield className="h-3 w-3 text-white" />
+        </span>
+      </div>
+      <span className="max-w-full truncate text-xs font-semibold text-white/90">
+        {m.display_name ?? "Moderator"}
+      </span>
     </div>
   );
 }
