@@ -994,7 +994,7 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
     <Link
       to="/user/$id"
       params={{ id: p.user_id }}
-      className="group flex flex-col items-center gap-1"
+      className="group flex shrink-0 flex-col items-center gap-1"
       title={`View ${p.display_name ?? "listener"}'s page`}
     >
       <div
