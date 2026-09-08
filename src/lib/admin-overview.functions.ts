@@ -27,7 +27,7 @@ export const getAdminOverview = createServerFn({ method: "POST" })
       sb.from("profiles").select("id", { count: "exact", head: true }),
       sb.from("tips").select("amount_cents,created_at").eq("status", "paid"),
       sb.from("tips").select("amount_cents").eq("status", "paid").gte("created_at", sincePrev30).lt("created_at", since30),
-      sb.from("merch_commissions").select("order_total_cents,commission_cents,paid_at,created_at"),
+      sb.from("merch_commissions").select("order_total_cents,commission_cents,status,created_at"),
       sb.from("merch_commissions").select("order_total_cents").gte("created_at", sincePrev30).lt("created_at", since30),
       sb.from("streams").select("id,title,host_id,started_at,viewer_count,status").order("started_at", { ascending: false, nullsFirst: false }).limit(5),
       sb.from("user_roles").select("user_id").eq("role", "artist").limit(50),

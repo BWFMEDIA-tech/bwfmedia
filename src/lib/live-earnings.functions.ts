@@ -15,12 +15,12 @@ export const getStreamLiveEarnings = createServerFn({ method: "GET" })
       { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
     );
 
-    // Tips paid on this stream
+    // Tips paid on this stream — read the anon-safe view (base table SELECT is
+    // revoked for anon; tips_public already filters to status = 'paid').
     const { data: tipsRows } = await sb
-      .from("tips")
+      .from("tips_public")
       .select("amount_cents")
-      .eq("stream_id", data.streamId)
-      .eq("status", "paid");
+      .eq("stream_id", data.streamId);
     const stream_cents = (tipsRows ?? []).reduce(
       (s: number, r: any) => s + (r.amount_cents ?? 0),
       0,
