@@ -746,11 +746,11 @@ function ArtistSide({
                   <SignedImg
                     src={coverUrl}
                     alt={trackTitle ?? name}
-                    className="absolute inset-0 h-full w-full rounded-full object-cover"
+                    className="absolute inset-0 z-30 h-full w-full rounded-full object-cover"
                   />
                 ) : (
                   <div
-                    className="absolute inset-0 flex h-full w-full items-center justify-center rounded-full"
+                    className="absolute inset-0 z-30 flex h-full w-full items-center justify-center rounded-full"
                     style={{ background: grad }}
                   >
                     <Swords className="h-5 w-5 text-white/70" />
@@ -771,7 +771,7 @@ function ArtistSide({
                 {/* subtle inner shadow so the round disc reads as vinyl */}
                 <span className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_18px_rgba(0,0,0,0.55)]" />
                 {/* spindle hole */}
-                <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black ring-1 ring-white/30" />
+                <span className="absolute left-1/2 top-1/2 z-40 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black ring-1 ring-white/30" />
               </div>
             </div>
             {isPlaying && (
