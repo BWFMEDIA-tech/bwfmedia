@@ -483,8 +483,8 @@ function ParticipantRow({
   return (
     <div className="rounded-lg border border-white/5 bg-white/[0.02]">
       <div className="flex items-center gap-3 p-2">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-bold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
-          {avatar ? <SignedImg src={avatar} alt={name} className="h-full w-full rounded-full object-cover" /> : name.charAt(0).toUpperCase()}
+        <div className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full text-xs font-bold text-white" style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}>
+          {avatar ? <SignedImg src={avatar} alt={name} className="block h-full w-full max-h-full max-w-full object-contain" /> : name.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
