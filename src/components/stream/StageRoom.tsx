@@ -998,18 +998,18 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
       title={`View ${p.display_name ?? "listener"}'s page`}
     >
       <div
-        className="rounded-full p-0.5 transition group-hover:scale-105"
+        className="shrink-0 rounded-full p-0.5 transition group-hover:scale-105"
         style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}
       >
         {p.avatar_url ? (
           <SignedImg
             src={p.avatar_url}
             alt={p.display_name ?? "Listener"}
-            className="h-12 w-12 rounded-full border border-[#0d0d18] object-cover"
+            className="h-12 w-12 shrink-0 rounded-full border border-[#0d0d18] object-cover"
           />
         ) : (
           <div
-            className="h-12 w-12 rounded-full border border-[#0d0d18]"
+            className="h-12 w-12 shrink-0 rounded-full border border-[#0d0d18]"
             style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
           />
         )}
