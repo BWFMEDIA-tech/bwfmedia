@@ -63,10 +63,10 @@ export function TunevioHome() {
 
   const quickAccess = [
     { title: "Liked Songs", icon: <Heart className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-magenta to-tv-violet", section: "made-for-you" },
-    { title: "Recently Played", icon: <Clock className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-blue-600", section: "jump-back-in" },
-    { title: "Daily Mix", icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-violet-500 to-fuchsia-600", section: "made-for-you" },
-    { title: "Trending Now", icon: <Flame className="h-5 w-5" />, gradient: "bg-gradient-to-br from-orange-500 to-tv-magenta", section: "trending" },
-    { title: "New Releases", icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-emerald-400 to-tv-cyan", section: "new-releases" },
+    { title: "Recently Played", imageUrl: feed?.discover[0]?.coverUrl ?? null, icon: <Clock className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-blue-600", section: "jump-back-in" },
+    { title: "Daily Mix", imageUrl: feed?.discover[1]?.coverUrl ?? feed?.popular[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-violet-500 to-fuchsia-600", section: "made-for-you" },
+    { title: "Trending Now", imageUrl: feed?.trending[0]?.coverUrl ?? null, icon: <Flame className="h-5 w-5" />, gradient: "bg-gradient-to-br from-orange-500 to-tv-magenta", section: "trending" },
+    { title: "New Releases", imageUrl: feed?.newReleases[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-emerald-400 to-tv-cyan", section: "new-releases" },
     { title: "Your Playlists", icon: <ListMusic className="h-5 w-5" />, gradient: "bg-gradient-to-br from-slate-500 to-slate-800", section: "made-for-you" },
     { title: "Following Artists", icon: <Users className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-violet to-indigo-700", section: "artists-you-follow" },
     { title: "Play Arena", icon: <Mic2 className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-magenta to-red-600", to: "/mic-drop" },
