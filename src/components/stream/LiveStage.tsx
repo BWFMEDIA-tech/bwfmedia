@@ -366,12 +366,29 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     { onlySubscribed: false },
   );
   const participants = useParticipants();
-  // Only keep camera tracks that are actually published (drop placeholders for
-  // listeners/crowd viewers who have no camera). Otherwise the first slot can
-  // become the local viewer's empty placeholder and hide the real guest.
-  const cameraTracks = tracks.filter(
-    (t) => t.source === Track.Source.Camera && (t as any).publication?.track,
-  );
+  // Keep camera tracks that have a real publication (drop placeholders for
+  // listeners/crowd viewers who have no camera). Remote publications may not
+  // be subscribed yet — especially on mobile where subscription lands a beat
+  // after the publish event — so we must NOT require `publication.track`
+  // here, or the artist tile falls back to "Waiting for Artist" forever.
+  const cameraTracks = tracks.filter((t) => {
+    if (t.source !== Track.Source.Camera) return false;
+    const pub = (t as any).publication;
+    return !!pub && (!!pub.track || pub.isSubscribed !== undefined);
+  });
+
+  // Ensure remote camera publications are actually subscribed. With
+  // adaptive stream / mobile publishers the subscription can stay pending.
+  useEffect(() => {
+    for (const t of tracks) {
+      const pub = (t as any).publication;
+      if (!pub || t.source !== Track.Source.Camera) continue;
+      if (typeof pub.setSubscribed === "function" && pub.isSubscribed === false) {
+        try { pub.setSubscribed(true); } catch { /* ignore */ }
+      }
+    }
+  }, [tracks]);
+
 
   useEffect(() => {
     onViewerCount?.(participants.length);
@@ -427,9 +444,12 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const items = sortByActive(buckets[panel]);
     const primary = items[0] ?? null;
     const primaryId = primary?.participant?.identity ?? null;
-    // Camera-off spotlight tiles arrive as placeholders — render the
-    // avatar/fallback instead of an empty video tile.
-    const primaryTrack = primary && (primary as any).publication?.track ? primary : null;
+    // Show the live video whenever the participant has an unmuted camera
+    // publication — the media may still be arriving (common on phones).
+    // Only fall back to the avatar when the camera is genuinely off.
+    const pub = primary ? (primary as any).publication : null;
+    const primaryTrack = pub && !pub.isMuted ? primary : null;
+
     return (
       <div className="flex flex-col gap-2">
         <StageTile
