@@ -427,10 +427,13 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const items = sortByActive(buckets[panel]);
     const primary = items[0] ?? null;
     const primaryId = primary?.participant?.identity ?? null;
+    // Camera-off spotlight tiles arrive as placeholders — render the
+    // avatar/fallback instead of an empty video tile.
+    const primaryTrack = primary && (primary as any).publication?.track ? primary : null;
     return (
       <div className="flex flex-col gap-2">
         <StageTile
-          track={primary}
+          track={primaryTrack}
           label={label}
           fallbackImage={fallback}
           profile={primaryId ? profiles[primaryId] : undefined}
