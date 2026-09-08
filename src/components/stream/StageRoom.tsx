@@ -349,9 +349,10 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
       <div className="mt-8">
         <SectionHeader
           label="GUESTS"
-          count={`${guests.length}/${MAX_GUESTS}`}
+          count={`${guestSlotsTaken}/${MAX_GUESTS}`}
           color={ACCENT}
-          canInvite={canManage && guests.length < MAX_GUESTS}
+          canInvite={canManage && guestSlotsTaken < MAX_GUESTS}
+
           onInvite={() => setInvite("speaker")}
           inviteLabel="Invite Guest"
         />
