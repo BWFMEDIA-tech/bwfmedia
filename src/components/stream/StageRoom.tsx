@@ -501,10 +501,10 @@ function InviteModal({
                     className="shrink-0"
                   >
                     {p.avatar_url ? (
-                      <SignedImg src={p.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                      <SignedImg src={p.avatar_url} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
                     ) : (
                       <div
-                        className="h-8 w-8 rounded-full"
+                        className="h-8 w-8 shrink-0 rounded-full"
                         style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
                       />
                     )}
@@ -994,11 +994,11 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
     <Link
       to="/user/$id"
       params={{ id: p.user_id }}
-      className="group flex flex-col items-center gap-1"
+      className="group flex shrink-0 flex-col items-center gap-1"
       title={`View ${p.display_name ?? "listener"}'s page`}
     >
       <div
-        className="rounded-full p-0.5 transition group-hover:scale-105"
+        className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full p-0.5 transition group-hover:scale-105"
         style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}
       >
         {p.avatar_url ? (
