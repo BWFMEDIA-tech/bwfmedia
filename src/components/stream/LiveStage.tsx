@@ -413,16 +413,19 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
       continue;
     }
     const role = roleMap[id];
-    const panel: Panel =
-      role === "admin" || role === "administrator" || role === "owner" || role === "moderator"
-        ? "admin"
-        : role === "host" || role === "cohost" || role === "co_host"
-          ? "host"
-          : "middle"; // artist | guest | listener | speaker | unknown
+    const isAdminRole =
+      role === "admin" || role === "administrator" || role === "owner" || role === "moderator";
+    const isHostRole = role === "host" || role === "cohost" || role === "co_host";
+    // Only people the host has actually promoted to the stage get a video box.
+    // Listeners, green-room guests and unknown roles stay in the audience.
+    const isStageRole = role === "speaker" || role === "artist" || role === "guest";
+    if (!isAdminRole && !isHostRole && !isStageRole) continue;
+    const panel: Panel = isAdminRole ? "admin" : isHostRole ? "host" : "middle";
     // When a spotlight is active for a panel, suppress catch-alls there.
     if (spotlight.artist && panel === "middle") continue;
     if (spotlight.host && panel === "admin") continue;
     buckets[panel].push(t);
+
   }
   // A spotlighted participant with camera OFF must still appear in their
   // box — otherwise "Bring to artist video box" looks like it does nothing.
