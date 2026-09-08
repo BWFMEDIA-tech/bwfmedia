@@ -34,6 +34,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
+const MAX_MODS = 5;
 
 // BWF cinema palette — "Immersive Stage Cinema"
 const PURPLE = "#C53DFF"; // brand magenta (primary, host)
@@ -69,6 +70,14 @@ export function StageRoom({
   const muteFn = useServerFn(setParticipantMute);
   const setSpotlight = useServerFn(setStreamSpotlight);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
+  const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    listModerators()
+      .then((res) => { if (!cancelled) setModerators(res.moderators); })
+      .catch(() => { if (!cancelled) setModerators([]); });
+    return () => { cancelled = true; };
+  }, []);
   const [confirm, setConfirm] = useState<null | {
     title: string;
     description: string;
