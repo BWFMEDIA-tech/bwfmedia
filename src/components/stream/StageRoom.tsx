@@ -501,10 +501,10 @@ function InviteModal({
                     className="shrink-0"
                   >
                     {p.avatar_url ? (
-                      <SignedImg src={p.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                      <SignedImg src={p.avatar_url} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
                     ) : (
                       <div
-                        className="h-8 w-8 rounded-full"
+                        className="h-8 w-8 shrink-0 rounded-full"
                         style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
                       />
                     )}
