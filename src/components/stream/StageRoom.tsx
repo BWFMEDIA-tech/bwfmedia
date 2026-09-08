@@ -377,10 +377,28 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
               }
             />
           ))}
+          {showSelfGuestPlaceholder && (
+            <SpeakerBubble
+              key="self-guest-placeholder"
+              p={{
+                id: "self-guest-placeholder",
+                stream_id: streamId ?? "",
+                user_id: selfProfile!.user_id,
+                stage_role: "speaker",
+                joined_at: new Date().toISOString(),
+                display_name: selfProfile!.display_name ?? null,
+                avatar_url: selfProfile!.avatar_url ?? null,
+              }}
+              kind="speaker"
+              canManage={false}
+              isSelf
+            />
+          )}
           {(() => {
-            const remaining = Math.max(0, MAX_GUESTS - guests.length);
+            const remaining = Math.max(0, MAX_GUESTS - guestSlotsTaken);
             const visible = Math.min(remaining, VISIBLE_EMPTY_GUESTS);
             const overflow = remaining - visible;
+
             return (
               <>
                 {Array.from({ length: visible }).map((_, i) => (
