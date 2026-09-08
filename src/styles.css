@@ -306,3 +306,38 @@
   20%  { opacity: 1; transform: translate(-50%, 0px) scale(1.15); }
   100% { opacity: 0; transform: translate(-50%, -36px) scale(1); }
 }
+
+/* ── Tunevio dashboard surface system ───────────────────────────── */
+:root {
+  --tv-base: #07070c;
+  --tv-surface: #0e0e16;
+  --tv-card: #15151f;
+  --tv-card-hover: #1f1f2d;
+  --tv-active: #29293c;
+  --tv-line: rgba(255, 255, 255, 0.08);
+  --tv-radius: 16px;
+  --tv-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.9);
+  --tv-cyan: #00e6ff;
+  --tv-magenta: #ff00a6;
+  --tv-violet: #c53dff;
+}
+
+@theme inline {
+  --color-tv-base: var(--tv-base);
+  --color-tv-surface: var(--tv-surface);
+  --color-tv-card: var(--tv-card);
+  --color-tv-card-hover: var(--tv-card-hover);
+  --color-tv-active: var(--tv-active);
+  --color-tv-line: var(--tv-line);
+  --color-tv-cyan: var(--tv-cyan);
+  --color-tv-magenta: var(--tv-magenta);
+  --color-tv-violet: var(--tv-violet);
+}
+
+@utility tv-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
