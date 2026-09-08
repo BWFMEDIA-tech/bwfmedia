@@ -180,7 +180,7 @@ function RootComponent() {
         </div>
         {isChrome && pathname === "/" && <SiteFooter />}
         <CartDrawer />
-        {(pathname === "/charts" || pathname.startsWith("/artist/")) && <GlobalPlayer />}
+        {(pathname === "/" || pathname === "/charts" || pathname.startsWith("/artist/")) && <GlobalPlayer />}
         {showBottomNav && <MobileBottomNav />}
         <Toaster position="top-center" richColors />
         </PlayerProvider>
