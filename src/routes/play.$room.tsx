@@ -165,15 +165,18 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
   return (
     <>
       <div className="space-y-5">
-        {/* Immersive hero player + right rail (queue/battle/leaderboard) */}
-        <ImmersivePlayer
-          track={playing}
-          upNext={queued}
-          leaderboard={leaderboard}
-          userId={auth.user?.id ?? null}
-          streamId={stream?.id ?? null}
-          isHost={isHost}
-        />
+        {/* Audience / live session panel now sits in the former player slot */}
+        {stream && (
+          <ListeningSessionPanel
+            isHost={session.isHost}
+            hostPresent={session.hostPresent}
+            listenerCount={session.listenerCount}
+            participants={session.participants}
+            currentTrackTitle={playing?.title ?? null}
+            currentArtist={playing?.artist_name ?? null}
+            playbackState={session.snapshot?.playbackState ?? "stopped"}
+          />
+        )}
 
         <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
           {/* Main column */}
@@ -231,18 +234,16 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
           {/* Right column */}
           <div className="space-y-5">
+            {/* Immersive player now sits at the top of the right rail, above chat */}
+            <ImmersivePlayer
+              track={playing}
+              upNext={queued}
+              leaderboard={leaderboard}
+              userId={auth.user?.id ?? null}
+              streamId={stream?.id ?? null}
+              isHost={isHost}
+            />
             {showChat && <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />}
-            {stream && (
-              <ListeningSessionPanel
-                isHost={session.isHost}
-                hostPresent={session.hostPresent}
-                listenerCount={session.listenerCount}
-                participants={session.participants}
-                currentTrackTitle={playing?.title ?? null}
-                currentArtist={playing?.artist_name ?? null}
-                playbackState={session.snapshot?.playbackState ?? "stopped"}
-              />
-            )}
             <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
         </div>
