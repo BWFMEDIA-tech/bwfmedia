@@ -586,15 +586,16 @@ function SpeakerBubble({
   const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#991b1b" : "#c2410c";
   const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="absolute -mt-3 self-center">
+    <div className="relative flex flex-col items-center gap-2 pt-3">
+      <div className="absolute -top-0.5 left-1/2 z-30 -translate-x-1/2">
         <span
-          className="rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white"
+          className="whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white shadow-lg shadow-black/50 ring-1 ring-black/40"
           style={{ background: badgeBg }}
         >
           {badgeLabel}
         </span>
       </div>
+
       <div
         className={cn(
           "relative rounded-full p-1 transition-transform duration-150",
