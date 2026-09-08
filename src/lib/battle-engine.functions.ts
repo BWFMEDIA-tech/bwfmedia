@@ -739,7 +739,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       match,
       rounds: rounds ?? [],
       currentRound,
-      activeSide: (match.active_side as "a" | "b" | null) ?? null,
+      activeSide,
       votingStatus:
         (currentRound?.voting_status as "closed" | "open" | "finalized") ?? "closed",
       aTrack,
