@@ -407,6 +407,18 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     if (spotlight.host && panel === "admin") continue;
     buckets[panel].push(t);
   }
+  // A spotlighted participant with camera OFF must still appear in their
+  // box — otherwise "Bring to artist video box" looks like it does nothing.
+  // Pull their placeholder tile (avatar fallback) into the pinned panel.
+  const ensureSpotlightEntry = (panel: Panel, id: string | null) => {
+    if (!id || buckets[panel].length) return;
+    const t = tracks.find(
+      (tr) => tr.source === Track.Source.Camera && tr.participant?.identity === id,
+    );
+    if (t) buckets[panel].push(t);
+  };
+  ensureSpotlightEntry("middle", spotlight.artist);
+  ensureSpotlightEntry("admin", spotlight.host);
   // Priority: active speaker first within each bucket.
   const sortByActive = (arr: typeof cameraTracks) =>
     [...arr].sort((a, b) => Number(!!b.participant?.isSpeaking) - Number(!!a.participant?.isSpeaking));
