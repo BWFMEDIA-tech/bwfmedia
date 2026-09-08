@@ -71,7 +71,7 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
       .from("battle_matches")
       .select("winner_id")
       .in("winner_id", ids)
-      .eq("status", "complete");
+      .eq("status", "completed");
     const winsByUser = new Map<string, number>();
     for (const row of winsRes.data ?? []) {
       winsByUser.set(row.winner_id, (winsByUser.get(row.winner_id) ?? 0) + 1);
@@ -82,7 +82,7 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
     const matchesRes = await sb
       .from("battle_matches")
       .select("artist_a_id, artist_b_id, winner_id, ended_at, updated_at, created_at")
-      .eq("status", "complete")
+      .eq("status", "completed")
       .or(`artist_a_id.in.(${ids.join(",")}),artist_b_id.in.(${ids.join(",")})`)
       .order("ended_at", { ascending: true })
       .limit(20000);

@@ -65,7 +65,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const matchesRes = await sb
         .from("battle_matches")
         .select("winner_id, ended_at, updated_at, created_at")
-        .eq("status", "complete")
+        .eq("status", "completed")
         .or(`artist_a_id.eq.${id},artist_b_id.eq.${id}`)
         .order("ended_at", { ascending: true })
         .limit(5000);
