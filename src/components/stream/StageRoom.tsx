@@ -76,13 +76,30 @@ export function StageRoom({
     run: () => Promise<void>;
   }>(null);
 
+const AUDIENCE_ROLES = ["listener", "green_room"];
   const hosts = participants.filter((p) => p.stage_role === "host" || p.stage_role === "co_host").slice(0, MAX_HOSTS);
-  const guests = participants.filter((p) => p.stage_role === "speaker").slice(0, MAX_GUESTS);
-  // If the local host hasn't been registered in stage_participants yet,
-  // show their profile in the first host slot as a placeholder.
-  const showSelfHostPlaceholder = !!selfProfile && canManage && !hosts.some((p) => p.user_id === selfProfile.user_id);
+  // Anyone who is on stage but isn't a host belongs in the guest section —
+  // speaker, guest, artist, or any future on-stage role.
+  const guests = participants
+    .filter(
+      (p) =>
+        p.stage_role !== "host" &&
+        p.stage_role !== "co_host" &&
+        !AUDIENCE_ROLES.includes(p.stage_role ?? "listener"),
+    )
+    .slice(0, MAX_GUESTS);
+  const selfListed =
+    !!selfProfile &&
+    (hosts.some((p) => p.user_id === selfProfile.user_id) || guests.some((p) => p.user_id === selfProfile.user_id));
+  // If the local user hasn't been registered in stage_participants yet, show a
+  // placeholder — in the host row only when they can manage the stage,
+  // otherwise in the guest row.
+  const showSelfHostPlaceholder = !!selfProfile && canManage && !selfListed;
+  const showSelfGuestPlaceholder = !!selfProfile && !canManage && !selfListed;
   const hostSlotsTaken = hosts.length + (showSelfHostPlaceholder ? 1 : 0);
+  const guestSlotsTaken = guests.length + (showSelfGuestPlaceholder ? 1 : 0);
   const audience = participants.filter((p) => p.stage_role === "listener" || p.stage_role === "green_room");
+
 
   const demote = async (uid: string) => {
     if (!streamId) return;
@@ -272,7 +289,7 @@ export function StageRoom({
         </div>
         <div className="flex shrink-0 items-center gap-2.5">
           <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
-          <CapacityChip label="Guests" filled={guests.length} total={MAX_GUESTS} color={ACCENT} />
+          <CapacityChip label="Guests" filled={guestSlotsTaken} total={MAX_GUESTS} color={ACCENT} />
         </div>
       </div>
 
@@ -332,9 +349,10 @@ export function StageRoom({
       <div className="mt-8">
         <SectionHeader
           label="GUESTS"
-          count={`${guests.length}/${MAX_GUESTS}`}
+          count={`${guestSlotsTaken}/${MAX_GUESTS}`}
           color={ACCENT}
-          canInvite={canManage && guests.length < MAX_GUESTS}
+          canInvite={canManage && guestSlotsTaken < MAX_GUESTS}
+
           onInvite={() => setInvite("speaker")}
           inviteLabel="Invite Guest"
         />
@@ -360,10 +378,28 @@ export function StageRoom({
               }
             />
           ))}
+          {showSelfGuestPlaceholder && (
+            <SpeakerBubble
+              key="self-guest-placeholder"
+              p={{
+                id: "self-guest-placeholder",
+                stream_id: streamId ?? "",
+                user_id: selfProfile!.user_id,
+                stage_role: "speaker",
+                joined_at: new Date().toISOString(),
+                display_name: selfProfile!.display_name ?? null,
+                avatar_url: selfProfile!.avatar_url ?? null,
+              }}
+              kind="speaker"
+              canManage={false}
+              isSelf
+            />
+          )}
           {(() => {
-            const remaining = Math.max(0, MAX_GUESTS - guests.length);
+            const remaining = Math.max(0, MAX_GUESTS - guestSlotsTaken);
             const visible = Math.min(remaining, VISIBLE_EMPTY_GUESTS);
             const overflow = remaining - visible;
+
             return (
               <>
                 {Array.from({ length: visible }).map((_, i) => (
