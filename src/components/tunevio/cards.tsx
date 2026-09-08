@@ -574,8 +574,19 @@ export function QuickAccessCard({
     );
   }
   return (
-    <button type="button" onClick={onClick} className="block w-full text-left">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      className="block w-full cursor-pointer text-left"
+    >
       {inner}
-    </button>
+    </div>
   );
 }
