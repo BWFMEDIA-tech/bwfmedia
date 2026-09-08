@@ -444,9 +444,12 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const items = sortByActive(buckets[panel]);
     const primary = items[0] ?? null;
     const primaryId = primary?.participant?.identity ?? null;
-    // Camera-off spotlight tiles arrive as placeholders — render the
-    // avatar/fallback instead of an empty video tile.
-    const primaryTrack = primary && (primary as any).publication?.track ? primary : null;
+    // Show the live video whenever the participant has an unmuted camera
+    // publication — the media may still be arriving (common on phones).
+    // Only fall back to the avatar when the camera is genuinely off.
+    const pub = primary ? (primary as any).publication : null;
+    const primaryTrack = pub && !pub.isMuted ? primary : null;
+
     return (
       <div className="flex flex-col gap-2">
         <StageTile
