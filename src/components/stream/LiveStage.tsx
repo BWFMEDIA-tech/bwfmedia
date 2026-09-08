@@ -451,7 +451,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const primaryTrack = pub && !pub.isMuted ? primary : null;
 
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2">
         <StageTile
           track={primaryTrack}
           label={label}
@@ -491,13 +491,13 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
           "md:grid md:grid-cols-3 md:items-start md:overflow-visible md:pb-0",
         )}
       >
-        <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
+        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("admin", "HOST", "Waiting for Host")}
         </div>
-        <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
+        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
         </div>
-        <div className="min-w-[88%] shrink-0 snap-center md:min-w-0">
+        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("host", "HOST", "Waiting for Host", hostImage)}
         </div>
       </div>
@@ -857,9 +857,9 @@ function SpotlightControls({
   );
   return (
     <>
-      <div className="flex items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5">
-        <div className="flex items-center gap-2 text-[11px] text-white/70">
-          <Pin className="h-3 w-3 text-fuchsia-400" />
+      <div className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5">
+        <div className="flex min-w-0 items-center gap-2 text-[11px] text-white/70">
+          <Pin className="h-3 w-3 shrink-0 text-fuchsia-400" />
           {pinned ? (
             <span className="truncate">
               Pinned: <span className="font-semibold text-white">{pinned.display_name ?? "Guest"}</span>
