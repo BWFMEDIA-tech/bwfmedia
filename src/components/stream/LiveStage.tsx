@@ -407,6 +407,18 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     if (spotlight.host && panel === "admin") continue;
     buckets[panel].push(t);
   }
+  // A spotlighted participant with camera OFF must still appear in their
+  // box — otherwise "Bring to artist video box" looks like it does nothing.
+  // Pull their placeholder tile (avatar fallback) into the pinned panel.
+  const ensureSpotlightEntry = (panel: Panel, id: string | null) => {
+    if (!id || buckets[panel].length) return;
+    const t = tracks.find(
+      (tr) => tr.source === Track.Source.Camera && tr.participant?.identity === id,
+    );
+    if (t) buckets[panel].push(t);
+  };
+  ensureSpotlightEntry("middle", spotlight.artist);
+  ensureSpotlightEntry("admin", spotlight.host);
   // Priority: active speaker first within each bucket.
   const sortByActive = (arr: typeof cameraTracks) =>
     [...arr].sort((a, b) => Number(!!b.participant?.isSpeaking) - Number(!!a.participant?.isSpeaking));
@@ -415,10 +427,13 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const items = sortByActive(buckets[panel]);
     const primary = items[0] ?? null;
     const primaryId = primary?.participant?.identity ?? null;
+    // Camera-off spotlight tiles arrive as placeholders — render the
+    // avatar/fallback instead of an empty video tile.
+    const primaryTrack = primary && (primary as any).publication?.track ? primary : null;
     return (
       <div className="flex flex-col gap-2">
         <StageTile
-          track={primary}
+          track={primaryTrack}
           label={label}
           fallbackImage={fallback}
           profile={primaryId ? profiles[primaryId] : undefined}
