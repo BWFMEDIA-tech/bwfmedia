@@ -38,7 +38,7 @@ function PayoutsAdmin() {
             {unpaid.map((c: any, i: number) => (
               <div key={i} className="flex items-center justify-between py-3">
                 <div>
-                  <div className="font-mono text-xs">{c.artist_id?.slice(0, 8)}…</div>
+                  <div className="font-mono text-xs">{c.user_id?.slice(0, 8)}…</div>
                   <div className="text-[11px] text-white/40">{new Date(c.created_at).toLocaleDateString()}</div>
                 </div>
                 <Link to="/admin/merch" className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-bold hover:bg-blue-500">
