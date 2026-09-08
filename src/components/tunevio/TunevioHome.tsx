@@ -204,7 +204,7 @@ export function TunevioHome() {
           <ContentRail
             id="live-now"
             title="Live Right Now"
-            eyebrow="🔴 On air"
+            eyebrow="On air"
             showAllTo="/live"
             size="wide"
             items={(feed?.liveStreams ?? []).map((s) => <LiveStreamCard key={s.id} stream={s} />)}
@@ -214,7 +214,7 @@ export function TunevioHome() {
           <ContentRail
             id="play-arena"
             title="Play Arena Battles"
-            eyebrow="🎤 Live competition"
+            eyebrow="Live competition"
             showAllTo="/mic-drop"
             size="lg"
             items={(feed?.battles ?? []).map((b) => <LiveArenaCard key={b.id} battle={b} />)}
@@ -224,7 +224,7 @@ export function TunevioHome() {
           <ContentRail
             id="trending"
             title="Trending Now"
-            eyebrow="🔥 Heating up"
+            eyebrow="Heating up"
             showAllTo="/charts"
             items={(feed?.trending ?? []).map((t) => (
               <AlbumCard key={t.id} track={t} queue={feed?.trending} />
@@ -235,7 +235,7 @@ export function TunevioHome() {
           <PersonalRail
             id="jump-back-in"
             title="Jump Back In"
-            eyebrow="🎵 Pick up where you left off"
+            eyebrow="Pick up where you left off"
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
           />
@@ -255,7 +255,7 @@ export function TunevioHome() {
           <ContentRail
             id="artists-you-follow"
             title={auth.isAuthenticated ? "Artists You Follow" : "Artists To Follow"}
-            eyebrow="🎤 Your people"
+            eyebrow="Your people"
             showAllTo="/artists"
             size="md"
             items={(feed?.artists ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
@@ -265,7 +265,7 @@ export function TunevioHome() {
           <ListSection
             id="popular"
             title="Popular This Week"
-            eyebrow="🔥 Most played"
+            eyebrow="Most played"
             showAllTo="/charts"
           >
             {(feed?.popular ?? []).slice(0, 10).map((t, i) => (
@@ -277,7 +277,7 @@ export function TunevioHome() {
           <PersonalRail
             id="made-for-you"
             title="Made For You"
-            eyebrow="🎧 Personalized"
+            eyebrow="Personalized"
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
           />
@@ -286,7 +286,7 @@ export function TunevioHome() {
           <ContentRail
             id="charts"
             title="Tunevio Charts"
-            eyebrow="🏆 Top of the platform"
+            eyebrow="Top of the platform"
             showAllTo="/charts"
             items={(feed?.charts ?? []).map((t, i) => (
               <AlbumCard
@@ -306,7 +306,7 @@ export function TunevioHome() {
           <ContentRail
             id="rising"
             title="Rising Artists"
-            eyebrow="📈 Gaining momentum"
+            eyebrow="Gaining momentum"
             showAllTo="/leaderboard"
             items={(feed?.rising ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
           />
@@ -315,7 +315,7 @@ export function TunevioHome() {
           <ContentRail
             id="boosted"
             title="Boosted Artists"
-            eyebrow="🚀 Promoted on Tunevio"
+            eyebrow="Promoted on Tunevio"
             showAllTo="/discover"
             items={(feed?.boosted ?? []).map((t) => (
               <AlbumCard
@@ -335,7 +335,7 @@ export function TunevioHome() {
           <ContentRail
             id="discover"
             title="Discover"
-            eyebrow="💎 Curated for the culture"
+            eyebrow="Curated for the culture"
             showAllTo="/discover"
             size="md"
             items={[
