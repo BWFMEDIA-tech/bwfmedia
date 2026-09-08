@@ -459,6 +459,57 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
   );
 }
 
+function ModBubble({
+  m,
+}: {
+  m: { user_id: string; display_name: string | null; avatar_url: string | null };
+}) {
+  return (
+    <div className="group relative flex flex-col items-center gap-2 pt-3">
+      <div className="relative">
+        <div
+          className="absolute -inset-1 rounded-full opacity-70 blur-md"
+          style={{ background: `radial-gradient(circle, ${BLUE}66, transparent 70%)` }}
+        />
+        <div
+          className="relative shrink-0 rounded-full p-[2px]"
+          style={{ background: `linear-gradient(135deg, ${BLUE}, ${ACCENT})` }}
+        >
+          {m.avatar_url ? (
+            <SignedImg
+              src={m.avatar_url}
+              alt={m.display_name ?? "Moderator"}
+              className="h-16 w-16 shrink-0 rounded-full border border-[#0d0d18] object-cover"
+            />
+          ) : (
+            <div
+              className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#0d0d18] text-lg font-bold text-white"
+              style={{ background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})` }}
+            >
+              {(m.display_name ?? "M").charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <span
+          className="absolute -top-0.5 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white shadow-lg shadow-black/50 ring-1 ring-black/40"
+          style={{ background: `linear-gradient(135deg, ${BLUE}, ${ACCENT})` }}
+        >
+          MOD
+        </span>
+        <span
+          className="absolute -bottom-1 -right-1 z-30 grid h-5 w-5 place-items-center rounded-full ring-2 ring-[#05050b]"
+          style={{ background: BLUE }}
+        >
+          <Shield className="h-3 w-3 text-white" />
+        </span>
+      </div>
+      <span className="max-w-full truncate text-xs font-semibold text-white/90">
+        {m.display_name ?? "Moderator"}
+      </span>
+    </div>
+  );
+}
+
 function SectionHeader({
   label,
   count,
