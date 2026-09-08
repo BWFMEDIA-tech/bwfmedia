@@ -741,10 +741,25 @@ function ArtistSide({
                 )}
                 style={spinning ? { animationPlayState: spinPaused ? "paused" : "running" } : undefined}
               >
-                {/* concentric grooves */}
-                <span className="pointer-events-none absolute inset-[6%] rounded-full border border-white/5" />
-                <span className="pointer-events-none absolute inset-[14%] rounded-full border border-white/5" />
-                <span className="pointer-events-none absolute inset-[22%] rounded-full border border-white/[0.04]" />
+                {/* album cover fills the disc and spins clockwise while playing */}
+                {coverUrl ? (
+                  <SignedImg
+                    src={coverUrl}
+                    alt={trackTitle ?? name}
+                    className="absolute inset-0 h-full w-full rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0 flex h-full w-full items-center justify-center rounded-full"
+                    style={{ background: grad }}
+                  >
+                    <Swords className="h-5 w-5 text-white/70" />
+                  </div>
+                )}
+                {/* concentric grooves over the cover */}
+                <span className="pointer-events-none absolute inset-[6%] rounded-full border border-white/10" />
+                <span className="pointer-events-none absolute inset-[14%] rounded-full border border-white/10" />
+                <span className="pointer-events-none absolute inset-[22%] rounded-full border border-white/[0.08]" />
                 {/* highlight sheen */}
                 <span
                   className="pointer-events-none absolute inset-0 rounded-full"
@@ -753,23 +768,8 @@ function ArtistSide({
                       "conic-gradient(from 0deg, rgba(255,255,255,0.08), transparent 25%, rgba(255,255,255,0.05) 50%, transparent 75%, rgba(255,255,255,0.08))",
                   }}
                 />
-                {/* cover label in center */}
-                <div
-                  className="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-white/20"
-                  style={{ background: grad }}
-                >
-                  {coverUrl ? (
-                    <SignedImg
-                      src={coverUrl}
-                      alt={trackTitle ?? name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <Swords className="h-5 w-5 text-white/70" />
-                    </div>
-                  )}
-                </div>
+                {/* subtle inner shadow so the round disc reads as vinyl */}
+                <span className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_18px_rgba(0,0,0,0.55)]" />
                 {/* spindle hole */}
                 <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black ring-1 ring-white/30" />
               </div>
