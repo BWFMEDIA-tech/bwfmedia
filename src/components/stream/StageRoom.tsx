@@ -289,7 +289,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         </div>
         <div className="flex shrink-0 items-center gap-2.5">
           <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
-          <CapacityChip label="Guests" filled={guests.length} total={MAX_GUESTS} color={ACCENT} />
+          <CapacityChip label="Guests" filled={guestSlotsTaken} total={MAX_GUESTS} color={ACCENT} />
         </div>
       </div>
 
