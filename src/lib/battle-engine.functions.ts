@@ -683,6 +683,32 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       }
     }
 
+    // The side that is actually on air is whichever round track is currently
+    // "playing" on the stream. `battle_matches.active_side` can lag behind the
+    // real audio (host restarts, auto-advance, missed realtime event), which
+    // made the wrong artist card animate. The playing row wins; the column is
+    // only a fallback when nothing is playing.
+    let activeSide = (match.active_side as "a" | "b" | null) ?? null;
+    {
+      const roundTrackIds = [currentRound?.a_playing_track_id, currentRound?.b_playing_track_id]
+        .filter(Boolean) as string[];
+      if (roundTrackIds.length) {
+        const { data: live } = await sb
+          .from("play_tracks")
+          .select("id, updated_at")
+          .in("id", roundTrackIds)
+          .eq("status", "playing")
+          .order("updated_at", { ascending: false })
+          .limit(1);
+        const playingId = live?.[0]?.id ?? null;
+        if (playingId) {
+          activeSide = playingId === currentRound?.b_playing_track_id ? "b" : "a";
+        }
+      }
+    }
+
+
+
     // Percentages are computed HERE, from live accepted votes of the current
     // round only — never client-side, never from viewer counts, never carried
     // over from previous rounds. Validated before it reaches any client; a
@@ -713,7 +739,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       match,
       rounds: rounds ?? [],
       currentRound,
-      activeSide: (match.active_side as "a" | "b" | null) ?? null,
+      activeSide,
       votingStatus:
         (currentRound?.voting_status as "closed" | "open" | "finalized") ?? "closed",
       aTrack,
