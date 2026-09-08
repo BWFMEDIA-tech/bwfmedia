@@ -632,6 +632,13 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
         voteTotals: emptyVoteTotals(),
       };
     }
+    // `play_tracks` is artist-private under RLS, but the battle display is
+    // public. Read only the two artists' battle-track presentation fields on
+    // the server so every viewer receives the artwork/title that the host
+    // selected; the previous anonymous query silently returned no rows and
+    // made both discs fall back to the colored vinyl placeholder.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const trackSb = supabaseAdmin;
     const { data: rounds } = await sb
       .from("battle_rounds")
       .select("*")
@@ -646,7 +653,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
     let aTrack: any = null;
     let bTrack: any = null;
     if (trackIds.length) {
-      const { data: tracks } = await sb
+      const { data: tracks } = await trackSb
         .from("play_tracks")
         .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status")
         .in("id", trackIds);
@@ -667,7 +674,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
     if (!bTrack && match.artist_b_id) needFallback.push({ side: "b", artistId: match.artist_b_id as string });
     if (needFallback.length) {
       const artistIds = needFallback.map((n) => n.artistId!).filter(Boolean);
-      const { data: subs } = await sb
+      const { data: subs } = await trackSb
         .from("play_tracks")
         .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at")
         .eq("stream_id", data.streamId)
@@ -693,7 +700,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       const roundTrackIds = [currentRound?.a_playing_track_id, currentRound?.b_playing_track_id]
         .filter(Boolean) as string[];
       if (roundTrackIds.length) {
-        const { data: live } = await sb
+        const { data: live } = await trackSb
           .from("play_tracks")
           .select("id, updated_at")
           .in("id", roundTrackIds)
