@@ -472,3 +472,50 @@ function PersonalRail({
     />
   );
 }
+
+type HomeVideo = {
+  id: string;
+  title: string;
+  artist: string | null;
+  storage_path: string;
+  thumbnail_path: string | null;
+};
+
+/** Music video card — links to the video page, signed thumbnail with first-frame fallback. */
+function VideoCard({ video }: { video: HomeVideo }) {
+  const thumb = useSignedVideoUrl(video.thumbnail_path);
+  const fallback = useSignedVideoUrl(video.thumbnail_path ? null : video.storage_path);
+  return (
+    <Link
+      to="/videos/$id"
+      params={{ id: video.id } as never}
+      className="group block overflow-hidden rounded-2xl border border-tv-line bg-tv-surface transition hover:border-tv-cyan/50"
+    >
+      <div className="relative aspect-video w-full overflow-hidden bg-black/40">
+        {thumb ? (
+          <img
+            src={thumb}
+            alt={video.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          />
+        ) : fallback ? (
+          <video src={fallback} preload="metadata" muted playsInline className="h-full w-full object-cover" />
+        ) : (
+          <div className="grid h-full w-full place-items-center bg-white/5">
+            <Clapperboard className="h-8 w-8 text-white/20" />
+          </div>
+        )}
+        <span className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-tv-cyan text-black shadow-lg">
+            <Play className="ml-0.5 h-5 w-5 fill-current" />
+          </span>
+        </span>
+      </div>
+      <div className="p-3">
+        <p className="truncate text-sm font-bold">{video.title}</p>
+        <p className="truncate text-xs text-white/50">{video.artist || "Tunevio"}</p>
+      </div>
+    </Link>
+  );
+}
