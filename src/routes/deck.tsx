@@ -154,9 +154,9 @@ function Cover() {
             "Real Content. Real People. Real Reach."
           </p>
           <div className="mt-14 grid grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto">
-            <StatCard big="687M+" label="Views" />
-            <StatCard big="325K+" label="Subscribers" />
-            <StatCard big="18M+" label="Likes" />
+            <StatCard big="731.7M+" label="Views" />
+            <StatCard big="335.625K+" label="Subscribers" />
+            <StatCard big="811.9M+" label="Likes" />
           </div>
           <div className="mt-12 font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/70">
             Founder · <span className="text-bone">Dantavious Lee</span>
@@ -231,12 +231,12 @@ function Traction() {
       </div>
       <H>The audience<br />is already here.</H>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10">
-        <StatCard big="687.2M" label="Total Views" />
-        <StatCard big="325,003" label="Subscribers" />
-        <StatCard big="18.0M" label="Likes" />
+        <StatCard big="731.7M" label="Total Views" />
+        <StatCard big="335,625" label="Subscribers" />
+        <StatCard big="18.8M" label="Likes" />
         <StatCard big="2.8M" label="Views (Last 7 Days)" />
-        <StatCard big="761K+" label="Comments" />
-        <StatCard big="2.9M" label="Shares" />
+        <StatCard big="811.9K+" label="Comments" />
+        <StatCard big="3.1M" label="Shares" />
       </div>
       <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">
         These aren't projections, this is a <span className="text-bone font-bold">live, engaged audience</span> we already command across YouTube, Instagram, TikTok and short-form networks.
@@ -464,9 +464,9 @@ function Closing() {
             <Mail className="w-4 h-4" /> Contact for Investment
           </a>
           <div className="mt-12 grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto">
-            <StatCard big="687M+" label="Views" />
-            <StatCard big="325K+" label="Subs" />
-            <StatCard big="18M+" label="Likes" />
+            <StatCard big="731.7M+" label="Views" />
+            <StatCard big="335.625K+" label="Subs" />
+            <StatCard big="811.9M+" label="Likes" />
           </div>
         </motion.div>
       </div>
