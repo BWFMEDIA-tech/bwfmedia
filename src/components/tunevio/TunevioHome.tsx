@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Bell,
+  Clapperboard,
   Clock,
   Compass,
   Flame,
@@ -10,6 +11,7 @@ import {
   Home,
   ListMusic,
   Mic2,
+  Play,
   Radio,
   Rocket,
   Search,
@@ -22,6 +24,8 @@ import {
 import { getHomeFeed } from "@/lib/home-feed.functions";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
+import { supabase } from "@/integrations/supabase/client";
+import { useSignedVideoUrl } from "@/lib/video-urls";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ContentRail, ListSection } from "@/components/tunevio/ContentRail";
 import {
@@ -51,6 +55,24 @@ export function TunevioHome() {
   const { data, isLoading } = useQuery({
     queryKey: ["home-feed"],
     queryFn: () => getHomeFeed(),
+    staleTime: 60_000,
+  });
+  const { data: videos } = useQuery({
+    queryKey: ["home-videos"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("videos")
+        .select("id, title, artist, storage_path, thumbnail_path")
+        .order("created_at", { ascending: false })
+        .limit(12);
+      return (data ?? []) as {
+        id: string;
+        title: string;
+        artist: string | null;
+        storage_path: string;
+        thumbnail_path: string | null;
+      }[];
+    },
     staleTime: 60_000,
   });
   const auth = useAuth();
@@ -209,6 +231,16 @@ export function TunevioHome() {
             showAllTo="/live"
             size="wide"
             items={(feed?.liveStreams ?? []).map((s) => <LiveStreamCard key={s.id} stream={s} />)}
+          />
+
+          {/* Music videos */}
+          <ContentRail
+            id="music-videos"
+            title="Music Videos"
+            eyebrow="Watch now"
+            showAllTo="/videos"
+            size="wide"
+            items={(videos ?? []).map((v) => <VideoCard key={v.id} video={v} />)}
           />
 
           {/* Play Arena */}
@@ -438,5 +470,52 @@ function PersonalRail({
         <AlbumCard key={t.id} track={t} queue={tracks} />
       ))}
     />
+  );
+}
+
+type HomeVideo = {
+  id: string;
+  title: string;
+  artist: string | null;
+  storage_path: string;
+  thumbnail_path: string | null;
+};
+
+/** Music video card — links to the video page, signed thumbnail with first-frame fallback. */
+function VideoCard({ video }: { video: HomeVideo }) {
+  const thumb = useSignedVideoUrl(video.thumbnail_path);
+  const fallback = useSignedVideoUrl(video.thumbnail_path ? null : video.storage_path);
+  return (
+    <Link
+      to="/videos/$id"
+      params={{ id: video.id } as never}
+      className="group block overflow-hidden rounded-2xl border border-tv-line bg-tv-surface transition hover:border-tv-cyan/50"
+    >
+      <div className="relative aspect-video w-full overflow-hidden bg-black/40">
+        {thumb ? (
+          <img
+            src={thumb}
+            alt={video.title}
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          />
+        ) : fallback ? (
+          <video src={fallback} preload="metadata" muted playsInline className="h-full w-full object-cover" />
+        ) : (
+          <div className="grid h-full w-full place-items-center bg-white/5">
+            <Clapperboard className="h-8 w-8 text-white/20" />
+          </div>
+        )}
+        <span className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-tv-cyan text-black shadow-lg">
+            <Play className="ml-0.5 h-5 w-5 fill-current" />
+          </span>
+        </span>
+      </div>
+      <div className="p-3">
+        <p className="truncate text-sm font-bold">{video.title}</p>
+        <p className="truncate text-xs text-white/50">{video.artist || "Tunevio"}</p>
+      </div>
+    </Link>
   );
 }
