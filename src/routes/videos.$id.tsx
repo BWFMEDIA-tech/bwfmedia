@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSignedVideoUrl } from "@/lib/video-urls";
 import { ArrowLeft, ExternalLink, Music2, Megaphone, Calendar } from "lucide-react";
 import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import grunge from "@/assets/grunge-bg.jpg";
@@ -116,7 +117,7 @@ function VideoDetailPage() {
     router.navigate({ to: "/videos" });
   };
 
-  const publicUrl = video ? supabase.storage.from("videos").getPublicUrl(video.storage_path).data.publicUrl : "";
+  const signedUrl = useSignedVideoUrl(video?.storage_path ?? null);
 
   return (
     <div
@@ -150,7 +151,7 @@ function VideoDetailPage() {
         ) : (
           <article>
             <div className="aspect-video bg-black border border-blood/40 mb-8">
-              <video src={publicUrl} controls autoPlay className="w-full h-full object-contain bg-black" />
+              <video src={signedUrl ?? undefined} controls autoPlay className="w-full h-full object-contain bg-black" />
             </div>
 
             <div className="flex items-center gap-3 mb-4">
