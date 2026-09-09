@@ -235,7 +235,7 @@ function Traction() {
         <StatCard big="335,625" label="Subscribers" />
         <StatCard big="18.8M" label="Likes" />
         <StatCard big="2.8M" label="Views (Last 7 Days)" />
-        <StatCard big="761K+" label="Comments" />
+        <StatCard big="811.9K+" label="Comments" />
         <StatCard big="3.1M" label="Shares" />
       </div>
       <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">
