@@ -30,25 +30,27 @@ export const recordStreamEvent = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data, context }) => {
     const duration = Math.max(0, Math.floor(Number(data.duration_played_seconds) || 0));
-    const { data: row, error } = await (context.supabase as any)
-      .from('stream_events')
-      .insert({
-        user_id: context.userId,
-        track_id: data.track_id,
-        duration_played_seconds: duration,
-        user_tier: data.user_tier,
-        full_listen: !!data.full_listen,
-        liked: !!data.liked,
-        saved: !!data.saved,
-        shared: !!data.shared,
-        client_session_id: data.client_session_id ?? null,
-        metadata: data.metadata ?? {},
-      })
-      .select('id, valid_stream, duration_played_seconds, weighted_value')
-      .single();
+    // Trusted fields (tier, weighting, validity, anomaly scores) are computed
+    // inside the database routine — never accepted from the client.
+    const { data: row, error } = await (context.supabase as any).rpc('record_stream_event', {
+      p_track_id: data.track_id,
+      p_duration_played_seconds: duration,
+      p_full_listen: !!data.full_listen,
+      p_liked: !!data.liked,
+      p_saved: !!data.saved,
+      p_shared: !!data.shared,
+      p_client_session_id: data.client_session_id ?? null,
+      p_metadata: data.metadata ?? {},
+    });
     if (error) throw new Error(error.message);
-    return row;
+    return row as {
+      id: string;
+      valid_stream: boolean;
+      duration_played_seconds: number;
+      weighted_value: number;
+    };
   });
+
 
 /** Artist dashboard summary (subscription + earnings placeholder). */
 export const getMyArtistDashboard = createServerFn({ method: 'GET' })

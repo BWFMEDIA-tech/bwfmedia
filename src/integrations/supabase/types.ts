@@ -4583,6 +4583,19 @@ export type Database = {
         }
         Returns: string
       }
+      record_stream_event: {
+        Args: {
+          p_client_session_id?: string
+          p_duration_played_seconds: number
+          p_full_listen?: boolean
+          p_liked?: boolean
+          p_metadata?: Json
+          p_saved?: boolean
+          p_shared?: boolean
+          p_track_id: string
+        }
+        Returns: Json
+      }
       refresh_artist_vote_rollups: {
         Args: { _since?: string }
         Returns: number
