@@ -188,6 +188,26 @@ export function MediaCard({
       </Link>
     );
   }
+  // No destination: let anyone click/tap the card itself to play.
+  if (onPlay) {
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={playing ? `Pause ${title}` : `Play ${title}`}
+        onClick={onPlay}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onPlay();
+          }
+        }}
+        className="block cursor-pointer text-left"
+      >
+        {body}
+      </div>
+    );
+  }
   return body;
 }
 
