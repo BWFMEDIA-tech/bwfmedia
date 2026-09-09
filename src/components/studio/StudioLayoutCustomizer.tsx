@@ -8,6 +8,7 @@
  * is ever torn down by toggling the layout.
  */
 import { Children, createContext, isValidElement, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, ChevronUp, Eye, EyeOff, LayoutPanelTop, RotateCcw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
