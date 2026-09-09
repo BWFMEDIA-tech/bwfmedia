@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Bell,
+  Clapperboard,
   Clock,
   Compass,
   Flame,
@@ -10,6 +11,7 @@ import {
   Home,
   ListMusic,
   Mic2,
+  Play,
   Radio,
   Rocket,
   Search,
@@ -22,6 +24,8 @@ import {
 import { getHomeFeed } from "@/lib/home-feed.functions";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
+import { supabase } from "@/integrations/supabase/client";
+import { useSignedVideoUrl } from "@/lib/video-urls";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ContentRail, ListSection } from "@/components/tunevio/ContentRail";
 import {
