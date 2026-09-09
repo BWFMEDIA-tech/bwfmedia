@@ -57,6 +57,24 @@ export function TunevioHome() {
     queryFn: () => getHomeFeed(),
     staleTime: 60_000,
   });
+  const { data: videos } = useQuery({
+    queryKey: ["home-videos"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("videos")
+        .select("id, title, artist, storage_path, thumbnail_path")
+        .order("created_at", { ascending: false })
+        .limit(12);
+      return (data ?? []) as {
+        id: string;
+        title: string;
+        artist: string | null;
+        storage_path: string;
+        thumbnail_path: string | null;
+      }[];
+    },
+    staleTime: 60_000,
+  });
   const auth = useAuth();
   const player = usePlayer();
   const navigate = useNavigate();
@@ -213,6 +231,16 @@ export function TunevioHome() {
             showAllTo="/live"
             size="wide"
             items={(feed?.liveStreams ?? []).map((s) => <LiveStreamCard key={s.id} stream={s} />)}
+          />
+
+          {/* Music videos */}
+          <ContentRail
+            id="music-videos"
+            title="Music Videos"
+            eyebrow="Watch now"
+            showAllTo="/videos"
+            size="wide"
+            items={(videos ?? []).map((v) => <VideoCard key={v.id} video={v} />)}
           />
 
           {/* Play Arena */}
