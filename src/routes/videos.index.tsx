@@ -40,13 +40,16 @@ type VideoRow = {
   created_at: string;
 };
 
-function publicUrl(path: string) {
-  return supabase.storage.from("videos").getPublicUrl(path).data.publicUrl;
+/** Thumbnail (or first-frame video fallback) for a card. The `videos` bucket is
+ *  private, so every URL must be signed. */
+function VideoThumb({ v, className = "w-full h-full object-cover" }: { v: VideoRow; className?: string }) {
+  const thumb = useSignedVideoUrl(v.thumbnail_path);
+  const fallback = useSignedVideoUrl(v.thumbnail_path ? null : v.storage_path);
+  if (thumb) return <img src={thumb} alt={v.title} loading="lazy" className={className} />;
+  if (fallback) return <video src={fallback} preload="metadata" className={className} />;
+  return <div className={`${className} bg-white/5`} />;
 }
 
-function thumbUrl(v: { thumbnail_path: string | null }) {
-  return v.thumbnail_path ? publicUrl(v.thumbnail_path) : null;
-}
 
 async function captureVideoThumbnail(file: File): Promise<Blob | null> {
   return new Promise((resolve) => {
