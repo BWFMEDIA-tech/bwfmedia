@@ -300,7 +300,8 @@ export function CustomizeLayoutButton() {
               <RotateCcw className="h-3.5 w-3.5" /> Reset to default layout
             </button>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
