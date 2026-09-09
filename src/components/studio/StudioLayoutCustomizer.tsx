@@ -225,8 +225,8 @@ export function CustomizeLayoutButton() {
         <LayoutPanelTop className="h-3.5 w-3.5" /> Customize Layout
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setOpen(false)}>
+      {open && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[2000] flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm" onClick={() => setOpen(false)}>
           <div
             className="mt-16 w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
