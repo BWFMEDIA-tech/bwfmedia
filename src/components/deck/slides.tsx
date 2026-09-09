@@ -27,7 +27,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const TOTAL = 12;
+const TOTAL = 13;
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -665,4 +665,48 @@ export function Slide12() {
   );
 }
 
-export const SLIDES = [Slide1, Slide2, Slide3, Slide4, Slide5, Slide6, Slide7, Slide8, Slide9, Slide10, Slide11, Slide12];
+/* ================= SLIDE 13 — ANALYTICS ================= */
+export function Slide13() {
+  const stats = [
+    { v: "335,625", l: "Subscribers", i: <Users className="w-7 h-7" /> },
+    { v: "731.7M", l: "Views", i: <Play className="w-7 h-7" /> },
+    { v: "18.8M", l: "Likes", i: <Sparkles className="w-7 h-7" /> },
+    { v: "811.9K", l: "Comments", i: <MessageCircle className="w-7 h-7" /> },
+    { v: "3.1M", l: "Shares", i: <TrendingUp className="w-7 h-7" /> },
+  ];
+  return (
+    <SlideShell number={13} total={TOTAL} label="Analytics">
+      <div className="flex-1 flex flex-col items-center justify-center px-20 py-16 text-center">
+        <Kicker>All time</Kicker>
+        <motion.div {...fade(0.1)} className="font-display text-7xl tracking-tight text-bone mb-4">
+          BWF<sup className="text-3xl align-super">™</sup>
+        </motion.div>
+        <motion.p {...fade(0.2)} className="font-cond tracking-[0.25em] text-xl uppercase text-bone/60 mb-12">
+          Network Analytics
+        </motion.p>
+        <div className="grid grid-cols-5 gap-6 w-full max-w-6xl">
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.l}
+              {...fade(0.25 + i * 0.07)}
+              className="flex flex-col items-center gap-4 border border-border bg-black/40 rounded-xl p-7"
+            >
+              <div style={{ color: "var(--blood)" }}>{s.i}</div>
+              <div className="font-display text-5xl tracking-tight" style={{ color: "var(--blood)" }}>
+                {s.v}
+              </div>
+              <div className="font-cond font-bold tracking-[0.2em] text-sm uppercase text-bone/70">
+                {s.l}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        <motion.div {...fade(0.65)} className="mt-10 max-w-4xl text-bone/60 text-xl leading-relaxed">
+          BWF Network's existing audience gives Tunevio a built-in foundation of creators, viewers and engaged fans.
+        </motion.div>
+      </div>
+    </SlideShell>
+  );
+}
+
+export const SLIDES = [Slide1, Slide2, Slide3, Slide4, Slide5, Slide6, Slide7, Slide8, Slide9, Slide10, Slide11, Slide12, Slide13];
