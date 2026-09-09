@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSignedVideoUrl } from "@/lib/video-urls";
 import {
   Upload,
   Play, Pause, Heart, Bookmark, Share2, MoreHorizontal,
@@ -230,6 +231,8 @@ function VideosPage() {
   const trending = videos.slice(0, 5);
   const newReleases = videos.slice(0, 5);
   const videoOfWeek = videos[1] ?? hero;
+  const heroSrc = useSignedVideoUrl(hero?.storage_path ?? null);
+  const heroPoster = useSignedVideoUrl(hero?.thumbnail_path ?? null);
   const progressPercent = duration > 0 ? Math.min(100, Math.max(0, (currentTime / duration) * 100)) : 0;
 
   useEffect(() => {
@@ -504,8 +507,8 @@ function VideosPage() {
                 <div className="relative aspect-video md:aspect-auto md:min-h-[360px] bg-black overflow-hidden">
                   <video
                     ref={videoRef}
-                    src={publicUrl(hero.storage_path)}
-                    poster={thumbUrl(hero) ?? undefined}
+                    src={heroSrc ?? undefined}
+                    poster={heroPoster ?? undefined}
                     preload="metadata"
                     playsInline
                     controls={nativeControls}
@@ -720,11 +723,7 @@ function TrendingCard({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group block">
       <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
-        {thumbUrl(v) ? (
-          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
-        ) : (
-          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
-        )}
+        <VideoThumb v={v} />
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 flex items-center justify-center transition-colors">
           <span className="w-10 h-10 rounded-full bg-black/50 border border-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Play size={14} className="text-white ml-0.5" />
@@ -753,11 +752,7 @@ function ShelfCard({ v, onPlay }: { v: VideoRow; onPlay?: () => void }) {
     <div className="group relative w-44 sm:w-48 shrink-0">
       <Link to="/videos/$id" params={{ id: v.id }} className="block">
         <div className="relative aspect-video rounded-lg overflow-hidden bg-neutral-900 border border-white/5 group-hover:border-white/20 shadow-lg transition-all">
-          {thumbUrl(v) ? (
-            <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
-          ) : (
-            <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
-          )}
+          <VideoThumb v={v} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <span className="absolute bottom-2 right-2 text-[10px] bg-black/80 px-1.5 py-0.5 rounded font-medium">
             {pseudoDuration(v.id)}
@@ -808,11 +803,7 @@ function _UnusedTrendingCard({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group block">
       <div className="relative aspect-video rounded-lg overflow-hidden bg-black border border-white/5 group-hover:border-red-500/50 transition-colors">
-        {thumbUrl(v) ? (
-          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
-        ) : (
-          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
-        )}
+        <VideoThumb v={v} />
         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 flex items-center justify-center transition-colors">
           <span className="w-10 h-10 rounded-full bg-black/50 border border-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Play size={14} className="text-white ml-0.5" />
@@ -840,11 +831,7 @@ function NewReleaseRow({ v }: { v: VideoRow }) {
   return (
     <Link to="/videos/$id" params={{ id: v.id }} className="group flex items-center gap-3 p-2 rounded-lg hover:bg-white/5">
       <div className="relative w-20 h-14 rounded-md overflow-hidden bg-black shrink-0 border border-white/5">
-        {thumbUrl(v) ? (
-          <img src={thumbUrl(v)!} alt={v.title} loading="lazy" className="w-full h-full object-cover" />
-        ) : (
-          <video src={publicUrl(v.storage_path)} preload="metadata" className="w-full h-full object-cover" />
-        )}
+        <VideoThumb v={v} />
         <span className="absolute bottom-0.5 right-0.5 text-[9px] bg-black/80 px-1 rounded">{pseudoDuration(v.id)}</span>
       </div>
       <div className="min-w-0 flex-1">
