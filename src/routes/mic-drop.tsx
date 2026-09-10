@@ -189,7 +189,7 @@ function MicDropArena() {
                 <div className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white/80">
                   <Play className="h-3 w-3" /> Watch & Vote
                 </div>
-              </Link>
+              </WatchLink>
             ))}
           </div>
         ) : (
