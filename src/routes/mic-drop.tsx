@@ -71,7 +71,17 @@ function MicDropArena() {
     .slice(0, 5);
 
   const battlesThisWeek = live?.activeBattles ?? 0;
-  const watchLink = featured?.roomName ? `/play/${featured.roomName}` : "/play";
+  const room = featured?.roomName ?? null;
+  const WatchLink = ({ className, children }: { className: string; children: React.ReactNode }) =>
+    room ? (
+      <Link to="/play/$room" params={{ room }} className={className}>
+        {children}
+      </Link>
+    ) : (
+      <Link to="/play" className={className}>
+        {children}
+      </Link>
+    );
 
   return (
     <div className="min-h-screen bg-black text-white pb-32">
