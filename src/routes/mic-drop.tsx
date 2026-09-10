@@ -115,12 +115,9 @@ function MicDropArena() {
             >
               <Mic className="h-4 w-4" /> Enter Battle
             </Link>
-            <Link
-              to={watchLink}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold uppercase tracking-wider hover:bg-white/10"
-            >
+            <WatchLink className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold uppercase tracking-wider hover:bg-white/10">
               <Play className="h-4 w-4" /> {isLive ? "Watch Live" : "Open Arena"}
-            </Link>
+            </WatchLink>
           </div>
           <div className="mt-8 flex flex-wrap gap-6 text-xs text-white/50">
             <Stat
