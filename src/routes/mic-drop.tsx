@@ -155,9 +155,8 @@ function MicDropArena() {
         {isLive ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {battlers.map((b, i) => (
-              <Link
+              <WatchLink
                 key={`${b.name}-${i}`}
-                to={watchLink}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-left transition hover:border-white/20"
               >
                 <div
