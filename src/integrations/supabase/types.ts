@@ -245,6 +245,45 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_exclusive_content: {
+        Row: {
+          artist_id: string
+          body: string | null
+          content_type: string
+          created_at: string
+          id: string
+          media_url: string | null
+          published_at: string | null
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          artist_id: string
+          body?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          published_at?: string | null
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          artist_id?: string
+          body?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          media_url?: string | null
+          published_at?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       artist_follows: {
         Row: {
           artist_id: string
@@ -1730,6 +1769,83 @@ export type Database = {
         }
         Relationships: []
       }
+      listener_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          created_at: string
+          progress: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          created_at?: string
+          progress?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          created_at?: string
+          progress?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listener_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "listener_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listener_challenges: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string
+          id: string
+          metric: string
+          reward_points: number
+          slug: string
+          sort_order: number
+          target: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description: string
+          id?: string
+          metric: string
+          reward_points?: number
+          slug: string
+          sort_order?: number
+          target?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          metric?: string
+          reward_points?: number
+          slug?: string
+          sort_order?: number
+          target?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       live_submissions: {
         Row: {
           amount_cents: number
@@ -2510,6 +2626,111 @@ export type Database = {
           },
         ]
       }
+      playlist_follows: {
+        Row: {
+          created_at: string
+          playlist_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          playlist_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          playlist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_follows_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlist_tracks: {
+        Row: {
+          created_at: string
+          id: string
+          playlist_id: string
+          position: number
+          track_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          playlist_id: string
+          position?: number
+          track_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_tracks_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "playlist_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       podcast_state: {
         Row: {
           audio_idx: number
@@ -2805,6 +3026,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      saved_releases: {
+        Row: {
+          created_at: string
+          release_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          release_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          release_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_releases_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_tracks: {
+        Row: {
+          created_at: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "saved_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shopify_store_credentials: {
         Row: {
@@ -3773,6 +4053,45 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      track_reactions: {
+        Row: {
+          created_at: string
+          reaction: string
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          reaction: string
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          reaction?: string
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "track_reactions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "track_reactions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_accounts: {
         Row: {
