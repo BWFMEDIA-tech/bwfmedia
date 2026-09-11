@@ -76,12 +76,21 @@ export function Artwork({
       )}
     >
       {src ? (
-        <SignedImg
-          src={src}
-          alt={alt}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
-        />
+        <>
+          <SignedImg
+            src={src}
+            alt={alt}
+            loading="lazy"
+            className="h-full w-full object-contain transition-transform duration-500 md:group-hover:scale-105"
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.65) 100%)",
+            }}
+          />
+        </>
       ) : (
         <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white/25">
           {alt.slice(0, 1).toUpperCase()}
