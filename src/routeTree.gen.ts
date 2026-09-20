@@ -37,7 +37,6 @@ import { Route as LiveRouteImport } from './routes/live'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as GoLiveRouteImport } from './routes/go-live'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as ForYouRouteImport } from './routes/for-you'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EarningsRouteImport } from './routes/earnings'
 import { Route as DmcaRouteImport } from './routes/dmca'
@@ -279,11 +278,6 @@ const GoLiveRoute = GoLiveRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForYouRoute = ForYouRouteImport.update({
-  id: '/for-you',
-  path: '/for-you',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -831,7 +825,6 @@ export interface FileRoutesByFullPath {
   '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
-  '/for-you': typeof ForYouRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -963,7 +956,6 @@ export interface FileRoutesByTo {
   '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
-  '/for-you': typeof ForYouRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -1097,7 +1089,6 @@ export interface FileRoutesById {
   '/dmca': typeof DmcaRoute
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
-  '/for-you': typeof ForYouRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -1232,7 +1223,6 @@ export interface FileRouteTypes {
     | '/dmca'
     | '/earnings'
     | '/events'
-    | '/for-you'
     | '/forgot-password'
     | '/go-live'
     | '/leaderboard'
@@ -1364,7 +1354,6 @@ export interface FileRouteTypes {
     | '/dmca'
     | '/earnings'
     | '/events'
-    | '/for-you'
     | '/forgot-password'
     | '/go-live'
     | '/leaderboard'
@@ -1497,7 +1486,6 @@ export interface FileRouteTypes {
     | '/dmca'
     | '/earnings'
     | '/events'
-    | '/for-you'
     | '/forgot-password'
     | '/go-live'
     | '/leaderboard'
@@ -1631,7 +1619,6 @@ export interface RootRouteChildren {
   DmcaRoute: typeof DmcaRoute
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
-  ForYouRoute: typeof ForYouRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GoLiveRoute: typeof GoLiveRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -1903,13 +1890,6 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/for-you': {
-      id: '/for-you'
-      path: '/for-you'
-      fullPath: '/for-you'
-      preLoaderRoute: typeof ForYouRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -2754,7 +2734,6 @@ const rootRouteChildren: RootRouteChildren = {
   DmcaRoute: DmcaRoute,
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
-  ForYouRoute: ForYouRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GoLiveRoute: GoLiveRoute,
   LeaderboardRoute: LeaderboardRoute,
