@@ -65,83 +65,25 @@ export const Route = createFileRoute('/api/public/studio-booking')({
           return Response.json({ error: 'Failed to save booking' }, { status: 500 })
         }
 
-        // 2. Render confirmation email and enqueue
+        // 2. Send confirmation email
         try {
-          const entry = TEMPLATES['studio-booking-confirmation']
-          const templateData = {
-            name: data.full_name,
-            sessionType: data.session_type,
-            date: formatDate(data.preferred_date),
-            time: data.preferred_time,
-            duration: data.duration,
-            crewSize: data.crew_size,
-            payUrl: `${SITE_URL}/pay/${inserted.id}?table=studio_bookings`,
-          }
-          const html = await render(React.createElement(entry.component, templateData))
-          const text = await render(React.createElement(entry.component, templateData), { plainText: true })
-          const subject = typeof entry.subject === 'function' ? entry.subject(templateData) : entry.subject
-
-          const messageId = `studio-${inserted.id}`
-
-          // Create / get unsubscribe token (one per email)
-          const normalizedEmail = data.email.toLowerCase()
-          let unsubscribeToken: string | null = null
-          const { data: existingTok } = await supabase
-            .from('email_unsubscribe_tokens')
-            .select('token')
-            .eq('email', normalizedEmail)
-            .maybeSingle()
-          if (existingTok?.token) {
-            unsubscribeToken = existingTok.token
-          } else {
-            const newToken = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '')
-            const { error: tokErr } = await supabase
-              .from('email_unsubscribe_tokens')
-              .insert({ email: normalizedEmail, token: newToken })
-            if (!tokErr) unsubscribeToken = newToken
-          }
-
-          // Check suppression
-          const { data: suppressed } = await supabase
-            .from('suppressed_emails')
-            .select('email')
-            .eq('email', normalizedEmail)
-            .maybeSingle()
-
-          if (suppressed) {
-            console.log('Skipping email send — recipient suppressed', { email: normalizedEmail })
-            return Response.json({ ok: true, id: inserted.id, emailSent: false, reason: 'suppressed' })
-          }
-
-          const payload = {
+          const outcome = await sendAndLog(supabase, {
+            templateName: 'studio-booking-confirmation',
             to: data.email,
-            from: FROM_ADDRESS,
-            sender_domain: SENDER_DOMAIN,
-            subject,
-            html,
-            text,
-            purpose: 'transactional',
-            label: 'studio-booking-confirmation',
-            idempotency_key: `studio-confirm-${inserted.id}`,
-            unsubscribe_token: unsubscribeToken,
-            message_id: messageId,
-            queued_at: new Date().toISOString(),
-          }
-
-          const { error: enqueueError } = await supabase.rpc('enqueue_email', {
-            queue_name: 'transactional_emails',
-            payload,
+            templateData: {
+              name: data.full_name,
+              sessionType: data.session_type,
+              date: formatDate(data.preferred_date),
+              time: data.preferred_time,
+              duration: data.duration,
+              crewSize: data.crew_size,
+              payUrl: `${SITE_URL}/pay/${inserted.id}?table=studio_bookings`,
+            },
+            idempotencyKey: `studio-confirm-${inserted.id}`,
+            messageId: `studio-${inserted.id}`,
           })
-
-          if (enqueueError) {
-            console.error('Failed to enqueue email', enqueueError)
-          } else {
-            await supabase.from('email_send_log').insert({
-              message_id: messageId,
-              template_name: 'studio-booking-confirmation',
-              recipient_email: data.email,
-              status: 'pending',
-            })
+          if (outcome === 'suppressed') {
+            return Response.json({ ok: true, id: inserted.id, emailSent: false, reason: 'suppressed' })
           }
         } catch (err) {
           console.error('Email pipeline error', err)

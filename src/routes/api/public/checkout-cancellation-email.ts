@@ -2,13 +2,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
-import * as React from 'react'
-import { render } from '@react-email/components'
-import { TEMPLATES } from '@/lib/email-templates/registry'
 import { validateReturnUrl } from '@/lib/validate-return-url'
-
-const SENDER_DOMAIN = 'notify.bwfmedia.company'
-const FROM_ADDRESS = `BWF Media <checkout@${SENDER_DOMAIN}>`
+import { sendAndLog } from '@/lib/email-send-log'
 
 const Schema = z.object({
   email: z.string().email().max(200),
@@ -61,39 +56,17 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
         }
 
         try {
-          const entry = TEMPLATES['checkout-cancellation']
-          const templateData = {
-            // Recipient-facing template fields are intentionally not accepted
-            // from the public client; only the generic body is sent.
-            returnUrl: data.returnUrl,
-          }
-          const html = await render(React.createElement(entry.component, templateData))
-          const text = await render(React.createElement(entry.component, templateData), { plainText: true })
-          const subject = typeof entry.subject === 'function' ? entry.subject(templateData) : entry.subject
-
           // Idempotency: same recipient + same cart contents = single email.
           const messageId = `checkout-cancel-${data.cartFingerprint}-${data.email.toLowerCase()}`
 
-          // Skip if we've already enqueued this exact cancel email.
           const { data: prior } = await supabase
             .from('email_send_log')
             .select('message_id')
             .eq('message_id', messageId)
+            .limit(1)
             .maybeSingle()
           if (prior) {
             return Response.json({ ok: true, sent: false, reason: 'duplicate' })
-          }
-
-          const normalizedEmail = data.email.toLowerCase()
-
-          // Suppression check
-          const { data: suppressed } = await supabase
-            .from('suppressed_emails')
-            .select('email')
-            .eq('email', normalizedEmail)
-            .maybeSingle()
-          if (suppressed) {
-            return Response.json({ ok: true, sent: false, reason: 'suppressed' })
           }
 
           // Per-recipient rate limit to prevent abuse via rotating cart fingerprints.
@@ -109,56 +82,22 @@ export const Route = createFileRoute('/api/public/checkout-cancellation-email')(
             return Response.json({ ok: true, sent: false, reason: 'rate_limited' })
           }
 
-          // Unsubscribe token (one per email)
-          let unsubscribeToken: string | null = null
-          const { data: existingTok } = await supabase
-            .from('email_unsubscribe_tokens')
-            .select('token')
-            .eq('email', normalizedEmail)
-            .maybeSingle()
-          if (existingTok?.token) {
-            unsubscribeToken = existingTok.token
-          } else {
-            const newToken = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '')
-            const { error: tokErr } = await supabase
-              .from('email_unsubscribe_tokens')
-              .insert({ email: normalizedEmail, token: newToken })
-            if (!tokErr) unsubscribeToken = newToken
-          }
-
-          const payload = {
+          const outcome = await sendAndLog(supabase, {
+            templateName: 'checkout-cancellation',
             to: data.email,
-            from: FROM_ADDRESS,
-            sender_domain: SENDER_DOMAIN,
-            subject,
-            html,
-            text,
-            purpose: 'transactional',
-            label: 'checkout-cancellation',
-            idempotency_key: messageId,
-            unsubscribe_token: unsubscribeToken,
-            message_id: messageId,
-            queued_at: new Date().toISOString(),
-          }
-
-          const { error: enqueueError } = await supabase.rpc('enqueue_email', {
-            queue_name: 'transactional_emails',
-            payload,
-          })
-
-          if (enqueueError) {
-            console.error('Failed to enqueue cancellation email', enqueueError)
-            return Response.json({ ok: false, error: 'enqueue_failed' }, { status: 500 })
-          }
-
-          await supabase.from('email_send_log').insert({
-            message_id: messageId,
-            template_name: 'checkout-cancellation',
-            recipient_email: data.email,
-            status: 'pending',
+            // Recipient-facing template fields are intentionally not accepted
+            // from the public client; only the generic body is sent.
+            templateData: { returnUrl: data.returnUrl },
+            idempotencyKey: messageId,
             metadata: { ip },
           })
 
+          if (outcome === 'failed') {
+            return Response.json({ ok: false, error: 'send_failed' }, { status: 500 })
+          }
+          if (outcome === 'suppressed') {
+            return Response.json({ ok: true, sent: false, reason: 'suppressed' })
+          }
           return Response.json({ ok: true, sent: true })
         } catch (err) {
           console.error('Cancellation email error', err)
