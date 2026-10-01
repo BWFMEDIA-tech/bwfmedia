@@ -88,7 +88,6 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
           })
         }
       }
-      }
     } catch (e) {
       console.error('[direct-message] offline email failed', e)
     }
