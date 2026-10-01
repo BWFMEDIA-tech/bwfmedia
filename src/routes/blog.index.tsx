@@ -196,12 +196,15 @@ function BlogPage() {
             <h2 className="font-display text-3xl md:text-5xl leading-none text-bone heavy-shadow">
               LATEST <span style={{ color: "var(--blood)" }}>POSTS</span>
             </h2>
-            <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50">
-              {posts.length} stories
-            </span>
+            <div className="flex items-center gap-4">
+              {isAdmin && <NewBlogPostDialog onCreated={refresh} />}
+              <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/50">
+                {allPosts.length} stories
+              </span>
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {posts.map((p, i) => (
+            {allPosts.map((p, i) => (
               <PostCard key={i} p={p} />
             ))}
           </div>
