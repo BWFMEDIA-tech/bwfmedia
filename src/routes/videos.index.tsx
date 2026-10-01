@@ -245,13 +245,20 @@ function VideosPage() {
     setDuration(0);
     setPlaying(false);
     if (!v || !hero) return;
+    // Stop the previous clip immediately while the new playback link loads.
+    v.pause();
     v.volume = volume;
     v.muted = muted;
+  }, [hero?.id]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !heroSrc) return;
     if (playAfterLoadRef.current) {
       playAfterLoadRef.current = false;
       v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
     }
-  }, [hero?.id]);
+  }, [heroSrc]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -263,6 +270,7 @@ function VideosPage() {
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
+    if (!heroSrc) { playAfterLoadRef.current = true; return; }
     if (v.paused) {
       v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
     } else {
