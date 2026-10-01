@@ -14,6 +14,7 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId: actorId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendAndLog } = await import("@/lib/email-send-log");
 
     // 1. Load the stream + host display name. Bail if not live.
     const { data: stream } = await supabaseAdmin
