@@ -39,7 +39,7 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     const hostName =
       hostProfile?.stage_name || hostProfile?.display_name || "A BWF host";
     const link = `/stream/${stream.room_name}`;
-    const streamUrl = `https://bwfmedia.company${link}`;
+    const streamUrl = `https://bwfnetwork.com${link}`;
 
     // 2. Build recipient list: every profile except the host.
     const { data: profiles } = await supabaseAdmin

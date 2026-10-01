@@ -21,7 +21,7 @@ interface Props {
 const Email = ({
   hostName = 'A BWF host',
   streamTitle = 'BWF Live',
-  streamUrl = 'https://bwfmedia.company/live',
+  streamUrl = 'https://bwfnetwork.com/live',
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -58,7 +58,7 @@ export const template = {
   previewData: {
     hostName: 'JXHNNY RICH',
     streamTitle: 'BWF Live: Unsigned Artist Review',
-    streamUrl: 'https://bwfmedia.company/live',
+    streamUrl: 'https://bwfnetwork.com/live',
   },
 } satisfies TemplateEntry
 

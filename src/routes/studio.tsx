@@ -22,9 +22,9 @@ export const Route = createFileRoute("/studio")({
       { property: "og:title", content: "BWF Media Studio - Where Culture, Content & Creators Meet" },
       { property: "og:description", content: "Premium studio bookings for artists & creators. Professional sound, lighting, and brand-ready delivery." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfmedia.company/studio" },
+      { property: "og:url", content: "https://bwfnetwork.com/studio" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfmedia.company/studio" }],
+    links: [{ rel: "canonical", href: "https://bwfnetwork.com/studio" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -35,13 +35,13 @@ export const Route = createFileRoute("/studio")({
           provider: {
             "@type": "Organization",
             name: "BWF Media TV",
-            url: "https://bwfmedia.company",
+            url: "https://bwfnetwork.com",
           },
           areaServed: "US",
           name: "BWF Media Studio Bookings",
           description:
             "Premium studio sessions for artist interviews, music video content, podcast recording, press, and social content packs.",
-          url: "https://bwfmedia.company/studio",
+          url: "https://bwfnetwork.com/studio",
         }),
       },
     ],

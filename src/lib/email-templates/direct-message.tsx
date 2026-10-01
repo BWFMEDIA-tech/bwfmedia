@@ -21,7 +21,7 @@ interface Props {
 const Email = ({
   senderName = 'Someone',
   preview = 'You have a new message on BWF Network',
-  inboxUrl = 'https://bwfmedia.company/messages',
+  inboxUrl = 'https://bwfnetwork.com/messages',
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -55,7 +55,7 @@ export const template = {
   previewData: {
     senderName: 'JXHNNY RICH',
     preview: 'Hey — loved your last set. Want to collab?',
-    inboxUrl: 'https://bwfmedia.company/messages',
+    inboxUrl: 'https://bwfnetwork.com/messages',
   },
 } satisfies TemplateEntry
 
