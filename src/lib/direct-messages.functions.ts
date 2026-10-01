@@ -82,7 +82,7 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
             templateData: {
               senderName,
               preview,
-              inboxUrl: 'https://bwfmedia.company/messages',
+              inboxUrl: 'https://bwfnetwork.com/messages',
             },
             idempotencyKey: `dm-${inserted.id}`,
           })

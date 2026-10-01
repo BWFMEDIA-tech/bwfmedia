@@ -126,7 +126,7 @@ export const template = {
     time: '2:00 PM',
     duration: '2 Hours',
     crewSize: 'Duo (2 Operators)',
-    payUrl: 'https://bwfmedia.company/pay/example-id?table=studio_bookings',
+    payUrl: 'https://bwfnetwork.com/pay/example-id?table=studio_bookings',
   },
 } satisfies TemplateEntry
 

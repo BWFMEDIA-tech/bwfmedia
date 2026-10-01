@@ -119,7 +119,7 @@ export const template = {
     location: 'Brooklyn, NY',
     date: 'Jun 10, 2026',
     time: '2:00 PM',
-    payUrl: 'https://bwfmedia.company/pay/example-id?table=block_bookings',
+    payUrl: 'https://bwfnetwork.com/pay/example-id?table=block_bookings',
   },
 } satisfies TemplateEntry
 

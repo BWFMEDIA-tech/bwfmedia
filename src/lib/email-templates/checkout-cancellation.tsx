@@ -20,7 +20,7 @@ const CheckoutCancellation = ({
   totalFormatted,
   returnUrl,
 }: CheckoutCancellationProps) => {
-  const url = returnUrl || 'https://bwfmedia.company'
+  const url = returnUrl || 'https://bwfnetwork.com'
   return (
     <Html lang="en" dir="ltr">
       <Head />
@@ -102,7 +102,7 @@ export const template = {
     name: 'Alex',
     itemCount: 2,
     totalFormatted: '$700',
-    returnUrl: 'https://bwfmedia.company',
+    returnUrl: 'https://bwfnetwork.com',
   },
 } satisfies TemplateEntry
 

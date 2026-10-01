@@ -22,9 +22,9 @@ export const Route = createFileRoute("/videos/")({
       { property: "og:title", content: "Music Videos & Sponsored Content | BWF Media TV" },
       { property: "og:description", content: "Featured music videos and sponsored content from BWF Media artists and partners." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfmedia.company/videos" },
+      { property: "og:url", content: "https://bwfnetwork.com/videos" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfmedia.company/videos" }],
+    links: [{ rel: "canonical", href: "https://bwfnetwork.com/videos" }],
   }),
 });
 

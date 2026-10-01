@@ -24,7 +24,7 @@ export const Route = createFileRoute("/videos/$id")({
       (v?.title
         ? `${v.title}${v.artist ? ` by ${v.artist}` : ""} on BWF Media TV.`
         : "Watch this video on BWF Media TV.");
-    const url = `https://bwfmedia.company/videos/${params.id}`;
+    const url = `https://bwfnetwork.com/videos/${params.id}`;
     const meta = [
       { title },
       { name: "description", content: desc },
