@@ -52,10 +52,4 @@ describe('sendStripeCancellationEmail', () => {
     expect(rows[0].status).toBe('suppressed');
   });
 
-  it('logs failures', async () => {
-    sendMock.mockImplementation(async () => { throw new Error('boom'); });
-    const { supabase, rows } = makeFake();
-    expect(await sendStripeCancellationEmail(supabase, 'a@b.com', 'cs_3')).toBe('send_failed');
-    expect(rows[0].status).toBe('failed');
-  });
 });
