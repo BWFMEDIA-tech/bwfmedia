@@ -24,7 +24,7 @@ export const Route = createFileRoute("/leaderboard")({
   }),
   errorComponent: ({ error }) => (
     <div className="min-h-screen bg-[#05050a] text-white p-10">
-      <p className="text-red-400">Couldn't load leaderboard: {error.message}</p>
+      <p className="text-red-400">Couldn't load leaderboard: {(error as Error).message}</p>
     </div>
   ),
   notFoundComponent: () => <div className="p-10 text-white">Not found.</div>,
