@@ -4688,17 +4688,8 @@ export type Database = {
         Args: { _amount_cents: number; _artist_id: string; _source_id: string }
         Returns: undefined
       }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
-      }
       deliver_release: { Args: { _release_id: string }; Returns: Json }
       dequeue_matchmaking: { Args: never; Returns: boolean }
-      email_queue_dispatch: { Args: never; Returns: undefined }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
-      }
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
@@ -4850,15 +4841,6 @@ export type Database = {
         Returns: string
       }
       month_bucket: { Args: { _ts: string }; Returns: string }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
       react_to_battle: {
         Args: {
           _action: string
@@ -4868,14 +4850,6 @@ export type Database = {
           _user_agent?: string
         }
         Returns: Json
-      }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
       }
       rebuild_artist_vote_stats: { Args: never; Returns: Json }
       recompute_play_arena_rankings: { Args: never; Returns: number }
