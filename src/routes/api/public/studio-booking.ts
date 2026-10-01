@@ -2,12 +2,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
-import * as React from 'react'
-import { render } from '@react-email/components'
-import { TEMPLATES } from '@/lib/email-templates/registry'
-
-const SENDER_DOMAIN = 'notify.bwfmedia.company'
-const FROM_ADDRESS = `BWF Media <bookings@${SENDER_DOMAIN}>`
+import { sendAndLog } from '@/lib/email-send-log'
 const SITE_URL = 'https://bwfmedia.company'
 
 const Schema = z.object({

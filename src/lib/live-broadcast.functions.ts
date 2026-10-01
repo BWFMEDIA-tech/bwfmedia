@@ -1,12 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import * as React from "react";
-import { render } from "@react-email/components";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { TEMPLATES } from "@/lib/email-templates/registry";
-
-const SENDER_DOMAIN = "notify.bwfmedia.company";
-const FROM_ADDRESS = `BWF Network <live@${SENDER_DOMAIN}>`;
 
 /**
  * Broadcast "host went live" to every other authenticated user who opted in.
@@ -96,14 +90,8 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     });
     let emailed = 0;
     if (emailRecipients.length > 0) {
-      // Render once per stream broadcast.
-      const entry = TEMPLATES["live-stream-started"];
       const tplData = { hostName, streamTitle: stream.title, streamUrl };
-      const html = await render(React.createElement(entry.component, tplData));
-      const text = await render(React.createElement(entry.component, tplData), { plainText: true });
-      const subject = typeof entry.subject === "function" ? entry.subject(tplData) : entry.subject;
 
-      // Fetch emails via auth.admin in chunks of 1000.
       for (let i = 0; i < emailRecipients.length; i += 200) {
         const chunk = emailRecipients.slice(i, i + 200);
         const userLookups = await Promise.all(
@@ -114,58 +102,20 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
         );
         for (const { uid, email } of userLookups) {
           if (!email) continue;
-          const lower = email.toLowerCase();
-          const { data: suppressed } = await supabaseAdmin
-            .from("suppressed_emails").select("email").eq("email", lower).maybeSingle();
-          if (suppressed) continue;
-
           const messageId = `live-${stream.id}-${uid}`;
-          const { error: claimErr } = await supabaseAdmin
-            .from("email_send_log")
-            .insert({
-              message_id: messageId,
-              template_name: "live-stream-started",
-              recipient_email: email,
-              status: "pending",
-              metadata: { stream_id: stream.id, host_id: stream.host_id },
-            });
-          if (claimErr) continue; // duplicate or other; skip
+          const { data: prior } = await supabaseAdmin
+            .from("email_send_log").select("id")
+            .eq("message_id", messageId).eq("status", "sent").limit(1).maybeSingle();
+          if (prior) continue;
 
-          // unsubscribe token
-          let unsubscribeToken: string | null = null;
-          const { data: existing } = await supabaseAdmin
-            .from("email_unsubscribe_tokens").select("token").eq("email", lower).maybeSingle();
-          if (existing?.token) unsubscribeToken = existing.token;
-          else {
-            const t = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
-            const { error: tokErr } = await supabaseAdmin
-              .from("email_unsubscribe_tokens").insert({ email: lower, token: t });
-            if (!tokErr) unsubscribeToken = t;
-          }
-
-          const { error: enqErr } = await supabaseAdmin.rpc("enqueue_email", {
-            queue_name: "transactional_emails",
-            payload: {
-              to: email,
-              from: FROM_ADDRESS,
-              sender_domain: SENDER_DOMAIN,
-              subject,
-              html,
-              text,
-              purpose: "transactional",
-              label: "live-stream-started",
-              idempotency_key: messageId,
-              unsubscribe_token: unsubscribeToken,
-              message_id: messageId,
-              queued_at: new Date().toISOString(),
-            },
+          const outcome = await sendAndLog(supabaseAdmin, {
+            templateName: "live-stream-started",
+            to: email,
+            templateData: tplData,
+            idempotencyKey: messageId,
+            metadata: { stream_id: stream.id, host_id: stream.host_id },
           });
-          if (enqErr) {
-            await supabaseAdmin.from("email_send_log").delete()
-              .eq("message_id", messageId).eq("status", "pending");
-            continue;
-          }
-          emailed += 1;
+          if (outcome === "sent") emailed += 1;
         }
       }
     }
