@@ -127,6 +127,7 @@ import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/b
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
+import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
@@ -739,6 +740,11 @@ const BroadcastBroadcastIdManageRoute =
     path: '/manage',
     getParentRoute: () => BroadcastBroadcastIdRoute,
   } as any)
+const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
+  id: '/lovable/email/events',
+  path: '/lovable/email/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -926,6 +932,7 @@ export interface FileRoutesByFullPath {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
@@ -1057,6 +1064,7 @@ export interface FileRoutesByTo {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
@@ -1190,6 +1198,7 @@ export interface FileRoutesById {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
@@ -1324,6 +1333,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/oauth/$platform/callback'
@@ -1455,6 +1465,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/oauth/$platform/callback'
@@ -1587,6 +1598,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
+    | '/lovable/email/events'
     | '/lovable/email/suppression'
     | '/play/audience/$room'
     | '/api/oauth/$platform/callback'
@@ -1680,6 +1692,7 @@ export interface RootRouteChildren {
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
+  LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
   ApiOauthPlatformCallbackRoute: typeof ApiOauthPlatformCallbackRoute
@@ -2522,6 +2535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastBroadcastIdManageRouteImport
       parentRoute: typeof BroadcastBroadcastIdRoute
     }
+    '/lovable/email/events': {
+      id: '/lovable/email/events'
+      path: '/lovable/email/events'
+      fullPath: '/lovable/email/events'
+      preLoaderRoute: typeof LovableEmailEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -2799,6 +2819,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
+  LovableEmailEventsRoute: LovableEmailEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
   ApiOauthPlatformCallbackRoute: ApiOauthPlatformCallbackRoute,
