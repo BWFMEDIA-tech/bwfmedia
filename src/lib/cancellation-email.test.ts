@@ -53,7 +53,7 @@ describe('sendStripeCancellationEmail', () => {
   });
 
   it('logs failures', async () => {
-    sendMock.mockRejectedValue(new Error('boom'));
+    sendMock.mockImplementation(async () => { throw new Error('boom'); });
     const { supabase, rows } = makeFake();
     expect(await sendStripeCancellationEmail(supabase, 'a@b.com', 'cs_3')).toBe('send_failed');
     expect(rows[0]).toMatchObject({ status: 'failed', error_message: 'boom' });
