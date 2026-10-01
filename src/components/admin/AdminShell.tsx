@@ -15,6 +15,7 @@ type NavEntry =
 
 const NAV: NavEntry[] = [
   { kind: "link", to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { kind: "link", to: "/stream-studio", label: "Stream Studio", icon: PlayCircle },
   {
     kind: "group", key: "artists", label: "Artists", icon: Star,
     children: [
