@@ -71,62 +71,21 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
 
         const recipientEmail = recipientAuth?.user?.email
         if (recipientEmail) {
-          // Check suppression
-          const { data: suppressed } = await supabaseAdmin
-            .from('suppressed_emails')
-            .select('id')
-            .eq('email', recipientEmail.toLowerCase())
-            .maybeSingle()
-
-          if (!suppressed) {
-            const senderName =
-              senderProfile?.display_name || 'Someone on BWF Network'
-            const preview =
-              data.body.length > 200 ? data.body.slice(0, 197) + '…' : data.body
-
-            // Render & enqueue directly (avoids admin-only send route)
-            const React = await import('react')
-            const { render } = await import('@react-email/components')
-            const { TEMPLATES } = await import('@/lib/email-templates/registry')
-            const template = TEMPLATES['direct-message']
-            if (template) {
-              const templateData = {
-                senderName,
-                preview,
-                inboxUrl: 'https://bwfmedia.company/messages',
-              }
-              const element = React.createElement(template.component, templateData)
-              const html = await render(element)
-              const text = await render(element, { plainText: true })
-              const subject =
-                typeof template.subject === 'function'
-                  ? template.subject(templateData)
-                  : template.subject
-              const messageId = crypto.randomUUID()
-              await supabaseAdmin.from('email_send_log').insert({
-                message_id: messageId,
-                template_name: 'direct-message',
-                recipient_email: recipientEmail,
-                status: 'pending',
-              })
-              await supabaseAdmin.rpc('enqueue_email', {
-                queue_name: 'transactional_emails',
-                payload: {
-                  message_id: messageId,
-                  to: recipientEmail,
-                  from: `bwfmedia <noreply@notify.bwfmedia.company>`,
-                  sender_domain: 'notify.bwfmedia.company',
-                  subject,
-                  html,
-                  text,
-                  purpose: 'transactional',
-                  label: 'direct-message',
-                  idempotency_key: `dm-${inserted.id}`,
-                  queued_at: new Date().toISOString(),
-                },
-              })
-            }
-          }
+          const senderName =
+            senderProfile?.display_name || 'Someone on BWF Network'
+          const preview =
+            data.body.length > 200 ? data.body.slice(0, 197) + '…' : data.body
+          const { sendAndLog } = await import('@/lib/email-send-log')
+          await sendAndLog(supabaseAdmin, {
+            templateName: 'direct-message',
+            to: recipientEmail,
+            templateData: {
+              senderName,
+              preview,
+              inboxUrl: 'https://bwfmedia.company/messages',
+            },
+            idempotencyKey: `dm-${inserted.id}`,
+          })
         }
       }
     } catch (e) {

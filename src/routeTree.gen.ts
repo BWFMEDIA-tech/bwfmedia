@@ -91,7 +91,6 @@ import { Route as BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport } from './
 import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as LabelsIndexRouteImport } from './routes/labels.index'
@@ -127,7 +126,7 @@ import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/b
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
 import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
@@ -136,9 +135,7 @@ import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/publi
 import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -556,11 +553,6 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
@@ -739,9 +731,9 @@ const BroadcastBroadcastIdManageRoute =
     path: '/manage',
     getParentRoute: () => BroadcastBroadcastIdRoute,
   } as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
+const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
+  id: '/lovable/email/events',
+  path: '/lovable/email/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayAudienceRoomRoute = PlayAudienceRoomRouteImport.update({
@@ -788,22 +780,10 @@ const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
   path: '/lovable/email/auth/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
     path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -888,7 +868,6 @@ export interface FileRoutesByFullPath {
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
-  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
@@ -926,7 +905,7 @@ export interface FileRoutesByFullPath {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
@@ -935,9 +914,7 @@ export interface FileRoutesByFullPath {
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1019,7 +996,6 @@ export interface FileRoutesByTo {
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
-  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
@@ -1057,7 +1033,7 @@ export interface FileRoutesByTo {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
@@ -1066,9 +1042,7 @@ export interface FileRoutesByTo {
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1152,7 +1126,6 @@ export interface FileRoutesById {
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
-  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
@@ -1190,7 +1163,7 @@ export interface FileRoutesById {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
-  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
@@ -1199,9 +1172,7 @@ export interface FileRoutesById {
   '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
-  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
-  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1286,7 +1257,6 @@ export interface FileRouteTypes {
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
-    | '/email/unsubscribe'
     | '/invite/$code'
     | '/label-invite/$code'
     | '/labels/$labelId'
@@ -1324,7 +1294,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
-    | '/lovable/email/suppression'
+    | '/lovable/email/events'
     | '/play/audience/$room'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
@@ -1333,9 +1303,7 @@ export interface FileRouteTypes {
     | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1417,7 +1385,6 @@ export interface FileRouteTypes {
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
-    | '/email/unsubscribe'
     | '/invite/$code'
     | '/label-invite/$code'
     | '/labels/$labelId'
@@ -1455,7 +1422,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
-    | '/lovable/email/suppression'
+    | '/lovable/email/events'
     | '/play/audience/$room'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
@@ -1464,9 +1431,7 @@ export interface FileRouteTypes {
     | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -1549,7 +1514,6 @@ export interface FileRouteTypes {
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
-    | '/email/unsubscribe'
     | '/invite/$code'
     | '/label-invite/$code'
     | '/labels/$labelId'
@@ -1587,7 +1551,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/broadcast/$broadcastId/manage'
-    | '/lovable/email/suppression'
+    | '/lovable/email/events'
     | '/play/audience/$room'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
@@ -1596,9 +1560,7 @@ export interface FileRouteTypes {
     | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
-    | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
-    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1658,7 +1620,6 @@ export interface RootRouteChildren {
   BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRouteWithChildren
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
-  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
@@ -1680,7 +1641,7 @@ export interface RootRouteChildren {
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
-  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
   ApiOauthPlatformCallbackRoute: typeof ApiOauthPlatformCallbackRoute
   ApiPublicHooksProcessPayoutsRoute: typeof ApiPublicHooksProcessPayoutsRoute
@@ -1689,9 +1650,7 @@ export interface RootRouteChildren {
   ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
-  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2270,13 +2229,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/invite/$code': {
       id: '/invite/$code'
       path: '/invite/$code'
@@ -2522,11 +2474,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastBroadcastIdManageRouteImport
       parentRoute: typeof BroadcastBroadcastIdRoute
     }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+    '/lovable/email/events': {
+      id: '/lovable/email/events'
+      path: '/lovable/email/events'
+      fullPath: '/lovable/email/events'
+      preLoaderRoute: typeof LovableEmailEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/play/audience/$room': {
@@ -2585,25 +2537,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
       fullPath: '/lovable/email/transactional/preview'
       preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -2776,7 +2714,6 @@ const rootRouteChildren: RootRouteChildren = {
   BroadcastBroadcastIdRoute: BroadcastBroadcastIdRouteWithChildren,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
-  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
   LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
@@ -2799,7 +2736,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
-  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  LovableEmailEventsRoute: LovableEmailEventsRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
   ApiOauthPlatformCallbackRoute: ApiOauthPlatformCallbackRoute,
   ApiPublicHooksProcessPayoutsRoute: ApiPublicHooksProcessPayoutsRoute,
@@ -2808,9 +2745,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
-  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

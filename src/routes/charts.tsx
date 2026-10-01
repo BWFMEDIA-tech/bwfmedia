@@ -24,7 +24,7 @@ export const Route = createFileRoute("/charts")({
   }),
   errorComponent: ({ error }) => (
     <div className="min-h-screen bg-black text-white p-10">
-      <p className="text-red-400">Couldn't load charts: {error.message}</p>
+      <p className="text-red-400">Couldn't load charts: {(error as Error).message}</p>
     </div>
   ),
   notFoundComponent: () => <div className="p-10 text-white">Not found.</div>,

@@ -58,7 +58,7 @@ export const Route = createFileRoute("/videos/$id")({
     <div className="min-h-screen flex items-center justify-center text-bone bg-black p-6">
       <div className="text-center">
         <p className="text-blood font-cond uppercase tracking-widest mb-3">Error</p>
-        <p className="text-bone/70">{error.message}</p>
+        <p className="text-bone/70">{(error as Error).message}</p>
         <Link to="/videos" className="inline-block mt-6 px-4 py-2 bg-blood text-bone font-cond uppercase tracking-widest text-xs">
           Back to Videos
         </Link>
