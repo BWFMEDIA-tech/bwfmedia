@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Calendar, Clock, Mic, Video, Flame, TrendingUp, Camera, Music2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { listBlogPosts, formatPostDate, type BlogPostRow } from "@/lib/blog-posts";
+import { NewBlogPostDialog } from "@/components/blog/NewBlogPostDialog";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
@@ -110,6 +114,23 @@ const posts: Array<{
 ];
 
 function BlogPage() {
+  const { roles } = useAuth();
+  const isAdmin = roles.includes("admin");
+  const [dbPosts, setDbPosts] = useState<BlogPostRow[]>([]);
+  const refresh = () => { listBlogPosts().then(setDbPosts).catch(() => {}); };
+  useEffect(refresh, [isAdmin]);
+  const allPosts = [
+    ...dbPosts.map((d) => ({
+      category: d.published ? d.category : `${d.category} · Draft`,
+      Icon: Mic,
+      title: d.title,
+      excerpt: d.excerpt,
+      date: formatPostDate(d.created_at),
+      readTime: `${d.read_minutes} min read`,
+      href: `/blog/${d.slug}`,
+    })),
+    ...posts,
+  ];
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Top bar */}
