@@ -46,7 +46,7 @@ const SIDEBAR = [
   { to: "/charts", label: "Charts", icon: Trophy },
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/live", label: "Live", icon: Radio },
-  { to: "/mic-drop", label: "Play Arena", icon: Mic2 },
+  { to: "/mic-drop", label: "Arena", icon: Mic2 },
   { to: "/artists", label: "Artists", icon: Users },
   { to: "/leaderboard", label: "Leaderboard", icon: Star },
 ] as const;
