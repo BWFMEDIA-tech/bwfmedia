@@ -4,16 +4,16 @@ import { TunevioHome } from "@/components/tunevio/TunevioHome";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tunevio — Stream Music, Live Battles & Rising Artists" },
+      { title: "Tunevio — Music Streaming, Live Battles & Artist Charts" },
       {
         name: "description",
         content:
-          "Tunevio is the creator-powered music platform: stream new releases, follow rising artists, watch live battles in the Play Arena and climb the charts.",
+          "Stream music from independent artists, watch live battles in the Arena, follow rising talent and climb the charts — only on Tunevio.",
       },
-      { property: "og:title", content: "Tunevio — Stream Music, Live Battles & Rising Artists" },
+      { property: "og:title", content: "Tunevio — Music Streaming, Live Battles & Artist Charts" },
       {
         property: "og:description",
-        content: "Stream new releases, follow rising artists and watch live battles on Tunevio.",
+        content: "Stream music from independent artists, watch live battles in the Arena, follow rising talent and climb the charts — only on Tunevio.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://tunevio.com/" },
