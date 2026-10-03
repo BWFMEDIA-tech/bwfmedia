@@ -40,19 +40,19 @@ export const resolveInvite = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (error) {
-      console.error("[invite] lookup error", { code, error: error.message });
+      console.error("[invite] lookup error", { error: error.message });
       return { ok: false, reason: "not_found" };
     }
     if (!row) {
-      console.warn("[invite] not_found", { code });
+      console.warn("[invite] not_found");
       return { ok: false, reason: "not_found" };
     }
     if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) {
-      console.warn("[invite] expired", { code });
+      console.warn("[invite] expired");
       return { ok: false, reason: "expired" };
     }
     if (row.max_uses != null && row.uses >= row.max_uses) {
-      console.warn("[invite] exhausted", { code });
+      console.warn("[invite] exhausted");
       return { ok: false, reason: "exhausted" };
     }
 
@@ -70,7 +70,7 @@ export const resolveInvite = createServerFn({ method: "POST" })
       streamId = live?.id ?? null;
     }
     if (!streamId) {
-      console.warn("[invite] no_live_stream", { code });
+      console.warn("[invite] no_live_stream");
       return { ok: false, reason: "no_live_stream" };
     }
 
@@ -109,7 +109,7 @@ export const recordInviteJoin = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const client = adminClient();
-    console.log("[invite] join", { code: data.code, role: data.role, userId: context.userId });
+    console.log("[invite] join", { role: data.role });
     // Atomic increment via RPC would be nicer; quick read-modify-write is fine
     // for low-contention invite codes.
     const { data: row } = await client
