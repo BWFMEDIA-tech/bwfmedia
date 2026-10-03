@@ -1,4 +1,4 @@
-// @public-endpoint: external callers (webhook / OAuth callback / cron). Caller is verified inside the handler via signature / shared secret / Stripe-session lookup.
+// @public-endpoint: booking form. Caller must send a valid signed-in bearer token, verified inside the handler.
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
@@ -24,6 +24,17 @@ export const Route = createFileRoute('/api/public/block-booking')({
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
         if (!supabaseUrl || !serviceKey) {
           return Response.json({ error: 'Server config error' }, { status: 500 })
+        }
+
+        const authHeader = request.headers.get('authorization') ?? ''
+        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+        if (!token) {
+          return Response.json({ error: 'Please sign in to book' }, { status: 401 })
+        }
+        const authClient = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+        const { data: userData, error: userErr } = await authClient.auth.getUser(token)
+        if (userErr || !userData?.user) {
+          return Response.json({ error: 'Please sign in to book' }, { status: 401 })
         }
 
         let body: unknown

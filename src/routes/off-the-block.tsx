@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
@@ -396,9 +397,16 @@ function BookingCalendar() {
     setSubmitting(true);
     let bookingId: string | null = null;
     try {
+      const { data: sess } = await supabase.auth.getSession();
+      const accessToken = sess.session?.access_token;
+      if (!accessToken) {
+        toast.error("Please sign in to book a shoot");
+        setSubmitting(false);
+        return;
+      }
       const res = await fetch("/api/public/block-booking", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({
           full_name: name,
           email,
