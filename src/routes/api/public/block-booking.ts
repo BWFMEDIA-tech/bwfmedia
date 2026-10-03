@@ -51,6 +51,7 @@ export const Route = createFileRoute('/api/public/block-booking')({
         const { data: inserted, error: insertError } = await supabase
           .from('block_bookings')
           .insert({
+            user_id: userData.user.id,
             full_name: data.full_name,
             email: data.email,
             phone: data.phone ?? null,
