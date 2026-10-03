@@ -417,7 +417,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
             )}
           </div>
           {battle ? (
-            <div className="mt-5 flex items-center justify-around">
+            <div className="mt-5 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-1 sm:gap-3">
               <BattleSide
                 name={battle.artistA.name}
                 avatar={battle.artistA.avatar}
@@ -425,8 +425,8 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
                 accent="from-[#00E6FF] to-[#004BFF] ring-[#00E6FF]/60"
               />
               <div className="text-center">
-                <p className="text-2xl font-black text-white/60">VS</p>
-                <p className="mt-2 text-xs text-white/50">
+                <p className="text-lg font-black text-white/60 sm:text-2xl">VS</p>
+                <p className="mt-2 text-[10px] text-white/50 sm:text-xs">
                   Round {battle.currentRound} / {battle.totalRounds}
                 </p>
               </div>
@@ -514,19 +514,19 @@ function BattleSide({
   accent: string;
 }) {
   return (
-    <div className="text-center">
+    <div className="min-w-0 text-center">
       {avatar ? (
         <SignedImg
           src={avatar}
           alt={name}
-          className={`h-16 w-16 rounded-full object-cover ring-2 ${accent.split(" ").pop()}`}
+          className={`mx-auto h-12 w-12 rounded-full object-cover ring-2 sm:h-16 sm:w-16 ${accent.split(" ").pop()}`}
         />
       ) : (
-        <div className={`h-16 w-16 rounded-full bg-gradient-to-br ${accent} ring-2 flex items-center justify-center font-bold`}>
+        <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br text-sm font-bold ring-2 sm:h-16 sm:w-16 ${accent}`}>
           {name.slice(0, 2).toUpperCase()}
         </div>
       )}
-      <p className="mt-2 text-sm font-bold truncate max-w-[6rem]">{name}</p>
+      <p className="mt-2 truncate text-xs font-bold sm:text-sm" title={name}>{name}</p>
       <p className="text-[10px] text-amber-400">{wins} {wins === 1 ? "win" : "wins"}</p>
     </div>
   );

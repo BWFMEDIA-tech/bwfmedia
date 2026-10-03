@@ -321,7 +321,8 @@ export function SiteHeader() {
         </div>
 
         {/* Mobile toggle */}
-        <div className="lg:hidden">
+        <div className="ml-auto flex shrink-0 items-center gap-1 lg:hidden">
+          {auth.isAuthenticated && <NotificationBell />}
           <HeaderCartButton />
         </div>
       </div>

@@ -939,21 +939,21 @@ function StreamStudio() {
   if (auth.loading) return <div className="min-h-screen bg-[#050509]" />;
 
   return (
-    <div className="min-h-screen bg-black text-zinc-300" style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}>
+    <div className="min-h-screen min-w-0 bg-black text-zinc-300" style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}>
       <MediaEngineProvider>
       <SiteHeader />
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen min-w-0">
         <Sidebar />
-        <main className="flex flex-1 flex-col">
+        <main className="flex min-w-0 flex-1 flex-col">
           <StudioLayoutProvider isAdmin={auth.roles.includes("admin")} defs={STUDIO_BLOCKS}>
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto p-3 sm:p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px]">
             {/* Center column */}
             <StudioColumn className="flex min-w-0 flex-col gap-3">
               {/* Console header */}
               <StudioBlock id="console" label="Console Header">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-5 py-3 backdrop-blur">
+              <div className="flex min-w-0 flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-3 py-3 backdrop-blur sm:px-5 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex min-w-0 flex-wrap items-center gap-3">
                   <div className={cn(
                     "flex items-center gap-2 rounded-full px-3 py-1 border",
                     lk ? "bg-[#FF00A6]/10 border-[#FF00A6]/40" : "bg-zinc-900 border-zinc-800",
@@ -963,9 +963,9 @@ function StreamStudio() {
                       {lk ? "LIVE" : "OFFLINE"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm font-bold text-white">
-                    {stream?.title || "BWF Live: LIVE ARENA"}
-                    <CheckCircle2 className="h-4 w-4" style={{ color: "#00E6FF" }} />
+                  <div className="flex min-w-0 items-center gap-1.5 text-sm font-bold text-white">
+                    <span className="min-w-0 break-words">{stream?.title || "BWF Live: LIVE ARENA"}</span>
+                    <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#00E6FF" }} />
                   </div>
                   <div className="flex gap-1.5">
                     <button
@@ -991,7 +991,7 @@ function StreamStudio() {
                       <Headphones className="h-3 w-3" /> Podcast
                     </button>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Category</span>
                     {LIVE_CATEGORIES.map((c) => (
                       <button
@@ -1011,7 +1011,7 @@ function StreamStudio() {
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center gap-3 text-xs">
+                <div className="flex flex-wrap items-center gap-3 text-xs">
                   {!lk && (
                     <button
                       onClick={goLive}
@@ -1038,6 +1038,9 @@ function StreamStudio() {
                     Thumbnail
                   </button>
                   <CustomizeLayoutButton />
+                  <Link to="/" className="rounded-md border border-zinc-800 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-300 lg:hidden">
+                    Home
+                  </Link>
                   <div className="h-6 w-px bg-zinc-800" />
 
                   <button className="rounded-md border border-zinc-800 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white">
