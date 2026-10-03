@@ -21,8 +21,11 @@ export function NotificationBell() {
       if (!cancelled) setCount(c ?? 0);
     };
     refresh();
+    // Both desktop and mobile headers mount this bell. Realtime reuses a
+    // channel with the same topic, so each mount needs its own topic before
+    // registering postgres_changes callbacks.
     const ch = supabase
-      .channel(`notif-bell-${uid}`)
+      .channel(`notif-bell-${uid}-${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${uid}` },
