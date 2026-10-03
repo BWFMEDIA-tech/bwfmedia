@@ -18,7 +18,7 @@ export const Route = createFileRoute("/deck")({
       { title: "BWFMEDIA, Investor Pitch Deck" },
       { name: "description", content: "BWFMEDIA Inc. investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
       { property: "og:title", content: "BWFMEDIA, Investor Pitch Deck" },
-      { property: "og:description", content: "Real Content. Real People. Real Reach. Raising $500K–$1M to scale the #1 independent digital network for culture-driven content." },
+      { property: "og:description", content: "Real Content. Real People. Real Reach. Private investor presentation from BWFMEDIA Inc." },
     ],
   }),
   component: DeckPage,
