@@ -320,6 +320,7 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    await assertCanEnterStream(data.streamId, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const patch: { connection_status: string; last_seen_at?: string } = { connection_status: data.connectionStatus };
     if (data.connectionStatus === "connected") patch.last_seen_at = new Date().toISOString();
@@ -354,6 +355,21 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     if (insErr) throw new Error(insErr.message);
     return { ok: true, participant: seeded ?? null };
   });
+
+/** Non-hosts may only enter a stream room while it is live, unless they
+ *  already hold a stage seat assigned by the host. */
+async function assertCanEnterStream(streamId: string, userId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: stream } = await supabaseAdmin
+    .from("streams").select("status, host_id").eq("id", streamId).maybeSingle();
+  if (!stream) throw new Error("Stream not found");
+  if (stream.status === "live" || stream.host_id === userId) return;
+  const { data: seat } = await supabaseAdmin
+    .from("stage_participants").select("stage_role")
+    .eq("stream_id", streamId).eq("user_id", userId).maybeSingle();
+  if (seat && !["listener", "green_room"].includes(String(seat.stage_role))) return;
+  throw new Error("This stream isn't live right now");
+}
 /** Viewer joins the stage as a listener. Idempotent per (user, stream, key)
  *  via request_idempotency, so retries / Strict Mode double-invokes / network
  *  replays return the same cached response and never create duplicate rows.
@@ -368,6 +384,7 @@ export const joinStage = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    await assertCanEnterStream(data.streamId, userId);
     return runIdempotent({
       supabase,
       userId,
