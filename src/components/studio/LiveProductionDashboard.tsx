@@ -327,7 +327,7 @@ function SourceToggleCard({
         <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 flex-col items-center gap-1 sm:flex-row sm:gap-2">
+        <div className="flex min-w-0 flex-col items-center gap-1 2xl:flex-row 2xl:gap-2">
           <span className="max-w-full truncate text-sm text-studio-bright">{label}</span>
           <StatusPill on={on} partial={partial} accent={accent} />
         </div>

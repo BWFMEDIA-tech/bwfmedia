@@ -972,6 +972,7 @@ function StreamStudio() {
                     <Button
                       variant="outline"
                       onClick={() => setMode("review")}
+                      aria-pressed={mode === "review"}
                       className={cn(
                         "studio-button gap-1 px-2.5",
                         mode === "review"
@@ -983,6 +984,7 @@ function StreamStudio() {
                     <Button
                       variant="outline"
                       onClick={() => setMode("podcast")}
+                      aria-pressed={mode === "podcast"}
                       className={cn(
                         "studio-button gap-1 px-2.5",
                         mode === "podcast" && "studio-button-active",
@@ -998,6 +1000,7 @@ function StreamStudio() {
                         key={c.id}
                         variant="outline"
                         onClick={() => setStreamCategory(c.id)}
+                        aria-pressed={streamCategory === c.id}
                         disabled={!!lk}
                         title={lk ? "Category is set when you go live" : c.label}
                         className={cn(
