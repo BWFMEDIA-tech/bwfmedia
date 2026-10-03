@@ -311,10 +311,10 @@ function ParticipantAudioLogger() {
   useEffect(() => {
     if (!room) return;
     const onConnected = (p: Participant) => {
-      console.log("[stage-audio] Participant connected", p.identity);
+      console.log("[stage-audio] Participant connected");
     };
     const onDisconnected = (p: Participant) => {
-      console.log("[stage-audio] Participant disconnected", p.identity);
+      console.log("[stage-audio] Participant disconnected");
     };
     const onSubscribed = (
       _track: unknown,
@@ -323,7 +323,6 @@ function ParticipantAudioLogger() {
     ) => {
       if (pub.kind === Track.Kind.Audio) {
         console.log("[stage-audio] Audio track subscribed", {
-          from: participant.identity,
           trackSid: pub.trackSid,
         });
       }
@@ -400,7 +399,6 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
             try {
               (pub as RemoteTrackPublication).setSubscribed(true);
               console.log("[stage-audio] Re-subscribed audio track", {
-                from: p.identity,
                 trackSid: pub.trackSid,
               });
             } catch (err) {
@@ -455,9 +453,7 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       if (pub.kind === Track.Kind.Audio && !pub.isSubscribed) {
         try {
           pub.setSubscribed(true);
-          console.log("[stage-audio] Auto-subscribed newly published audio", {
-            from: participant.identity,
-          });
+          console.log("[stage-audio] Auto-subscribed newly published audio");
         } catch (err) {
           console.warn("[stage-audio] Auto-subscribe failed", err);
         }
