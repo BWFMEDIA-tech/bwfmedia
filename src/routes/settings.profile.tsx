@@ -207,8 +207,8 @@ function ProfileSettingsPage() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-      <div className="space-y-6">
+    <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-6">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Profile Settings</h1>
           <p className="mt-1 text-sm text-white/60">Manage how your profile appears to fans across BWF Network.</p>
@@ -216,7 +216,7 @@ function ProfileSettingsPage() {
 
         <Section>
           <Field title="Profile Photo" hint="This is your profile image">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <div className="relative h-20 w-20 cursor-pointer overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-red-600/30 to-purple-600/30" onClick={() => avatarInput.current?.click()}>
                 {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-xl font-black text-white/30">{initials || "?"}</div>}
                 <div className="absolute -bottom-0 -right-0 grid h-6 w-6 place-items-center rounded-full bg-red-600 text-white"><Camera className="h-3 w-3" /></div>
@@ -303,12 +303,11 @@ function ProfileSettingsPage() {
             {socials.map((s, idx) => {
               const meta = SOCIAL_PROVIDERS.find((p) => p.key === s.provider)!;
               return (
-                <div key={s.provider} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2">
-                  <div className={`grid h-9 w-9 place-items-center rounded-md text-white text-xs font-bold ${meta.color}`}>{meta.label[0]}</div>
-                  <input value={s.handle} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, handle: e.target.value } : c))} placeholder={meta.label} className="w-32 rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs" />
-                  <input value={s.handle} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, handle: e.target.value } : c))} placeholder="@handle" className="w-40 rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs" />
-                  <input value={s.url} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, url: e.target.value } : c))} placeholder="https://" className="flex-1 rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs" />
-                  <Switch checked={s.enabled} onCheckedChange={(v) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, enabled: v } : c))} />
+                <div key={s.provider} className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                  <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-white text-xs font-bold ${meta.color}`} title={meta.label}>{meta.label[0]}</div>
+                  <input aria-label={`${meta.label} handle`} value={s.handle} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, handle: e.target.value } : c))} placeholder="@handle" className="min-w-0 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs" />
+                  <input aria-label={`${meta.label} URL`} value={s.url} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, url: e.target.value } : c))} placeholder="https://" className="col-span-3 row-start-2 min-w-0 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs sm:col-span-1 sm:row-start-auto" />
+                  <Switch aria-label={`Show ${meta.label}`} checked={s.enabled} onCheckedChange={(v) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, enabled: v } : c))} />
                 </div>
               );
             })}
@@ -351,9 +350,9 @@ function ProfileSettingsPage() {
             <div className="mb-3 space-y-2 rounded-lg border border-red-600/30 bg-red-600/[0.03] p-3">
               <div className="text-xs font-semibold uppercase tracking-wider text-red-400">{editingEvent.id ? "Edit event" : "New event"}</div>
               <input value={editingEvent.title ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })} placeholder="Event title" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-              <div className="grid grid-cols-2 gap-2">
-                <input type="datetime-local" value={editingEvent.starts_at ? new Date(editingEvent.starts_at).toISOString().slice(0, 16) : ""} onChange={(e) => setEditingEvent({ ...editingEvent, starts_at: e.target.value })} className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-                <input value={editingEvent.location ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, location: e.target.value })} placeholder="Location (e.g. Atlanta, GA)" className="rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+              <div className="grid min-w-0 gap-2 sm:grid-cols-2">
+                <input type="datetime-local" value={editingEvent.starts_at ? new Date(editingEvent.starts_at).toISOString().slice(0, 16) : ""} onChange={(e) => setEditingEvent({ ...editingEvent, starts_at: e.target.value })} className="min-w-0 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+                <input value={editingEvent.location ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, location: e.target.value })} placeholder="Location (e.g. Atlanta, GA)" className="min-w-0 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
               </div>
               <input value={editingEvent.link_url ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, link_url: e.target.value })} placeholder="Ticket / info link (optional)" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
               <textarea value={editingEvent.description ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })} placeholder="Description (optional)" rows={2} className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />

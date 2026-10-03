@@ -141,7 +141,7 @@ function VideoDetailPage() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-6 md:px-12 py-10">
+      <main className="max-w-6xl mx-auto min-w-0 px-4 py-6 sm:px-6 md:px-12 md:py-10">
         {loading ? (
           <p className="text-bone/50">Loading…</p>
         ) : !video ? (
@@ -150,7 +150,7 @@ function VideoDetailPage() {
           </div>
         ) : (
           <article>
-            <div className="aspect-video bg-black border border-blood/40 mb-8">
+            <div className="aspect-video bg-black border border-blood/40 mb-6 md:mb-8">
               <video src={signedUrl ?? undefined} controls autoPlay className="w-full h-full object-contain bg-black" />
             </div>
 
@@ -168,7 +168,7 @@ function VideoDetailPage() {
               </span>
             </div>
 
-            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl uppercase leading-[0.9]">{video.title}</h1>
+            <h1 className="font-display break-words text-3xl uppercase leading-tight sm:text-4xl md:text-6xl lg:text-7xl">{video.title}</h1>
             {video.artist && (
               <p className="mt-3 text-xl text-bone/80 font-cond uppercase tracking-[0.2em]">{video.artist}</p>
             )}

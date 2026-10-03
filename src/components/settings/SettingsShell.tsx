@@ -26,12 +26,12 @@ export function Card({ children, title, icon }: { children: ReactNode; title?: s
 
 export function Row({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-white/5 py-3 last:border-0">
-      <div>
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-white/5 py-3 last:border-0 sm:gap-4">
+      <div className="min-w-0">
         <div className="text-sm font-medium">{label}</div>
         {hint && <div className="text-xs text-white/50">{hint}</div>}
       </div>
-      <div>{children}</div>
+      <div className="min-w-0 max-w-full">{children}</div>
     </div>
   );
 }
