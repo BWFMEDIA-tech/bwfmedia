@@ -11,6 +11,7 @@ import {
   Headphones, Wifi, PhoneOff, ChevronRight, GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import hostImg from "@/assets/stream-host.jpg";
 import guestImg from "@/assets/stream-guest.jpg";
@@ -939,7 +940,7 @@ function StreamStudio() {
   if (auth.loading) return <div className="min-h-screen bg-[#050509]" />;
 
   return (
-    <div className="min-h-screen min-w-0 bg-black text-zinc-300" style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}>
+    <div className="studio-controls min-h-screen min-w-0 bg-background text-foreground" style={{ fontFamily: "'Barlow', system-ui, sans-serif" }}>
       <MediaEngineProvider>
       <SiteHeader />
       <div className="flex min-h-screen min-w-0">
@@ -967,67 +968,66 @@ function StreamStudio() {
                     <span className="min-w-0 break-words">{stream?.title || "BWF Live: LIVE ARENA"}</span>
                     <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#00E6FF" }} />
                   </div>
-                  <div className="flex gap-1.5">
-                    <button
+                  <div className="grid w-full grid-cols-2 gap-1.5 sm:flex sm:w-auto">
+                    <Button
+                      variant="outline"
                       onClick={() => setMode("review")}
                       className={cn(
-                        "inline-flex items-center gap-1 whitespace-nowrap rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
+                        "studio-button gap-1 px-2.5",
                         mode === "review"
-                          ? "bg-[#C53DFF]/20 text-[#C53DFF] border-[#C53DFF]/40"
-                          : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
+                          ? "studio-button-active" : "",
                       )}
                     >
                       <Music2 className="h-3 w-3" /> Music Review
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="outline"
                       onClick={() => setMode("podcast")}
                       className={cn(
-                        "inline-flex items-center gap-1 whitespace-nowrap rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border",
-                        mode === "podcast"
-                          ? "bg-[#00E6FF]/20 text-[#00E6FF] border-[#00E6FF]/40"
-                          : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
+                        "studio-button gap-1 px-2.5",
+                        mode === "podcast" && "studio-button-active",
                       )}
                     >
                       <Headphones className="h-3 w-3" /> Podcast
-                    </button>
+                    </Button>
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Category</span>
                     {LIVE_CATEGORIES.map((c) => (
-                      <button
+                      <Button
                         key={c.id}
+                        variant="outline"
                         onClick={() => setStreamCategory(c.id)}
                         disabled={!!lk}
                         title={lk ? "Category is set when you go live" : c.label}
                         className={cn(
-                          "whitespace-nowrap rounded px-2.5 py-1 text-[10px] font-bold uppercase tracking-tighter border disabled:opacity-60",
-                          streamCategory === c.id
-                            ? "bg-[#FF00A6]/20 text-[#FF00A6] border-[#FF00A6]/40"
-                            : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white",
+                          "studio-button px-2.5",
+                          streamCategory === c.id && "studio-button-active",
                         )}
                       >
                         {c.label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-xs">
+                <div className="grid grid-cols-2 items-center gap-2 text-xs sm:flex sm:flex-wrap">
                   {!lk && (
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={goLive}
                       disabled={going}
-                      className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-black disabled:opacity-50"
-                      style={{ background: "#00E6FF" }}
+                      className="studio-button studio-button-primary col-span-2 gap-1.5 px-3 sm:col-span-1"
                     >
                       <Radio className="h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live"}
-                    </button>
+                    </Button>
                   )}
-                  <button onClick={copyInvite} className="text-zinc-500 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest">
+                  <Button variant="outline" onClick={copyInvite} className="studio-button px-3">
                     Share
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => setThumbOpen(true)}
-                    className="flex items-center gap-1.5 text-zinc-500 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-widest"
+                    className="studio-button gap-1.5 px-3"
                     title="Stream thumbnail"
                   >
                     {thumbUrl ? (
@@ -1036,16 +1036,14 @@ function StreamStudio() {
                       <ImageIcon className="h-3 w-3" />
                     )}
                     Thumbnail
-                  </button>
+                  </Button>
                   <CustomizeLayoutButton />
-                  <Link to="/" className="rounded-md border border-zinc-800 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-300 lg:hidden">
+                  <Link to="/" className="studio-button inline-flex items-center justify-center px-3 lg:hidden">
                     Home
                   </Link>
-                  <div className="h-6 w-px bg-zinc-800" />
-
-                  <button className="rounded-md border border-zinc-800 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white">
+                  <Button variant="outline" className="studio-button w-10 p-0" title="More options" aria-label="More options">
                     <MoreHorizontal className="h-3.5 w-3.5" />
-                  </button>
+                  </Button>
                 </div>
               </div>
               </StudioBlock>
@@ -1119,14 +1117,14 @@ function StreamStudio() {
                       />
                       <div className="flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-black/40 p-3 text-xs text-zinc-400">
                         Ready when you are —
-                        <button
+                        <Button
+                          variant="outline"
                           onClick={goLive}
                           disabled={going}
-                          className="rounded-md px-3 py-1.5 font-bold uppercase tracking-wider text-black disabled:opacity-50"
-                          style={{ background: "#00E6FF" }}
+                          className="studio-button studio-button-primary px-3"
                         >
                           {going ? "Starting…" : "Go Live"}
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
