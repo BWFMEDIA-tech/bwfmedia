@@ -7,6 +7,15 @@ export const Route = createFileRoute("/unsubscribe")({
   validateSearch: (search: Record<string, unknown>) => ({
     token: typeof search.token === "string" ? search.token : "",
   }),
+  head: () => ({ meta: [
+    { title: "Unsubscribe — Tunevio" },
+    { name: "description", content: "Manage your Tunevio app email subscription." },
+    { property: "og:title", content: "Unsubscribe — Tunevio" },
+    { property: "og:description", content: "Manage your Tunevio app email subscription." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: UnsubscribePage,
 });
 
@@ -17,13 +26,13 @@ function UnsubscribePage() {
   useEffect(() => {
     if (!token) { setState("invalid"); return; }
     fetch(`/email/unsubscribe?token=${encodeURIComponent(token)}`)
-      .then((r) => r.json())
+      .then((r) => { if (r.status >= 500) throw new Error("Service unavailable"); return r.json(); })
       .then((d) => {
         if (d.valid) setState("valid");
         else if (d.reason === "already_unsubscribed") setState("already");
         else setState("invalid");
       })
-      .catch(() => setState("invalid"));
+      .catch(() => setState("error"));
   }, [token]);
 
   async function handleConfirm() {
@@ -78,7 +87,7 @@ function UnsubscribePage() {
             <>
               <Check className="w-10 h-10 mx-auto" style={{ color: GOLD }} />
               <h1 className="mt-4 font-display text-3xl uppercase">Unsubscribed</h1>
-              <p className="mt-3 text-bone/75">You won't receive any more emails from us.</p>
+              <p className="mt-3 text-bone/75">You won't receive more app emails from us. Account sign-in emails can still arrive.</p>
             </>
           )}
           {state === "already" && (
@@ -91,8 +100,8 @@ function UnsubscribePage() {
           {(state === "invalid" || state === "error") && (
             <>
               <X className="w-10 h-10 mx-auto text-red-500" />
-              <h1 className="mt-4 font-display text-3xl uppercase">Invalid Link</h1>
-              <p className="mt-3 text-bone/75">This unsubscribe link is invalid or expired.</p>
+              <h1 className="mt-4 font-display text-3xl uppercase">{state === "error" ? "Please Try Again" : "Invalid Link"}</h1>
+              <p className="mt-3 text-bone/75">{state === "error" ? "We couldn't process your request right now. Please try again later." : "This unsubscribe link is invalid or expired."}</p>
             </>
           )}
         </HUDFrame>
