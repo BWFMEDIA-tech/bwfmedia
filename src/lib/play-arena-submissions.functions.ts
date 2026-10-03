@@ -115,6 +115,17 @@ export const submitSongToArena = createServerFn({ method: "POST" })
     //    after we verified ownership above).
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const weight = PRIORITY_WEIGHT[data.priority] ?? 1;
+    // Priority placement costs boost credits (1 per extra weight level),
+    // charged to the caller before the track is queued.
+    const boostCost = weight - 1;
+    if (boostCost > 0) {
+      const { error: spendErr } = await supabase.rpc("spend_boost_credit", {
+        _reason: "arena_priority",
+        _reference_id: `${data.arenaId}:${data.songId}`,
+        _amount: boostCost,
+      });
+      if (spendErr) throw new Error("Not enough boost credits for priority placement");
+    }
     // Compute next position within arena (lower = higher priority)
     const { data: maxRow } = await supabaseAdmin
       .from("play_tracks")

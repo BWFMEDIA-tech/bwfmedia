@@ -40,7 +40,8 @@ export const getCharts = createServerFn({ method: "GET" })
       .from("play_tracks")
       .select(
         "id, title, artist_name, artist_user_id, cover_url, audio_url, duration_seconds, play_count, like_count, dislike_count, score, created_at",
-      );
+      )
+      .in("status", ["playing", "completed"]);
 
     switch (data.tab) {
       case "top_rated":
