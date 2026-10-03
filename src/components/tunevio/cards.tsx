@@ -555,7 +555,7 @@ export function QuickAccessCard({
   onPlay?: () => void;
 }) {
   const inner = (
-    <div className="group flex h-full min-h-20 items-center gap-2 overflow-hidden rounded-lg border border-tv-line bg-white/[0.06] p-2 transition hover:bg-white/[0.12] active:bg-tv-active sm:min-h-14 sm:gap-3 sm:pr-2">
+    <div className="group relative flex h-full min-h-24 flex-col items-start gap-1 overflow-hidden rounded-lg border border-tv-line bg-white/[0.06] p-2 transition hover:bg-white/[0.12] active:bg-tv-active sm:min-h-14 sm:flex-row sm:items-center sm:gap-3 sm:pr-2">
       <div
         className={cn(
           "grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-md text-white/80 sm:h-14 sm:w-14",
@@ -568,7 +568,7 @@ export function QuickAccessCard({
           icon
         )}
       </div>
-      <span className="min-w-0 flex-1 break-words text-xs font-bold leading-tight text-white sm:text-sm">{title}</span>
+      <span className="min-w-0 flex-1 text-xs font-bold leading-tight text-white sm:break-words sm:text-sm">{title}</span>
       {onPlay ? (
         <button
           type="button"
@@ -578,7 +578,7 @@ export function QuickAccessCard({
             e.stopPropagation();
             onPlay();
           }}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-tv-cyan text-primary-foreground transition sm:h-9 sm:w-9 md:opacity-0 md:group-hover:opacity-100"
+          className="absolute right-2 top-2 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-tv-cyan text-black transition sm:static sm:h-9 sm:w-9 md:opacity-0 md:group-hover:opacity-100"
         >
           <Play className="ml-0.5 h-4 w-4 fill-current" />
         </button>
