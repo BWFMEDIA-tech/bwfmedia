@@ -92,6 +92,7 @@ import { Route as BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport } from './
 import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as LabelsIndexRouteImport } from './routes/labels.index'
@@ -559,6 +560,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
@@ -875,6 +881,7 @@ export interface FileRoutesByFullPath {
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
@@ -1004,6 +1011,7 @@ export interface FileRoutesByTo {
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
@@ -1135,6 +1143,7 @@ export interface FileRoutesById {
   '/broadcast/$broadcastId': typeof BroadcastBroadcastIdRouteWithChildren
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
@@ -1267,6 +1276,7 @@ export interface FileRouteTypes {
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
+    | '/email/unsubscribe'
     | '/invite/$code'
     | '/label-invite/$code'
     | '/labels/$labelId'
@@ -1396,6 +1406,7 @@ export interface FileRouteTypes {
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
+    | '/email/unsubscribe'
     | '/invite/$code'
     | '/label-invite/$code'
     | '/labels/$labelId'
@@ -1526,6 +1537,7 @@ export interface FileRouteTypes {
     | '/broadcast/$broadcastId'
     | '/checkout/cancel'
     | '/checkout/return'
+    | '/email/unsubscribe'
     | '/invite/$code'
     | '/label-invite/$code'
     | '/labels/$labelId'
@@ -1633,6 +1645,7 @@ export interface RootRouteChildren {
   BroadcastBroadcastIdRoute: typeof BroadcastBroadcastIdRouteWithChildren
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
@@ -2249,6 +2262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invite/$code': {
       id: '/invite/$code'
       path: '/invite/$code'
@@ -2735,6 +2755,7 @@ const rootRouteChildren: RootRouteChildren = {
   BroadcastBroadcastIdRoute: BroadcastBroadcastIdRouteWithChildren,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
   LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
