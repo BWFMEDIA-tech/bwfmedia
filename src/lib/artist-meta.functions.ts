@@ -3,7 +3,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { computeStreaks, getArtistTitle } from "@/lib/artist-titles";
 
 export const getArtistMeta = createServerFn({ method: "GET" })
-  .inputValidator((data: { id: string }) => data)
+  .inputValidator((data: { id: string }) => {
+    const id = typeof data?.id === "string" ? data.id.trim() : "";
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      throw new Error("Invalid artist id");
+    }
+    return { id };
+  })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb: any = supabaseAdmin;
