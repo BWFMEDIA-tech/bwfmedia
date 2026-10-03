@@ -81,11 +81,11 @@ export const resolveInvite = createServerFn({ method: "POST" })
       .maybeSingle();
 
     if (!stream) {
-      console.warn("[invite] stream_missing", { code, streamId });
+      console.warn("[invite] stream_missing", { streamId });
       return { ok: false, reason: "not_found" };
     }
 
-    console.log("[invite] opened", { code, streamId, allowed_role: row.allowed_role });
+    console.log("[invite] opened", { streamId, allowed_role: row.allowed_role });
     return {
       ok: true,
       code: row.code,

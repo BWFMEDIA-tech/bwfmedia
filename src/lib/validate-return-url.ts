@@ -10,9 +10,10 @@ const ALLOWED_HOSTS = [
   'bwfnetwork.com',
   'www.bwfnetwork.com',
   'bwfnetwork.lovable.app',
+  'tunevio.lovable.app',
+  'id-preview--27e4a45a-5178-4d5c-983d-86a01b3c0985.lovable.app',
+  '27e4a45a-5178-4d5c-983d-86a01b3c0985.lovableproject.com',
 ];
-
-const ALLOWED_HOST_SUFFIXES = ['.lovable.app'];
 
 /**
  * Validates that a client-supplied URL points to a trusted application
@@ -26,14 +27,13 @@ export function validateReturnUrl(url: string): string {
   } catch {
     throw new Error('Invalid returnUrl');
   }
-  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-    throw new Error('returnUrl must be http(s)');
-  }
   const host = parsed.hostname.toLowerCase();
-  const ok =
-    ALLOWED_HOSTS.includes(host) ||
-    ALLOWED_HOST_SUFFIXES.some((s) => host.endsWith(s)) ||
-    host === 'localhost';
+  const isLocal = host === 'localhost' || host === '127.0.0.1';
+  if (parsed.protocol !== 'https:' && !(isLocal && parsed.protocol === 'http:')) {
+    throw new Error('returnUrl must be https');
+  }
+  if (parsed.username || parsed.password) throw new Error('Invalid returnUrl');
+  const ok = ALLOWED_HOSTS.includes(host) || isLocal;
   if (!ok) {
     throw new Error('returnUrl must be on the application domain');
   }
