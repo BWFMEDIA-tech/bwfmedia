@@ -226,9 +226,9 @@ export function CustomizeLayoutButton() {
       </button>
 
       {open && typeof document !== "undefined" && createPortal(
-        <div className="fixed inset-0 z-[2000] flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-4" onClick={() => setOpen(false)}>
           <div
-            className="mt-16 w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl"
+            className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col rounded-lg border border-zinc-800 bg-zinc-950 p-3 shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
@@ -239,11 +239,12 @@ export function CustomizeLayoutButton() {
             </div>
             <p className="mb-3 text-[11px] text-zinc-500">Admin only. Changes are saved to this device.</p>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            <div className="flex flex-col gap-1.5 pr-1">
               {ordered.map((d, i) => {
                 const st = ctx.state.blocks[d.id] ?? { hidden: false, collapsed: false };
                 return (
-                  <div key={d.id} className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-black/50 px-2.5 py-2">
+                  <div key={d.id} className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-black/50 px-2 py-2 sm:gap-2 sm:px-2.5">
                     <span className="flex-1 truncate text-xs text-white/80">{d.label}</span>
                     <button
                       onClick={() => ctx.move(d.id, -1)}
@@ -291,6 +292,7 @@ export function CustomizeLayoutButton() {
                   </div>
                 );
               })}
+            </div>
             </div>
 
             <button

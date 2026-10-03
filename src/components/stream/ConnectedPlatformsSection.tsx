@@ -48,14 +48,14 @@ function CallbackUrlList() {
           return (
             <div
               key={r.key}
-              className="flex items-center gap-2 rounded border border-white/5 bg-black/40 px-2 py-1.5"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded border border-white/5 bg-black/40 px-2 py-1.5 sm:grid-cols-[7rem_minmax(0,1fr)_auto]"
             >
-              <span className="w-28 shrink-0 text-[11px] font-semibold text-white/70">
+              <span className="col-span-2 min-w-0 text-[11px] font-semibold text-white/70 sm:col-span-1">
                 {r.label}
               </span>
               {url ? (
                 <>
-                  <code className="min-w-0 flex-1 truncate font-mono text-[11px] text-[#00E6FF]">
+                  <code className="min-w-0 break-all font-mono text-[11px] text-[#00E6FF]">
                     {url}
                   </code>
                   <button
@@ -71,7 +71,7 @@ function CallbackUrlList() {
                   </button>
                 </>
               ) : (
-                <span className="text-[11px] text-white/40">
+                <span className="col-span-2 text-[11px] text-white/40 sm:col-span-2">
                   Manual RTMP — no OAuth callback needed
                 </span>
               )}

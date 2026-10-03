@@ -77,20 +77,20 @@ function LivePage() {
   return (
     <div className="min-h-screen bg-[#050509] text-white pt-24 pb-12 px-4">
       <div className="mx-auto max-w-6xl">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex flex-wrap items-center gap-3 mb-2">
           <span className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-widest">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE NOW
           </span>
-          <h1 className="text-3xl font-bold">Live on BWF Network</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl">Live on BWF Network</h1>
         </div>
         <p className="text-white/60 mb-4">Drop into any active stream. Listen, react, or request the stage.</p>
 
-        <div className="mb-8 flex flex-wrap gap-2">
+        <div className="-mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
           {[{ id: "all", label: "All" }, ...LIVE_CATEGORIES].map((c) => (
             <button
               key={c.id}
               onClick={() => setActiveCategory(c.id)}
-              className={`rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
+              className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
                 activeCategory === c.id
                   ? "border-[#FF00A6]/50 bg-[#FF00A6]/20 text-[#FF00A6]"
                   : "border-white/10 bg-white/5 text-white/60 hover:text-white"
