@@ -193,7 +193,7 @@ export function StudioBlock({
           onClick={() => ctx.toggleCollapsed(id)}
           title={st.collapsed ? `Expand ${label}` : `Collapse ${label}`}
           aria-label={st.collapsed ? `Expand ${label}` : `Collapse ${label}`}
-          className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+          className="studio-button h-8 w-8 min-h-8 p-0 text-muted-foreground hover:text-foreground"
         >
           {st.collapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
         </Button>
@@ -221,13 +221,14 @@ export function CustomizeLayoutButton() {
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-md border border-[#C53DFF]/40 bg-[#C53DFF]/10 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#C53DFF] hover:bg-[#C53DFF]/20"
+        className="studio-button gap-1.5 px-2.5"
       >
         <LayoutPanelTop className="h-3.5 w-3.5" /> Customize Layout
-      </button>
+      </Button>
 
       {open && typeof document !== "undefined" && createPortal(
         <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm sm:p-4" onClick={() => setOpen(false)}>
