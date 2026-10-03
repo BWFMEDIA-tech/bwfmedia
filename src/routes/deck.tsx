@@ -10,7 +10,7 @@ import grunge from "@/assets/grunge-bg.jpg";
 import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { verifyDeckPassword } from "@/lib/deck-gate.functions";
+import { getDeckContent } from "@/lib/deck-gate.functions";
 
 export const Route = createFileRoute("/deck")({
   head: () => ({
@@ -129,9 +129,44 @@ function DeckNav() {
   );
 }
 
-/* ---------- slides ---------- */
+/* ---------- slides (content delivered by the server after unlock) ---------- */
 
-function Cover() {
+type DeckData = NonNullable<Awaited<ReturnType<typeof getDeckContent>>["content"]>;
+
+/** Renders inline markup: **bold**, [[blood]], and \n line breaks. */
+function Rich({ text }: { text: string }) {
+  const out: React.ReactNode[] = [];
+  text.split("\n").forEach((line, li) => {
+    if (li > 0) out.push(<br key={`br${li}`} />);
+    line.split(/(\*\*[^*]+\*\*|\[\[[^\]]+\]\])/g).forEach((seg, si) => {
+      if (!seg) return;
+      const k = `${li}-${si}`;
+      if (seg.startsWith("**")) out.push(<span key={k} className="text-bone font-bold">{seg.slice(2, -2)}</span>);
+      else if (seg.startsWith("[[")) out.push(<span key={k} className="font-bold" style={{ color: "var(--blood)" }}>{seg.slice(2, -2)}</span>);
+      else out.push(seg);
+    });
+  });
+  return <>{out}</>;
+}
+
+function Kicker({ icon: Icon, text }: { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; text: string }) {
+  return (
+    <div className="flex items-center gap-4 mb-6">
+      <Icon className="w-8 h-8" style={{ color: "var(--blood)" }} />
+      <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">{text}</span>
+    </div>
+  );
+}
+
+function Quote({ text }: { text: string }) {
+  return (
+    <div className="mt-12 border-l-4 pl-6 py-2 max-w-3xl" style={{ borderColor: "var(--blood)" }}>
+      <p className="font-cond text-lg md:text-xl text-bone/90 italic"><Rich text={text} /></p>
+    </div>
+  );
+}
+
+function Cover({ c }: { c: DeckData["cover"] }) {
   return (
     <section
       className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-20"
@@ -144,22 +179,18 @@ function Cover() {
       <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at 50% 40%, color-mix(in oklab, var(--blood) 22%, transparent), transparent 60%)" }} />
       <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 py-20 text-center">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <span className="font-cond font-bold tracking-[0.5em] text-xs uppercase text-bone/60">Investor Pitch Deck · 2026</span>
+          <span className="font-cond font-bold tracking-[0.5em] text-xs uppercase text-bone/60">{c.eyebrow}</span>
           <h1 className="mt-8 font-display text-7xl md:text-[9rem] leading-[0.9] text-bone">
             BWF<span style={{ color: "var(--blood)" }}>MEDIA</span>
             <br />INC.
             <span className="sr-only"> Investor Pitch Deck</span>
           </h1>
-          <p className="mt-8 font-cond text-2xl md:text-3xl italic text-bone/80">
-            "Real Content. Real People. Real Reach."
-          </p>
+          <p className="mt-8 font-cond text-2xl md:text-3xl italic text-bone/80">{c.tagline}</p>
           <div className="mt-14 grid grid-cols-3 gap-4 md:gap-8 max-w-3xl mx-auto">
-            <StatCard big="731.7M+" label="Views" />
-            <StatCard big="335.625K+" label="Subscribers" />
-            <StatCard big="811.9M+" label="Likes" />
+            {c.stats.map((st) => <StatCard key={st.label} big={st.big} label={st.label} />)}
           </div>
           <div className="mt-12 font-cond font-bold tracking-[0.4em] text-xs uppercase text-bone/70">
-            Founder · <span className="text-bone">Dantavious Lee</span>
+            Founder · <span className="text-bone">{c.founder}</span>
           </div>
         </motion.div>
       </div>
@@ -168,100 +199,56 @@ function Cover() {
   );
 }
 
-function Problem() {
+function Problem({ c }: { c: DeckData["problem"] }) {
   return (
     <Slide number="02" label="The Problem">
-      <div className="flex items-center gap-4 mb-6">
-        <AlertTriangle className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">Independent creators are stuck</span>
-      </div>
-      <H>Creators don't own<br />their reach.</H>
-      <p className="font-cond text-xl text-bone/75 max-w-2xl mb-10">
-        Independent artists and culture creators struggle with three core problems:
-      </p>
-      <ul className="space-y-5 max-w-2xl">
-        <Bullet>Distribution beyond social media</Bullet>
-        <Bullet>Monetization control over their own content</Bullet>
-        <Bullet>Exposure without signing to a label</Bullet>
-      </ul>
-      <div className="mt-12 border-l-4 pl-6 py-2 max-w-3xl" style={{ borderColor: "var(--blood)" }}>
-        <p className="font-cond text-lg md:text-xl text-bone/90 italic">
-          Platforms like YouTube prioritize <span className="text-bone font-bold">algorithms</span>, not <span className="text-bone font-bold">ownership</span>.
-        </p>
-      </div>
+      <Kicker icon={AlertTriangle} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
+      <p className="font-cond text-xl text-bone/75 max-w-2xl mb-10">{c.intro}</p>
+      <ul className="space-y-5 max-w-2xl">{c.bullets.map((b) => <Bullet key={b}>{b}</Bullet>)}</ul>
+      <Quote text={c.quote} />
     </Slide>
   );
 }
 
-function Solution() {
+function Solution({ c }: { c: DeckData["solution"] }) {
   return (
     <Slide number="03" label="The Solution">
-      <div className="flex items-center gap-4 mb-6">
-        <Lightbulb className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">A vertically integrated network</span>
-      </div>
-      <H>Content + Distribution<br />+ Monetization.</H>
+      <Kicker icon={Lightbulb} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="grid md:grid-cols-3 gap-4 mt-10">
-        {[
-          { t: "Viral Media Platform", d: "Short-form, music, culture, virality." },
-          { t: "Interview + Promo Engine", d: "Direct artist exposure & promotion." },
-          { t: "BWFMEDIA TV", d: "Streaming network for culture content." },
-        ].map((s) => (
-          <div key={s.t} className="border border-border bg-black/40 p-6">
-            <div className="font-display text-2xl text-bone mb-2">{s.t}</div>
-            <div className="font-cond text-bone/70">{s.d}</div>
+        {c.cards.map((x) => (
+          <div key={x.t} className="border border-border bg-black/40 p-6">
+            <div className="font-display text-2xl text-bone mb-2">{x.t}</div>
+            <div className="font-cond text-bone/70">{x.d}</div>
           </div>
         ))}
       </div>
-      <div className="mt-12 border-l-4 pl-6 py-2 max-w-3xl" style={{ borderColor: "var(--blood)" }}>
-        <p className="font-cond text-lg md:text-xl text-bone/90 italic">
-          Think: an <span className="text-bone font-bold">independent Netflix + Tubi</span> for culture-driven content.
-        </p>
-      </div>
+      <Quote text={c.quote} />
     </Slide>
   );
 }
 
-function Traction() {
+function Traction({ c }: { c: DeckData["traction"] }) {
   return (
     <Slide number="04" label="Traction">
-      <div className="flex items-center gap-4 mb-6">
-        <TrendingUp className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">Demand is already validated</span>
-      </div>
-      <H>The audience<br />is already here.</H>
+      <Kicker icon={TrendingUp} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10">
-        <StatCard big="731.7M" label="Total Views" />
-        <StatCard big="335,625" label="Subscribers" />
-        <StatCard big="18.8M" label="Likes" />
-        <StatCard big="2.8M" label="Views (Last 7 Days)" />
-        <StatCard big="811.9K+" label="Comments" />
-        <StatCard big="3.1M" label="Shares" />
+        {c.stats.map((st) => <StatCard key={st.label} big={st.big} label={st.label} />)}
       </div>
-      <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">
-        These aren't projections, this is a <span className="text-bone font-bold">live, engaged audience</span> we already command across YouTube, Instagram, TikTok and short-form networks.
-      </p>
+      <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl"><Rich text={c.note} /></p>
     </Slide>
   );
 }
 
-function Ecosystem() {
+function Ecosystem({ c }: { c: DeckData["ecosystem"] }) {
   return (
     <Slide number="05" label="Product Ecosystem">
-      <div className="flex items-center gap-4 mb-6">
-        <Layers className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">One brand, many surfaces</span>
-      </div>
-      <H>The full BWFMEDIA<br />platform.</H>
+      <Kicker icon={Layers} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="grid md:grid-cols-2 gap-4 mt-8 max-w-4xl">
-        {[
-          "YouTube + Social Channels",
-          "Roku Streaming Channel",
-          "Original Shows & Interviews",
-          "Music Video Distribution",
-          "Advertising & Marketing Services",
-          "BWFMEDIA TV Network",
-        ].map((t) => (
+        {c.items.map((t) => (
           <div key={t} className="border border-border bg-black/40 p-5 flex items-center gap-4">
             <Play className="w-5 h-5 flex-shrink-0" style={{ color: "var(--blood)" }} />
             <span className="font-cond text-lg text-bone/90">{t}</span>
@@ -272,45 +259,29 @@ function Ecosystem() {
   );
 }
 
-function Market() {
+function Market({ c }: { c: DeckData["market"] }) {
   return (
     <Slide number="06" label="Market Opportunity">
-      <div className="flex items-center gap-4 mb-6">
-        <Globe className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">A massive, accelerating market</span>
-      </div>
-      <H>$600B+ in motion.</H>
+      <Kicker icon={Globe} text={c.kicker} />
+      <H>{c.title}</H>
       <div className="grid md:grid-cols-2 gap-6 mt-8 max-w-4xl">
-        <StatCard big="$100B+" label="Creator Economy" />
-        <StatCard big="$500B+" label="Streaming Industry" />
+        {c.stats.map((st) => <StatCard key={st.label} big={st.big} label={st.label} />)}
       </div>
-      <p className="mt-10 font-cond text-xl text-bone/85 max-w-3xl leading-relaxed">
-        Independent creators are <span className="text-bone font-bold">shifting away from labels</span> and toward direct monetization. BWFMEDIA sits at the intersection of both waves.
-      </p>
+      <p className="mt-10 font-cond text-xl text-bone/85 max-w-3xl leading-relaxed"><Rich text={c.note} /></p>
     </Slide>
   );
 }
 
-function BusinessModel() {
+function BusinessModel({ c }: { c: DeckData["business"] }) {
   return (
     <Slide number="07" label="Business Model">
-      <div className="flex items-center gap-4 mb-6">
-        <DollarSign className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">Multiple revenue streams</span>
-      </div>
-      <H>Six ways we<br />make money.</H>
+      <Kicker icon={DollarSign} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="grid md:grid-cols-2 gap-4 mt-8 max-w-4xl">
-        {[
-          { t: "Paid Interviews", d: "$500+ per booking." },
-          { t: "Artist Promo Packages", d: "Tiered $400 – $3,000." },
-          { t: "Ad Revenue", d: "YouTube + streaming network." },
-          { t: "Brand Partnerships", d: "Sponsorships & integrations." },
-          { t: "Subscription Model", d: "Future recurring tier." },
-          { t: "Content Licensing", d: "Resell archive & IP." },
-        ].map((s) => (
-          <div key={s.t} className="border border-border bg-black/40 p-5">
-            <div className="font-display text-xl text-bone">{s.t}</div>
-            <div className="font-cond text-bone/70 mt-1">{s.d}</div>
+        {c.cards.map((x) => (
+          <div key={x.t} className="border border-border bg-black/40 p-5">
+            <div className="font-display text-xl text-bone">{x.t}</div>
+            <div className="font-cond text-bone/70 mt-1">{x.d}</div>
           </div>
         ))}
       </div>
@@ -318,98 +289,63 @@ function BusinessModel() {
   );
 }
 
-function Competition() {
+function Competition({ c }: { c: DeckData["competition"] }) {
   return (
     <Slide number="08" label="Competitive Landscape">
-      <div className="flex items-center gap-4 mb-6">
-        <Swords className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">We compete across categories</span>
-      </div>
-      <H>Nobody combines<br />all three.</H>
+      <Kicker icon={Swords} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="grid md:grid-cols-3 gap-4 mt-8">
-        {[
-          { t: "YouTube", d: "Distribution" },
-          { t: "Netflix", d: "Content" },
-          { t: "Tubi", d: "Free Streaming" },
-        ].map((c) => (
-          <div key={c.t} className="border border-border bg-black/40 p-6 text-center">
-            <div className="font-display text-3xl text-bone">{c.t}</div>
-            <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/60 mt-2">{c.d}</div>
+        {c.cards.map((x) => (
+          <div key={x.t} className="border border-border bg-black/40 p-6 text-center">
+            <div className="font-display text-3xl text-bone">{x.t}</div>
+            <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/60 mt-2">{x.d}</div>
           </div>
         ))}
       </div>
       <div className="mt-12 border-l-4 pl-6 py-2 max-w-3xl" style={{ borderColor: "var(--blood)" }}>
-        <p className="font-cond text-lg md:text-xl text-bone/90">
-          BWFMEDIA = <span className="text-bone font-bold">all three</span> + a <span style={{ color: "var(--blood)" }} className="font-bold">culture niche</span> + a proven <span className="text-bone font-bold">viral engine</span>.
-        </p>
+        <p className="font-cond text-lg md:text-xl text-bone/90"><Rich text={c.quote} /></p>
       </div>
     </Slide>
   );
 }
 
-function Growth() {
+function Growth({ c }: { c: DeckData["growth"] }) {
   return (
     <Slide number="09" label="Growth Strategy">
-      <div className="flex items-center gap-4 mb-6">
-        <Rocket className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">How we scale from here</span>
-      </div>
-      <H>The next 24 months.</H>
-      <ul className="space-y-5 max-w-3xl mt-8">
-        <Bullet>Scale viral content production across all platforms</Bullet>
-        <Bullet>Expand artist partnerships and exclusive interviews</Bullet>
-        <Bullet>Launch the full BWFMEDIA TV streaming platform</Bullet>
-        <Bullet>Paid ad amplification on top-performing content</Bullet>
-        <Bullet>Influencer collaborations to expand reach</Bullet>
-      </ul>
+      <Kicker icon={Rocket} text={c.kicker} />
+      <H>{c.title}</H>
+      <ul className="space-y-5 max-w-3xl mt-8">{c.bullets.map((b) => <Bullet key={b}>{b}</Bullet>)}</ul>
     </Slide>
   );
 }
 
-function Financials() {
+function Financials({ c }: { c: DeckData["financials"] }) {
   return (
     <Slide number="10" label="Financial Projections">
-      <div className="flex items-center gap-4 mb-6">
-        <LineChart className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">Revenue trajectory</span>
-      </div>
-      <H>From $500K to<br />$5M in 36 months.</H>
+      <Kicker icon={LineChart} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="grid md:grid-cols-3 gap-4 mt-8">
-        {[
-          { y: "Year 1", v: "$250K – $500K" },
-          { y: "Year 2", v: "$1M+" },
-          { y: "Year 3", v: "$3M – $5M" },
-        ].map((f) => (
+        {c.years.map((f) => (
           <div key={f.y} className="border border-border bg-black/40 p-6">
             <div className="font-cond font-bold tracking-[0.3em] text-[11px] uppercase text-bone/60">{f.y}</div>
             <div className="font-display text-3xl md:text-4xl mt-3 red-shadow" style={{ color: "var(--blood)" }}>{f.v}</div>
           </div>
         ))}
       </div>
-      <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">
-        Driven by scaling content output, expanding monetization systems, and converting our existing audience into paying customers and subscribers.
-      </p>
+      <p className="mt-10 font-cond text-lg text-bone/80 max-w-3xl">{c.note}</p>
     </Slide>
   );
 }
 
-function Ask() {
+function Ask({ c }: { c: DeckData["ask"] }) {
   return (
     <Slide number="11" label="The Ask">
-      <div className="flex items-center gap-4 mb-6">
-        <Target className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">Investment opportunity</span>
-      </div>
-      <H>Raising<br /><span style={{ color: "var(--blood)" }}>$500K – $1M.</span></H>
+      <Kicker icon={Target} text={c.kicker} />
+      <H><Rich text={c.title} /></H>
       <div className="mt-8">
         <div className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60 mb-4">Use of funds</div>
         <div className="grid md:grid-cols-2 gap-4 max-w-4xl">
-          {[
-            "Content production & studio infrastructure",
-            "Platform development (BWFMEDIA TV)",
-            "Marketing & paid ad amplification",
-            "Team expansion (editors, producers, sales)",
-          ].map((t) => (
+          {c.uses.map((t) => (
             <div key={t} className="border border-border bg-black/40 p-5 flex items-center gap-4">
               <span className="w-2 h-2 flex-shrink-0" style={{ backgroundColor: "var(--blood)" }} />
               <span className="font-cond text-lg text-bone/90">{t}</span>
@@ -421,21 +357,16 @@ function Ask() {
   );
 }
 
-function Vision() {
+function Vision({ c }: { c: DeckData["vision"] }) {
   return (
     <Slide number="12" label="Vision">
-      <div className="flex items-center gap-4 mb-6">
-        <Eye className="w-8 h-8" style={{ color: "var(--blood)" }} />
-        <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/60">Where we're going</span>
-      </div>
-      <h2 className="font-display text-4xl md:text-6xl leading-[1.05] text-bone max-w-4xl">
-        "Become the <span style={{ color: "var(--blood)" }}>#1 independent digital network</span> for culture-driven content."
-      </h2>
+      <Kicker icon={Eye} text={c.kicker} />
+      <h2 className="font-display text-4xl md:text-6xl leading-[1.05] text-bone max-w-4xl"><Rich text={c.quote} /></h2>
     </Slide>
   );
 }
 
-function Closing() {
+function Closing({ c }: { c: DeckData["closing"] }) {
   return (
     <section
       className="relative min-h-screen w-full overflow-hidden flex items-center justify-center"
@@ -454,19 +385,17 @@ function Closing() {
             <span style={{ color: "var(--blood)" }}>future of culture.</span>
           </h2>
           <p className="mt-8 font-cond text-xl text-bone/80">
-            Founder · <span className="text-bone font-bold">Dantavious Lee</span>
+            Founder · <span className="text-bone font-bold">{c.founder}</span>
           </p>
           <a
-            href="mailto:hello@bwfmedia.tv"
+            href={`mailto:${c.email}`}
             className="inline-flex items-center gap-3 mt-10 px-8 py-4 font-cond font-bold tracking-[0.3em] text-sm uppercase text-bone"
             style={{ backgroundColor: "var(--blood)" }}
           >
             <Mail className="w-4 h-4" /> Contact for Investment
           </a>
           <div className="mt-12 grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto">
-            <StatCard big="731.7M+" label="Views" />
-            <StatCard big="335.625K+" label="Subs" />
-            <StatCard big="811.9M+" label="Likes" />
+            {c.stats.map((st) => <StatCard key={st.label} big={st.big} label={st.label} />)}
           </div>
         </motion.div>
       </div>
@@ -476,14 +405,11 @@ function Closing() {
 }
 
 function DeckPage() {
-  const [unlocked, setUnlocked] = useState(false);
+  const [deck, setDeck] = useState<DeckData | null>(null);
   const [leadCaptured, setLeadCaptured] = useState(false);
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("deck_unlocked") === "1") {
-      setUnlocked(true);
-    }
     if (typeof window !== "undefined" && sessionStorage.getItem("deck_lead_captured") === "1") {
       setLeadCaptured(true);
     }
@@ -492,28 +418,27 @@ function DeckPage() {
 
   if (!checked) return <main className="bg-black min-h-screen" />;
   if (!leadCaptured) return <DeckLeadForm onSubmitted={() => setLeadCaptured(true)} />;
-  if (!unlocked) return <DeckGate onUnlock={() => setUnlocked(true)} />;
+  if (!deck) return <DeckGate onUnlock={setDeck} />;
 
   return (
     <main className="bg-black min-h-screen">
       <DeckNav />
-      <Cover />
-      <Problem />
-      <Solution />
-      <Traction />
-      <Ecosystem />
-      <Market />
-      <BusinessModel />
-      <Competition />
-      <Growth />
-      <Financials />
-      <Ask />
-      <Vision />
-      <Closing />
+      <Cover c={deck.cover} />
+      <Problem c={deck.problem} />
+      <Solution c={deck.solution} />
+      <Traction c={deck.traction} />
+      <Ecosystem c={deck.ecosystem} />
+      <Market c={deck.market} />
+      <BusinessModel c={deck.business} />
+      <Competition c={deck.competition} />
+      <Growth c={deck.growth} />
+      <Financials c={deck.financials} />
+      <Ask c={deck.ask} />
+      <Vision c={deck.vision} />
+      <Closing c={deck.closing} />
     </main>
   );
 }
-
 
 const INVESTOR_TYPES = [
   "Angel investor",
@@ -875,11 +800,11 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
   );
 }
 
-function DeckGate({ onUnlock }: { onUnlock: () => void }) {
+function DeckGate({ onUnlock }: { onUnlock: (d: DeckData) => void }) {
   const [pw, setPw] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const verify = useServerFn(verifyDeckPassword);
+  const verify = useServerFn(getDeckContent);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -888,9 +813,8 @@ function DeckGate({ onUnlock }: { onUnlock: () => void }) {
     setError("");
     try {
       const res = await verify({ data: { password: pw } });
-      if (res.ok) {
-        sessionStorage.setItem("deck_unlocked", "1");
-        onUnlock();
+      if (res.ok && res.content) {
+        onUnlock(res.content);
       } else {
         setError("Incorrect password.");
       }
