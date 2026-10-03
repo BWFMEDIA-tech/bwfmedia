@@ -128,8 +128,9 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
 export const listLiveStreams = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ limit: z.number().int().min(1).max(50).default(20) }).parse(i ?? {}))
   .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!);
+    // Public listing: server-side read limited to live rows and public-safe fields.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const client = supabaseAdmin as any;
     const { data: streams, error } = await client
       .from("streams")
       .select("id, title, room_name, status, host_id, category, thumbnail_url, viewer_count, started_at, mode")
