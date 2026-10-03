@@ -55,6 +55,9 @@ export function SubmitToArenaModal({
 
   async function handleSubmit() {
     if (!arenaId) return toast.error("Pick an arena");
+    if (boostCost > 0 && balance !== null && balance < boostCost) {
+      return toast.error(`Not enough boost credits — you need ${boostCost} but have ${balance}. Get more on the Credits page.`);
+    }
     setSubmitting(true);
     try {
       await submit({ data: { songId: song.id, arenaId, message: message || undefined, priority } });
@@ -153,12 +156,16 @@ export function SubmitToArenaModal({
               ))}
             </div>
             {priority !== "standard" && (
-              <div className="mt-2 text-[10px] text-white/40">Boost pricing coming soon — free during launch.</div>
+              <div className="mt-2 text-[10px] text-white/50">
+                Priority placement costs {boostCost} boost credit{boostCost === 1 ? "" : "s"} —
+                {balance === null ? " checking your balance…" : ` you have ${balance}.`}{" "}
+                <a href="/credits" className="underline hover:text-fuchsia-300">Get credits</a>
+              </div>
             )}
           </div>
 
           <button
-            disabled={submitting || loading || !arenaId}
+            disabled={submitting || loading || !arenaId || (boostCost > 0 && balance !== null && balance < boostCost)}
             onClick={handleSubmit}
             className="w-full rounded-md bg-gradient-to-r from-fuchsia-600 to-pink-600 px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-fuchsia-500/30 transition hover:from-fuchsia-500 hover:to-pink-500 disabled:opacity-50"
           >
