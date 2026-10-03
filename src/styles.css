@@ -332,6 +332,65 @@
   --color-tv-cyan: var(--tv-cyan);
   --color-tv-magenta: var(--tv-magenta);
   --color-tv-violet: var(--tv-violet);
+  --color-studio-ink: var(--studio-ink);
+  --color-studio-blue: var(--studio-blue);
+  --color-studio-cyan: var(--studio-cyan);
+  --color-studio-bright: var(--studio-bright);
+  --color-studio-glass: var(--studio-glass);
+  --color-studio-edge: var(--studio-edge);
+}
+
+/* Stream Studio controls: tactile glass, clear on/off states. */
+.studio-controls {
+  --studio-ink: #0B0B0B;
+  --studio-blue: #004BFF;
+  --studio-cyan: #00E6FF;
+  --studio-bright: #F5F5F5;
+  --studio-glass: color-mix(in srgb, var(--studio-bright) 5%, transparent);
+  --studio-edge: color-mix(in srgb, var(--studio-bright) 14%, transparent);
+}
+
+@utility studio-button {
+  min-height: 40px;
+  border: 1px solid var(--studio-edge);
+  border-radius: 8px;
+  background: var(--studio-glass);
+  color: var(--studio-bright);
+  backdrop-filter: blur(16px);
+  font-family: "Bebas Neue", "Barlow", sans-serif;
+  font-size: 16px;
+  letter-spacing: 0;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  &:hover { border-color: var(--studio-cyan); background: color-mix(in srgb, var(--studio-cyan) 11%, transparent); }
+  &:active { transform: scale(0.97); }
+  &:focus-visible { outline: 2px solid var(--studio-cyan); outline-offset: 2px; }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+@utility studio-button-active {
+  border-color: var(--studio-cyan);
+  background: color-mix(in srgb, var(--studio-blue) 30%, transparent);
+  color: var(--studio-bright);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--studio-cyan) 18%, transparent);
+}
+
+@utility studio-button-primary {
+  border-color: var(--studio-cyan);
+  background: var(--studio-cyan);
+  color: var(--studio-ink);
+  &:hover { background: color-mix(in srgb, var(--studio-cyan) 82%, var(--studio-bright)); color: var(--studio-ink); }
+}
+
+@utility studio-button-danger {
+  border-color: color-mix(in srgb, var(--destructive) 52%, transparent);
+  background: color-mix(in srgb, var(--destructive) 18%, transparent);
+  color: var(--studio-bright);
+  &:hover { background: color-mix(in srgb, var(--destructive) 38%, transparent); border-color: var(--destructive); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-controls .studio-button { transition: none; }
+  .studio-controls .studio-button:active { transform: none; }
 }
 
 @utility tv-scroll {
