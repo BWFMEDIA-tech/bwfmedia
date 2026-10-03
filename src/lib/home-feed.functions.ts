@@ -90,19 +90,21 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
       sb
         .from("play_tracks")
         .select(TRACK_COLS)
+        .in("status", ["playing", "completed"])
         .gte("created_at", since30)
         .order("score", { ascending: false })
         .limit(LIMIT),
-      sb.from("play_tracks").select(TRACK_COLS).order("created_at", { ascending: false }).limit(LIMIT),
-      sb.from("play_tracks").select(TRACK_COLS).order("play_count", { ascending: false }).limit(LIMIT),
-      sb.from("play_tracks").select(TRACK_COLS).order("score", { ascending: false }).limit(LIMIT),
+      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("created_at", { ascending: false }).limit(LIMIT),
+      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("play_count", { ascending: false }).limit(LIMIT),
+      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("score", { ascending: false }).limit(LIMIT),
       sb
         .from("play_tracks")
         .select(TRACK_COLS)
+        .in("status", ["playing", "completed"])
         .gte("created_at", since7)
         .order("play_count", { ascending: false })
         .limit(LIMIT),
-      sb.from("play_tracks").select("artist_user_id, play_count").limit(2000),
+      sb.from("play_tracks").select("artist_user_id, play_count").in("status", ["playing", "completed"]).limit(2000),
       sb
         .from("battle_matches")
         .select("id, stream_id, artist_a_name, artist_b_name, current_round, total_rounds, started_at")
