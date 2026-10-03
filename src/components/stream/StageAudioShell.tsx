@@ -323,7 +323,6 @@ function ParticipantAudioLogger() {
     ) => {
       if (pub.kind === Track.Kind.Audio) {
         console.log("[stage-audio] Audio track subscribed", {
-          from: participant.identity,
           trackSid: pub.trackSid,
         });
       }
