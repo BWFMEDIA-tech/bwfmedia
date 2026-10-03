@@ -146,10 +146,9 @@ export const getStreamByRoom = createServerFn({ method: "POST" })
     z.object({ roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/) }).parse(input),
   )
   .handler(async ({ data }) => {
-    // Public read of streams (RLS allows). Use anon client via env publishable key.
-    const { createClient } = await import("@supabase/supabase-js");
-    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!);
-    const { data: row, error } = await client
+    // Public lookup by room: server-side read limited to public-safe columns.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await (supabaseAdmin as any)
       .from("streams")
       .select("id, title, room_name, status, host_id, mode, stage_locked, started_at")
       .eq("room_name", data.roomName)

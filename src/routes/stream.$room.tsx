@@ -153,6 +153,18 @@ function GuestPage() {
     } finally { setJoining(false); }
   };
 
+  if (streamMeta?.status === "ended") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#050509] p-6 text-white">
+        <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18] p-6 text-center">
+          <h1 className="mb-1 text-2xl font-bold">This stream has ended</h1>
+          <p className="mb-4 text-sm text-white/60">{streamMeta.title || "Thanks for tuning in."}</p>
+          <a href="/live" className="inline-block w-full rounded-lg bg-gradient-to-r from-violet-500 to-blue-500 py-2.5 text-sm font-semibold">See who's live</a>
+        </div>
+      </div>
+    );
+  }
+
   if (!lk) {
     return (
       <div
