@@ -1,0 +1,1 @@
+- Keep the legacy `/email/unsubscribe` token endpoint as a compatibility bridge to Lovable-managed subscription state, because already-sent emails still link to it; new email links remain Lovable-hosted.
