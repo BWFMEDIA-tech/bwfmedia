@@ -9,6 +9,7 @@ import { friendlyMediaError } from "@/lib/media-engine/errors";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { SignedImg } from "@/components/ui/signed-img";
+import { Button } from "@/components/ui/button";
 
 const PURPLE = "#8b5cf6";
 const BLUE = "#3b82f6";
@@ -130,16 +131,17 @@ function ToggleHeader({
         <span className="hidden h-8 w-px bg-white/10 md:block" />
         <ToggleChip label="BROADCAST MODE" on={broadcast} onChange={onBroadcast} accent={BLUE} />
       </div>
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <span className="mr-2 text-[10px] font-bold tracking-widest text-white/50">QUICK CONTROLS</span>
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
+        <span className="col-span-2 text-[10px] font-bold text-muted-foreground sm:mr-2">QUICK CONTROLS</span>
         <QuickBtn icon={muted ? VolumeX : Volume2} label={muted ? "Unmute All" : "Mute All"} onClick={onMuteAll} active={muted} />
         <QuickBtn icon={camera ? Video : VideoOff} label="Camera" onClick={onCamera} active={!camera} />
-        <button
+        <Button
           onClick={onEnd}
-          className="flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-500"
+          variant="outline"
+          className="studio-button studio-button-danger col-span-2 gap-2 px-3 sm:col-span-1"
         >
           <Radio className="h-3.5 w-3.5" /> End Broadcast
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -149,16 +151,16 @@ function ToggleChip({ label, on, onChange, accent }: { label: string; on: boolea
   return (
     <div className="flex items-center gap-3">
       <span className="text-xs font-bold tracking-widest text-white/80">{label}</span>
-      <button
+      <Button
         type="button"
         role="switch"
         aria-checked={on}
+        aria-label={label}
         onClick={() => onChange(!on)}
         className={cn(
-          "relative inline-flex h-7 w-16 items-center rounded-full border border-white/10 transition",
-          on ? "" : "bg-white/5",
+          "relative inline-flex h-8 w-16 items-center rounded-full border border-studio-edge transition",
+          on ? "bg-studio-blue" : "bg-studio-glass",
         )}
-        style={on ? { background: `linear-gradient(135deg, ${accent}, ${accent}cc)` } : undefined}
       >
         <span
           className={cn(
@@ -168,22 +170,23 @@ function ToggleChip({ label, on, onChange, accent }: { label: string; on: boolea
         >
           {on ? "ON" : "OFF"}
         </span>
-      </button>
+      </Button>
     </div>
   );
 }
 
 function QuickBtn({ icon: Icon, label, onClick, active }: { icon: any; label: string; onClick?: () => void; active?: boolean }) {
   return (
-    <button
+    <Button
       onClick={onClick}
+      variant="outline"
       className={cn(
-        "flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/5",
-        active ? "bg-white/10 text-white" : "text-white/80",
+        "studio-button min-w-0 gap-2 px-3",
+        active && "studio-button-active",
       )}
     >
       <Icon className="h-3.5 w-3.5" /> {label}
-    </button>
+    </Button>
   );
 }
 
@@ -243,7 +246,7 @@ function SourceTogglePanel() {
           Inputs → Mixer → Outputs
         </span>
       </header>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <SourceToggleCard
           label="Mic"
           sub={state.hasMic ? "Connected" : "Tap to enable"}
@@ -306,34 +309,31 @@ function SourceToggleCard({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
       role="switch"
       aria-checked={on}
       aria-label={`${label} ${on ? "on" : "off"}`}
       onClick={onClick}
       className={cn(
-        "group relative flex items-center gap-3 rounded-xl border p-3 text-left transition",
-        on ? "border-white/15 bg-white/[0.04]" : "border-white/5 bg-white/[0.02] hover:bg-white/[0.04]",
+        "studio-button group relative flex h-auto min-h-20 min-w-0 flex-col items-center gap-2 p-2 text-center sm:flex-row sm:p-3 sm:text-left",
+        on && "studio-button-active",
       )}
     >
       <span
-        className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition"
-        style={{
-          background: on ? `linear-gradient(135deg, ${accent}, ${accent}99)` : "rgba(255,255,255,0.05)",
-          boxShadow: on ? `0 0 16px ${accent}55` : undefined,
-        }}
+        className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-full border transition", on ? "border-studio-cyan bg-studio-blue text-studio-bright" : "border-studio-edge bg-studio-glass text-muted-foreground")}
       >
-        <Icon className={cn("h-4 w-4", on ? "text-white" : "text-white/50")} />
+        <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="truncate text-xs font-semibold text-white">{label}</span>
+        <div className="flex min-w-0 flex-col items-center gap-1 sm:flex-row sm:gap-2">
+          <span className="max-w-full truncate text-sm text-studio-bright">{label}</span>
           <StatusPill on={on} partial={partial} accent={accent} />
         </div>
-        <div className="mt-0.5 truncate text-[10px] text-white/50">{sub}</div>
+        <div className="mt-0.5 truncate font-sans text-[10px] text-muted-foreground">{sub}</div>
       </div>
-    </button>
+    </Button>
   );
 }
 
