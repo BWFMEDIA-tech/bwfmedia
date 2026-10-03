@@ -17,3 +17,17 @@ export const verifyDeckPassword = createServerFn({ method: "POST" })
     const ok = a.length === b.length && timingSafeEqual(a, b);
     return { ok };
   });
+/** Returns the confidential deck slides only when the password is correct. */
+export const getDeckContent = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => Input.parse(data))
+  .handler(async ({ data }) => {
+    const expected = process.env.DECK_PASSWORD;
+    if (!expected) throw new Error("Deck password not configured");
+    const a = Buffer.from(data.password);
+    const b = Buffer.from(expected);
+    if (!(a.length === b.length && timingSafeEqual(a, b))) {
+      return { ok: false as const, content: null };
+    }
+    const { DECK_CONTENT } = await import("./deck-content.server");
+    return { ok: true as const, content: DECK_CONTENT };
+  });
