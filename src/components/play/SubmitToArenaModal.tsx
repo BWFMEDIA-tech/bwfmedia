@@ -42,6 +42,17 @@ export function SubmitToArenaModal({
     })();
   }, [listArenas]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const wallet = await getBoostWallet();
+        setBalance(wallet.balance);
+      } catch {
+        // balance stays unknown; the server still enforces the spend
+      }
+    })();
+  }, []);
+
   async function handleSubmit() {
     if (!arenaId) return toast.error("Pick an arena");
     setSubmitting(true);
