@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Signed-in users can read videos bucket" ON storage.objects;

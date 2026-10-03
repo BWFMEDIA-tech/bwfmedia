@@ -1,4 +1,4 @@
-// @public-endpoint: external callers (webhook / OAuth callback / cron). Caller is verified inside the handler via signature / shared secret / Stripe-session lookup.
+// @public-endpoint: booking form. Caller must send a valid signed-in bearer token, verified inside the handler.
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
@@ -26,6 +26,17 @@ export const Route = createFileRoute('/api/public/block-booking')({
           return Response.json({ error: 'Server config error' }, { status: 500 })
         }
 
+        const authHeader = request.headers.get('authorization') ?? ''
+        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+        if (!token) {
+          return Response.json({ error: 'Please sign in to book' }, { status: 401 })
+        }
+        const authClient = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+        const { data: userData, error: userErr } = await authClient.auth.getUser(token)
+        if (userErr || !userData?.user) {
+          return Response.json({ error: 'Please sign in to book' }, { status: 401 })
+        }
+
         let body: unknown
         try { body = await request.json() } catch {
           return Response.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -40,6 +51,7 @@ export const Route = createFileRoute('/api/public/block-booking')({
         const { data: inserted, error: insertError } = await supabase
           .from('block_bookings')
           .insert({
+            user_id: userData.user.id,
             full_name: data.full_name,
             email: data.email,
             phone: data.phone ?? null,

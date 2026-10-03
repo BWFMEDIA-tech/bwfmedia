@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { signVideoPaths } from "@/lib/video-sign.functions";
 
 const cache = new Map<string, { url: string; expiresAt: number }>();
 const inflight = new Map<string, Promise<string | null>>();
@@ -12,11 +13,20 @@ export async function signVideoPath(path: string | null | undefined): Promise<st
   const pending = inflight.get(path);
   if (pending) return pending;
   const p = (async () => {
-    const { data, error } = await supabase.storage.from("videos").createSignedUrl(path, 3600);
+    let signedUrl: string | null = null;
+    try {
+      const { data: s } = await supabase.auth.getSession();
+      if (s.session) {
+        const res = await signVideoPaths({ data: { paths: [path] } });
+        signedUrl = res.results[path] ?? null;
+      }
+    } catch {
+      signedUrl = null;
+    }
     inflight.delete(path);
-    if (error || !data?.signedUrl) return null;
-    cache.set(path, { url: data.signedUrl, expiresAt: Date.now() + 3600_000 });
-    return data.signedUrl;
+    if (!signedUrl) return null;
+    cache.set(path, { url: signedUrl, expiresAt: Date.now() + 3600_000 });
+    return signedUrl;
   })();
   inflight.set(path, p);
   return p;
