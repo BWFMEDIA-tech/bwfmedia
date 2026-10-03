@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Headphones, Loader2, Rocket, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { getBoostWallet } from "@/lib/boost-economy.functions";
 import { listLiveArenas, submitSongToArena } from "@/lib/play-arena-submissions.functions";
 import { SignedImg } from "@/components/ui/signed-img";
 
@@ -24,6 +25,8 @@ export function SubmitToArenaModal({
   const [priority, setPriority] = useState<Priority>("standard");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [balance, setBalance] = useState<number | null>(null);
+  const boostCost = priority === "featured" ? 2 : priority === "boosted" ? 1 : 0;
 
   useEffect(() => {
     (async () => {
