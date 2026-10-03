@@ -190,7 +190,7 @@ export function TunevioHome() {
           {/* Quick access bento grid */}
           <section>
             <h2 className="mb-3 px-1 text-lg font-black sm:text-xl">Good to see you</h2>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
               {quickAccess.map((q) => (
                 <QuickAccessCard
                   key={q.title}

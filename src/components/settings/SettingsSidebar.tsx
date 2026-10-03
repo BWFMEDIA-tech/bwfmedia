@@ -21,21 +21,21 @@ const items = [
 export function SettingsSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <aside className="w-full lg:w-64 flex-shrink-0">
-      <div className="text-[10px] uppercase tracking-[0.3em] text-white/40 mb-3 px-3">Settings</div>
-      <nav className="space-y-1">
+    <aside className="min-w-0 w-full lg:w-64 flex-shrink-0">
+      <div className="text-[10px] uppercase tracking-[0.3em] text-white/40 mb-3 px-1 lg:px-3">Settings</div>
+      <nav aria-label="Settings sections" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:px-0 lg:pb-0">
         {items.map((it) => {
           const active = pathname === it.to;
           const Icon = it.icon;
           return (
-            <Link key={it.to} to={it.to} className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${active ? "bg-gradient-to-r from-red-600/30 to-red-600/5 text-white border border-red-600/40" : "text-white/60 hover:bg-white/5 hover:text-white"}`}>
-              <Icon className={`h-4 w-4 ${active ? "text-red-500" : ""}`} />
+            <Link key={it.to} to={it.to} aria-current={active ? "page" : undefined} className={`group flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border px-3 py-2.5 text-sm transition lg:gap-3 ${active ? "border-accent/40 bg-accent/10 text-foreground" : "border-border text-muted-foreground hover:bg-muted hover:text-foreground lg:border-transparent"}`}>
+              <Icon className="h-4 w-4 shrink-0" />
               <span className="font-medium">{it.label}</span>
             </Link>
           );
         })}
       </nav>
-      <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mt-6 hidden rounded-xl border border-white/10 bg-white/[0.02] p-4 lg:block">
         <div className="flex items-center gap-2 text-sm font-semibold text-white"><HelpCircle className="h-4 w-4 text-red-500" /> Need Help?</div>
         <p className="mt-1.5 text-xs text-white/60">Visit our Help Center for guides and support.</p>
         <a href="/contact" className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-red-600/40 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-red-500 hover:bg-red-600/10">

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   User, Music2, Video, BarChart3, Bell, ChevronRight, Menu, Disc3, Building2,
 } from "lucide-react";
@@ -53,6 +53,7 @@ const NAV: Entry[] = [
 export function ArtistDashboardShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => setMobileOpen(false), [pathname]);
   const [open, setOpen] = useState<Record<string, boolean>>({
     profile: true, music: true, videos: false, analytics: false,
   });
@@ -82,6 +83,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
                 <Link
                   key={entry.to}
                   to={entry.to}
+                    onClick={() => setMobileOpen(false)}
                   className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
                     active
                       ? "bg-gradient-to-r from-fuchsia-600/90 to-pink-500/70 text-white shadow-[0_4px_20px_-4px_rgba(217,70,239,0.5)]"
@@ -117,6 +119,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
                       <Link
                         key={entry.key + c.label}
                         to={c.to}
+                        onClick={() => setMobileOpen(false)}
                         search={c.search as any}
                         className="mb-0.5 flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] text-white/55 transition hover:bg-white/5 hover:text-white"
                       >
@@ -132,7 +135,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
         </nav>
       </aside>
 
-      {mobileOpen && <div className="fixed inset-0 z-30 bg-black/60 lg:hidden" onClick={() => setMobileOpen(false)} />}
+      {mobileOpen && <button type="button" aria-label="Close navigation" className="fixed inset-0 z-30 bg-black/60 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-white/10 bg-[#050509]/85 px-4 backdrop-blur sm:px-6">
