@@ -248,7 +248,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-white/10 p-5 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
+      className="relative rounded-3xl border border-white/10 p-3 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
           "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,75,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
@@ -790,7 +790,7 @@ function SpeakerBubble({
             <MoreVertical className="h-3 w-3" /> Manage
           </button>
           {menuOpen && (
-            <div className="absolute left-1/2 z-30 mt-1 w-56 -translate-x-1/2 overflow-hidden rounded-lg border border-white/10 bg-[#13131f] shadow-xl">
+            <div className="absolute left-1/2 z-30 mt-1 w-[min(14rem,calc(100vw-3rem))] -translate-x-1/2 overflow-hidden rounded-lg border border-white/10 bg-[#13131f] shadow-xl">
               {kind === "speaker" && onPromote && (
                 <>
                   {onSpotlight && (
