@@ -309,6 +309,7 @@ export const endPlaySession = createServerFn({ method: "POST" })
       winner_track_id: top?.id ?? null,
       ended_at: new Date().toISOString(),
     }, { onConflict: "stream_id" });
+    await writeArenaClock(supabase, data.streamId, null, false, 0);
     return { ok: true, winnerTrackId: top?.id ?? null };
   });
 
