@@ -288,9 +288,8 @@ export const setParticipantMute = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
-    const mutedUntil = data.mute
-      ? new Date(Date.now() + data.durationMinutes * 60_000).toISOString()
-      : null;
+    // Mutes stay in place until the host unmutes.
+    const mutedUntil = data.mute ? "9999-12-31T00:00:00.000Z" : null;
     const { error } = await supabase
       .from("stage_participants")
       .update({ muted_until: mutedUntil })
@@ -309,7 +308,7 @@ export const setStageMuteAll = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
-    const mutedUntil = data.mute ? new Date(Date.now() + 360 * 60_000).toISOString() : null;
+    const mutedUntil = data.mute ? "9999-12-31T00:00:00.000Z" : null;
     const { error } = await supabase
       .from("stage_participants")
       .update({ muted_until: mutedUntil })
