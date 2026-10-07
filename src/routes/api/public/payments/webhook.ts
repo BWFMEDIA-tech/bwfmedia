@@ -312,6 +312,12 @@ async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
       _metadata: { subscription_id: subId, env, plan_role: role },
     });
     if (subRow?.user_id) {
+      await (supabase as any).rpc('record_artist_referral_commission', {
+        _artist_id: subRow.user_id,
+        _invoice_id: invoice.id,
+        _amount_cents: amountPaid,
+        _plan_role: role,
+      });
       await (supabase as any).rpc('record_host_referral_commission', {
         _referred_user_id: subRow.user_id,
         _invoice_id: invoice.id,

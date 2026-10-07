@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Crown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getMyHostEarnings } from "@/lib/host-tiers.functions";
+import { ArtistReferralsPanel } from "@/components/host/ArtistReferralsPanel";
 
 export const Route = createFileRoute("/host-earnings")({
   head: () => ({
@@ -78,6 +79,8 @@ function HostEarningsPage() {
             <Stat label="Rewards earned" value={fmt(d.referrals.earned_cents)} />
           </div>
         </section>
+
+        <ArtistReferralsPanel userId={user.id} />
 
         <section className="rounded-2xl border border-border bg-card p-5">
           <h2 className="mb-4 font-semibold">Tier progression</h2>

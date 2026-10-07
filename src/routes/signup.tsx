@@ -12,12 +12,14 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const nav = useNavigate();
-  useEffect(() => {
-    const ref = new URLSearchParams(window.location.search).get("ref");
-    if (ref) saveHostReferral({ hostId: ref, source: "link" });
-  }, []);
   const [step, setStep] = useState<"role" | "details">("role");
   const [role, setRole] = useState<"artist" | "listener" | null>(null);
+  useEffect(() => {
+    const qs = new URLSearchParams(window.location.search);
+    const ref = qs.get("ref");
+    if (ref) saveHostReferral({ hostId: ref, source: "link" });
+    if (qs.get("as") === "artist") setRole("artist");
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");

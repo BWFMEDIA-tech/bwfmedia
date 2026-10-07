@@ -59,6 +59,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminArtistReferralsRouteImport } from './routes/admin.artist-referrals'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-bookings'
@@ -96,6 +97,7 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
+import { Route as JoinUsernameRouteImport } from './routes/join.$username'
 import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as LabelsIndexRouteImport } from './routes/labels.index'
 import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
@@ -393,6 +395,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminArtistReferralsRoute = AdminArtistReferralsRouteImport.update({
+  id: '/artist-referrals',
+  path: '/artist-referrals',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminArtistsRoute = AdminArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
@@ -580,6 +587,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinUsernameRoute = JoinUsernameRouteImport.update({
+  id: '/join/$username',
+  path: '/join/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LabelInviteCodeRoute = LabelInviteCodeRouteImport.update({
@@ -861,6 +873,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
@@ -897,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -993,6 +1007,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
@@ -1029,6 +1044,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1127,6 +1143,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
@@ -1163,6 +1180,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1262,6 +1280,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
+    | '/admin/artist-referrals'
     | '/admin/artists'
     | '/admin/audit'
     | '/admin/block-bookings'
@@ -1298,6 +1317,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
@@ -1394,6 +1414,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
+    | '/admin/artist-referrals'
     | '/admin/artists'
     | '/admin/audit'
     | '/admin/block-bookings'
@@ -1430,6 +1451,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
@@ -1527,6 +1549,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
+    | '/admin/artist-referrals'
     | '/admin/artists'
     | '/admin/audit'
     | '/admin/block-bookings'
@@ -1563,6 +1586,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
@@ -1672,6 +1696,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
+  JoinUsernameRoute: typeof JoinUsernameRoute
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
@@ -2056,6 +2081,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/artist-referrals': {
+      id: '/admin/artist-referrals'
+      path: '/artist-referrals'
+      fullPath: '/admin/artist-referrals'
+      preLoaderRoute: typeof AdminArtistReferralsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/artists': {
       id: '/admin/artists'
       path: '/artists'
@@ -2313,6 +2345,13 @@ declare module '@tanstack/react-router' {
       path: '/invite/$code'
       fullPath: '/invite/$code'
       preLoaderRoute: typeof InviteCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join/$username': {
+      id: '/join/$username'
+      path: '/join/$username'
+      fullPath: '/join/$username'
+      preLoaderRoute: typeof JoinUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/label-invite/$code': {
@@ -2628,6 +2667,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminArtistReferralsRoute: typeof AdminArtistReferralsRoute
   AdminArtistsRoute: typeof AdminArtistsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBlockBookingsRoute: typeof AdminBlockBookingsRoute
@@ -2657,6 +2697,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminArtistReferralsRoute: AdminArtistReferralsRoute,
   AdminArtistsRoute: AdminArtistsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBlockBookingsRoute: AdminBlockBookingsRoute,
@@ -2799,6 +2840,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
+  JoinUsernameRoute: JoinUsernameRoute,
   LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
   PayBookingIdRoute: PayBookingIdRoute,
