@@ -19,12 +19,13 @@ import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { TipModal } from "@/components/stream/TipModal";
+import { LiveSetlist, type SetlistTrack } from "@/components/artist/LiveSetlist";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
 export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   stream: LiveStream;
-  artist: { name: string; photo: string | null; handle?: string; genre?: string | null; featuredTrack?: { title: string; cover: string | null; plays: number } | null };
+  artist: { name: string; photo: string | null; handle?: string; genre?: string | null; featuredTrack?: { title: string; cover: string | null; plays: number } | null; tracks?: SetlistTrack[] };
   followSlot?: ReactNode;
   onEnded: () => void;
 }) {
@@ -168,6 +169,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
           <LiveChat streamId={stream.id} auth={auth} viewerCount={viewers} startedAt={stream.started_at} hostId={stream.host_id} status="live" profileLayout />
         </div>
         <aside className="artist-live-sidebar min-w-0 space-y-4">
+          <LiveSetlist streamId={stream.id} artistName={artist.name} isOwner={isOwner} tracks={artist.tracks ?? []} />
           {showAudience && <section className="border-b border-border pb-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-primary" /> Audience <span className="ml-auto text-muted-foreground">{viewers.toLocaleString()}</span></h2>
             {participants.some((p) => p.stage_role === "listener" || p.stage_role === "green_room") ? <AudienceRow participants={participants} /> : <p className="text-sm text-muted-foreground">{connection ? "No audience members yet." : "Join to see the audience."}</p>}
