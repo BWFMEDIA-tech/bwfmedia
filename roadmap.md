@@ -5,5 +5,5 @@
 - [x] Verify homepage, Live, Videos, sign-in, and phone menu; no runtime errors or horizontal overflow on checked pages.
 
 # Remove remaining pink
-- [ ] Replace remaining pink accents and states with logo blues and grays.
-- [ ] Verify Leaderboard and shared page styling.
+- [x] Replace remaining pink accents and states with logo blues and grays.
+- [x] Verify Leaderboard and shared palette styling; no pink rendered in Leaderboard and preview checks pass.
