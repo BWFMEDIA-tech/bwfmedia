@@ -28,30 +28,13 @@ export function getSharedAudioContext(): AudioContext | null {
     (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!Ctor) return null;
   sharedCtx = new Ctor();
-  installGestureUnlock();
   return sharedCtx;
-}
-
-/**
- * Media elements routed through the shared context are SILENT while the
- * context is suspended, even though the element reports it is playing.
- * Browsers only allow resuming from a user gesture, so resume on every
- * tap/key anywhere on the page.
- */
-let gestureUnlockInstalled = false;
-function installGestureUnlock(): void {
-  if (gestureUnlockInstalled || typeof window === "undefined") return;
-  gestureUnlockInstalled = true;
-  const unlock = () => resumeAudioContext();
-  for (const ev of ["pointerdown", "touchend", "keydown", "click"]) {
-    window.addEventListener(ev, unlock, { capture: true, passive: true });
-  }
 }
 
 /** Resume the shared context — must be called from a user gesture. */
 export function resumeAudioContext(): void {
-  if (sharedCtx && sharedCtx.state !== "running" && sharedCtx.state !== "closed") {
-    void sharedCtx.resume().catch(() => {});
+  if (sharedCtx && sharedCtx.state === "suspended") {
+    void sharedCtx.resume();
   }
 }
 

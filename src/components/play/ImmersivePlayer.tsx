@@ -9,8 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { setPlaybackPlaying } from "@/lib/playback-store";
 import { useMyVote, type PlayTrack } from "@/lib/usePlayQueue";
-import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack, setArenaPlayback } from "@/lib/play.functions";
-import { useArenaRadio } from "@/lib/useArenaRadio";
+import { votePlayTrack, advancePlayQueue, playTrackNow, reorderPlayQueue, deletePlayTrack } from "@/lib/play.functions";
 import { castBattleVote } from "@/lib/battles.functions";
 import { RankBadge } from "@/components/rank/RankBadge";
 import {
@@ -23,10 +22,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
-import { useSharedAudioGraph, resumeSharedAudio, arenaBroadcast, getGraphFor } from "@/lib/useSharedAudioGraph";
+import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
-import { useSignedAudioUrl, getSignedAudioUrl } from "@/lib/useSignedAudio";
+import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { usePlayer } from "@/lib/player-context";
 
 /* ============================================================
@@ -468,14 +467,6 @@ export function ImmersivePlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
-  // Host: hand the music tap to the live room so it's sent to everyone.
-  useEffect(() => {
-    if (!isHost) return;
-    const g = getGraphFor(audioRef.current);
-    if (!g) return;
-    arenaBroadcast.setHostStream(g.broadcast.stream);
-    return () => arenaBroadcast.setHostStream(null);
-  }, [isHost, ctxRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
   const trackAudioSrc = useSignedAudioUrl(track?.audio_url ?? null);
   const nextAudioSrc = useSignedAudioUrl(upNext[0]?.audio_url ?? null);
   // Stop the global mini-player whenever the immersive arena player has a
@@ -512,16 +503,6 @@ export function ImmersivePlayer({
   const playFn = useServerFn(playTrackNow);
   const reorderFn = useServerFn(reorderPlayQueue);
   const deleteFn = useServerFn(deletePlayTrack);
-  const setPlaybackFn = useServerFn(setArenaPlayback);
-  // Shared Arena radio clock — one authoritative timeline for everyone.
-  const radio = useArenaRadio(streamId);
-  const radioRef = useRef(radio);
-  radioRef.current = radio;
-  const needsUnlockRef = useRef(false);
-  const radioMatches = !!radio.state && !!track && radio.state.trackId === track.id;
-  const radioPaused = radioMatches && !radio.state!.playing;
-  const shownProgress = radioPaused ? radio.state!.positionSeconds : progress;
-  needsUnlockRef.current = needsUnlock;
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
 
@@ -588,37 +569,13 @@ export function ImmersivePlayer({
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    const onTime = () => {
-      // Freeze the bar while the shared radio is paused.
-      const s = radioRef.current.state;
-      if (s && s.trackId === track?.id && !s.playing) { setProgress(s.positionSeconds); return; }
-      if (!a.paused) setProgress(a.currentTime);
-    };
+    const onTime = () => setProgress(a.currentTime);
     const onMeta = () => setDuration(a.duration || 0);
-    const onPlay = () => {
-      setIsPlaying(true); setPlaybackPlaying(true); resume();
-      // Without a tap the browser keeps the sound engine asleep, so the
-      // song "plays" in total silence. Ask the listener to tap.
-      const ctx = ctxRef.current;
-      setTimeout(() => {
-        if (ctx && ctx.state !== "running" && !a.paused) setNeedsUnlock(true);
-      }, 400);
-    };
+    const onPlay = () => { setIsPlaying(true); setPlaybackPlaying(true); resume(); };
     const onPause = () => { setIsPlaying(false); setPlaybackPlaying(false); };
     const onEnd = async () => {
       setIsPlaying(false);
       setPlaybackPlaying(false);
-      // Only advance when the shared clock agrees the song has really finished.
-      // A bad seek or stalled load can fire "ended" early — resync instead.
-      const s = radioRef.current.state;
-      const dur = a.duration || 0;
-      if (s && s.trackId === track?.id && dur > 0) {
-        const live = radioRef.current.livePosition();
-        if (live < dur - 3) {
-          try { a.currentTime = Math.max(0, live); await a.play(); } catch { /* sync loop retries */ }
-          return;
-        }
-      }
       if (isHost && streamId) {
         try { await advanceFn({ data: { streamId } }); } catch { /* ignore */ }
       }
@@ -637,61 +594,17 @@ export function ImmersivePlayer({
     };
   }, [track?.id, isHost, streamId, advanceFn, resume]);
 
-  // Detect songs whose audio file is missing/unplayable. Without this the
-  // room sits silent forever on a broken track. Host auto-skips it.
-  useEffect(() => {
-    const url = track?.audio_url;
-    if (!track?.id) return;
-    let cancelled = false;
-    const handleBroken = async () => {
-      if (cancelled) return;
-      toast.error(`"${track.title}" can't be played — its audio file is missing.${isHost ? " Skipping to the next song." : ""}`);
-      if (isHost && streamId) {
-        try { await advanceFn({ data: { streamId } }); } catch { /* ignore */ }
-      }
-    };
-    if (!url) { void handleBroken(); return () => { cancelled = true; }; }
-    void getSignedAudioUrl(url).then((s) => { if (!s) void handleBroken(); });
-    const a = audioRef.current;
-    let retries = 0;
-    // A load error is often temporary (network blip, expired link). Retry
-    // a couple of times at the live position before treating it as broken.
-    const onErr = () => {
-      if (!a?.getAttribute("src") || cancelled) return;
-      if (retries < 2) {
-        retries += 1;
-        setTimeout(() => {
-          if (cancelled || !a) return;
-          const pos = radioRef.current.livePosition();
-          a.load();
-          try { a.currentTime = pos; } catch { /* sync loop fixes */ }
-          a.play().catch(() => {});
-        }, 1000 * retries);
-        return;
-      }
-      void handleBroken();
-    };
-    a?.addEventListener("error", onErr);
-    return () => { cancelled = true; a?.removeEventListener("error", onErr); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [track?.id]);
-
-  // Auto-start playback as soon as the audio source is ready. Joins at the
-  // LIVE position of the shared Arena clock (late joiners don't start at 0).
+  // Auto-start playback as soon as the audio source is ready. This is what
+  // makes new tracks play for everyone in the room without refreshing —
+  // when realtime delivers a new `playing` track, the <audio> remounts
+  // (key={track.id}) with a fresh src and this effect kicks off play().
   useEffect(() => {
     const a = audioRef.current;
     if (!a || !trackAudioSrc) return;
     let cancelled = false;
     const tryPlay = async () => {
-      const s = radioRef.current.state;
-      const matches = !!s && s.trackId === track?.id;
-      if (matches && !s!.playing) return; // shared radio is paused
       try {
         resume();
-        if (matches) {
-          const pos = radioRef.current.livePosition();
-          try { a.currentTime = pos; } catch { /* metadata not ready; sync loop fixes */ }
-        }
         await a.play();
         if (!cancelled) setNeedsUnlock(false);
       } catch {
@@ -703,45 +616,16 @@ export function ImmersivePlayer({
     return () => { cancelled = true; };
   }, [trackAudioSrc, track?.id, resume]);
 
-  // Radio sync loop: keep this client on the authoritative server timeline.
-  // Small drift → nudge playbackRate; large drift → hard seek.
-  useEffect(() => {
-    const tick = () => {
-      const a = audioRef.current;
-      const s = radioRef.current.state;
-      if (!a || !s || !track || s.trackId !== track.id || !a.getAttribute("src")) return;
-      if (a.readyState < 1) return;
-      if (!s.playing) {
-        if (!a.paused) a.pause();
-        if (Math.abs(a.currentTime - s.positionSeconds) > 0.3) a.currentTime = s.positionSeconds;
-        a.playbackRate = 1;
-        return;
-      }
-      const target = radioRef.current.livePosition();
-      if (a.duration && target >= a.duration - 0.25) return; // ending; host advances
-      if (a.paused) {
-        if (!needsUnlockRef.current) {
-          a.currentTime = target;
-          a.play().catch(() => setNeedsUnlock(true));
-        }
-        return;
-      }
-      const drift = a.currentTime - target;
-      if (Math.abs(drift) > 2) { a.currentTime = target; a.playbackRate = 1; }
-      else if (Math.abs(drift) > 0.15) a.playbackRate = drift > 0 ? 0.95 : 1.05;
-      else a.playbackRate = 1;
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [radio.state, track?.id]);
-
   useEffect(() => {
     setProgress(0);
     setDuration(0);
     if (!track?.audio_url || !trackAudioSrc) {
       const a = audioRef.current;
-      if (a) { a.pause(); a.removeAttribute("src"); a.load(); }
+      if (a) {
+        a.pause();
+        a.removeAttribute("src");
+        a.load();
+      }
       setIsPlaying(false);
       setPlaybackPlaying(false);
     }
@@ -752,7 +636,6 @@ export function ImmersivePlayer({
     if (!a) return;
     try {
       resume();
-      if (radioMatches) a.currentTime = radio.livePosition();
       await a.play();
       setNeedsUnlock(false);
     } catch (e: any) {
@@ -763,19 +646,22 @@ export function ImmersivePlayer({
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    // Element stays at full level so the live broadcast tap is unaffected;
-    // this device's volume is applied on the local output only.
-    a.volume = 1;
-    arenaBroadcast.setLocalVolume(muted ? 0 : volume);
+    a.volume = muted ? 0 : volume;
   }, [volume, muted]);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    a.playbackRate = speed;
+  }, [speed]);
 
   /* ----- sleep timer ----- */
   useEffect(() => {
     if (sleepRef.current) clearTimeout(sleepRef.current);
     if (sleepMin) {
       sleepRef.current = setTimeout(() => {
-        setMuted(true);
-        toast.message("Sleep timer reached — muted");
+        audioRef.current?.pause();
+        toast.message("Sleep timer reached — paused");
         setSleepMin(null);
       }, sleepMin * 60_000);
     }
@@ -808,44 +694,25 @@ export function ImmersivePlayer({
       toast.message("Loading secure audio… tap again in a moment");
       return;
     }
-    resume(); // ensure AudioContext is running (user gesture)
-    if (isHost && streamId) {
-      // Host pauses/resumes the shared radio for everyone. Apply locally
-      // right away so the song and progress bar stop instantly.
-      const wantPlaying = radioMatches ? !radio.state?.playing : a.paused;
-      if (!wantPlaying) a.pause();
-      try { await setPlaybackFn({ data: { streamId, playing: wantPlaying } }); }
-      catch (e: any) { toast.error(e?.message ?? "Could not update playback"); }
-      return;
-    }
-    // Guests, artists and listeners: a tap always makes the song audible at
-    // the live position. Only when it's already audible does it mute.
-    const roomPaused = radioMatches && radio.state && !radio.state.playing;
-    if (roomPaused) {
-      toast.message("The host paused the song — it will resume for everyone together.");
-      return;
-    }
-    const ctx = ctxRef.current;
-    const silent = a.paused || muted || volume === 0 || needsUnlock || (ctx && ctx.state !== "running");
-    if (silent) {
-      try {
-        await ctx?.resume?.().catch(() => {});
-        resume();
-        if (radioMatches) a.currentTime = radio.livePosition();
-        if (a.paused) await a.play();
-        if (volume === 0) setVolume(0.8);
-        setNeedsUnlock(false);
-        setMuted(false);
-      } catch (e: any) {
-        setNeedsUnlock(true);
-        toast.error(e?.message ?? "Tap again to start audio");
+    try {
+      resume(); // ensure AudioContext is running (user gesture)
+      if (a.paused) {
+        await a.play();
+      } else {
+        a.pause();
       }
-    } else {
-      setMuted(true);
+    } catch (e: any) {
+      // Autoplay blocked or src not yet loaded — surface the unlock overlay.
+      setNeedsUnlock(true);
+      toast.error(e?.message ?? "Tap again to start audio");
     }
   };
-  const seek = (_pct: number) => { /* radio mode: seeking disabled */ };
-  void seek;
+  const seek = (pct: number) => {
+    const a = audioRef.current;
+    if (!a || !duration) return;
+    a.currentTime = pct * duration;
+    setProgress(a.currentTime);
+  };
   const vote = async (v: 1 | -1) => {
     if (!track) return;
     if (!userId) { toast.error("Sign in to vote"); return; }
@@ -859,11 +726,23 @@ export function ImmersivePlayer({
     catch (e: any) { toast.error(e?.message ?? "Skip failed"); }
   };
   const hostPlayPrev = async () => {
-    // Host-only: replay the most recently finished track for everyone
-    // (restarts on the shared clock). Listeners can't restart the song.
-    if (!isHost || !streamId) return;
-    const prev = leaderboard[0] ?? track;
-    if (!prev) return;
+    // Spotify-style: if we're more than 3s into the track, restart it.
+    const a = audioRef.current;
+    if (a && a.currentTime > 3) {
+      a.currentTime = 0;
+      setProgress(0);
+      return;
+    }
+    // Otherwise host can replay the most recently finished track.
+    if (!isHost || !streamId) {
+      if (a) { a.currentTime = 0; setProgress(0); }
+      return;
+    }
+    const prev = leaderboard[0];
+    if (!prev) {
+      if (a) { a.currentTime = 0; setProgress(0); }
+      return;
+    }
     try { await playFn({ data: { streamId, trackId: prev.id } }); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
@@ -1029,25 +908,21 @@ export function ImmersivePlayer({
         <div className="relative z-10 mt-6 w-full">
           {/* Progress */}
           <div className="flex items-center gap-3 text-[11px] tabular-nums text-white/60">
-            <span className="inline-flex items-center gap-1 font-black tracking-widest text-[#00E6FF]">
-              <span className={`h-1.5 w-1.5 rounded-full bg-[#00E6FF] ${radioPaused ? "" : "animate-pulse"}`} />
-              {radioPaused ? "PAUSED" : "LIVE"}
-            </span>
-            <span className="w-10 text-right">{fmt(shownProgress)}</span>
-            {/* Radio-style: no seeking — everyone shares one timeline. */}
-            <div
-              className="relative h-2 flex-1 rounded-full bg-white/10 overflow-hidden"
-              role="progressbar"
-              aria-label="Live playback position"
-              aria-valuemin={0}
-              aria-valuemax={Math.round(duration || 0)}
-              aria-valuenow={Math.round(shownProgress)}
+            <span className="w-10 text-right">{fmt(progress)}</span>
+            <button
+              type="button"
+              className="group relative h-2 flex-1 rounded-full bg-white/10 overflow-hidden"
+              onClick={(e) => {
+                const r = e.currentTarget.getBoundingClientRect();
+                seek((e.clientX - r.left) / r.width);
+              }}
+              aria-label="Seek"
             >
               <div
                 className="h-full bg-gradient-to-r from-[#00E6FF] via-[#0000FF] to-[#00E6FF] shadow-[0_0_10px_rgba(0,0,255,0.8)] transition-all"
-                style={{ width: duration ? `${(shownProgress / duration) * 100}%` : "0%" }}
+                style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
               />
-            </div>
+            </button>
             <span className="w-10">{fmt(duration)}</span>
           </div>
 
@@ -1121,9 +996,8 @@ export function ImmersivePlayer({
             <button
               aria-label="Previous"
               onClick={hostPlayPrev}
-              disabled={!isHost}
               className="grid h-10 w-10 place-items-center rounded-full text-white/70 hover:text-white transition disabled:opacity-30"
-              title={isHost ? "Replay last track for everyone" : "Host only"}
+              title="Restart / previous"
             ><SkipBack className="h-5 w-5" /></button>
 
             <button
@@ -1169,6 +1043,19 @@ export function ImmersivePlayer({
                 aria-label="Volume"
               />
             </div>
+            <label className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
+              <Gauge className="h-3.5 w-3.5" />
+              <select
+                value={speed}
+                onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                className="bg-transparent text-xs font-bold outline-none"
+                aria-label="Playback speed"
+              >
+                {[0.75, 1, 1.25, 1.5, 2].map(s => (
+                  <option key={s} value={s} className="bg-black">{s}×</option>
+                ))}
+              </select>
+            </label>
             <label className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
               <Moon className="h-3.5 w-3.5" />
               <select

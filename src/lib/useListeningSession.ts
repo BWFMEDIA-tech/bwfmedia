@@ -16,9 +16,6 @@ type Options = {
   me: { userId: string; displayName?: string | null; avatarUrl?: string | null } | null;
   /** Resolve trackId -> PlayerTrack so listeners can load host's picks. */
   resolveTrack?: (trackId: string) => Promise<PlayerTrack | null> | PlayerTrack | null;
-  /** Presence/snapshot only — never write the row or drive the player.
-   *  Used by Play Arena, where the server owns the radio clock. */
-  readOnly?: boolean;
 };
 
 const DRIFT_TOLERANCE_MS = 500;
@@ -33,10 +30,9 @@ const DRIFT_CHECK_MS = 8000;
  *   every ~8s. If the host disappears from presence, playback pauses
  *   locally.
  */
-export function useListeningSession({ streamId, hostUserId, me, resolveTrack, readOnly }: Options) {
+export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: Options) {
   const player = usePlayer();
   const isHost = !!(me && hostUserId && me.userId === hostUserId);
-  const drives = !readOnly;
 
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -86,7 +82,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack, re
   // ---- Listener: apply remote snapshot to local player ----
   const currentTrackIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!drives || isHost || !snapshot) return;
+    if (isHost || !snapshot) return;
     let cancelled = false;
 
     const apply = async () => {
@@ -136,7 +132,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack, re
   });
 
   useEffect(() => {
-    if (!drives || !isHost || !streamId) return;
+    if (!isHost || !streamId) return;
     if (applyingRemoteRef.current) return;
 
     const state: PlaybackState = player.isPlaying ? "playing" : "paused";
@@ -174,7 +170,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack, re
 
   // ---- Host: periodic position heartbeat so late joiners get accurate pos ----
   useEffect(() => {
-    if (!drives || !isHost || !streamId) return;
+    if (!isHost || !streamId) return;
     const interval = setInterval(() => {
       if (!player.isPlaying) return;
       void publishSession({
@@ -189,7 +185,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack, re
 
   // ---- Listener: drift correction ----
   useEffect(() => {
-    if (!drives || isHost) return;
+    if (isHost) return;
     const interval = setInterval(() => {
       const snap = snapRef.current;
       if (!snap || snap.playbackState !== "playing") return;
@@ -213,7 +209,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack, re
     [participants, hostUserId],
   );
   useEffect(() => {
-    if (!drives || isHost || !snapshot) return;
+    if (isHost || !snapshot) return;
     if (!hostPresent && player.isPlaying) {
       applyingRemoteRef.current = true;
       player.pause();
@@ -226,7 +222,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack, re
   const listeners = useMemo(() => participants.filter((p) => p.role === "listener"), [participants]);
 
   const leaveSession = useCallback(async () => {
-    if (drives && isHost && streamId) await endSession(streamId);
+    if (isHost && streamId) await endSession(streamId);
   }, [isHost, streamId]);
 
   return {

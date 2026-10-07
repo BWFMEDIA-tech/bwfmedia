@@ -806,7 +806,3 @@
   backdrop-filter: blur(14px);
   box-shadow: var(--live-glow, none);
 }
-
-@keyframes live-reaction-rise { 0% { transform: translateY(0) scale(.8); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-140px) scale(1.25); opacity: 0; } }
-.live-reaction-burst { animation: live-reaction-rise 1.8s ease-out forwards; }
-.live-quick-reactions { background: var(--live-glass); backdrop-filter: blur(14px); }

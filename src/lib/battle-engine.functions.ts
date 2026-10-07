@@ -605,10 +605,12 @@ export const dispatchBattleEvent = createServerFn({ method: "POST" })
 export const getBattleRoomState = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    // Battle tables are signed-in-only under RLS, but the battle display is
-    // public. Read the room state server-side (read-only) so every viewer —
-    // signed in or not — sees Side A / Side B and live vote totals.
-    const { supabaseAdmin: sb } = await import("@/integrations/supabase/client.server");
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { auth: { persistSession: false, autoRefreshToken: false } },
+    );
     const { data: match } = await sb
       .from("battle_matches")
       .select("*")
