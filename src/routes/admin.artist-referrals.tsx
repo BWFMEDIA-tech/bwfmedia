@@ -29,7 +29,7 @@ function ArtistReferralsAdmin() {
   const n = (id: string) => d?.names[id] ?? id.slice(0, 8);
 
   return (
-    <SectionPage title="Artist Referrals" description="Host commission on memberships from artists they refer.">
+    <SectionPage title="Artist Referrals" subtitle="Host commission on memberships from artists they refer.">
       <div className="space-y-6">
         <section className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4">
           <label className="text-sm">Commission %<input type="number" min={0} max={100} step="0.5" value={pct} onChange={(e) => setPct(e.target.value)} className="mt-1 block w-28 rounded-md border border-border bg-background px-2 py-1.5" /></label>
