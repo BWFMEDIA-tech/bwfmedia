@@ -1,3 +1,4 @@
+import { ArenaMusicBroadcast } from "@/components/stream/ArenaMusicBroadcast";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -173,6 +174,7 @@ export function StageAudioShell({
     >
       <StageConnectionProvider>
         <RoomAudioRenderer />
+        <ArenaMusicBroadcast />
         <StageMicSync streamId={streamId} userId={userId} />
         <LocalSpeakingSignalPublisher />
         <AudioPlaybackUnblocker />
