@@ -86,6 +86,9 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
       ? { userId: auth.user.id, displayName: auth.displayName ?? null, avatarUrl: null }
       : null,
     resolveTrack,
+    // The Arena's own player handles audio; letting the session also drive
+    // the global player played the song twice and kept seeking it.
+    drivePlayer: false,
   });
 
   // Register presence as a listener so chat/queue RLS policies that require

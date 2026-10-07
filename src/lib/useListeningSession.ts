@@ -16,6 +16,9 @@ type Options = {
   me: { userId: string; displayName?: string | null; avatarUrl?: string | null } | null;
   /** Resolve trackId -> PlayerTrack so listeners can load host's picks. */
   resolveTrack?: (trackId: string) => Promise<PlayerTrack | null> | PlayerTrack | null;
+  /** When false, only presence is synced; the global player is never touched
+   *  (use when the page has its own audio element, e.g. the Arena player). */
+  drivePlayer?: boolean;
 };
 
 const DRIFT_TOLERANCE_MS = 500;
@@ -30,7 +33,7 @@ const DRIFT_CHECK_MS = 8000;
  *   every ~8s. If the host disappears from presence, playback pauses
  *   locally.
  */
-export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: Options) {
+export function useListeningSession({ streamId, hostUserId, me, resolveTrack, drivePlayer = true }: Options) {
   const player = usePlayer();
   const isHost = !!(me && hostUserId && me.userId === hostUserId);
 
@@ -82,7 +85,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
   // ---- Listener: apply remote snapshot to local player ----
   const currentTrackIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (isHost || !snapshot) return;
+    if (!drivePlayer || isHost || !snapshot) return;
     let cancelled = false;
 
     const apply = async () => {
@@ -122,7 +125,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
     // Intentionally omit `player` from deps: it re-creates on every player
     // state change and would re-run apply() constantly.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snapshot?.updatedAtMs, snapshot?.currentTrackId, snapshot?.playbackState, isHost]);
+  }, [snapshot?.updatedAtMs, snapshot?.currentTrackId, snapshot?.playbackState, isHost, drivePlayer]);
 
   // ---- Host: publish local player changes ----
   const lastPublishRef = useRef<{ state: PlaybackState; trackId: string | null; posMs: number }>({
@@ -132,7 +135,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
   });
 
   useEffect(() => {
-    if (!isHost || !streamId) return;
+    if (!drivePlayer || !isHost || !streamId) return;
     if (applyingRemoteRef.current) return;
 
     const state: PlaybackState = player.isPlaying ? "playing" : "paused";
@@ -166,11 +169,11 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
       positionMs: posMs,
       ts: Date.now(),
     } as any);
-  }, [isHost, streamId, player.isPlaying, player.track?.id, player.progress]);
+  }, [isHost, streamId, player.isPlaying, player.track?.id, player.progress, drivePlayer]);
 
   // ---- Host: periodic position heartbeat so late joiners get accurate pos ----
   useEffect(() => {
-    if (!isHost || !streamId) return;
+    if (!drivePlayer || !isHost || !streamId) return;
     const interval = setInterval(() => {
       if (!player.isPlaying) return;
       void publishSession({
@@ -185,7 +188,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
 
   // ---- Listener: drift correction ----
   useEffect(() => {
-    if (isHost) return;
+    if (!drivePlayer || isHost) return;
     const interval = setInterval(() => {
       const snap = snapRef.current;
       if (!snap || snap.playbackState !== "playing") return;
@@ -201,7 +204,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
       }
     }, DRIFT_CHECK_MS);
     return () => clearInterval(interval);
-  }, [isHost, player]);
+  }, [isHost, player, drivePlayer]);
 
   // ---- Listener: host disconnect -> pause locally ----
   const hostPresent = useMemo(
@@ -209,7 +212,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
     [participants, hostUserId],
   );
   useEffect(() => {
-    if (isHost || !snapshot) return;
+    if (!drivePlayer || isHost || !snapshot) return;
     if (!hostPresent && player.isPlaying) {
       applyingRemoteRef.current = true;
       player.pause();
@@ -217,7 +220,7 @@ export function useListeningSession({ streamId, hostUserId, me, resolveTrack }: 
         applyingRemoteRef.current = false;
       }, 0);
     }
-  }, [hostPresent, isHost, snapshot, player]);
+  }, [hostPresent, isHost, snapshot, player, drivePlayer]);
 
   const listeners = useMemo(() => participants.filter((p) => p.role === "listener"), [participants]);
 
