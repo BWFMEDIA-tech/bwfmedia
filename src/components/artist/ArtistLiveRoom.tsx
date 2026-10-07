@@ -1,7 +1,7 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Eye, Radio, Share2, LogOut, Users, Crown, Music2, MoreHorizontal, Heart, Gem, Hand, Clock, MessageCircle } from "lucide-react";
+import { Eye, Radio, Share2, LogOut, Users, Crown, Music2, MoreHorizontal, Heart, Gem, Hand, Clock, MessageCircle, Flag, Headphones } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -22,9 +22,10 @@ import { TipModal } from "@/components/stream/TipModal";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
-export function ArtistLiveRoom({ stream, artist, onEnded }: {
+export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   stream: LiveStream;
-  artist: { name: string; photo: string | null };
+  artist: { name: string; photo: string | null; handle?: string; genre?: string | null; featuredTrack?: { title: string; cover: string | null; plays: number } | null };
+  followSlot?: ReactNode;
   onEnded: () => void;
 }) {
   const auth = useAuth();
@@ -93,16 +94,45 @@ export function ArtistLiveRoom({ stream, artist, onEnded }: {
 
   return (
     <main className="artist-live-room mx-auto w-full max-w-5xl px-3 pb-5 pt-4 md:px-4 md:pt-4">
-      <header className="mb-5 flex flex-wrap items-center gap-3 border-b border-border pb-4">
-        <span className="inline-flex items-center gap-2 rounded-md bg-trust px-4 py-2 text-sm font-bold text-accent-foreground">LIVE</span>
-        <div className="min-w-0 flex-1">
-          <h1 className="flex items-center gap-2 text-sm font-medium text-foreground"><span className="h-2 w-2 shrink-0 rounded-full bg-primary" />{artist.name} · Live Room</h1>
+      <header className="live-header mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border p-3 sm:flex sm:flex-wrap">
+        <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+          <span className="live-pill inline-flex shrink-0 items-center gap-1.5 rounded-md bg-trust px-3 py-1.5 text-xs font-bold tracking-wider text-accent-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-foreground" />LIVE</span>
+          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-primary">
+            {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center bg-card text-primary"><Music2 className="h-5 w-5" /></div>}
+          </div>
+          <div className="min-w-0">
+            <h1 className="truncate text-sm font-semibold text-foreground">{stream.title || `${artist.name} is live`}</h1>
+            <p className="truncate text-xs text-muted-foreground">{artist.name}{artist.handle ? ` · ${artist.handle}` : ""}</p>
+          </div>
         </div>
-        <span className="flex items-center gap-1.5 text-xs text-brand-silver"><Eye className="h-4 w-4" /> {viewers.toLocaleString()}</span>
-        <Button variant="outline" size="sm" onClick={share}><Share2 /> Share</Button>
-        <div className="relative"><Button variant="outline" size="icon" aria-label="Room options" onClick={() => setShowMenu(v => !v)}><MoreHorizontal /></Button>{showMenu && <div className="absolute right-0 top-12 z-20 w-48 rounded-lg border border-border bg-card p-2"><p className="px-2 py-2 text-xs text-muted-foreground">{stream.title}</p><Button variant="ghost" className="w-full" onClick={() => { setShowAudience(v => !v); setShowMenu(false); }}>Toggle audience</Button></div>}</div>
-        {connection && <Button variant="ghost" size="icon" title="Leave room" aria-label="Leave room" onClick={() => setConnection(null)}><LogOut /></Button>}
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-brand-silver"><Eye className="h-4 w-4" /> {viewers.toLocaleString()}</span>
+          <Button variant="outline" size="sm" onClick={share} aria-label="Share"><Share2 /><span className="hidden sm:inline">Share</span></Button>
+          <div className="relative"><Button variant="outline" size="icon" aria-label="Room options" onClick={() => setShowMenu(v => !v)}><MoreHorizontal /></Button>{showMenu && <div className="absolute right-0 top-12 z-20 w-52 rounded-lg border border-border bg-card p-2"><p className="px-2 py-2 text-xs text-muted-foreground">{stream.title}</p><Button variant="ghost" className="w-full justify-start" onClick={() => { setShowAudience(v => !v); setShowMenu(false); }}><Users />Toggle audience</Button>{!isOwner && <Button variant="ghost" className="w-full justify-start" onClick={() => { setShowMenu(false); toast.success("Thanks — our team will review this live."); }}><Flag />Report live</Button>}</div>}</div>
+          {connection && <Button variant="ghost" size="icon" title="Leave room" aria-label="Leave room" onClick={() => setConnection(null)}><LogOut /></Button>}
+        </div>
       </header>
+
+      <section className="live-artist-card mb-5 flex flex-wrap items-center gap-4 rounded-2xl border border-border p-4">
+        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border">
+          {artist.photo ? <SignedImg src={artist.photo} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center bg-card text-primary"><Music2 className="h-6 w-6" /></div>}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-semibold text-foreground">{artist.name}</p>
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {artist.handle && <span>{artist.handle}</span>}
+            {artist.genre && <span className="inline-flex items-center gap-1"><Music2 className="h-3 w-3 text-primary" />{artist.genre}</span>}
+            <span className="inline-flex items-center gap-1"><Headphones className="h-3 w-3 text-primary" />{viewers.toLocaleString()} listening</span>
+          </p>
+        </div>
+        {artist.featuredTrack && (
+          <div className="flex min-w-0 max-w-full items-center gap-3 rounded-xl border border-border bg-background/40 p-2 pr-4">
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-card">{artist.featuredTrack.cover ? <SignedImg src={artist.featuredTrack.cover} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-primary"><Music2 className="h-4 w-4" /></div>}</div>
+            <div className="min-w-0"><p className="text-[10px] uppercase tracking-wider text-primary">Top track</p><p className="truncate text-sm text-foreground">{artist.featuredTrack.title}</p></div>
+          </div>
+        )}
+        {followSlot && <div className="shrink-0">{followSlot}</div>}
+      </section>
 
       {connection ? (
         <div className="artist-live-stage flex min-w-0 flex-col gap-4">
