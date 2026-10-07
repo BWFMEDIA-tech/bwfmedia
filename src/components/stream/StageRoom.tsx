@@ -451,7 +451,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           />
         )}
         {Array.from({ length: Math.max(0, MAX_HOSTS - hostSlotsTaken) }).map((_, i) => (
-          <EmptySlot key={`h-${i}`} label="Host slot" color={PURPLE} />
+          <EmptySlot key={`h-${i}`} label="Host slot" color="#00E6FF" />
         ))}
       </div>
 
@@ -474,7 +474,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             <ModBubble key={m.user_id} m={m} />
           ))}
           {Array.from({ length: Math.max(0, MAX_MODS - Math.min(moderators.length, MAX_MODS)) }).map((_, i) => (
-            <EmptySlot key={`m-${i}`} label="Mod slot" color={BLUE} />
+            <EmptySlot key={`m-${i}`} label="Mod slot" color="#C0C8D8" />
           ))}
         </div>
       </div>
@@ -1295,17 +1295,17 @@ function EmptySlot({ label = "Open slot", color = "#ffffff" }: { label?: string;
       <div
         className="relative grid h-20 w-20 place-items-center rounded-full border border-dashed transition group-hover:scale-105"
         style={{
-          borderColor: `${color}55`,
-          background: `radial-gradient(60% 60% at 50% 50%, ${color}10, transparent 70%)`,
+          borderColor: `${color}aa`,
+          background: `radial-gradient(60% 60% at 50% 50%, ${color}22, transparent 70%)`,
         }}
       >
-        <span className="text-lg font-thin" style={{ color: `${color}99` }}>
+        <span className="text-lg font-thin" style={{ color }}>
           +
         </span>
       </div>
       <div
         className="text-[10px] font-semibold uppercase tracking-widest"
-        style={{ color: `${color}77` }}
+        style={{ color: `${color}dd` }}
       >
         {label}
       </div>
