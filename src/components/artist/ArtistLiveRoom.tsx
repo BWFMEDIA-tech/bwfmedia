@@ -95,8 +95,9 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
 
   return (
     <main className="artist-live-room mx-auto w-full max-w-5xl px-3 pb-5 pt-4 md:px-4 md:pt-4">
-      <header className="live-header mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border p-3 sm:flex sm:flex-wrap">
-        <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+        <header className="live-header mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border p-3">
+          {/* The title column shrinks first so the right-side actions never get pushed off narrow screens. */}
+          <div className="flex min-w-0 flex-auto items-center gap-3">
           <span className="live-pill inline-flex shrink-0 items-center gap-1.5 rounded-md bg-trust px-3 py-1.5 text-xs font-bold tracking-wider text-accent-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-foreground" />LIVE</span>
           <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-primary">
             {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center bg-card text-primary"><Music2 className="h-5 w-5" /></div>}
@@ -106,11 +107,13 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
             <p className="truncate text-xs text-muted-foreground">{artist.name}{artist.handle ? ` · ${artist.handle}` : ""}</p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <span className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-brand-silver"><Eye className="h-4 w-4" /> {viewers.toLocaleString()}</span>
           <Button variant="outline" size="sm" onClick={share} aria-label="Share"><Share2 /><span className="hidden sm:inline">Share</span></Button>
           <div className="relative"><Button variant="outline" size="icon" aria-label="Room options" onClick={() => setShowMenu(v => !v)}><MoreHorizontal /></Button>{showMenu && <div className="absolute right-0 top-12 z-20 w-52 rounded-lg border border-border bg-card p-2"><p className="px-2 py-2 text-xs text-muted-foreground">{stream.title}</p><Button variant="ghost" className="w-full justify-start" onClick={() => { setShowAudience(v => !v); setShowMenu(false); }}><Users />Toggle audience</Button>{!isOwner && <Button variant="ghost" className="w-full justify-start" onClick={() => { setShowMenu(false); toast.success("Thanks — our team will review this live."); }}><Flag />Report live</Button>}</div>}</div>
           {connection && <Button variant="ghost" size="icon" title="Leave room" aria-label="Leave room" onClick={() => setConnection(null)}><LogOut /></Button>}
+          {!connection && <Button size="sm" className="live-header-cta shrink-0 whitespace-nowrap" disabled={joining || auth.loading} onClick={join}><Radio /> {joining ? "Joining…" : isOwner ? "Resume live" : "Watch live"}</Button>}
+
         </div>
       </header>
 
@@ -156,11 +159,11 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
           </div>
           {["Artist", "Guest"].map(label => <div key={label} className="profile-video-tile"><span className="profile-video-badge"><Users className="h-4 w-4" />{label}</span><div className="profile-video-empty"><Users className="h-10 w-10" /><span>Join to watch live</span></div></div>)}
           </div>
-          <div className="profile-entry-actions">
+          {(!auth.user || isOwner) && <div className="profile-entry-actions">
             {!auth.user && <input aria-label="Your live-room name" placeholder="Your name (optional)" value={guestName} maxLength={80} onChange={(event) => setGuestName(event.target.value)} className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground" />}
-            <Button size="lg" className="w-full" disabled={joining || auth.loading} onClick={join}><Radio /> {joining ? "Joining…" : isOwner ? "Resume live" : "Watch live"}</Button>
             {isOwner && <Button variant="outline" className="w-full" disabled={ending} onClick={stop}>{ending ? "Ending…" : "End live"}</Button>}
-          </div>
+          </div>}
+
         </section>
       )}
 

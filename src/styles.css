@@ -121,7 +121,8 @@
 .artist-live-room > header > span:first-child {
   box-shadow: 0 0 20px color-mix(in srgb, var(--brand-blue) 35%, transparent);
 }
-.artist-live-room > header button {
+/* The join button keeps its own solid fill; only the secondary header actions get the glass look. */
+.artist-live-room > header button:not(.live-header-cta) {
   border-radius: .75rem;
   background: var(--live-glass);
 }
