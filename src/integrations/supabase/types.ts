@@ -1891,6 +1891,47 @@ export type Database = {
         }
         Relationships: []
       }
+      live_setlist_items: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          id: string
+          position: number
+          status: string
+          stream_id: string
+          title: string
+          track_id: string | null
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          position?: number
+          status?: string
+          stream_id: string
+          title: string
+          track_id?: string | null
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          position?: number
+          status?: string
+          stream_id?: string
+          title?: string
+          track_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_setlist_items_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       live_submissions: {
         Row: {
           amount_cents: number

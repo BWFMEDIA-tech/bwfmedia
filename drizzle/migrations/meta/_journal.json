@@ -29,6 +29,13 @@
       "when": 1791337632217,
       "tag": "0003_independent_profile_live_ownership",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791338737248,
+      "tag": "0004_live_setlist",
+      "breakpoints": true
     }
   ]
 }
