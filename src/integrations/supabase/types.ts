@@ -3581,6 +3581,35 @@ export type Database = {
           },
         ]
       }
+      stream_moderators: {
+        Row: {
+          added_by: string
+          created_at: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_moderators_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_platform_connections: {
         Row: {
           account_label: string | null
