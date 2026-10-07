@@ -78,7 +78,7 @@
   --accent: oklch(0.49 0.27 264);
   --accent-foreground: #FFFFFF;
 
-  --destructive: #FF4D6A;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
 
   --border: #1c1c1f;
@@ -466,6 +466,17 @@
   --color-fuchsia-800: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
   --color-fuchsia-900: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
   --color-fuchsia-950: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
+  --color-rose-50: var(--brand-silver);
+  --color-rose-100: var(--brand-silver);
+  --color-rose-200: var(--brand-silver);
+  --color-rose-300: var(--brand-silver);
+  --color-rose-400: var(--brand-cyan);
+  --color-rose-500: var(--brand-blue);
+  --color-rose-600: var(--brand-blue);
+  --color-rose-700: color-mix(in srgb, var(--brand-blue) 70%, var(--brand-ink));
+  --color-rose-800: color-mix(in srgb, var(--brand-blue) 50%, var(--brand-ink));
+  --color-rose-900: color-mix(in srgb, var(--brand-blue) 30%, var(--brand-ink));
+  --color-rose-950: var(--brand-ink);
 }
 .accent-\[\#C53DFF\] { accent-color: var(--brand-blue); }
 .accent-\[\#FF00A6\] { accent-color: var(--brand-cyan); }

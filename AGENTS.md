@@ -1,5 +1,5 @@
 - Keep the legacy `/email/unsubscribe` token endpoint as a compatibility bridge to Lovable-managed subscription state, because already-sent emails still link to it; new email links remain Lovable-hosted.
 - Give each mounted notification bell its own Realtime topic, because the desktop and mobile headers coexist and subscribed channels cannot accept new database callbacks.
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
-- Keep site branding in shared semantic palette tokens and a legacy utility color bridge, because existing pages use both tokens and older color utilities.
+- Keep site branding in shared semantic palette tokens with bridges for legacy utilities, inline styles, and SVG accents, because older pages express colors through all three paths.
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
