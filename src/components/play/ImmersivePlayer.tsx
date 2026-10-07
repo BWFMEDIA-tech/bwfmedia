@@ -686,6 +686,25 @@ export function ImmersivePlayer({
     return () => clearInterval(id);
   }, [radio.state, track?.id]);
 
+  const unlockAndPlay = async () => {
+    const a = audioRef.current;
+    if (!a) return;
+    try {
+      resume();
+      if (radioMatches) a.currentTime = radio.livePosition();
+      await a.play();
+      setNeedsUnlock(false);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not start audio");
+    }
+  };
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    a.volume = muted ? 0 : volume;
+  }, [volume, muted]);
+
   /* ----- sleep timer ----- */
   useEffect(() => {
     if (sleepRef.current) clearTimeout(sleepRef.current);
