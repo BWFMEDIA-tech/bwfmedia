@@ -652,7 +652,7 @@ function ArtistSide({
   flash?: { side: "a" | "b"; n: number; key: number } | null;
 }) {
   const grad = side === "a"
-    ? "linear-gradient(135deg, #c53dff, #004bff)"
+    ? "linear-gradient(135deg, #c53dff, #0000ff)"
     : "linear-gradient(135deg, #ff00a6, #00e6ff)";
   const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
   const isEmpty = !artistId;

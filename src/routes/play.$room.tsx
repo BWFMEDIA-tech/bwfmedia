@@ -186,7 +186,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
                   if (!status?.membershipActive) return setModal("membership");
                   setModal("submit");
                 }}
-                className="rounded-2xl border border-[#C53DFF]/40 bg-gradient-to-br from-[#C53DFF]/20 to-[#004BFF]/10 p-4 text-left hover:border-[#C53DFF] transition"
+                className="rounded-2xl border border-[#C53DFF]/40 bg-gradient-to-br from-[#C53DFF]/20 to-[#0000FF]/10 p-4 text-left hover:border-[#C53DFF] transition"
               >
                 <div className="flex items-center gap-2 text-[#C53DFF] font-semibold">
                   <Music className="h-4 w-4" /> Submit a track

@@ -160,7 +160,7 @@ function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean })
             href={event.link_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#C53DFF] to-[#004BFF] px-3 py-1.5 text-xs font-bold hover:shadow-[0_0_20px_-5px_#C53DFF80]"
+            className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#C53DFF] to-[#0000FF] px-3 py-1.5 text-xs font-bold hover:shadow-[0_0_20px_-5px_#C53DFF80]"
           >
             Open <ExternalLink className="h-3 w-3" />
           </a>

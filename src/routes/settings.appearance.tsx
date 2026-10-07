@@ -9,7 +9,7 @@ import { SettingsShell, Card, Row } from "@/components/settings/SettingsShell";
 
 export const Route = createFileRoute("/settings/appearance")({ component: AppearancePage });
 
-const ACCENTS = ["#E50914", "#FF00A6", "#00E6FF", "#004BFF", "#C53DFF", "#10B981"];
+const ACCENTS = ["#E50914", "#FF00A6", "#00E6FF", "#0000FF", "#C53DFF", "#10B981"];
 
 function AppearancePage() {
   const { user } = useAuth();

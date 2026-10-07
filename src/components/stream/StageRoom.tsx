@@ -39,7 +39,7 @@ const MAX_MODS = 5;
 
 // BWF cinema palette — "Immersive Stage Cinema"
 const PURPLE = "#C53DFF"; // brand magenta (primary, host)
-const BLUE = "#004BFF"; // brand electric blue (co-host accents)
+const BLUE = "#0000FF"; // brand electric blue (co-host accents)
 const ACCENT = "#00E6FF"; // brand cyan (guest accent)
 const PINK = "#FF00A6"; // brand pink (live / speaking secondary)
 

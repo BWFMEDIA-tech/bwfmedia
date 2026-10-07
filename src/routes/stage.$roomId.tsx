@@ -142,7 +142,7 @@ function StagePage() {
       <div className="relative w-full max-w-7xl min-h-[88vh] bg-[#050505] border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(197,61,255,0.08)] flex flex-col">
         {/* Ambient glows */}
         <div className="pointer-events-none absolute -top-24 -left-24 w-64 h-64 bg-[#C53DFF]/20 blur-[100px] rounded-full" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 w-64 h-64 bg-[#004BFF]/20 blur-[100px] rounded-full" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 w-64 h-64 bg-[#0000FF]/20 blur-[100px] rounded-full" />
 
         {/* Header */}
         <div className="relative flex items-center justify-between px-6 lg:px-10 py-5 lg:py-6 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
@@ -231,7 +231,7 @@ function StagePage() {
 
                 <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-[#C53DFF] overflow-hidden rotate-3 shadow-[0_0_20px_rgba(197,61,255,0.4)] flex items-center justify-center bg-gradient-to-br from-[#C53DFF]/50 to-[#004BFF]/40 text-lg font-bold">
+                    <div className="w-14 h-14 rounded-2xl border-2 border-[#C53DFF] overflow-hidden rotate-3 shadow-[0_0_20px_rgba(197,61,255,0.4)] flex items-center justify-center bg-gradient-to-br from-[#C53DFF]/50 to-[#0000FF]/40 text-lg font-bold">
                       {hostInitial}
                     </div>
                     <div className="min-w-0">
@@ -285,8 +285,8 @@ function StagePage() {
               <div className="flex -space-x-3">
                 {[
                   "from-[#C53DFF] to-[#FF00A6]",
-                  "from-[#00E6FF] to-[#004BFF]",
-                  "from-[#FF00A6] to-[#004BFF]",
+                  "from-[#00E6FF] to-[#0000FF]",
+                  "from-[#FF00A6] to-[#0000FF]",
                 ].map((g, i) => (
                   <div
                     key={i}
@@ -336,7 +336,7 @@ function StagePage() {
 
             <div className="hidden md:flex flex-col items-center order-3 md:order-2 w-full md:w-auto">
               <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-1 h-1 rounded-full bg-[#004BFF]" />
+                <div className="w-1 h-1 rounded-full bg-[#0000FF]" />
                 <div className="w-1 h-1 rounded-full bg-[#C53DFF]" />
                 <div className="w-1 h-1 rounded-full bg-[#FF00A6]" />
               </div>

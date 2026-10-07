@@ -90,7 +90,7 @@
   --bone: #FFFFFF;
   --ash: #6A6A6A;
 
-  --trust: #004BFF;
+  --trust: #0000FF;
   --success: #00C853;
 
   --brand-cyan: oklch(0.84 0.15 207);
@@ -348,7 +348,7 @@
 /* Stream Studio controls: tactile glass, clear on/off states. */
 .studio-controls {
   --studio-ink: #0B0B0B;
-  --studio-blue: #004BFF;
+  --studio-blue: #0000FF;
   --studio-cyan: #00E6FF;
   --studio-bright: #F5F5F5;
   --studio-glass: color-mix(in srgb, var(--studio-bright) 5%, transparent);

@@ -34,7 +34,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 const PURPLE = "#C53DFF";
 const PINK = "#FF00A6";
 const CYAN = "#00E6FF";
-const BLUE = "#004BFF";
+const BLUE = "#0000FF";
 const GREEN = "#22c55e";
 const AMBER = "#f59e0b";
 
