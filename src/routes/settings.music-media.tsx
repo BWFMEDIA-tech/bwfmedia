@@ -20,6 +20,36 @@ function MusicMediaPage() {
   const [loading, setLoading] = useState(true);
   const [submitSong, setSubmitSong] = useState<any | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  function toggleSelect(id: string) {
+    setSelected((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected((s) => (s.size === tracks.length && tracks.length > 0 ? new Set() : new Set(tracks.map((t) => t.id))));
+  }
+
+  async function deleteSelected() {
+    if (!user || selected.size === 0) return;
+    const ids = [...selected];
+    if (!confirm(`Delete ${ids.length} track${ids.length === 1 ? "" : "s"}? This cannot be undone.`)) return;
+    const prev = tracks;
+    setTracks((ts) => ts.filter((t) => !selected.has(t.id)));
+    setSelected(new Set());
+    const { error } = await supabase.from("play_tracks").delete().in("id", ids);
+    if (error) { setTracks(prev); return toast.error(error.message); }
+    if (featuredTrack && ids.includes(featuredTrack)) {
+      await supabase.from("profiles").update({ featured_track_id: null } as any).eq("id", user.id);
+      setFeaturedTrack(null);
+    }
+    toast.success(`${ids.length} track${ids.length === 1 ? "" : "s"} deleted`);
+  }
 
   async function reload() {
     if (!user) return;
@@ -56,7 +86,27 @@ function MusicMediaPage() {
   return (
     <SettingsShell title="Music & Media" blurb="Pick what fans see first.">
       <Card title="Your Tracks" icon={<Music className="h-4 w-4 text-red-500" />}>
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          {tracks.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label className="flex cursor-pointer select-none items-center gap-2 text-xs font-semibold text-white/70 hover:text-white">
+                <input
+                  type="checkbox"
+                  checked={selected.size > 0 && selected.size === tracks.length}
+                  onChange={toggleSelectAll}
+                  className="h-4 w-4 accent-cyan-400"
+                />
+                Select all
+              </label>
+              <button
+                onClick={deleteSelected}
+                disabled={selected.size === 0}
+                className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 disabled:opacity-40 disabled:hover:bg-transparent"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete selected ({selected.size})
+              </button>
+            </div>
+          )}
           <button
             onClick={() => setShowAdd(true)}
             className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow shadow-violet-500/30 hover:from-violet-400 hover:to-blue-400"
@@ -68,6 +118,12 @@ function MusicMediaPage() {
           <ul className="divide-y divide-white/5">
             {tracks.map((t) => (
               <li key={t.id} className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  checked={selected.has(t.id)}
+                  onChange={() => toggleSelect(t.id)}
+                  className="h-4 w-4 shrink-0 accent-cyan-400"
+                />
                 <div className="h-10 w-10 overflow-hidden rounded bg-white/5">{t.cover_url && <SignedImg src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
                 <div className="flex-1 min-w-0">
                   <div className="truncate text-sm font-semibold">{t.title}</div>
