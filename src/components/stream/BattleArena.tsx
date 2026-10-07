@@ -683,7 +683,7 @@ function ArtistSide({
           className="pointer-events-none absolute left-1/2 top-6 z-20 -translate-x-1/2 font-mono text-2xl font-black animate-[voteFloat_0.9s_ease-out_forwards]"
           style={{
             color: side === "a" ? "#a78bfa" : "#ff6ab1",
-            textShadow: `0 0 12px ${side === "a" ? "rgba(0,0,255,0.9)" : "rgba(255,0,166,0.9)"}`,
+            textShadow: `0 0 12px ${side === "a" ? "rgba(0,0,255,0.9)" : "rgba(0,0,255,0.9)"}`,
           }}
         >
           +{flash.n}
@@ -728,7 +728,7 @@ function ArtistSide({
             <div
               className={cn(
                 "relative h-full w-full overflow-hidden rounded-full border-2",
-                isPlaying && "shadow-[0_0_30px_rgba(255,0,166,0.6)]",
+                isPlaying && "shadow-[0_0_30px_rgba(0,0,255,0.6)]",
               )}
               style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
             >

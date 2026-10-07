@@ -413,7 +413,7 @@ function TunevioLanding() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.7, delay: 0.15 }}
-                className="mt-8 w-full max-w-xl rounded-2xl border border-white/10 shadow-[0_0_60px_-15px_rgba(255,0,166,0.45)]"
+                className="mt-8 w-full max-w-xl rounded-2xl border border-white/10 shadow-[0_0_60px_-15px_rgba(0,0,255,0.45)]"
               />
             </motion.div>
 
@@ -456,7 +456,7 @@ function TunevioLanding() {
                   <div
                     className="inline-flex h-10 w-10 items-center justify-center rounded-xl"
                     style={{
-                      background: "linear-gradient(135deg,rgba(255,0,166,0.25),rgba(0,230,255,0.2))",
+                      background: "linear-gradient(135deg,rgba(0,0,255,0.25),rgba(0,230,255,0.2))",
                       border: "1px solid rgba(255,255,255,0.08)",
                     }}
                   >

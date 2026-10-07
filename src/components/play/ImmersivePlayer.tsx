@@ -224,7 +224,7 @@ function LiveVisualizerImpl({
           const grad = ctx2d.createLinearGradient(0, h, 0, h - bh);
           grad.addColorStop(0, "rgba(0,230,255,0.9)");
           grad.addColorStop(0.5, "rgba(0,0,255,0.9)");
-          grad.addColorStop(1, "rgba(255,0,166,0.9)");
+          grad.addColorStop(1, "rgba(0,0,255,0.9)");
           ctx2d.fillStyle = grad;
           ctx2d.shadowColor = "rgba(0,0,255,0.7)";
           ctx2d.shadowBlur = 8 * dpr;
@@ -846,7 +846,7 @@ export function ImmersivePlayer({
                   onClick={toggleLike}
                   className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${
                     liked
-                      ? "border-[#FF00A6] bg-[#FF00A6]/15 text-[#FF00A6] shadow-[0_0_20px_-5px_rgba(255,0,166,0.7)]"
+                      ? "border-[#FF00A6] bg-[#FF00A6]/15 text-[#FF00A6] shadow-[0_0_20px_-5px_rgba(0,0,255,0.7)]"
                       : "border-white/15 text-white/80 hover:border-white/40"
                   }`}
                 >
@@ -977,7 +977,7 @@ export function ImmersivePlayer({
                   onClick={() => castBattleSide("b")}
                   className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
                     battleVote.myChoice === "b"
-                      ? "border-[#FF00A6] bg-[#FF00A6]/15 text-[#FF00A6] shadow-[0_0_22px_-6px_rgba(255,0,166,0.8)]"
+                      ? "border-[#FF00A6] bg-[#FF00A6]/15 text-[#FF00A6] shadow-[0_0_22px_-6px_rgba(0,0,255,0.8)]"
                       : "border-[#FF00A6]/30 text-[#FF00A6]/85 hover:border-[#FF00A6]"
                   }`}
                   title={`Vote for ${battleVote.artistBName}`}
@@ -1100,7 +1100,7 @@ export function ImmersivePlayer({
       <div className="space-y-4">
         {/* Battle status */}
         {battle && (
-          <div className="overflow-hidden rounded-2xl border border-[#FF00A6]/40 bg-gradient-to-br from-[#FF00A6]/15 via-[#C53DFF]/10 to-[#0000FF]/15 p-4 shadow-[0_0_40px_-15px_rgba(255,0,166,0.6)]">
+          <div className="overflow-hidden rounded-2xl border border-[#FF00A6]/40 bg-gradient-to-br from-[#FF00A6]/15 via-[#C53DFF]/10 to-[#0000FF]/15 p-4 shadow-[0_0_40px_-15px_rgba(0,0,255,0.6)]">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-[0.2em] text-[#FF00A6]">
                 <Trophy className="h-3 w-3" /> LIVE BATTLE · ROUND {battle.current_round}/{battle.total_rounds}
@@ -1317,7 +1317,7 @@ function BattleSide({ name, wins, active, side }: { name: string; wins: number; 
   return (
     <div className={`rounded-xl border p-2.5 text-center transition ${
       active
-        ? "border-[#FF00A6] bg-[#FF00A6]/10 shadow-[0_0_25px_-5px_rgba(255,0,166,0.7)]"
+        ? "border-[#FF00A6] bg-[#FF00A6]/10 shadow-[0_0_25px_-5px_rgba(0,0,255,0.7)]"
         : "border-white/10 bg-black/30"
     }`}>
       <div className={`text-[9px] font-black tracking-widest ${side === "a" ? "text-[#00E6FF]" : "text-[#FF00A6]"}`}>SIDE {side.toUpperCase()}</div>

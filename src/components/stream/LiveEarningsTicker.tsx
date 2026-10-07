@@ -128,7 +128,7 @@ export function LiveEarningsTicker({
       }`}
       style={{
         boxShadow: pulse
-          ? "0 0 40px rgba(0,0,255,0.45), inset 0 0 30px rgba(255,0,166,0.15)"
+          ? "0 0 40px rgba(0,0,255,0.45), inset 0 0 30px rgba(0,0,255,0.15)"
           : "0 0 0 rgba(0,0,0,0)",
         transition: "box-shadow 400ms ease",
       }}
@@ -140,7 +140,7 @@ export function LiveEarningsTicker({
           </div>
           <div
             className="mt-1 truncate text-2xl font-black text-white"
-            style={{ textShadow: pulse ? "0 0 20px rgba(255,0,166,0.7)" : "none" }}
+            style={{ textShadow: pulse ? "0 0 20px rgba(0,0,255,0.7)" : "none" }}
           >
             {fmt(sEased)}
           </div>

@@ -56,7 +56,7 @@ export function ProfileLiveBar({ artistId, isOwner }: { artistId: string; isOwne
     >
       <span
         className="grid h-9 w-9 place-items-center rounded-xl"
-        style={{ background: "linear-gradient(135deg, rgba(255,0,166,0.3), rgba(0,0,255,0.25))" }}
+        style={{ background: "linear-gradient(135deg, rgba(0,0,255,0.3), rgba(0,0,255,0.25))" }}
       >
         <Radio className="h-4 w-4 text-white" />
       </span>

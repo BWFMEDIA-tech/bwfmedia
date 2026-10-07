@@ -125,7 +125,7 @@ function PricingPage() {
                 key={planId}
                 className={`relative rounded-2xl p-6 border bg-gradient-to-b from-white/[0.04] to-transparent ${
                   isHighlighted
-                    ? "border-[#FF00A6]/60 shadow-[0_0_60px_-15px_rgba(255,0,166,0.5)]"
+                    ? "border-[#FF00A6]/60 shadow-[0_0_60px_-15px_rgba(0,0,255,0.5)]"
                     : "border-white/10"
                 }`}
               >

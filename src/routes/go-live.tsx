@@ -188,7 +188,7 @@ function GoLivePage() {
       <div className="flex items-center gap-3">
         <div
           className="grid h-12 w-12 place-items-center rounded-xl"
-          style={{ background: "linear-gradient(135deg, rgba(255,0,166,0.3), rgba(0,0,255,0.25))", border: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ background: "linear-gradient(135deg, rgba(0,0,255,0.3), rgba(0,0,255,0.25))", border: "1px solid rgba(255,255,255,0.08)" }}
         >
           <Radio className="h-5 w-5" />
         </div>
@@ -231,7 +231,7 @@ function GoLivePage() {
           onClick={goLive}
           disabled={going}
           className="w-full rounded-xl px-4 py-3.5 text-sm font-black uppercase tracking-wide disabled:opacity-60"
-          style={{ background: "linear-gradient(90deg,#FF00A6,#C53DFF)", boxShadow: "0 8px 30px rgba(255,0,166,0.35)" }}
+          style={{ background: "linear-gradient(90deg,#FF00A6,#C53DFF)", boxShadow: "0 8px 30px rgba(0,0,255,0.35)" }}
         >
           {going ? "Starting…" : "Go Live"}
         </button>

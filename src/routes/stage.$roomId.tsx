@@ -184,7 +184,7 @@ function StagePage() {
           {/* Queue rail */}
           <div className="lg:w-16 flex lg:flex-col gap-5 items-center justify-between lg:justify-start py-3 lg:py-4 px-3 lg:px-0 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
             <div className="flex lg:flex-col gap-4 items-center">
-              <div className="w-10 h-10 rounded-full border-2 border-[#FF00A6] p-0.5 shadow-[0_0_18px_rgba(255,0,166,0.35)]">
+              <div className="w-10 h-10 rounded-full border-2 border-[#FF00A6] p-0.5 shadow-[0_0_18px_rgba(0,0,255,0.35)]">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FF00A6]/40 to-[#C53DFF]/30 flex items-center justify-center text-[10px] font-bold">
                   {hostInitial}
                 </div>
@@ -197,7 +197,7 @@ function StagePage() {
               </div>
             </div>
             <button
-              className="w-12 h-12 rounded-full bg-[#FF00A6]/20 border border-[#FF00A6]/50 flex items-center justify-center text-[#FF00A6] shadow-[0_0_20px_rgba(255,0,166,0.2)] hover:scale-105 transition-transform"
+              className="w-12 h-12 rounded-full bg-[#FF00A6]/20 border border-[#FF00A6]/50 flex items-center justify-center text-[#FF00A6] shadow-[0_0_20px_rgba(0,0,255,0.2)] hover:scale-105 transition-transform"
               aria-label="Raise hand"
             >
               <Hand className="w-5 h-5" />
@@ -373,7 +373,7 @@ function StagePage() {
               </button>
               <button
                 onClick={() => navigate({ to: "/stream-studio" })}
-                className="px-6 py-3 lg:py-4 bg-[#FF00A6] rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-[0_0_40px_rgba(255,0,166,0.3)] hover:scale-105 transition-all flex items-center gap-2"
+                className="px-6 py-3 lg:py-4 bg-[#FF00A6] rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-[0_0_40px_rgba(0,0,255,0.3)] hover:scale-105 transition-all flex items-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5" /> Leave
               </button>
