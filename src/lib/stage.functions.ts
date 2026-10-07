@@ -303,17 +303,25 @@ export const setParticipantMute = createServerFn({ method: "POST" })
 export const setStageMuteAll = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({ streamId: z.string().uuid(), mute: z.boolean() }).parse(input),
+    z.object({
+      streamId: z.string().uuid(),
+      mute: z.boolean(),
+      group: z.enum(["all", "guests", "moderators"]).default("all"),
+      userIds: z.array(z.string().uuid()).max(50).optional(),
+    }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
     const mutedUntil = data.mute ? "9999-12-31T00:00:00.000Z" : null;
-    const { error } = await supabase
+    if (data.group === "moderators" && !(data.userIds?.length)) return { ok: true };
+    let q = supabase
       .from("stage_participants")
       .update({ muted_until: mutedUntil })
       .eq("stream_id", data.streamId)
-      .in("stage_role", ["host", "co_host", "speaker"]);
+      .in("stage_role", data.group === "guests" ? ["speaker"] : ["host", "co_host", "speaker"]);
+    if (data.group === "moderators") q = q.in("user_id", data.userIds!);
+    const { error } = await q;
     if (error) throw new Error(error.message);
     return { ok: true };
   });

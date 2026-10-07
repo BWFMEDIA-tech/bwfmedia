@@ -71,9 +71,26 @@ export function StageRoom({
   const demoteSrv = useServerFn(demoteToAudience);
   const muteFn = useServerFn(setParticipantMute);
   const muteAllFn = useServerFn(setStageMuteAll);
+  const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
   const [muteAllBusy, setMuteAllBusy] = useState(false);
   const stageSpeakers = participants.filter((x) => x.stage_role === "host" || x.stage_role === "co_host" || x.stage_role === "speaker");
   const stageAllMuted = stageSpeakers.length > 0 && stageSpeakers.every((x) => !!x.muted_until && new Date(x.muted_until).getTime() > Date.now());
+  const isMutedP = (x: StageParticipant) => !!x.muted_until && new Date(x.muted_until).getTime() > Date.now();
+  const guestSpeakers = participants.filter((x) => x.stage_role === "speaker");
+  const guestsAllMuted = guestSpeakers.length > 0 && guestSpeakers.every(isMutedP);
+  const modIds = new Set(moderators.map((m) => m.user_id));
+  const modSpeakers = stageSpeakers.filter((x) => modIds.has(x.user_id));
+  const modsAllMuted = modSpeakers.length > 0 && modSpeakers.every(isMutedP);
+  const [groupBusy, setGroupBusy] = useState<null | "guests" | "moderators">(null);
+  const toggleGroupMute = async (group: "guests" | "moderators", currentlyMuted: boolean) => {
+    if (!streamId) return;
+    setGroupBusy(group);
+    try {
+      await muteAllFn({ data: { streamId, mute: !currentlyMuted, group, userIds: group === "moderators" ? modSpeakers.map((x) => x.user_id) : undefined } });
+      toast.success(`${group === "guests" ? "Guests" : "Moderators"} ${currentlyMuted ? "unmuted" : "muted"}`);
+    } catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    finally { setGroupBusy(null); }
+  };
   const toggleStageMute = async () => {
     if (!streamId) return;
     setMuteAllBusy(true);
@@ -85,7 +102,6 @@ export function StageRoom({
   };
   const setSpotlight = useServerFn(setStreamSpotlight);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
-  const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
   useEffect(() => {
     let cancelled = false;
     listModerators()
@@ -392,6 +408,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           color={BLUE}
           canInvite={false}
           onInvite={() => {}}
+          muteAll={canManage ? { muted: modsAllMuted, busy: groupBusy === "moderators", disabled: modSpeakers.length === 0, onToggle: () => toggleGroupMute("moderators", modsAllMuted) } : undefined}
         />
         <p className="-mt-1 mb-3 text-[10px] leading-snug text-white/40">
           Moderators monitor live rooms, remove inappropriate users, handle reports, stop harassment,
@@ -417,6 +434,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
 
           onInvite={() => setInvite("speaker")}
           inviteLabel="Invite Guest"
+          muteAll={canManage ? { muted: guestsAllMuted, busy: groupBusy === "guests", disabled: guestSpeakers.length === 0, onToggle: () => toggleGroupMute("guests", guestsAllMuted) } : undefined}
         />
         <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
           {guests.map((p) => (
@@ -545,6 +563,7 @@ function SectionHeader({
   canInvite,
   onInvite,
   inviteLabel,
+  muteAll,
 }: {
   label: string;
   count: string;
@@ -552,14 +571,30 @@ function SectionHeader({
   canInvite: boolean;
   onInvite: () => void;
   inviteLabel?: string;
+  muteAll?: { muted: boolean; busy: boolean; disabled: boolean; onToggle: () => void };
 }) {
   return (
-    <div className="mb-3 flex items-center justify-between">
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
       <div className="flex items-center gap-2">
         <span className="h-2 w-2 rounded-full" style={{ background: color }} />
         <span className="text-[11px] font-bold tracking-widest text-white/80">{label}</span>
         <span className="text-[10px] text-white/40">{count}</span>
       </div>
+      <div className="flex items-center gap-2">
+      {muteAll && (
+        <button
+          type="button"
+          onClick={muteAll.onToggle}
+          disabled={muteAll.busy || muteAll.disabled}
+          className={cn(
+            "flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold disabled:opacity-40",
+            muteAll.muted ? "border-red-400/50 bg-red-500/15 text-red-200" : "border-white/15 text-white/80 hover:bg-white/5",
+          )}
+        >
+          {muteAll.muted ? <MicOff className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
+          {muteAll.muted ? "Unmute all" : "Mute all"}
+        </button>
+      )}
       {canInvite && (
         <button
           onClick={onInvite}
@@ -568,6 +603,7 @@ function SectionHeader({
           <UserPlus className="h-3 w-3" /> {inviteLabel ?? "Invite"}
         </button>
       )}
+      </div>
     </div>
   );
 }
