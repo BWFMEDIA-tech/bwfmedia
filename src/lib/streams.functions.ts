@@ -141,6 +141,19 @@ export const deleteStreamsBulk = createServerFn({ method: "POST" })
     return { ok: true, deleted: count ?? 0 };
   });
 
+/** Public profile lookup exposes only the artist's currently live room. */
+export const getArtistLiveStream = createServerFn({ method: "GET" })
+  .inputValidator((input) => z.object({ artistId: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: stream, error } = await supabaseAdmin.from("streams")
+      .select("id, title, room_name, host_id, mode, started_at, viewer_count")
+      .eq("host_id", data.artistId).eq("status", "live")
+      .order("started_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) throw new Error(error.message);
+    return stream;
+  });
+
 export const getStreamByRoom = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({ roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/) }).parse(input),
