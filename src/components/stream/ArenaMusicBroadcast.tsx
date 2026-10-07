@@ -27,6 +27,13 @@ export function ArenaMusicBroadcast() {
     const publish = async () => {
       if (published || cancelled || !room.localParticipant.permissions?.canPublish) return;
       try {
+        // No duplicates: drop any earlier arena-music track (reconnect/re-mount).
+        for (const pub of Array.from(room.localParticipant.trackPublications.values())) {
+          if (pub.trackName === ARENA_MUSIC_TRACK && pub.track) {
+            await room.localParticipant.unpublishTrack(pub.track as LocalAudioTrack, false).catch(() => {});
+          }
+        }
+        if (published || cancelled) return;
         const t = new LocalAudioTrack(mst, undefined, false);
         await room.localParticipant.publishTrack(t, {
           name: ARENA_MUSIC_TRACK,
@@ -62,8 +69,10 @@ export function ArenaMusicBroadcast() {
         p.trackPublications.forEach((pub) => {
           const rp = pub as RemoteTrackPublication;
           if (rp.trackName === ARENA_MUSIC_TRACK && rp.isSubscribed && rp.track) {
+            // Only ONE copy is ever audible; a sending device hears its own local copy only.
+            const audible = !active && !arenaBroadcast.getHostStream();
+            (rp.track as any).setVolume?.(audible ? arenaBroadcast.getLocalVolume() : 0);
             active = true;
-            (rp.track as any).setVolume?.(arenaBroadcast.getLocalVolume());
           }
         });
       });
@@ -76,7 +85,7 @@ export function ArenaMusicBroadcast() {
       evs.forEach((e) => room.off(e, scan));
       arenaBroadcast.setRemoteActive(false);
     };
-  }, [room, localVolume]);
+  }, [room, localVolume, hostStream]);
 
   return null;
 }
