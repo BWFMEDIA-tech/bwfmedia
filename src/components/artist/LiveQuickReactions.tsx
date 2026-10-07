@@ -7,13 +7,14 @@ const ARTIST_EMOJIS = ["🔥", "👏", "💙", "🙌", "👑"];
 const TRACK_EMOJIS = ["🎶", "💯", "🤯", "🔁", "🎧"];
 
 /** Tap-to-react bar. Reactions are ephemeral realtime broadcasts shared by everyone in the room. */
-export function LiveQuickReactions({ streamId, artistName }: { streamId: string; artistName: string }) {
+export function LiveQuickReactions({ streamId, artistName, onCountsChange }: { streamId: string; artistName: string; onCountsChange?: (c: Record<string, number>) => void }) {
   const topicId = useId();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const [bursts, setBursts] = useState<Burst[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [track, setTrack] = useState<string | null>(null);
   const lastSent = useRef(0);
+  useEffect(() => { onCountsChange?.(counts); }, [counts, onCountsChange]);
 
   const show = (emoji: string, target: Target) => {
     const id = Date.now() + Math.random();
