@@ -6,7 +6,7 @@ import {
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp, Headphones,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
-  DollarSign as Dollar, Trophy, Flame, Crown,
+  DollarSign as Dollar, Trophy, Flame, Crown, Disc3,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
@@ -261,6 +261,9 @@ function HeroBanner({
             </Link>
             <Link to="/settings/artist-info" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition" style={{ background: RED, boxShadow: `0 6px 24px ${RED}55` }}>
               Edit Artist Profile
+            </Link>
+            <Link to="/distribution" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">
+              <Disc3 className="h-4 w-4" /> Distribution
             </Link>
           </>
         ) : (
