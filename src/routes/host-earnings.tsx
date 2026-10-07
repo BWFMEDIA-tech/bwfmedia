@@ -61,6 +61,25 @@ function HostEarningsPage() {
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5">
+          <h2 className="font-semibold">Signup rewards</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {d.referrals.percentage > 0
+              ? `You earn ${d.referrals.percentage}% of every subscription payment from people who sign up through your link or your live room.`
+              : "Top Hosts earn 20% of every subscription payment from people who sign up through their link or live room. Your signups are still counted now."}
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <input readOnly value={typeof window !== "undefined" && user ? `${window.location.origin}/signup?ref=${user.id}` : ""} className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-xs" />
+            <button className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" onClick={() => { void navigator.clipboard.writeText(`${window.location.origin}/signup?ref=${user.id}`); }}>Copy link</button>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+            <Stat label="Signups" value={String(d.referrals.signups)} />
+            <Stat label="From link" value={String(d.referrals.from_link)} />
+            <Stat label="From live room" value={String(d.referrals.from_live)} />
+            <Stat label="Rewards earned" value={fmt(d.referrals.earned_cents)} />
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-5">
           <h2 className="mb-4 font-semibold">Tier progression</h2>
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {[...tierOrder, ...d.tiers.filter((t: any) => t.is_custom)].map((t: any, i: number, arr: any[]) => (

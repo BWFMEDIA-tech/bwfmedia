@@ -7,12 +7,22 @@ export const getMyHostEarnings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const sb: any = context.supabase;
-    const [{ data: rate }, { data: tiers }, { data: rows }, { data: streams }] = await Promise.all([
+    const [{ data: rate }, { data: tiers }, { data: rows }, { data: streams }, { data: refs }, { data: comms }] = await Promise.all([
       sb.rpc("get_host_rate", { _user_id: context.userId }),
       sb.from("host_tiers").select("*").eq("active", true).order("rank"),
       sb.from("room_host_earnings").select("*").eq("host_id", context.userId).order("calculated_at", { ascending: false }).limit(100),
       sb.from("streams").select("id,status,title").eq("host_id", context.userId),
+      sb.from("host_referrals").select("id,source").eq("host_id", context.userId),
+      sb.from("host_referral_commissions").select("commission_cents,status").eq("host_id", context.userId),
     ]);
+    const myTier = (tiers ?? []).find((t: any) => t.slug === (Array.isArray(rate) ? rate[0] : rate)?.tier_slug);
+    const referrals = {
+      percentage: Number(myTier?.referral_percentage ?? 0),
+      signups: (refs ?? []).length,
+      from_link: (refs ?? []).filter((r: any) => r.source === "link").length,
+      from_live: (refs ?? []).filter((r: any) => r.source === "live_room").length,
+      earned_cents: (comms ?? []).filter((c: any) => c.status !== "reversed").reduce((a: number, c: any) => a + Number(c.commission_cents), 0),
+    };
     const r = Array.isArray(rate) ? rate[0] : rate;
     const list = (rows ?? []) as any[];
     const sum = (f: (x: any) => boolean, k = "host_amount_cents") =>
@@ -25,6 +35,7 @@ export const getMyHostEarnings = createServerFn({ method: "GET" })
     return {
       tier: { slug: r?.tier_slug ?? "standard", name: r?.tier_name ?? "Standard Host", percentage: Number(r?.percentage ?? 10), status: r?.status ?? "active" },
       tiers: tiers ?? [],
+      referrals,
       next: next ? { name: next.name, percentage: Number(next.percentage), minimum_rooms: next.minimum_rooms, minimum_revenue_cents: Number(next.minimum_revenue_cents) } : null,
       totals: {
         rooms_hosted: (streams ?? []).length,

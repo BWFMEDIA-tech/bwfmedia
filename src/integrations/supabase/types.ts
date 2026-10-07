@@ -1649,6 +1649,69 @@ export type Database = {
           },
         ]
       }
+      host_referral_commissions: {
+        Row: {
+          commission_cents: number
+          created_at: string
+          host_id: string
+          id: string
+          invoice_id: string
+          percentage: number
+          referred_user_id: string
+          status: string
+          subscription_amount_cents: number
+        }
+        Insert: {
+          commission_cents: number
+          created_at?: string
+          host_id: string
+          id?: string
+          invoice_id: string
+          percentage: number
+          referred_user_id: string
+          status?: string
+          subscription_amount_cents: number
+        }
+        Update: {
+          commission_cents?: number
+          created_at?: string
+          host_id?: string
+          id?: string
+          invoice_id?: string
+          percentage?: number
+          referred_user_id?: string
+          status?: string
+          subscription_amount_cents?: number
+        }
+        Relationships: []
+      }
+      host_referrals: {
+        Row: {
+          created_at: string
+          host_id: string
+          id: string
+          referred_user_id: string
+          source: string
+          stream_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          host_id: string
+          id?: string
+          referred_user_id: string
+          source?: string
+          stream_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          host_id?: string
+          id?: string
+          referred_user_id?: string
+          source?: string
+          stream_id?: string | null
+        }
+        Relationships: []
+      }
       host_tier_history: {
         Row: {
           changed_by: string | null
@@ -1698,6 +1761,7 @@ export type Database = {
           name: string
           percentage: number
           rank: number
+          referral_percentage: number
           slug: string
           updated_at: string
         }
@@ -1713,6 +1777,7 @@ export type Database = {
           name: string
           percentage: number
           rank?: number
+          referral_percentage?: number
           slug: string
           updated_at?: string
         }
@@ -1728,6 +1793,7 @@ export type Database = {
           name?: string
           percentage?: number
           rank?: number
+          referral_percentage?: number
           slug?: string
           updated_at?: string
         }
@@ -5163,6 +5229,14 @@ export type Database = {
       }
       rebuild_artist_vote_stats: { Args: never; Returns: Json }
       recompute_play_arena_rankings: { Args: never; Returns: number }
+      record_host_referral_commission: {
+        Args: {
+          _amount_cents: number
+          _invoice_id: string
+          _referred_user_id: string
+        }
+        Returns: number
+      }
       record_revenue_event: {
         Args: {
           _amount_cents: number
