@@ -24,6 +24,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { setStreamSpotlight } from "@/lib/stage.functions";
 import { Pin, PinOff, X as XIcon } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
+import { Button } from "@/components/ui/button";
+import { Crown, Music2, UserRound, AudioLines } from "lucide-react";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -41,9 +43,10 @@ interface LiveStageProps {
   publish?: boolean;
   /** Show host/admin LiveKit controls (mic, camera, screen-share, end stream, device selector). */
   showHostTools?: boolean;
+  profileHost?: { id: string; name: string; photo: string | null };
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost }: LiveStageProps) {
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
 
   // Publish health to the global store; reset on unmount so other surfaces
@@ -95,7 +98,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
     >
       <RoomAudioRenderer />
       <StageConnectionProvider>
-        <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />
+        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
         <PublishSync publish={publish} />
         <LocalSpeakingSignalPublisher />
       </StageConnectionProvider>
@@ -510,6 +513,61 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 }
 
 const StageInner = LiveStageContent;
+
+function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite }: {
+  host: { id: string; name: string; photo: string | null }; streamId?: string;
+  showHostTools: boolean; publish: boolean; onEnd: () => void; onInvite: () => void;
+}) {
+  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }], { onlySubscribed: false });
+  const participants = useParticipants();
+  const roles = useParticipantRoles(streamId, participants.map(p => p.identity));
+  const profiles = useParticipantProfiles(participants.map(p => p.identity));
+  const spotlight = useStreamSpotlight(streamId);
+  const guests = participants.filter(p => p.identity !== host.id && ["speaker", "artist", "guest", "co_host", "host"].includes(roles[p.identity] ?? ""));
+  const featured = guests.find(p => p.identity === spotlight.artist) ?? guests[0];
+  const guest = guests.find(p => p.identity !== featured?.identity);
+  const slots = [
+    { label: "Host", icon: Crown, identity: host.id, name: host.name, photo: host.photo },
+    { label: "Artist", icon: Music2, identity: featured?.identity, name: featured?.name, photo: null },
+    { label: "Guest", icon: UserRound, identity: guest?.identity, name: guest?.name, photo: null },
+  ];
+  return <>
+    <div className="profile-video-grid">
+      {slots.map(({ label, icon: Icon, identity, name, photo }) => {
+        const track = tracks.find(t => t.participant.identity === identity);
+        const publication = track && "publication" in track ? track.publication : null;
+        const profile = identity ? profiles[identity] : undefined;
+        const avatar = profile?.avatar_url ?? photo;
+        const displayName = profile?.display_name ?? name;
+        return <div key={label} className="profile-video-tile">
+          {track && publication && !publication.isMuted ? <TrackRefContext.Provider value={track}><ParticipantTile className="!h-full !w-full" /></TrackRefContext.Provider> : avatar ? <SignedImg src={avatar} alt={displayName ?? label} className="h-full w-full object-cover" /> : <div className="profile-video-empty"><Icon className="h-10 w-10" /><span>{identity ? "Camera off" : `Waiting for ${label.toLowerCase()}`}</span></div>}
+          <span className="profile-video-badge"><Icon className="h-4 w-4" />{label}</span>
+          {displayName && <div className="profile-video-identity">{avatar && <SignedImg src={avatar} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />}<div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{displayName}</p><p className="text-xs text-muted-foreground">{label === "Host" ? "Live host" : "On stage"}</p></div><AudioLines className={cn("h-6 w-6 text-primary", track?.participant.isSpeaking ? "opacity-100" : "opacity-30")} /></div>}
+        </div>;
+      })}
+    </div>
+    {publish && <ProfileMediaControls streamId={streamId} owner={showHostTools} onEnd={onEnd} onInvite={onInvite} />}
+  </>;
+}
+
+function ProfileMediaControls({ streamId, owner, onEnd, onInvite }: { streamId?: string; owner: boolean; onEnd: () => void; onInvite: () => void }) {
+  const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
+  const toggle = async (kind: "mic" | "cam" | "screen") => {
+    try {
+      if (kind === "mic") await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+      if (kind === "cam") await localParticipant.setCameraEnabled(!isCameraEnabled);
+      if (kind === "screen") await localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+    } catch (error) { toast.error(friendlyDeviceError(error)); }
+  };
+  return <div className="profile-media-controls">
+    <Button variant="ghost" onClick={() => void toggle("mic")}><span>{isMicrophoneEnabled ? <Mic /> : <MicOff />}</span>{isMicrophoneEnabled ? "Mute" : "Unmute"}</Button>
+    <Button variant="ghost" onClick={() => void toggle("cam")}><span>{isCameraEnabled ? <Camera /> : <CameraOff />}</span>Camera</Button>
+    <Button variant="ghost" onClick={() => void toggle("screen")}><MonitorUp />{isScreenShareEnabled ? "Stop Share" : "Share Screen"}</Button>
+    {owner && <Button variant="ghost" onClick={onInvite}><UserPlus />Invite Guest</Button>}
+    {owner && streamId && <RecordButton streamId={streamId} />}
+    {owner && <Button variant="ghost" onClick={onEnd} className="text-primary"><PhoneOff />End Live</Button>}
+  </div>;
+}
 
 /**
  * Camera-only publish sync. Use inside an existing LiveKitRoom (e.g. the
