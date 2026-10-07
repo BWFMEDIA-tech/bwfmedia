@@ -789,7 +789,7 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
 }
 
 type SpotlightStore = {
-  current: { host: string | null; artist: string | null };
+  current: { host: string | null; artist: string | null; cohost: string | null };
   channel: ReturnType<typeof supabase.channel> | null;
   listeners: Set<() => void>;
 };
