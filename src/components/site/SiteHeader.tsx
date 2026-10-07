@@ -247,7 +247,7 @@ export function SiteHeader() {
         </form>
 
         {/* Right cluster */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:flex shrink-0 items-center gap-2 whitespace-nowrap">
           <HeaderCartButton />
           {auth.isAuthenticated ? (
             <>
