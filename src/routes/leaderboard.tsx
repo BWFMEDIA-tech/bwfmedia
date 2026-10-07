@@ -20,8 +20,6 @@ export const Route = createFileRoute("/leaderboard")({
       { name: "description", content: "The top artists on BWF Network ranked by XP, battle wins, and audience votes. Climb the ranks." },
       { property: "og:title", content: "Artist Leaderboard — BWF Network" },
       { property: "og:description", content: "The top artists on BWF Network ranked by XP, battle wins, and audience votes." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   errorComponent: ({ error }) => (
@@ -108,9 +106,9 @@ function LeaderboardPage() {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 sm:w-auto">
-              <HeroStat icon={Sparkles} label="XP" value={totals.xp} accent="var(--brand-silver)" />
+              <HeroStat icon={Sparkles} label="XP" value={totals.xp} accent="#C53DFF" />
               <HeroStat icon={ThumbsUp} label="Votes" value={totals.votes} accent="#00E6FF" />
-              <HeroStat icon={Swords} label="Wins" value={totals.wins} accent="var(--brand-cyan)" />
+              <HeroStat icon={Swords} label="Wins" value={totals.wins} accent="#FF00A6" />
             </div>
           </div>
         </header>
@@ -193,10 +191,10 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
   const isFirst = entry.rank === 1;
   const accent =
     entry.rank === 1
-      ? { from: "var(--brand-silver)", via: "var(--brand-cyan)", to: "var(--brand-blue)", glow: "color-mix(in srgb, var(--brand-cyan) 55%, transparent)" }
+      ? { from: "#FFD700", via: "#FF00A6", to: "#C53DFF", glow: "rgba(255,0,166,0.55)" }
       : entry.rank === 2
       ? { from: "#E5E7EB", via: "#00E6FF", to: "#004BFF", glow: "rgba(0,230,255,0.45)" }
-      : { from: "var(--brand-silver)", via: "var(--brand-blue)", to: "var(--brand-cyan)", glow: "color-mix(in srgb, var(--brand-blue) 45%, transparent)" };
+      : { from: "#CD7F32", via: "#C53DFF", to: "#FF00A6", glow: "rgba(197,61,255,0.45)" };
   const Icon = entry.rank === 1 ? Crown : entry.rank === 2 ? Trophy : Medal;
   const lift =
     entry.rank === 1 ? "sm:-translate-y-6 sm:scale-[1.04]" : entry.rank === 2 ? "" : "sm:translate-y-3";
@@ -341,7 +339,7 @@ function PodiumStat({
 function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
   const isHot = entry.rank <= 10;
   const rankAccent =
-    entry.rank <= 10 ? "var(--brand-cyan)" : entry.rank <= 25 ? "var(--brand-silver)" : "var(--muted-foreground)";
+    entry.rank <= 10 ? "#FF00A6" : entry.rank <= 25 ? "#00E6FF" : "rgba(255,255,255,0.4)";
 
   return (
     <Link
@@ -406,8 +404,8 @@ function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
           </div>
         </div>
 
-        <RowCell icon={Sparkles} value={entry.xp} color="var(--brand-silver)" />
-        <RowCell icon={Swords} value={entry.battleWins} color="var(--brand-cyan)" />
+        <RowCell icon={Sparkles} value={entry.xp} color="#C53DFF" />
+        <RowCell icon={Swords} value={entry.battleWins} color="#FF00A6" />
         <RowCell icon={ThumbsUp} value={entry.battleVotes} color="#00E6FF" />
         <RowCell icon={Disc3} value={entry.trackCount} color="rgba(255,255,255,0.5)" />
 
@@ -448,11 +446,11 @@ function TitleBadge({ entry }: { entry: LeaderboardEntry }) {
 function StreakBadge({ entry }: { entry: LeaderboardEntry }) {
   const milestone = getStreakMilestone(entry.currentStreak);
   if (!milestone) return null;
-  const c = milestone >= 25 ? "var(--brand-silver)" : milestone >= 10 ? "var(--brand-blue)" : "var(--brand-cyan)";
+  const c = milestone >= 25 ? "#FFD700" : milestone >= 10 ? "#FF00A6" : "#00E6FF";
   return (
     <span
       className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-      style={{ borderColor: `color-mix(in srgb, ${c} 40%, transparent)`, color: c, background: `color-mix(in srgb, ${c} 8%, transparent)` }}
+      style={{ borderColor: `${c}66`, color: c, background: `${c}14` }}
       title={`${entry.currentStreak} straight wins (best: ${entry.bestStreak})`}
     >
       <Flame className="h-2.5 w-2.5" />

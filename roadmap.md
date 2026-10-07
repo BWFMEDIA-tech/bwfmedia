@@ -3,7 +3,3 @@
 - [x] Apply cyan, blue, silver, and black across shared and legacy page styling.
 - [x] Update app icons from the supplied logo.
 - [x] Verify homepage, Live, Videos, sign-in, and phone menu; no runtime errors or horizontal overflow on checked pages.
-
-# Remove remaining pink
-- [x] Replace remaining pink accents and states with logo blues and grays.
-- [x] Verify Leaderboard and shared palette styling; no pink rendered in Leaderboard and preview checks pass.
