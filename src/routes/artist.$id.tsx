@@ -151,7 +151,7 @@ function ArtistProfilePage() {
       <ArtistLiveRoom
         key={liveQuery.data.id}
         stream={liveQuery.data}
-        artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null }}
+        artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null, tracks: (meta?.tracks ?? []).map((t) => ({ id: t.id, title: t.title, cover_url: t.cover_url })) }}
         followSlot={!isOwner ? <FollowButton artistId={id} /> : null}
         onEnded={onLiveEnded}
       />
