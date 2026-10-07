@@ -161,6 +161,50 @@ async function assertHost(supabase: any, userId: string, streamId: string) {
   }
 }
 
+/** Write the authoritative Arena radio clock. `last_sync_at` is stamped by
+ *  the DB guard trigger with the SERVER's now(), so clients never choose the
+ *  start time. Position = seconds into the track at last_sync_at. */
+async function writeArenaClock(
+  supabase: any,
+  streamId: string,
+  trackId: string | null,
+  playing: boolean,
+  positionSeconds: number,
+) {
+  await supabase.from("arena_playback_state").upsert(
+    {
+      stream_id: streamId,
+      current_track_id: trackId,
+      is_playing: playing && !!trackId,
+      position_seconds: Math.max(0, positionSeconds),
+    },
+    { onConflict: "stream_id" },
+  );
+}
+
+/** Host: pause or resume the shared Arena radio for everyone. */
+export const setArenaPlayback = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ streamId: z.string().uuid(), playing: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertHost(supabase, userId, data.streamId);
+    const { data: row } = await supabase
+      .from("arena_playback_state")
+      .select("current_track_id, is_playing, position_seconds, last_sync_at")
+      .eq("stream_id", data.streamId)
+      .maybeSingle();
+    if (!row?.current_track_id) return { ok: false };
+    const base = Number(row.position_seconds ?? 0);
+    const elapsed = row.is_playing ? (Date.now() - new Date(row.last_sync_at).getTime()) / 1000 : 0;
+    const pos = base + Math.max(0, elapsed);
+    if (row.is_playing === data.playing) return { ok: true };
+    await writeArenaClock(supabase, data.streamId, row.current_track_id, data.playing, pos);
+    return { ok: true };
+  });
+
 /** Host: mark a track as currently playing. */
 export const playTrackNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -184,6 +228,7 @@ export const playTrackNow = createServerFn({ method: "POST" })
         { stream_id: data.streamId, current_track_id: data.trackId, status: "open" },
         { onConflict: "stream_id" },
       );
+    await writeArenaClock(supabase, data.streamId, data.trackId, true, 0);
     return { ok: true };
   });
 
@@ -234,12 +279,14 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
     if (!next) {
       await supabase.from("play_sessions")
         .upsert({ stream_id: data.streamId, current_track_id: null }, { onConflict: "stream_id" });
+      await writeArenaClock(supabase, data.streamId, null, false, 0);
       return { ok: true, next: null };
     }
     await supabase.from("play_tracks").update({ status: "playing" }).eq("id", next.id);
     await supabase.from("play_sessions")
       .upsert({ stream_id: data.streamId, current_track_id: next.id, status: "open" },
         { onConflict: "stream_id" });
+    await writeArenaClock(supabase, data.streamId, next.id, true, 0);
     return { ok: true, next: next.id };
   });
 
