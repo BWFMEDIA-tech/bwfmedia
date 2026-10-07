@@ -79,7 +79,9 @@ export function StageRoom({
   const isMutedP = (x: StageParticipant) => !!x.muted_until && new Date(x.muted_until).getTime() > Date.now();
   const guestSpeakers = participants.filter((x) => x.stage_role === "speaker");
   const guestsAllMuted = guestSpeakers.length > 0 && guestSpeakers.every(isMutedP);
-  const modIds = new Set([...moderators.map((m) => m.user_id)]);
+  // Moderators the host picked for this stream only.
+  const [streamModIds, setStreamModIds] = useState<string[]>([]);
+  const modIds = new Set([...moderators.map((m) => m.user_id), ...streamModIds]);
   const modSpeakers = stageSpeakers.filter((x) => modIds.has(x.user_id));
   const modsAllMuted = modSpeakers.length > 0 && modSpeakers.every(isMutedP);
   const [groupBusy, setGroupBusy] = useState<null | "guests" | "moderators">(null);
@@ -110,8 +112,6 @@ export function StageRoom({
       .catch(() => { if (!cancelled) setModerators([]); });
     return () => { cancelled = true; };
   }, []);
-  // Moderators the host picked for this stream only.
-  const [streamModIds, setStreamModIds] = useState<string[]>([]);
   useEffect(() => {
     if (!streamId) return;
     let active = true;
@@ -136,7 +136,12 @@ export function StageRoom({
       : await supabase.from("stream_moderators").insert({ stream_id: streamId, user_id: uid, added_by: auth.user.id });
     if (res.error) return toast.error(res.error.message);
     setStreamModIds((prev) => (isMod ? prev.filter((x) => x !== uid) : [...prev, uid]));
-    toast.success(isMod ? `${name} is no longer a moderator` : `${name} is now a moderator`);
+    // Mods keep a live mic: bring audience members up to the stage as speakers.
+    const target = participants.find((x) => x.user_id === uid);
+    if (!isMod && (!target || AUDIENCE_ROLES.includes(target.stage_role ?? "listener"))) {
+      try { await setRole({ data: { streamId, targetUserId: uid, stageRole: "speaker" } }); } catch {}
+    }
+    toast.success(isMod ? `${name} is no longer a moderator` : `${name} is now a moderator and can speak`);
   };
   const allModerators = [
     ...moderators,
