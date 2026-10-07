@@ -20,6 +20,36 @@ function MusicMediaPage() {
   const [loading, setLoading] = useState(true);
   const [submitSong, setSubmitSong] = useState<any | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  function toggleSelect(id: string) {
+    setSelected((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected((s) => (s.size === tracks.length && tracks.length > 0 ? new Set() : new Set(tracks.map((t) => t.id))));
+  }
+
+  async function deleteSelected() {
+    if (!user || selected.size === 0) return;
+    const ids = [...selected];
+    if (!confirm(`Delete ${ids.length} track${ids.length === 1 ? "" : "s"}? This cannot be undone.`)) return;
+    const prev = tracks;
+    setTracks((ts) => ts.filter((t) => !selected.has(t.id)));
+    setSelected(new Set());
+    const { error } = await supabase.from("play_tracks").delete().in("id", ids);
+    if (error) { setTracks(prev); return toast.error(error.message); }
+    if (featuredTrack && ids.includes(featuredTrack)) {
+      await supabase.from("profiles").update({ featured_track_id: null } as any).eq("id", user.id);
+      setFeaturedTrack(null);
+    }
+    toast.success(`${ids.length} track${ids.length === 1 ? "" : "s"} deleted`);
+  }
 
   async function reload() {
     if (!user) return;
