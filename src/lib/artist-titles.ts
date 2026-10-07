@@ -17,10 +17,10 @@ export type ArtistTitle = {
 /** Ordered highest → lowest so the first match is the earned title. */
 export const ARTIST_TITLES: ArtistTitle[] = [
   { key: "hall_of_fame", label: "Hall of Fame", minWins: 100, color: "#FFD700" },
-  { key: "elite", label: "Elite", minWins: 50, color: "#FF00A6" },
-  { key: "champion", label: "Champion", minWins: 25, color: "#C53DFF" },
+  { key: "elite", label: "Elite", minWins: 50, color: "#B8C2D0" },
+  { key: "champion", label: "Champion", minWins: 25, color: "#0000FF" },
   { key: "challenger", label: "Challenger", minWins: 10, color: "#00E6FF" },
-  { key: "contender", label: "Contender", minWins: 5, color: "#0000FF" },
+  { key: "contender", label: "Contender", minWins: 5, color: "#5B5BFF" },
   { key: "arena_rookie", label: "Arena Rookie", minWins: 1, color: "#22c55e" },
 ];
 
