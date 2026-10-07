@@ -985,7 +985,7 @@ function SpeakerBubble({
                         onToggleModerator();
                       }}
                     >
-                      {isStreamMod ? "Remove Moderator" : "Bring to Moderator"}
+                      {isStreamMod ? "Remove from mod slot" : "Bring to mod slot"}
                     </MenuItem>
                   )}
                   {hostTransferMode === "transfer" && (
@@ -1109,7 +1109,7 @@ function SpeakerBubble({
                         onToggleModerator();
                       }}
                     >
-                      {isStreamMod ? "Remove Moderator" : "Bring to Moderator"}
+                      {isStreamMod ? "Remove from mod slot" : "Bring to mod slot"}
                     </MenuItem>
                   )}
                   {!isPrimaryHost && onToggleMute && !isSelf && (
