@@ -575,7 +575,7 @@ export const setStreamSpotlight = createServerFn({ method: "POST" })
       .object({
         streamId: z.string().uuid(),
         targetUserId: z.string().uuid().nullable(),
-        slot: z.enum(["host", "artist"]).default("artist"),
+        slot: z.enum(["host", "artist", "cohost"]).default("artist"),
       })
       .parse(d),
   )
@@ -583,7 +583,9 @@ export const setStreamSpotlight = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
     const column =
-      data.slot === "host" ? "spotlight_host_user_id" : "spotlight_user_id";
+      data.slot === "host" ? "spotlight_host_user_id"
+      : data.slot === "cohost" ? "spotlight_cohost_user_id"
+      : "spotlight_user_id";
     const { error } = await supabase
       .from("streams")
       .update({ [column]: data.targetUserId } as any)

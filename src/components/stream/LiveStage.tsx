@@ -415,6 +415,10 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
       buckets.middle.push(t);
       continue;
     }
+    if (spotlight.cohost && id === spotlight.cohost) {
+      buckets.host.push(t);
+      continue;
+    }
     const role = roleMap[id];
     const isAdminRole =
       role === "admin" || role === "administrator" || role === "owner" || role === "moderator";
@@ -430,6 +434,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     // When a spotlight is active for a panel, suppress catch-alls there.
     if (spotlight.artist && panel === "middle") continue;
     if (spotlight.host && panel === "admin") continue;
+    if (spotlight.cohost && panel === "host") continue;
     buckets[panel].push(t);
 
   }
@@ -445,6 +450,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
   };
   ensureSpotlightEntry("middle", spotlight.artist);
   ensureSpotlightEntry("admin", spotlight.host);
+  ensureSpotlightEntry("host", spotlight.cohost);
   // Priority: active speaker first within each bucket.
   const sortByActive = (arr: typeof cameraTracks) =>
     [...arr].sort((a, b) => Number(!!b.participant?.isSpeaking) - Number(!!a.participant?.isSpeaking));
@@ -793,7 +799,7 @@ const spotlightStores = new Map<string, SpotlightStore>();
 function getSpotlightStore(streamId: string): SpotlightStore {
   let store = spotlightStores.get(streamId);
   if (!store) {
-    store = { current: { host: null, artist: null }, channel: null, listeners: new Set() };
+    store = { current: { host: null, artist: null, cohost: null }, channel: null, listeners: new Set() };
     spotlightStores.set(streamId, store);
 
     const channel = supabase.channel(`spotlight-${streamId}`);
@@ -808,10 +814,12 @@ function getSpotlightStore(streamId: string): SpotlightStore {
         const next = {
           artist: row?.spotlight_user_id ?? null,
           host: row?.spotlight_host_user_id ?? null,
+          cohost: row?.spotlight_cohost_user_id ?? null,
         };
         if (
           store!.current.host === next.host &&
-          store!.current.artist === next.artist
+          store!.current.artist === next.artist &&
+          store!.current.cohost === next.cohost
         )
           return;
         store!.current = next;
@@ -829,7 +837,7 @@ function getSpotlightStore(streamId: string): SpotlightStore {
       try {
         const { data } = await supabase
           .from("streams")
-          .select("spotlight_user_id, spotlight_host_user_id")
+          .select("spotlight_user_id, spotlight_host_user_id, spotlight_cohost_user_id")
           .eq("id", streamId)
           .maybeSingle();
         const live = spotlightStores.get(streamId);
@@ -837,10 +845,12 @@ function getSpotlightStore(streamId: string): SpotlightStore {
         const next = {
           artist: (data as any)?.spotlight_user_id ?? null,
           host: (data as any)?.spotlight_host_user_id ?? null,
+          cohost: (data as any)?.spotlight_cohost_user_id ?? null,
         };
         if (
           live.current.host === next.host &&
-          live.current.artist === next.artist
+          live.current.artist === next.artist &&
+          live.current.cohost === next.cohost
         )
           return;
         live.current = next;
@@ -868,8 +878,8 @@ function subscribeSpotlight(streamId: string, callback: () => void): () => void 
   };
 }
 
-const EMPTY_SPOTLIGHT = { host: null, artist: null } as const;
-export type SpotlightState = { host: string | null; artist: string | null };
+const EMPTY_SPOTLIGHT = { host: null, artist: null, cohost: null } as const;
+export type SpotlightState = { host: string | null; artist: string | null; cohost: string | null };
 function getSpotlightSnapshot(streamId: string): SpotlightState {
   return spotlightStores.get(streamId)?.current ?? EMPTY_SPOTLIGHT;
 }
@@ -907,7 +917,7 @@ function SpotlightControls({
   spotlightUserId: string | null;
   participants: ReturnType<typeof useParticipants>;
   profiles: Record<string, ProfileLite>;
-  slot?: "host" | "artist";
+  slot?: "host" | "artist" | "cohost";
 }) {
   const [open, setOpen] = useState(false);
   const setSpotlight = useServerFn(setStreamSpotlight);
