@@ -3,13 +3,8 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertHost(supabase: any, userId: string, streamId: string) {
-  const [{ data: stream }, { data: roles }] = await Promise.all([
-    supabase.from("streams").select("host_id").eq("id", streamId).maybeSingle(),
-    supabase.from("user_roles").select("role").eq("user_id", userId),
-  ]);
-  const isHost = stream?.host_id === userId;
-  const isAdmin = (roles ?? []).some((r: any) => r.role === "admin");
-  if (!isHost && !isAdmin) throw new Error("Not authorized");
+  const { data: stream } = await supabase.from("streams").select("host_id").eq("id", streamId).maybeSingle();
+  if (stream?.host_id !== userId) throw new Error("Only the stream owner can manage the queue");
 }
 
 export const joinQueue = createServerFn({ method: "POST" })

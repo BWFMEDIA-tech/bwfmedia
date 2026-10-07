@@ -4,3 +4,4 @@
 - Keep site branding in shared semantic palette tokens and a legacy utility color bridge, because existing pages use both tokens and older color utilities.
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
+- Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
