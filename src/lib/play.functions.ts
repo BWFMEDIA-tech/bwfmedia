@@ -36,6 +36,7 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
     const { data: stream } = await supabase
       .from("streams").select("id, status").eq("id", data.streamId).maybeSingle();
     if (!stream) throw new Error("Stream not found");
+    if (stream.status === "ended") throw new Error("This live has ended and isn't taking songs");
 
     // Membership gate (admin/host bypass).
     const { data: roles } = await supabase
@@ -89,8 +90,14 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       boosted = true;
     }
 
+    // Queue writes run server-side after the checks above: artists submitting
+    // from the room usually aren't stage participants, so the per-user insert
+    // rule rejected them, and they can't see other artists' queued rows to
+    // compute the next position.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     // Position: boosted → at top of boosted block; regular → end of queue.
-    const { data: lastPos } = await supabase
+    const { data: lastPos } = await supabaseAdmin
       .from("play_tracks")
       .select("position")
       .eq("stream_id", data.streamId)
@@ -101,7 +108,7 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       .maybeSingle();
     const nextPosition = (lastPos?.position ?? 0) + 10;
 
-    const { data: inserted, error } = await supabase
+    const { data: inserted, error } = await supabaseAdmin
       .from("play_tracks")
       .insert({
         stream_id: data.streamId,
