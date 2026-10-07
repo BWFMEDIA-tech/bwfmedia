@@ -586,6 +586,17 @@ export function ImmersivePlayer({
     const onEnd = async () => {
       setIsPlaying(false);
       setPlaybackPlaying(false);
+      // Only advance when the shared clock agrees the song has really finished.
+      // A bad seek or stalled load can fire "ended" early — resync instead.
+      const s = radioRef.current.state;
+      const dur = a.duration || 0;
+      if (s && s.trackId === track?.id && dur > 0) {
+        const live = radioRef.current.livePosition();
+        if (live < dur - 3) {
+          try { a.currentTime = Math.max(0, live); await a.play(); } catch { /* sync loop retries */ }
+          return;
+        }
+      }
       if (isHost && streamId) {
         try { await advanceFn({ data: { streamId } }); } catch { /* ignore */ }
       }
@@ -620,7 +631,24 @@ export function ImmersivePlayer({
     if (!url) { void handleBroken(); return () => { cancelled = true; }; }
     void getSignedAudioUrl(url).then((s) => { if (!s) void handleBroken(); });
     const a = audioRef.current;
-    const onErr = () => { if (a?.getAttribute("src")) void handleBroken(); };
+    let retries = 0;
+    // A load error is often temporary (network blip, expired link). Retry
+    // a couple of times at the live position before treating it as broken.
+    const onErr = () => {
+      if (!a?.getAttribute("src") || cancelled) return;
+      if (retries < 2) {
+        retries += 1;
+        setTimeout(() => {
+          if (cancelled || !a) return;
+          const pos = radioRef.current.livePosition();
+          a.load();
+          try { a.currentTime = pos; } catch { /* sync loop fixes */ }
+          a.play().catch(() => {});
+        }, 1000 * retries);
+        return;
+      }
+      void handleBroken();
+    };
     a?.addEventListener("error", onErr);
     return () => { cancelled = true; a?.removeEventListener("error", onErr); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
