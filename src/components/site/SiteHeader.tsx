@@ -133,7 +133,7 @@ export function SiteHeader() {
       className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "backdrop-blur-xl bg-black/90 border-b border-blood/40 shadow-[0_8px_24px_-12px_rgba(225,29,42,0.35)]"
-          : "backdrop-blur bg-black/50 border-b border-white/5"
+          : "backdrop-blur bg-background/95 border-b border-border"
       }`}
     >
       <div className="max-w-[1600px] mx-auto px-4 md:px-8 h-[72px] md:h-20 lg:h-20 flex items-center gap-4">
@@ -149,8 +149,8 @@ export function SiteHeader() {
         </button>
 
         {/* Logo */}
-        <RouterLink to="/" className="flex items-center gap-2 shrink-0 md:ml-12 mr-2">
-          <img src={bwfLogo.url} alt="BWF Network" className="h-12 md:h-14 w-auto object-contain" />
+        <RouterLink to="/" className="flex min-w-0 items-center shrink-0 mr-2">
+          <img src={bwfLogo.url} alt="Tunevio" className="h-auto w-36 sm:w-44 xl:w-48 object-contain" />
         </RouterLink>
 
         {/* Desktop primary nav */}
@@ -161,7 +161,7 @@ export function SiteHeader() {
               <RouterLink
                 key={item.label}
                 to={item.to}
-                className={`relative px-3 py-2 text-sm font-medium transition-colors ${
+                className={`relative px-2 py-2 text-xs xl:text-sm font-medium transition-colors ${
                   active ? "text-bone" : "text-bone/65 hover:text-bone"
                 }`}
               >
@@ -235,19 +235,19 @@ export function SiteHeader() {
         {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="hidden lg:flex items-center gap-2 w-48 lg:w-72 px-3.5 h-10 rounded-full border border-white/10 bg-white/[0.04] focus-within:border-blood/60 focus-within:bg-white/[0.07] transition-colors"
+          className="hidden lg:flex shrink-0 items-center gap-2 w-40 xl:w-56 px-3.5 h-10 rounded-full border border-white/10 bg-white/[0.04] focus-within:border-blood/60 focus-within:bg-white/[0.07] transition-colors"
         >
           <Search size={15} className="text-bone/50" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search artists, shows…"
-            className="flex-1 bg-transparent text-sm text-bone placeholder:text-bone/40 outline-none"
+            className="min-w-0 flex-1 bg-transparent text-sm text-bone placeholder:text-bone/40 outline-none"
           />
         </form>
 
         {/* Right cluster */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:flex shrink-0 items-center gap-2 whitespace-nowrap">
           <HeaderCartButton />
           {auth.isAuthenticated ? (
             <>

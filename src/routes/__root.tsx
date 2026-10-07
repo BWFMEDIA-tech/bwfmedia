@@ -42,7 +42,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0b0b12" },
+      { name: "theme-color", content: "#000000" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -58,14 +58,6 @@ export const Route = createRootRoute({
       { name: "twitter:site", content: "@bwfmediatv" },
       { name: "twitter:title", content: "BWF Network — Music, Live Streams, and Creator Platform" },
       { name: "twitter:description", content: "Stream music, go live, and monetize your audience on BWF Network." },
-      {
-        property: "og:image",
-        content: "https://tunevio.com/og-image.png",
-      },
-      {
-        name: "twitter:image",
-        content: "https://tunevio.com/og-image.png",
-      },
     ],
     scripts: [
       {
@@ -100,8 +92,8 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "icon", type: "image/png", href: "/favicon.png?v=cyan-silver" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png?v=cyan-silver" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

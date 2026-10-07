@@ -427,7 +427,7 @@ function VideosPage() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="video-network min-h-screen bg-black text-white flex">
       {/* MOBILE MENU TOGGLE */}
       <button
         type="button"
