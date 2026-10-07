@@ -225,12 +225,12 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
   const doPromote = (uid: string, name: string, mode: "host" | "co_host" | "transfer") => {
     if (!streamId) return;
     const titles = {
-      host: "Promote to Host",
+      host: "Bring to host slot",
       co_host: "Promote to Co-Host",
       transfer: "Transfer Ownership",
     } as const;
     const descs = {
-      host: `${name} will become a Host with full stage management privileges.`,
+      host: `${name} will move into an open Host slot in the HOSTS row with full stage management privileges.`,
       co_host: `${name} will become a Co-Host. You'll keep your host role.`,
       transfer: `${name} will become the primary Host. You'll be demoted to Co-Host. This can be reversed only by the new host.`,
     } as const;
@@ -514,6 +514,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
               onSpotlight={(slot, currentlyPinned) =>
                 doSpotlight(p.user_id, p.display_name ?? "Guest", slot, currentlyPinned)
               }
+              hostSlotOpen={hostSlotsTaken < MAX_HOSTS}
             />
           ))}
           {showSelfGuestPlaceholder && (
@@ -747,6 +748,7 @@ function SpeakerBubble({
   onToggleModerator,
   onToggleMute,
   onSpotlight,
+  hostSlotOpen = true,
 }: {
   p: StageParticipant;
   kind: "host" | "co_host" | "speaker";
@@ -766,6 +768,7 @@ function SpeakerBubble({
   onToggleModerator?: () => void;
   onToggleMute?: () => void;
   onSpotlight?: (slot: "host" | "artist" | "cohost", currentlyPinned: boolean) => void;
+  hostSlotOpen?: boolean;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;
   const connected = useConnectedIdentities();
@@ -956,12 +959,14 @@ function SpeakerBubble({
                   <MenuDivider />
                   <MenuItem
                     icon={<Crown className="h-3.5 w-3.5" />}
+                    disabled={hostSlotOpen === false}
+                    title={hostSlotOpen ? undefined : "All Host slots are full"}
                     onClick={() => {
                       setMenuOpen(false);
                       onPromote("host");
                     }}
                   >
-                    Promote to Host
+                    Bring to host slot
                   </MenuItem>
                   <MenuItem
                     icon={<Star className="h-3.5 w-3.5" />}
@@ -1167,18 +1172,25 @@ function MenuItem({
   children,
   onClick,
   danger,
+  disabled,
+  title,
 }: {
   icon: React.ReactNode;
   children: React.ReactNode;
   onClick: () => void;
   danger?: boolean;
+  disabled?: boolean;
+  title?: string;
 }) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
+      title={title}
       className={cn(
         "flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-white/5",
         danger ? "text-red-300" : "text-white/80",
+        disabled && "cursor-not-allowed opacity-40 hover:bg-transparent",
       )}
     >
       {icon}
