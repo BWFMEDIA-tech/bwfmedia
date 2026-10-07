@@ -22,6 +22,8 @@ export const saveRecording = createServerFn({ method: 'POST' })
     if (!data.storagePath.startsWith(`${userId}/`)) {
       throw new Error('Invalid storage path');
     }
+    const { data: stream } = await supabase.from('streams').select('host_id').eq('id', data.streamId).maybeSingle();
+    if (stream?.host_id !== userId) throw new Error('Only the stream owner can save recordings');
     const { data: row, error } = await supabase
       .from('stream_recordings')
       .insert({
@@ -57,11 +59,12 @@ export const deleteRecording = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const { error } = await supabase
       .from('stream_recordings')
       .delete()
-      .eq('id', data.id);
+      .eq('id', data.id)
+      .eq('host_id', userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -79,6 +82,7 @@ export const getRecordingSignedUrl = createServerFn({ method: 'POST' })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!rec) throw new Error('Recording not found');
+    if (rec.host_id !== userId) throw new Error('Only the recording owner can access this recording');
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const { data: signed, error: sErr } = await supabaseAdmin.storage
       .from('stream-recordings')
