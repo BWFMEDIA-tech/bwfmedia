@@ -103,29 +103,90 @@
   --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
 
-/* Profile-only overrides must outrank the legacy streaming utility classes. */
+/* Reference-inspired glass theme stays local to live artist profiles. */
+.artist-live-room {
+  --radius-lg: 1.125rem;
+  --card: color-mix(in srgb, var(--brand-ink) 78%, var(--background));
+  --border: color-mix(in srgb, var(--brand-silver) 19%, transparent);
+  --live-glass: linear-gradient(145deg, color-mix(in srgb, var(--brand-silver) 7%, var(--card)), var(--card) 70%);
+  --live-glow: 0 0 24px color-mix(in srgb, var(--brand-cyan) 9%, transparent);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: linear-gradient(160deg, var(--card), var(--background) 45%);
+  box-shadow: var(--shadow-deep), inset 0 1px 0 color-mix(in srgb, var(--brand-silver) 8%, transparent);
+}
+.artist-live-room > header { border-bottom: 0; }
+.artist-live-room > header > span:first-child {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--brand-blue) 35%, transparent);
+}
+.artist-live-room > header button {
+  border-radius: .75rem;
+  background: var(--live-glass);
+}
 .artist-live-room .stage-tile-glow {
   border-radius: var(--radius-lg) !important;
   background: var(--border) !important;
-  box-shadow: none !important;
+  box-shadow: var(--live-glow) !important;
 }
 .artist-live-room .stage-tile,
 .artist-live-room .stage-tile > div:not(.pointer-events-none) {
   border-radius: var(--radius-lg) !important;
   background-color: var(--card) !important;
-  background-image: none !important;
+  background-image: var(--live-glass) !important;
 }
 .artist-live-chat > aside {
   width: 100% !important;
   border-radius: var(--radius-lg) !important;
-  box-shadow: none !important;
-  background: var(--card) !important;
+  box-shadow: var(--live-glow) !important;
+  background: var(--live-glass) !important;
 }
 .artist-live-stage > div:last-child {
-  background: var(--card);
+  background: transparent;
   border-radius: var(--radius-lg);
 }
 .artist-live-room .stage-tile video { object-fit: cover; }
+.artist-live-room .stage-tile > .pointer-events-none:last-child {
+  background: linear-gradient(0deg, var(--background), transparent);
+  min-height: 4rem;
+}
+.artist-live-stage > div > .flex.flex-wrap {
+  margin-inline: auto;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--live-glass);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: var(--live-glow);
+  justify-content: center;
+}
+.artist-live-stage > div > .flex.flex-wrap > button {
+  flex-direction: column;
+  gap: .5rem;
+  background: transparent;
+  border-color: transparent;
+  color: var(--foreground);
+  min-width: 4.5rem;
+}
+.artist-live-stage > div > .flex.flex-wrap > button:hover {
+  background: color-mix(in srgb, var(--brand-cyan) 10%, transparent);
+}
+.artist-live-stage > div > .flex.flex-wrap > button:last-child { color: var(--primary); }
+.artist-live-sidebar > section,
+.artist-live-sidebar > details {
+  background: var(--live-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--live-glow);
+}
+.artist-live-chat > aside > div:last-child { border-color: var(--border); }
+@media (max-width: 639px) {
+  .artist-live-room { margin-top: 0; border-inline: 0; border-radius: 0; }
+  .artist-live-stage > div > .flex.flex-wrap { width: 100%; }
+  .artist-live-stage > div > .flex.flex-wrap > button { min-width: 4rem; }
+}
 @layer base {
   /* Live profiles reuse streaming tools without changing Studio's layout. */
   .artist-live-room { color: var(--foreground); }

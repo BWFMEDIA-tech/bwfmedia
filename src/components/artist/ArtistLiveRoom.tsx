@@ -88,7 +88,7 @@ export function ArtistLiveRoom({ stream, artist, onEnded }: {
   };
 
   return (
-    <main className="artist-live-room mx-auto min-h-screen w-full max-w-6xl px-3 pb-28 pt-4 md:px-6 md:pt-6">
+    <main className="artist-live-room mx-auto min-h-screen w-full max-w-6xl px-3 pb-28 pt-4 md:px-5 md:pt-5">
       <header className="mb-5 flex flex-wrap items-center gap-3 border-b border-border pb-4">
         <span className="inline-flex items-center gap-2 rounded-md bg-trust px-3 py-2 text-xs font-bold text-accent-foreground"><Radio className="h-4 w-4" /> LIVE</span>
         <div className="min-w-0 flex-1">
@@ -129,7 +129,7 @@ export function ArtistLiveRoom({ stream, artist, onEnded }: {
         <div className="artist-live-chat min-w-0">
           <LiveChat streamId={stream.id} auth={auth} viewerCount={viewers} startedAt={stream.started_at} hostId={stream.host_id} status="live" />
         </div>
-        <aside className="min-w-0 space-y-4">
+        <aside className="artist-live-sidebar min-w-0 space-y-4">
           <section className="border-b border-border pb-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-primary" /> Audience <span className="ml-auto text-muted-foreground">{viewers.toLocaleString()}</span></h2>
             {participants.some((p) => p.stage_role === "listener" || p.stage_role === "green_room") ? <AudienceRow participants={participants} /> : <p className="text-sm text-muted-foreground">{connection ? "No audience members yet." : "Join to see the audience."}</p>}
