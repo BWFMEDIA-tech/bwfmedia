@@ -227,9 +227,14 @@ function HeroBanner({
       </div>
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
         {isOwner ? (
-          <Link to="/settings/artist-info" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition" style={{ background: RED, boxShadow: `0 6px 24px ${RED}55` }}>
-            Edit Artist Profile
-          </Link>
+          <>
+            <Link to="/go-live" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-wide text-white hover:brightness-110 transition" style={{ background: "linear-gradient(90deg,#00E6FF,#0000FF)", boxShadow: "0 6px 24px rgba(0,0,255,0.4)" }}>
+              <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Go Live
+            </Link>
+            <Link to="/settings/artist-info" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition" style={{ background: RED, boxShadow: `0 6px 24px ${RED}55` }}>
+              Edit Artist Profile
+            </Link>
+          </>
         ) : (
           <>
             <FollowButton artistId={artist.id} />
