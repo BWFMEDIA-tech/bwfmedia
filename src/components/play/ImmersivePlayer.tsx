@@ -23,7 +23,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
-import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
+import { useSharedAudioGraph, resumeSharedAudio, arenaBroadcast, getGraphFor } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
 import { useSignedAudioUrl, getSignedAudioUrl } from "@/lib/useSignedAudio";
@@ -468,6 +468,14 @@ export function ImmersivePlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { analyserRef, gainRef, ctxRef, resume } = useAudioGraph(audioRef);
+  // Host: hand the music tap to the live room so it's sent to everyone.
+  useEffect(() => {
+    if (!isHost) return;
+    const g = getGraphFor(audioRef.current);
+    if (!g) return;
+    arenaBroadcast.setHostStream(g.broadcast.stream);
+    return () => arenaBroadcast.setHostStream(null);
+  }, [isHost, ctxRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
   const trackAudioSrc = useSignedAudioUrl(track?.audio_url ?? null);
   const nextAudioSrc = useSignedAudioUrl(upNext[0]?.audio_url ?? null);
   // Stop the global mini-player whenever the immersive arena player has a
@@ -755,7 +763,10 @@ export function ImmersivePlayer({
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    a.volume = muted ? 0 : volume;
+    // Element stays at full level so the live broadcast tap is unaffected;
+    // this device's volume is applied on the local output only.
+    a.volume = 1;
+    arenaBroadcast.setLocalVolume(muted ? 0 : volume);
   }, [volume, muted]);
 
   /* ----- sleep timer ----- */
