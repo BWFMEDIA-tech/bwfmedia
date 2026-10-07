@@ -587,7 +587,15 @@ export function ImmersivePlayer({
       if (!a.paused) setProgress(a.currentTime);
     };
     const onMeta = () => setDuration(a.duration || 0);
-    const onPlay = () => { setIsPlaying(true); setPlaybackPlaying(true); resume(); };
+    const onPlay = () => {
+      setIsPlaying(true); setPlaybackPlaying(true); resume();
+      // Without a tap the browser keeps the sound engine asleep, so the
+      // song "plays" in total silence. Ask the listener to tap.
+      const ctx = ctxRef.current;
+      setTimeout(() => {
+        if (ctx && ctx.state !== "running" && !a.paused) setNeedsUnlock(true);
+      }, 400);
+    };
     const onPause = () => { setIsPlaying(false); setPlaybackPlaying(false); };
     const onEnd = async () => {
       setIsPlaying(false);
