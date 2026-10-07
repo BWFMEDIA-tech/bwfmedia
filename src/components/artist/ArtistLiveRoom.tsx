@@ -158,11 +158,11 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
           </div>
           {["Artist", "Guest"].map(label => <div key={label} className="profile-video-tile"><span className="profile-video-badge"><Users className="h-4 w-4" />{label}</span><div className="profile-video-empty"><Users className="h-10 w-10" /><span>Join to watch live</span></div></div>)}
           </div>
-          <div className="profile-entry-actions">
+          {(!auth.user || isOwner) && <div className="profile-entry-actions">
             {!auth.user && <input aria-label="Your live-room name" placeholder="Your name (optional)" value={guestName} maxLength={80} onChange={(event) => setGuestName(event.target.value)} className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground" />}
             {isOwner && <Button variant="outline" className="w-full" disabled={ending} onClick={stop}>{ending ? "Ending…" : "End live"}</Button>}
+          </div>}
 
-          </div>
         </section>
       )}
 
