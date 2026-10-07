@@ -14,6 +14,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-brand-silver: var(--brand-silver);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -601,3 +602,19 @@
 [style*="gradient"][style*="139,92,246"] { background-image: var(--gradient-blood) !important; }
 [style*="gradient"][style*="168,85,247"] { background-image: var(--gradient-blood) !important; }
 [style*="gradient"][style*="236,72,153"] { background-image: var(--gradient-blood) !important; }
+
+/* Video catalog's legacy red accents are branding, not destructive actions. */
+.video-network .bg-red-500 { background-color: var(--brand-blue); }
+.video-network .hover\:bg-red-600:hover { background-color: var(--brand-blue); filter: brightness(1.15); }
+.video-network .text-red-500 { color: var(--brand-cyan); }
+.video-network .hover\:text-red-400:hover { color: var(--brand-silver); }
+.video-network .from-red-500 { --tw-gradient-from: var(--brand-cyan); }
+.video-network .to-red-700 { --tw-gradient-to: var(--brand-blue); }
+.video-network .from-red-900\/60 { --tw-gradient-from: color-mix(in srgb, var(--brand-blue) 25%, transparent); }
+.video-network .via-red-950\/30 { --tw-gradient-via: color-mix(in srgb, var(--brand-cyan) 8%, transparent); }
+.video-network .accent-red-500 { accent-color: var(--brand-cyan); }
+
+/* Bright blue works as a fill; silver keeps small accent text legible. */
+.text-\[\#C53DFF\], .text-\[\#c53dff\] { color: var(--brand-silver); }
+.group:hover .group-hover\:bg-\[\#FF00A6\] { background-color: var(--brand-cyan); }
+.group:hover .group-hover\:border-\[\#C53DFF\]\/60 { border-color: color-mix(in srgb, var(--brand-blue) 60%, transparent); }
