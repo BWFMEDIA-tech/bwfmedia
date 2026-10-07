@@ -86,7 +86,27 @@ function MusicMediaPage() {
   return (
     <SettingsShell title="Music & Media" blurb="Pick what fans see first.">
       <Card title="Your Tracks" icon={<Music className="h-4 w-4 text-red-500" />}>
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          {tracks.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label className="flex cursor-pointer select-none items-center gap-2 text-xs font-semibold text-white/70 hover:text-white">
+                <input
+                  type="checkbox"
+                  checked={selected.size > 0 && selected.size === tracks.length}
+                  onChange={toggleSelectAll}
+                  className="h-4 w-4 accent-cyan-400"
+                />
+                Select all
+              </label>
+              <button
+                onClick={deleteSelected}
+                disabled={selected.size === 0}
+                className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 disabled:opacity-40 disabled:hover:bg-transparent"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete selected ({selected.size})
+              </button>
+            </div>
+          )}
           <button
             onClick={() => setShowAdd(true)}
             className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow shadow-violet-500/30 hover:from-violet-400 hover:to-blue-400"
