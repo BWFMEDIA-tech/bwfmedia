@@ -1611,6 +1611,128 @@ export type Database = {
         }
         Relationships: []
       }
+      host_profiles: {
+        Row: {
+          created_at: string
+          custom_percentage: number | null
+          status: string
+          tier_id: string
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          custom_percentage?: number | null
+          status?: string
+          tier_id: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          custom_percentage?: number | null
+          status?: string
+          tier_id?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "host_profiles_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "host_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      host_tier_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          host_id: string
+          id: string
+          new_percentage: number
+          new_tier: string
+          previous_percentage: number | null
+          previous_tier: string | null
+          reason: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          host_id: string
+          id?: string
+          new_percentage: number
+          new_tier: string
+          previous_percentage?: number | null
+          previous_tier?: string | null
+          reason: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          host_id?: string
+          id?: string
+          new_percentage?: number
+          new_tier?: string
+          previous_percentage?: number | null
+          previous_tier?: string | null
+          reason?: string
+        }
+        Relationships: []
+      }
+      host_tiers: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          is_custom: boolean
+          minimum_engagement: number
+          minimum_revenue_cents: number
+          minimum_rooms: number
+          name: string
+          percentage: number
+          rank: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_custom?: boolean
+          minimum_engagement?: number
+          minimum_revenue_cents?: number
+          minimum_rooms?: number
+          name: string
+          percentage: number
+          rank?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_custom?: boolean
+          minimum_engagement?: number
+          minimum_revenue_cents?: number
+          minimum_rooms?: number
+          name?: string
+          percentage?: number
+          rank?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invite_codes: {
         Row: {
           allowed_role: string
@@ -3112,6 +3234,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      room_host_earnings: {
+        Row: {
+          calculated_at: string
+          eligible_pool_cents: number
+          host_amount_cents: number
+          host_id: string
+          host_percentage: number
+          id: string
+          paid_at: string | null
+          reversed_reason: string | null
+          status: string
+          stream_id: string
+          tier_slug: string
+        }
+        Insert: {
+          calculated_at?: string
+          eligible_pool_cents: number
+          host_amount_cents: number
+          host_id: string
+          host_percentage: number
+          id?: string
+          paid_at?: string | null
+          reversed_reason?: string | null
+          status?: string
+          stream_id: string
+          tier_slug: string
+        }
+        Update: {
+          calculated_at?: string
+          eligible_pool_cents?: number
+          host_amount_cents?: number
+          host_id?: string
+          host_percentage?: number
+          id?: string
+          paid_at?: string | null
+          reversed_reason?: string | null
+          status?: string
+          stream_id?: string
+          tier_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_host_earnings_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: true
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_releases: {
         Row: {
@@ -4716,6 +4888,15 @@ export type Database = {
         Returns: Json
       }
       approve_release_takedown: { Args: { _release_id: string }; Returns: Json }
+      assign_host_tier: {
+        Args: {
+          _custom_percentage: number
+          _host_id: string
+          _reason: string
+          _tier_slug: string
+        }
+        Returns: Json
+      }
       assign_release_identifiers: {
         Args: { _release_id: string }
         Returns: Json
@@ -4810,6 +4991,7 @@ export type Database = {
       dequeue_matchmaking: { Args: never; Returns: boolean }
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
+      finalize_room_earnings: { Args: { _stream_id: string }; Returns: Json }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
       get_artist_earnings_summary: {
         Args: { _artist_id: string }
@@ -4841,6 +5023,15 @@ export type Database = {
           tips_cents: number
         }[]
       }
+      get_host_rate: {
+        Args: { _user_id: string }
+        Returns: {
+          percentage: number
+          status: string
+          tier_name: string
+          tier_slug: string
+        }[]
+      }
       get_label_earnings: {
         Args: { _label_id: string }
         Returns: {
@@ -4870,6 +5061,7 @@ export type Database = {
       get_my_profile_location: { Args: never; Returns: string }
       get_or_create_profile_stream: { Args: never; Returns: string }
       get_revenue_pool_total: { Args: { _month?: string }; Returns: number }
+      get_room_host_estimate: { Args: { _stream_id: string }; Returns: Json }
       get_round_vote_totals: {
         Args: { _round_id: string }
         Returns: {
@@ -5016,6 +5208,18 @@ export type Database = {
         Returns: undefined
       }
       reset_round_votes: { Args: { _round_id: string }; Returns: undefined }
+      reverse_host_earning: {
+        Args: { _earning_id: string; _reason: string }
+        Returns: undefined
+      }
+      room_eligible_pool_cents: {
+        Args: { _stream_id: string }
+        Returns: number
+      }
+      set_host_status: {
+        Args: { _host_id: string; _reason: string; _status: string }
+        Returns: undefined
+      }
       spend_boost_credit: {
         Args: { _amount?: number; _reason?: string; _reference_id?: string }
         Returns: number
