@@ -818,12 +818,22 @@ export function ImmersivePlayer({
       catch (e: any) { toast.error(e?.message ?? "Could not update playback"); }
       return;
     }
-    // Listeners: first tap unlocks audio and joins at the live position;
-    // after that the button just mutes/unmutes locally (no restarting).
-    if (a.paused) {
+    // Guests, artists and listeners: a tap always makes the song audible at
+    // the live position. Only when it's already audible does it mute.
+    const roomPaused = radioMatches && radio.state && !radio.state.playing;
+    if (roomPaused) {
+      toast.message("The host paused the song — it will resume for everyone together.");
+      return;
+    }
+    const ctx = ctxRef.current;
+    const silent = a.paused || muted || volume === 0 || needsUnlock || (ctx && ctx.state !== "running");
+    if (silent) {
       try {
+        await ctx?.resume?.().catch(() => {});
+        resume();
         if (radioMatches) a.currentTime = radio.livePosition();
-        await a.play();
+        if (a.paused) await a.play();
+        if (volume === 0) setVolume(0.8);
         setNeedsUnlock(false);
         setMuted(false);
       } catch (e: any) {
@@ -831,7 +841,7 @@ export function ImmersivePlayer({
         toast.error(e?.message ?? "Tap again to start audio");
       }
     } else {
-      setMuted((m) => !m);
+      setMuted(true);
     }
   };
   const seek = (_pct: number) => { /* radio mode: seeking disabled */ };
