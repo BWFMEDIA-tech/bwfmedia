@@ -35,20 +35,16 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
 
-    // Server-side host check: only the actual stream host (or an admin) gets
+    // Server-side host check: only the actual stream owner gets
     // LiveKit room admin/create grants. Never trust a client-supplied flag.
     const { data: stream } = await supabase
       .from("streams")
-      .select("host_id")
+      .select("id, host_id, status")
       .eq("room_name", data.roomName)
       .maybeSingle();
-    const { data: adminRow } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    const isHost = (stream?.host_id === userId) || !!adminRow;
+    if (!stream) throw new Error("Stream not found");
+    const isHost = stream.host_id === userId;
+    if (!isHost && stream.status !== "live") throw new Error("Stream is not live");
 
     // Mirror LiveKit publish rights to the stage role recorded in
     // `stage_participants`. Only host / co_host / speaker get canPublish;
@@ -106,7 +102,7 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
     // downgrading an existing speaker/host row. Re-tokening after promotion
     // must not kick the guest back to listener.
     if (stream?.host_id && stream.host_id !== userId) {
-      const role = isHost ? "host" : "listener";
+      const role = "listener";
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       // resolve stream id from room_name
       const { data: streamRow } = await supabaseAdmin

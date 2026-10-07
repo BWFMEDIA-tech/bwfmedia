@@ -39,8 +39,8 @@ export function ArtistLiveRoom({ stream, artist, onEnded }: {
   const { participants, hands, queue } = useStageState(connection ? stream.id : null);
   const isOwner = auth.user?.id === stream.host_id;
   const myRole = participants.find((p) => p.user_id === auth.user?.id)?.stage_role;
-  const canManage = isOwner || myRole === "host" || myRole === "co_host";
-  const onStage = canManage || myRole === "speaker";
+  const canManage = isOwner;
+  const onStage = isOwner || myRole === "host" || myRole === "co_host" || myRole === "speaker";
   useStagePresence(connection ? stream.id : null, auth.user?.id ?? null);
 
   useEffect(() => { setViewers(stream.viewer_count ?? 0); }, [stream.viewer_count]);
