@@ -96,6 +96,7 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
+import { Route as JoinUsernameRouteImport } from './routes/join.$username'
 import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as LabelsIndexRouteImport } from './routes/labels.index'
 import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
@@ -582,6 +583,11 @@ const InviteCodeRoute = InviteCodeRouteImport.update({
   path: '/invite/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JoinUsernameRoute = JoinUsernameRouteImport.update({
+  id: '/join/$username',
+  path: '/join/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LabelInviteCodeRoute = LabelInviteCodeRouteImport.update({
   id: '/label-invite/$code',
   path: '/label-invite/$code',
@@ -897,6 +903,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1029,6 +1036,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1163,6 +1171,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1298,6 +1307,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
@@ -1430,6 +1440,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
@@ -1563,6 +1574,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/email/unsubscribe'
     | '/invite/$code'
+    | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/pay/$bookingId'
@@ -1672,6 +1684,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InviteCodeRoute: typeof InviteCodeRoute
+  JoinUsernameRoute: typeof JoinUsernameRoute
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
@@ -2315,6 +2328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/join/$username': {
+      id: '/join/$username'
+      path: '/join/$username'
+      fullPath: '/join/$username'
+      preLoaderRoute: typeof JoinUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/label-invite/$code': {
       id: '/label-invite/$code'
       path: '/label-invite/$code'
@@ -2799,6 +2819,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InviteCodeRoute: InviteCodeRoute,
+  JoinUsernameRoute: JoinUsernameRoute,
   LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
   PayBookingIdRoute: PayBookingIdRoute,
