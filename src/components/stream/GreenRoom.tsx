@@ -7,8 +7,8 @@ import type { StageParticipant } from "@/lib/useStageState";
 import { SignedImg } from "@/components/ui/signed-img";
 import { Loader2 } from "lucide-react";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
 
 export function GreenRoom({ streamId, participants }: { streamId: string | null; participants: StageParticipant[] }) {
   const green = participants.filter((p) => p.stage_role === "green_room");

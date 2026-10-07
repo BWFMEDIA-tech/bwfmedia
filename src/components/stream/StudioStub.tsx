@@ -17,7 +17,7 @@ export function StudioStub({
         <div
           className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl"
           style={{
-            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
+            background: "linear-gradient(135deg,#00E6FF,#0000FF)",
             boxShadow: "0 8px 32px rgba(139,92,246,0.45)",
           }}
         >

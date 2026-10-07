@@ -21,8 +21,8 @@ function SecurityAdmin() {
       subtitle="Bans, moderation, and platform safety controls."
       stats={[
         { label: "Active Bans", value: stats.data?.bansCount ?? 0, icon: Ban, color: "#ef4444" },
-        { label: "Audit Events", value: stats.data?.auditCount ?? 0, icon: ScrollText, color: "#3b82f6" },
-        { label: "Suppressed Emails", value: stats.data?.suppressedCount ?? 0, icon: Lock, color: "#a855f7" },
+        { label: "Audit Events", value: stats.data?.auditCount ?? 0, icon: ScrollText, color: "#0000FF" },
+        { label: "Suppressed Emails", value: stats.data?.suppressedCount ?? 0, icon: Lock, color: "#00E6FF" },
       ]}
     >
       <div className="grid gap-4 sm:grid-cols-2">

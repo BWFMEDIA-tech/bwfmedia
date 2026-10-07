@@ -236,7 +236,7 @@ function ChoosePath({
           metricLabel="Next Slot In"
           metricValue={nextSlot}
           metricColor="text-[#C53DFF]"
-          button={{ label: "JOIN QUEUE", className: "bg-[#C53DFF] hover:bg-[#b02ee6]" }}
+          button={{ label: "JOIN QUEUE", className: "bg-[#C53DFF] hover:bg-[#0000CC]" }}
           footer={<>Your Position: <span className="font-bold text-white">{queuePos}</span></>}
         />
         <PathCard
@@ -487,7 +487,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
             <Link
               to="/play/$room"
               params={{ room: trending.roomName }}
-              className="mt-3 block w-full rounded-lg bg-[#C53DFF] px-3 py-2 text-center text-xs font-bold hover:bg-[#b02ee6]"
+              className="mt-3 block w-full rounded-lg bg-[#C53DFF] px-3 py-2 text-center text-xs font-bold hover:bg-[#0000CC]"
             >
               JOIN ROOM
             </Link>
@@ -598,7 +598,7 @@ function RankProgression() {
 /* ---------- Power-Ups ---------- */
 function PowerUps() {
   const items = [
-    { icon: <Users className="h-5 w-5" />, title: "CROWD SURGE", desc: "Doubles XP from audience votes.", color: "text-[#C53DFF]", btn: "bg-[#C53DFF] hover:bg-[#b02ee6]" },
+    { icon: <Users className="h-5 w-5" />, title: "CROWD SURGE", desc: "Doubles XP from audience votes.", color: "text-[#C53DFF]", btn: "bg-[#C53DFF] hover:bg-[#0000CC]" },
     { icon: <Target className="h-5 w-5" />, title: "PERFECT SET", desc: "Bonus XP for no skips.", color: "text-[#00E6FF]", btn: "bg-[#00E6FF] text-black hover:bg-cyan-300" },
     { icon: <Zap className="h-5 w-5" />, title: "FAST RISE", desc: "Temporary XP boost for new artists.", color: "text-emerald-400", btn: "bg-emerald-500 hover:bg-emerald-400 text-black" },
     { icon: <Crown className="h-5 w-5" />, title: "FEATURED SLOT", desc: "Get featured and gain massive exposure.", color: "text-amber-400", btn: "bg-amber-500 text-black hover:bg-amber-400" },

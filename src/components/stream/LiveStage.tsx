@@ -25,8 +25,8 @@ import { setStreamSpotlight } from "@/lib/stage.functions";
 import { Pin, PinOff, X as XIcon } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
 
 interface LiveStageProps {
   token: string;

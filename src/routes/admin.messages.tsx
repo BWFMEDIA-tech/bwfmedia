@@ -20,7 +20,7 @@ function MessagesAdmin() {
       title="Messages"
       subtitle="Direct messages and email health across the platform."
       stats={[
-        { label: "Direct Messages", value: stats.data?.messagesCount ?? 0, icon: MessageSquare, color: "#3b82f6" },
+        { label: "Direct Messages", value: stats.data?.messagesCount ?? 0, icon: MessageSquare, color: "#0000FF" },
         { label: "Suppressed Emails", value: stats.data?.suppressedCount ?? 0, icon: Mail, color: "#ef4444" },
       ]}
     >

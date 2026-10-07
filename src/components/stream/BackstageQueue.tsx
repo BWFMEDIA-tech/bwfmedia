@@ -7,8 +7,8 @@ import { GripVertical, X as XIcon, ChevronRight } from "lucide-react";
 import type { QueueEntry } from "@/lib/useStageState";
 import { SignedImg } from "@/components/ui/signed-img";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
 
 export function BackstageQueue({ streamId, queue, canManage }: { streamId: string | null; queue: QueueEntry[]; canManage: boolean }) {
   const [dragging, setDragging] = useState<string | null>(null);

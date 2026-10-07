@@ -24,7 +24,7 @@ function PayoutsAdmin() {
       stats={[
         { label: "Paid Out", value: `$${((stats.data?.commissionsPaidCents ?? 0) / 100).toFixed(2)}`, icon: CheckCircle2, color: "#22c55e" },
         { label: "Owed", value: `$${(unpaidCents / 100).toFixed(2)}`, icon: Clock, color: "#f97316" },
-        { label: "Total Earned", value: `$${((stats.data?.commissionsTotalCents ?? 0) / 100).toFixed(2)}`, icon: Banknote, color: "#3b82f6" },
+        { label: "Total Earned", value: `$${((stats.data?.commissionsTotalCents ?? 0) / 100).toFixed(2)}`, icon: Banknote, color: "#0000FF" },
       ]}
       ctaLabel="Open Merch Ledger"
       ctaTo="/admin/merch"

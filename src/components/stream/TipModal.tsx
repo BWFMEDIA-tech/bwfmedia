@@ -7,8 +7,8 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
 const PRESETS = [5, 10, 20, 50];
 
 export function TipModal({

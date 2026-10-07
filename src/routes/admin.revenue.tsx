@@ -74,8 +74,8 @@ function RevenueAdmin() {
       subtitle="Monthly platform revenue and 75 / 20 / 5 pool split."
       stats={[
         { label: "Total this month", value: money(total), icon: DollarSign, color: "#22c55e" },
-        { label: "Listener subs", value: money(t?.listener_cents), icon: Users, color: "#3b82f6" },
-        { label: "Artist subs", value: money(t?.artist_cents), icon: Music, color: "#a855f7" },
+        { label: "Listener subs", value: money(t?.listener_cents), icon: Users, color: "#0000FF" },
+        { label: "Artist subs", value: money(t?.artist_cents), icon: Music, color: "#00E6FF" },
         { label: "Ads", value: money(t?.ads_cents), icon: Megaphone, color: "#f97316" },
       ]}
     >
@@ -116,7 +116,7 @@ function RevenueAdmin() {
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-4">
-        <PoolCard label="Active Subscribers" cents={(subs.data?.active_subscribers ?? 0) * 100} tint="from-[#3b82f6]/30 to-[#1e3a8a]/20" icon={UserCheck} formatAsCount />
+        <PoolCard label="Active Subscribers" cents={(subs.data?.active_subscribers ?? 0) * 100} tint="from-[#0000FF]/30 to-[#001A80]/20" icon={UserCheck} formatAsCount />
         <PoolCard label="MRR" cents={subs.data?.mrr_cents ?? 0} tint="from-emerald-500/30 to-emerald-700/20" icon={TrendingUp} />
         <PoolCard label="Listener MRR" cents={subs.data?.listener_mrr_cents ?? 0} tint="from-[#00E6FF]/30 to-[#0000FF]/20" icon={Users} />
         <PoolCard label="Artist MRR" cents={subs.data?.artist_mrr_cents ?? 0} tint="from-[#C53DFF]/30 to-[#FF00A6]/20" icon={Music} />

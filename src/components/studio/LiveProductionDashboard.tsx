@@ -11,9 +11,9 @@ import { toast } from "sonner";
 import { SignedImg } from "@/components/ui/signed-img";
 import { Button } from "@/components/ui/button";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
-const PINK = "#ec4899";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
+const PINK = "#B8C2D0";
 
 /**
  * Live Production Dashboard.

@@ -38,9 +38,9 @@ function ContentAdmin() {
       title="Content"
       subtitle="Videos, recordings, and uploaded media across the network."
       stats={[
-        { label: "Videos", value: stats.data?.videosCount ?? 0, icon: Video, color: "#3b82f6" },
+        { label: "Videos", value: stats.data?.videosCount ?? 0, icon: Video, color: "#0000FF" },
         { label: "Stream Recordings", value: stats.data?.recordingsCount ?? 0, icon: Mic, color: "#ef4444" },
-        { label: "All Content", value: (stats.data?.videosCount ?? 0) + (stats.data?.recordingsCount ?? 0), icon: PlayCircle, color: "#a855f7" },
+        { label: "All Content", value: (stats.data?.videosCount ?? 0) + (stats.data?.recordingsCount ?? 0), icon: PlayCircle, color: "#00E6FF" },
       ]}
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

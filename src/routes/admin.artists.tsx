@@ -25,9 +25,9 @@ function ArtistsAdmin() {
       title="Artists"
       subtitle="Verified artists, performance and rankings."
       stats={[
-        { label: "Total Artists", value: stats.data?.artistsCount ?? 0, icon: Star, color: "#a855f7" },
+        { label: "Total Artists", value: stats.data?.artistsCount ?? 0, icon: Star, color: "#00E6FF" },
         { label: "Live Streams", value: overview.data?.cards.liveStreams.value ?? 0, icon: Radio, color: "#ef4444" },
-        { label: "Total Users", value: stats.data?.profilesCount ?? 0, icon: Users, color: "#3b82f6" },
+        { label: "Total Users", value: stats.data?.profilesCount ?? 0, icon: Users, color: "#0000FF" },
       ]}
       ctaLabel="Manage Roles"
       ctaTo="/admin/users"

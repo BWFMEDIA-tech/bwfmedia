@@ -512,7 +512,7 @@ function VoteTracker({
             <span
               className="font-mono text-3xl font-black tabular-nums sm:text-4xl"
               style={{
-                background: "linear-gradient(135deg,#7c3aed,#3b82f6)",
+                background: "linear-gradient(135deg,#00E6FF,#0000FF)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -567,7 +567,7 @@ function VoteTracker({
           className="absolute inset-y-0 left-0 transition-[width] duration-700 ease-out"
           style={{
             width: `${aPct}%`,
-            background: "linear-gradient(90deg,#7c3aed,#3b82f6)",
+            background: "linear-gradient(90deg,#00E6FF,#0000FF)",
             boxShadow: "0 0 18px rgba(124,58,237,0.6)",
           }}
         />

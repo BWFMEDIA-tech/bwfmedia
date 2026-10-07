@@ -23,7 +23,7 @@ function TransactionsAdmin() {
       stats={[
         { label: "Tip Revenue", value: `$${((stats.data?.tipsRevenueCents ?? 0) / 100).toFixed(2)}`, icon: DollarSign, color: "#22c55e" },
         { label: "Merch Revenue", value: `$${((stats.data?.commissionsTotalCents ?? 0) / 100).toFixed(2)}`, icon: ShoppingBag, color: "#f97316" },
-        { label: "Total Revenue", value: `$${(((stats.data?.tipsRevenueCents ?? 0) + (stats.data?.commissionsTotalCents ?? 0)) / 100).toFixed(2)}`, icon: Receipt, color: "#3b82f6" },
+        { label: "Total Revenue", value: `$${(((stats.data?.tipsRevenueCents ?? 0) + (stats.data?.commissionsTotalCents ?? 0)) / 100).toFixed(2)}`, icon: Receipt, color: "#0000FF" },
       ]}
     >
       <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">

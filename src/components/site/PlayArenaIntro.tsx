@@ -108,7 +108,7 @@ export function PlayArenaIntro() {
                   className="bg-clip-text text-transparent"
                   style={{
                     backgroundImage:
-                      "linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #22d3ee 100%)",
+                      "linear-gradient(90deg, #00E6FF 0%, #B8C2D0 50%, #00E6FF 100%)",
                   }}
                 >
                   Live Music Battles
@@ -158,7 +158,7 @@ export function PlayArenaIntro() {
                   className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-95"
                   style={{
                     backgroundImage:
-                      "linear-gradient(90deg, #a855f7 0%, #ec4899 60%, #22d3ee 100%)",
+                      "linear-gradient(90deg, #00E6FF 0%, #B8C2D0 60%, #00E6FF 100%)",
                   }}
                 >
                   Enter Play Arena
@@ -239,7 +239,7 @@ export function PlayArenaIntro() {
                     className="h-full rounded-full"
                     style={{
                       backgroundImage:
-                        "linear-gradient(90deg, #a855f7, #ec4899 60%, #22d3ee)",
+                        "linear-gradient(90deg, #00E6FF, #B8C2D0 60%, #00E6FF)",
                     }}
                   />
                 </div>

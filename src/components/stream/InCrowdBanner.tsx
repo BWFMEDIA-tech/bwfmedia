@@ -22,7 +22,7 @@ export function InCrowdBanner({
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
           style={{
-            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
+            background: "linear-gradient(135deg,#00E6FF,#0000FF)",
             boxShadow: "0 8px 24px rgba(139,92,246,0.35)",
           }}
         >

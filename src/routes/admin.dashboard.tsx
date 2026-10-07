@@ -86,8 +86,8 @@ function AdminDashboard() {
 
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Stat icon={Radio} label="Live now" value={String(liveStreams.length)} color="#22c55e" />
-          <Stat icon={DollarSign} label="Tip revenue" value={`$${(tipsTotal / 100).toFixed(2)}`} color="#8b5cf6" />
-          <Stat icon={Users} label="Tips received" value={String(tipCount)} color="#3b82f6" />
+          <Stat icon={DollarSign} label="Tip revenue" value={`$${(tipsTotal / 100).toFixed(2)}`} color="#00E6FF" />
+          <Stat icon={Users} label="Tips received" value={String(tipCount)} color="#0000FF" />
           <Stat icon={Ban} label="Active bans" value={String(bans.length)} color="#ef4444" />
         </section>
 

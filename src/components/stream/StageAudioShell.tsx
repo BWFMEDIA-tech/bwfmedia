@@ -124,12 +124,12 @@ export function StageAudioShell({
           <SignedImg
             src={me.avatar_url}
             alt=""
-            className="mx-auto mb-3 h-16 w-16 rounded-full border-2 border-[#8b5cf6] object-cover shadow-[0_0_24px_rgba(139,92,246,0.4)]"
+            className="mx-auto mb-3 h-16 w-16 rounded-full border-2 border-[#00E6FF] object-cover shadow-[0_0_24px_rgba(139,92,246,0.4)]"
           />
         ) : (
           <div
-            className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#8b5cf6]"
-            style={{ background: "linear-gradient(135deg,#8b5cf6,#3b82f6)" }}
+            className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#00E6FF]"
+            style={{ background: "linear-gradient(135deg,#00E6FF,#0000FF)" }}
           >
             <Mic className="h-6 w-6 text-white" />
           </div>
@@ -145,7 +145,7 @@ export function StageAudioShell({
         <button
           onClick={() => setConnect(true)}
           className="rounded-md px-4 py-2 text-xs font-semibold text-white"
-          style={{ background: "linear-gradient(135deg,#8b5cf6,#3b82f6)" }}
+          style={{ background: "linear-gradient(135deg,#00E6FF,#0000FF)" }}
         >
           <Radio className="mr-1 inline h-3.5 w-3.5" />
           {isHost ? "Join as host" : "Join audio"}
