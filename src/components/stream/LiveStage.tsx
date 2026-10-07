@@ -418,12 +418,14 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const role = roleMap[id];
     const isAdminRole =
       role === "admin" || role === "administrator" || role === "owner" || role === "moderator";
-    const isHostRole = role === "host" || role === "cohost" || role === "co_host";
+    const isCoHostRole = role === "cohost" || role === "co_host";
+    const isHostRole = role === "host";
     // Only people the host has actually promoted to the stage get a video box.
     // Listeners, green-room guests and unknown roles stay in the audience.
     const isStageRole = role === "speaker" || role === "artist" || role === "guest";
-    if (!isAdminRole && !isHostRole && !isStageRole) continue;
-    const panel: Panel = isAdminRole ? "admin" : isHostRole ? "host" : "middle";
+    if (!isAdminRole && !isHostRole && !isCoHostRole && !isStageRole) continue;
+    // Co-hosts always land in the CO-HOST box (on every device size).
+    const panel: Panel = isAdminRole || isCoHostRole ? "admin" : isHostRole ? "host" : "middle";
     // When a spotlight is active for a panel, suppress catch-alls there.
     if (spotlight.artist && panel === "middle") continue;
     if (spotlight.host && panel === "admin") continue;
