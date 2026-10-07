@@ -11,7 +11,7 @@ import { endStream, type getArtistLiveStream } from "@/lib/streams.functions";
 import { useStageState } from "@/lib/useStageState";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { supabase } from "@/integrations/supabase/client";
-import { LiveStage } from "@/components/stream/LiveStage";
+import { LiveStage, ProfileStage, CameraPublishSync } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
@@ -108,7 +108,8 @@ export function ArtistLiveRoom({ stream, artist, onEnded }: {
         <div className="artist-live-stage flex min-w-0 flex-col gap-4">
           {stream.mode === "stage" && auth.user ? (
             <StageAudioShell token={connection.token} serverUrl={connection.wsUrl} streamId={stream.id} userId={auth.user.id} autoConnect showHostTools={canManage} onLeave={() => setConnection(null)}>
-              <StageRoom streamId={stream.id} participants={participants} canManage={canManage} />
+              <ProfileStage host={{ id: stream.host_id, name: artist.name, photo: artist.photo }} streamId={stream.id} publish={onStage} showHostTools={canManage} onEnd={() => { void stop(); }} onInvite={() => { void invite(); }} />
+              <CameraPublishSync publish={onStage} />
             </StageAudioShell>
           ) : (
             <LiveStage token={connection.token} serverUrl={connection.wsUrl} streamId={stream.id} hostImage={artist.photo ?? undefined} profileHost={{ id: stream.host_id, name: artist.name, photo: artist.photo }} publish={onStage} showHostTools={canManage} onEnd={() => { void stop(); }} onInvite={() => { void invite(); }} />

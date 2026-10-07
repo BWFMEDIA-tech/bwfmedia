@@ -514,7 +514,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
 const StageInner = LiveStageContent;
 
-function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite }: {
+export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite }: {
   host: { id: string; name: string; photo: string | null }; streamId?: string;
   showHostTools: boolean; publish: boolean; onEnd: () => void; onInvite: () => void;
 }) {
