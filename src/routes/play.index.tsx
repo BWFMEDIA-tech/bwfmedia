@@ -249,7 +249,7 @@ function ChoosePath({
           metricLabel="Find Opponent"
           metricValue={data.totals.liveBattles > 0 ? "LIVE" : "OPEN"}
           metricColor="text-[#00E6FF]"
-          button={{ label: "FIND MATCH", className: "bg-[#0000FF] hover:bg-[#0040d9]" }}
+          button={{ label: "FIND MATCH", className: "bg-[#0000FF] hover:bg-[#0000CC]" }}
           footer={<>Battles Today: <span className="font-bold text-white">{battlesToday}/10</span></>}
         />
         <PathCard
@@ -444,7 +444,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
             <Link
               to="/play/$room"
               params={{ room: battle.roomName }}
-              className="mt-5 block w-full rounded-lg bg-[#0000FF] px-3 py-2 text-center text-xs font-bold hover:bg-[#0040d9]"
+              className="mt-5 block w-full rounded-lg bg-[#0000FF] px-3 py-2 text-center text-xs font-bold hover:bg-[#0000CC]"
             >
               WATCH NOW
             </Link>

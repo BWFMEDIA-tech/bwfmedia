@@ -209,7 +209,7 @@ function StagePage() {
             <div className="flex-1 grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 min-h-[420px]">
               {/* Lead host tile */}
               <div className="md:col-span-3 md:row-span-2 relative rounded-3xl overflow-hidden border border-white/10 group bg-gradient-to-br from-[#1a0a2a] via-black to-[#0a0a1f]">
-                <div className="absolute inset-0 opacity-50 [background:radial-gradient(60%_50%_at_30%_40%,rgba(197,61,255,0.35),transparent_60%),radial-gradient(50%_45%_at_75%_70%,rgba(0,75,255,0.3),transparent_60%)]" />
+                <div className="absolute inset-0 opacity-50 [background:radial-gradient(60%_50%_at_30%_40%,rgba(197,61,255,0.35),transparent_60%),radial-gradient(50%_45%_at_75%_70%,rgba(0,0,255,0.3),transparent_60%)]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
                 <div className="absolute inset-0 border-2 border-[#C53DFF]/30 group-hover:border-[#C53DFF]/60 transition-colors pointer-events-none rounded-3xl" />
 
