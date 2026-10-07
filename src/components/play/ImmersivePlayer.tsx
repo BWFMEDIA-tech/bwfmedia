@@ -589,7 +589,7 @@ export function ImmersivePlayer({
       // Only advance when the shared clock agrees the song has really finished.
       // A bad seek or stalled load can fire "ended" early — resync instead.
       const s = radioRef.current.state;
-      const dur = a.duration || track?.duration_seconds || 0;
+      const dur = a.duration || 0;
       if (s && s.trackId === track?.id && dur > 0) {
         const live = radioRef.current.livePosition();
         if (live < dur - 3) {
