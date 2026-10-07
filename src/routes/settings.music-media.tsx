@@ -118,6 +118,12 @@ function MusicMediaPage() {
           <ul className="divide-y divide-white/5">
             {tracks.map((t) => (
               <li key={t.id} className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  checked={selected.has(t.id)}
+                  onChange={() => toggleSelect(t.id)}
+                  className="h-4 w-4 shrink-0 accent-cyan-400"
+                />
                 <div className="h-10 w-10 overflow-hidden rounded bg-white/5">{t.cover_url && <SignedImg src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
                 <div className="flex-1 min-w-0">
                   <div className="truncate text-sm font-semibold">{t.title}</div>
