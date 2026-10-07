@@ -129,7 +129,7 @@ function EventsAdmin() {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-[#C53DFF] to-[#004BFF] px-4 py-2 text-xs font-bold disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-[#C53DFF] to-[#0000FF] px-4 py-2 text-xs font-bold disabled:opacity-50"
             >
               <Plus className="h-3.5 w-3.5" /> {saving ? "Saving..." : "Create event"}
             </button>

@@ -180,7 +180,7 @@ function ProfileHero({
         <div className="lg:col-span-3 flex flex-col gap-2.5">
           <Link
             to="/live"
-            className="group flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#C53DFF] to-[#004BFF] px-4 py-3 text-left hover:shadow-[0_0_30px_-5px_#C53DFF80] transition"
+            className="group flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#C53DFF] to-[#0000FF] px-4 py-3 text-left hover:shadow-[0_0_30px_-5px_#C53DFF80] transition"
           >
             <Music2 className="h-5 w-5 shrink-0" />
             <div className="min-w-0">
@@ -249,7 +249,7 @@ function ChoosePath({
           metricLabel="Find Opponent"
           metricValue={data.totals.liveBattles > 0 ? "LIVE" : "OPEN"}
           metricColor="text-[#00E6FF]"
-          button={{ label: "FIND MATCH", className: "bg-[#004BFF] hover:bg-[#0040d9]" }}
+          button={{ label: "FIND MATCH", className: "bg-[#0000FF] hover:bg-[#0000CC]" }}
           footer={<>Battles Today: <span className="font-bold text-white">{battlesToday}/10</span></>}
         />
         <PathCard
@@ -382,7 +382,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
                   {q.avatar ? (
                     <SignedImg src={q.avatar} alt={q.artistName} className="h-7 w-7 rounded-full object-cover" />
                   ) : (
-                    <span className="h-7 w-7 rounded-full bg-gradient-to-br from-[#C53DFF] to-[#004BFF] text-[10px] font-bold flex items-center justify-center">
+                    <span className="h-7 w-7 rounded-full bg-gradient-to-br from-[#C53DFF] to-[#0000FF] text-[10px] font-bold flex items-center justify-center">
                       {q.artistName.slice(0, 2).toUpperCase()}
                     </span>
                   )}
@@ -422,7 +422,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
                 name={battle.artistA.name}
                 avatar={battle.artistA.avatar}
                 wins={battle.aWins}
-                accent="from-[#00E6FF] to-[#004BFF] ring-[#00E6FF]/60"
+                accent="from-[#00E6FF] to-[#0000FF] ring-[#00E6FF]/60"
               />
               <div className="text-center">
                 <p className="text-lg font-black text-white/60 sm:text-2xl">VS</p>
@@ -444,12 +444,12 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
             <Link
               to="/play/$room"
               params={{ room: battle.roomName }}
-              className="mt-5 block w-full rounded-lg bg-[#004BFF] px-3 py-2 text-center text-xs font-bold hover:bg-[#0040d9]"
+              className="mt-5 block w-full rounded-lg bg-[#0000FF] px-3 py-2 text-center text-xs font-bold hover:bg-[#0000CC]"
             >
               WATCH NOW
             </Link>
           ) : (
-            <button className="mt-5 w-full rounded-lg bg-[#004BFF]/40 px-3 py-2 text-xs font-bold text-white/70 cursor-not-allowed">
+            <button className="mt-5 w-full rounded-lg bg-[#0000FF]/40 px-3 py-2 text-xs font-bold text-white/70 cursor-not-allowed">
               NO BATTLE LIVE
             </button>
           )}
@@ -462,7 +462,7 @@ function LiveArenaStatus({ data }: { data: ArenaDashboard }) {
             <p className="text-sm font-bold">TRENDING LIVE ROOM</p>
           </div>
           <p className="text-xs text-white/50 mt-0.5">Top event right now</p>
-          <div className="mt-3 aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-[#C53DFF]/40 via-[#FF00A6]/30 to-[#004BFF]/40 flex items-end p-3">
+          <div className="mt-3 aspect-video rounded-lg overflow-hidden relative bg-gradient-to-br from-[#C53DFF]/40 via-[#FF00A6]/30 to-[#0000FF]/40 flex items-end p-3">
             {trending?.thumbnail ? (
               <img
                 src={trending.thumbnail}
@@ -565,7 +565,7 @@ function RankProgression() {
     { icon: <Medal className="h-5 w-5" />, label: "BRONZE PERFORMER", range: "0 – 1,999 XP", color: "text-amber-600", bg: "from-amber-700/40 to-amber-900/30" },
     { icon: <Award className="h-5 w-5" />, label: "SILVER ARTIST", range: "2,000 – 4,999 XP", color: "text-slate-300", bg: "from-slate-400/30 to-slate-600/20" },
     { icon: <Trophy className="h-5 w-5" />, label: "GOLD CREATOR", range: "5,000 – 9,999 XP", color: "text-amber-400", bg: "from-amber-400/30 to-amber-600/20" },
-    { icon: <Gem className="h-5 w-5" />, label: "DIAMOND STAR", range: "10,000+ XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#004BFF]/20" },
+    { icon: <Gem className="h-5 w-5" />, label: "DIAMOND STAR", range: "10,000+ XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#0000FF]/20" },
     { icon: <Crown className="h-5 w-5" />, label: "LEGEND", range: "Invite Only · Top 1%", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/40 to-[#FF00A6]/20" },
   ];
   return (
@@ -676,7 +676,7 @@ function ArenaPass() {
 /* ---------- Promo Banner ---------- */
 function PromoBanner() {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#C53DFF]/30 via-[#FF00A6]/20 to-[#004BFF]/30 p-6 sm:p-8">
+    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#C53DFF]/30 via-[#FF00A6]/20 to-[#0000FF]/30 p-6 sm:p-8">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,#FF00A640,transparent_60%)] pointer-events-none" />
       <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
         <div>

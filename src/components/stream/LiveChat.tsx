@@ -34,7 +34,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 const PURPLE = "#C53DFF";
 const PINK = "#FF00A6";
 const CYAN = "#00E6FF";
-const BLUE = "#004BFF";
+const BLUE = "#0000FF";
 const GREEN = "#22c55e";
 const AMBER = "#f59e0b";
 
@@ -201,7 +201,7 @@ export function LiveChat({
       className="relative flex w-full flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(197,61,255,0.55)] lg:w-[340px] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(80% 50% at 0% 0%, rgba(197,61,255,0.18), transparent 60%), radial-gradient(80% 50% at 100% 100%, rgba(0,75,255,0.18), transparent 60%), #07070f",
+          "radial-gradient(80% 50% at 0% 0%, rgba(197,61,255,0.18), transparent 60%), radial-gradient(80% 50% at 100% 100%, rgba(0,0,255,0.18), transparent 60%), #07070f",
       }}
     >
       {/* subtle grid texture */}

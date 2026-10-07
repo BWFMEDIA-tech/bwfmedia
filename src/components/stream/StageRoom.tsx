@@ -39,7 +39,7 @@ const MAX_MODS = 5;
 
 // BWF cinema palette — "Immersive Stage Cinema"
 const PURPLE = "#C53DFF"; // brand magenta (primary, host)
-const BLUE = "#004BFF"; // brand electric blue (co-host accents)
+const BLUE = "#0000FF"; // brand electric blue (co-host accents)
 const ACCENT = "#00E6FF"; // brand cyan (guest accent)
 const PINK = "#FF00A6"; // brand pink (live / speaking secondary)
 
@@ -251,7 +251,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
       className="relative rounded-3xl border border-white/10 p-3 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,75,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
+          "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,0,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
       }}
     >
       {/* subtle grid overlay */}

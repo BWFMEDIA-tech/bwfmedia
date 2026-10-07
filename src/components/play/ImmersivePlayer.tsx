@@ -30,7 +30,7 @@ import { usePlayer } from "@/lib/player-context";
 
 /* ============================================================
    Brand palette (BWF):
-   purple #C53DFF · magenta #FF00A6 · cyan #00E6FF · blue #004BFF
+   purple #C53DFF · magenta #FF00A6 · cyan #00E6FF · blue #0000FF
 ============================================================ */
 
 function fmt(sec: number): string {
@@ -789,7 +789,7 @@ export function ImmersivePlayer({
                 onClick={() => setVisMode(m)}
                 className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
                   visMode === m
-                    ? "bg-gradient-to-r from-[#C53DFF] to-[#004BFF] text-white shadow-[0_0_15px_rgba(197,61,255,0.6)]"
+                    ? "bg-gradient-to-r from-[#C53DFF] to-[#0000FF] text-white shadow-[0_0_15px_rgba(197,61,255,0.6)]"
                     : "text-white/50 hover:text-white"
                 }`}
               >{m}</button>
@@ -807,7 +807,7 @@ export function ImmersivePlayer({
               {track?.cover_url ? (
                 <SignedImg src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
               ) : (
-                <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
+                <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#C53DFF] to-[#0000FF]">
                   <Sparkles className="h-16 w-16 text-white/60" />
                 </div>
               )}
@@ -819,7 +819,7 @@ export function ImmersivePlayer({
                 className="absolute inset-0 z-20 grid place-items-center rounded-3xl bg-black/60 backdrop-blur-sm"
                 aria-label="Tap to start listening"
               >
-                <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#004BFF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.9)]">
+                <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#0000FF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.9)]">
                   <Play className="h-8 w-8" />
                   TAP TO LISTEN
                 </span>
@@ -1010,7 +1010,7 @@ export function ImmersivePlayer({
               aria-label={isPlaying ? "Pause" : "Play"}
               onClick={togglePlay}
               disabled={!track?.audio_url && !(isHost && upNext.length > 0)}
-              className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#004BFF] text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
+              className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#0000FF] text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
             >
               {isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7 translate-x-0.5" />}
             </button>
@@ -1100,7 +1100,7 @@ export function ImmersivePlayer({
       <div className="space-y-4">
         {/* Battle status */}
         {battle && (
-          <div className="overflow-hidden rounded-2xl border border-[#FF00A6]/40 bg-gradient-to-br from-[#FF00A6]/15 via-[#C53DFF]/10 to-[#004BFF]/15 p-4 shadow-[0_0_40px_-15px_rgba(255,0,166,0.6)]">
+          <div className="overflow-hidden rounded-2xl border border-[#FF00A6]/40 bg-gradient-to-br from-[#FF00A6]/15 via-[#C53DFF]/10 to-[#0000FF]/15 p-4 shadow-[0_0_40px_-15px_rgba(255,0,166,0.6)]">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-[0.2em] text-[#FF00A6]">
                 <Trophy className="h-3 w-3" /> LIVE BATTLE · ROUND {battle.current_round}/{battle.total_rounds}
@@ -1220,7 +1220,7 @@ function UpNextPreview({ next, secondsUntil }: { next: PlayTrack; secondsUntil: 
           {secondsUntil > 0 ? `in ${fmt(secondsUntil)}` : "any moment"}
         </span>
       </div>
-      <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
+      <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#0000FF]">
         {next.cover_url ? (
           <SignedImg src={next.cover_url} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -1278,7 +1278,7 @@ function QueueItem({
       ) : (
         <span className="w-5 text-center text-[11px] font-black text-white/40">{index + 1}</span>
       )}
-      <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#004BFF]">
+      <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#C53DFF] to-[#0000FF]">
         {track.cover_url && <SignedImg src={track.cover_url} alt="" className="h-full w-full object-cover" />}
       </div>
       <div className="min-w-0 flex-1">
