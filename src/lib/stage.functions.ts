@@ -300,6 +300,25 @@ export const setParticipantMute = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Host mutes/unmutes every mic on stage at once (e.g. while music plays). */
+export const setStageMuteAll = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ streamId: z.string().uuid(), mute: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertHostOrMod(supabase, userId, data.streamId);
+    const mutedUntil = data.mute ? new Date(Date.now() + 360 * 60_000).toISOString() : null;
+    const { error } = await supabase
+      .from("stage_participants")
+      .update({ muted_until: mutedUntil })
+      .eq("stream_id", data.streamId)
+      .in("stage_role", ["host", "co_host", "speaker"]);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 /** Current user heartbeat. Uses a narrow server-side update so speakers/hosts
  * can refresh connection_status without granting clients permission to edit
  * their own stage_role. */

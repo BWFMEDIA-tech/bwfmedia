@@ -174,6 +174,7 @@ export function StageAudioShell({
       <StageConnectionProvider>
         <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
+        <MutedSpeakerGuard streamId={streamId} />
         <LocalSpeakingSignalPublisher />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
@@ -185,6 +186,63 @@ export function StageAudioShell({
       </StageConnectionProvider>
     </LiveKitRoom>
   );
+}
+
+/**
+ * Listener-side enforcement: anyone muted by the host is silenced for every
+ * viewer, even if their own device tries to keep publishing.
+ */
+function MutedSpeakerGuard({ streamId }: { streamId: string }) {
+  const room = useRoomContext();
+  const [muted, setMuted] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { data } = await supabase
+        .from("stage_participants")
+        .select("user_id, muted_until")
+        .eq("stream_id", streamId)
+        .not("muted_until", "is", null);
+      if (!active) return;
+      const now = Date.now();
+      setMuted(new Set((data ?? [])
+        .filter((r: any) => r.muted_until && new Date(r.muted_until).getTime() > now)
+        .map((r: any) => r.user_id as string)));
+    };
+    load();
+    const ch = supabase
+      .channel(`stage-mute-guard-${streamId}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes",
+        { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` },
+        load)
+      .subscribe();
+    const t = setInterval(load, 30_000);
+    return () => { active = false; clearInterval(t); supabase.removeChannel(ch); };
+  }, [streamId]);
+
+  useEffect(() => {
+    if (!room) return;
+    const apply = () => {
+      room.remoteParticipants.forEach((p) => {
+        const silence = muted.has(p.identity);
+        p.audioTrackPublications.forEach((pub) => {
+          if (pub.source === Track.Source.Microphone) pub.setEnabled(!silence);
+        });
+      });
+    };
+    apply();
+    room.on(RoomEvent.TrackPublished, apply);
+    room.on(RoomEvent.TrackSubscribed, apply);
+    room.on(RoomEvent.ParticipantConnected, apply);
+    return () => {
+      room.off(RoomEvent.TrackPublished, apply);
+      room.off(RoomEvent.TrackSubscribed, apply);
+      room.off(RoomEvent.ParticipantConnected, apply);
+    };
+  }, [room, muted]);
+
+  return null;
 }
 
 function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
@@ -265,6 +323,23 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     }
     setPrevCanSpeak(canSpeak);
   }, [role, mutedUntil, localParticipant, permissionTick]);
+
+  useEffect(() => {
+    if (!room || !localParticipant) return;
+    const enforce = () => {
+      const isHostMuted = !!mutedUntil && new Date(mutedUntil).getTime() > Date.now();
+      if (isHostMuted && localParticipant.isMicrophoneEnabled) {
+        localParticipant.setMicrophoneEnabled(false).catch(() => {});
+        toast.info("The host has muted you");
+      }
+    };
+    room.on(RoomEvent.LocalTrackPublished, enforce);
+    room.on(RoomEvent.TrackUnmuted, enforce);
+    return () => {
+      room.off(RoomEvent.LocalTrackPublished, enforce);
+      room.off(RoomEvent.TrackUnmuted, enforce);
+    };
+  }, [room, localParticipant, mutedUntil]);
 
   return null;
 }
