@@ -95,8 +95,9 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
 
   return (
     <main className="artist-live-room mx-auto w-full max-w-5xl px-3 pb-5 pt-4 md:px-4 md:pt-4">
-      <header className="live-header mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-border p-3 sm:flex sm:flex-wrap">
-        <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+        <header className="live-header mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border p-3">
+          {/* The title column shrinks first so the right-side actions never get pushed off narrow screens. */}
+          <div className="flex min-w-0 flex-auto items-center gap-3">
           <span className="live-pill inline-flex shrink-0 items-center gap-1.5 rounded-md bg-trust px-3 py-1.5 text-xs font-bold tracking-wider text-accent-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-foreground" />LIVE</span>
           <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-primary">
             {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center bg-card text-primary"><Music2 className="h-5 w-5" /></div>}
