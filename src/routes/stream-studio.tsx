@@ -63,7 +63,7 @@ const STUDIO_BLOCKS: StudioBlockDef[] = [
   { id: "production", label: "Live Production Dashboard" },
   { id: "promotion", label: "Promotion Mode" },
   { id: "liveroom", label: "Live Room / Stage" },
-  { id: "panels", label: "Hands / Backstage / Green Room" },
+
   { id: "invite", label: "Invite Guest" },
   { id: "earnings", label: "Live Earnings" },
   { id: "chat", label: "Live Chat" },
@@ -1179,17 +1179,15 @@ function StreamStudio() {
                     {streamMode === "stage" && <AudienceRow participants={participants} />}
                   </StageAudioShell>
                 )}
+                {/* Guest tools sit at the bottom of the stage. */}
+                <div className="mt-3 grid gap-3 lg:grid-cols-3">
+                  <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />
+                  <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />
+                  <GreenRoom streamId={stream?.id ?? null} participants={participants} />
+                </div>
               </>
               </StudioBlock>
 
-              {/* Three live panels — bento row */}
-              <StudioBlock id="panels" label="Hands / Backstage / Green Room">
-              <div className="grid gap-3 lg:grid-cols-3">
-                <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />
-                <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />
-                <GreenRoom streamId={stream?.id ?? null} participants={participants} />
-              </div>
-              </StudioBlock>
 
               {/* Invite link */}
               <StudioBlock id="invite" label="Invite Guest">
