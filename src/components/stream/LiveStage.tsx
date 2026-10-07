@@ -425,7 +425,8 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     const isStageRole = role === "speaker" || role === "artist" || role === "guest";
     if (!isAdminRole && !isHostRole && !isCoHostRole && !isStageRole) continue;
     // Co-hosts always land in the CO-HOST box (on every device size).
-    const panel: Panel = isAdminRole || isCoHostRole ? "admin" : isHostRole ? "host" : "middle";
+    // Box 1 (left) = Host, box 3 (right) = Co-Host, on every device size.
+    const panel: Panel = isHostRole ? "admin" : isAdminRole || isCoHostRole ? "host" : "middle";
     // When a spotlight is active for a panel, suppress catch-alls there.
     if (spotlight.artist && panel === "middle") continue;
     if (spotlight.host && panel === "admin") continue;
@@ -500,13 +501,13 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         )}
       >
         <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
-          {renderPanel("admin", "CO-HOST", "Waiting for Co-Host")}
+          {renderPanel("admin", "HOST", "Waiting for Host", hostImage)}
         </div>
         <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
         </div>
         <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
-          {renderPanel("host", "HOST", "Waiting for Host", hostImage)}
+          {renderPanel("host", "CO-HOST", "Waiting for Co-Host")}
         </div>
       </div>
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
