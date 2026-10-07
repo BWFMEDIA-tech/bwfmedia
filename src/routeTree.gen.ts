@@ -28,6 +28,7 @@ import { Route as EarningsRouteImport } from './routes/earnings'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GoLiveRouteImport } from './routes/go-live'
+import { Route as HostEarningsRouteImport } from './routes/host-earnings'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as LoginRouteImport } from './routes/login'
@@ -66,6 +67,7 @@ import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.canc
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminHostTiersRouteImport } from './routes/admin.host-tiers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
@@ -232,6 +234,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const GoLiveRoute = GoLiveRouteImport.update({
   id: '/go-live',
   path: '/go-live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HostEarningsRoute = HostEarningsRouteImport.update({
+  id: '/host-earnings',
+  path: '/host-earnings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -424,6 +431,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
 const AdminEventsRoute = AdminEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHostTiersRoute = AdminHostTiersRouteImport.update({
+  id: '/host-tiers',
+  path: '/host-tiers',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -819,6 +831,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
+  '/host-earnings': typeof HostEarningsRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -856,6 +869,7 @@ export interface FileRoutesByFullPath {
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/host-tiers': typeof AdminHostTiersRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -949,6 +963,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
+  '/host-earnings': typeof HostEarningsRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -986,6 +1001,7 @@ export interface FileRoutesByTo {
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/host-tiers': typeof AdminHostTiersRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -1081,6 +1097,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
+  '/host-earnings': typeof HostEarningsRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -1118,6 +1135,7 @@ export interface FileRoutesById {
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/host-tiers': typeof AdminHostTiersRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
@@ -1214,6 +1232,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/go-live'
+    | '/host-earnings'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1251,6 +1270,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
+    | '/admin/host-tiers'
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
@@ -1344,6 +1364,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/go-live'
+    | '/host-earnings'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1381,6 +1402,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
+    | '/admin/host-tiers'
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
@@ -1475,6 +1497,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/go-live'
+    | '/host-earnings'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1512,6 +1535,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
+    | '/admin/host-tiers'
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
@@ -1607,6 +1631,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GoLiveRoute: typeof GoLiveRoute
+  HostEarningsRoute: typeof HostEarningsRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
@@ -1812,6 +1837,13 @@ declare module '@tanstack/react-router' {
       path: '/go-live'
       fullPath: '/go-live'
       preLoaderRoute: typeof GoLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/host-earnings': {
+      id: '/host-earnings'
+      path: '/host-earnings'
+      fullPath: '/host-earnings'
+      preLoaderRoute: typeof HostEarningsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -2078,6 +2110,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/admin/events'
       preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/host-tiers': {
+      id: '/admin/host-tiers'
+      path: '/host-tiers'
+      fullPath: '/admin/host-tiers'
+      preLoaderRoute: typeof AdminHostTiersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/login': {
@@ -2597,6 +2636,7 @@ interface AdminRouteChildren {
   AdminContentRoute: typeof AdminContentRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventsRoute: typeof AdminEventsRoute
+  AdminHostTiersRoute: typeof AdminHostTiersRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMerchRoute: typeof AdminMerchRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
@@ -2625,6 +2665,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminContentRoute: AdminContentRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEventsRoute: AdminEventsRoute,
+  AdminHostTiersRoute: AdminHostTiersRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMerchRoute: AdminMerchRoute,
   AdminMessagesRoute: AdminMessagesRoute,
@@ -2714,6 +2755,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GoLiveRoute: GoLiveRoute,
+  HostEarningsRoute: HostEarningsRoute,
   LeaderboardRoute: LeaderboardRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
