@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { readHostReferral, saveHostReferral } from "@/lib/host-referral";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
@@ -11,6 +12,10 @@ export const Route = createFileRoute("/signup")({
 
 function SignupPage() {
   const nav = useNavigate();
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref) saveHostReferral({ hostId: ref, source: "link" });
+  }, []);
   const [step, setStep] = useState<"role" | "details">("role");
   const [role, setRole] = useState<"artist" | "listener" | null>(null);
   const [email, setEmail] = useState("");
@@ -40,6 +45,12 @@ function SignupPage() {
       if (genre) meta.genre = genre;
     } else {
       if (interests) meta.interests = interests.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+    const ref = readHostReferral();
+    if (ref) {
+      meta.referred_by = ref.hostId;
+      meta.referral_source = ref.source;
+      if (ref.streamId) meta.referral_stream_id = ref.streamId;
     }
     const { error } = await supabase.auth.signUp({
       email, password,
