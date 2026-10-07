@@ -147,7 +147,7 @@
   border-radius: var(--radius-lg);
 }
 .artist-live-room .stage-tile video { object-fit: cover; }
-.artist-live-room .stage-tile > .pointer-events-none:last-child {
+.artist-live-room .stage-tile > .pointer-events-none.inset-x-0 {
   background: linear-gradient(0deg, var(--background), transparent);
   min-height: 4rem;
 }
