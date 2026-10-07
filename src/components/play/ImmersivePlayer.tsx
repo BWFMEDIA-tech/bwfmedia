@@ -579,7 +579,12 @@ export function ImmersivePlayer({
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    const onTime = () => setProgress(a.currentTime);
+    const onTime = () => {
+      // Freeze the bar while the shared radio is paused.
+      const s = radioRef.current.state;
+      if (s && s.trackId === track?.id && !s.playing) { setProgress(s.positionSeconds); return; }
+      if (!a.paused) setProgress(a.currentTime);
+    };
     const onMeta = () => setDuration(a.duration || 0);
     const onPlay = () => { setIsPlaying(true); setPlaybackPlaying(true); resume(); };
     const onPause = () => { setIsPlaying(false); setPlaybackPlaying(false); };
@@ -784,9 +789,12 @@ export function ImmersivePlayer({
       return;
     }
     resume(); // ensure AudioContext is running (user gesture)
-    if (isHost && streamId && radioMatches) {
-      // Host pauses/resumes the shared radio for everyone.
-      try { await setPlaybackFn({ data: { streamId, playing: !radio.state?.playing } }); }
+    if (isHost && streamId) {
+      // Host pauses/resumes the shared radio for everyone. Apply locally
+      // right away so the song and progress bar stop instantly.
+      const wantPlaying = radioMatches ? !radio.state?.playing : a.paused;
+      if (!wantPlaying) a.pause();
+      try { await setPlaybackFn({ data: { streamId, playing: wantPlaying } }); }
       catch (e: any) { toast.error(e?.message ?? "Could not update playback"); }
       return;
     }
