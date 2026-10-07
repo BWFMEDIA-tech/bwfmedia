@@ -610,6 +610,9 @@ function useParticipantRoles(streamId: string | undefined, identities: string[])
       (stageRes.data ?? []).forEach((r: any) => { next[r.user_id] = r.stage_role; });
       // Admin/moderator overrides stage role for left-panel routing.
       (adminRows ?? []).forEach((r: any) => {
+        // The stream's own host / co-host role always wins so the host
+        // stays in the HOST box even if they're also a site admin.
+        if (next[r.user_id] === "host" || next[r.user_id] === "co_host") return;
         if (r.role === "admin" || r.role === "moderator" || r.role === "owner" || r.role === "administrator") {
           next[r.user_id] = r.role;
         }
