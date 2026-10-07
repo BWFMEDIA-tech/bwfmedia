@@ -8,6 +8,7 @@ import {
   revokeHostPrivileges,
   demoteToAudience,
   setParticipantMute,
+  setStageMuteAll,
   setStreamSpotlight,
 } from "@/lib/stage.functions";
 import { listModerators } from "@/lib/moderation.functions";
@@ -69,6 +70,19 @@ export function StageRoom({
   const revoke = useServerFn(revokeHostPrivileges);
   const demoteSrv = useServerFn(demoteToAudience);
   const muteFn = useServerFn(setParticipantMute);
+  const muteAllFn = useServerFn(setStageMuteAll);
+  const [muteAllBusy, setMuteAllBusy] = useState(false);
+  const stageSpeakers = participants.filter((x) => x.stage_role === "host" || x.stage_role === "co_host" || x.stage_role === "speaker");
+  const stageAllMuted = stageSpeakers.length > 0 && stageSpeakers.every((x) => !!x.muted_until && new Date(x.muted_until).getTime() > Date.now());
+  const toggleStageMute = async () => {
+    if (!streamId) return;
+    setMuteAllBusy(true);
+    try {
+      await muteAllFn({ data: { streamId, mute: !stageAllMuted } });
+      toast.success(stageAllMuted ? "Stage unmuted" : "Whole stage muted — only the music is heard");
+    } catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    finally { setMuteAllBusy(false); }
+  };
   const setSpotlight = useServerFn(setStreamSpotlight);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
   const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
@@ -297,7 +311,21 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             </div>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2.5">
+        <div className="flex shrink-0 flex-wrap items-center gap-2.5">
+          {canManage && (
+            <button
+              type="button"
+              onClick={toggleStageMute}
+              disabled={muteAllBusy || stageSpeakers.length === 0}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold disabled:opacity-50",
+                stageAllMuted ? "border-red-400/50 bg-red-500/15 text-red-200" : "border-white/15 bg-white/5 text-white hover:bg-white/10",
+              )}
+            >
+              {stageAllMuted ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+              {stageAllMuted ? "Unmute stage" : "Mute whole stage"}
+            </button>
+          )}
           <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
           <CapacityChip label="Mods" filled={Math.min(moderators.length, MAX_MODS)} total={MAX_MODS} color={BLUE} />
           <CapacityChip label="Guests" filled={guestSlotsTaken} total={MAX_GUESTS} color={ACCENT} />
