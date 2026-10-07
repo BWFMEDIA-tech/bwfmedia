@@ -303,7 +303,12 @@ export const setParticipantMute = createServerFn({ method: "POST" })
 export const setStageMuteAll = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({ streamId: z.string().uuid(), mute: z.boolean() }).parse(input),
+    z.object({
+      streamId: z.string().uuid(),
+      mute: z.boolean(),
+      group: z.enum(["all", "guests", "moderators"]).default("all"),
+      userIds: z.array(z.string().uuid()).max(50).optional(),
+    }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -313,7 +318,9 @@ export const setStageMuteAll = createServerFn({ method: "POST" })
       .from("stage_participants")
       .update({ muted_until: mutedUntil })
       .eq("stream_id", data.streamId)
-      .in("stage_role", ["host", "co_host", "speaker"]);
+      .in("stage_role", data.group === "guests" ? ["speaker"] : ["host", "co_host", "speaker"])
+      .in("user_id", data.group === "moderators" ? (data.userIds ?? []) : ["00000000-0000-0000-0000-000000000000"].slice(0, 0).length ? [] : undefined as any)
+      ;
     if (error) throw new Error(error.message);
     return { ok: true };
   });
