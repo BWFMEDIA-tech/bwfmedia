@@ -139,7 +139,7 @@ function StagePage() {
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet"
       />
-      <div className="relative w-full max-w-7xl min-h-[88vh] bg-[#050505] border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(197,61,255,0.08)] flex flex-col">
+      <div className="relative w-full max-w-7xl min-h-[88vh] bg-[#050505] border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(0,0,255,0.08)] flex flex-col">
         {/* Ambient glows */}
         <div className="pointer-events-none absolute -top-24 -left-24 w-64 h-64 bg-[#C53DFF]/20 blur-[100px] rounded-full" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 w-64 h-64 bg-[#0000FF]/20 blur-[100px] rounded-full" />
@@ -209,7 +209,7 @@ function StagePage() {
             <div className="flex-1 grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 min-h-[420px]">
               {/* Lead host tile */}
               <div className="md:col-span-3 md:row-span-2 relative rounded-3xl overflow-hidden border border-white/10 group bg-gradient-to-br from-[#1a0a2a] via-black to-[#0a0a1f]">
-                <div className="absolute inset-0 opacity-50 [background:radial-gradient(60%_50%_at_30%_40%,rgba(197,61,255,0.35),transparent_60%),radial-gradient(50%_45%_at_75%_70%,rgba(0,0,255,0.3),transparent_60%)]" />
+                <div className="absolute inset-0 opacity-50 [background:radial-gradient(60%_50%_at_30%_40%,rgba(0,0,255,0.35),transparent_60%),radial-gradient(50%_45%_at_75%_70%,rgba(0,0,255,0.3),transparent_60%)]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
                 <div className="absolute inset-0 border-2 border-[#C53DFF]/30 group-hover:border-[#C53DFF]/60 transition-colors pointer-events-none rounded-3xl" />
 
@@ -231,7 +231,7 @@ function StagePage() {
 
                 <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-[#C53DFF] overflow-hidden rotate-3 shadow-[0_0_20px_rgba(197,61,255,0.4)] flex items-center justify-center bg-gradient-to-br from-[#C53DFF]/50 to-[#0000FF]/40 text-lg font-bold">
+                    <div className="w-14 h-14 rounded-2xl border-2 border-[#C53DFF] overflow-hidden rotate-3 shadow-[0_0_20px_rgba(0,0,255,0.4)] flex items-center justify-center bg-gradient-to-br from-[#C53DFF]/50 to-[#0000FF]/40 text-lg font-bold">
                       {hostInitial}
                     </div>
                     <div className="min-w-0">
@@ -359,7 +359,7 @@ function StagePage() {
                   <button
                     onClick={goLive}
                     disabled={busy}
-                    className="px-6 py-3 lg:py-4 bg-[#C53DFF] rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-[0_0_40px_rgba(197,61,255,0.3)] hover:scale-105 transition-all disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-3 lg:py-4 bg-[#C53DFF] rounded-2xl font-bold uppercase tracking-widest text-[10px] shadow-[0_0_40px_rgba(0,0,255,0.3)] hover:scale-105 transition-all disabled:opacity-50 flex items-center gap-2"
                   >
                     <Radio className="w-3.5 h-3.5" /> Go Live
                   </button>

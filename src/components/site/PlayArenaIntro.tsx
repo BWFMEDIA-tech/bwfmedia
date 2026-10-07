@@ -79,9 +79,9 @@ export function PlayArenaIntro() {
         className="pointer-events-none absolute inset-0 opacity-60"
         style={{
           backgroundImage: [
-            "radial-gradient(ellipse 50% 40% at 10% 20%, rgba(168,85,247,0.18), transparent 60%)",
+            "radial-gradient(ellipse 50% 40% at 10% 20%, rgba(0,0,255,0.18), transparent 60%)",
             "radial-gradient(ellipse 50% 40% at 90% 80%, rgba(34,211,238,0.14), transparent 60%)",
-            "radial-gradient(ellipse 40% 30% at 60% 50%, rgba(236,72,153,0.10), transparent 60%)",
+            "radial-gradient(ellipse 40% 30% at 60% 50%, rgba(184,194,208,0.10), transparent 60%)",
           ].join(","),
         }}
       />

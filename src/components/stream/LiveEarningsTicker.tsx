@@ -128,7 +128,7 @@ export function LiveEarningsTicker({
       }`}
       style={{
         boxShadow: pulse
-          ? "0 0 40px rgba(197,61,255,0.45), inset 0 0 30px rgba(255,0,166,0.15)"
+          ? "0 0 40px rgba(0,0,255,0.45), inset 0 0 30px rgba(255,0,166,0.15)"
           : "0 0 0 rgba(0,0,0,0)",
         transition: "box-shadow 400ms ease",
       }}
@@ -186,7 +186,7 @@ export function LiveEarningsTicker({
       <div className="pointer-events-none absolute -inset-px rounded-2xl"
            style={{
              background: pulse
-               ? "linear-gradient(135deg, rgba(197,61,255,0.25), rgba(0,230,255,0.18))"
+               ? "linear-gradient(135deg, rgba(0,0,255,0.25), rgba(0,230,255,0.18))"
                : "transparent",
              transition: "background 400ms ease",
              mixBlendMode: "screen",

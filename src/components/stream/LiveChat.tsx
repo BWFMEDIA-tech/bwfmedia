@@ -198,10 +198,10 @@ export function LiveChat({
 
   return (
     <aside
-      className="relative flex w-full flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(197,61,255,0.55)] lg:w-[340px] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
+      className="relative flex w-full flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(0,0,255,0.55)] lg:w-[340px] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(80% 50% at 0% 0%, rgba(197,61,255,0.18), transparent 60%), radial-gradient(80% 50% at 100% 100%, rgba(0,0,255,0.18), transparent 60%), #07070f",
+          "radial-gradient(80% 50% at 0% 0%, rgba(0,0,255,0.18), transparent 60%), radial-gradient(80% 50% at 100% 100%, rgba(0,0,255,0.18), transparent 60%), #07070f",
       }}
     >
       {/* subtle grid texture */}
@@ -260,7 +260,7 @@ export function LiveChat({
       {/* Messages */}
       <div
         ref={listRef}
-        className="relative flex-1 overflow-y-auto px-3 py-4 max-h-[460px] [scrollbar-width:thin] [scrollbar-color:rgba(197,61,255,0.4)_transparent]"
+        className="relative flex-1 overflow-y-auto px-3 py-4 max-h-[460px] [scrollbar-width:thin] [scrollbar-color:rgba(0,0,255,0.4)_transparent]"
       >
         {!streamId && (
           <EmptyState

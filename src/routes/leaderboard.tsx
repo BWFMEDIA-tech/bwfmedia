@@ -194,7 +194,7 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
       ? { from: "#FFD700", via: "#FF00A6", to: "#C53DFF", glow: "rgba(255,0,166,0.55)" }
       : entry.rank === 2
       ? { from: "#E5E7EB", via: "#00E6FF", to: "#0000FF", glow: "rgba(0,230,255,0.45)" }
-      : { from: "#CD7F32", via: "#C53DFF", to: "#FF00A6", glow: "rgba(197,61,255,0.45)" };
+      : { from: "#CD7F32", via: "#C53DFF", to: "#FF00A6", glow: "rgba(0,0,255,0.45)" };
   const Icon = entry.rank === 1 ? Crown : entry.rank === 2 ? Trophy : Medal;
   const lift =
     entry.rank === 1 ? "sm:-translate-y-6 sm:scale-[1.04]" : entry.rank === 2 ? "" : "sm:translate-y-3";

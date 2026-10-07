@@ -248,10 +248,10 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
 
   return (
     <div
-      className="relative rounded-3xl border border-white/10 p-3 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
+      className="relative rounded-3xl border border-white/10 p-3 sm:p-6 shadow-[0_0_80px_-20px_rgba(0,0,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,0,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
+          "radial-gradient(60% 60% at 12% 0%, rgba(0,0,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,0,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
       }}
     >
       {/* subtle grid overlay */}

@@ -568,7 +568,7 @@ function VoteTracker({
           style={{
             width: `${aPct}%`,
             background: "linear-gradient(90deg,#00E6FF,#0000FF)",
-            boxShadow: "0 0 18px rgba(124,58,237,0.6)",
+            boxShadow: "0 0 18px rgba(0,0,255,0.6)",
           }}
         />
         <div
@@ -683,7 +683,7 @@ function ArtistSide({
           className="pointer-events-none absolute left-1/2 top-6 z-20 -translate-x-1/2 font-mono text-2xl font-black animate-[voteFloat_0.9s_ease-out_forwards]"
           style={{
             color: side === "a" ? "#a78bfa" : "#ff6ab1",
-            textShadow: `0 0 12px ${side === "a" ? "rgba(124,58,237,0.9)" : "rgba(255,0,166,0.9)"}`,
+            textShadow: `0 0 12px ${side === "a" ? "rgba(0,0,255,0.9)" : "rgba(255,0,166,0.9)"}`,
           }}
         >
           +{flash.n}

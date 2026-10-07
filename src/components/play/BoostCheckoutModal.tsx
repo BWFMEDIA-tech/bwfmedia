@@ -28,7 +28,7 @@ export function BoostCheckoutModal({
       </div>
 
       {/* Gradient border wrapper */}
-      <div className="relative w-full max-w-xl my-auto rounded-3xl p-[1.5px] bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] shadow-[0_20px_80px_-10px_rgba(197,61,255,0.5)]">
+      <div className="relative w-full max-w-xl my-auto rounded-3xl p-[1.5px] bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] shadow-[0_20px_80px_-10px_rgba(0,0,255,0.5)]">
         <div className="relative rounded-[calc(1.5rem-1.5px)] bg-[#08080F] overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)]">
           {/* Branded header */}
           <div className="relative flex items-center justify-between px-5 py-4 border-b border-white/5 bg-gradient-to-r from-[#C53DFF]/10 via-transparent to-[#00E6FF]/10">

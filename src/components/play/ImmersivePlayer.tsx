@@ -223,10 +223,10 @@ function LiveVisualizerImpl({
           const bh = v * h * 0.9;
           const grad = ctx2d.createLinearGradient(0, h, 0, h - bh);
           grad.addColorStop(0, "rgba(0,230,255,0.9)");
-          grad.addColorStop(0.5, "rgba(197,61,255,0.9)");
+          grad.addColorStop(0.5, "rgba(0,0,255,0.9)");
           grad.addColorStop(1, "rgba(255,0,166,0.9)");
           ctx2d.fillStyle = grad;
-          ctx2d.shadowColor = "rgba(197,61,255,0.7)";
+          ctx2d.shadowColor = "rgba(0,0,255,0.7)";
           ctx2d.shadowBlur = 8 * dpr;
           const x = i * barW + barW * 0.15;
           const bw = barW * 0.7;
@@ -768,7 +768,7 @@ export function ImmersivePlayer({
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
       {/* ───────── HERO PLAYER ───────── */}
-      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(120%_120%_at_20%_0%,rgba(197,61,255,0.18),transparent_60%),radial-gradient(120%_120%_at_80%_100%,rgba(0,230,255,0.14),transparent_55%),#06060f] p-5 sm:p-8 backdrop-blur-xl shadow-[0_0_120px_-40px_rgba(197,61,255,0.55)]">
+      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(120%_120%_at_20%_0%,rgba(0,0,255,0.18),transparent_60%),radial-gradient(120%_120%_at_80%_100%,rgba(0,230,255,0.14),transparent_55%),#06060f] p-5 sm:p-8 backdrop-blur-xl shadow-[0_0_120px_-40px_rgba(0,0,255,0.55)]">
         {/* glow corners */}
         <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[#C53DFF]/30 blur-3xl" />
         <div aria-hidden className="pointer-events-none absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-[#00E6FF]/25 blur-3xl" />
@@ -789,7 +789,7 @@ export function ImmersivePlayer({
                 onClick={() => setVisMode(m)}
                 className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
                   visMode === m
-                    ? "bg-gradient-to-r from-[#C53DFF] to-[#0000FF] text-white shadow-[0_0_15px_rgba(197,61,255,0.6)]"
+                    ? "bg-gradient-to-r from-[#C53DFF] to-[#0000FF] text-white shadow-[0_0_15px_rgba(0,0,255,0.6)]"
                     : "text-white/50 hover:text-white"
                 }`}
               >{m}</button>
@@ -801,7 +801,7 @@ export function ImmersivePlayer({
         <div className="relative z-10 mx-auto flex w-full max-w-[420px] items-center justify-center">
           <div className="relative aspect-square w-full">
             <LiveVisualizer analyserRef={analyserRef} mode={visMode} isPlaying={isPlaying} />
-            <div className={`absolute inset-[18%] overflow-hidden rounded-3xl border-2 border-white/15 shadow-[0_0_80px_-10px_rgba(197,61,255,0.7)] transition-transform duration-500 ${
+            <div className={`absolute inset-[18%] overflow-hidden rounded-3xl border-2 border-white/15 shadow-[0_0_80px_-10px_rgba(0,0,255,0.7)] transition-transform duration-500 ${
               isPlaying ? "scale-100" : "scale-95"
             }`}>
               {track?.cover_url ? (
@@ -819,7 +819,7 @@ export function ImmersivePlayer({
                 className="absolute inset-0 z-20 grid place-items-center rounded-3xl bg-black/60 backdrop-blur-sm"
                 aria-label="Tap to start listening"
               >
-                <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#0000FF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.9)]">
+                <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#0000FF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(0,0,255,0.9)]">
                   <Play className="h-8 w-8" />
                   TAP TO LISTEN
                 </span>
@@ -919,7 +919,7 @@ export function ImmersivePlayer({
               aria-label="Seek"
             >
               <div
-                className="h-full bg-gradient-to-r from-[#00E6FF] via-[#C53DFF] to-[#FF00A6] shadow-[0_0_10px_rgba(197,61,255,0.8)] transition-all"
+                className="h-full bg-gradient-to-r from-[#00E6FF] via-[#C53DFF] to-[#FF00A6] shadow-[0_0_10px_rgba(0,0,255,0.8)] transition-all"
                 style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
               />
             </button>
@@ -1010,7 +1010,7 @@ export function ImmersivePlayer({
               aria-label={isPlaying ? "Pause" : "Play"}
               onClick={togglePlay}
               disabled={!track?.audio_url && !(isHost && upNext.length > 0)}
-              className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#0000FF] text-white shadow-[0_0_60px_-5px_rgba(197,61,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
+              className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br from-[#C53DFF] via-[#FF00A6] to-[#0000FF] text-white shadow-[0_0_60px_-5px_rgba(0,0,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
             >
               {isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7 translate-x-0.5" />}
             </button>

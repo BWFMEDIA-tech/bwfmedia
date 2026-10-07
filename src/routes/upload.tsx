@@ -62,7 +62,7 @@ function UploadHub() {
             <div
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl"
               style={{
-                background: "linear-gradient(135deg, rgba(197,61,255,0.25), rgba(0,230,255,0.2))",
+                background: "linear-gradient(135deg, rgba(0,0,255,0.25), rgba(0,230,255,0.2))",
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
             >

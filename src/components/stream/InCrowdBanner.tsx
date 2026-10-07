@@ -23,7 +23,7 @@ export function InCrowdBanner({
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
           style={{
             background: "linear-gradient(135deg,#00E6FF,#0000FF)",
-            boxShadow: "0 8px 24px rgba(139,92,246,0.35)",
+            boxShadow: "0 8px 24px rgba(0,0,255,0.35)",
           }}
         >
           <Ear className="h-5 w-5 text-white" />

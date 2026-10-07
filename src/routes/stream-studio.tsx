@@ -138,7 +138,7 @@ function StreamStudioGuard() {
 
 /* ---------- Theme tokens ---------- */
 const PURPLE = "#00E6FF";
-const PURPLE_GLOW = "rgba(139,92,246,0.45)";
+const PURPLE_GLOW = "rgba(0,0,255,0.45)";
 const BLUE = "#0000FF";
 
 /* ---------- Sidebar ---------- */

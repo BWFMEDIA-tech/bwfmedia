@@ -124,7 +124,7 @@ export function StageAudioShell({
           <SignedImg
             src={me.avatar_url}
             alt=""
-            className="mx-auto mb-3 h-16 w-16 rounded-full border-2 border-[#00E6FF] object-cover shadow-[0_0_24px_rgba(139,92,246,0.4)]"
+            className="mx-auto mb-3 h-16 w-16 rounded-full border-2 border-[#00E6FF] object-cover shadow-[0_0_24px_rgba(0,0,255,0.4)]"
           />
         ) : (
           <div
