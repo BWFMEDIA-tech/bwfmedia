@@ -85,11 +85,7 @@ export const endStream = createServerFn({ method: "POST" })
     const { data: row } = await supabase
       .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
     if (!row) throw new Error("Stream not found");
-    if (row.host_id !== userId) {
-      const { data: adm } = await supabase
-        .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
-      if (!adm) throw new Error("Not authorized");
-    }
+    if (row.host_id !== userId) throw new Error("Only the stream owner can manage this live");
     const { error } = await supabase
       .from("streams")
       .update({ status: "ended", ended_at: new Date().toISOString() })
@@ -107,11 +103,7 @@ export const deleteStream = createServerFn({ method: "POST" })
     const { data: row } = await supabase
       .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
     if (!row) throw new Error("Stream not found");
-    if (row.host_id !== userId) {
-      const { data: adm } = await supabase
-        .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
-      if (!adm) throw new Error("Not authorized");
-    }
+    if (row.host_id !== userId) throw new Error("Only the stream owner can manage this live");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("streams").delete().eq("id", data.streamId);
     if (error) throw new Error(error.message);
@@ -132,7 +124,7 @@ export const deleteStreamsBulk = createServerFn({ method: "POST" })
       .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
     if (!adm) throw new Error("Not authorized");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from("streams").delete({ count: "exact" });
+    let q = supabaseAdmin.from("streams").delete({ count: "exact" }).eq("host_id", userId);
     if (data.ids && data.ids.length) q = q.in("id", data.ids);
     else if (data.status && data.status !== "all") q = q.eq("status", data.status);
     else q = q.not("id", "is", null);
@@ -201,11 +193,7 @@ export const updateStreamThumbnail = createServerFn({ method: "POST" })
     const { data: row } = await supabase
       .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
     if (!row) throw new Error("Stream not found");
-    if (row.host_id !== userId) {
-      const { data: adm } = await supabase
-        .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
-      if (!adm) throw new Error("Not authorized");
-    }
+    if (row.host_id !== userId) throw new Error("Only the stream owner can manage this live");
     const { error } = await supabase
       .from("streams")
       .update({ thumbnail_url: data.thumbnailUrl })

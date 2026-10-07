@@ -31,7 +31,7 @@ export const listModerators = createServerFn({ method: "GET" }).handler(async ()
 async function assertModOrHost(supabase: any, userId: string, streamId?: string) {
   const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
   const isMod = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");
-  if (isMod) return;
+  if (!streamId && isMod) return;
   if (!streamId) throw new Error("Not authorized");
   const { data: s } = await supabase.from("streams").select("host_id").eq("id", streamId).maybeSingle();
   if (s?.host_id !== userId) throw new Error("Not authorized");
@@ -45,7 +45,7 @@ export const deleteMessage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertModOrHost(supabase, userId, data.streamId);
-    const { error } = await supabase.from("stream_messages").delete().eq("id", data.messageId);
+    const { error } = await supabase.from("stream_messages").delete().eq("id", data.messageId).eq("stream_id", data.streamId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -138,7 +138,7 @@ export const endStreamAdmin = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertModOrHost(supabase, userId);
+    await assertModOrHost(supabase, userId, data.streamId);
     const { error } = await supabase.from("streams")
       .update({ status: "ended", ended_at: new Date().toISOString() })
       .eq("id", data.streamId);

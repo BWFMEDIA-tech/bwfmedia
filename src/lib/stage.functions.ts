@@ -4,17 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createIdempotencyKey, runIdempotent } from "@/lib/idempotency";
 
 async function assertHostOrMod(supabase: any, userId: string, streamId: string) {
-  const [{ data: stream }, { data: roles }, { data: sp }] = await Promise.all([
-    supabase.from("streams").select("host_id").eq("id", streamId).maybeSingle(),
-    supabase.from("user_roles").select("role").eq("user_id", userId),
-    supabase.from("stage_participants").select("stage_role")
-      .eq("stream_id", streamId).eq("user_id", userId).maybeSingle(),
-  ]);
-  const isHost = stream?.host_id === userId;
-  const isCoHost = sp?.stage_role === "co_host" || sp?.stage_role === "host";
-  const isMod = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");
-  if (!isHost && !isCoHost && !isMod) throw new Error("Not authorized");
-  return { isPrimaryHost: isHost, isMod };
+  const { data: stream } = await supabase.from("streams").select("host_id").eq("id", streamId).maybeSingle();
+  if (stream?.host_id !== userId) throw new Error("Only the stream owner can manage this live");
+  return { isPrimaryHost: true, isMod: false };
 }
 
 async function logHostAction(
@@ -449,12 +441,8 @@ export const promoteToHost = createServerFn({ method: "POST" })
       .from("streams").select("host_id, host_transfer_mode").eq("id", data.streamId).maybeSingle();
     if (!stream) throw new Error("Stream not found");
 
-    // Only primary host or admins/mods can promote; transfer requires primary host.
-    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    const isPrimary = stream.host_id === userId;
-    const isMod = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");
-    if (!isPrimary && !isMod) throw new Error("Only the host or an admin can promote");
-    if (data.mode === "transfer" && !isPrimary && !isMod) throw new Error("Only the host can transfer ownership");
+    if (stream.host_id !== userId) throw new Error("Only the stream owner can promote guests");
+    if (data.mode === "transfer") throw new Error("Profile live ownership cannot be transferred");
 
     const { data: existing } = await supabase
       .from("stage_participants").select("stage_role")
@@ -514,10 +502,7 @@ export const revokeHostPrivileges = createServerFn({ method: "POST" })
     const { data: stream } = await supabase
       .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
     if (!stream) throw new Error("Stream not found");
-    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    const isPrimary = stream.host_id === userId;
-    const isMod = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");
-    if (!isPrimary && !isMod) throw new Error("Only the host or an admin can revoke privileges");
+    if (stream.host_id !== userId) throw new Error("Only the stream owner can revoke privileges");
     if (data.targetUserId === stream.host_id) throw new Error("Cannot revoke the primary host. Transfer ownership first.");
 
     const { data: existing } = await supabase
