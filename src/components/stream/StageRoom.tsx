@@ -71,6 +71,7 @@ export function StageRoom({
   const demoteSrv = useServerFn(demoteToAudience);
   const muteFn = useServerFn(setParticipantMute);
   const muteAllFn = useServerFn(setStageMuteAll);
+  const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
   const [muteAllBusy, setMuteAllBusy] = useState(false);
   const stageSpeakers = participants.filter((x) => x.stage_role === "host" || x.stage_role === "co_host" || x.stage_role === "speaker");
   const stageAllMuted = stageSpeakers.length > 0 && stageSpeakers.every((x) => !!x.muted_until && new Date(x.muted_until).getTime() > Date.now());
@@ -101,7 +102,6 @@ export function StageRoom({
   };
   const setSpotlight = useServerFn(setStreamSpotlight);
   const [invite, setInvite] = useState<null | "host" | "speaker">(null);
-  const [moderators, setModerators] = useState<{ user_id: string; display_name: string | null; avatar_url: string | null }[]>([]);
   useEffect(() => {
     let cancelled = false;
     listModerators()
