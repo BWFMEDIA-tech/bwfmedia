@@ -20,6 +20,7 @@ import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { TipModal } from "@/components/stream/TipModal";
 import { LiveSetlist, type SetlistTrack } from "@/components/artist/LiveSetlist";
+import { saveHostReferral } from "@/lib/host-referral";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
@@ -50,6 +51,9 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   useStagePresence(connection ? stream.id : null, auth.user?.id ?? null);
 
   useEffect(() => { setViewers(stream.viewer_count ?? 0); }, [stream.viewer_count]);
+  useEffect(() => {
+    if (!auth.loading && !auth.user) saveHostReferral({ hostId: stream.host_id, source: "live_room", streamId: stream.id });
+  }, [auth.loading, auth.user, stream.host_id, stream.id]);
   useEffect(() => {
     const channel = supabase.channel(`artist-live-${stream.id}-${topicId}`)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${stream.id}` }, ({ new: row }) => {
