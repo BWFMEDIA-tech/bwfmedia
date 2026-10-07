@@ -43,6 +43,13 @@
       "when": 1791394637549,
       "tag": "0005_stream_cohost_spotlight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791394900895,
+      "tag": "0006_stream_moderators",
+      "breakpoints": true
     }
   ]
 }
