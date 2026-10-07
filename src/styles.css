@@ -798,3 +798,10 @@
 .text-\[\#C53DFF\], .text-\[\#c53dff\] { color: var(--brand-silver); }
 .group:hover .group-hover\:bg-\[\#FF00A6\] { background-color: var(--brand-cyan); }
 .group:hover .group-hover\:border-\[\#C53DFF\]\/60 { border-color: color-mix(in srgb, var(--brand-blue) 60%, transparent); }
+
+.artist-live-room .live-header,
+.artist-live-room .live-artist-card {
+  background: var(--live-glass, color-mix(in oklab, var(--card) 80%, transparent));
+  backdrop-filter: blur(14px);
+  box-shadow: var(--live-glow, none);
+}

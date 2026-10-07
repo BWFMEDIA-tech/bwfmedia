@@ -146,7 +146,16 @@ function ArtistProfilePage() {
   }
 
   if (liveQuery.data) {
-    return <ArtistLiveRoom key={liveQuery.data.id} stream={liveQuery.data} artist={artist} onEnded={onLiveEnded} />;
+    const topTrack = [...(meta?.tracks ?? [])].sort((a, b) => (b.play_count ?? 0) - (a.play_count ?? 0))[0];
+    return (
+      <ArtistLiveRoom
+        key={liveQuery.data.id}
+        stream={liveQuery.data}
+        artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null }}
+        followSlot={!isOwner ? <FollowButton artistId={id} /> : null}
+        onEnded={onLiveEnded}
+      />
+    );
   }
 
   return (
