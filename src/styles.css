@@ -103,6 +103,29 @@
   --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
 
+/* Profile-only overrides must outrank the legacy streaming utility classes. */
+.artist-live-room .stage-tile-glow {
+  border-radius: var(--radius-lg) !important;
+  background: var(--border) !important;
+  box-shadow: none !important;
+}
+.artist-live-room .stage-tile,
+.artist-live-room .stage-tile > div:not(.pointer-events-none) {
+  border-radius: var(--radius-lg) !important;
+  background-color: var(--card) !important;
+  background-image: none !important;
+}
+.artist-live-chat > div {
+  width: 100% !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: none !important;
+  background: var(--card) !important;
+}
+.artist-live-stage > div:last-child {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+}
+.artist-live-room .stage-tile video { object-fit: cover; }
 @layer base {
   /* Live profiles reuse streaming tools without changing Studio's layout. */
   .artist-live-room { color: var(--foreground); }
