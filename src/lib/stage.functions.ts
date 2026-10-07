@@ -449,31 +449,7 @@ export const promoteToHost = createServerFn({ method: "POST" })
       .eq("stream_id", data.streamId).eq("user_id", data.targetUserId).maybeSingle();
     const previousRole = existing?.stage_role ?? null;
 
-    if (data.mode === "transfer") {
-      // 1) target -> host (also flip streams.host_id)
-      const { error: e1 } = await supabase.from("streams")
-        .update({ host_id: data.targetUserId }).eq("id", data.streamId);
-      if (e1) throw new Error(e1.message);
-      const { error: e2 } = await supabase.from("stage_participants").upsert(
-        { stream_id: data.streamId, user_id: data.targetUserId, stage_role: "host" },
-        { onConflict: "stream_id,user_id" },
-      );
-      if (e2) throw new Error(e2.message);
-      await syncLiveKitPublishPermission(supabase, data.streamId, data.targetUserId, "host");
-      // 2) original host -> co_host
-      const { error: e3 } = await supabase.from("stage_participants").upsert(
-        { stream_id: data.streamId, user_id: stream.host_id, stage_role: "co_host" },
-        { onConflict: "stream_id,user_id" },
-      );
-      if (e3) throw new Error(e3.message);
-      await syncLiveKitPublishPermission(supabase, data.streamId, stream.host_id, "co_host");
-      await logHostAction(supabase, {
-        actorId: userId, action: "transfer_ownership",
-        streamId: data.streamId, targetUserId: data.targetUserId,
-        previousRole, newRole: "host",
-        summary: `Transferred ownership to ${data.targetUserId}`,
-      });
-    } else {
+    {
       const newRole = data.mode === "host" ? "host" : "co_host";
       const { error } = await supabase.from("stage_participants").upsert(
         { stream_id: data.streamId, user_id: data.targetUserId, stage_role: newRole },
