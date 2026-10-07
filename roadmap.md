@@ -6,3 +6,4 @@
 - [x] Verify live-profile entry and chat on desktop and mobile: no page errors or horizontal overflow; preview builds pass.
 - [x] Verify normal-profile restoration after the host ends a stream.
 - [x] Verify the setlist panel and the header join button on a live page at phone and desktop widths.
+- [ ] Host tiers phase 2: bonuses, host notifications, host payouts via existing payout flow, paid submissions/boosts counted per room once they are tied to a live room
