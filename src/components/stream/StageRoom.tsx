@@ -13,6 +13,7 @@ import {
 } from "@/lib/stage.functions";
 import { listModerators } from "@/lib/moderation.functions";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Mic,
   MicOff,
@@ -78,7 +79,7 @@ export function StageRoom({
   const isMutedP = (x: StageParticipant) => !!x.muted_until && new Date(x.muted_until).getTime() > Date.now();
   const guestSpeakers = participants.filter((x) => x.stage_role === "speaker");
   const guestsAllMuted = guestSpeakers.length > 0 && guestSpeakers.every(isMutedP);
-  const modIds = new Set(moderators.map((m) => m.user_id));
+  const modIds = new Set([...moderators.map((m) => m.user_id)]);
   const modSpeakers = stageSpeakers.filter((x) => modIds.has(x.user_id));
   const modsAllMuted = modSpeakers.length > 0 && modSpeakers.every(isMutedP);
   const [groupBusy, setGroupBusy] = useState<null | "guests" | "moderators">(null);
@@ -109,6 +110,43 @@ export function StageRoom({
       .catch(() => { if (!cancelled) setModerators([]); });
     return () => { cancelled = true; };
   }, []);
+  // Moderators the host picked for this stream only.
+  const [streamModIds, setStreamModIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!streamId) return;
+    let active = true;
+    const load = async () => {
+      const { data } = await supabase.from("stream_moderators").select("user_id").eq("stream_id", streamId);
+      if (active) setStreamModIds((data ?? []).map((r: any) => r.user_id));
+    };
+    load();
+    const ch = supabase
+      .channel(`stream-mods-${streamId}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "stream_moderators", filter: `stream_id=eq.${streamId}` }, load)
+      .subscribe();
+    return () => { active = false; supabase.removeChannel(ch); };
+  }, [streamId]);
+  const toggleStreamMod = async (uid: string, name: string) => {
+    if (!streamId) return;
+    const isMod = streamModIds.includes(uid);
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth?.user) return;
+    const res = isMod
+      ? await supabase.from("stream_moderators").delete().eq("stream_id", streamId).eq("user_id", uid)
+      : await supabase.from("stream_moderators").insert({ stream_id: streamId, user_id: uid, added_by: auth.user.id });
+    if (res.error) return toast.error(res.error.message);
+    setStreamModIds((prev) => (isMod ? prev.filter((x) => x !== uid) : [...prev, uid]));
+    toast.success(isMod ? `${name} is no longer a moderator` : `${name} is now a moderator`);
+  };
+  const allModerators = [
+    ...moderators,
+    ...streamModIds
+      .filter((id) => !moderators.some((m) => m.user_id === id))
+      .map((id) => {
+        const p = participants.find((x) => x.user_id === id);
+        return { user_id: id, display_name: p?.display_name ?? null, avatar_url: p?.avatar_url ?? null };
+      }),
+  ];
   const [confirm, setConfirm] = useState<null | {
     title: string;
     description: string;
@@ -210,9 +248,9 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
   const doRevoke = (uid: string, name: string) => {
     if (!streamId) return;
     setConfirm({
-      title: "Remove Host Privileges",
+      title: "Demote to Guest",
       description: `${name} will return to Guest. They can still speak on stage.`,
-      confirmLabel: "Remove Privileges",
+      confirmLabel: "Demote to Guest",
       run: async () => {
         await revoke({ data: { streamId, targetUserId: uid } });
         toast.success("Host privileges removed");
@@ -388,6 +426,8 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
             onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
             onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "This user")}
+            isStreamMod={streamModIds.includes(p.user_id)}
+            onToggleModerator={canManage ? () => toggleStreamMod(p.user_id, p.display_name ?? "This user") : undefined}
             onToggleMute={() => doToggleMute(p)}
             onSpotlight={(slot, currentlyPinned) =>
               doSpotlight(p.user_id, p.display_name ?? "Guest", slot, currentlyPinned)
@@ -419,7 +459,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
       <div className="mt-8">
         <SectionHeader
           label="MODERATORS"
-          count={`${Math.min(moderators.length, MAX_MODS)}/${MAX_MODS}`}
+          count={`${Math.min(allModerators.length, MAX_MODS)}/${MAX_MODS}`}
           color={BLUE}
           canInvite={false}
           onInvite={() => {}}
@@ -430,7 +470,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           monitor cheating, enforce community rules, and assist hosts. Moderators are assigned by BWF admins.
         </p>
         <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
-          {moderators.slice(0, MAX_MODS).map((m) => (
+          {allModerators.slice(0, MAX_MODS).map((m) => (
             <ModBubble key={m.user_id} m={m} />
           ))}
           {Array.from({ length: Math.max(0, MAX_MODS - Math.min(moderators.length, MAX_MODS)) }).map((_, i) => (
@@ -468,6 +508,8 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
               onDemoteToAudience={() => doDemoteToAudience(p.user_id, p.display_name ?? "Guest")}
+              isStreamMod={streamModIds.includes(p.user_id)}
+              onToggleModerator={canManage ? () => toggleStreamMod(p.user_id, p.display_name ?? "Guest") : undefined}
               onToggleMute={() => doToggleMute(p)}
               onSpotlight={(slot, currentlyPinned) =>
                 doSpotlight(p.user_id, p.display_name ?? "Guest", slot, currentlyPinned)
@@ -701,6 +743,8 @@ function SpeakerBubble({
   onRevoke,
   onKick,
   onDemoteToAudience,
+  isStreamMod,
+  onToggleModerator,
   onToggleMute,
   onSpotlight,
 }: {
@@ -718,6 +762,8 @@ function SpeakerBubble({
   onRevoke?: () => void;
   onKick?: () => void;
   onDemoteToAudience?: () => void;
+  isStreamMod?: boolean;
+  onToggleModerator?: () => void;
   onToggleMute?: () => void;
   onSpotlight?: (slot: "host" | "artist" | "cohost", currentlyPinned: boolean) => void;
 }) {
@@ -926,6 +972,17 @@ function SpeakerBubble({
                   >
                     Promote to Co-Host
                   </MenuItem>
+                  {onToggleModerator && !isSelf && (
+                    <MenuItem
+                      icon={<Shield className="h-3.5 w-3.5" />}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onToggleModerator();
+                      }}
+                    >
+                      {isStreamMod ? "Remove Moderator" : "Bring to Moderator"}
+                    </MenuItem>
+                  )}
                   {hostTransferMode === "transfer" && (
                     <MenuItem
                       icon={<ArrowRightLeft className="h-3.5 w-3.5" />}
@@ -1036,7 +1093,18 @@ function SpeakerBubble({
                         onRevoke();
                       }}
                     >
-                      Remove Host Privileges
+                      Demote to Guest
+                    </MenuItem>
+                  )}
+                  {!isPrimaryHost && onToggleModerator && !isSelf && (
+                    <MenuItem
+                      icon={<Shield className="h-3.5 w-3.5" />}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onToggleModerator();
+                      }}
+                    >
+                      {isStreamMod ? "Remove Moderator" : "Bring to Moderator"}
                     </MenuItem>
                   )}
                   {!isPrimaryHost && onToggleMute && !isSelf && (
