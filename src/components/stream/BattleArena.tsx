@@ -123,7 +123,7 @@ export function BattleArena({
           </button>
         </div>
         <p className="mt-2 text-xs text-white/60">
-          Pick two artists on stage. Audience votes each round. Best of {`{rounds}`} wins.
+          Pick two artists on stage. Audience votes each round. Best of 3 wins.
         </p>
         {showCreate && (
           <CreateBattleDialog
