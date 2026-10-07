@@ -305,6 +305,117 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_referral_clicks: {
+        Row: {
+          created_at: string
+          host_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          host_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          host_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      artist_referral_commissions: {
+        Row: {
+          artist_id: string
+          commission_cents: number
+          created_at: string
+          host_id: string
+          id: string
+          invoice_id: string
+          percentage: number
+          reversed_at: string | null
+          reversed_by: string | null
+          reversed_reason: string | null
+          status: string
+          subscription_amount_cents: number
+        }
+        Insert: {
+          artist_id: string
+          commission_cents: number
+          created_at?: string
+          host_id: string
+          id?: string
+          invoice_id: string
+          percentage: number
+          reversed_at?: string | null
+          reversed_by?: string | null
+          reversed_reason?: string | null
+          status?: string
+          subscription_amount_cents: number
+        }
+        Update: {
+          artist_id?: string
+          commission_cents?: number
+          created_at?: string
+          host_id?: string
+          id?: string
+          invoice_id?: string
+          percentage?: number
+          reversed_at?: string | null
+          reversed_by?: string | null
+          reversed_reason?: string | null
+          status?: string
+          subscription_amount_cents?: number
+        }
+        Relationships: []
+      }
+      artist_referral_settings: {
+        Row: {
+          enabled: boolean
+          id: boolean
+          percentage: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          id?: boolean
+          percentage?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          id?: boolean
+          percentage?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      artist_referrals: {
+        Row: {
+          artist_id: string
+          code: string | null
+          created_at: string
+          host_id: string
+          id: string
+        }
+        Insert: {
+          artist_id: string
+          code?: string | null
+          created_at?: string
+          host_id: string
+          id?: string
+        }
+        Update: {
+          artist_id?: string
+          code?: string | null
+          created_at?: string
+          host_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       artist_royalties: {
         Row: {
           artist_id: string
@@ -1648,6 +1759,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      host_referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       host_referral_commissions: {
         Row: {
@@ -5056,6 +5185,7 @@ export type Database = {
       deliver_release: { Args: { _release_id: string }; Returns: Json }
       dequeue_matchmaking: { Args: never; Returns: boolean }
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
+      ensure_host_referral_code: { Args: { _user_id: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
       finalize_room_earnings: { Args: { _stream_id: string }; Returns: Json }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
@@ -5229,6 +5359,15 @@ export type Database = {
       }
       rebuild_artist_vote_stats: { Args: never; Returns: Json }
       recompute_play_arena_rankings: { Args: never; Returns: number }
+      record_artist_referral_commission: {
+        Args: {
+          _amount_cents: number
+          _artist_id: string
+          _invoice_id: string
+          _plan_role: string
+        }
+        Returns: number
+      }
       record_host_referral_commission: {
         Args: {
           _amount_cents: number
