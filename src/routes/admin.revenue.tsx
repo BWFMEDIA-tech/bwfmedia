@@ -74,8 +74,8 @@ function RevenueAdmin() {
       subtitle="Monthly platform revenue and 75 / 20 / 5 pool split."
       stats={[
         { label: "Total this month", value: money(total), icon: DollarSign, color: "#22c55e" },
-        { label: "Listener subs", value: money(t?.listener_cents), icon: Users, color: "#3b82f6" },
-        { label: "Artist subs", value: money(t?.artist_cents), icon: Music, color: "#a855f7" },
+        { label: "Listener subs", value: money(t?.listener_cents), icon: Users, color: "#0000FF" },
+        { label: "Artist subs", value: money(t?.artist_cents), icon: Music, color: "#00E6FF" },
         { label: "Ads", value: money(t?.ads_cents), icon: Megaphone, color: "#f97316" },
       ]}
     >
@@ -87,7 +87,7 @@ function RevenueAdmin() {
           size="sm"
           onClick={() => recomputeMut.mutate()}
           disabled={recomputeMut.isPending}
-          className="bg-gradient-to-r from-[#C53DFF] to-[#FF00A6]"
+          className="bg-gradient-to-r from-[#0000FF] to-[#00E6FF]"
         >
           <RefreshCw className={`mr-2 h-4 w-4 ${recomputeMut.isPending ? "animate-spin" : ""}`} />
           Recalculate current month
@@ -98,7 +98,7 @@ function RevenueAdmin() {
         <PoolCard
           label="Artist Royalty Pool"
           cents={artistPool}
-          tint="from-[#C53DFF]/30 to-[#FF00A6]/20"
+          tint="from-[#0000FF]/30 to-[#00E6FF]/20"
           icon={Music}
         />
         <PoolCard
@@ -116,10 +116,10 @@ function RevenueAdmin() {
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-4">
-        <PoolCard label="Active Subscribers" cents={(subs.data?.active_subscribers ?? 0) * 100} tint="from-[#3b82f6]/30 to-[#1e3a8a]/20" icon={UserCheck} formatAsCount />
+        <PoolCard label="Active Subscribers" cents={(subs.data?.active_subscribers ?? 0) * 100} tint="from-[#0000FF]/30 to-[#001A80]/20" icon={UserCheck} formatAsCount />
         <PoolCard label="MRR" cents={subs.data?.mrr_cents ?? 0} tint="from-emerald-500/30 to-emerald-700/20" icon={TrendingUp} />
         <PoolCard label="Listener MRR" cents={subs.data?.listener_mrr_cents ?? 0} tint="from-[#00E6FF]/30 to-[#0000FF]/20" icon={Users} />
-        <PoolCard label="Artist MRR" cents={subs.data?.artist_mrr_cents ?? 0} tint="from-[#C53DFF]/30 to-[#FF00A6]/20" icon={Music} />
+        <PoolCard label="Artist MRR" cents={subs.data?.artist_mrr_cents ?? 0} tint="from-[#0000FF]/30 to-[#00E6FF]/20" icon={Music} />
       </div>
 
       <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
@@ -179,7 +179,7 @@ function RevenueAdmin() {
                     <td className="py-2 pr-4">{money(p.artist_revenue_cents)}</td>
                     <td className="py-2 pr-4">{money(p.ads_revenue_cents)}</td>
                     <td className="py-2 pr-4">{money(p.tips_revenue_cents)}</td>
-                    <td className="py-2 pr-4 text-[#C53DFF]">{money(p.artist_pool_cents)}</td>
+                    <td className="py-2 pr-4 text-[#0000FF]">{money(p.artist_pool_cents)}</td>
                     <td className="py-2 pr-4 text-[#00E6FF]">{money(p.platform_pool_cents)}</td>
                     <td className="py-2 pr-4 text-emerald-400">{money(p.incentive_pool_cents)}</td>
                   </tr>

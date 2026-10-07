@@ -137,10 +137,10 @@ function AdminProfilePage() {
           <Card>
             <h3 className="mb-4 text-lg font-bold">Admin Overview</h3>
             <div className="grid grid-cols-2 gap-3">
-              <Mini icon={Users} color="#3b82f6" label="Total Users" value={overview.data?.cards.totalUsers.value ?? 0} />
+              <Mini icon={Users} color="#0000FF" label="Total Users" value={overview.data?.cards.totalUsers.value ?? 0} />
               <Mini icon={Radio} color="#ef4444" label="Live Streams" value={overview.data?.cards.liveStreams.value ?? 0} />
               <Mini icon={DollarSign} color="#22c55e" label="Revenue" value={`$${((overview.data?.cards.totalRevenueCents.value ?? 0) / 100).toFixed(0)}`} />
-              <Mini icon={ShoppingBag} color="#a855f7" label="Merch Sales" value={overview.data?.cards.merchSales.value ?? 0} />
+              <Mini icon={ShoppingBag} color="#00E6FF" label="Merch Sales" value={overview.data?.cards.merchSales.value ?? 0} />
             </div>
           </Card>
 

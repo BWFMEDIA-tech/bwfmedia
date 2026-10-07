@@ -268,7 +268,7 @@ function NewReleaseForm({ onCreated }: { onCreated: () => void }) {
         <Field label="Producers (comma separated)"><input value={form.producers} onChange={(e) => setForm({ ...form, producers: e.target.value })} className={inputCls} /></Field>
       </div>
       <label className="mt-3 flex items-center gap-2 text-sm text-white/70">
-        <input type="checkbox" checked={form.is_explicit} onChange={(e) => setForm({ ...form, is_explicit: e.target.checked })} className="h-4 w-4 accent-[#FF00A6]" />
+        <input type="checkbox" checked={form.is_explicit} onChange={(e) => setForm({ ...form, is_explicit: e.target.checked })} className="h-4 w-4 accent-[#00E6FF]" />
         Explicit content
       </label>
       <button
@@ -399,7 +399,7 @@ function ReleaseCard({ release, onChanged }: { release: any; onChanged: () => vo
                     toast.error(e.message ?? "Could not submit");
                   }
                 }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#FF00A6] px-4 py-1.5 text-xs font-bold text-white hover:opacity-90"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#00E6FF] px-4 py-1.5 text-xs font-bold text-white hover:opacity-90"
               >
                 <Send className="h-3 w-3" /> Submit for Review
               </button>
@@ -719,7 +719,7 @@ function EditReleaseForm({ release, onDone }: { release: any; onDone: () => void
         <Field label="Producers (comma separated)"><input value={form.producers} onChange={(e) => setForm({ ...form, producers: e.target.value })} className={inputCls} /></Field>
       </div>
       <label className="mt-3 flex items-center gap-2 text-sm text-white/70">
-        <input type="checkbox" checked={form.is_explicit} onChange={(e) => setForm({ ...form, is_explicit: e.target.checked })} className="h-4 w-4 accent-[#FF00A6]" />
+        <input type="checkbox" checked={form.is_explicit} onChange={(e) => setForm({ ...form, is_explicit: e.target.checked })} className="h-4 w-4 accent-[#00E6FF]" />
         Explicit content
       </label>
       <button onClick={save} disabled={saving} className="mt-4 rounded-full bg-[#00E6FF] px-5 py-1.5 text-xs font-bold text-black disabled:opacity-50">
@@ -817,7 +817,7 @@ function DeliveryPanel({ release, onChanged }: { release: any; onChanged: () => 
                 disabled={locked || saving}
                 className={`rounded-full border px-3 py-1.5 text-[11px] font-bold transition disabled:opacity-50 ${
                   on
-                    ? "border-[#C53DFF]/40 bg-[#C53DFF]/15 text-[#C53DFF]"
+                    ? "border-[#0000FF]/40 bg-[#0000FF]/15 text-[#0000FF]"
                     : "border-white/10 text-white/50 hover:text-white"
                 }`}
               >
@@ -965,7 +965,7 @@ function RightsPanel({ release, editable, onChanged }: { release: any; editable:
   return (
     <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
       <div className="mb-3 flex items-center gap-2 text-sm font-bold">
-        <ShieldCheck className="h-4 w-4 text-[#FF00A6]" /> Rights &amp; release identity
+        <ShieldCheck className="h-4 w-4 text-[#00E6FF]" /> Rights &amp; release identity
         {release.rights_confirmed && (
           <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
             confirmed
@@ -1081,7 +1081,7 @@ function RightsPanel({ release, editable, onChanged }: { release: any; editable:
                     type="button"
                     onClick={() => setTerritories(on ? territories.filter((c) => c !== t.code) : [...territories, t.code])}
                     className={`rounded-full border px-2.5 py-1 text-[10px] font-bold transition ${
-                      on ? "border-[#C53DFF]/40 bg-[#C53DFF]/15 text-[#C53DFF]" : "border-white/10 text-white/45 hover:text-white"
+                      on ? "border-[#0000FF]/40 bg-[#0000FF]/15 text-[#0000FF]" : "border-white/10 text-white/45 hover:text-white"
                     }`}
                   >
                     {t.label}
@@ -1105,7 +1105,7 @@ function RightsPanel({ release, editable, onChanged }: { release: any; editable:
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-md bg-[#FF00A6] px-4 py-2 text-xs font-bold text-black hover:bg-[#ff33b8] disabled:opacity-50"
+          className="rounded-md bg-[#00E6FF] px-4 py-2 text-xs font-bold text-black hover:bg-[#ff33b8] disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save rights"}
         </button>

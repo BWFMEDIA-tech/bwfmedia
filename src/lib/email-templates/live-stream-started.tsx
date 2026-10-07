@@ -80,7 +80,7 @@ const h1 = { fontSize: '28px', fontWeight: 800, margin: '8px 0 4px', color: '#0a
 const subtitle = { fontSize: '15px', color: '#475569', margin: '0 0 16px' }
 const body = { fontSize: '15px', lineHeight: '1.6', color: '#1f2937' }
 const cta = {
-  background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+  background: 'linear-gradient(135deg, #00E6FF, #0000FF)',
   color: '#ffffff',
   padding: '12px 22px',
   borderRadius: '10px',

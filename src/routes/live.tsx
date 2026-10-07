@@ -92,7 +92,7 @@ function LivePage() {
               onClick={() => setActiveCategory(c.id)}
               className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
                 activeCategory === c.id
-                  ? "border-[#FF00A6]/50 bg-[#FF00A6]/20 text-[#FF00A6]"
+                  ? "border-[#00E6FF]/50 bg-[#00E6FF]/20 text-[#00E6FF]"
                   : "border-white/10 bg-white/5 text-white/60 hover:text-white"
               }`}
             >
@@ -152,7 +152,7 @@ function LivePage() {
                     </span>
                   </div>
                   {s.category && (
-                    <span className="mt-3 inline-block rounded-md bg-[#C53DFF]/15 border border-[#C53DFF]/30 px-2 py-1 text-[10px] font-semibold text-[#C53DFF]">
+                    <span className="mt-3 inline-block rounded-md bg-[#0000FF]/15 border border-[#0000FF]/30 px-2 py-1 text-[10px] font-semibold text-[#0000FF]">
                       {liveCategoryLabel(s.category)}
                     </span>
                   )}

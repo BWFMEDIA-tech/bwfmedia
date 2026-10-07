@@ -93,7 +93,7 @@ function NotificationsPage() {
               <li key={n.id}>
                 <button onClick={() => open(n)} className={`w-full text-left rounded-xl border p-4 transition ${n.read_at ? "border-white/5 bg-white/[0.02]" : "border-violet-500/30 bg-violet-500/5"}`}>
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 h-9 w-9 shrink-0 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#8b5cf6,#3b82f6)" }}>
+                    <div className="mt-0.5 h-9 w-9 shrink-0 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00E6FF,#0000FF)" }}>
                       {n.type === "live_stream_started" ? <Radio className="h-4 w-4 text-white" /> : <Bell className="h-4 w-4 text-white" />}
                     </div>
                     <div className="min-w-0 flex-1">

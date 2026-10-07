@@ -411,6 +411,28 @@
 
 /* Legacy page utilities share the current logo palette. Status colors remain unchanged. */
 @theme inline {
+  --color-blue-50: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-blue-100: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-blue-200: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-blue-300: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-blue-400: var(--brand-blue);
+  --color-blue-500: var(--brand-blue);
+  --color-blue-600: var(--brand-blue);
+  --color-blue-700: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-blue-800: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-blue-900: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-blue-950: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-sky-50: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-sky-100: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-sky-200: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-sky-300: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
+  --color-sky-400: var(--brand-blue);
+  --color-sky-500: var(--brand-blue);
+  --color-sky-600: var(--brand-blue);
+  --color-sky-700: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-sky-800: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-sky-900: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-sky-950: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
   --color-violet-50: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
   --color-violet-100: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
   --color-violet-200: color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver));
@@ -444,28 +466,28 @@
   --color-indigo-800: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
   --color-indigo-900: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
   --color-indigo-950: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
-  --color-pink-50: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-pink-100: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-pink-200: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-pink-300: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-pink-400: var(--brand-cyan);
-  --color-pink-500: var(--brand-cyan);
-  --color-pink-600: var(--brand-cyan);
-  --color-pink-700: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-pink-800: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-pink-900: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-pink-950: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-fuchsia-50: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-fuchsia-100: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-fuchsia-200: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-fuchsia-300: color-mix(in oklch, var(--brand-cyan) 65%, var(--brand-silver));
-  --color-fuchsia-400: var(--brand-cyan);
-  --color-fuchsia-500: var(--brand-cyan);
-  --color-fuchsia-600: var(--brand-cyan);
-  --color-fuchsia-700: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-fuchsia-800: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-fuchsia-900: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
-  --color-fuchsia-950: color-mix(in oklch, var(--brand-cyan) 70%, var(--brand-ink));
+  --color-pink-50: var(--brand-silver);
+  --color-pink-100: var(--brand-silver);
+  --color-pink-200: color-mix(in oklch, var(--brand-silver) 85%, var(--brand-blue));
+  --color-pink-300: color-mix(in oklch, var(--brand-silver) 70%, var(--brand-blue));
+  --color-pink-400: color-mix(in oklch, var(--brand-silver) 50%, var(--brand-blue));
+  --color-pink-500: color-mix(in oklch, var(--brand-silver) 40%, var(--brand-blue));
+  --color-pink-600: color-mix(in oklch, var(--brand-silver) 30%, var(--brand-blue));
+  --color-pink-700: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-pink-800: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-pink-900: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-pink-950: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-fuchsia-50: var(--brand-silver);
+  --color-fuchsia-100: var(--brand-silver);
+  --color-fuchsia-200: color-mix(in oklch, var(--brand-silver) 85%, var(--brand-blue));
+  --color-fuchsia-300: color-mix(in oklch, var(--brand-silver) 70%, var(--brand-blue));
+  --color-fuchsia-400: color-mix(in oklch, var(--brand-silver) 50%, var(--brand-blue));
+  --color-fuchsia-500: color-mix(in oklch, var(--brand-silver) 40%, var(--brand-blue));
+  --color-fuchsia-600: color-mix(in oklch, var(--brand-silver) 30%, var(--brand-blue));
+  --color-fuchsia-700: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-fuchsia-800: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-fuchsia-900: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
+  --color-fuchsia-950: color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink));
 }
 .accent-\[\#C53DFF\] { accent-color: var(--brand-blue); }
 .accent-\[\#FF00A6\] { accent-color: var(--brand-cyan); }

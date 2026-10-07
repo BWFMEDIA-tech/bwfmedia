@@ -30,7 +30,7 @@ function Dashboard() {
       />
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={Users} color="#3b82f6" label="Total Users" value={fmtNum(data?.cards.totalUsers.value)} delta={data?.cards.totalUsers.delta} loading={isLoading} />
+        <Stat icon={Users} color="#0000FF" label="Total Users" value={fmtNum(data?.cards.totalUsers.value)} delta={data?.cards.totalUsers.delta} loading={isLoading} />
         <Stat icon={Radio} color="#ef4444" label="Live Streams" value={fmtNum(data?.cards.liveStreams.value)} loading={isLoading} />
         <Stat icon={DollarSign} color="#22c55e" label="Total Revenue" value={fmtMoney(data?.cards.totalRevenueCents.value)} delta={data?.cards.totalRevenueCents.delta} loading={isLoading} />
         <Stat icon={ShoppingBag} color="#f97316" label="Merch Sales" value={fmtNum(data?.cards.merchSales.value)} delta={data?.cards.merchSales.delta} loading={isLoading} />

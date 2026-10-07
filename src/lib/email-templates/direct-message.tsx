@@ -64,7 +64,7 @@ const container = { padding: '32px 24px', maxWidth: '560px', margin: '0 auto' }
 const header = { marginBottom: '12px' }
 const badge = {
   display: 'inline-block',
-  background: '#8b5cf6',
+  background: '#00E6FF',
   color: '#ffffff',
   fontSize: '11px',
   fontWeight: 700,
@@ -79,12 +79,12 @@ const body = {
   lineHeight: '1.6',
   color: '#1f2937',
   background: '#f8fafc',
-  borderLeft: '3px solid #8b5cf6',
+  borderLeft: '3px solid #00E6FF',
   padding: '14px 16px',
   borderRadius: '6px',
 }
 const cta = {
-  background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)',
+  background: 'linear-gradient(135deg, #00E6FF, #0000FF)',
   color: '#ffffff',
   padding: '12px 22px',
   borderRadius: '10px',

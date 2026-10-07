@@ -7,8 +7,8 @@ import { CheckCircle2, ChevronRight, X as XIcon, Mic, MicOff, Camera, CameraOff,
 import type { HandRequest } from "@/lib/useStageState";
 import { SignedImg } from "@/components/ui/signed-img";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
 
 export function RaiseHandPanel({ hands, streamId }: { hands: HandRequest[]; streamId?: string | null }) {
   const respond = useServerFn(respondHand);

@@ -288,7 +288,7 @@ export function CustomizeLayoutButton() {
                       className={cn(
                         "rounded border p-1",
                         st.hidden
-                          ? "border-[#FF00A6]/40 bg-[#FF00A6]/10 text-[#FF00A6]"
+                          ? "border-[#00E6FF]/40 bg-[#00E6FF]/10 text-[#00E6FF]"
                           : "border-zinc-800 text-zinc-400 hover:text-white",
                       )}
                     >

@@ -133,7 +133,7 @@ function GoLivePage() {
       <div className="min-h-screen bg-[#050509] text-white pb-24">
         <div className="mx-auto max-w-6xl px-3 py-4 md:px-6 md:py-6">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF00A6] px-3 py-1 text-xs font-bold uppercase tracking-wide">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00E6FF] px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Live
             </span>
             <span className="truncate text-sm font-semibold">{stream.title}</span>
@@ -188,7 +188,7 @@ function GoLivePage() {
       <div className="flex items-center gap-3">
         <div
           className="grid h-12 w-12 place-items-center rounded-xl"
-          style={{ background: "linear-gradient(135deg, rgba(255,0,166,0.3), rgba(197,61,255,0.25))", border: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ background: "linear-gradient(135deg, rgba(0,0,255,0.3), rgba(0,0,255,0.25))", border: "1px solid rgba(255,255,255,0.08)" }}
         >
           <Radio className="h-5 w-5" />
         </div>
@@ -206,7 +206,7 @@ function GoLivePage() {
             onChange={(e) => setTitle(e.target.value)}
             maxLength={120}
             placeholder="What's happening?"
-            className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm outline-none focus:border-[#C53DFF]/60"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-sm outline-none focus:border-[#0000FF]/60"
           />
         </div>
         <div>
@@ -218,7 +218,7 @@ function GoLivePage() {
                 onClick={() => setCategory(c.id)}
                 className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                   category === c.id
-                    ? "border-[#C53DFF] bg-[#C53DFF]/20 text-white"
+                    ? "border-[#0000FF] bg-[#0000FF]/20 text-white"
                     : "border-white/10 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]"
                 }`}
               >
@@ -231,7 +231,7 @@ function GoLivePage() {
           onClick={goLive}
           disabled={going}
           className="w-full rounded-xl px-4 py-3.5 text-sm font-black uppercase tracking-wide disabled:opacity-60"
-          style={{ background: "linear-gradient(90deg,#FF00A6,#C53DFF)", boxShadow: "0 8px 30px rgba(255,0,166,0.35)" }}
+          style={{ background: "linear-gradient(90deg,#00E6FF,#0000FF)", boxShadow: "0 8px 30px rgba(0,0,255,0.35)" }}
         >
           {going ? "Starting…" : "Go Live"}
         </button>

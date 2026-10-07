@@ -86,7 +86,7 @@ function EventsPage() {
               onSelect={setSelected}
               modifiers={{ event: eventDates }}
               modifiersClassNames={{
-                event: "relative font-bold text-[#00E6FF] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-[#FF00A6]",
+                event: "relative font-bold text-[#00E6FF] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-[#00E6FF]",
               }}
               className="pointer-events-auto"
             />
@@ -124,7 +124,7 @@ function EventsPage() {
 function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean }) {
   const isLive = event.status === "live";
   return (
-    <article className="rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-[#C53DFF]/40">
+    <article className="rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-[#0000FF]/40">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs text-white/50">
@@ -132,7 +132,7 @@ function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean })
               {event.event_type}
             </span>
             {isLive && (
-              <span className="inline-flex items-center gap-1 rounded bg-[#FF00A6]/20 px-2 py-0.5 font-bold text-[#FF00A6]">
+              <span className="inline-flex items-center gap-1 rounded bg-[#00E6FF]/20 px-2 py-0.5 font-bold text-[#00E6FF]">
                 <Radio className="h-3 w-3" /> LIVE
               </span>
             )}
@@ -160,7 +160,7 @@ function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean })
             href={event.link_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#C53DFF] to-[#0000FF] px-3 py-1.5 text-xs font-bold hover:shadow-[0_0_20px_-5px_#C53DFF80]"
+            className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#0000FF] to-[#0000FF] px-3 py-1.5 text-xs font-bold hover:shadow-[0_0_20px_-5px_#0000FF80]"
           >
             Open <ExternalLink className="h-3 w-3" />
           </a>

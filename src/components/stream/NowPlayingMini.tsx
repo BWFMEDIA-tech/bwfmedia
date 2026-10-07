@@ -60,7 +60,7 @@ export function NowPlayingMini({ streamId }: { streamId: string | null }) {
           <button
             onClick={toggle}
             aria-label={isPlaying ? "Pause" : "Play"}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-[0_0_20px_-4px_rgba(139,92,246,0.6)] hover:opacity-90"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-[0_0_20px_-4px_rgba(0,0,255,0.6)] hover:opacity-90"
           >
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 translate-x-[1px]" />}
           </button>

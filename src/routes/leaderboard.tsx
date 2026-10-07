@@ -61,8 +61,8 @@ function LeaderboardPage() {
     <div className="relative min-h-screen overflow-hidden bg-[#05050a] text-white">
       {/* Cinematic backdrop */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-[#C53DFF]/25 blur-[140px]" />
-        <div className="absolute top-20 right-[-160px] h-[460px] w-[460px] rounded-full bg-[#FF00A6]/25 blur-[140px]" />
+        <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-[#0000FF]/25 blur-[140px]" />
+        <div className="absolute top-20 right-[-160px] h-[460px] w-[460px] rounded-full bg-[#00E6FF]/25 blur-[140px]" />
         <div className="absolute bottom-[-200px] left-1/3 h-[520px] w-[520px] rounded-full bg-[#00E6FF]/20 blur-[160px]" />
         <div
           className="absolute inset-0 opacity-[0.07]"
@@ -88,8 +88,8 @@ function LeaderboardPage() {
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-white/70 backdrop-blur">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF00A6] opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#FF00A6]" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00E6FF] opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00E6FF]" />
                 </span>
                 Live Rankings · Season 01
               </div>
@@ -97,7 +97,7 @@ function LeaderboardPage() {
                 <span className="block bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
                   THE
                 </span>
-                <span className="block bg-gradient-to-r from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-[#0000FF] via-[#00E6FF] to-[#00E6FF] bg-clip-text text-transparent">
                   LEADERBOARD
                 </span>
               </h1>
@@ -106,9 +106,9 @@ function LeaderboardPage() {
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 sm:w-auto">
-              <HeroStat icon={Sparkles} label="XP" value={totals.xp} accent="#C53DFF" />
+              <HeroStat icon={Sparkles} label="XP" value={totals.xp} accent="#0000FF" />
               <HeroStat icon={ThumbsUp} label="Votes" value={totals.votes} accent="#00E6FF" />
-              <HeroStat icon={Swords} label="Wins" value={totals.wins} accent="#FF00A6" />
+              <HeroStat icon={Swords} label="Wins" value={totals.wins} accent="#00E6FF" />
             </div>
           </div>
         </header>
@@ -132,7 +132,7 @@ function LeaderboardPage() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search the ranks…"
-              className="h-12 rounded-full border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-white/40 focus-visible:ring-[#FF00A6]/50"
+              className="h-12 rounded-full border-white/10 bg-white/[0.04] pl-11 text-white placeholder:text-white/40 focus-visible:ring-[#00E6FF]/50"
             />
           </div>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/50">
@@ -191,10 +191,10 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
   const isFirst = entry.rank === 1;
   const accent =
     entry.rank === 1
-      ? { from: "#FFD700", via: "#FF00A6", to: "#C53DFF", glow: "rgba(255,0,166,0.55)" }
+      ? { from: "#FFD700", via: "#00E6FF", to: "#0000FF", glow: "rgba(0,0,255,0.55)" }
       : entry.rank === 2
       ? { from: "#E5E7EB", via: "#00E6FF", to: "#0000FF", glow: "rgba(0,230,255,0.45)" }
-      : { from: "#CD7F32", via: "#C53DFF", to: "#FF00A6", glow: "rgba(197,61,255,0.45)" };
+      : { from: "#CD7F32", via: "#B8C2D0", to: "#0000FF", glow: "rgba(0,0,255,0.45)" };
   const Icon = entry.rank === 1 ? Crown : entry.rank === 2 ? Trophy : Medal;
   const lift =
     entry.rank === 1 ? "sm:-translate-y-6 sm:scale-[1.04]" : entry.rank === 2 ? "" : "sm:translate-y-3";
@@ -339,7 +339,7 @@ function PodiumStat({
 function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
   const isHot = entry.rank <= 10;
   const rankAccent =
-    entry.rank <= 10 ? "#FF00A6" : entry.rank <= 25 ? "#00E6FF" : "rgba(255,255,255,0.4)";
+    entry.rank <= 10 ? "#00E6FF" : entry.rank <= 25 ? "#00E6FF" : "rgba(255,255,255,0.4)";
 
   return (
     <Link
@@ -404,8 +404,8 @@ function LeaderRow({ entry }: { entry: LeaderboardEntry }) {
           </div>
         </div>
 
-        <RowCell icon={Sparkles} value={entry.xp} color="#C53DFF" />
-        <RowCell icon={Swords} value={entry.battleWins} color="#FF00A6" />
+        <RowCell icon={Sparkles} value={entry.xp} color="#0000FF" />
+        <RowCell icon={Swords} value={entry.battleWins} color="#00E6FF" />
         <RowCell icon={ThumbsUp} value={entry.battleVotes} color="#00E6FF" />
         <RowCell icon={Disc3} value={entry.trackCount} color="rgba(255,255,255,0.5)" />
 
@@ -446,7 +446,7 @@ function TitleBadge({ entry }: { entry: LeaderboardEntry }) {
 function StreakBadge({ entry }: { entry: LeaderboardEntry }) {
   const milestone = getStreakMilestone(entry.currentStreak);
   if (!milestone) return null;
-  const c = milestone >= 25 ? "#FFD700" : milestone >= 10 ? "#FF00A6" : "#00E6FF";
+  const c = milestone >= 25 ? "#FFD700" : milestone >= 10 ? "#00E6FF" : "#00E6FF";
   return (
     <span
       className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"

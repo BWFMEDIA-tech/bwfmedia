@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { Lock, Unlock, Video, Mic } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const PURPLE = "#8b5cf6";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
 
 export function ModeToggle({
   streamId,

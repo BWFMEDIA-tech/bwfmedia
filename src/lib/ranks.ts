@@ -23,9 +23,9 @@ export const RANKS: RankDef[] = [
   { key: "silver",    name: "Silver Artist",    floor: 2000,   cap: 5000,   image: silver,    color: "#D9DEE7", glow: "rgba(217,222,231,0.55)" },
   { key: "gold",      name: "Gold Creator",     floor: 5000,   cap: 10000,  image: gold,      color: "#F5C542", glow: "rgba(245,197,66,0.65)" },
   { key: "diamond",   name: "Diamond Star",     floor: 10000,  cap: 25000,  image: diamond,   color: "#00E6FF", glow: "rgba(0,230,255,0.65)" },
-  { key: "platinum",  name: "Platinum Icon",    floor: 25000,  cap: 50000,  image: platinum,  color: "#C53DFF", glow: "rgba(197,61,255,0.7)" },
-  { key: "superstar", name: "Superstar",        floor: 50000,  cap: 100000, image: superstar, color: "#FF00A6", glow: "rgba(255,0,166,0.7)" },
-  { key: "legend",    name: "Legend",           floor: 100000, cap: null,     image: legend,    color: "#C53DFF", glow: "rgba(197,61,255,0.75)" },
+  { key: "platinum",  name: "Platinum Icon",    floor: 25000,  cap: 50000,  image: platinum,  color: "#B8C2D0", glow: "rgba(0,0,255,0.7)" },
+  { key: "superstar", name: "Superstar",        floor: 50000,  cap: 100000, image: superstar, color: "#0000FF", glow: "rgba(0,0,255,0.7)" },
+  { key: "legend",    name: "Legend",           floor: 100000, cap: null,     image: legend,    color: "#00E6FF", glow: "rgba(0,0,255,0.75)" },
 ];
 
 export function getRankFromXp(xp: number | null | undefined): RankDef {

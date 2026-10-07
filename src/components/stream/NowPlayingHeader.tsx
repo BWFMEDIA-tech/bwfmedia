@@ -155,7 +155,7 @@ export function NowPlayingHeader({
   const badge =
     mode === "battle-live"    ? { label: "Battle Round Track", icon: Swords, cls: "from-pink-500 to-red-500",     ring: "ring-red-500/60",     glow: "shadow-[0_0_30px_-4px_rgba(244,63,94,0.7)]" } :
     mode === "battle-pending" ? { label: "Battle Standby",     icon: Trophy, cls: "from-amber-500 to-pink-500",   ring: "ring-amber-400/50",   glow: "shadow-[0_0_24px_-6px_rgba(245,158,11,0.6)]" } :
-    mode === "upload"         ? { label: "Uploaded Track",     icon: Disc3,  cls: "from-violet-500 to-blue-500",  ring: "ring-violet-400/50",  glow: "shadow-[0_0_24px_-6px_rgba(139,92,246,0.6)]" } :
+    mode === "upload"         ? { label: "Uploaded Track",     icon: Disc3,  cls: "from-violet-500 to-blue-500",  ring: "ring-violet-400/50",  glow: "shadow-[0_0_24px_-6px_rgba(0,0,255,0.6)]" } :
     mode === "live"           ? { label: "Live Performance",   icon: Mic,    cls: "from-emerald-500 to-cyan-500", ring: "ring-emerald-400/60", glow: "shadow-[0_0_24px_-6px_rgba(16,185,129,0.6)]" } :
                                 { label: "Idle",               icon: Volume2,cls: "from-zinc-600 to-zinc-700",    ring: "ring-white/10",       glow: "" };
   const BadgeIcon = badge.icon;
@@ -194,7 +194,7 @@ export function NowPlayingHeader({
       mode === "battle-live" ? "border-red-500/50 shadow-[0_8px_40px_-12px_rgba(244,63,94,0.6)]"
       : mode === "battle-pending" ? "border-amber-500/40 shadow-[0_8px_40px_-12px_rgba(245,158,11,0.5)]"
       : mode === "live" ? "border-emerald-500/40 shadow-[0_8px_40px_-12px_rgba(16,185,129,0.5)]"
-      : "border-violet-500/30 shadow-[0_8px_40px_-12px_rgba(139,92,246,0.5)]"
+      : "border-violet-500/30 shadow-[0_8px_40px_-12px_rgba(0,0,255,0.5)]"
     }`}>
       {/* Top mode banner */}
       <div className={`-mx-3 -mt-3 mb-3 flex items-center justify-between gap-2 bg-gradient-to-r ${badge.cls} px-3 py-1.5 sm:-mx-4 sm:-mt-4 sm:mb-3 sm:px-4`}>
@@ -273,7 +273,7 @@ export function NowPlayingHeader({
           <button
             onClick={toggle}
             aria-label={isPlaying ? "Pause" : "Play"}
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${badge.cls} text-white shadow-[0_0_24px_-4px_rgba(139,92,246,0.7)] hover:opacity-90 sm:h-12 sm:w-12`}
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${badge.cls} text-white shadow-[0_0_24px_-4px_rgba(0,0,255,0.7)] hover:opacity-90 sm:h-12 sm:w-12`}
           >
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-[1px]" />}
           </button>

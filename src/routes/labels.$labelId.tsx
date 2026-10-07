@@ -121,7 +121,7 @@ function LabelWorkspace() {
               key={t.id}
               onClick={() => setTab(t.id as typeof tab)}
               className={`px-4 py-2 rounded-full text-sm font-semibold capitalize whitespace-nowrap transition ${
-                activeTab === t.id ? "bg-[#C53DFF] text-white" : "bg-white/5 text-white/60 hover:text-white"
+                activeTab === t.id ? "bg-[#0000FF] text-white" : "bg-white/5 text-white/60 hover:text-white"
               }`}
             >
               {t.id}
@@ -163,7 +163,7 @@ function EarningsTab({ labelId, myRole }: { labelId: string; myRole: LabelRole }
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Total royalties", value: money(totals.total_cents), color: "#C53DFF" },
+          { label: "Total royalties", value: money(totals.total_cents), color: "#0000FF" },
           { label: "Paid out", value: money(totals.paid_cents), color: "#4ade80" },
           { label: "Pending", value: money(totals.pending_cents), color: "#fbbf24" },
           { label: "Streams", value: Number(totals.total_streams).toLocaleString(), color: "#00E6FF" },
@@ -370,9 +370,9 @@ function RosterTab({ labelId, myRole, roster, invites, onChanged }: any) {
     <div className="space-y-6">
       <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
         <div className="flex items-center justify-between gap-3 mb-4">
-          <h3 className="font-bold flex items-center gap-2"><Disc3 className="w-4 h-4 text-[#FF00A6]" /> Roster</h3>
+          <h3 className="font-bold flex items-center gap-2"><Disc3 className="w-4 h-4 text-[#00E6FF]" /> Roster</h3>
           {canManage && (
-            <button onClick={() => invite.mutate()} className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-lg font-semibold text-black bg-[#FF00A6]">
+            <button onClick={() => invite.mutate()} className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-lg font-semibold text-black bg-[#00E6FF]">
               <Plus className="w-4 h-4" /> Invite artist
             </button>
           )}

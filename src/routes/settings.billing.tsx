@@ -52,7 +52,7 @@ function BillingPage() {
 
   return (
     <SettingsShell title="Billing" blurb="Recent tips and payments.">
-      <Card title="Subscription" icon={<CreditCard className="h-4 w-4 text-[#FF00A6]" />}>
+      <Card title="Subscription" icon={<CreditCard className="h-4 w-4 text-[#00E6FF]" />}>
         {isActive ? (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -76,7 +76,7 @@ function BillingPage() {
         ) : (
           <div className="space-y-3">
             <div className="text-sm text-white/60">You're on the free plan.</div>
-            <Button asChild className="w-full bg-gradient-to-r from-[#C53DFF] to-[#FF00A6] font-bold uppercase tracking-wider">
+            <Button asChild className="w-full bg-gradient-to-r from-[#0000FF] to-[#00E6FF] font-bold uppercase tracking-wider">
               <Link to="/pricing">See plans</Link>
             </Button>
           </div>

@@ -213,7 +213,7 @@ function ControlButton({
         danger && "border border-red-500/40 text-red-300 hover:bg-red-500/10",
         !primary && !active && !danger && "bg-white/10 text-white hover:bg-white/20",
       )}
-      style={primary ? { background: "linear-gradient(135deg, #c53dff, #ff00a6)" } : undefined}
+      style={primary ? { background: "linear-gradient(135deg, #0000FF, #00E6FF)" } : undefined}
     >
       {icon}
       <span>{loading ? "…" : label}</span>

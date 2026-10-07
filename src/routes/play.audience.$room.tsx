@@ -139,7 +139,7 @@ function AudiencePage() {
           {state?.stream.title ?? "Loading session…"}
         </h1>
 
-        <div className="mt-6 relative aspect-square w-full max-w-[320px] rounded-3xl overflow-hidden border-2 border-violet-500/40 shadow-[0_0_80px_-15px_rgba(139,92,246,0.7)] bg-gradient-to-br from-violet-700 to-blue-700">
+        <div className="mt-6 relative aspect-square w-full max-w-[320px] rounded-3xl overflow-hidden border-2 border-violet-500/40 shadow-[0_0_80px_-15px_rgba(0,0,255,0.7)] bg-gradient-to-br from-violet-700 to-blue-700">
           {playing?.cover_url ? (
             <SignedImg src={playing.cover_url} alt={`${playing.title} cover`} className="h-full w-full object-cover" />
           ) : (

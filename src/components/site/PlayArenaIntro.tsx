@@ -79,9 +79,9 @@ export function PlayArenaIntro() {
         className="pointer-events-none absolute inset-0 opacity-60"
         style={{
           backgroundImage: [
-            "radial-gradient(ellipse 50% 40% at 10% 20%, rgba(168,85,247,0.18), transparent 60%)",
+            "radial-gradient(ellipse 50% 40% at 10% 20%, rgba(0,0,255,0.18), transparent 60%)",
             "radial-gradient(ellipse 50% 40% at 90% 80%, rgba(34,211,238,0.14), transparent 60%)",
-            "radial-gradient(ellipse 40% 30% at 60% 50%, rgba(236,72,153,0.10), transparent 60%)",
+            "radial-gradient(ellipse 40% 30% at 60% 50%, rgba(184,194,208,0.10), transparent 60%)",
           ].join(","),
         }}
       />
@@ -108,7 +108,7 @@ export function PlayArenaIntro() {
                   className="bg-clip-text text-transparent"
                   style={{
                     backgroundImage:
-                      "linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #22d3ee 100%)",
+                      "linear-gradient(90deg, #00E6FF 0%, #B8C2D0 50%, #00E6FF 100%)",
                   }}
                 >
                   Live Music Battles
@@ -158,7 +158,7 @@ export function PlayArenaIntro() {
                   className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-95"
                   style={{
                     backgroundImage:
-                      "linear-gradient(90deg, #a855f7 0%, #ec4899 60%, #22d3ee 100%)",
+                      "linear-gradient(90deg, #00E6FF 0%, #B8C2D0 60%, #00E6FF 100%)",
                   }}
                 >
                   Enter Play Arena
@@ -239,7 +239,7 @@ export function PlayArenaIntro() {
                     className="h-full rounded-full"
                     style={{
                       backgroundImage:
-                        "linear-gradient(90deg, #a855f7, #ec4899 60%, #22d3ee)",
+                        "linear-gradient(90deg, #00E6FF, #B8C2D0 60%, #00E6FF)",
                     }}
                   />
                 </div>

@@ -137,9 +137,9 @@ function StreamStudioGuard() {
 }
 
 /* ---------- Theme tokens ---------- */
-const PURPLE = "#8b5cf6";
-const PURPLE_GLOW = "rgba(139,92,246,0.45)";
-const BLUE = "#3b82f6";
+const PURPLE = "#00E6FF";
+const PURPLE_GLOW = "rgba(0,0,255,0.45)";
+const BLUE = "#0000FF";
 
 /* ---------- Sidebar ---------- */
 const NAV: Array<{ icon: any; label: string; to: string; badge?: number }> = [
@@ -356,8 +356,8 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
 
 /* ---------- Join requests / On deck / Invite ---------- */
 const JOIN_REQUESTS = [
-  { name: "Luna Luv", handle: "@itslunaluv", genre: "R&B / Soul", grad: "linear-gradient(135deg,#f472b6,#a855f7)" },
-  { name: "Yung Maze", handle: "@yungmaze_", genre: "Hip Hop / Trap", grad: "linear-gradient(135deg,#3b82f6,#1e3a8a)" },
+  { name: "Luna Luv", handle: "@itslunaluv", genre: "R&B / Soul", grad: "linear-gradient(135deg,#B8C2D0,#00E6FF)" },
+  { name: "Yung Maze", handle: "@yungmaze_", genre: "Hip Hop / Trap", grad: "linear-gradient(135deg,#0000FF,#001A80)" },
   { name: "Spade Sixx", handle: "@spadesixx", genre: "Hip Hop / Rap", grad: "linear-gradient(135deg,#10b981,#0f766e)" },
 ];
 
@@ -448,7 +448,7 @@ function InviteGuest() {
     },
     {
       Icon: Instagram,
-      bg: "linear-gradient(135deg,#f472b6,#a855f7)",
+      bg: "linear-gradient(135deg,#B8C2D0,#00E6FF)",
       label: "Copy link for Instagram",
       onClick: async () => {
         await navigator.clipboard.writeText(link);
@@ -638,7 +638,7 @@ function ChatPanel() {
         </div>
         <div className="grid grid-cols-3 gap-2">
           <Stat icon={Eye} label="Viewers" value="1,245" color={BLUE} />
-          <Stat icon={Heart} label="Likes" value="3,482" color="#ec4899" />
+          <Stat icon={Heart} label="Likes" value="3,482" color="#B8C2D0" />
           <Stat icon={DollarSign} label="Donations" value="$245" color="#22c55e" />
           <Stat icon={Share2} label="Shares" value="127" color={PURPLE} />
           <Stat icon={Circle} label="Stream Time" value="01:23:47" color="#f59e0b" small />
@@ -957,10 +957,10 @@ function StreamStudio() {
                 <div className="flex min-w-0 flex-wrap items-center gap-3">
                   <div className={cn(
                     "flex items-center gap-2 rounded-full px-3 py-1 border",
-                    lk ? "bg-[#FF00A6]/10 border-[#FF00A6]/40" : "bg-zinc-900 border-zinc-800",
+                    lk ? "bg-[#00E6FF]/10 border-[#00E6FF]/40" : "bg-zinc-900 border-zinc-800",
                   )}>
-                    <span className={cn("h-2 w-2 rounded-full", lk ? "bg-[#FF00A6] animate-pulse" : "bg-zinc-600")} />
-                    <span className="text-base tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif", color: lk ? "#FF00A6" : "#a1a1aa" }}>
+                    <span className={cn("h-2 w-2 rounded-full", lk ? "bg-[#00E6FF] animate-pulse" : "bg-zinc-600")} />
+                    <span className="text-base tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif", color: lk ? "#00E6FF" : "#a1a1aa" }}>
                       {lk ? "LIVE" : "OFFLINE"}
                     </span>
                   </div>

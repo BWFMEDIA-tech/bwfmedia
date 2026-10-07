@@ -63,7 +63,7 @@ export function DistributionReviewQueue() {
           <StatTile label="Approved" value={s.counts?.approved ?? 0} accent="text-emerald-300" />
           <StatTile label="Live" value={s.counts?.live ?? 0} accent="text-cyan-300" />
           <StatTile label="Rejected" value={s.counts?.rejected ?? 0} accent="text-red-300" />
-          <StatTile label="Takedown requests" value={s.takedowns ?? 0} accent="text-[#FF00A6]" />
+          <StatTile label="Takedown requests" value={s.takedowns ?? 0} accent="text-[#00E6FF]" />
         </div>
       )}
 
@@ -379,7 +379,7 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
               <button
                 onClick={runDelivery}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-md bg-[#C53DFF] px-4 py-2 text-xs font-bold text-black hover:bg-[#d566ff] disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-md bg-[#0000FF] px-4 py-2 text-xs font-bold text-black hover:bg-[#d566ff] disabled:opacity-50"
               >
                 <Radio className="h-3.5 w-3.5" /> {release.status === "live" ? "Re-deliver" : "Deliver to Tunevio"}
               </button>
@@ -406,7 +406,7 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
               <button
                 onClick={() => setForcing((v) => !v)}
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-md border border-[#FF00A6]/40 px-4 py-2 text-xs font-bold text-[#FF00A6] hover:bg-[#FF00A6]/10 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-md border border-[#00E6FF]/40 px-4 py-2 text-xs font-bold text-[#00E6FF] hover:bg-[#00E6FF]/10 disabled:opacity-50"
               >
                 <PackageX className="h-3.5 w-3.5" /> Take down
               </button>
@@ -420,19 +420,19 @@ function QueueCard({ release, onChanged }: { release: any; onChanged: () => void
           </div>
 
           {forcing && (
-            <div className="mt-3 rounded-lg border border-[#FF00A6]/30 bg-[#FF00A6]/5 p-3">
-              <div className="mb-2 text-xs font-bold text-[#FF00A6]">Remove this release from Tunevio</div>
+            <div className="mt-3 rounded-lg border border-[#00E6FF]/30 bg-[#00E6FF]/5 p-3">
+              <div className="mb-2 text-xs font-bold text-[#00E6FF]">Remove this release from Tunevio</div>
               <textarea
                 value={forceReason}
                 onChange={(e) => setForceReason(e.target.value)}
                 rows={2}
                 placeholder="Reason (shown to the artist) — e.g. copyright claim, policy violation…"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none placeholder:text-white/30 focus:border-[#FF00A6]/50"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none placeholder:text-white/30 focus:border-[#00E6FF]/50"
               />
               <button
                 onClick={runForceTakedown}
                 disabled={busy || forceReason.trim().length < 3}
-                className="mt-2 rounded-md bg-[#FF00A6] px-4 py-2 text-xs font-bold text-black hover:bg-[#ff33b8] disabled:opacity-40"
+                className="mt-2 rounded-md bg-[#00E6FF] px-4 py-2 text-xs font-bold text-black hover:bg-[#ff33b8] disabled:opacity-40"
               >
                 Confirm takedown
               </button>

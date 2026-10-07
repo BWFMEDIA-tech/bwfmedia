@@ -86,7 +86,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
                     onClick={() => setMobileOpen(false)}
                   className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
                     active
-                      ? "bg-gradient-to-r from-fuchsia-600/90 to-pink-500/70 text-white shadow-[0_4px_20px_-4px_rgba(217,70,239,0.5)]"
+                      ? "bg-gradient-to-r from-fuchsia-600/90 to-pink-500/70 text-white shadow-[0_4px_20px_-4px_rgba(0,0,255,0.5)]"
                       : "text-white/65 hover:bg-white/5 hover:text-white"
                   }`}
                 >

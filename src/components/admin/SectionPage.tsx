@@ -32,7 +32,7 @@ export function SectionPage({
               <Card key={s.label} className="!p-4">
                 <div className="flex items-center gap-3">
                   {Icon && (
-                    <div className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: `${s.color || "#3b82f6"}22`, color: s.color || "#3b82f6" }}>
+                    <div className="grid h-9 w-9 place-items-center rounded-lg" style={{ background: `${s.color || "#0000FF"}22`, color: s.color || "#0000FF" }}>
                       <Icon className="h-4 w-4" />
                     </div>
                   )}

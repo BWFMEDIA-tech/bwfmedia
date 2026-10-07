@@ -44,7 +44,7 @@ export function FollowersModal({
       <DialogContent className="bg-[#0c0c0e] border-white/10 text-white max-w-md p-0 overflow-hidden">
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-white/10">
           <DialogTitle className="flex items-center gap-2 text-base">
-            <Users className="h-4 w-4 text-[#FF00A6]" />
+            <Users className="h-4 w-4 text-[#00E6FF]" />
             Followers
             <span className="text-white/40 text-xs font-normal tabular-nums">
               {total.toLocaleString()}

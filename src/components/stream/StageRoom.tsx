@@ -38,10 +38,10 @@ const MAX_GUESTS = 20;
 const MAX_MODS = 5;
 
 // BWF cinema palette — "Immersive Stage Cinema"
-const PURPLE = "#C53DFF"; // brand magenta (primary, host)
+const PURPLE = "#0000FF"; // brand magenta (primary, host)
 const BLUE = "#0000FF"; // brand electric blue (co-host accents)
 const ACCENT = "#00E6FF"; // brand cyan (guest accent)
-const PINK = "#FF00A6"; // brand pink (live / speaking secondary)
+const PINK = "#00E6FF"; // brand pink (live / speaking secondary)
 
 // Cap how many empty guest tiles we render — 20 dashed circles is visual noise.
 const VISIBLE_EMPTY_GUESTS = 5;
@@ -248,10 +248,10 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
 
   return (
     <div
-      className="relative rounded-3xl border border-white/10 p-3 sm:p-6 shadow-[0_0_80px_-20px_rgba(197,61,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
+      className="relative rounded-3xl border border-white/10 p-3 sm:p-6 shadow-[0_0_80px_-20px_rgba(0,0,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
       style={{
         background:
-          "radial-gradient(60% 60% at 12% 0%, rgba(197,61,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,0,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
+          "radial-gradient(60% 60% at 12% 0%, rgba(0,0,255,0.28), transparent 70%), radial-gradient(50% 60% at 100% 100%, rgba(0,0,255,0.30), transparent 70%), radial-gradient(40% 50% at 85% 10%, rgba(0,230,255,0.18), transparent 70%), #05050b",
       }}
     >
       {/* subtle grid overlay */}
