@@ -1020,6 +1020,17 @@ function SpeakerBubble({
                       {isStreamMod ? "Remove from mod slot" : "Bring to mod slot"}
                     </MenuItem>
                   )}
+                  {onToggleModerator && !isSelf && isStreamMod && (
+                    <MenuItem
+                      icon={<UserMinus className="h-3.5 w-3.5" />}
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onToggleModerator();
+                      }}
+                    >
+                      Demote to Guest
+                    </MenuItem>
+                  )}
                   {hostTransferMode === "transfer" && (
                     <MenuItem
                       icon={<ArrowRightLeft className="h-3.5 w-3.5" />}
