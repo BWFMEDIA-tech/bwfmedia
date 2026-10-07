@@ -153,6 +153,7 @@ const NAV: Array<{ icon: any; label: string; to: string; badge?: number }> = [
   { icon: Bell, label: "Notifications", to: "/notifications" },
   { icon: BarChart3, label: "Insights", to: "/admin/dashboard" },
   { icon: DollarSign, label: "Earnings", to: "/earnings" },
+  { icon: Crown, label: "Host Earnings", to: "/host-earnings" },
   { icon: Settings, label: "Settings", to: "/settings" },
 ];
 
