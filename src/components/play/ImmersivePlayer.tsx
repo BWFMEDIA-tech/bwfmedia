@@ -512,6 +512,7 @@ export function ImmersivePlayer({
   const needsUnlockRef = useRef(false);
   const radioMatches = !!radio.state && !!track && radio.state.trackId === track.id;
   const radioPaused = radioMatches && !radio.state!.playing;
+  needsUnlockRef.current = needsUnlock;
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
 
@@ -690,8 +691,8 @@ export function ImmersivePlayer({
     if (sleepRef.current) clearTimeout(sleepRef.current);
     if (sleepMin) {
       sleepRef.current = setTimeout(() => {
-        audioRef.current?.pause();
-        toast.message("Sleep timer reached — paused");
+        setMuted(true);
+        toast.message("Sleep timer reached — muted");
         setSleepMin(null);
       }, sleepMin * 60_000);
     }
@@ -727,7 +728,7 @@ export function ImmersivePlayer({
     resume(); // ensure AudioContext is running (user gesture)
     if (isHost && streamId && radioMatches) {
       // Host pauses/resumes the shared radio for everyone.
-      try { await setPlaybackFn({ data: { streamId, playing: !!radio.state?.paused_is_false_placeholder } }); }
+      try { await setPlaybackFn({ data: { streamId, playing: !radio.state?.playing } }); }
       catch (e: any) { toast.error(e?.message ?? "Could not update playback"); }
       return;
     }
