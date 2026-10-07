@@ -583,11 +583,11 @@ function ModBubble({
             <SignedImg
               src={m.avatar_url}
               alt={m.display_name ?? "Moderator"}
-              className="h-[72px] w-[72px] shrink-0 rounded-full border border-[#0d0d18] object-cover"
+              className="h-[88px] w-[88px] shrink-0 rounded-full border border-[#0d0d18] object-cover"
             />
           ) : (
             <div
-              className="grid h-[72px] w-[72px] shrink-0 place-items-center rounded-full border border-[#0d0d18] text-xl font-bold text-white"
+              className="grid h-[88px] w-[88px] shrink-0 place-items-center rounded-full border border-[#0d0d18] text-2xl font-bold text-white"
               style={{ background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})` }}
             >
               {(m.display_name ?? "M").charAt(0).toUpperCase()}
@@ -836,10 +836,10 @@ function SpeakerBubble({
         )}
         <Link to="/artist/$id" params={{ id: p.user_id }}>
           {p.avatar_url ? (
-            <SignedImg src={p.avatar_url} alt="" className="h-20 w-20 rounded-full border-2 border-[#0d0d18] object-cover" />
+            <SignedImg src={p.avatar_url} alt="" className="h-[96px] w-[96px] rounded-full border-2 border-[#0d0d18] object-cover" />
           ) : (
             <div
-              className="h-20 w-20 rounded-full border-2 border-[#0d0d18]"
+              className="h-[96px] w-[96px] rounded-full border-2 border-[#0d0d18]"
               style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
             />
           )}
@@ -1252,18 +1252,18 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
       title={`View ${p.display_name ?? "listener"}'s page`}
     >
       <div
-        className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full p-0.5 transition group-hover:scale-105"
+        className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-full p-0.5 transition group-hover:scale-105"
         style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}
       >
         {p.avatar_url ? (
           <SignedImg
             src={p.avatar_url}
             alt={p.display_name ?? "Listener"}
-            className="h-12 w-12 rounded-full border border-[#0d0d18] object-cover"
+            className="h-[58px] w-[58px] rounded-full border border-[#0d0d18] object-cover"
           />
         ) : (
           <div
-            className="h-12 w-12 rounded-full border border-[#0d0d18]"
+            className="h-[58px] w-[58px] rounded-full border border-[#0d0d18]"
             style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
           />
         )}
@@ -1293,7 +1293,7 @@ function EmptySlot({ label = "Open slot", color = "#ffffff" }: { label?: string;
   return (
     <div className="group flex flex-col items-center gap-2">
       <div
-        className="relative grid h-20 w-20 place-items-center rounded-full border border-dashed transition group-hover:scale-105"
+        className="relative grid h-[96px] w-[96px] place-items-center rounded-full border border-dashed transition group-hover:scale-105"
         style={{
           borderColor: `${color}aa`,
           background: `radial-gradient(60% 60% at 50% 50%, ${color}22, transparent 70%)`,
@@ -1317,7 +1317,7 @@ function MoreOpenChip({ count, color }: { count: number; color: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       <div
-        className="grid h-20 w-20 place-items-center rounded-full border text-center"
+        className="grid h-[96px] w-[96px] place-items-center rounded-full border text-center"
         style={{
           borderColor: `${color}55`,
           background: `radial-gradient(60% 60% at 50% 50%, ${color}18, transparent 70%)`,
