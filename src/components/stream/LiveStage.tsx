@@ -624,6 +624,12 @@ function StageTile({ track, label, fallbackImage, placeholder, profile, small }:
           {label}
         </span>
       </div>
+      {profile?.display_name && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-2 bg-background/80 px-3 py-3 text-foreground backdrop-blur">
+          {avatar && <SignedImg src={avatar} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />}
+          <span className="min-w-0 truncate text-xs font-semibold">{profile.display_name}</span>
+        </div>
+      )}
       </div>
     </div>
   );

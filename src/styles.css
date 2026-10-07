@@ -103,7 +103,58 @@
   --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
 
+/* Profile-only overrides must outrank the legacy streaming utility classes. */
+.artist-live-room .stage-tile-glow {
+  border-radius: var(--radius-lg) !important;
+  background: var(--border) !important;
+  box-shadow: none !important;
+}
+.artist-live-room .stage-tile,
+.artist-live-room .stage-tile > div:not(.pointer-events-none) {
+  border-radius: var(--radius-lg) !important;
+  background-color: var(--card) !important;
+  background-image: none !important;
+}
+.artist-live-chat > aside {
+  width: 100% !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: none !important;
+  background: var(--card) !important;
+}
+.artist-live-stage > div:last-child {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+}
+.artist-live-room .stage-tile video { object-fit: cover; }
 @layer base {
+  /* Live profiles reuse streaming tools without changing Studio's layout. */
+  .artist-live-room { color: var(--foreground); }
+  .artist-live-room .stage-tile-glow {
+    border-radius: var(--radius-lg);
+    background: var(--border);
+    box-shadow: none;
+  }
+  .artist-live-room .stage-tile {
+    border-radius: var(--radius-lg);
+    background: var(--card);
+  }
+  .artist-live-room .stage-tile > div {
+    background-color: var(--card);
+    background-image: none;
+  }
+  .artist-live-room .stage-tile video { object-fit: cover; }
+  .artist-live-room .stage-tile-glow + div { min-width: 0; }
+  .artist-live-chat > aside {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+    background: var(--card);
+  }
+  .artist-live-room aside > section > div {
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
   * { border-color: var(--color-border); }
   body {
     background-color: var(--color-background);

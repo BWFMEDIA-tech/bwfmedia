@@ -3,3 +3,4 @@
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
 - Keep site branding in shared semantic palette tokens and a legacy utility color bridge, because existing pages use both tokens and older color utilities.
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
+- Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
@@ -28,6 +28,8 @@ import { FollowersModal } from "@/components/artist/FollowersModal";
 import { SignedImg } from "@/components/ui/signed-img";
 import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
+import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
+import { getArtistLiveStream } from "@/lib/streams.functions";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -48,9 +50,10 @@ export const Route = createFileRoute("/artist/$id")({
       { property: "og:title", content: title },
       { property: "og:description", content: desc },
       { property: "og:type", content: "profile" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: url },
     ];
-    if (loaderData?.photo) {
+    if (loaderData?.photo?.startsWith("https://")) {
       meta.push({ property: "og:image", content: loaderData.photo });
       meta.push({ name: "twitter:image", content: loaderData.photo });
     }
@@ -98,6 +101,18 @@ function ArtistProfilePage() {
   const auth = useAuth();
   const { user, isAuthenticated } = auth;
   const isOwner = !!user && user.id === id;
+  const queryClient = useQueryClient();
+  const fetchLive = useServerFn(getArtistLiveStream);
+  const liveQuery = useQuery({
+    queryKey: ["artist-live", id],
+    queryFn: () => fetchLive({ data: { artistId: id } }),
+    refetchInterval: 10_000,
+    refetchOnWindowFocus: true,
+  });
+  const onLiveEnded = useCallback(() => {
+    queryClient.setQueryData(["artist-live", id], null);
+    void queryClient.invalidateQueries({ queryKey: ["artist-live", id] });
+  }, [queryClient, id]);
 
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
   const isBlank = !meta?.name && !meta?.photo && !meta?.bio
@@ -128,6 +143,10 @@ function ArtistProfilePage() {
         </div>
       </div>
     );
+  }
+
+  if (liveQuery.data) {
+    return <ArtistLiveRoom key={liveQuery.data.id} stream={liveQuery.data} artist={artist} onEnded={onLiveEnded} />;
   }
 
   return (
