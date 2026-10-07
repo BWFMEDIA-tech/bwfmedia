@@ -5,4 +5,4 @@
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Use opt-in profile layouts for shared LiveStage and LiveChat tools, because reference-matched profile presentation must not alter Arena or Studio layouts.
-- Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
+- Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.- Play Arena audio follows one server-written radio clock per stream (arena_playback_state written only by host-authorized queue server functions; clients only read and drift-correct), because every listener must hear the same position.
