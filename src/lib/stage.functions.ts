@@ -314,13 +314,14 @@ export const setStageMuteAll = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertHostOrMod(supabase, userId, data.streamId);
     const mutedUntil = data.mute ? "9999-12-31T00:00:00.000Z" : null;
-    const { error } = await supabase
+    if (data.group === "moderators" && !(data.userIds?.length)) return { ok: true };
+    let q = supabase
       .from("stage_participants")
       .update({ muted_until: mutedUntil })
       .eq("stream_id", data.streamId)
-      .in("stage_role", data.group === "guests" ? ["speaker"] : ["host", "co_host", "speaker"])
-      .in("user_id", data.group === "moderators" ? (data.userIds ?? []) : ["00000000-0000-0000-0000-000000000000"].slice(0, 0).length ? [] : undefined as any)
-      ;
+      .in("stage_role", data.group === "guests" ? ["speaker"] : ["host", "co_host", "speaker"]);
+    if (data.group === "moderators") q = q.in("user_id", data.userIds!);
+    const { error } = await q;
     if (error) throw new Error(error.message);
     return { ok: true };
   });
