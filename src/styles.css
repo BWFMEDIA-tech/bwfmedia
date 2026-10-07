@@ -115,7 +115,7 @@
   background-color: var(--card) !important;
   background-image: none !important;
 }
-.artist-live-chat > div {
+.artist-live-chat > aside {
   width: 100% !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: none !important;
@@ -144,7 +144,7 @@
   }
   .artist-live-room .stage-tile video { object-fit: cover; }
   .artist-live-room .stage-tile-glow + div { min-width: 0; }
-  .artist-live-chat > div {
+  .artist-live-chat > aside {
     width: 100%;
     border-radius: var(--radius-lg);
     box-shadow: none;
