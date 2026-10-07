@@ -512,6 +512,7 @@ export function ImmersivePlayer({
   const needsUnlockRef = useRef(false);
   const radioMatches = !!radio.state && !!track && radio.state.trackId === track.id;
   const radioPaused = radioMatches && !radio.state!.playing;
+  const shownProgress = radioPaused ? radio.state!.positionSeconds : progress;
   needsUnlockRef.current = needsUnlock;
   const [myVote] = useMyVote(track?.id ?? null, userId);
   const [liked, toggleLike] = useTrackLike(track?.id ?? null, userId);
@@ -579,7 +580,12 @@ export function ImmersivePlayer({
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
-    const onTime = () => setProgress(a.currentTime);
+    const onTime = () => {
+      // Freeze the bar while the shared radio is paused.
+      const s = radioRef.current.state;
+      if (s && s.trackId === track?.id && !s.playing) { setProgress(s.positionSeconds); return; }
+      if (!a.paused) setProgress(a.currentTime);
+    };
     const onMeta = () => setDuration(a.duration || 0);
     const onPlay = () => { setIsPlaying(true); setPlaybackPlaying(true); resume(); };
     const onPause = () => { setIsPlaying(false); setPlaybackPlaying(false); };
@@ -784,9 +790,12 @@ export function ImmersivePlayer({
       return;
     }
     resume(); // ensure AudioContext is running (user gesture)
-    if (isHost && streamId && radioMatches) {
-      // Host pauses/resumes the shared radio for everyone.
-      try { await setPlaybackFn({ data: { streamId, playing: !radio.state?.playing } }); }
+    if (isHost && streamId) {
+      // Host pauses/resumes the shared radio for everyone. Apply locally
+      // right away so the song and progress bar stop instantly.
+      const wantPlaying = radioMatches ? !radio.state?.playing : a.paused;
+      if (!wantPlaying) a.pause();
+      try { await setPlaybackFn({ data: { streamId, playing: wantPlaying } }); }
       catch (e: any) { toast.error(e?.message ?? "Could not update playback"); }
       return;
     }
@@ -995,7 +1004,7 @@ export function ImmersivePlayer({
               <span className={`h-1.5 w-1.5 rounded-full bg-[#00E6FF] ${radioPaused ? "" : "animate-pulse"}`} />
               {radioPaused ? "PAUSED" : "LIVE"}
             </span>
-            <span className="w-10 text-right">{fmt(progress)}</span>
+            <span className="w-10 text-right">{fmt(shownProgress)}</span>
             {/* Radio-style: no seeking — everyone shares one timeline. */}
             <div
               className="relative h-2 flex-1 rounded-full bg-white/10 overflow-hidden"
@@ -1003,11 +1012,11 @@ export function ImmersivePlayer({
               aria-label="Live playback position"
               aria-valuemin={0}
               aria-valuemax={Math.round(duration || 0)}
-              aria-valuenow={Math.round(progress)}
+              aria-valuenow={Math.round(shownProgress)}
             >
               <div
                 className="h-full bg-gradient-to-r from-[#00E6FF] via-[#0000FF] to-[#00E6FF] shadow-[0_0_10px_rgba(0,0,255,0.8)] transition-all"
-                style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
+                style={{ width: duration ? `${(shownProgress / duration) * 100}%` : "0%" }}
               />
             </div>
             <span className="w-10">{fmt(duration)}</span>
