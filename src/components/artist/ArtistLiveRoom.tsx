@@ -107,7 +107,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
             <p className="truncate text-xs text-muted-foreground">{artist.name}{artist.handle ? ` · ${artist.handle}` : ""}</p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <span className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-brand-silver"><Eye className="h-4 w-4" /> {viewers.toLocaleString()}</span>
           <Button variant="outline" size="sm" onClick={share} aria-label="Share"><Share2 /><span className="hidden sm:inline">Share</span></Button>
           <div className="relative"><Button variant="outline" size="icon" aria-label="Room options" onClick={() => setShowMenu(v => !v)}><MoreHorizontal /></Button>{showMenu && <div className="absolute right-0 top-12 z-20 w-52 rounded-lg border border-border bg-card p-2"><p className="px-2 py-2 text-xs text-muted-foreground">{stream.title}</p><Button variant="ghost" className="w-full justify-start" onClick={() => { setShowAudience(v => !v); setShowMenu(false); }}><Users />Toggle audience</Button>{!isOwner && <Button variant="ghost" className="w-full justify-start" onClick={() => { setShowMenu(false); toast.success("Thanks — our team will review this live."); }}><Flag />Report live</Button>}</div>}</div>
