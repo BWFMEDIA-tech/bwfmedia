@@ -81,7 +81,7 @@ export function SiteFooter() {
         {/* Brand column */}
         <div className="lg:col-span-2">
           <RouterLink to="/" className="inline-flex items-center gap-3">
-            <img src={bwfLogo.url} alt="BWF Media" className="w-14 h-14 object-contain" />
+            <img src={bwfLogo.url} alt="Tunevio" className="w-60 max-w-full h-auto object-contain" />
           </RouterLink>
           <p className="mt-4 text-sm text-bone/55 max-w-sm leading-relaxed">
             Where culture goes viral. A premium media network for artists, brands, and the moments that matter.

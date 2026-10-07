@@ -149,8 +149,8 @@ export function SiteHeader() {
         </button>
 
         {/* Logo */}
-        <RouterLink to="/" className="flex items-center gap-2 shrink-0 md:ml-12 mr-2">
-          <img src={bwfLogo.url} alt="BWF Network" className="h-12 md:h-14 w-auto object-contain" />
+        <RouterLink to="/" className="flex min-w-0 items-center shrink-0 mr-2">
+          <img src={bwfLogo.url} alt="Tunevio" className="h-auto w-36 sm:w-44 xl:w-48 object-contain" />
         </RouterLink>
 
         {/* Desktop primary nav */}
