@@ -25,7 +25,7 @@ import { GripVertical, Trash2 } from "lucide-react";
 import { useSharedAudioGraph, resumeSharedAudio } from "@/lib/useSharedAudioGraph";
 import { useRenderActive } from "@/lib/useRenderActive";
 import { SignedImg } from "@/components/ui/signed-img";
-import { useSignedAudioUrl } from "@/lib/useSignedAudio";
+import { useSignedAudioUrl, getSignedAudioUrl } from "@/lib/useSignedAudio";
 import { usePlayer } from "@/lib/player-context";
 
 /* ============================================================
@@ -593,6 +593,28 @@ export function ImmersivePlayer({
       a.removeEventListener("ended", onEnd);
     };
   }, [track?.id, isHost, streamId, advanceFn, resume]);
+
+  // Detect songs whose audio file is missing/unplayable. Without this the
+  // room sits silent forever on a broken track. Host auto-skips it.
+  useEffect(() => {
+    const url = track?.audio_url;
+    if (!track?.id) return;
+    let cancelled = false;
+    const handleBroken = async () => {
+      if (cancelled) return;
+      toast.error(`"${track.title}" can't be played — its audio file is missing.${isHost ? " Skipping to the next song." : ""}`);
+      if (isHost && streamId) {
+        try { await advanceFn({ data: { streamId } }); } catch { /* ignore */ }
+      }
+    };
+    if (!url) { void handleBroken(); return () => { cancelled = true; }; }
+    void getSignedAudioUrl(url).then((s) => { if (!s) void handleBroken(); });
+    const a = audioRef.current;
+    const onErr = () => { if (a?.getAttribute("src")) void handleBroken(); };
+    a?.addEventListener("error", onErr);
+    return () => { cancelled = true; a?.removeEventListener("error", onErr); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track?.id]);
 
   // Auto-start playback as soon as the audio source is ready. This is what
   // makes new tracks play for everyone in the room without refreshing —
