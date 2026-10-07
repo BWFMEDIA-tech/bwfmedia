@@ -583,11 +583,11 @@ function ModBubble({
             <SignedImg
               src={m.avatar_url}
               alt={m.display_name ?? "Moderator"}
-              className="h-16 w-16 shrink-0 rounded-full border border-[#0d0d18] object-cover"
+              className="h-[72px] w-[72px] shrink-0 rounded-full border border-[#0d0d18] object-cover"
             />
           ) : (
             <div
-              className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#0d0d18] text-lg font-bold text-white"
+              className="grid h-[72px] w-[72px] shrink-0 place-items-center rounded-full border border-[#0d0d18] text-xl font-bold text-white"
               style={{ background: `linear-gradient(135deg, ${BLUE}, ${PURPLE})` }}
             >
               {(m.display_name ?? "M").charAt(0).toUpperCase()}
