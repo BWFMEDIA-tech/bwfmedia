@@ -686,6 +686,17 @@ export function ImmersivePlayer({
     return () => clearInterval(id);
   }, [radio.state, track?.id]);
 
+  useEffect(() => {
+    setProgress(0);
+    setDuration(0);
+    if (!track?.audio_url || !trackAudioSrc) {
+      const a = audioRef.current;
+      if (a) { a.pause(); a.removeAttribute("src"); a.load(); }
+      setIsPlaying(false);
+      setPlaybackPlaying(false);
+    }
+  }, [track?.id, track?.audio_url, trackAudioSrc]);
+
   const unlockAndPlay = async () => {
     const a = audioRef.current;
     if (!a) return;
