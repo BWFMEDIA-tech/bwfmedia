@@ -117,7 +117,21 @@ export function StageRoom({
   }>(null);
 
 const AUDIENCE_ROLES = ["listener", "green_room"];
-  const hosts = participants.filter((p) => p.stage_role === "host" || p.stage_role === "co_host").slice(0, MAX_HOSTS);
+  // The primary host is always pinned to the first (left) slot; any other
+  // hosts or co-hosts are added to the right in the order they joined.
+  const hosts = participants
+    .filter((p) => p.stage_role === "host" || p.stage_role === "co_host")
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => {
+      const ap = primaryHostId && a.p.user_id === primaryHostId ? 0 : 1;
+      const bp = primaryHostId && b.p.user_id === primaryHostId ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      const at = (a.p as any).joined_at ?? (a.p as any).created_at ?? "";
+      const bt = (b.p as any).joined_at ?? (b.p as any).created_at ?? "";
+      return at && bt ? String(at).localeCompare(String(bt)) : a.i - b.i;
+    })
+    .map(({ p }) => p)
+    .slice(0, MAX_HOSTS);
   // Anyone who is on stage but isn't a host belongs in the guest section —
   // speaker, guest, artist, or any future on-stage role.
   const guests = participants
