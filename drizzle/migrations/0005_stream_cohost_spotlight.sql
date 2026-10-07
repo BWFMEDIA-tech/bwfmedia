@@ -1,0 +1,1 @@
+ALTER TABLE public.streams ADD COLUMN IF NOT EXISTS spotlight_cohost_user_id uuid;
