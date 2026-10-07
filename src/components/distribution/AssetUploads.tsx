@@ -28,7 +28,7 @@ function ProgressBar({ pct }: { pct: number }) {
     <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
       <div
         className="h-full rounded-full transition-[width] duration-200"
-        style={{ width: `${pct}%`, background: "linear-gradient(90deg,#00E6FF,#C53DFF)" }}
+        style={{ width: `${pct}%`, background: "linear-gradient(90deg,#00E6FF,#0000FF)" }}
       />
     </div>
   );

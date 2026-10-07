@@ -957,10 +957,10 @@ function StreamStudio() {
                 <div className="flex min-w-0 flex-wrap items-center gap-3">
                   <div className={cn(
                     "flex items-center gap-2 rounded-full px-3 py-1 border",
-                    lk ? "bg-[#FF00A6]/10 border-[#FF00A6]/40" : "bg-zinc-900 border-zinc-800",
+                    lk ? "bg-[#00E6FF]/10 border-[#00E6FF]/40" : "bg-zinc-900 border-zinc-800",
                   )}>
-                    <span className={cn("h-2 w-2 rounded-full", lk ? "bg-[#FF00A6] animate-pulse" : "bg-zinc-600")} />
-                    <span className="text-base tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif", color: lk ? "#FF00A6" : "#a1a1aa" }}>
+                    <span className={cn("h-2 w-2 rounded-full", lk ? "bg-[#00E6FF] animate-pulse" : "bg-zinc-600")} />
+                    <span className="text-base tracking-[0.2em]" style={{ fontFamily: "'Bebas Neue', sans-serif", color: lk ? "#00E6FF" : "#a1a1aa" }}>
                       {lk ? "LIVE" : "OFFLINE"}
                     </span>
                   </div>

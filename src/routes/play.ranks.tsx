@@ -50,16 +50,16 @@ const RANKS = [
   { icon: BadgeCheck, label: "SILVER ARTIST", floor: 2000, cap: 5000, range: "2,000 – 4,999 XP", color: "text-slate-300", bg: "from-slate-400/30 to-slate-600/20", note: "Your music is gaining traction. Fans are starting to notice." },
   { icon: Trophy, label: "GOLD CREATOR", floor: 5000, cap: 10000, range: "5,000 – 9,999 XP", color: "text-amber-400", bg: "from-amber-400/30 to-amber-600/20", note: "Established creator with growing influence and engagement." },
   { icon: Diamond, label: "DIAMOND STAR", floor: 10000, cap: 25000, range: "10,000 – 24,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#0000FF]/20", note: "Elite status. Consistent performance and strong fan support." },
-  { icon: Crown, label: "PLATINUM ICON", floor: 25000, cap: 50000, range: "25,000 – 49,999 XP", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/30 to-[#00E6FF]/20", note: "Recognized across the platform. A true standout artist." },
-  { icon: Star, label: "SUPERSTAR", floor: 50000, cap: 100000, range: "50,000 – 99,999 XP", color: "text-[#FF00A6]", bg: "from-[#FF00A6]/30 to-[#C53DFF]/20", note: "Massive reach. Dominating battles, streams, and engagement." },
-  { icon: Sparkles, label: "LEGEND", floor: 100000, cap: null as number | null, range: "100,000+ XP", color: "text-[#C53DFF]", bg: "from-[#C53DFF]/40 to-[#FF00A6]/20", note: "Invite Only · Top 1% of BWF NETWORK performers." },
+  { icon: Crown, label: "PLATINUM ICON", floor: 25000, cap: 50000, range: "25,000 – 49,999 XP", color: "text-[#0000FF]", bg: "from-[#0000FF]/30 to-[#00E6FF]/20", note: "Recognized across the platform. A true standout artist." },
+  { icon: Star, label: "SUPERSTAR", floor: 50000, cap: 100000, range: "50,000 – 99,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#0000FF]/20", note: "Massive reach. Dominating battles, streams, and engagement." },
+  { icon: Sparkles, label: "LEGEND", floor: 100000, cap: null as number | null, range: "100,000+ XP", color: "text-[#0000FF]", bg: "from-[#0000FF]/40 to-[#00E6FF]/20", note: "Invite Only · Top 1% of BWF NETWORK performers." },
 ];
 
 const XP_RULES = [
   { icon: Mic, label: "Join Live Arena", xp: "+50 XP", sub: "Per Performance", color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  { icon: Disc3, label: "Submit Track", xp: "+25 XP", sub: "Per Track", color: "text-[#C53DFF]", bg: "bg-[#C53DFF]/10" },
+  { icon: Disc3, label: "Submit Track", xp: "+25 XP", sub: "Per Track", color: "text-[#0000FF]", bg: "bg-[#0000FF]/10" },
   { icon: Swords, label: "Win Battle", xp: "+200 XP", sub: "Per Victory", color: "text-[#00E6FF]", bg: "bg-[#00E6FF]/10" },
-  { icon: Users, label: "Audience Votes", xp: "+1 XP", sub: "Per 10 Votes", color: "text-[#FF00A6]", bg: "bg-[#FF00A6]/10" },
+  { icon: Users, label: "Audience Votes", xp: "+1 XP", sub: "Per 10 Votes", color: "text-[#00E6FF]", bg: "bg-[#00E6FF]/10" },
   { icon: Flame, label: "Win Streak Bonus", xp: "+10%", sub: "XP Multiplier", color: "text-amber-400", bg: "bg-amber-500/10" },
 ];
 
@@ -102,7 +102,7 @@ function RanksPage() {
           <div className="text-xs text-white/40">PLAY ARENA · PROGRESSION</div>
         </header>
 
-        <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#C53DFF]/15 via-[#0a0a14] to-[#00E6FF]/10 p-6 sm:p-8">
+        <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0000FF]/15 via-[#0a0a14] to-[#00E6FF]/10 p-6 sm:p-8">
           <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-white/60">
             <Sparkles className="h-3.5 w-3.5" /> YOUR PROGRESSION
           </div>
@@ -170,13 +170,13 @@ function CurrentRankCard({
   }
   return (
     <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <Stat label="Current Rank" value={rankName} accent="text-[#C53DFF]" />
+      <Stat label="Current Rank" value={rankName} accent="text-[#0000FF]" />
       <div className="rounded-xl border border-white/10 bg-black/30 p-4">
         <p className="text-[10px] tracking-widest text-white/50">XP</p>
         <p className="mt-1 text-2xl font-black">{xp.toLocaleString()}</p>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full bg-gradient-to-r from-[#C53DFF] to-[#00E6FF]"
+            className="h-full bg-gradient-to-r from-[#0000FF] to-[#00E6FF]"
             style={{ width: `${progressPct}%` }}
           />
         </div>
@@ -321,7 +321,7 @@ function PowerUps({
             const Icon = (p.icon && ICONS[p.icon]) || Zap;
             const isActive = activeSlugs.has(p.slug);
             const canAfford = credits >= p.cost_credits;
-            const accent = p.accent ?? "#C53DFF";
+            const accent = p.accent ?? "#0000FF";
             return (
               <div key={p.id} className="rounded-xl border border-white/10 bg-[#11111d] p-3 flex flex-col">
                 <div

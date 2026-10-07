@@ -76,7 +76,7 @@ function LabelsPage() {
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl sm:text-4xl font-black flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-[#C53DFF]" /> Labels & Teams
+              <Building2 className="w-8 h-8 text-[#0000FF]" /> Labels & Teams
             </h1>
             <p className="text-white/60 mt-2">Build a roster, invite your team, and manage releases together.</p>
           </div>
@@ -101,7 +101,7 @@ function LabelsPage() {
               <button
                 disabled={name.trim().length < 2 || create.isPending}
                 onClick={() => create.mutate()}
-                className="px-5 py-3 rounded-xl font-semibold text-black bg-[#FF00A6] disabled:opacity-40"
+                className="px-5 py-3 rounded-xl font-semibold text-black bg-[#00E6FF] disabled:opacity-40"
               >
                 {create.isPending ? "Creating…" : "Create label"}
               </button>
@@ -118,7 +118,7 @@ function LabelsPage() {
                 key={l.label_id}
                 to="/labels/$labelId"
                 params={{ labelId: l.label_id }}
-                className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5 hover:border-[#C53DFF]/60 transition"
+                className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5 hover:border-[#0000FF]/60 transition"
               >
                 <div className="flex items-center gap-3">
                   {l.logo_url ? (

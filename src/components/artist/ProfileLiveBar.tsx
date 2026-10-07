@@ -36,9 +36,9 @@ export function ProfileLiveBar({ artistId, isOwner }: { artistId: string; isOwne
       <Link
         to="/stream/$room"
         params={{ room: live.room_name }}
-        className="flex items-center gap-3 rounded-2xl border border-[#FF00A6]/40 bg-[#FF00A6]/10 px-4 py-3 transition hover:bg-[#FF00A6]/20"
+        className="flex items-center gap-3 rounded-2xl border border-[#00E6FF]/40 bg-[#00E6FF]/10 px-4 py-3 transition hover:bg-[#00E6FF]/20"
       >
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF00A6] px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00E6FF] px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-white">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> Live
         </span>
         <span className="min-w-0 flex-1 truncate text-sm text-white/85">{live.title || "Live now"}</span>

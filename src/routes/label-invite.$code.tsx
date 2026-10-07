@@ -40,7 +40,7 @@ function LabelInvitePage() {
   return (
     <div className="min-h-screen bg-[#050509] text-white flex items-center justify-center px-6">
       <div className="max-w-md w-full rounded-2xl border border-white/10 bg-[#0d0d18] p-8 text-center">
-        <Building2 className="w-10 h-10 text-[#C53DFF] mx-auto mb-4" />
+        <Building2 className="w-10 h-10 text-[#0000FF] mx-auto mb-4" />
         <h1 className="text-2xl font-black mb-2">You've been invited to a label</h1>
         <p className="text-white/60 mb-6">Accept to join the label on Tunevio.</p>
         {auth.user ? (

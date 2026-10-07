@@ -102,7 +102,7 @@ function EventsAdmin() {
       subtitle="Schedule events that appear on the public events calendar."
       stats={[
         { label: "Total Events", value: events.length, icon: CalendarIcon, color: "#00E6FF" },
-        { label: "Upcoming", value: events.filter((e) => new Date(e.starts_at) > new Date()).length, icon: CalendarIcon, color: "#C53DFF" },
+        { label: "Upcoming", value: events.filter((e) => new Date(e.starts_at) > new Date()).length, icon: CalendarIcon, color: "#0000FF" },
       ]}
     >
       {!isAdmin ? (
@@ -129,7 +129,7 @@ function EventsAdmin() {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-[#C53DFF] to-[#0000FF] px-4 py-2 text-xs font-bold disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-[#0000FF] to-[#0000FF] px-4 py-2 text-xs font-bold disabled:opacity-50"
             >
               <Plus className="h-3.5 w-3.5" /> {saving ? "Saving..." : "Create event"}
             </button>
@@ -185,7 +185,7 @@ function Input({ label, value, onChange, type = "text", required, placeholder }:
         required={required}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-[#C53DFF]"
+        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-[#0000FF]"
       />
     </label>
   );
@@ -199,7 +199,7 @@ function Textarea({ label, value, onChange }: { label: string; value: string; on
         value={value}
         rows={3}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-[#C53DFF]"
+        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-[#0000FF]"
       />
     </label>
   );
@@ -212,7 +212,7 @@ function Select({ label, value, onChange, options }: { label: string; value: str
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-[#C53DFF]"
+        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-[#0000FF]"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>

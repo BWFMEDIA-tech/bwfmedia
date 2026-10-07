@@ -176,7 +176,7 @@ function WaitlistForm({
           disabled={status === "loading"}
           className="group relative inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-black overflow-hidden disabled:opacity-70"
           style={{
-            background: "linear-gradient(90deg,#C53DFF,#00E6FF)",
+            background: "linear-gradient(90deg,#0000FF,#00E6FF)",
           }}
         >
           {status === "loading" ? (
@@ -188,7 +188,7 @@ function WaitlistForm({
         </button>
       </div>
       {status === "error" && (
-        <p className="px-3 pt-2 pb-1 text-sm text-[#FF00A6]">{message}</p>
+        <p className="px-3 pt-2 pb-1 text-sm text-[#00E6FF]">{message}</p>
       )}
     </form>
   );
@@ -245,9 +245,9 @@ function TunevioLanding() {
     <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#C53DFF]/30 blur-[140px]" />
+        <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#0000FF]/30 blur-[140px]" />
         <div className="absolute top-1/3 -right-40 h-[500px] w-[500px] rounded-full bg-[#00E6FF]/25 blur-[140px]" />
-        <div className="absolute bottom-0 left-1/3 h-[400px] w-[400px] rounded-full bg-[#FF00A6]/20 blur-[140px]" />
+        <div className="absolute bottom-0 left-1/3 h-[400px] w-[400px] rounded-full bg-[#00E6FF]/20 blur-[140px]" />
         <div
           className="absolute inset-0 opacity-[0.08]"
           style={{
@@ -317,7 +317,7 @@ function TunevioLanding() {
             The Future of{" "}
             <span
               className="bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(90deg,#C53DFF,#00E6FF)" }}
+              style={{ backgroundImage: "linear-gradient(90deg,#0000FF,#00E6FF)" }}
             >
               Independent Music
             </span>{" "}
@@ -385,13 +385,13 @@ function TunevioLanding() {
               transition={{ duration: 0.6 }}
             >
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur-md">
-                <Swords className="h-3.5 w-3.5 text-[#FF00A6]" />
+                <Swords className="h-3.5 w-3.5 text-[#00E6FF]" />
                 <span>Live Battles</span>
               </div>
               <h2 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">
                 {"Play Arena -\u00A0"}<span
                   className="bg-clip-text text-transparent"
-                  style={{ backgroundImage: "linear-gradient(90deg,#FF00A6,#00E6FF)" }}
+                  style={{ backgroundImage: "linear-gradient(90deg,#00E6FF,#00E6FF)" }}
                 >
                   Live Music Battles
                 </span>
@@ -451,7 +451,7 @@ function TunevioLanding() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-80px" }}
                   transition={{ duration: 0.5, delay: i * 0.05 }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl hover:border-[#FF00A6]/50 transition-colors"
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl hover:border-[#00E6FF]/50 transition-colors"
                 >
                   <div
                     className="inline-flex h-10 w-10 items-center justify-center rounded-xl"
@@ -479,7 +479,7 @@ function TunevioLanding() {
               What Makes{" "}
               <span
                 className="bg-clip-text text-transparent"
-                style={{ backgroundImage: "linear-gradient(90deg,#C53DFF,#00E6FF)" }}
+                style={{ backgroundImage: "linear-gradient(90deg,#0000FF,#00E6FF)" }}
               >
                 Tunevio
               </span>{" "}
@@ -498,7 +498,7 @@ function TunevioLanding() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl hover:border-[#C53DFF]/50 transition-colors"
+                className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl hover:border-[#0000FF]/50 transition-colors"
               >
                 <div
                   className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
@@ -542,7 +542,7 @@ function TunevioLanding() {
                 <div
                   className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl"
                   style={{
-                    background: "linear-gradient(135deg,#C53DFF,#00E6FF)",
+                    background: "linear-gradient(135deg,#0000FF,#00E6FF)",
                     boxShadow: "0 0 30px rgba(0,230,255,0.35)",
                   }}
                 >
@@ -563,7 +563,7 @@ function TunevioLanding() {
             Don't Miss{" "}
             <span
               className="bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(90deg,#C53DFF,#00E6FF)" }}
+              style={{ backgroundImage: "linear-gradient(90deg,#0000FF,#00E6FF)" }}
             >
               Launch Day
             </span>

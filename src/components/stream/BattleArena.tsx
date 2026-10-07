@@ -112,12 +112,12 @@ export function BattleArena({
       <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-bold text-white">
-            <Swords className="h-4 w-4 text-[#ff00a6]" /> Battle Arena
+            <Swords className="h-4 w-4 text-[#00E6FF]" /> Battle Arena
           </div>
           <button
             onClick={() => setShowCreate(true)}
             className="rounded-md px-3 py-1.5 text-xs font-semibold text-white"
-            style={{ background: "linear-gradient(135deg, #c53dff, #ff00a6)" }}
+            style={{ background: "linear-gradient(135deg, #0000FF, #00E6FF)" }}
           >
             Start 1v1 Battle
           </button>
@@ -321,7 +321,7 @@ function BattleView({
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18]">
       <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-2">
         <div className="flex items-center gap-2 text-xs font-bold text-white">
-          <Swords className="h-3.5 w-3.5 text-[#ff00a6]" />
+          <Swords className="h-3.5 w-3.5 text-[#00E6FF]" />
           BATTLE · Round {Math.max(1, match.current_round as number)} / {match.total_rounds as number}
           {match.status === "completed" && (
             <span className="ml-2 rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] text-emerald-300">
@@ -356,7 +356,7 @@ function BattleView({
             )
           )}
           {userId && xp !== null && (
-            <span className="flex items-center gap-1 rounded bg-[#c53dff]/15 px-2 py-0.5 text-[11px] font-mono font-bold text-[#e8b6ff]">
+            <span className="flex items-center gap-1 rounded bg-[#0000FF]/15 px-2 py-0.5 text-[11px] font-mono font-bold text-[#e8b6ff]">
               <Sparkles className="h-3 w-3" /> {xp.toLocaleString()} XP
             </span>
           )}
@@ -533,7 +533,7 @@ function VoteTracker({
             style={{
               clipPath:
                 "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
-              background: "linear-gradient(135deg,#c53dff,#ff00a6)",
+              background: "linear-gradient(135deg,#0000FF,#00E6FF)",
             }}
           >
             VOTE
@@ -546,7 +546,7 @@ function VoteTracker({
             <span
               className="font-mono text-3xl font-black tabular-nums sm:text-4xl"
               style={{
-                background: "linear-gradient(135deg,#ff00a6,#ef4444)",
+                background: "linear-gradient(135deg,#00E6FF,#ef4444)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -575,7 +575,7 @@ function VoteTracker({
           className="absolute inset-y-0 right-0 transition-[width] duration-700 ease-out"
           style={{
             width: `${bPct}%`,
-            background: "linear-gradient(90deg,#ff00a6,#ef4444)",
+            background: "linear-gradient(90deg,#00E6FF,#ef4444)",
             boxShadow: "0 0 18px rgba(239,68,68,0.6)",
           }}
         />
@@ -652,9 +652,9 @@ function ArtistSide({
   flash?: { side: "a" | "b"; n: number; key: number } | null;
 }) {
   const grad = side === "a"
-    ? "linear-gradient(135deg, #c53dff, #0000ff)"
-    : "linear-gradient(135deg, #ff00a6, #00e6ff)";
-  const waveColor = side === "a" ? "#c53dff" : "#ff00a6";
+    ? "linear-gradient(135deg, #0000FF, #0000ff)"
+    : "linear-gradient(135deg, #00E6FF, #00e6ff)";
+  const waveColor = side === "a" ? "#0000FF" : "#00E6FF";
   const isEmpty = !artistId;
   const dim = !isEmpty && status !== "playing";
   const audioPlaying = usePlaybackPlaying();
@@ -665,7 +665,7 @@ function ArtistSide({
   const spinPaused = isPlaying && !audioPlaying;
   const statusMeta =
     status === "playing"
-      ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#ff00a6] to-[#00e6ff] text-black animate-pulse" }
+      ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#00E6FF] to-[#00e6ff] text-black animate-pulse" }
       : status === "next"
         ? { label: "Up Next", cls: "bg-white/10 text-white/80" }
         : status === "finished"
@@ -1033,7 +1033,7 @@ function CreateBattleDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
-          <Trophy className="h-4 w-4 text-[#c53dff]" /> {isEdit ? "Edit Matchup" : "Create 1v1 Battle"}
+          <Trophy className="h-4 w-4 text-[#0000FF]" /> {isEdit ? "Edit Matchup" : "Create 1v1 Battle"}
         </div>
         <div className="space-y-3">
           <ArtistSelect label="Artist A" value={a} onChange={setA} participants={participants} exclude={b} />
@@ -1057,7 +1057,7 @@ function CreateBattleDialog({
           <button
             type="button"
             onClick={() => setUploadOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/15 bg-black/30 px-3 py-2 text-xs font-semibold text-white/80 hover:border-[#c53dff]/60 hover:bg-white/5"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/15 bg-black/30 px-3 py-2 text-xs font-semibold text-white/80 hover:border-[#0000FF]/60 hover:bg-white/5"
           >
             <Sparkles className="h-3.5 w-3.5 text-[#00e6ff]" />
             Upload new track to my profile
@@ -1101,7 +1101,7 @@ function CreateBattleDialog({
           <button
             onClick={submit} disabled={busy}
             className="rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg, #c53dff, #ff00a6)" }}
+            style={{ background: "linear-gradient(135deg, #0000FF, #00E6FF)" }}
           >
             {busy ? "Saving…" : isEdit ? (confirming ? "Confirm save" : "Save matchup") : "Create battle"}
           </button>

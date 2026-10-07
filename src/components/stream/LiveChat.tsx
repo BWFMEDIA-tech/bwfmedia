@@ -31,8 +31,8 @@ import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
 
 // BWF Immersive Cinema palette
-const PURPLE = "#C53DFF";
-const PINK = "#FF00A6";
+const PURPLE = "#0000FF";
+const PINK = "#00E6FF";
 const CYAN = "#00E6FF";
 const BLUE = "#0000FF";
 const GREEN = "#22c55e";

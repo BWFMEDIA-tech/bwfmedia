@@ -186,9 +186,9 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
                   if (!status?.membershipActive) return setModal("membership");
                   setModal("submit");
                 }}
-                className="rounded-2xl border border-[#C53DFF]/40 bg-gradient-to-br from-[#C53DFF]/20 to-[#0000FF]/10 p-4 text-left hover:border-[#C53DFF] transition"
+                className="rounded-2xl border border-[#0000FF]/40 bg-gradient-to-br from-[#0000FF]/20 to-[#0000FF]/10 p-4 text-left hover:border-[#0000FF] transition"
               >
-                <div className="flex items-center gap-2 text-[#C53DFF] font-semibold">
+                <div className="flex items-center gap-2 text-[#0000FF] font-semibold">
                   <Music className="h-4 w-4" /> Submit a track
                 </div>
                 <p className="text-xs text-white/60 mt-1">
@@ -199,15 +199,15 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
               </button>
               <button
                 onClick={() => { if (!auth.user) return toast.error("Sign in to boost"); setModal("boost"); }}
-                className="rounded-2xl border border-[#FF00A6]/40 bg-gradient-to-br from-[#FF00A6]/20 to-[#C53DFF]/10 p-4 text-left hover:border-[#FF00A6] transition"
+                className="rounded-2xl border border-[#00E6FF]/40 bg-gradient-to-br from-[#00E6FF]/20 to-[#0000FF]/10 p-4 text-left hover:border-[#00E6FF] transition"
               >
-                <div className="flex items-center gap-2 text-[#FF00A6] font-semibold">
+                <div className="flex items-center gap-2 text-[#00E6FF] font-semibold">
                   <Zap className="h-4 w-4" /> Skip the Line — $25
                 </div>
                 <p className="text-xs text-white/60 mt-1">
                   2 boost credits · jump to the front of the queue.
                   {status && status.boostCredits > 0 && (
-                    <span className="ml-1 text-[#FF00A6]">You have {status.boostCredits}.</span>
+                    <span className="ml-1 text-[#00E6FF]">You have {status.boostCredits}.</span>
                   )}
                 </p>
               </button>

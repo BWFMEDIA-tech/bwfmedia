@@ -139,10 +139,10 @@ export function GlobalPlayer() {
               onClick={p.toggleShuffle}
               aria-label={p.shuffle ? "Shuffle on" : "Shuffle off"}
               aria-pressed={p.shuffle}
-              className={`relative ${p.shuffle ? "text-[#FF00A6]" : "text-white/50 hover:text-white"}`}
+              className={`relative ${p.shuffle ? "text-[#00E6FF]" : "text-white/50 hover:text-white"}`}
             >
               <Shuffle className="h-4 w-4" />
-              {p.shuffle && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#FF00A6]" />}
+              {p.shuffle && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#00E6FF]" />}
             </button>
             <button onClick={p.prev} className="text-white/70 hover:text-white"><SkipBack className="h-5 w-5" /></button>
             <button onClick={p.toggle} className="grid h-10 w-10 place-items-center rounded-full bg-red-600 text-white hover:bg-red-500" disabled={!track}>
@@ -153,10 +153,10 @@ export function GlobalPlayer() {
               onClick={p.cycleRepeat}
               aria-label={repeatLabel}
               title={repeatLabel}
-              className={`relative ${p.repeat !== "off" ? "text-[#FF00A6]" : "text-white/50 hover:text-white"}`}
+              className={`relative ${p.repeat !== "off" ? "text-[#00E6FF]" : "text-white/50 hover:text-white"}`}
             >
               {p.repeat === "one" ? <Repeat1 className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}
-              {p.repeat !== "off" && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#FF00A6]" />}
+              {p.repeat !== "off" && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#00E6FF]" />}
             </button>
           </div>
           <div className="group flex w-full max-w-xl items-center gap-2 text-[11px] text-white/50">
@@ -167,7 +167,7 @@ export function GlobalPlayer() {
                 aria-hidden
               />
               <div
-                className="pointer-events-none absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white group-hover:bg-[#FF00A6]"
+                className="pointer-events-none absolute left-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-white group-hover:bg-[#00E6FF]"
                 style={{ width: `${pct}%` }}
                 aria-hidden
               />

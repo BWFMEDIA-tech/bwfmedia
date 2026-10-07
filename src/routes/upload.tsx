@@ -57,7 +57,7 @@ function UploadHub() {
           <Link
             key={o.to}
             to={o.to}
-            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-[#C53DFF]/50 hover:bg-white/[0.06]"
+            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-[#0000FF]/50 hover:bg-white/[0.06]"
           >
             <div
               className="grid h-12 w-12 shrink-0 place-items-center rounded-xl"

@@ -170,13 +170,13 @@ export function HypePassPanel({
               transition={{ type: "spring", stiffness: 400, damping: 32 }}
               className={cn(
                 "rounded-xl border bg-white/[0.03] p-3",
-                leaderId === artistId ? "border-[#ff00a6]/50" : "border-white/10",
+                leaderId === artistId ? "border-[#00E6FF]/50" : "border-white/10",
               )}
             >
               <div className="mb-2 flex items-center justify-between">
                 <span className="truncate text-xs font-bold text-white">{artist.name}</span>
                 {leaderId === artistId && (
-                  <span className="flex items-center gap-1 rounded bg-[#ff00a6]/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#ff9ad9]">
+                  <span className="flex items-center gap-1 rounded bg-[#00E6FF]/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#ff9ad9]">
                     <Crown className="h-3 w-3" /> Leading
                   </span>
                 )}

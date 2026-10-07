@@ -152,7 +152,7 @@ export function LiveEarningsTicker({
         <div className="hidden sm:block h-12 w-px bg-white/10" />
 
         <div className="min-w-0 text-right">
-          <div className="flex items-center justify-end gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#C53DFF]">
+          <div className="flex items-center justify-end gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0000FF]">
             <TrendingUp className="h-3 w-3" /> Pool
           </div>
           <div className="mt-1 text-2xl font-black text-white">{fmt(pEased)}</div>

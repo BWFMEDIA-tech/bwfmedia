@@ -478,7 +478,7 @@ function MiniWaveform({
             style={{
               height: `${Math.round(h * 100)}%`,
               background: active
-                ? (played ? "#FF00A6" : "rgba(255,255,255,0.22)")
+                ? (played ? "#00E6FF" : "rgba(255,255,255,0.22)")
                 : (isReal ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.14)"),
             }}
           />
@@ -572,7 +572,7 @@ function TrackRowImpl({
           onClick={onToggleLike}
           aria-pressed={liked}
           aria-label={liked ? `Unlike ${title}` : `Like ${title}`}
-          className={`inline-flex w-full items-center justify-end gap-1 rounded py-0.5 transition-colors ${liked ? "text-[#FF00A6]" : "text-white/60 hover:text-white"}`}
+          className={`inline-flex w-full items-center justify-end gap-1 rounded py-0.5 transition-colors ${liked ? "text-[#00E6FF]" : "text-white/60 hover:text-white"}`}
         >
           <Heart className="h-3.5 w-3.5 shrink-0" fill={liked ? "currentColor" : "none"} />
           <span className="tabular-nums">{fmtNum(likeCount)}</span>

@@ -86,7 +86,7 @@ function PricingPage() {
             <Sparkles className="h-3 w-3" /> Tunevio Plans
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight">
-            Listen. Create. <span className="bg-gradient-to-r from-[#C53DFF] via-[#FF00A6] to-[#00E6FF] bg-clip-text text-transparent">Get paid.</span>
+            Listen. Create. <span className="bg-gradient-to-r from-[#0000FF] via-[#00E6FF] to-[#00E6FF] bg-clip-text text-transparent">Get paid.</span>
           </h1>
           <p className="mt-4 text-white/60 max-w-xl mx-auto">
             Premium streaming for fans. Pro tools for artists and labels. Cancel anytime.
@@ -125,12 +125,12 @@ function PricingPage() {
                 key={planId}
                 className={`relative rounded-2xl p-6 border bg-gradient-to-b from-white/[0.04] to-transparent ${
                   isHighlighted
-                    ? "border-[#FF00A6]/60 shadow-[0_0_60px_-15px_rgba(0,0,255,0.5)]"
+                    ? "border-[#00E6FF]/60 shadow-[0_0_60px_-15px_rgba(0,0,255,0.5)]"
                     : "border-white/10"
                 }`}
               >
                 {tag && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-to-r from-[#C53DFF] to-[#FF00A6] text-white">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-to-r from-[#0000FF] to-[#00E6FF] text-white">
                     {tag}
                   </div>
                 )}
@@ -152,7 +152,7 @@ function PricingPage() {
                   disabled={loadingPlan === planId}
                   className={`mt-6 w-full font-bold uppercase tracking-wider ${
                     isHighlighted
-                      ? "bg-gradient-to-r from-[#C53DFF] to-[#FF00A6] hover:opacity-90"
+                      ? "bg-gradient-to-r from-[#0000FF] to-[#00E6FF] hover:opacity-90"
                       : "bg-white text-black hover:bg-white/90"
                   }`}
                 >
