@@ -554,7 +554,15 @@ export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, on
     { label: "Guest", icon: UserRound, identity: guest?.identity, name: guest?.name, photo: null },
   ];
   return <>
-    <div className="profile-video-grid">
+    {audioOnly ? (
+      <div className="profile-podcast-banner flex items-center gap-3 rounded-2xl border border-border p-4">
+        <Headphones className="h-5 w-5 shrink-0 text-primary" />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground">Podcast mode — audio only</p>
+          <p className="text-xs text-muted-foreground">Video is off. Mics stay live for everyone on stage.</p>
+        </div>
+      </div>
+    ) : <div className="profile-video-grid">
       {slots.map(({ label, icon: Icon, identity, name, photo }) => {
         const track = tracks.find(t => t.participant.identity === identity);
         const publication = track && "publication" in track ? track.publication : null;
@@ -567,7 +575,7 @@ export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, on
           {displayName && <div className="profile-video-identity">{avatar && <SignedImg src={avatar} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />}<div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{displayName}</p><p className="text-xs text-muted-foreground">{label === "Host" ? "Live host" : "On stage"}</p></div><AudioLines className={cn("h-6 w-6 text-primary", track?.participant.isSpeaking ? "opacity-100" : "opacity-30")} /></div>}
         </div>;
       })}
-    </div>
+    </div>}
     {publish && <ProfileMediaControls streamId={streamId} owner={showHostTools} onEnd={onEnd} onInvite={onInvite} />}
   </>;
 }
