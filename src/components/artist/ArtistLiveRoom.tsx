@@ -146,11 +146,11 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         <div className="artist-live-stage flex min-w-0 flex-col gap-4">
           {stream.mode === "stage" && auth.user ? (
             <StageAudioShell token={connection.token} serverUrl={connection.wsUrl} streamId={stream.id} userId={auth.user.id} autoConnect showHostTools={canManage} onLeave={() => setConnection(null)}>
-              <ProfileStage host={{ id: stream.host_id, name: artist.name, photo: artist.photo }} streamId={stream.id} publish={onStage} showHostTools={canManage} onEnd={() => { void stop(); }} onInvite={() => { void invite(); }} />
+              <ProfileStage host={{ id: stream.host_id, name: artist.name, photo: artist.photo }} streamId={stream.id} publish={onStage} showHostTools={canManage} audioOnly onEnd={() => { void stop(); }} onInvite={() => { void invite(); }} />
               <CameraPublishSync publish={onStage} />
             </StageAudioShell>
           ) : (
-            <LiveStage token={connection.token} serverUrl={connection.wsUrl} streamId={stream.id} hostImage={artist.photo ?? undefined} profileHost={{ id: stream.host_id, name: artist.name, photo: artist.photo }} publish={onStage} showHostTools={canManage} onEnd={() => { void stop(); }} onInvite={() => { void invite(); }} />
+            <LiveStage token={connection.token} serverUrl={connection.wsUrl} streamId={stream.id} hostImage={artist.photo ?? undefined} profileHost={{ id: stream.host_id, name: artist.name, photo: artist.photo }} publish={onStage} showHostTools={canManage} audioOnly={stream.mode === "stage"} onEnd={() => { void stop(); }} onInvite={() => { void invite(); }} />
           )}
         </div>
       ) : (
