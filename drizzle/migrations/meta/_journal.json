@@ -71,6 +71,13 @@
       "when": 1791410955429,
       "tag": "0009_artist_referral_program",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791422055489,
+      "tag": "0010_lock_down_money_functions",
+      "breakpoints": true
     }
   ]
 }
