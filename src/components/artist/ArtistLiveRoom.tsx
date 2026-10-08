@@ -155,14 +155,22 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         </div>
       ) : (
         <section className="profile-entry-stage">
-          <div className="profile-video-grid">
+          {stream.mode === "stage" ? (
+            <div className="profile-podcast-banner flex items-center gap-3 rounded-2xl border border-border p-4">
+              <Headphones className="h-5 w-5 shrink-0 text-primary" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">Podcast mode — audio only</p>
+                <p className="text-xs text-muted-foreground">Video is off. Listen in live.</p>
+              </div>
+            </div>
+          ) : <div className="profile-video-grid">
           <div className="profile-video-tile">
             {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-primary"><Music2 className="h-20 w-20" /></div>}
             <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-background/80 px-3 py-2 text-xs text-foreground"><Crown className="h-4 w-4 text-primary" /> Host</span>
             <div className="profile-video-identity"><p className="text-sm font-semibold">{artist.name}</p></div>
           </div>
           {["Artist", "Guest"].map(label => <div key={label} className="profile-video-tile"><span className="profile-video-badge"><Users className="h-4 w-4" />{label}</span><div className="profile-video-empty"><Users className="h-10 w-10" /><span>Join to watch live</span></div></div>)}
-          </div>
+          </div>}
           {(!auth.user || isOwner) && <div className="profile-entry-actions">
             {!auth.user && <input aria-label="Your live-room name" placeholder="Your name (optional)" value={guestName} maxLength={80} onChange={(event) => setGuestName(event.target.value)} className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground" />}
             {isOwner && <Button variant="outline" className="w-full" disabled={ending} onClick={stop}>{ending ? "Ending…" : "End live"}</Button>}
