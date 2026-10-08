@@ -75,7 +75,7 @@ function PlayArenaDashboard() {
   });
   return (
     <div className="min-h-screen bg-[#06060d] text-white pt-20 pb-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="w-full px-4 sm:px-6 lg:px-8 space-y-6">
         <ProfileHero totals={data.totals} user={userStats ?? null} />
         <ChoosePath data={data} user={userStats ?? null} />
         <LiveArenaStatus data={data} />
