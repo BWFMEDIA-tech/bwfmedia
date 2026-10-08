@@ -28,7 +28,9 @@ export const getStreamLiveEarnings = createServerFn({ method: "GET" })
     const tip_count = tipsRows?.length ?? 0;
 
     // Current month revenue pool total via SECURITY DEFINER aggregate (no PII)
-    const { data: poolTotal } = await (sb as any).rpc("get_revenue_pool_total", {
+    // The pool aggregate is service-role only since the money lockdown.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: poolTotal } = await (supabaseAdmin as any).rpc("get_revenue_pool_total", {
       _month: null,
     });
     const pool_cents = Number(poolTotal ?? 0);
