@@ -189,6 +189,8 @@
 }
 .artist-live-chat > aside > div:last-child { border-color: var(--border); }
 .profile-video-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .85rem; }
+.profile-video-grid-single { grid-template-columns: minmax(0, 1fr); }
+.profile-video-grid-single .profile-video-tile { width: 100%; max-width: 32rem; }
 .profile-video-tile { position: relative; aspect-ratio: 0.8; overflow: hidden; border: 1px solid var(--brand-cyan); border-radius: 1rem; background: var(--live-glass); min-width: 0; box-shadow: var(--live-glow); }
 .profile-video-tile:nth-child(2) { border-color: var(--brand-blue); }
 .profile-video-tile:nth-child(3) { border-color: var(--brand-silver); }
