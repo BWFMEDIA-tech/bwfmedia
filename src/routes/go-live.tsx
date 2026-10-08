@@ -11,6 +11,7 @@ import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { AudienceRow, StageRoom } from "@/components/stream/StageRoom";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
+import { LiveSetlist } from "@/components/artist/LiveSetlist";
 import { updateStreamMode } from "@/lib/stage.functions";
 import { useStageState } from "@/lib/useStageState";
 import { LIVE_CATEGORIES } from "@/lib/live-categories";
@@ -215,6 +216,9 @@ function GoLivePage() {
               />
               <RaiseHandPanel streamId={stream.id} hands={hands} />
             </section>
+            <div className="mt-5 min-w-0">
+              <LiveSetlist streamId={stream.id} artistName={artist.name} isOwner tracks={[]} />
+            </div>
             <div className="profile-room-content artist-live-chat mt-5 min-w-0">
               <LiveChat
                 streamId={stream.id}
