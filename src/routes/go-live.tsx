@@ -2,14 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Radio, Copy, Check, Users } from "lucide-react";
+import { Radio, Copy, Check, Users, Headphones, Music2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { startOrResumeStream, endStream, getMyActiveStream } from "@/lib/streams.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
-import { AudienceRow } from "@/components/stream/StageRoom";
+import { AudienceRow, StageRoom } from "@/components/stream/StageRoom";
+import { updateStreamMode } from "@/lib/stage.functions";
 import { useStageState } from "@/lib/useStageState";
 import { LIVE_CATEGORIES } from "@/lib/live-categories";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,18 @@ function GoLivePage() {
   const [copied, setCopied] = useState(false);
   const [artist, setArtist] = useState<{ name: string; photo: string | null }>({ name: "", photo: null });
   const { participants } = useStageState(stream?.id ?? null);
+  const updateModeFn = useServerFn(updateStreamMode);
+  const [podcast, setPodcast] = useState(false);
+  const switchMode = async (next: boolean) => {
+    setPodcast(next);
+    if (!stream) return;
+    try {
+      await updateModeFn({ data: { streamId: stream.id, mode: next ? "stage" : "broadcast" } });
+      toast.success(next ? "Podcast mode: audio only" : "Music Review mode: video on");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't switch mode");
+    }
+  };
 
   useEffect(() => {
     const userId = auth.user?.id;
@@ -168,8 +181,17 @@ function GoLivePage() {
             </div>
           </header>
 
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              <Button variant={podcast ? "outline" : "default"} onClick={() => switchMode(false)} aria-pressed={!podcast}>
+                <Music2 className="h-4 w-4" /> Music Review
+              </Button>
+              <Button variant={podcast ? "default" : "outline"} onClick={() => switchMode(true)} aria-pressed={podcast}>
+                <Headphones className="h-4 w-4" /> Podcast
+              </Button>
+            </div>
             <div className="artist-live-stage min-w-0">
               <LiveStage
+                audioOnly={podcast}
                 token={lk.token}
                 serverUrl={lk.wsUrl}
                 streamId={stream.id}
@@ -182,6 +204,15 @@ function GoLivePage() {
                 profileHost={{ id: auth.user.id, name: artist.name, photo: artist.photo }}
               />
             </div>
+            <section className="mt-5 min-w-0">
+              <StageRoom
+                streamId={stream.id}
+                participants={participants}
+                canManage
+                primaryHostId={auth.user.id}
+                selfProfile={{ user_id: auth.user.id, display_name: artist.name, avatar_url: artist.photo }}
+              />
+            </section>
             <div className="profile-room-content artist-live-chat mt-5 min-w-0">
               <LiveChat
                 streamId={stream.id}
