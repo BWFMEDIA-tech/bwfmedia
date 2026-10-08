@@ -537,7 +537,7 @@ const StageInner = LiveStageContent;
 export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite, onViewerCount, audioOnly = false }: {
   host: { id: string; name: string; photo: string | null }; streamId?: string;
   showHostTools: boolean; publish: boolean; onEnd: () => void; onInvite: () => void;
-  onViewerCount?: (count: number) => void;
+  onViewerCount?: (count: number) => void; audioOnly?: boolean;
 }) {
   const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }], { onlySubscribed: false });
   const participants = useParticipants();
