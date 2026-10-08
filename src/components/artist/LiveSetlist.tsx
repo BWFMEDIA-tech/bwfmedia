@@ -78,10 +78,12 @@ export function LiveSetlist({ streamId, artistName, isOwner, tracks }: {
   const played = items.filter((i) => i.status === "played");
   const nextPos = (items.at(-1)?.position ?? 0) + 1;
 
+  // Adding songs while nothing plays starts the first one, which opens the player.
   const addMany = (list: { title: string; track?: SetlistTrack }[]) =>
     run(supabase.from("live_setlist_items").insert(list.map((l, i) => ({
       stream_id: streamId, title: l.title.slice(0, 200), track_id: null,
       cover_url: l.track?.cover_url ?? null, audio_url: l.track?.audio_url ?? null, position: nextPos + i,
+      ...(i === 0 && !nowPlaying ? { status: "playing", started_at: new Date().toISOString() } : {}),
     }))));
   const add = (title: string, track?: SetlistTrack) => addMany([{ title, track }]);
   const addSelected = async () => {
@@ -123,19 +125,34 @@ export function LiveSetlist({ streamId, artistName, isOwner, tracks }: {
 
   return (
     <section className="live-setlist space-y-4">
-      <div className="live-now-playing flex items-center gap-3 rounded-xl border border-border p-3">
-        <Art src={nowPlaying?.cover_url ?? null} size="h-14 w-14" />
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-            {nowPlaying && <span className="flex h-3 items-end gap-0.5" aria-hidden>{[0, 1, 2].map((i) => <span key={i} className="w-0.5 animate-pulse rounded-full bg-primary" style={{ height: `${6 + i * 3}px`, animationDelay: `${i * 150}ms` }} />)}</span>}
-            Now playing
-          </p>
-          <p className="truncate text-sm font-semibold text-foreground">{nowPlaying?.title ?? "Nothing playing yet"}</p>
-          <p className="truncate text-xs text-muted-foreground">{nowPlaying ? artistName : isOwner ? "Pick a song from your setlist" : "The artist hasn't started a song"}</p>
+      {nowPlaying ? (
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-card/60 p-5 text-center shadow-[0_0_60px_-20px_hsl(var(--primary))]">
+          <div className="mb-4 flex items-center justify-between">
+            <span className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary-foreground">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-foreground" /> Live
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">Now playing</span>
+          </div>
+          <div className="relative mx-auto my-6 aspect-square w-56 max-w-[70%]">
+            <div className="absolute -inset-5 animate-[spin_18s_linear_infinite] rounded-full border-2 border-dotted border-primary/60" aria-hidden />
+            <Art src={nowPlaying.cover_url} size="relative h-full w-full !rounded-2xl shadow-[0_0_40px_hsl(var(--primary)/0.5)]" />
+          </div>
+          <p className="truncate text-xl font-bold text-foreground">{nowPlaying.title}</p>
+          <p className="truncate text-sm text-muted-foreground">{artistName}</p>
+          <SharedPlayer item={nowPlaying} onEnded={isOwner ? finish : undefined} />
+          {isOwner && <Button size="sm" variant="outline" className="mt-3 rounded-full" onClick={finish}><SkipForward /> Next song</Button>}
         </div>
-        {nowPlaying && <SharedPlayer item={nowPlaying} onEnded={isOwner ? finish : undefined} />}
-        {isOwner && nowPlaying && <Button size="sm" variant="outline" onClick={finish} aria-label="Next song"><SkipForward /><span className="hidden sm:inline">Next</span></Button>}
-      </div>
+      ) : (
+        <div className="live-now-playing flex items-center gap-3 rounded-xl border border-border p-3">
+          <Art src={null} size="h-14 w-14" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">Now playing</p>
+            <p className="truncate text-sm font-semibold text-foreground">Nothing playing yet</p>
+            <p className="truncate text-xs text-muted-foreground">{isOwner ? "Add a song and the player opens" : "The artist hasn't started a song"}</p>
+          </div>
+        </div>
+      )}
+
 
       <div>
         <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground"><ListMusic className="h-4 w-4 text-primary" /> Setlist <span className="ml-auto text-xs text-muted-foreground">{upNext.length} up next</span></h2>
@@ -231,13 +248,23 @@ function SharedPlayer({ item, onEnded }: { item: Item; onEnded?: () => void }) {
     a.play().then(() => setBlocked(false)).catch(() => setBlocked(true));
   }, [item.started_at]);
 
-  if (!item.audio_url) return null;
+  const [t, setT] = useState(0);
+  const [dur, setDur] = useState(0);
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  if (!item.audio_url) return <p className="mt-4 text-xs text-muted-foreground">No audio for this song</p>;
   return (
-    <>
-      <audio ref={ref} src={src ?? undefined} muted={muted} onLoadedMetadata={sync} onEnded={onEnded} preload="auto" />
-      {blocked
-        ? <Button size="sm" onClick={sync}><Play /> Listen</Button>
-        : <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={muted ? "Unmute music" : "Mute music"} onClick={() => setMuted((m) => !m)}>{muted ? <VolumeX /> : <Volume2 />}</Button>}
-    </>
+    <div className="mt-4 space-y-4">
+      <audio ref={ref} src={src ?? undefined} muted={muted} onLoadedMetadata={(e) => { setDur(e.currentTarget.duration || 0); sync(); }} onTimeUpdate={(e) => setT(e.currentTarget.currentTime)} onEnded={onEnded} preload="auto" />
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="w-9 text-right tabular-nums">{fmt(t)}</span>
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: dur ? `${Math.min(100, (t / dur) * 100)}%` : "0%" }} /></div>
+        <span className="w-9 tabular-nums">{fmt(dur)}</span>
+      </div>
+      <div className="flex items-center justify-center gap-4">
+        {blocked
+          ? <Button className="h-16 w-16 rounded-full" onClick={sync} aria-label="Listen"><Play className="!h-7 !w-7" /></Button>
+          : <Button variant="outline" className="h-14 w-14 rounded-full" aria-label={muted ? "Unmute music" : "Mute music"} onClick={() => setMuted((m) => !m)}>{muted ? <VolumeX className="!h-6 !w-6" /> : <Volume2 className="!h-6 !w-6" />}</Button>}
+      </div>
+    </div>
   );
 }
