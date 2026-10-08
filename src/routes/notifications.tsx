@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Bell, CheckCheck, Radio } from "lucide-react";
+import { Bell, CheckCheck, Radio, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
@@ -63,6 +63,14 @@ function NotificationsPage() {
     toast.success("All marked read");
   };
 
+  const deleteAll = async () => {
+    if (!auth.user || items.length === 0) return;
+    if (!window.confirm("Delete all notifications? This can't be undone.")) return;
+    await supabase.from("notifications").delete().eq("user_id", auth.user.id);
+    setItems([]);
+    toast.success("All notifications deleted");
+  };
+
   const open = async (n: Notif) => {
     if (!n.read_at && auth.user) {
       await supabase.from("notifications").update({ read_at: new Date().toISOString() })
@@ -76,9 +84,14 @@ function NotificationsPage() {
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold flex items-center gap-3"><Bell className="h-7 w-7" /> Notifications</h1>
-          <button onClick={markAllRead} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs hover:bg-white/10">
-            <CheckCheck className="h-3.5 w-3.5" /> Mark all read
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={markAllRead} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs hover:bg-white/10">
+              <CheckCheck className="h-3.5 w-3.5" /> Mark all read
+            </button>
+            <button onClick={deleteAll} disabled={items.length === 0} className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300 hover:bg-red-500/20 transition disabled:opacity-40 disabled:cursor-not-allowed">
+              <Trash2 className="h-3.5 w-3.5" /> Delete all
+            </button>
+          </div>
         </div>
         {loading ? (
           <p className="text-white/50">Loading…</p>
