@@ -125,3 +125,46 @@ export const recordInviteJoin = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+const ROLE_RANK = { listener: 0, speaker: 1, host: 2 } as const;
+
+/**
+ * Place the signed-in invitee on stage with the role their invite grants.
+ * Runs server-side because stage RLS only lets the stream owner promote people;
+ * the invite code is re-validated here so callers cannot self-promote.
+ */
+export const joinStageFromInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({ code: codeSchema, streamId: z.string().uuid(), role: z.enum(["host", "speaker", "listener"]) })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const client = adminClient();
+    const { data: row } = await client
+      .from("invite_codes")
+      .select("stream_id, allowed_role, expires_at")
+      .eq("code", data.code.toLowerCase())
+      .maybeSingle();
+    if (!row) throw new Error("Invite not found");
+    if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) throw new Error("Invite expired");
+    if (row.stream_id && row.stream_id !== data.streamId) throw new Error("Invite is for a different live");
+    const allowed = (row.allowed_role ?? "listener") as keyof typeof ROLE_RANK;
+    if (ROLE_RANK[data.role] > ROLE_RANK[allowed]) throw new Error("Invite does not allow this role");
+
+    const { data: stream } = await client
+      .from("streams")
+      .select("id, status, mode")
+      .eq("id", data.streamId)
+      .maybeSingle();
+    if (!stream || stream.status !== "live" || stream.mode !== "stage") throw new Error("Live is not available");
+
+    const { error } = await client
+      .from("stage_participants")
+      .upsert(
+        { stream_id: data.streamId, user_id: context.userId, stage_role: data.role },
+        { onConflict: "stream_id,user_id" },
+      );
+    if (error) throw new Error("Could not join the stage");
+    return { ok: true };
+  });

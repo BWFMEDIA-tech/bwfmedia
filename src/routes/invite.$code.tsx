@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-r
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Radio, Crown, Mic, Headphones, ArrowRight, AlertTriangle } from "lucide-react";
-import { resolveInvite, recordInviteJoin, type ResolvedInvite } from "@/lib/invites.functions";
+import { resolveInvite, recordInviteJoin, joinStageFromInvite, type ResolvedInvite } from "@/lib/invites.functions";
 import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
@@ -32,6 +32,7 @@ function InvitePage() {
   const { code } = useParams({ from: "/invite/$code" });
   const resolveFn = useServerFn(resolveInvite);
   const recordFn = useServerFn(recordInviteJoin);
+  const joinStageFn = useServerFn(joinStageFromInvite);
   const guestTokenFn = useServerFn(getGuestLiveKitToken);
   const authTokenFn = useServerFn(getLiveKitToken);
   const auth = useAuth();
@@ -95,12 +96,7 @@ function InvitePage() {
       // If host or speaker, register as a stage participant with that role.
       if (auth.user && resolved.stream.mode === "stage") {
         const stageRole = role === "host" ? "host" : role === "speaker" ? "speaker" : "listener";
-        await supabase
-          .from("stage_participants")
-          .upsert(
-            { stream_id: resolved.stream.id, user_id: auth.user.id, stage_role: stageRole },
-            { onConflict: "stream_id,user_id" },
-          );
+await joinStageFn({ data: { code, streamId: resolved.stream.id, role: stageRole } });
       }
     } catch (e: any) {
       console.error("[invite] join failed", e);
