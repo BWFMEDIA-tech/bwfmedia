@@ -29,7 +29,7 @@ import { HostEarningsCard } from "@/components/stream/HostEarningsCard";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
-import { setHostTransferMode as setHostTransferModeFn } from "@/lib/stage.functions";
+import { setHostTransferMode as setHostTransferModeFn, updateStreamMode } from "@/lib/stage.functions";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
 
 
@@ -740,7 +740,21 @@ function Meter({ label, color }: { label: string; color: string }) {
 
 /* ---------- Main ---------- */
 function StreamStudio() {
-  const [mode, setMode] = useState<"review" | "podcast">("review");
+  const [mode, setModeState] = useState<"review" | "podcast">("review");
+  const updateStreamModeFn = useServerFn(updateStreamMode);
+  const setMode = async (next: "review" | "podcast") => {
+    setModeState(next);
+    const target = next === "podcast" ? "stage" : "broadcast";
+    setStreamMode(target);
+    const sid = stream?.id;
+    if (!sid) return;
+    try {
+      await updateStreamModeFn({ data: { streamId: sid, mode: target } });
+      toast.success(next === "podcast" ? "Podcast mode: audio only" : "Music Review mode: video on");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't switch mode");
+    }
+  };
   const auth = useAuth();
   const nav = useNavigate();
   const startFn = useServerFn(startOrResumeStream);
