@@ -63,6 +63,14 @@ function NotificationsPage() {
     toast.success("All marked read");
   };
 
+  const deleteAll = async () => {
+    if (!auth.user || items.length === 0) return;
+    if (!window.confirm("Delete all notifications? This can't be undone.")) return;
+    await supabase.from("notifications").delete().eq("user_id", auth.user.id);
+    setItems([]);
+    toast.success("All notifications deleted");
+  };
+
   const open = async (n: Notif) => {
     if (!n.read_at && auth.user) {
       await supabase.from("notifications").update({ read_at: new Date().toISOString() })
