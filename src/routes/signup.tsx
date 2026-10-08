@@ -77,7 +77,7 @@ function SignupPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-bone flex flex-col items-center justify-center gap-8 px-5 pt-10 pb-28 overflow-x-hidden">
+    <div className="relative min-h-screen bg-black text-bone flex flex-col items-center justify-center gap-8 px-5 pt-10 pb-12 overflow-x-hidden">
       <video
         className="absolute inset-0 w-full h-full object-cover opacity-40"
         src={heroRapperVideo.url}
