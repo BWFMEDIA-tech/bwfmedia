@@ -569,12 +569,12 @@ function ProfileMediaControls({ streamId, owner, onEnd, onInvite }: { streamId?:
     } catch (error) { toast.error(friendlyDeviceError(error)); }
   };
   return <div className="profile-media-controls">
-    <Button variant="ghost" onClick={() => void toggle("mic")}><span>{isMicrophoneEnabled ? <Mic /> : <MicOff />}</span>{isMicrophoneEnabled ? "Mute" : "Unmute"}</Button>
-    <Button variant="ghost" onClick={() => void toggle("cam")}><span>{isCameraEnabled ? <Camera /> : <CameraOff />}</span>Camera</Button>
-    <Button variant="ghost" onClick={() => void toggle("screen")}><MonitorUp />{isScreenShareEnabled ? "Stop Share" : "Share Screen"}</Button>
-    {owner && <Button variant="ghost" onClick={onInvite}><UserPlus />Invite Guest</Button>}
+    <Button variant="ghost" aria-pressed={!isMicrophoneEnabled} title={isMicrophoneEnabled ? "Mute microphone" : "Unmute microphone"} onClick={() => void toggle("mic")}><span>{isMicrophoneEnabled ? <Mic /> : <MicOff />}</span>{isMicrophoneEnabled ? "Mute" : "Unmute"}</Button>
+    <Button variant="ghost" aria-pressed={isCameraEnabled} title={isCameraEnabled ? "Turn camera off" : "Turn camera on"} onClick={() => void toggle("cam")}><span>{isCameraEnabled ? <Camera /> : <CameraOff />}</span>Camera</Button>
+    <Button variant="ghost" aria-pressed={isScreenShareEnabled} title="Share screen" onClick={() => void toggle("screen")}><span><MonitorUp /></span>{isScreenShareEnabled ? "Stop Share" : "Screen"}</Button>
+    {owner && <Button variant="ghost" onClick={onInvite} title="Invite guest"><span><UserPlus /></span>Guests</Button>}
     {owner && streamId && <RecordButton streamId={streamId} />}
-    {owner && <Button variant="ghost" onClick={onEnd} className="text-primary"><PhoneOff />End Live</Button>}
+    {owner && <Button variant="ghost" onClick={onEnd} className="profile-end-action"><span><PhoneOff /></span>End Live</Button>}
   </div>;
 }
 
