@@ -44,9 +44,11 @@ interface LiveStageProps {
   /** Show host/admin LiveKit controls (mic, camera, screen-share, end stream, device selector). */
   showHostTools?: boolean;
   profileHost?: { id: string; name: string; photo: string | null };
+  /** Podcast mode: keep the mic live but turn the camera off. */
+  audioOnly?: boolean;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost, audioOnly = false }: LiveStageProps) {
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
 
   // Publish health to the global store; reset on unmount so other surfaces
@@ -99,19 +101,19 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       <RoomAudioRenderer />
       <StageConnectionProvider>
         {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
-        <PublishSync publish={publish} />
+        <PublishSync publish={publish} camera={!audioOnly} />
         <LocalSpeakingSignalPublisher />
       </StageConnectionProvider>
     </LiveKitRoom>
   );
 }
 
-function PublishSync({ publish }: { publish: boolean }) {
+function PublishSync({ publish, camera = true }: { publish: boolean; camera?: boolean }) {
   const prev = useRef<boolean | null>(null);
   useResilientLocalMediaPublish({
     publish,
     microphone: true,
-    camera: true,
+    camera,
     onDisabled: () => {
       if (prev.current === true) toast.info("You're back in the crowd");
       prev.current = false;
