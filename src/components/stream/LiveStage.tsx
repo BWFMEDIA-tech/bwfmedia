@@ -26,6 +26,7 @@ import { Pin, PinOff, X as XIcon } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
 import { Button } from "@/components/ui/button";
 import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
+import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -411,6 +412,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
   const spotlight = useStreamSpotlight(streamId);
+  const visibleSlots = getVisibleLiveVideoSlots(spotlight);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host";
@@ -514,18 +516,21 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         className={cn(
           "gap-4",
           "flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          "md:grid md:grid-cols-3 md:items-start md:overflow-visible md:pb-0",
+          "md:grid md:items-start md:overflow-visible md:pb-0",
+          visibleSlots.length === 1 && "md:grid-cols-1",
+          visibleSlots.length === 2 && "md:grid-cols-2",
+          visibleSlots.length === 3 && "md:grid-cols-3",
         )}
       >
         <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("admin", "HOST", "Waiting for Host", hostImage)}
         </div>
-        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+        {spotlight.artist && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
-        </div>
-        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+        </div>}
+        {spotlight.cohost && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("host", "CO-HOST", "Waiting for Co-Host")}
-        </div>
+        </div>}
       </div>
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
     </>
@@ -546,12 +551,12 @@ export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, on
   const profiles = useParticipantProfiles(participants.map(p => p.identity));
   const spotlight = useStreamSpotlight(streamId);
   const guests = participants.filter(p => p.identity !== host.id && ["speaker", "artist", "guest", "co_host", "host"].includes(roles[p.identity] ?? ""));
-  const featured = guests.find(p => p.identity === spotlight.artist) ?? guests[0];
-  const guest = guests.find(p => p.identity !== featured?.identity);
+  const featured = spotlight.artist ? guests.find(p => p.identity === spotlight.artist) : undefined;
+  const guest = spotlight.cohost ? guests.find(p => p.identity === spotlight.cohost) : undefined;
   const slots = [
     { label: "Host", icon: Crown, identity: host.id, name: host.name, photo: host.photo },
-    { label: "Artist", icon: Music2, identity: featured?.identity, name: featured?.name, photo: null },
-    { label: "Guest", icon: UserRound, identity: guest?.identity, name: guest?.name, photo: null },
+    ...(featured ? [{ label: "Artist", icon: Music2, identity: featured.identity, name: featured.name, photo: null }] : []),
+    ...(guest ? [{ label: "Guest", icon: UserRound, identity: guest.identity, name: guest.name, photo: null }] : []),
   ];
   return <>
     {audioOnly ? (
