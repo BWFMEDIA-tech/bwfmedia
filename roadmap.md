@@ -1,4 +1,5 @@
 # Live artist profile
+- [x] Show only the host video box until the host explicitly selects an artist or guest; rule tests pass and host-only mobile/desktop layout has no overflow.
 - [x] Add the right-side stage dropdown with Hosts/Mods/Guests navigation and existing permission-gated mute actions; verified during a signed-in connected broadcast, menu rendering/navigation, clean runtime, and test broadcast ending.
 - [x] Move the stage below live controls and expose profile-live Raise Hand with host request handling; verified a signed-in broadcast at desktop/531px, request panel, no page errors/overflow, and test stream ending. Guest approval still needs a second signed-in participant to verify.
 - [x] Replace the legacy `/go-live` broadcast view with the updated profile stage, circular controls, and chat; verified a signed-in broadcast, camera, desktop and phone layouts, and ending the test stream.
