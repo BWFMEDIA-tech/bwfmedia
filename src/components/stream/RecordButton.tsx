@@ -7,7 +7,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useServerFn } from '@tanstack/react-start';
 import { saveRecording } from '@/lib/recordings.functions';
 import { useAuth } from '@/lib/auth-context';
-import { cn } from '@/lib/utils';
 
 interface Props {
   streamId: string;
@@ -96,8 +95,9 @@ export function RecordButton({ streamId }: Props) {
 
   if (state === 'uploading') {
     return (
-      <button disabled className="flex items-center gap-2 rounded-lg border border-white/5 px-3 py-2 text-xs font-medium text-white/70">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…
+      <button disabled title="Saving recording">
+        <span><Loader2 className="animate-spin" /></span>
+        <span>Saving…</span>
       </button>
     );
   }
@@ -105,15 +105,11 @@ export function RecordButton({ streamId }: Props) {
   return (
     <button
       onClick={state === 'recording' ? stop : start}
-      className={cn(
-        'flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition',
-        state === 'recording'
-          ? 'border-red-500/40 bg-red-500/15 text-red-200 hover:bg-red-500/25'
-          : 'border-white/5 text-white/80 hover:bg-white/5',
-      )}
+      aria-pressed={state === 'recording'}
+      title={state === 'recording' ? `Recording ${mmss}` : 'Record'}
     >
-      {state === 'recording' ? <Square className="h-3.5 w-3.5 fill-current" /> : <Circle className="h-3.5 w-3.5 fill-red-500 text-red-500" />}
-      {state === 'recording' ? `Rec ${mmss}` : 'Record'}
+      <span>{state === 'recording' ? <Square className="fill-current" /> : <Circle className="text-destructive fill-destructive" />}</span>
+      <span>{state === 'recording' ? `Rec ${mmss}` : 'Record'}</span>
     </button>
   );
 }
