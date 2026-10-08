@@ -9,6 +9,8 @@ import { startOrResumeStream, endStream, getMyActiveStream } from "@/lib/streams
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
+import { AudienceRow } from "@/components/stream/StageRoom";
+import { useStageState } from "@/lib/useStageState";
 import { LIVE_CATEGORIES } from "@/lib/live-categories";
 import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -47,6 +49,7 @@ function GoLivePage() {
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [artist, setArtist] = useState<{ name: string; photo: string | null }>({ name: "", photo: null });
+  const { participants } = useStageState(stream?.id ?? null);
 
   useEffect(() => {
     const userId = auth.user?.id;
@@ -189,6 +192,10 @@ function GoLivePage() {
                 status="live"
                 profileLayout
               />
+              <section className="mt-4 border-b border-border pb-4">
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-primary" /> Audience <span className="ml-auto text-muted-foreground">{viewerCount.toLocaleString()}</span></h2>
+                {participants.some((p) => p.stage_role === "listener" || p.stage_role === "green_room") ? <AudienceRow participants={participants} /> : <p className="text-sm text-muted-foreground">No audience members yet.</p>}
+              </section>
             </div>
       </main>
     );
