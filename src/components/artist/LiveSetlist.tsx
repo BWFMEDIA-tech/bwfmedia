@@ -248,13 +248,23 @@ function SharedPlayer({ item, onEnded }: { item: Item; onEnded?: () => void }) {
     a.play().then(() => setBlocked(false)).catch(() => setBlocked(true));
   }, [item.started_at]);
 
-  if (!item.audio_url) return null;
+  const [t, setT] = useState(0);
+  const [dur, setDur] = useState(0);
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  if (!item.audio_url) return <p className="mt-4 text-xs text-muted-foreground">No audio for this song</p>;
   return (
-    <>
-      <audio ref={ref} src={src ?? undefined} muted={muted} onLoadedMetadata={sync} onEnded={onEnded} preload="auto" />
-      {blocked
-        ? <Button size="sm" onClick={sync}><Play /> Listen</Button>
-        : <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={muted ? "Unmute music" : "Mute music"} onClick={() => setMuted((m) => !m)}>{muted ? <VolumeX /> : <Volume2 />}</Button>}
-    </>
+    <div className="mt-4 space-y-4">
+      <audio ref={ref} src={src ?? undefined} muted={muted} onLoadedMetadata={(e) => { setDur(e.currentTarget.duration || 0); sync(); }} onTimeUpdate={(e) => setT(e.currentTarget.currentTime)} onEnded={onEnded} preload="auto" />
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="w-9 text-right tabular-nums">{fmt(t)}</span>
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-[width]" style={{ width: dur ? `${Math.min(100, (t / dur) * 100)}%` : "0%" }} /></div>
+        <span className="w-9 tabular-nums">{fmt(dur)}</span>
+      </div>
+      <div className="flex items-center justify-center gap-4">
+        {blocked
+          ? <Button className="h-16 w-16 rounded-full" onClick={sync} aria-label="Listen"><Play className="!h-7 !w-7" /></Button>
+          : <Button variant="outline" className="h-14 w-14 rounded-full" aria-label={muted ? "Unmute music" : "Mute music"} onClick={() => setMuted((m) => !m)}>{muted ? <VolumeX className="!h-6 !w-6" /> : <Volume2 className="!h-6 !w-6" />}</Button>}
+      </div>
+    </div>
   );
 }
