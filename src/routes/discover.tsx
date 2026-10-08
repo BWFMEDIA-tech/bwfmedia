@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import discoverHero from "@/assets/discover-hero.jpg";
 import { getHomepageData } from "@/lib/homepage.functions";
 import { SignedImg } from "@/components/ui/signed-img";
+import { PlatformCapabilities } from "@/components/site/PlatformCapabilities";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
@@ -434,6 +435,11 @@ function DiscoverPage() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* WHAT THE PLATFORM WILL DO */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+        <PlatformCapabilities className="mx-auto w-full max-w-5xl" />
       </section>
 
       {/* MOVEMENT CTA */}

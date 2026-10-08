@@ -4,7 +4,6 @@ import { readHostReferral, saveHostReferral } from "@/lib/host-referral";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
-import { PlatformCapabilities } from "@/components/site/PlatformCapabilities";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Create account — BWF Network" }] }),
