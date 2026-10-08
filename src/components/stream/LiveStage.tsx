@@ -750,26 +750,27 @@ function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; on
     : quality === ConnectionQuality.Poor ? "#f59e0b" : "#94a3b8";
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+    <div className="studio-media-controls">
       <div className="mr-2 flex items-center gap-2 px-2">
         <Wifi className="h-3.5 w-3.5" style={{ color: qualityColor }} />
         <div className="text-xs">
-          <div className="font-semibold text-white">LiveKit</div>
-          <div className="text-[10px] text-white/50">{qualityLabel} connection</div>
+          <div className="font-semibold text-foreground">LiveKit</div>
+          <div className="text-[10px] text-muted-foreground">{qualityLabel} connection</div>
         </div>
       </div>
       <CtrlBtn icon={micOn ? Mic : MicOff} label={micOn ? "Mute" : "Unmute"} onClick={toggleMic} active={!micOn} />
-      <CtrlBtn icon={camOn ? Camera : CameraOff} label={camOn ? "Stop Cam" : "Start Cam"} onClick={toggleCam} active={!camOn} />
-      <CtrlBtn icon={MonitorUp} label={sharing ? "Stop Share" : "Share Screen"} onClick={toggleShare} active={sharing} />
-      <CtrlBtn icon={UserPlus} label="Invite Guest" onClick={onInvite} />
+      <CtrlBtn icon={camOn ? Camera : CameraOff} label="Camera" onClick={toggleCam} active={!camOn} />
+      <CtrlBtn icon={MonitorUp} label={sharing ? "Stop Share" : "Screen"} onClick={toggleShare} active={sharing} />
+      <CtrlBtn icon={UserPlus} label="Guests" onClick={onInvite} />
       {streamId && <RecordButton streamId={streamId} />}
       <DeviceSelector compact />
       <button
         onClick={async () => { await room?.disconnect(); onEnd(); }}
-        className="ml-auto flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-500"
+        className="studio-end-action"
+        aria-label="End live"
       >
-        <PhoneOff className="h-3.5 w-3.5" />
-        End Stream
+        <span><PhoneOff /></span>
+        <span>End Live</span>
       </button>
     </div>
   );
@@ -777,15 +778,9 @@ function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; on
 
 function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: string; onClick?: () => void; active?: boolean }) {
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-2 rounded-lg border border-white/5 px-3 py-2 text-xs font-medium transition hover:bg-white/5",
-        active ? "bg-white/10 text-white" : "text-white/80",
-      )}
-    >
-      <Icon className="h-3.5 w-3.5" />
-      {label}
+    <button onClick={onClick} aria-pressed={!!active} title={label}>
+      <span><Icon /></span>
+      <span>{label}</span>
     </button>
   );
 }
