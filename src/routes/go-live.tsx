@@ -179,7 +179,7 @@ function GoLivePage() {
                 profileHost={{ id: auth.user.id, name: artist.name, photo: artist.photo }}
               />
             </div>
-            <div className="artist-live-chat mt-5 min-w-0">
+            <div className="profile-room-content artist-live-chat mt-5 min-w-0">
               <LiveChat
                 streamId={stream.id}
                 auth={auth}
