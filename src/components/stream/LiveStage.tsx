@@ -102,10 +102,19 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       <StageConnectionProvider>
         {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
         <PublishSync publish={publish} camera={!audioOnly} />
+        {audioOnly && <AudioOnlySync />}
         <LocalSpeakingSignalPublisher />
       </StageConnectionProvider>
     </LiveKitRoom>
   );
+}
+
+function AudioOnlySync() {
+  const { localParticipant } = useLocalParticipant();
+  useEffect(() => {
+    void localParticipant.setCameraEnabled(false).catch(() => {});
+  }, [localParticipant]);
+  return null;
 }
 
 function PublishSync({ publish, camera = true }: { publish: boolean; camera?: boolean }) {
