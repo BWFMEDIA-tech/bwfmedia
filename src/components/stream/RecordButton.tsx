@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useServerFn } from '@tanstack/react-start';
 import { saveRecording } from '@/lib/recordings.functions';
 import { useAuth } from '@/lib/auth-context';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   streamId: string;
@@ -95,21 +96,22 @@ export function RecordButton({ streamId }: Props) {
 
   if (state === 'uploading') {
     return (
-      <button disabled title="Saving recording">
+      <Button variant="ghost" disabled title="Saving recording">
         <span><Loader2 className="animate-spin" /></span>
         <span>Saving…</span>
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={state === 'recording' ? stop : start}
       aria-pressed={state === 'recording'}
       title={state === 'recording' ? `Recording ${mmss}` : 'Record'}
     >
       <span>{state === 'recording' ? <Square className="fill-current" /> : <Circle className="text-destructive fill-destructive" />}</span>
       <span>{state === 'recording' ? `Rec ${mmss}` : 'Record'}</span>
-    </button>
+    </Button>
   );
 }

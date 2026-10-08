@@ -203,7 +203,7 @@
 .profile-video-empty svg { color: var(--primary); opacity: .4; }
 .profile-video-identity { position: absolute; inset: auto 0 0; min-height: 4.5rem; padding: 1.5rem .85rem .85rem; display: flex; align-items: center; gap: .65rem; background: linear-gradient(0deg, var(--background), transparent); color: var(--foreground); }
 .profile-media-controls { margin: .9rem auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; padding: .75rem; width: 100%; max-width: 100%; border: 1px solid var(--border); border-radius: 1rem; background: var(--live-glass); }
-.profile-media-controls > button { display: flex; flex-direction: column; gap: .55rem; height: 5rem; min-width: 4.5rem; border: 0; padding: .25rem; font-size: .75rem; color: var(--foreground); background: transparent; }
+.profile-media-controls > button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem; height: 5rem; min-width: 4.5rem; border: 0; padding: .25rem; font-size: .75rem; color: var(--foreground); background: transparent; }
 .profile-media-controls > button > span:first-child { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--border); background: var(--card); }
 .profile-media-controls > button[aria-pressed="true"] > span:first-child { border-color: var(--primary); color: var(--primary); }
 .profile-media-controls > .profile-end-action { color: var(--destructive); }
@@ -214,6 +214,8 @@
 .studio-media-controls > button > span:first-child { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--border); background: var(--card); }
 .studio-media-controls > button[aria-pressed="true"] > span:first-child { border-color: var(--primary); color: var(--primary); }
 .studio-media-controls > button svg { height: 1.25rem; width: 1.25rem; }
+.profile-media-controls > button > span:first-child,
+.studio-media-controls > button > span:first-child { flex-shrink: 0; }
 .studio-media-controls > .studio-end-action { color: var(--destructive); }
 .studio-media-controls > .studio-end-action > span:first-child { border-color: color-mix(in srgb, var(--destructive) 45%, transparent); }
 .profile-entry-actions { display: flex; gap: .75rem; max-width: 34rem; margin: 1rem auto; align-items: center; }
