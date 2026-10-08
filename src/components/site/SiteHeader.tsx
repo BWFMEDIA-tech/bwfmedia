@@ -15,8 +15,6 @@ import {
   Compass,
   BarChart3,
   Music,
-  Camera,
-  Star,
   Mail,
   Newspaper,
   Calendar,
@@ -61,9 +59,8 @@ const PRIMARY: NavItem[] = [
   { to: "/charts", label: "Charts", icon: BarChart3 },
 ];
 
+// "Book a Shoot" (/studio) and "Off Da Block" (/off-the-block) hidden for now — restore when ready.
 const BROWSE: NavItem[] = [
-  { to: "/studio", label: "Book a Shoot", icon: Camera },
-  { to: "/off-the-block", label: "Off Da Block", icon: Star },
   { to: "/events", label: "Events", icon: Calendar },
   { to: "/blog", label: "Blog", icon: Newspaper },
   { to: "/contact", label: "Contact", icon: Mail },
