@@ -188,7 +188,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         <div className="artist-live-chat min-w-0">
           <LiveChat streamId={stream.id} auth={auth} viewerCount={viewers} startedAt={stream.started_at} hostId={stream.host_id} status="live" profileLayout />
           {showAudience && <section className="mt-4 border-b border-border pb-4">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-primary" /> Audience <span className="ml-auto text-muted-foreground">{viewers.toLocaleString()}</span></h2>
+            <h2 className="mb-3 flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-primary" /> Audience <span className="text-muted-foreground">{viewers.toLocaleString()}</span>{!isOwner && <span className="ml-auto"><RaiseHandButton streamId={stream.id} auth={auth} label="Raise Hand" /></span>}</h2>
             {participants.some((p) => p.stage_role === "listener" || p.stage_role === "green_room") ? <AudienceRow participants={participants} /> : <p className="text-sm text-muted-foreground">{connection ? "No audience members yet." : "Join to see the audience."}</p>}
           </section>}
         </div>
