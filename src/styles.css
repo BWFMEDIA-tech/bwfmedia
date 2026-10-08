@@ -238,6 +238,8 @@
   .profile-media-controls { gap: .25rem; padding: .5rem; }
   .profile-media-controls > button { min-width: 3.4rem; font-size: .65rem; height: 4.5rem; flex: 1 0 26%; }
   .profile-media-controls > button > span:first-child { width: 2.65rem; height: 2.65rem; }
+  .studio-media-controls > button { min-width: 3.4rem; font-size: .65rem; height: 4.5rem; }
+  .studio-media-controls > button > span:first-child { width: 2.65rem; height: 2.65rem; }
   .profile-action-dock { gap: .2rem; }
   .profile-action-dock button { min-width: 3rem; padding-inline: .5rem; }
   .artist-live-room > header { gap: .5rem; }
