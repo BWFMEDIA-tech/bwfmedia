@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+const adminRpc = async () => (await import("@/integrations/supabase/client.server")).supabaseAdmin as any;
 
 export const LABEL_ROLES = ["owner", "manager", "anr", "finance"] as const;
 export type LabelRole = (typeof LABEL_ROLES)[number];
@@ -324,7 +325,7 @@ export const getLabelEarnings = createServerFn({ method: "GET" })
   .inputValidator((d) => uuid.parse(d))
   .handler(async ({ data, context }) => {
     await requireRole(context, data.id, "viewEarnings");
-    const { data: rows, error } = await context.supabase.rpc("get_label_earnings", { _label_id: data.id });
+    const { data: rows, error } = await (await adminRpc()).rpc("get_label_earnings", { _label_id: data.id });
     if (error) throw new Error(error.message);
     const list = (rows ?? []) as Array<{
       artist_id: string;
