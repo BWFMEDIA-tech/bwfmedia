@@ -25,7 +25,7 @@ import { setStreamSpotlight } from "@/lib/stage.functions";
 import { Pin, PinOff, X as XIcon } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
 import { Button } from "@/components/ui/button";
-import { Crown, Music2, UserRound, AudioLines } from "lucide-react";
+import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -100,7 +100,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
     >
       <RoomAudioRenderer />
       <StageConnectionProvider>
-        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
+        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} audioOnly={audioOnly} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
         <PublishSync publish={publish} camera={!audioOnly} />
         {audioOnly && <AudioOnlySync />}
         <LocalSpeakingSignalPublisher />
@@ -534,7 +534,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
 const StageInner = LiveStageContent;
 
-export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite, onViewerCount }: {
+export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite, onViewerCount, audioOnly = false }: {
   host: { id: string; name: string; photo: string | null }; streamId?: string;
   showHostTools: boolean; publish: boolean; onEnd: () => void; onInvite: () => void;
   onViewerCount?: (count: number) => void;
