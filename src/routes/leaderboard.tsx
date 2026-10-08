@@ -43,8 +43,8 @@ function LeaderboardPage() {
     );
   }, [rows, q]);
 
-  const top3 = rows.slice(0, 3);
-  const rest = filtered.filter((r) => r.rank > 3);
+  const top5 = rows.slice(0, 5);
+  const rest = filtered.filter((r) => r.rank > 5);
 
   const totals = useMemo(() => {
     return rows.reduce(
@@ -75,7 +75,7 @@ function LeaderboardPage() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 space-y-12">
+      <div className="relative w-full px-4 py-10 sm:px-6 lg:px-8 sm:py-16 space-y-12">
         {/* HERO */}
         <header className="space-y-6">
           <Link
@@ -114,12 +114,16 @@ function LeaderboardPage() {
         </header>
 
         {/* PODIUM */}
-        {top3.length > 0 && (
-          <section className="grid gap-4 sm:grid-cols-3 sm:items-end">
-            {[1, 0, 2].map((idx, i) => {
-              const a = top3[idx];
-              if (!a) return <div key={i} />;
-              return <PodiumCard key={a.userId} entry={a} />;
+        {top5.length > 0 && (
+          <section className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5 sm:items-end">
+            {top5.map((a) => {
+              // Desktop podium order: 4, 2, 1, 3, 5. Phones list 1-5 in rank order.
+              const order = ["lg:order-3", "lg:order-2", "lg:order-4", "lg:order-1", "lg:order-5"][a.rank - 1] ?? "";
+              return (
+                <div key={a.userId} className={order}>
+                  <PodiumCard entry={a} />
+                </div>
+              );
             })}
           </section>
         )}
@@ -194,10 +198,12 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
       ? { from: "#FFD700", via: "#00E6FF", to: "#0000FF", glow: "rgba(0,0,255,0.55)" }
       : entry.rank === 2
       ? { from: "#E5E7EB", via: "#00E6FF", to: "#0000FF", glow: "rgba(0,230,255,0.45)" }
-      : { from: "#CD7F32", via: "#B8C2D0", to: "#0000FF", glow: "rgba(0,0,255,0.45)" };
+      : entry.rank === 3
+      ? { from: "#CD7F32", via: "#B8C2D0", to: "#0000FF", glow: "rgba(0,0,255,0.45)" }
+      : { from: "#B8C2D0", via: "#00E6FF", to: "#004BFF", glow: "rgba(0,75,255,0.35)" };
   const Icon = entry.rank === 1 ? Crown : entry.rank === 2 ? Trophy : Medal;
   const lift =
-    entry.rank === 1 ? "sm:-translate-y-6 sm:scale-[1.04]" : entry.rank === 2 ? "" : "sm:translate-y-3";
+    entry.rank === 1 ? "sm:-translate-y-6 sm:scale-[1.04]" : entry.rank === 2 ? "" : entry.rank === 3 ? "sm:translate-y-3" : "lg:translate-y-6";
 
   return (
     <Link
