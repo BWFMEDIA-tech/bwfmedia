@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { validateReturnUrl } from "@/lib/validate-return-url";
+const adminRpc = async () => (await import("@/integrations/supabase/client.server")).supabaseAdmin as any;
 
 const MIN_PAYOUT_CENTS = 2500; // $25 minimum
 
@@ -28,7 +29,7 @@ export const getPayoutOverview = createServerFn({ method: "GET" })
         .eq("user_id", userId)
         .eq("environment", env)
         .maybeSingle(),
-      supabase.rpc("get_creator_balance_cents", { _user_id: userId }),
+      (await adminRpc()).rpc("get_creator_balance_cents", { _user_id: userId }),
       supabase
         .from("payout_requests")
         .select(
@@ -206,7 +207,7 @@ export const requestPayout = createServerFn({ method: "POST" })
     if (!acct.payouts_enabled)
       return { error: "Your payout account isn't approved yet. Finish onboarding." };
 
-    const { data: bal } = await supabase.rpc("get_creator_balance_cents", {
+    const { data: bal } = await (await adminRpc()).rpc("get_creator_balance_cents", {
       _user_id: userId,
     });
     const row = Array.isArray(bal) ? bal[0] : bal;
@@ -245,7 +246,7 @@ export const getMyRoyaltyEarnings = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const [summaryRes, monthsRes] = await Promise.all([
-      supabase.rpc("get_artist_earnings_summary", { _artist_id: userId }),
+      (await adminRpc()).rpc("get_artist_earnings_summary", { _artist_id: userId }),
       supabase
         .from("artist_royalties")
         .select("month, weighted_streams, raw_streams, share_pct, payout_amount_cents, status, paid_at")
@@ -297,7 +298,7 @@ export const requestRoyaltyPayout = createServerFn({ method: "POST" })
     if (!acct.payouts_enabled)
       return { error: "Your payout account isn't approved yet. Finish onboarding." };
 
-    const { data: summary } = await supabase.rpc("get_artist_earnings_summary", {
+    const { data: summary } = await (await adminRpc()).rpc("get_artist_earnings_summary", {
       _artist_id: userId,
     });
     const available = Number((summary as any)?.available_cents ?? 0);

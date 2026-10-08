@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+const adminRpc = async () => (await import("@/integrations/supabase/client.server")).supabaseAdmin as any;
 
 export const RELEASE_TYPES = ["single", "ep", "album"] as const;
 export const RELEASE_STATUSES = ["draft", "submitted", "approved", "rejected", "live"] as const;
@@ -372,7 +373,7 @@ export const getDistributionOverview = createServerFn({ method: "GET" })
     for (const r of releases ?? []) counts[r.status] = (counts[r.status] ?? 0) + 1;
 
     let earnings: any = null;
-    const { data: bal } = await context.supabase.rpc("get_creator_balance_cents", { _user_id: context.userId });
+    const { data: bal } = await (await adminRpc()).rpc("get_creator_balance_cents", { _user_id: context.userId });
     if (Array.isArray(bal)) earnings = bal[0] ?? null;
     else if (bal) earnings = bal;
 

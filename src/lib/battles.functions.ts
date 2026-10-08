@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+const adminRpc = async () => (await import("@/integrations/supabase/client.server")).supabaseAdmin as any;
 
 /**
  * Play Arena — Battle Engine server functions.
@@ -350,7 +351,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
     const weight = (res.weight as number) ?? 1;
     let xpBalance: number | null = null;
     try {
-      const { data: bal } = await supabase.rpc("award_xp", {
+      const { data: bal } = await (await adminRpc()).rpc("award_xp", {
         _user_id: userId,
         _delta: weight === 5 ? 25 : 5,
         _reason: "vote_cast",
