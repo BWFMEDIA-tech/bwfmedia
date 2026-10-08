@@ -5,6 +5,7 @@
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Use opt-in profile layouts for shared LiveStage and LiveChat tools, because reference-matched profile presentation must not alter Arena or Studio layouts.
+- Use the shared profile stage and chat presentation on `/go-live`, because starting a profile broadcast must show the same updated design as watching it without adding a second room connection.
 - Keep profile video sizing and control styling scoped to the profile selectors, because phone layouts must stack without changing shared broadcast tools or participant assignments.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.

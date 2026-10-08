@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Replace the legacy `/go-live` broadcast view with the updated profile stage, circular controls, and chat; verify signed-in display.
 - [x] Update live profile to the latest phone reference; verified signed-in viewing, audience toggle, stacked landscape videos at 320/393/531px, desktop columns, and no page errors or overflow.
 - [x] Match the latest live-profile reference with tall video frames, compact controls, chat/sidebar, and bottom actions; omit unsupported sample supporters and clips.
 - [x] Verify real guest viewing and audience toggle, three video frames, no owner controls for visitors, and no mobile overflow.
