@@ -116,7 +116,7 @@
   flex-direction: column;
   background: var(--background);
 }
-.artist-live-room > header { order: 0; }
+.artist-live-room > header { order: 0; position: relative; z-index: 20; }
 .artist-live-room > .artist-live-stage, .artist-live-room > .profile-entry-stage { order: 1; }
 .artist-live-room > .live-artist-card { order: 2; margin-top: 1rem; margin-bottom: 0; }
 .artist-live-room > .profile-room-content { order: 3; }
@@ -220,10 +220,8 @@
 .profile-action-dock button { height: 4rem; min-width: 4rem; display: flex; flex-direction: column; gap: .5rem; border-radius: 1rem; font-size: .7rem; color: var(--muted-foreground); }
 .profile-action-dock .profile-tip-action { color: var(--primary); border-color: var(--primary); box-shadow: var(--live-glow); }
 @media (max-width: 639px) {
-  .profile-video-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0.75rem; padding-bottom: 0.5rem; padding-inline: 0.25rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .profile-video-grid::-webkit-scrollbar { display: none; }
-  .profile-video-tile { flex: 0 0 85%; scroll-snap-align: center; aspect-ratio: 0.75; }
-  .profile-video-tile { border-radius: .85rem; }
+  .profile-video-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; width: 100%; }
+  .profile-video-tile { width: 100%; aspect-ratio: 16 / 9; border-radius: .85rem; }
   .profile-video-badge { left: .75rem; top: .75rem; padding: .3rem .5rem; gap: .3rem; font-size: .7rem; }
   .profile-video-badge svg { height: .85rem; width: .85rem; }
   .profile-video-identity { padding: 1rem .75rem .65rem; min-height: 3.5rem; gap: .5rem; }
