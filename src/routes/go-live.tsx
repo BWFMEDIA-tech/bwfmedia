@@ -10,6 +10,7 @@ import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { AudienceRow, StageRoom } from "@/components/stream/StageRoom";
+import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { updateStreamMode } from "@/lib/stage.functions";
 import { useStageState } from "@/lib/useStageState";
 import { LIVE_CATEGORIES } from "@/lib/live-categories";
@@ -50,7 +51,7 @@ function GoLivePage() {
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [artist, setArtist] = useState<{ name: string; photo: string | null }>({ name: "", photo: null });
-  const { participants } = useStageState(stream?.id ?? null);
+  const { participants, hands } = useStageState(stream?.id ?? null);
   const updateModeFn = useServerFn(updateStreamMode);
   const [podcast, setPodcast] = useState(false);
   const switchMode = async (next: boolean) => {
@@ -204,7 +205,7 @@ function GoLivePage() {
                 profileHost={{ id: auth.user.id, name: artist.name, photo: artist.photo }}
               />
             </div>
-            <section className="mt-5 min-w-0">
+            <section className="profile-stage-room mt-5 min-w-0 space-y-4" aria-label="Live stage">
               <StageRoom
                 streamId={stream.id}
                 participants={participants}
@@ -212,6 +213,7 @@ function GoLivePage() {
                 primaryHostId={auth.user.id}
                 selfProfile={{ user_id: auth.user.id, display_name: artist.name, avatar_url: artist.photo }}
               />
+              <RaiseHandPanel streamId={stream.id} hands={hands} />
             </section>
             <div className="profile-room-content artist-live-chat mt-5 min-w-0">
               <LiveChat
