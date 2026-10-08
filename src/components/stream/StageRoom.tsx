@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
+import { useMaybeRoomContext } from "@livekit/components-react";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 import { SignedImg } from "@/components/ui/signed-img";
 import { Button } from "@/components/ui/button";
@@ -854,6 +855,25 @@ function SpeakerBubble({
   const badgeLabel = kind === "host" ? "HOST" : kind === "co_host" ? "CO-HOST" : "GUEST";
   const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#991b1b" : "#c2410c";
   const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
+  const room = useMaybeRoomContext();
+  const [selfMicOn, setSelfMicOn] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!isSelf || !room) return;
+    const sync = () => setSelfMicOn(room.localParticipant.isMicrophoneEnabled);
+    sync();
+    room.localParticipant.on("trackMuted", sync).on("trackUnmuted", sync).on("localTrackPublished", sync).on("localTrackUnpublished", sync);
+    return () => { room.localParticipant.off("trackMuted", sync).off("trackUnmuted", sync).off("localTrackPublished", sync).off("localTrackUnpublished", sync); };
+  }, [isSelf, room]);
+  const micOff = isSelf && selfMicOn !== null ? !selfMicOn : isMuted;
+  const canTapMic = (isSelf && !!room) || (canManage && !isSelf && !!onToggleMute);
+  const onMicTap = async () => {
+    if (isSelf && room) {
+      if (isMuted) { toast.error("The host has muted you."); return; }
+      const next = !room.localParticipant.isMicrophoneEnabled;
+      try { await room.localParticipant.setMicrophoneEnabled(next); setSelfMicOn(next); }
+      catch { toast.error("Couldn't access your microphone. Check browser permissions."); }
+    } else if (onToggleMute) onToggleMute();
+  };
   return (
     <div className="relative flex flex-col items-center gap-2 pt-3">
       <div className="absolute -top-0.5 left-1/2 z-30 -translate-x-1/2">
@@ -899,15 +919,21 @@ function SpeakerBubble({
             />
           )}
         </Link>
-        <div
+        <button
+          type="button"
+          disabled={!canTapMic}
+          onClick={onMicTap}
+          aria-label={micOff ? "Turn microphone on" : "Turn microphone off"}
+          title={canTapMic ? (micOff ? "Unmute mic" : "Mute mic") : undefined}
           className={cn(
-            "absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0d0d18] transition-transform",
-            isSpeaking && "scale-125 animate-bounce",
+            "absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#0d0d18] transition-transform",
+            canTapMic && "cursor-pointer hover:scale-110",
+            isSpeaking && !micOff && "scale-125 animate-bounce",
           )}
-          style={{ background: ringColor }}
+          style={{ background: micOff ? "#dc2626" : ringColor }}
         >
-          <Mic className="h-3 w-3 text-white" />
-        </div>
+          {micOff ? <MicOff className="h-3.5 w-3.5 text-white" /> : <Mic className="h-3.5 w-3.5 text-white" />}
+        </button>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1 text-xs font-bold text-white">
