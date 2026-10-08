@@ -103,7 +103,7 @@ export function TunevioHome() {
 
   return (
     <div className="min-h-screen bg-tv-base text-white">
-      <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-4 pb-40 pt-4 sm:px-6 lg:px-8">
+      <div className="flex w-full gap-6 px-4 pb-40 pt-4 sm:px-6 lg:px-8">
         {/* Desktop sidebar */}
         <aside className="sticky top-24 hidden h-[calc(100vh-8rem)] w-[220px] shrink-0 flex-col rounded-2xl border border-tv-line bg-tv-surface p-4 lg:flex">
           <p className="px-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35">Browse</p>

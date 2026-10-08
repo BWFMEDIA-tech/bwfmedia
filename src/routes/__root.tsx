@@ -170,7 +170,7 @@ function RootComponent() {
 
           <Outlet />
         </div>
-        {isChrome && pathname === "/" && <SiteFooter />}
+        {isChrome && pathname === "/" && <SiteFooter fullWidth />}
         <CartDrawer />
         {(pathname === "/" || pathname === "/charts" || pathname.startsWith("/artist/")) && <GlobalPlayer />}
         {showBottomNav && <MobileBottomNav />}
