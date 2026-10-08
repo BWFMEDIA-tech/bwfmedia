@@ -4,6 +4,7 @@ import { readHostReferral, saveHostReferral } from "@/lib/host-referral";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import { PlatformCapabilities } from "@/components/site/PlatformCapabilities";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Create account — BWF Network" }] }),
@@ -76,7 +77,7 @@ function SignupPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-bone flex items-center justify-center p-6 overflow-hidden">
+    <div className="relative min-h-screen bg-black text-bone flex flex-col items-center justify-center gap-8 px-5 py-10 overflow-x-hidden">
       <video
         className="absolute inset-0 w-full h-full object-cover opacity-40"
         src={heroRapperVideo.url}
@@ -181,6 +182,8 @@ function SignupPage() {
           Already have an account? <Link to="/login" className="text-blood hover:text-blood-glow transition-colors">Sign in</Link>
         </div>
       </div>
+
+      <PlatformCapabilities className="relative z-10 w-full max-w-sm" />
     </div>
   );
 }
