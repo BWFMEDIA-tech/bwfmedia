@@ -112,11 +112,15 @@
   --live-glow: 0 0 24px color-mix(in srgb, var(--brand-cyan) 9%, transparent);
   margin-top: 1rem;
   margin-bottom: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  background: linear-gradient(160deg, var(--card), var(--background) 45%);
-  box-shadow: var(--shadow-deep), inset 0 1px 0 color-mix(in srgb, var(--brand-silver) 8%, transparent);
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
 }
+.artist-live-room > header { order: 0; }
+.artist-live-room > .artist-live-stage, .artist-live-room > .profile-entry-stage { order: 1; }
+.artist-live-room > .live-artist-card { order: 2; margin-top: 1rem; margin-bottom: 0; }
+.artist-live-room > .profile-room-content { order: 3; }
+.artist-live-room > .profile-action-dock { order: 4; }
 .artist-live-room > header { border-bottom: 0; }
 .artist-live-room > header > span:first-child {
   box-shadow: 0 0 20px color-mix(in srgb, var(--brand-blue) 35%, transparent);
@@ -184,7 +188,10 @@
 }
 .artist-live-chat > aside > div:last-child { border-color: var(--border); }
 .profile-video-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .85rem; }
-.profile-video-tile { position: relative; aspect-ratio: 0.65; overflow: hidden; border: 1px solid var(--border); border-radius: 1.25rem; background: var(--live-glass); min-width: 0; }
+.profile-video-tile { position: relative; aspect-ratio: 0.8; overflow: hidden; border: 1px solid var(--brand-cyan); border-radius: 1rem; background: var(--live-glass); min-width: 0; box-shadow: var(--live-glow); }
+.profile-video-tile:nth-child(2) { border-color: var(--brand-blue); }
+.profile-video-tile:nth-child(3) { border-color: var(--brand-silver); }
+.profile-video-tile > .lk-participant-tile { position: absolute; inset: 0; min-height: 0; }
 .profile-video-tile video { object-fit: cover; }
 .profile-video-tile .lk-participant-metadata { display: none; }
 .profile-video-badge { position: absolute; left: .85rem; top: .85rem; display: flex; align-items: center; gap: .4rem; padding: .4rem .7rem; border-radius: .4rem; background: color-mix(in srgb, var(--background) 65%, transparent); color: var(--foreground); font-size: .75rem; backdrop-filter: blur(12px); }
@@ -192,9 +199,11 @@
 .profile-video-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--muted-foreground); font-size: .75rem; }
 .profile-video-empty svg { color: var(--primary); opacity: .4; }
 .profile-video-identity { position: absolute; inset: auto 0 0; min-height: 4.5rem; padding: 1.5rem .85rem .85rem; display: flex; align-items: center; gap: .65rem; background: linear-gradient(0deg, var(--background), transparent); color: var(--foreground); }
-.profile-media-controls { margin: .9rem auto 0; display: flex; align-items: center; justify-content: center; gap: .2rem; padding: .6rem; width: fit-content; max-width: 100%; border: 1px solid var(--border); border-radius: 1rem; background: var(--live-glass); box-shadow: var(--live-glow); }
-.profile-media-controls > button { display: flex; flex-direction: column; gap: .55rem; height: 4rem; min-width: 4.5rem; border: 0; padding: .5rem; font-size: .7rem; color: var(--foreground); background: transparent; }
-.profile-media-controls > button:last-child { color: var(--primary); }
+.profile-media-controls { margin: .9rem auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; padding: .75rem; width: 100%; max-width: 100%; border: 1px solid var(--border); border-radius: 1rem; background: var(--live-glass); }
+.profile-media-controls > button { display: flex; flex-direction: column; gap: .55rem; height: 5rem; min-width: 4.5rem; border: 0; padding: .25rem; font-size: .75rem; color: var(--foreground); background: transparent; }
+.profile-media-controls > button > span:first-child { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--border); background: var(--card); }
+.profile-media-controls > button[aria-pressed="true"] > span:first-child { border-color: var(--primary); color: var(--primary); }
+.profile-media-controls > .profile-end-action { color: var(--destructive); }
 .profile-media-controls > button svg { height: 1.25rem; width: 1.25rem; }
 .profile-entry-actions { display: flex; gap: .75rem; max-width: 34rem; margin: 1rem auto; align-items: center; }
 .profile-entry-actions input { min-width: 0; }
@@ -212,20 +221,20 @@
 .profile-action-dock button { height: 4rem; min-width: 4rem; display: flex; flex-direction: column; gap: .5rem; border-radius: 1rem; font-size: .7rem; color: var(--muted-foreground); }
 .profile-action-dock .profile-tip-action { color: var(--primary); border-color: var(--primary); box-shadow: var(--live-glow); }
 @media (max-width: 639px) {
-  .profile-video-grid { gap: .4rem; }
-  .profile-video-tile { border-radius: .7rem; }
-  .profile-video-badge { left: .3rem; top: .4rem; padding: .25rem .35rem; gap: .2rem; font-size: .6rem; }
-  .profile-video-badge svg { height: .7rem; width: .7rem; }
-  .profile-video-identity { padding: 1rem .35rem .5rem; min-height: 3rem; gap: .2rem; }
-  .profile-video-identity > img, .profile-video-identity > svg, .profile-video-identity p + p { display: none; }
-  .profile-video-identity p { font-size: .65rem; }
-  .profile-video-empty { font-size: .6rem; gap: .5rem; text-align: center; padding: .3rem; }
-  .profile-media-controls { flex-wrap: wrap; gap: 0; }
-  .profile-media-controls > button { min-width: 3.1rem; font-size: .6rem; height: 3.5rem; }
+  .profile-video-grid { grid-template-columns: minmax(0, 1fr); gap: .75rem; width: 100%; }
+  .profile-video-tile { aspect-ratio: 16 / 9; border-radius: .85rem; width: 100%; }
+  .profile-video-badge { left: .75rem; top: .75rem; padding: .3rem .5rem; gap: .3rem; font-size: .7rem; }
+  .profile-video-badge svg { height: .85rem; width: .85rem; }
+  .profile-video-identity { padding: 1rem .75rem .65rem; min-height: 3.5rem; gap: .5rem; }
+  .profile-video-identity p { font-size: .8rem; }
+  .profile-video-empty { font-size: .75rem; gap: .5rem; text-align: center; padding: .75rem; }
+  .profile-media-controls { gap: .25rem; padding: .5rem; }
+  .profile-media-controls > button { min-width: 3.4rem; font-size: .65rem; height: 4.5rem; flex: 1 0 26%; }
+  .profile-media-controls > button > span:first-child { width: 2.65rem; height: 2.65rem; }
   .profile-action-dock { gap: .2rem; }
   .profile-action-dock button { min-width: 3rem; padding-inline: .5rem; }
   .artist-live-room > header { gap: .5rem; }
-  .artist-live-room > header h1 { font-size: .7rem; }
+  .artist-live-room > header h1 { font-size: .9rem; }
   .artist-live-room > header > span:first-child { padding: .5rem; font-size: .7rem; }
   .artist-live-room > header > button { padding-inline: .5rem; }
 }

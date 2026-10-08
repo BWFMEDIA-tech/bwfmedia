@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Update live profile to the latest phone reference and verify stacked videos and controls without overflow.
 - [x] Match the latest live-profile reference with tall video frames, compact controls, chat/sidebar, and bottom actions; omit unsupported sample supporters and clips.
 - [x] Verify real guest viewing and audience toggle, three video frames, no owner controls for visitors, and no mobile overflow.
 - [x] Reuse existing streaming controls in the artist profile while live.
