@@ -10,6 +10,9 @@ import { getLiveKitToken } from "@/lib/livekit.functions";
 import { LiveStage } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { LIVE_CATEGORIES } from "@/lib/live-categories";
+import { Button } from "@/components/ui/button";
+import { SignedImg } from "@/components/ui/signed-img";
+import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 
 export const Route = createFileRoute("/go-live")({
   head: () => ({
@@ -43,6 +46,19 @@ function GoLivePage() {
   const [viewerCount, setViewerCount] = useState(0);
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [artist, setArtist] = useState<{ name: string; photo: string | null }>({ name: "", photo: null });
+
+  useEffect(() => {
+    const userId = auth.user?.id;
+    if (!userId) return;
+    let cancelled = false;
+    void supabase.from("profiles").select(IDENTITY_COLUMNS).eq("id", userId).maybeSingle().then(({ data }) => {
+      if (cancelled) return;
+      const identity = effectiveIdentity(data);
+      setArtist({ name: identity.display_name ?? "", photo: identity.avatar_url });
+    });
+    return () => { cancelled = true; };
+  }, [auth.user?.id]);
 
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) navigate({ to: "/login" });
@@ -69,7 +85,7 @@ function GoLivePage() {
     return () => { cancelled = true; };
   }, [auth.user?.id]);
 
-  const shareUrl = stream ? `${typeof window !== "undefined" ? window.location.origin : ""}/stream/${stream.room_name}` : "";
+  const shareUrl = stream && auth.user ? `${typeof window !== "undefined" ? window.location.origin : ""}/artist/${auth.user.id}` : "";
 
   const goLive = async () => {
     if (going) return;
@@ -128,46 +144,42 @@ function GoLivePage() {
     );
   }
 
-  if (stream && lk) {
+  if (stream && lk && auth.user) {
     return (
-      <div className="min-h-screen bg-[#050509] text-white pb-24">
-        <div className="mx-auto max-w-6xl px-3 py-4 md:px-6 md:py-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00E6FF] px-3 py-1 text-xs font-bold uppercase tracking-wide">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Live
+      <main className="artist-live-room mx-auto w-full max-w-5xl px-3 pb-24 pt-4 text-foreground md:px-4">
+          <header className="live-header mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border p-3">
+            <div className="flex min-w-0 flex-auto items-center gap-3">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-trust px-3 py-1.5 text-xs font-bold text-accent-foreground">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-foreground" /> LIVE
             </span>
-            <span className="truncate text-sm font-semibold">{stream.title}</span>
-            <span className="inline-flex items-center gap-1 text-xs text-white/60">
-              <Users className="h-3.5 w-3.5" /> {viewerCount}
-            </span>
-            <div className="ml-auto flex items-center gap-2">
-              <button
-                onClick={copyLink}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 text-xs hover:bg-white/10"
-              >
-                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} Share link
-              </button>
-              <button
-                onClick={stopLive}
-                className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold hover:brightness-110"
-              >
-                End live
-              </button>
+            <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-primary bg-card text-primary">
+              {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" /> : <Radio className="h-5 w-5" />}
             </div>
-          </div>
+            <div className="min-w-0"><h1 className="truncate text-sm font-semibold">{stream.title}</h1><p className="truncate text-xs text-muted-foreground">{artist.name}</p></div>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground"><Users className="h-4 w-4" />{viewerCount}</span>
+              <Button variant="outline" size="sm" onClick={copyLink} aria-label="Share live profile">
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} Share link
+              </Button>
+            </div>
+          </header>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_340px]">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">
+            <div className="artist-live-stage min-w-0">
               <LiveStage
                 token={lk.token}
                 serverUrl={lk.wsUrl}
                 streamId={stream.id}
                 onEnd={stopLive}
-                onInvite={copyLink}
+                onInvite={async () => {
+                  try { await navigator.clipboard.writeText(`${window.location.origin}/invite/${stream.room_name}`); toast.success("Guest invite link copied"); }
+                  catch { toast.error("Could not copy invite link"); }
+                }}
                 onViewerCount={setViewerCount}
+                profileHost={{ id: auth.user.id, name: artist.name, photo: artist.photo }}
               />
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
+            <div className="profile-room-content artist-live-chat mt-5 min-w-0">
               <LiveChat
                 streamId={stream.id}
                 auth={auth}
@@ -175,11 +187,10 @@ function GoLivePage() {
                 startedAt={startedAt}
                 hostId={auth.user?.id ?? null}
                 status="live"
+                profileLayout
               />
             </div>
-          </div>
-        </div>
-      </div>
+      </main>
     );
   }
 

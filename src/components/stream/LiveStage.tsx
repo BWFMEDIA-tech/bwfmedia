@@ -98,7 +98,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
     >
       <RoomAudioRenderer />
       <StageConnectionProvider>
-        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
+        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
         <PublishSync publish={publish} />
         <LocalSpeakingSignalPublisher />
       </StageConnectionProvider>
@@ -523,12 +523,14 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
 
 const StageInner = LiveStageContent;
 
-export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite }: {
+export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite, onViewerCount }: {
   host: { id: string; name: string; photo: string | null }; streamId?: string;
   showHostTools: boolean; publish: boolean; onEnd: () => void; onInvite: () => void;
+  onViewerCount?: (count: number) => void;
 }) {
   const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }], { onlySubscribed: false });
   const participants = useParticipants();
+  useEffect(() => { onViewerCount?.(participants.length); }, [participants.length, onViewerCount]);
   const roles = useParticipantRoles(streamId, participants.map(p => p.identity));
   const profiles = useParticipantProfiles(participants.map(p => p.identity));
   const spotlight = useStreamSpotlight(streamId);
