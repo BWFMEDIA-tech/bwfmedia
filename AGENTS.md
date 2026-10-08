@@ -10,3 +10,4 @@
 - Keep profile video sizing and control styling scoped to the profile selectors, because phone layouts must stack without changing shared broadcast tools or participant assignments.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
+- Keep stage dropdown navigation and mute actions in the shared StageRoom, because Studio and profile lives must reuse the same roster and existing permission checks.
