@@ -6,3 +6,4 @@
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Use opt-in profile layouts for shared LiveStage and LiveChat tools, because reference-matched profile presentation must not alter Arena or Studio layouts.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
+- Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
