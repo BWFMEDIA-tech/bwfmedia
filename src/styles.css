@@ -119,6 +119,7 @@
 .artist-live-room > header { order: 0; position: relative; z-index: 20; }
 .artist-live-room > .artist-live-stage, .artist-live-room > .profile-entry-stage { order: 1; }
 .artist-live-room > .live-artist-card { order: 2; margin-top: 1rem; margin-bottom: 0; }
+.artist-live-room > .profile-stage-room { order: 2; }
 .artist-live-room > .profile-room-content { order: 3; }
 .artist-live-room > .profile-action-dock { order: 4; }
 .artist-live-room > header { border-bottom: 0; }

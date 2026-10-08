@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { Hand, LogOut, X as XIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +8,8 @@ import { raiseHand, leaveStage, cancelHand } from "@/lib/stage.functions";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
 
-export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: AuthState }) {
+export function RaiseHandButton({ streamId, auth, label: idleLabel }: { streamId: string; auth: AuthState; label?: string }) {
+  const topicId = useId();
   const raise = useServerFn(raiseHand);
   const leave = useServerFn(leaveStage);
   const cancel = useServerFn(cancelHand);
@@ -22,14 +25,15 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
   const tickRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!auth.user || !streamId) return;
+    const userId = auth.user?.id;
+    if (!userId || !streamId) return;
     let cancelled = false;
     (async () => {
       const { data } = await supabase
         .from("raise_hand_requests")
         .select("status, created_at")
         .eq("stream_id", streamId)
-        .eq("user_id", auth.user!.id)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -44,14 +48,14 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
         .from("stage_participants")
         .select("stage_role")
         .eq("stream_id", streamId)
-        .eq("user_id", auth.user!.id)
+        .eq("user_id", userId)
         .maybeSingle();
       if (cancelled) return;
-      setOnStage(data?.stage_role === "speaker" || data?.stage_role === "host");
+      setOnStage(data?.stage_role === "speaker" || data?.stage_role === "host" || data?.stage_role === "co_host");
     };
     refreshStage();
     const ch = supabase
-      .channel(`hand-${streamId}-${auth.user.id}`)
+      .channel(`hand-${streamId}-${userId}-${topicId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "raise_hand_requests", filter: `stream_id=eq.${streamId}` },
@@ -82,7 +86,7 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
       )
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
-  }, [streamId, auth.user?.id]);
+  }, [streamId, auth.user?.id, topicId]);
 
   // Ticking timer while pending
   useEffect(() => {
@@ -157,13 +161,13 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
 
   if (onStage) {
     return (
-      <button
+      <Button variant="outline" size="sm"
         onClick={onLeave}
         disabled={busy}
-        className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/20 disabled:opacity-60"
+        className="text-destructive"
       >
         <LogOut className="h-4 w-4" /> Leave stage
-      </button>
+      </Button>
     );
   }
 
@@ -172,46 +176,40 @@ export function RaiseHandButton({ streamId, auth }: { streamId: string; auth: Au
     const secs = elapsed % 60;
     const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
     return (
-      <div className="inline-flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-100">
+      <div role="status" className="inline-flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         <div className="flex flex-col leading-tight">
           <span>Waiting for host…</span>
-          <span className="text-[10px] font-normal text-amber-200/70">Requested {timeStr} ago</span>
+          <span className="text-[10px] font-normal text-muted-foreground">Requested {timeStr} ago</span>
         </div>
-        <button
+        <Button variant="outline" size="sm"
           onClick={onCancel}
           disabled={busy}
-          className="ml-1 flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-500/15 px-2 py-1 text-[10px] font-semibold text-amber-50 hover:bg-amber-500/25 disabled:opacity-50"
+          className="ml-1 h-7 px-2 text-xs"
           title="Cancel request"
         >
           <XIcon className="h-3 w-3" /> Cancel
-        </button>
+        </Button>
       </div>
     );
   }
 
   const label =
-    status === "declined" ? "Request again" : "Request to Join Stage";
+    status === "declined" ? "Request again" : idleLabel ?? "Request to Join Stage";
 
   if (!auth.isAuthenticated) {
     return (
-      <a
-        href="/auth"
-        className="flex items-center gap-2 rounded-lg border border-violet-400/30 bg-gradient-to-r from-violet-500/90 to-blue-500/90 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:from-violet-500 hover:to-blue-500"
-      >
-        <Hand className="h-4 w-4" /> Sign in to request stage
-      </a>
+      <Button asChild size="sm"><Link to="/login"><Hand className="h-4 w-4" /> Sign in to raise hand</Link></Button>
     );
   }
 
   return (
-    <button
+    <Button size="sm"
       type="button"
       onClick={onClick}
       disabled={busy}
-      className="flex items-center gap-2 rounded-lg border border-violet-400/30 bg-gradient-to-r from-violet-500/90 to-blue-500/90 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:from-violet-500 hover:to-blue-500 disabled:opacity-60"
     >
       <Hand className="h-4 w-4" /> {label}
-    </button>
+    </Button>
   );
 }

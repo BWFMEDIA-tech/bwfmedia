@@ -15,7 +15,7 @@ import { LiveStage, ProfileStage, CameraPublishSync } from "@/components/stream/
 import { LiveChat } from "@/components/stream/LiveChat";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
-import { InCrowdBanner } from "@/components/stream/InCrowdBanner";
+import { RaiseHandButton } from "@/components/stream/RaiseHandButton";
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
 import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { TipModal } from "@/components/stream/TipModal";
@@ -179,6 +179,12 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         </section>
       )}
 
+      {connection && <section className="profile-stage-room mt-5 min-w-0 space-y-4" aria-label="Live stage">
+        {!isOwner && <div className="flex justify-end"><RaiseHandButton streamId={stream.id} auth={auth} label="Raise Hand" /></div>}
+        <StageRoom streamId={stream.id} participants={participants} canManage={canManage} primaryHostId={stream.host_id} />
+        {canManage && <RaiseHandPanel streamId={stream.id} hands={hands} />}
+      </section>}
+
       <div className="profile-room-content mt-5 grid min-w-0 gap-4 md:grid-cols-[minmax(0,1.27fr)_minmax(0,1fr)]">
         <div className="artist-live-chat min-w-0">
           <LiveChat streamId={stream.id} auth={auth} viewerCount={viewers} startedAt={stream.started_at} hostId={stream.host_id} status="live" profileLayout />
@@ -191,11 +197,8 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
           <LiveSetlist streamId={stream.id} artistName={artist.name} isOwner={isOwner} tracks={artist.tracks ?? []} />
           <section><h2 className="mb-4 text-sm font-medium">This live</h2><div className="flex items-center gap-3"><Radio className="h-5 w-5 text-primary" /><div className="min-w-0"><p className="break-words text-sm">{stream.title}</p><p className="mt-1 text-xs text-muted-foreground">{artist.name}</p></div></div>{stream.started_at && <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />Started {new Date(stream.started_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>}</section>
           <section><h2 className="mb-3 text-sm font-medium">Support the artist</h2><div className="flex items-center gap-3"><Gem className="h-8 w-8 text-primary" /><div><p className="text-sm">{artist.name}</p><p className="mt-1 text-xs text-muted-foreground">Send a tip</p></div><Button variant="outline" className="ml-auto" onClick={() => setShowTip(true)}>Tip</Button></div></section>
-          {connection && !onStage && <InCrowdBanner streamId={stream.id} auth={auth} mode={stream.mode === "stage" ? "stage" : "broadcast"} />}
           {connection && canManage && <>
-            <RaiseHandPanel streamId={stream.id} hands={hands} />
             <BackstageQueue streamId={stream.id} queue={queue} canManage />
-            <details><summary className="cursor-pointer py-3 text-sm font-semibold text-primary">Manage stage</summary><StageRoom streamId={stream.id} participants={participants} canManage /></details>
           </>}
           {!auth.isAuthenticated && <Button asChild variant="outline" className="w-full"><Link to="/login">Sign in to chat and support</Link></Button>}
         </aside>
@@ -204,7 +207,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         <Button variant="ghost" onClick={() => document.querySelector<HTMLInputElement>('[aria-label="Live comment"]')?.focus()}><MessageCircle />Comment</Button>
         <Button variant="ghost" onClick={() => document.querySelector('.profile-chat-reactions')?.scrollIntoView({ behavior: "smooth", block: "center" })}><Heart />Reactions</Button>
         <Button variant="outline" className="profile-tip-action" onClick={() => setShowTip(true)}><Gem />Tip</Button>
-        {connection && !onStage && <Button variant="ghost" onClick={() => document.querySelector('.artist-live-sidebar')?.scrollIntoView({ behavior: "smooth", block: "center" })}><Hand />Request</Button>}
+         {connection && !onStage && <Button variant="ghost" onClick={() => document.querySelector('.profile-stage-room')?.scrollIntoView({ behavior: "smooth", block: "center" })}><Hand />Raise Hand</Button>}
         <Button variant="ghost" onClick={share}><Share2 />Share</Button>
       </nav>
       {showTip && <TipModal streamId={stream.id} artistId={stream.host_id} auth={auth} onClose={() => setShowTip(false)} />}
