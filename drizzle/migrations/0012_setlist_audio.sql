@@ -1,0 +1,1 @@
+ALTER TABLE public.live_setlist_items ADD COLUMN IF NOT EXISTS audio_url text, ADD COLUMN IF NOT EXISTS started_at timestamptz;
