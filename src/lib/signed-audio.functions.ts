@@ -147,6 +147,22 @@ export const signAudioUrl = createServerFn({ method: "POST" })
     }
 
     if (!authorized) {
+      // Song currently playing on a live artist's setlist.
+      const { data: item } = await (supabaseAdmin as any)
+        .from("live_setlist_items")
+        .select("id, streams!inner(status)")
+        .eq("status", "playing")
+        .eq("streams.status", "live")
+        .ilike("audio_url", `%${path}%`)
+        .limit(1)
+        .maybeSingle();
+      if (item?.id) {
+        authorized = true;
+        reason = "live_setlist";
+      }
+    }
+
+    if (!authorized) {
       audit("denied", "not_authorized", path);
       return { url: null as string | null, expiresIn: 0 };
     }

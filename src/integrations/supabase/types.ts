@@ -2210,30 +2210,36 @@ export type Database = {
       }
       live_setlist_items: {
         Row: {
+          audio_url: string | null
           cover_url: string | null
           created_at: string
           id: string
           position: number
+          started_at: string | null
           status: string
           stream_id: string
           title: string
           track_id: string | null
         }
         Insert: {
+          audio_url?: string | null
           cover_url?: string | null
           created_at?: string
           id?: string
           position?: number
+          started_at?: string | null
           status?: string
           stream_id: string
           title: string
           track_id?: string | null
         }
         Update: {
+          audio_url?: string | null
           cover_url?: string | null
           created_at?: string
           id?: string
           position?: number
+          started_at?: string | null
           status?: string
           stream_id?: string
           title?: string

@@ -85,6 +85,13 @@
       "when": 1791422071660,
       "tag": "0011_regrant_signed_in_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791459714637,
+      "tag": "0012_setlist_audio",
+      "breakpoints": true
     }
   ]
 }
