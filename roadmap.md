@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Add and verify the right-side stage dropdown with section navigation and existing mute actions.
 - [x] Move the stage below live controls and expose profile-live Raise Hand with host request handling; verified a signed-in broadcast at desktop/531px, request panel, no page errors/overflow, and test stream ending. Guest approval still needs a second signed-in participant to verify.
 - [x] Replace the legacy `/go-live` broadcast view with the updated profile stage, circular controls, and chat; verified a signed-in broadcast, camera, desktop and phone layouts, and ending the test stream.
 - [x] Update live profile to the latest phone reference; verified signed-in viewing, audience toggle, stacked landscape videos at 320/393/531px, desktop columns, and no page errors or overflow.

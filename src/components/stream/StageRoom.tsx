@@ -29,11 +29,15 @@ import {
   UserX,
   Pin,
   PinOff,
+  ChevronDown,
+  Users,
 } from "lucide-react";
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 import { SignedImg } from "@/components/ui/signed-img";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
@@ -65,6 +69,13 @@ export function StageRoom({
   hostTransferMode?: "co_host" | "transfer";
   spotlight?: { host: string | null; artist: string | null; cohost?: string | null };
 }) {
+  const hostsRef = useRef<HTMLDivElement>(null);
+  const modsRef = useRef<HTMLDivElement>(null);
+  const guestsRef = useRef<HTMLDivElement>(null);
+  const goToSection = (section: "hosts" | "mods" | "guests") => {
+    const target = section === "hosts" ? hostsRef : section === "mods" ? modsRef : guestsRef;
+    requestAnimationFrame(() => target.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
   const setRole = useServerFn(setStageRole);
   const remove = useServerFn(removeStageParticipant);
   const promote = useServerFn(promoteToHost);
@@ -385,28 +396,36 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             </div>
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2.5">
-          {canManage && (
-            <button
-              type="button"
-              onClick={toggleStageMute}
-              disabled={muteAllBusy || stageSpeakers.length === 0}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold disabled:opacity-50",
-                stageAllMuted ? "border-red-400/50 bg-red-500/15 text-red-200" : "border-white/15 bg-white/5 text-white hover:bg-white/10",
-              )}
-            >
-              {stageAllMuted ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-              {stageAllMuted ? "Unmute stage" : "Mute whole stage"}
-            </button>
-          )}
-          <CapacityChip label="Hosts" filled={hostSlotsTaken} total={MAX_HOSTS} color={PURPLE} />
-          <CapacityChip label="Mods" filled={Math.min(moderators.length, MAX_MODS)} total={MAX_MODS} color={BLUE} />
-          <CapacityChip label="Guests" filled={guestSlotsTaken} total={MAX_GUESTS} color={ACCENT} />
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="ml-auto shrink-0 gap-2 border-primary/40 bg-card text-foreground" aria-label="Stage menu">
+              <Users className="h-4 w-4 text-primary" /><span className="hidden sm:inline">Stage</span><ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={8} className="w-64 max-w-[calc(100vw-24px)] border-primary/30">
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Stage sections</DropdownMenuLabel>
+            <DropdownMenuItem onSelect={() => goToSection("hosts")}><Crown className="text-primary" />Hosts<span className="ml-auto tabular-nums text-muted-foreground">{hostSlotsTaken}/{MAX_HOSTS}</span></DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => goToSection("mods")}><Shield className="text-brand-silver" />Mods<span className="ml-auto tabular-nums text-muted-foreground">{Math.min(allModerators.length, MAX_MODS)}/{MAX_MODS}</span></DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => goToSection("guests")}><Users className="text-primary" />Guests<span className="ml-auto tabular-nums text-muted-foreground">{guestSlotsTaken}/{MAX_GUESTS}</span></DropdownMenuItem>
+            {canManage && <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Stage controls</DropdownMenuLabel>
+              <DropdownMenuItem disabled={muteAllBusy || !streamId || stageSpeakers.length === 0} onSelect={() => { void toggleStageMute(); }}>
+                {stageAllMuted ? <MicOff /> : <Mic />}{muteAllBusy ? "Updating stage…" : stageAllMuted ? "Unmute stage" : "Mute whole stage"}
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={groupBusy !== null || !streamId || modSpeakers.length === 0} onSelect={() => { void toggleGroupMute("moderators", modsAllMuted); }}>
+                {modsAllMuted ? <MicOff /> : <Mic />}{groupBusy === "moderators" ? "Updating mods…" : modsAllMuted ? "Unmute all mods" : "Mute all mods"}
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={groupBusy !== null || !streamId || guestSpeakers.length === 0} onSelect={() => { void toggleGroupMute("guests", guestsAllMuted); }}>
+                {guestsAllMuted ? <MicOff /> : <Mic />}{groupBusy === "guests" ? "Updating guests…" : guestsAllMuted ? "Unmute all guests" : "Mute all guests"}
+              </DropdownMenuItem>
+            </>}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Hosts row */}
+      <div ref={hostsRef} className="scroll-mt-20">
       <SectionHeader
         label="HOSTS"
         count={`${hosts.length}/${MAX_HOSTS}`}
@@ -461,8 +480,9 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         ))}
       </div>
 
+      </div>
       {/* Moderators row */}
-      <div className="mt-8">
+      <div ref={modsRef} className="mt-8 scroll-mt-20">
         <SectionHeader
           label="MODERATORS"
           count={`${Math.min(allModerators.length, MAX_MODS)}/${MAX_MODS}`}
@@ -512,7 +532,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
       </div>
 
       {/* Guests row */}
-      <div className="mt-8">
+      <div ref={guestsRef} className="mt-8 scroll-mt-20">
         <SectionHeader
           label="GUESTS"
           count={`${guestSlotsTaken}/${MAX_GUESTS}`}
