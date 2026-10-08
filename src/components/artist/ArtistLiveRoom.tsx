@@ -174,13 +174,13 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
       <div className="profile-room-content mt-5 grid min-w-0 gap-4 md:grid-cols-[minmax(0,1.27fr)_minmax(0,1fr)]">
         <div className="artist-live-chat min-w-0">
           <LiveChat streamId={stream.id} auth={auth} viewerCount={viewers} startedAt={stream.started_at} hostId={stream.host_id} status="live" profileLayout />
-        </div>
-        <aside className="artist-live-sidebar min-w-0 space-y-4">
-          <LiveSetlist streamId={stream.id} artistName={artist.name} isOwner={isOwner} tracks={artist.tracks ?? []} />
-          {showAudience && <section className="border-b border-border pb-4">
+          {showAudience && <section className="mt-4 border-b border-border pb-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground"><Users className="h-4 w-4 text-primary" /> Audience <span className="ml-auto text-muted-foreground">{viewers.toLocaleString()}</span></h2>
             {participants.some((p) => p.stage_role === "listener" || p.stage_role === "green_room") ? <AudienceRow participants={participants} /> : <p className="text-sm text-muted-foreground">{connection ? "No audience members yet." : "Join to see the audience."}</p>}
           </section>}
+        </div>
+        <aside className="artist-live-sidebar min-w-0 space-y-4">
+          <LiveSetlist streamId={stream.id} artistName={artist.name} isOwner={isOwner} tracks={artist.tracks ?? []} />
           <section><h2 className="mb-4 text-sm font-medium">This live</h2><div className="flex items-center gap-3"><Radio className="h-5 w-5 text-primary" /><div className="min-w-0"><p className="break-words text-sm">{stream.title}</p><p className="mt-1 text-xs text-muted-foreground">{artist.name}</p></div></div>{stream.started_at && <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />Started {new Date(stream.started_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>}</section>
           <section><h2 className="mb-3 text-sm font-medium">Support the artist</h2><div className="flex items-center gap-3"><Gem className="h-8 w-8 text-primary" /><div><p className="text-sm">{artist.name}</p><p className="mt-1 text-xs text-muted-foreground">Send a tip</p></div><Button variant="outline" className="ml-auto" onClick={() => setShowTip(true)}>Tip</Button></div></section>
           {connection && !onStage && <InCrowdBanner streamId={stream.id} auth={auth} mode={stream.mode === "stage" ? "stage" : "broadcast"} />}
