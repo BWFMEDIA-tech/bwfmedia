@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mic, Music2, Package, Radio, Swords } from "lucide-react";
+import { Clapperboard, Mic, Music2, Package, Radio, Swords } from "lucide-react";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -25,6 +25,13 @@ const OPTIONS = [
     icon: Music2,
     title: "Add Music to Profile",
     desc: "Upload tracks and manage your catalog.",
+  },
+  {
+    to: "/videos",
+    search: { upload: true },
+    icon: Clapperboard,
+    title: "Upload Music Video",
+    desc: "Share a music video with fans on your channel.",
   },
   {
     to: "/distribution",
@@ -57,6 +64,7 @@ function UploadHub() {
           <Link
             key={o.to}
             to={o.to}
+            search={"search" in o ? (o.search as any) : undefined}
             className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-[#0000FF]/50 hover:bg-white/[0.06]"
           >
             <div

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/videos/")({
+  validateSearch: (s: Record<string, unknown>): { upload?: boolean } => (s.upload ? { upload: true } : {}),
   component: VideosPage,
   head: () => ({
     meta: [
@@ -185,6 +186,7 @@ function VideosPage() {
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
+  const wantsUpload = Route.useSearch().upload === true;
   const [canUpload, setCanUpload] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -216,7 +218,11 @@ function VideosPage() {
       .select("role")
       .eq("user_id", userId)
       .in("role", ["artist", "admin"])
-      .then(({ data }) => setCanUpload(!!data && data.length > 0));
+      .then(({ data }) => {
+        const ok = !!data && data.length > 0;
+        setCanUpload(ok);
+        if (ok && wantsUpload) setShowUpload(true);
+      });
   }, [userId]);
 
   const load = async () => {
