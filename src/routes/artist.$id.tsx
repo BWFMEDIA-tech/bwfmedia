@@ -76,6 +76,8 @@ export const Route = createFileRoute("/artist/$id")({
     };
   },
   component: ArtistProfilePage,
+  errorComponent: () => <div className="px-6 py-16 text-center text-foreground"><h1 className="text-2xl font-semibold">Unable to load artist</h1><p className="mt-2 text-muted-foreground">Please refresh and try again.</p></div>,
+  notFoundComponent: () => <div className="px-6 py-16 text-center text-foreground">Artist not found.</div>,
 });
 
 const RED = "#00E6FF";
@@ -95,8 +97,9 @@ const SOCIAL_ICONS: Record<string, any> = {
 };
 
 function ArtistProfilePage() {
-  const { id } = useParams({ from: "/artist/$id" });
-  const { data: meta } = useSuspenseQuery(artistMetaOptions(id));
+  const { id: routeId } = useParams({ from: "/artist/$id" });
+  const { data: meta } = useSuspenseQuery(artistMetaOptions(routeId));
+  const id = meta.artistId;
   const [tip, setTip] = useState<number>(5);
   const auth = useAuth();
   const { user, isAuthenticated } = auth;
