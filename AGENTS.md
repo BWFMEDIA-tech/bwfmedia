@@ -12,3 +12,4 @@
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
 - Keep stage dropdown navigation and mute actions in the shared StageRoom, because Studio and profile lives must reuse the same roster and existing permission checks.
 - Derive profile video-box visibility from host spotlight selections, because unselected artist and guest boxes must stay hidden on every device.
+- Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.

@@ -13,12 +13,15 @@ export const getArtistMeta = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb: any = supabaseAdmin;
-    const id = data.id;
+    // Directory links use public_id; older links use the account id.
+    // Resolve either before querying account-owned music, live rooms, and stats.
+    const profileRes = await sb.from("profiles")
+      .select("id, display_name, stage_name, avatar_url, banner_url, bio, genre, genres, member_since, created_at")
+      .or(`id.eq.${data.id},public_id.eq.${data.id}`).maybeSingle();
+    if (profileRes.error) throw new Error("Unable to load artist profile. Please try again.");
+    const id: string = profileRes.data?.id ?? data.id;
     try {
-      const [profileRes, queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes] = await Promise.all([
-        sb.from("profiles")
-          .select("display_name, stage_name, avatar_url, banner_url, bio, genre, genres, member_since, created_at")
-          .eq("id", id).maybeSingle(),
+      const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes] = await Promise.all([
         sb.from("live_queue_public").select("artist_name, photo_url").eq("id", id).maybeSingle(),
         sb.from("play_tracks").select("like_count, dislike_count").eq("artist_user_id", id),
         sb.from("videos").select("id", { count: "exact", head: true }).eq("user_id", id),
@@ -113,6 +116,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const tracksSigned = trackList.map((t, i) => ({ ...t, cover_url: trackCovers[i] }));
 
       return {
+        artistId: id,
         exists: !!profileRes.data,
         name: (p.stage_name as string | null) ?? (p.display_name as string | null) ?? (q.artist_name as string | null) ?? null,
         photo: photoSigned,
@@ -145,6 +149,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       };
     } catch {
       return {
+        artistId: id,
         exists: false,
         name: null as string | null, photo: null as string | null,
         banner: null as string | null, bio: null as string | null,
