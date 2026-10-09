@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Clapperboard, Mic, Music2, Package, Radio, Swords } from "lucide-react";
+import { ChevronRight, Clapperboard, Mic, Music2, Package, Radio, Swords } from "lucide-react";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -8,6 +8,8 @@ export const Route = createFileRoute("/upload")({
       { name: "description", content: "Submit a track to Play Arena, add music to your profile, or go live on BWF Network." },
       { property: "og:title", content: "Upload — BWF Network" },
       { property: "og:description", content: "Submit tracks, add music, or go live." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: UploadHub,
@@ -57,29 +59,28 @@ const OPTIONS = [
 function UploadHub() {
   return (
     <div className="mx-auto max-w-md px-4 pb-24 pt-6 md:max-w-2xl md:pt-10">
-      <h1 className="text-3xl font-black tracking-tight text-foreground">Upload</h1>
+      <h1 className="text-3xl font-black text-foreground">Upload</h1>
       <p className="mt-1 text-sm text-muted-foreground">What do you want to share today?</p>
-      <div className="mt-6 grid gap-3">
+      <div className="mt-6 grid gap-5">
         {OPTIONS.map((o) => (
           <Link
             key={o.to}
             to={o.to}
             search={"search" in o ? (o.search as any) : undefined}
-            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:border-[#0000FF]/50 hover:bg-white/[0.06]"
+            className="upload-action group flex min-h-28 items-center gap-4 rounded-lg border p-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
             <div
-              className="grid h-12 w-12 shrink-0 place-items-center rounded-xl"
-              style={{
-                background: "linear-gradient(135deg, rgba(0,0,255,0.25), rgba(0,230,255,0.2))",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
+              className="upload-action-icon grid h-14 w-12 shrink-0 place-items-center rounded-lg border"
             >
-              <o.icon className="h-5 w-5 text-white" />
+              <o.icon className="h-6 w-6 text-foreground" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate font-semibold text-foreground">{o.title}</div>
-              <div className="truncate text-xs text-muted-foreground">{o.desc}</div>
+              <div className="text-sm font-semibold text-foreground sm:text-base">{o.title}</div>
+              <div className="mt-1 text-xs leading-relaxed text-brand-silver">{o.desc}</div>
             </div>
+            <span className="upload-action-arrow grid h-7 w-7 shrink-0 place-items-center rounded-full" aria-hidden="true">
+              <ChevronRight className="h-5 w-5" />
+            </span>
           </Link>
         ))}
       </div>
