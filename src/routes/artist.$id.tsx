@@ -309,11 +309,23 @@ function FollowButton({ artistId }: { artistId: string }) {
 
   const mut = useMutation({
     mutationFn: () => toggleFn({ data: { artistId } }),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ["artist-follow-stats", artistId] });
+      const previous = qc.getQueryData<{ count: number }>(["artist-follow-stats", artistId]);
+      qc.setQueryData(["artist-follow-stats", artistId], { count: Math.max(0, (previous?.count ?? 0) + (following ? -1 : 1)) });
+      qc.setQueryData(["artist-following", artistId], { following: !following });
+      return { previous, following };
+    },
     onSuccess: (res) => {
       qc.setQueryData(["artist-follow-stats", artistId], { count: res.count });
       qc.setQueryData(["artist-following", artistId], { following: res.following });
+      void qc.invalidateQueries({ queryKey: ["artist-follow-stats", artistId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Could not update follow"),
+    onError: (e: any, _vars, context) => {
+      qc.setQueryData(["artist-follow-stats", artistId], context?.previous);
+      qc.setQueryData(["artist-following", artistId], { following: context?.following ?? false });
+      toast.error(e?.message ?? "Could not update follow");
+    },
   });
 
   const following = followingQ.data?.following ?? false;

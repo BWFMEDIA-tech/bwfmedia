@@ -123,11 +123,11 @@ export const toggleArtistFollow = createServerFn({ method: "POST" })
       following = true;
     }
 
-    const sb = publicClient();
-    const { count } = await sb
+    const { count, error: countError } = await context.supabase
       .from("artist_follows")
       .select("id", { count: "exact", head: true })
       .eq("artist_id", data.artistId);
+    if (countError) throw countError;
 
     return { following, count: count ?? 0 };
   });
