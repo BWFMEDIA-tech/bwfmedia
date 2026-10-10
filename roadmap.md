@@ -1,5 +1,5 @@
 # Live artist profile
-- [ ] Organize the main menus and Artist Dashboard; non-artists enter artist signup, preserve home, verify desktop and phone navigation.
+- [x] Organize the main menus and seven Artist Dashboard sections; visitor artist-signup entry and signed-in dashboard verified on desktop/phone, no overflow or page errors; preserve home.
 - [x] Make the artist follower count update immediately and remain accurate after Follow/Following is clicked.
 - [x] Add artist streaming analytics with the supplied full dashboard layout, real stream data, artist-safe access, and mobile support.
 - [x] Show only the host video box until the host explicitly selects an artist or guest; rule tests pass and host-only mobile/desktop layout has no overflow.
