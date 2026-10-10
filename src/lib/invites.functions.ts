@@ -44,6 +44,14 @@ export const resolveInvite = createServerFn({ method: "POST" })
       return { ok: false, reason: "not_found" };
     }
     if (!row) {
+      // Shared live links use the room name — let anyone watch that live as a listener.
+      const { data: live } = await client
+        .from("streams")
+        .select("id, room_name, title, status, mode, host_id")
+        .eq("room_name", data.code)
+        .eq("status", "live")
+        .maybeSingle();
+      if (live) return { ok: true, code: data.code, allowed_role: "listener", stream: live as any, expires_at: null };
       console.warn("[invite] not_found");
       return { ok: false, reason: "not_found" };
     }

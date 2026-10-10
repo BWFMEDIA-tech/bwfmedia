@@ -49,7 +49,11 @@ function InvitePage() {
     console.log("[invite] page opened", { code });
     setLoading(true);
     resolveFn({ data: { code } })
-      .then((r) => setResolved(r))
+      .then((r) => {
+        // A shared live link (room name) opens the artist's live profile to watch.
+        if (r.ok && r.stream.room_name === code) { window.location.replace(`/artist/${r.stream.host_id}`); return; }
+        setResolved(r);
+      })
       .catch((e) => {
         console.error("[invite] resolve failed", e);
         setResolved({ ok: false, reason: "not_found" } as ResolvedInvite);
