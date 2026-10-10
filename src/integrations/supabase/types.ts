@@ -5261,6 +5261,7 @@ export type Database = {
       get_my_last_seen_at: { Args: never; Returns: string }
       get_my_profile_interests: { Args: never; Returns: string[] }
       get_my_profile_location: { Args: never; Returns: string }
+      get_my_streaming_analytics: { Args: { p_days?: number }; Returns: Json }
       get_or_create_profile_stream: { Args: never; Returns: string }
       get_revenue_pool_total: { Args: { _month?: string }; Returns: number }
       get_room_host_estimate: { Args: { _stream_id: string }; Returns: Json }
