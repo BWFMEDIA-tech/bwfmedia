@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { User, Music2, BarChart3, ChevronRight, PanelLeft, LayoutDashboard, Radio, Users, Settings } from "lucide-react";
+import { User, Music2, BarChart3, ChevronRight, PanelLeft, LayoutDashboard, Radio, Users, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import logo from "@/assets/tunevio-logo.png.asset.json";
@@ -65,9 +65,10 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background text-foreground flex">
       <aside className={`fixed bottom-0 top-[calc(var(--bwf-banner-h,0px)+72px)] left-0 z-40 w-64 border-r border-border bg-card transition-transform lg:sticky lg:top-[calc(var(--bwf-banner-h,0px)+80px)] lg:h-[calc(100vh-80px)] lg:translate-x-0 ${collapsed ? "lg:w-16" : "lg:w-64"} ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-16 items-center border-b border-border px-3">
-          <Link to="/" aria-label="Tunevio home" className={collapsed ? "hidden lg:hidden" : "block"}>
+          <Link to="/" aria-label="Tunevio home" className={collapsed ? "block lg:hidden" : "block"}>
             <img src={logo.url} alt="Tunevio" className="w-36 h-auto" />
           </Link>
+          <Button variant="ghost" size="icon" aria-label="Close artist menu" className="ml-auto lg:hidden" onClick={() => setMobileOpen(false)}><X /></Button>
         </div>
         <nav aria-label="Artist Dashboard" className="h-[calc(100%-4rem)] overflow-y-auto px-2 py-4">
           <Link to="/artist-dashboard" title="Overview" aria-current={pathname === "/artist-dashboard" ? "page" : undefined}
