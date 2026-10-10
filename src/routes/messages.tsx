@@ -208,6 +208,12 @@ function MessagesPage() {
     }
   };
 
+  const closeNewBox = () => {
+    setShowNew(false);
+    setSearchQ("");
+    setSearchResults([]);
+  };
+
   const openConversation = (otherId: string) => {
     setActiveId(otherId);
     setShowNew(false);
