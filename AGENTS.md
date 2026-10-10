@@ -15,3 +15,4 @@
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
 - Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
 - Resolve Artist Dashboard menu destinations through the shared navigation helper and reuse existing section routes, because non-artists need a signup entry and dashboard links must not point to unimplemented tabs.
+- Count song plays in the shared player on the audio's first real playback start per load, saving a stream event plus the song count server-side, because page opens, rerenders and repeated clicks must never add plays.

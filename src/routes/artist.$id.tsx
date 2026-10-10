@@ -16,7 +16,7 @@ import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { getMyTrackLikes, toggleTrackLike } from "@/lib/track-likes.functions";
-import { incrementTrackPlayCount } from "@/lib/play-counts.functions";
+import { PLAY_COUNT_EVENT } from "@/lib/player-context";
 import {
   getArtistFollowStats,
   getIsFollowingArtist,
@@ -685,8 +685,15 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
   const likedSet = new Set(myLikesQuery.data?.liked ?? []);
   const [likeOverrides, setLikeOverrides] = useState<Record<string, { liked: boolean; count: number }>>({});
   const [playOverrides, setPlayOverrides] = useState<Record<string, number>>({});
-  const incrementPlay = useServerFn(incrementTrackPlayCount);
-  const playedThisSession = useRef<Set<string>>(new Set());
+  // The shared player saves each real playback start; mirror the saved count here.
+  useEffect(() => {
+    const onCount = (e: Event) => {
+      const d = (e as CustomEvent<{ trackId: string; playCount: number }>).detail;
+      if (d?.trackId) setPlayOverrides((m) => ({ ...m, [d.trackId]: d.playCount }));
+    };
+    window.addEventListener(PLAY_COUNT_EVENT, onCount);
+    return () => window.removeEventListener(PLAY_COUNT_EVENT, onCount);
+  }, []);
 
   const likeMutation = useMutation({
     mutationFn: (trackId: string) => toggleTrackLike({ data: { trackId } }),
@@ -758,16 +765,6 @@ function PopularTracks({ tracks, isOwner, artistName, isAuthenticated }: { track
                     player.toggle();
                   } else {
                     player.play(track, playable);
-                    if (isAuthenticated && !playedThisSession.current.has(t.id)) {
-                      playedThisSession.current.add(t.id);
-                      incrementPlay({ data: { trackId: t.id } })
-                        .then((res) => {
-                          setPlayOverrides((m) => ({ ...m, [t.id]: res.play_count }));
-                        })
-                        .catch(() => {
-                          playedThisSession.current.delete(t.id);
-                        });
-                    }
                   }
                 }}
                 onStop={() => { if (isCurrent) player.pause(); }}
