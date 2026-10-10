@@ -9,6 +9,7 @@ import {
   listMyLabels, createLabel, listMyLabelMemberships, leaveLabel,
   LABEL_ROLE_META, type LabelRole,
 } from "@/lib/labels.functions";
+import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
 
 export const Route = createFileRoute("/labels/")({
   head: () => ({
@@ -22,7 +23,11 @@ export const Route = createFileRoute("/labels/")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: LabelsPage,
+  component: () => (
+    <ArtistDashboardShell>
+      <LabelsPage />
+    </ArtistDashboardShell>
+  ),
 });
 
 function LabelsPage() {
