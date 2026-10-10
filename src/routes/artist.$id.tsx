@@ -2,7 +2,7 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
-  BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
+  Inbox, MessageCircle, BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp, Headphones,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
@@ -262,6 +262,9 @@ function HeroBanner({
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
         {isOwner && !canUseTools ? (
           <Link to="/signup" search={{ as: "artist" } as any} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">Become an artist to go live</Link>
+        ) : null}
+        {isOwner && !canUseTools ? (
+          <Link to="/messages" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]"><Inbox className="h-4 w-4" /> Inbox</Link>
         ) : isOwner ? (
           <>
             <Link to="/go-live" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-wide text-white hover:brightness-110 transition" style={{ background: "linear-gradient(90deg,#00E6FF,#0000FF)", boxShadow: "0 6px 24px rgba(0,0,255,0.4)" }}>
@@ -273,10 +276,12 @@ function HeroBanner({
             <Link to="/distribution" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">
               <Disc3 className="h-4 w-4" /> Distribution
             </Link>
+            <Link to="/messages" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]"><Inbox className="h-4 w-4" /> Inbox</Link>
           </>
         ) : (
           <>
             <FollowButton artistId={artist.id} />
+            <Link to="/messages" search={{ to: artist.id }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]"><MessageCircle className="h-4 w-4" /> Message</Link>
             <PillButton icon={Share2} label="Share" />
             <button className="grid h-10 w-10 place-items-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10"><MoreHorizontal className="h-4 w-4" /></button>
           </>
