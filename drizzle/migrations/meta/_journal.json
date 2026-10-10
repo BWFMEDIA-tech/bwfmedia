@@ -99,6 +99,13 @@
       "when": 1791598794326,
       "tag": "0013_add_artist_streaming_analytics",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791604752536,
+      "tag": "0014_make_pdub_artist",
+      "breakpoints": true
     }
   ]
 }
