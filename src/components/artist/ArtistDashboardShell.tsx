@@ -69,10 +69,10 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
         <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
           <div className="text-xl font-black tracking-tight">
             <span className="text-white">BWF</span>
-            <span className="ml-1 text-[10px] font-bold tracking-[0.3em] text-fuchsia-400">ARTIST</span>
+            <span className="ml-1 text-[10px] font-bold tracking-[0.3em] text-cyan-400">ARTIST</span>
           </div>
         </div>
-        <div className="px-4 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-fuchsia-400">
+        <div className="px-4 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">
           Artist Dashboard
         </div>
         <nav className="px-2 pb-4">
@@ -87,7 +87,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
                     onClick={() => setMobileOpen(false)}
                   className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
                     active
-                      ? "bg-gradient-to-r from-fuchsia-600/90 to-pink-500/70 text-white shadow-[0_4px_20px_-4px_rgba(0,0,255,0.5)]"
+                      ? "bg-gradient-to-r from-blue-600/90 to-cyan-500/70 text-white shadow-[0_4px_20px_-4px_rgba(0,229,255,0.35)]"
                       : "text-white/65 hover:bg-white/5 hover:text-white"
                   }`}
                 >

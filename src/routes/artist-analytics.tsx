@@ -30,11 +30,11 @@ function ArtistAnalyticsPage() {
   const query = useQuery({ queryKey: ["my-streaming-analytics", days], queryFn: () => fetchAnalytics({ data: { days } }) });
   const data = query.data;
   const summary = data?.summary;
-  const hasLocations = !!data?.countries.some((country) => country.name !== "Unknown");
+  const hasLocations = !!data?.countries?.some((country) => country.name !== "Unknown");
 
   const exportCsv = () => {
     if (!data) return;
-    const lines = ["date,streams", ...data.daily.map((row) => `${row.date},${row.streams}`)];
+    const lines = ["date,streams", ...(data?.daily ?? []).map((row) => `${row.date},${row.streams}`)];
     const blob = new Blob([lines.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");

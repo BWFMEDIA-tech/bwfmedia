@@ -18,6 +18,7 @@ import {
   RELEASE_TYPES, PRO_OPTIONS,
   listReleaseDeliveries, requestReleaseTakedown,
 } from "@/lib/distribution.functions";
+import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
 
 export const Route = createFileRoute("/distribution")({
   head: () => ({
@@ -27,7 +28,11 @@ export const Route = createFileRoute("/distribution")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: DistributionPage,
+  component: () => (
+    <ArtistDashboardShell>
+      <DistributionPage />
+    </ArtistDashboardShell>
+  ),
 });
 
 const STATUS_STYLES: Record<string, string> = {

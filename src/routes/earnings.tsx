@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { getArtistRevenue } from "@/lib/revenue.functions";
+import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
 
 export const Route = createFileRoute("/earnings")({
   head: () => ({
@@ -25,7 +26,11 @@ export const Route = createFileRoute("/earnings")({
       },
     ],
   }),
-  component: EarningsPage,
+  component: () => (
+    <ArtistDashboardShell>
+      <EarningsPage />
+    </ArtistDashboardShell>
+  ),
 });
 
 type RevenueData = Awaited<ReturnType<typeof getArtistRevenue>>;
