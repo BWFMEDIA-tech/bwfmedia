@@ -20,6 +20,7 @@ import {
   Calendar,
   ShoppingCart,
   Trophy,
+  LayoutDashboard,
 } from "lucide-react";
 import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import { useAuth } from "@/lib/auth-context";
@@ -27,6 +28,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
 import { useCart } from "@/contexts/CartContext";
 import { SignedImg } from "@/components/ui/signed-img";
+import { artistDashboardDestination } from "@/lib/artist-navigation";
 
 function HeaderCartButton() {
   const { totalCount, openCart } = useCart();
@@ -51,16 +53,19 @@ type NavItem = { to: string; label: string; icon?: any };
 
 const PRIMARY: NavItem[] = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/play", label: "Arena", icon: Music },
-  { to: "/live", label: "Live", icon: Radio },
-  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
-  { to: "/discover", label: "Discover", icon: Compass },
-  { to: "/videos", label: "Videos", icon: Mic },
-  { to: "/charts", label: "Charts", icon: BarChart3 },
+  { to: "/discover", label: "Discover Music", icon: Compass },
+  { to: "/live", label: "Live Stage", icon: Radio },
+  { to: "/artists", label: "Artists", icon: Music },
+  { to: "/artist-dashboard", label: "Artist Dashboard", icon: LayoutDashboard },
+  { to: "/profile", label: "My Profile", icon: User },
 ];
 
 // "Book a Shoot" (/studio) and "Off Da Block" (/off-the-block) hidden for now — restore when ready.
 const BROWSE: NavItem[] = [
+  { to: "/play", label: "Arena", icon: Music },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { to: "/videos", label: "Videos", icon: Mic },
+  { to: "/charts", label: "Charts", icon: BarChart3 },
   { to: "/events", label: "Events", icon: Calendar },
   { to: "/blog", label: "Blog", icon: Newspaper },
   { to: "/contact", label: "Contact", icon: Mail },
@@ -84,6 +89,16 @@ export function SiteHeader() {
   const isAdmin = auth.roles.includes("admin");
   const isManager = auth.roles.includes("manager");
   const canBroadcast = isAdmin || isManager;
+  const primary = PRIMARY.map((item) => {
+    if (item.to === "/artist-dashboard") {
+      const to = artistDashboardDestination(auth.roles);
+      return { ...item, to, search: to === "/signup" ? { as: "artist" } : undefined, params: undefined };
+    }
+    if (item.to === "/profile") {
+      return { ...item, to: auth.user ? "/artist/$id" : "/login", params: auth.user ? { id: auth.user.id } : undefined, search: undefined };
+    }
+    return { ...item, search: undefined, params: undefined };
+  });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -152,13 +167,16 @@ export function SiteHeader() {
 
         {/* Desktop primary nav */}
         <div className="hidden lg:flex items-center gap-1 mx-auto">
-          {PRIMARY.map((item) => {
+          {primary.map((item) => {
             const active = isActive(item.to);
             return (
               <RouterLink
                 key={item.label}
                 to={item.to}
-                className={`relative px-2 py-2 text-xs xl:text-sm font-medium transition-colors ${
+                params={item.params}
+                search={item.search as any}
+                aria-current={active ? "page" : undefined}
+                className={`relative px-2 py-2 text-xs xl:text-sm font-medium whitespace-nowrap transition-colors ${
                   active ? "text-bone" : "text-bone/65 hover:text-bone"
                 }`}
               >
@@ -232,7 +250,7 @@ export function SiteHeader() {
         {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="hidden lg:flex shrink-0 items-center gap-2 w-40 xl:w-56 px-3.5 h-10 rounded-full border border-white/10 bg-white/[0.04] focus-within:border-blood/60 focus-within:bg-white/[0.07] transition-colors"
+          className="hidden 2xl:flex shrink-0 items-center gap-2 w-40 px-3.5 h-10 rounded-full border border-white/10 bg-white/[0.04] focus-within:border-blood/60 focus-within:bg-white/[0.07] transition-colors"
         >
           <Search size={15} className="text-bone/50" />
           <input
@@ -277,8 +295,8 @@ export function SiteHeader() {
                         <div className="text-sm font-semibold text-bone truncate">{auth.displayName || "User"}</div>
                         <div className="text-[11px] text-bone/50 truncate">{auth.user?.email}</div>
                       </div>
-                      <RouterLink to="/profile" className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
-                        <User size={15} /> Profile
+                      <RouterLink to="/artist/$id" params={{ id: auth.user?.id ?? "" }} className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
+                        <User size={15} /> My Profile
                       </RouterLink>
                       <RouterLink to="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
                         <Settings size={15} /> Settings
@@ -350,22 +368,26 @@ export function SiteHeader() {
               </form>
 
               <div>
-                <div className="font-cond text-[10px] tracking-[0.4em] uppercase text-bone/40 mb-2 px-1">Browse</div>
+                <div className="text-xs text-muted-foreground mb-3 px-1">Your music. Your stage. Your audience.</div>
+                <div className="font-cond text-[10px] tracking-[0.4em] uppercase text-bone/40 mb-2 px-1">Main Menu</div>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {PRIMARY.map((item) => {
+                  {primary.map((item) => {
                     const active = isActive(item.to);
                     return (
                       <RouterLink
                         key={item.label}
                         to={item.to}
-                        className={`flex items-center gap-2 px-3 py-3 rounded-lg border text-sm font-medium transition-colors ${
+                        params={item.params}
+                        search={item.search as any}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex min-w-0 items-center gap-2 px-3 py-3 rounded-lg border text-sm font-medium transition-colors ${
                           active
                             ? "border-blood bg-blood/15 text-bone"
                             : "border-white/10 bg-white/[0.03] text-bone/75 hover:text-bone"
                         }`}
                       >
-                        <item.icon size={15} className={active ? "text-blood" : "text-bone/50"} />
-                        {item.label}
+                        <item.icon size={15} className={`shrink-0 ${active ? "text-blood" : "text-bone/50"}`} />
+                        <span>{item.label}</span>
                       </RouterLink>
                     );
                   })}
@@ -412,8 +434,8 @@ export function SiteHeader() {
                         <div className="text-[11px] text-bone/50 truncate">{auth.user?.email}</div>
                       </div>
                     </div>
-                    <RouterLink to="/profile" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
-                      <User size={15} /> Profile
+                    <RouterLink to="/artist/$id" params={{ id: auth.user?.id ?? "" }} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
+                      <User size={15} /> My Profile
                     </RouterLink>
                     <RouterLink to="/settings" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
                       <Settings size={15} /> Settings

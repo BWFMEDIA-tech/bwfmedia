@@ -6,7 +6,14 @@ import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 export const Route = createFileRoute("/signup")({
-  head: () => ({ meta: [{ title: "Create account — BWF Network" }] }),
+  head: () => ({ meta: [
+    { title: "Sign Up — Tunevio" },
+    { name: "description", content: "Join Tunevio as an artist, listener or host. Your music. Your stage. Your audience." },
+    { property: "og:title", content: "Sign Up — Tunevio" },
+    { property: "og:description", content: "Join Tunevio as an artist, listener or host. Your music. Your stage. Your audience." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SignupPage,
 });
 
@@ -14,11 +21,15 @@ function SignupPage() {
   const nav = useNavigate();
   const [step, setStep] = useState<"role" | "details">("role");
   const [role, setRole] = useState<"artist" | "listener" | "host" | null>(null);
+  const [artistEntry, setArtistEntry] = useState(false);
   useEffect(() => {
     const qs = new URLSearchParams(window.location.search);
     const ref = qs.get("ref");
     if (ref) saveHostReferral({ hostId: ref, source: "link" });
-    if (qs.get("as") === "artist") setRole("artist");
+    if (qs.get("as") === "artist") {
+      setRole("artist");
+      setArtistEntry(true);
+    }
   }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -95,20 +106,20 @@ function SignupPage() {
         <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-5">
           <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
           <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
-            BWF Network
+            Tunevio
           </span>
         </div>
         <h1 className="font-display text-4xl uppercase text-bone leading-[0.9]">
-          Get On
+          {artistEntry ? "Artist" : "Get On"}
           <br />
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: "var(--gradient-blood)" }}
           >
-            Stage.
+            {artistEntry ? "Sign Up." : "Stage."}
           </span>
         </h1>
-        <p className="mt-3 mb-6 text-sm text-bone/60">Join the BWF Network.</p>
+        <p className="mt-3 mb-6 text-sm text-bone/60">Your music. Your stage. Your audience.</p>
 
         {step === "role" && (
           <>
