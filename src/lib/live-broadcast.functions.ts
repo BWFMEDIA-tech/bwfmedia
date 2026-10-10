@@ -37,7 +37,7 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
       .eq("id", stream.host_id)
       .maybeSingle();
     const hostName =
-      hostProfile?.stage_name || hostProfile?.display_name || "A BWF host";
+      hostProfile?.stage_name || hostProfile?.display_name || "A Tunevio host";
     const link = `/stream/${stream.room_name}`;
     const streamUrl = `https://bwfnetwork.com${link}`;
 

@@ -19,7 +19,7 @@ interface Props {
 }
 
 const Email = ({
-  hostName = 'A BWF host',
+  hostName = 'A Tunevio host',
   streamTitle = 'BWF Live',
   streamUrl = 'https://bwfnetwork.com/live',
 }: Props) => (
@@ -53,7 +53,7 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (d: Record<string, any>) =>
-    `🔴 Live Now: ${d?.hostName ?? 'A BWF host'} just started a live stream`,
+    `🔴 Live Now: ${d?.hostName ?? 'A Tunevio host'} just started a live stream`,
   displayName: 'Live stream started',
   previewData: {
     hostName: 'JXHNNY RICH',
