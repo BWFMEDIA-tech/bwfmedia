@@ -1,0 +1,1 @@
+INSERT INTO public.user_roles (user_id, role) VALUES ('38e3b834-2f50-4d2f-ab5f-ef2c5457b23b','artist') ON CONFLICT DO NOTHING;
