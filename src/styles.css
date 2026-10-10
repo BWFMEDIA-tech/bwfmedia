@@ -240,9 +240,18 @@
 .studio-media-controls > button > span:first-child { flex-shrink: 0; }
 .studio-media-controls > .studio-end-action { color: var(--destructive); }
 .studio-media-controls > .studio-end-action > span:first-child { border-color: color-mix(in srgb, var(--destructive) 45%, transparent); }
-.profile-entry-actions { display: flex; gap: .75rem; max-width: 34rem; margin: 1rem auto; align-items: center; }
-.profile-entry-actions input { min-width: 0; }
+.profile-entry-actions { display: flex; flex-wrap: wrap; gap: .75rem; max-width: 34rem; margin: 1rem auto; align-items: center; }
+.profile-entry-actions input { min-width: 0; flex: 1 1 100%; }
 .profile-entry-actions button { width: auto; flex: 1; }
+/* "Live Now" join button: brand cyan→blue, always visible on a live profile. */
+.live-now-button { background: linear-gradient(90deg, var(--primary), var(--brand-blue)); color: #fff; border: 0; box-shadow: 0 8px 28px color-mix(in srgb, var(--primary) 35%, transparent); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.live-now-button:hover { filter: brightness(1.12); }
+.live-now-button:disabled { opacity: .65; }
+.live-now-dot { width: .5rem; height: .5rem; border-radius: 9999px; background: #fff; animation: live-now-pulse 1.2s ease-in-out infinite; }
+@keyframes live-now-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.75); } }
+@media (prefers-reduced-motion: reduce) { .live-now-dot { animation: none; } }
+.profile-entry-live-cta { flex: 1 1 100%; height: 3rem; font-size: .95rem; }
+
 .profile-chat-panel { display: flex; flex-direction: column; height: 30rem; overflow: hidden; border: 1px solid var(--border); }
 .profile-chat-heading { display: flex; align-items: center; gap: .5rem; padding: 1rem; border-bottom: 1px solid var(--border); font-size: .85rem; }
 .profile-chat-messages { flex: 1; min-height: 0; overflow-y: auto; padding: .5rem .75rem; }
