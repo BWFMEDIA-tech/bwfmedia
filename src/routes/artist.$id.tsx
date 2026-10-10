@@ -211,9 +211,9 @@ function ArtistProfilePage() {
 }
 
 function HeroBanner({
-  artist, initials, location, genre, memberSince, isOwner,
+  artist, initials, location, genre, memberSince, isOwner, canUseTools = true,
 }: {
-  artist: ArtistView; initials: string; isOwner: boolean;
+  artist: ArtistView; initials: string; isOwner: boolean; canUseTools?: boolean;
   location: string | null; genre: string | null; memberSince: string | null;
 }) {
   const memberSinceLabel = memberSince
