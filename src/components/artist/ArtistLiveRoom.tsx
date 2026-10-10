@@ -60,6 +60,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   const authToken = useServerFn(getLiveKitToken);
   const guestToken = useServerFn(getGuestLiveKitToken);
   const endLive = useServerFn(endStream);
+  const makeInvite = useServerFn(createStreamInvite);
   const [connection, setConnection] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
   const [ending, setEnding] = useState(false);

@@ -43,6 +43,7 @@ function GoLivePage() {
   const endFn = useServerFn(endStream);
   const resumeFn = useServerFn(getMyActiveStream);
   const tokenFn = useServerFn(getLiveKitToken);
+  const makeInvite = useServerFn(createStreamInvite);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<string>(LIVE_CATEGORIES[0].id);
