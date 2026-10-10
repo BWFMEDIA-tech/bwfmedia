@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, MessageSquare, Search, Send, UserPlus } from "lucide-react";
+import { ArrowLeft, MessageSquare, Search, Send, UserPlus, X } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -231,12 +231,23 @@ function MessagesPage() {
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <MessageSquare className="h-6 w-6" /> Messages
           </h1>
-          <button
-            onClick={() => setShowNew((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
-          >
-            <UserPlus className="h-4 w-4" /> New message
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowNew((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+            >
+              <UserPlus className="h-4 w-4" /> New message
+            </button>
+            {showNew && (
+              <button
+                onClick={closeNewBox}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+                aria-label="Close new message box"
+              >
+                <X className="h-4 w-4" /> Close
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 h-[70vh] min-h-[500px]">
