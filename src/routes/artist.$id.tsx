@@ -174,6 +174,7 @@ function ArtistProfilePage() {
             genre={meta?.genre ?? null}
             memberSince={meta?.memberSince ?? null}
             isOwner={isOwner}
+            canUseTools={hasArtistTools(auth.roles)}
           />
           <ProfileLiveBar artistId={id} isOwner={ownerTools} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}

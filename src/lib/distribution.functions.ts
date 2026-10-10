@@ -71,6 +71,13 @@ async function ensureAdmin(ctx: { supabase: any; userId: string }) {
   if (!data) throw new Error("Forbidden");
 }
 
+async function ensureArtist(ctx: { supabase: any; userId: string }) {
+  const { data } = await ctx.supabase.from("user_roles").select("role").eq("user_id", ctx.userId);
+  if (!(data ?? []).some((r: any) => r.role === "artist" || r.role === "admin")) {
+    throw new Error("Distribution is only available to artist accounts");
+  }
+}
+
 // ---------- Artist-facing ----------
 
 export const listMyReleases = createServerFn({ method: "GET" })
@@ -103,6 +110,7 @@ export const createRelease = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ReleaseSchema.parse(input))
   .handler(async ({ data, context }) => {
+    await ensureArtist(context);
     const { data: row, error } = await context.supabase
       .from("distribution_releases")
       .insert({ ...data, user_id: context.userId })

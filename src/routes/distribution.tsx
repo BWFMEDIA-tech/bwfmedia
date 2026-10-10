@@ -11,6 +11,7 @@ import {
 import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distribution/AssetUploads";
 import { formatDuration } from "@/lib/distribution-upload";
 import { useAuth } from "@/lib/auth-context";
+import { hasArtistTools } from "@/lib/artist-navigation";
 import {
   listMyReleases, createRelease, updateRelease, deleteRelease,
   submitReleaseForReview, addReleaseTrack, updateReleaseTrack, deleteReleaseTrack,
@@ -100,6 +101,19 @@ function DistributionPage() {
           >
             Sign in
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!auth.rolesLoading && !hasArtistTools(auth.roles)) {
+    return (
+      <div className="grid min-h-screen place-items-center px-6 text-center">
+        <div>
+          <Disc3 className="mx-auto mb-4 h-10 w-10 text-[#00E6FF]" />
+          <h1 className="text-xl font-bold">Distribution is for artists</h1>
+          <p className="mt-2 text-sm text-white/50">Register as an artist to release your music.</p>
+          <button onClick={() => navigate({ to: "/signup", search: { as: "artist" } as any })} className="mt-4 rounded-full bg-[#00E6FF] px-6 py-2 text-sm font-bold text-black">Become an artist</button>
         </div>
       </div>
     );
