@@ -58,7 +58,9 @@ function LivePage() {
       .channel("live-now")
       .on("postgres_changes", { event: "*", schema: "public", table: "streams" }, refresh)
       .subscribe();
-    return () => { cancelled = true; supabase.removeChannel(ch); };
+    // Realtime is filtered by access rules for visitors, so also poll to pick up new profile lives.
+    const poll = setInterval(refresh, 15_000);
+    return () => { cancelled = true; clearInterval(poll); supabase.removeChannel(ch); };
   }, []);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
@@ -114,8 +116,8 @@ function LivePage() {
             {visibleStreams.map((s) => (
               <Link
                 key={s.id}
-                to="/stream/$room"
-                params={{ room: s.room_name }}
+                to="/artist/$id"
+                params={{ id: s.host_id }}
                 className="group rounded-2xl border border-white/10 bg-[#0d0d18] overflow-hidden hover:border-violet-500/50 transition"
               >
                 <div className="relative aspect-video bg-gradient-to-br from-violet-900 to-blue-900">
