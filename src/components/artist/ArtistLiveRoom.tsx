@@ -112,6 +112,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
     }
   };
   const invite = async () => {
+    if (!isOwner) { await share(); return; }
     try { const { code } = await makeInvite({ data: { streamId: stream.id } }); await navigator.clipboard.writeText(`${window.location.origin}/invite/${code}`); toast.success("Guest invite link copied"); }
     catch { toast.error("Could not copy invite link"); }
   };
