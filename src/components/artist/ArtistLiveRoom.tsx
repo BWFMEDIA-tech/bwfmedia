@@ -24,6 +24,31 @@ import { saveHostReferral } from "@/lib/host-referral";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
+/**
+ * Prominent "Live Now" call to action shown on a live artist profile.
+ * Anyone can click it — signed-in members and guests both join the live.
+ */
+function LiveNowButton({
+  joining, isOwner, authLoading, onJoin, className, size = "lg", label,
+}: {
+  joining: boolean; isOwner: boolean; authLoading: boolean; onJoin: () => void;
+  className?: string; size?: "sm" | "default" | "lg"; label?: string;
+}) {
+  return (
+    <Button
+      size={size}
+      className={`live-now-button shrink-0 whitespace-nowrap ${className ?? ""}`}
+      disabled={joining || authLoading}
+      onClick={onJoin}
+    >
+      <span className="live-now-dot" aria-hidden="true" />
+      {label ?? (joining ? "Joining…" : isOwner ? "Resume live" : "Live Now")}
+    </Button>
+  );
+}
+
+
+
 export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   stream: LiveStream;
   artist: { name: string; photo: string | null; handle?: string; genre?: string | null; featuredTrack?: { title: string; cover: string | null; plays: number } | null; tracks?: SetlistTrack[] };
@@ -116,7 +141,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
           <Button variant="outline" size="sm" onClick={share} aria-label="Share"><Share2 /><span className="hidden sm:inline">Share</span></Button>
           <div className="relative"><Button variant="outline" size="icon" aria-label="Room options" onClick={() => setShowMenu(v => !v)}><MoreHorizontal /></Button>{showMenu && <div className="absolute right-0 top-12 z-20 w-52 rounded-lg border border-border bg-card p-2"><p className="px-2 py-2 text-xs text-muted-foreground">{stream.title}</p><Button variant="ghost" className="w-full justify-start" onClick={() => { setShowAudience(v => !v); setShowMenu(false); }}><Users />Toggle audience</Button>{!isOwner && <Button variant="ghost" className="w-full justify-start" onClick={() => { setShowMenu(false); toast.success("Thanks — our team will review this live."); }}><Flag />Report live</Button>}</div>}</div>
           {connection && <Button variant="ghost" size="icon" title="Leave room" aria-label="Leave room" onClick={() => setConnection(null)}><LogOut /></Button>}
-          {!connection && <Button size="sm" className="live-header-cta shrink-0 whitespace-nowrap" disabled={joining || auth.loading} onClick={join}><Radio /> {joining ? "Joining…" : isOwner ? "Resume live" : "Watch live"}</Button>}
+          {!connection && <LiveNowButton size="sm" joining={joining} isOwner={isOwner} authLoading={auth.loading} onJoin={join} className="live-header-cta" />}
 
         </div>
       </header>
@@ -170,10 +195,12 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
             <div className="profile-video-identity"><p className="text-sm font-semibold">{artist.name}</p></div>
           </div>
           </div>}
-          {(!auth.user || isOwner) && <div className="profile-entry-actions">
+          <div className="profile-entry-actions">
             {!auth.user && <input aria-label="Your live-room name" placeholder="Your name (optional)" value={guestName} maxLength={80} onChange={(event) => setGuestName(event.target.value)} className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground" />}
+            <LiveNowButton joining={joining} isOwner={isOwner} authLoading={auth.loading} onJoin={join} className="profile-entry-live-cta" />
             {isOwner && <Button variant="outline" className="w-full" disabled={ending} onClick={stop}>{ending ? "Ending…" : "End live"}</Button>}
-          </div>}
+          </div>
+
 
         </section>
       )}
