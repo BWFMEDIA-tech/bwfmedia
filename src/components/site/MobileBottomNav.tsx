@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Swords, PlusCircle, Search, User } from "lucide-react";
+import { Home, Radio, LayoutDashboard, Compass, User } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
+import { artistDashboardDestination } from "@/lib/artist-navigation";
 
 type Tab = {
   to: string;
@@ -12,13 +14,14 @@ type Tab = {
 
 const TABS: Tab[] = [
   { to: "/", label: "Home", icon: Home, match: (p) => p === "/" },
-  { to: "/play", label: "Arena", icon: Swords, match: (p) => p === "/play" || p.startsWith("/play/") || p.startsWith("/play.") },
-  { to: "/upload", label: "Upload", icon: PlusCircle, match: (p) => p.startsWith("/upload") },
-  { to: "/search", label: "Search", icon: Search, match: (p) => p.startsWith("/search") },
-  { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") },
+  { to: "/discover", label: "Discover", icon: Compass, match: (p) => p.startsWith("/discover") || p.startsWith("/search") },
+  { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
+  { to: "/artist-dashboard", label: "Artist Hub", icon: LayoutDashboard, match: (p) => p.startsWith("/artist-dashboard") },
+  { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
 
 export function MobileBottomNav() {
+  const auth = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const root = document.documentElement;
@@ -37,13 +40,17 @@ export function MobileBottomNav() {
         {TABS.map((tab) => {
           const active = tab.match(pathname);
           const Icon = tab.icon;
+          const dashboardTo = artistDashboardDestination(auth.roles);
+          const to = tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
           return (
             <li key={tab.to} className="flex">
               <Link
-                to={tab.to}
+                to={to}
+                params={tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
+                search={tab.to === "/artist-dashboard" && dashboardTo === "/signup" ? { as: "artist" } as any : undefined}
                 className={cn(
                   "flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
-                  active ? "text-[#00E6FF]" : "text-white/60 hover:text-white",
+                  active ? "text-primary" : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-current={active ? "page" : undefined}
               >
