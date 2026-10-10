@@ -13,7 +13,7 @@ export const Route = createFileRoute("/signup")({
 function SignupPage() {
   const nav = useNavigate();
   const [step, setStep] = useState<"role" | "details">("role");
-  const [role, setRole] = useState<"artist" | "listener" | null>(null);
+  const [role, setRole] = useState<"artist" | "listener" | "host" | null>(null);
   useEffect(() => {
     const qs = new URLSearchParams(window.location.search);
     const ref = qs.get("ref");
@@ -37,7 +37,7 @@ function SignupPage() {
       return toast.error("Password must be 8+ chars with upper, lower, and a number.");
     }
     setLoading(true);
-    const redirectTo = role === "artist" ? "/artist/upgrade" : "/";
+    const redirectTo = role === "artist" ? "/artist/upgrade" : role === "host" ? "/host-earnings" : "/";
     const meta: Record<string, unknown> = {
       display_name: displayName,
       role,
@@ -130,6 +130,14 @@ function SignupPage() {
                 <div className="font-display text-lg uppercase text-bone">🎧 Listener</div>
                 <div className="text-xs text-bone/60 mt-1">I watch, listen, and engage</div>
               </button>
+              <button
+                type="button"
+                onClick={() => setRole("host")}
+                className={`text-left rounded-xl border p-4 transition-colors ${role === "host" ? "border-blood bg-blood/10" : "border-white/10 bg-black/40 hover:border-blood/40"}`}
+              >
+                <div className="font-display text-lg uppercase text-bone">🎙️ Host</div>
+                <div className="text-xs text-bone/60 mt-1">I host live rooms and battles, and earn from it</div>
+              </button>
             </div>
             <button
               type="button"
@@ -152,7 +160,7 @@ function SignupPage() {
               ← Change role ({role})
             </button>
             <form onSubmit={submit} className="flex flex-col gap-3">
-              <input required placeholder={role === "artist" ? "Display name" : "Username"} value={displayName} onChange={(e) => setDisplayName(e.target.value)}
+              <input required placeholder={role === "listener" ? "Username" : "Display name"} value={displayName} onChange={(e) => setDisplayName(e.target.value)}
                 className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
               {role === "artist" && (
                 <>
