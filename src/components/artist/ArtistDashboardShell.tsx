@@ -92,7 +92,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
           })}
         </nav>
       </aside>
-      {mobileOpen && <Button variant="ghost" aria-label="Close artist navigation" className="fixed inset-x-0 bottom-0 top-[calc(var(--bwf-banner-h,0px)+72px)] z-30 h-auto rounded-none bg-background/80 lg:hidden" onClick={() => setMobileOpen(false)} />}
+      {mobileOpen && <Button variant="ghost" aria-label="Close artist navigation" className="fixed inset-x-0 bottom-0 top-[calc(var(--bwf-banner-h,0px)+72px)] z-30 h-auto rounded-none bg-background/80 hover:bg-background/80 lg:hidden" onClick={() => setMobileOpen(false)} />}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex min-h-16 items-center gap-3 border-b border-border bg-background/95 px-4 sm:px-6">
           <Button variant="outline" size="icon" title="Toggle artist menu" aria-label="Toggle artist menu" aria-expanded={mobileOpen || !collapsed} onClick={() => { setMobileOpen((v) => !v); setCollapsed((v) => !v); }}><PanelLeft /></Button>
