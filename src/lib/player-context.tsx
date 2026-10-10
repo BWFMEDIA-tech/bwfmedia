@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getSignedAudioUrl } from "@/lib/useSignedAudio";
+import { supabase } from "@/integrations/supabase/client";
+import { incrementTrackPlayCount } from "@/lib/play-counts.functions";
+
+/** Fired after a play has been saved; detail = { trackId, playCount }. */
+export const PLAY_COUNT_EVENT = "tunevio:play-count";
 
 export interface PlayerTrack {
   id: string;
@@ -44,6 +49,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stateRef = useRef<PlayerState | null>(null);
   const playTokenRef = useRef(0);
+  // One pending count per playback start; cleared once the audio really plays.
+  const pendingCountRef = useRef<{ token: number; trackId: string } | null>(null);
   const [state, setState] = useState<PlayerState>({
     track: null,
     queue: [],
@@ -65,6 +72,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const a = audioRef.current;
     if (!a) return;
     const token = ++playTokenRef.current;
+    pendingCountRef.current = { token, trackId: track.id };
     const src = (await getSignedAudioUrl(track.audioUrl)) ?? track.audioUrl;
     if (token !== playTokenRef.current || audioRef.current !== a) return;
     if (a.src !== src) a.src = src;
@@ -95,6 +103,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
     const onMeta = () => setState((s) => ({ ...s, duration: a.duration || 0 }));
     const onPlay = () => setState((s) => ({ ...s, isPlaying: true }));
+    const onPlaying = () => {
+      const pending = pendingCountRef.current;
+      if (!pending || pending.token !== playTokenRef.current) return;
+      pendingCountRef.current = null;
+      void (async () => {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) return; // signed-out previews are not counted
+        try {
+          const res = await incrementTrackPlayCount({
+            data: { trackId: pending.trackId, playId: `${pending.trackId}:${Date.now()}:${pending.token}` },
+          });
+          window.dispatchEvent(new CustomEvent(PLAY_COUNT_EVENT, {
+            detail: { trackId: res.trackId, playCount: res.play_count },
+          }));
+        } catch (err) {
+          console.error("[player] failed to save play", err);
+        }
+      })();
+    };
     const onPause = () => setState((s) => ({ ...s, isPlaying: false }));
     const onEnd = () => {
       const s = stateRef.current; if (!s) return;
@@ -112,6 +139,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     a.addEventListener("loadedmetadata", onMeta);
     a.addEventListener("durationchange", onMeta);
     a.addEventListener("play", onPlay);
+    a.addEventListener("playing", onPlaying);
     a.addEventListener("pause", onPause);
     a.addEventListener("ended", onEnd);
     return () => {
@@ -120,6 +148,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       a.removeEventListener("loadedmetadata", onMeta);
       a.removeEventListener("durationchange", onMeta);
       a.removeEventListener("play", onPlay);
+      a.removeEventListener("playing", onPlaying);
       a.removeEventListener("pause", onPause);
       a.removeEventListener("ended", onEnd);
     };
