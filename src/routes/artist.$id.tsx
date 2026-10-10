@@ -11,6 +11,7 @@ import {
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
+import { hasArtistTools } from "@/lib/artist-navigation";
 import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RankBadge } from "@/components/rank/RankBadge";
@@ -104,6 +105,7 @@ function ArtistProfilePage() {
   const auth = useAuth();
   const { user, isAuthenticated } = auth;
   const isOwner = !!user && user.id === id;
+  const ownerTools = isOwner && hasArtistTools(auth.roles);
   const queryClient = useQueryClient();
   const fetchLive = useServerFn(getArtistLiveStream);
   const liveQuery = useQuery({
@@ -173,7 +175,7 @@ function ArtistProfilePage() {
             memberSince={meta?.memberSince ?? null}
             isOwner={isOwner}
           />
-          <ProfileLiveBar artistId={id} isOwner={isOwner} />
+          <ProfileLiveBar artistId={id} isOwner={ownerTools} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
@@ -201,7 +203,7 @@ function ArtistProfilePage() {
             isAuthenticated={isAuthenticated}
             auth={auth}
           />
-          {isOwner && <OwnerQuickLinks />}
+          {ownerTools && <OwnerQuickLinks />}
         </aside>
       </main>
     </div>
@@ -257,7 +259,9 @@ function HeroBanner({
         </div>
       </div>
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
-        {isOwner ? (
+        {isOwner && !canUseTools ? (
+          <Link to="/signup" search={{ as: "artist" } as any} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">Become an artist to go live</Link>
+        ) : isOwner ? (
           <>
             <Link to="/go-live" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-wide text-white hover:brightness-110 transition" style={{ background: "linear-gradient(90deg,#00E6FF,#0000FF)", boxShadow: "0 6px 24px rgba(0,0,255,0.4)" }}>
               <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Go Live
