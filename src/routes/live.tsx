@@ -129,7 +129,7 @@ function LivePage() {
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE
                   </span>
                   <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
-                    <Eye className="h-3 w-3" /> {s.viewer_count ?? 0}
+                    <Eye className="h-3 w-3" /> {s.viewer_count ?? 0} watching
                   </span>
                   {(isAdmin || auth.user?.id === s.host_id) && (
                     <button
@@ -153,6 +153,7 @@ function LivePage() {
                       {s.host?.stage_name || s.host?.display_name || "BWF host"}
                     </span>
                   </div>
+                  <p className="mt-2 text-xs text-white/60">{s.viewer_count ?? 0} in the audience · tap to join the chat</p>
                   {s.category && (
                     <span className="mt-3 inline-block rounded-md bg-[#0000FF]/15 border border-[#0000FF]/30 px-2 py-1 text-[10px] font-semibold text-[#0000FF]">
                       {liveCategoryLabel(s.category)}

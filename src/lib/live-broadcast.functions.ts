@@ -147,9 +147,28 @@ export const listLiveStreams = createServerFn({ method: "POST" })
         .in("id", hostIds);
       (profs ?? []).forEach((p: any) => profileMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url, stage_name: p.stage_name }));
     }
+    // Audience = people actually connected to each live room (minus the host).
+    const audience = new Map<string, number>();
+    const apiKey = process.env.LIVEKIT_API_KEY;
+    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    const wsUrl = process.env.LIVEKIT_URL;
+    const roomNames = (streams ?? []).map((s: any) => s.room_name).filter(Boolean);
+    if (apiKey && apiSecret && wsUrl && roomNames.length) {
+      try {
+        const { RoomServiceClient } = await import("livekit-server-sdk");
+        const rooms = await new RoomServiceClient(wsUrl.replace(/^ws/, "http"), apiKey, apiSecret).listRooms(roomNames);
+        for (const r of rooms) audience.set(r.name, Math.max(0, (r.numParticipants ?? 0) - 1));
+        // Keep the saved count in sync so live rooms show the same number.
+        await Promise.all((streams ?? []).filter((s: any) => audience.has(s.room_name) && audience.get(s.room_name) !== s.viewer_count)
+          .map((s: any) => client.from("streams").update({ viewer_count: audience.get(s.room_name) }).eq("id", s.id)));
+      } catch (err) {
+        console.error("[live] audience count failed", err);
+      }
+    }
     return {
       streams: (streams ?? []).map((s: any) => ({
         ...s,
+        viewer_count: audience.get(s.room_name) ?? s.viewer_count ?? 0,
         host: profileMap.get(s.host_id) ?? null,
       })),
     };
