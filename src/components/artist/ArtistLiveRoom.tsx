@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { createStreamInvite } from "@/lib/invites.functions";
 import { Eye, Radio, Share2, LogOut, Users, Crown, Music2, MoreHorizontal, Heart, Gem, Hand, Clock, MessageCircle, Flag, Headphones } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   const authToken = useServerFn(getLiveKitToken);
   const guestToken = useServerFn(getGuestLiveKitToken);
   const endLive = useServerFn(endStream);
+  const makeInvite = useServerFn(createStreamInvite);
   const [connection, setConnection] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
   const [ending, setEnding] = useState(false);
@@ -110,7 +112,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
     }
   };
   const invite = async () => {
-    try { await navigator.clipboard.writeText(`${window.location.origin}/invite/${stream.room_name}`); toast.success("Guest invite link copied"); }
+    try { const { code } = await makeInvite({ data: { streamId: stream.id } }); await navigator.clipboard.writeText(`${window.location.origin}/invite/${code}`); toast.success("Guest invite link copied"); }
     catch { toast.error("Could not copy invite link"); }
   };
   const stop = async () => {

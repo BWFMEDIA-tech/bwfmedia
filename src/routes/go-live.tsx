@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { createStreamInvite } from "@/lib/invites.functions";
 import { toast } from "sonner";
 import { Radio, Copy, Check, Users, Headphones, Music2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -42,6 +43,7 @@ function GoLivePage() {
   const endFn = useServerFn(endStream);
   const resumeFn = useServerFn(getMyActiveStream);
   const tokenFn = useServerFn(getLiveKitToken);
+  const makeInvite = useServerFn(createStreamInvite);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<string>(LIVE_CATEGORIES[0].id);
@@ -199,7 +201,7 @@ function GoLivePage() {
                 streamId={stream.id}
                 onEnd={stopLive}
                 onInvite={async () => {
-                  try { await navigator.clipboard.writeText(`${window.location.origin}/invite/${stream.room_name}`); toast.success("Guest invite link copied"); }
+                  try { const { code } = await makeInvite({ data: { streamId: stream.id } }); await navigator.clipboard.writeText(`${window.location.origin}/invite/${code}`); toast.success("Guest invite link copied"); }
                   catch { toast.error("Could not copy invite link"); }
                 }}
                 onViewerCount={setViewerCount}

@@ -168,3 +168,21 @@ export const joinStageFromInvite = createServerFn({ method: "POST" })
     if (error) throw new Error("Could not join the stage");
     return { ok: true };
   });
+
+/** Stream owner only — create a real guest invite for their own live. */
+export const createStreamInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: stream } = await context.supabase
+      .from("streams").select("id, host_id, status").eq("id", data.streamId).maybeSingle();
+    if (!stream || stream.host_id !== context.userId) throw new Error("Only the host can invite guests");
+    if (stream.status !== "live") throw new Error("This live has ended");
+    const code = `g-${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
+    const { error } = await adminClient().from("invite_codes").insert({
+      code, stream_id: stream.id, allowed_role: "speaker", created_by: context.userId,
+      expires_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    });
+    if (error) throw new Error("Could not create invite");
+    return { code };
+  });
