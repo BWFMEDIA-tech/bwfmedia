@@ -14,3 +14,18 @@ describe("Artist Dashboard entry", () => {
     expect(artistDashboardDestination(["admin"])).toBe("/artist-dashboard");
   });
 });
+import { hasArtistTools, canGoLive } from "./artist-navigation";
+describe("Listener restrictions", () => {
+  it("listeners and members cannot use artist tools", () => {
+    expect(hasArtistTools(["listener"])).toBe(false);
+    expect(hasArtistTools(["member"])).toBe(false);
+  });
+  it("listeners and members cannot go live", () => {
+    expect(canGoLive(["listener"])).toBe(false);
+    expect(canGoLive(["member"])).toBe(false);
+  });
+  it("artists keep their tools", () => {
+    expect(hasArtistTools(["artist"])).toBe(true);
+    expect(canGoLive(["artist"])).toBe(true);
+  });
+});
