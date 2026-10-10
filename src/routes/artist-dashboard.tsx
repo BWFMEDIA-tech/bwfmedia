@@ -8,12 +8,18 @@ import { getMyRoyaltyEarnings, requestRoyaltyPayout, setAutoPayout } from "@/lib
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
+import { artistDashboardDestination } from "@/lib/artist-navigation";
 
 export const Route = createFileRoute("/artist-dashboard")({
   head: () => ({
     meta: [
-      { title: "Artist Dashboard — BWF Network" },
+      { title: "Artist Dashboard — Tunevio" },
       { name: "description", content: "Manage your profile, music, videos, analytics and notifications." },
+      { property: "og:title", content: "Artist Dashboard — Tunevio" },
+      { property: "og:description", content: "Manage your profile, music, videos, analytics and notifications." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ArtistDashboardPage,
@@ -21,12 +27,12 @@ export const Route = createFileRoute("/artist-dashboard")({
 
 function Stat({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
-      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+    <div className="rounded-lg border border-border bg-card p-5">
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
       <div className="mt-2 text-2xl font-bold">{value}</div>
-      {sub ? <div className="mt-1 text-xs text-white/40">{sub}</div> : null}
+      {sub ? <div className="mt-1 text-xs text-muted-foreground">{sub}</div> : null}
     </div>
   );
 }
@@ -35,6 +41,19 @@ const fmtUsd = (cents: number | null | undefined) =>
   `$${((Number(cents ?? 0)) / 100).toFixed(2)}`;
 
 function ArtistDashboardPage() {
+  const auth = useAuth();
+  if (auth.loading || auth.rolesLoading) return <div className="p-8 text-muted-foreground" role="status">Loading Artist Dashboard…</div>;
+  if (artistDashboardDestination(auth.roles) === "/signup") return (
+    <div className="mx-auto max-w-xl px-6 py-16 text-foreground">
+      <h1 className="text-3xl font-bold">Artist Dashboard</h1>
+      <p className="mt-3 text-muted-foreground">Your music. Your stage. Your audience.</p>
+      <Button asChild className="mt-6"><Link to="/signup" search={{ as: "artist" } as any}>Sign up as an artist</Link></Button>
+    </div>
+  );
+  return <ArtistOverview />;
+}
+
+function ArtistOverview() {
   const qc = useQueryClient();
   const fetchDash = useServerFn(getMyArtistDashboard);
   const fetchRoyalty = useServerFn(getMyRoyaltyEarnings);
@@ -89,8 +108,8 @@ function ArtistDashboardPage() {
   return (
     <ArtistDashboardShell>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-        <p className="mt-1 text-sm text-white/60">Live overview of your streams, earnings, and payouts.</p>
+        <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Live overview of your streams, earnings, and payouts.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={sub ? CheckCircle2 : Clock} label="Subscription" value={subLabel} />
@@ -100,10 +119,10 @@ function ArtistDashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
+        <div className="rounded-lg border border-border bg-card p-5">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Withdraw earnings</div>
-            <div className="flex items-center gap-2 text-xs text-white/50">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               Auto-payout
               <Switch
                 checked={!!account?.auto_payout_enabled}
@@ -113,7 +132,7 @@ function ArtistDashboardPage() {
             </div>
           </div>
           <div className="mt-3 text-3xl font-bold">{fmtUsd(available)}</div>
-          <p className="mt-1 text-xs text-white/50">
+          <p className="mt-1 text-xs text-muted-foreground">
             Min payout {fmtUsd(account?.minimum_payout_cents ?? 2500)}. Stripe Connect required.
           </p>
           <Button
@@ -130,25 +149,25 @@ function ArtistDashboardPage() {
           ) : null}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
+        <div className="rounded-lg border border-border bg-card p-5">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <CalendarClock className="h-4 w-4" /> Monthly royalty history
           </div>
-          <div className="mt-3 divide-y divide-white/5 text-sm">
+          <div className="mt-3 divide-y divide-border text-sm">
             {months.length === 0 ? (
-              <p className="py-2 text-white/50">No royalty months yet. Stream activity will populate here.</p>
+              <p className="py-2 text-muted-foreground">No royalty months yet. Stream activity will populate here.</p>
             ) : (
               months.map((m: any) => (
                 <div key={m.month} className="flex items-center justify-between py-2">
                   <div>
                     <div className="font-medium">{new Date(m.month).toLocaleString(undefined,{month:'short',year:'numeric'})}</div>
-                    <div className="text-xs text-white/40">
+                    <div className="text-xs text-muted-foreground">
                       {Number(m.weighted_streams).toLocaleString(undefined,{maximumFractionDigits:2})} weighted · {Number(m.share_pct).toFixed(2)}% share
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-semibold">{fmtUsd(m.payout_amount_cents)}</div>
-                    <div className="text-[10px] uppercase tracking-wider text-white/40">{m.status}</div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{m.status}</div>
                   </div>
                 </div>
               ))
@@ -158,18 +177,20 @@ function ArtistDashboardPage() {
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
-          <div className="text-sm font-semibold">Get started</div>
-          <ul className="mt-3 space-y-2 text-sm text-white/70">
-            <li>• <Link to="/settings/profile" className="hover:text-white">Complete your profile</Link></li>
-            <li>• <Link to="/settings/music-media" className="hover:text-white">Upload your first single</Link></li>
-            <li>• <Link to="/settings/social-links" className="hover:text-white">Connect social links</Link></li>
-            <li>• <Link to="/distribution" className="hover:text-white">Distribute your music to streaming platforms</Link></li>
+        <div className="rounded-lg border border-border bg-card p-5">
+          <div className="text-sm font-semibold">Shortcuts</div>
+          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li>• <Link to="/go-live" className="hover:text-foreground">Start a performance</Link></li>
+            <li>• <Link to="/artist-analytics" className="hover:text-foreground">View streaming analytics</Link></li>
+            <li>• <Link to="/settings/profile" className="hover:text-foreground">Complete your profile</Link></li>
+            <li>• <Link to="/settings/music-media" className="hover:text-foreground">Upload your first single</Link></li>
+            <li>• <Link to="/settings/social-links" className="hover:text-foreground">Connect social links</Link></li>
+            <li>• <Link to="/distribution" className="hover:text-foreground">Distribute your music to streaming platforms</Link></li>
           </ul>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
+        <div className="rounded-lg border border-border bg-card p-5">
           <div className="text-sm font-semibold">Revenue breakdown</div>
-          <div className="mt-3 space-y-1 text-sm text-white/70">
+          <div className="mt-3 space-y-1 text-sm text-muted-foreground">
             <div className="flex justify-between"><span>Approved royalties</span><span>{fmtUsd(Number(summary?.approved_cents ?? 0))}</span></div>
             <div className="flex justify-between"><span>Pending royalties</span><span>{fmtUsd(pending)}</span></div>
             <div className="flex justify-between"><span>Paid out lifetime</span><span>{fmtUsd(paid)}</span></div>
