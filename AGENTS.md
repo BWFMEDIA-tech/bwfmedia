@@ -13,3 +13,4 @@
 - Keep stage dropdown navigation and mute actions in the shared StageRoom, because Studio and profile lives must reuse the same roster and existing permission checks.
 - Derive profile video-box visibility from host spotlight selections, because unselected artist and guest boxes must stay hidden on every device.
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
+- Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
