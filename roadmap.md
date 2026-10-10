@@ -17,3 +17,13 @@
 - [x] Verify normal-profile restoration after the host ends a stream.
 - [x] Verify the setlist panel and the header join button on a live page at phone and desktop widths.
 - [ ] Host tiers phase 2: bonuses, host notifications, host payouts via existing payout flow, paid submissions/boosts counted per room once they are tied to a live room
+
+## Subscription & Payment System (spec: Tunevio_-_Complete_Subscription_Payment_System)
+- [x] Stripe plans: listener_premium $4.99/mo, listener_annual $49.99/yr, host_premium $14.99/mo
+- [ ] DB: billing_interval + trial_reminder_sent_at columns, trial-reminder cron hook
+- [ ] Checkout: 30-day listener trial (payment method required), duplicate-subscription block, trial disclosure
+- [ ] Welcome email on enrollment + reminder 3 days before first charge
+- [ ] Full-song gating: active subscription/trial or artist/host/admin role required server-side
+- [ ] My Subscription dashboard: plan, role, trial status/days left, interval, next billing, status, cancel/change plan
+- [ ] Navigation: Pricing link in header, Subscribe buttons, Manage Subscription links
+- [ ] Tests: plan values + access rules; sandbox checkout E2E with test card

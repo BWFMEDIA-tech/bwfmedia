@@ -5,12 +5,14 @@ import { validateReturnUrl } from "@/lib/validate-return-url";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const TUNEVIO_PLANS = {
-  listener_premium:     { role: "listener", label: "Premium",      priceCents:  999 },
-  listener_fan_premium: { role: "listener", label: "Fan Premium",  priceCents: 1499 },
-  listener_student:     { role: "listener", label: "Student",      priceCents:  499 },
-  artist_starter:       { role: "artist",   label: "Artist Starter", priceCents:  999 },
-  artist_pro:           { role: "artist",   label: "Artist Pro",     priceCents: 1999 },
-  label_plan:           { role: "artist",   label: "Label Plan",     priceCents: 9900 },
+  listener_premium:     { role: "listener", label: "Premium",        priceCents:  499, interval: "month", trialDays: 30 },
+  listener_annual:      { role: "listener", label: "Premium Annual", priceCents: 4999, interval: "year",  trialDays: 30 },
+  listener_fan_premium: { role: "listener", label: "Fan Premium",    priceCents: 1499, interval: "month", trialDays: 0 },
+  listener_student:     { role: "listener", label: "Student",        priceCents:  499, interval: "month", trialDays: 0 },
+  artist_starter:       { role: "artist",   label: "Artist Premium", priceCents:  999, interval: "month", trialDays: 0 },
+  artist_pro:           { role: "artist",   label: "Artist Pro",     priceCents: 1999, interval: "month", trialDays: 0 },
+  host_premium:         { role: "host",     label: "Host Premium",   priceCents: 1499, interval: "month", trialDays: 0 },
+  label_plan:           { role: "artist",   label: "Label Plan",     priceCents: 9900, interval: "month", trialDays: 0 },
 } as const;
 
 export type TunevioPlanId = keyof typeof TUNEVIO_PLANS;
@@ -67,6 +69,27 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
     try {
       const plan = TUNEVIO_PLANS[data.planId];
       const stripe = createStripeClient(data.environment);
+
+      // Prevent duplicate subscriptions: one active plan per account role.
+      const { data: existing } = await context.supabase
+        .from("subscriptions")
+        .select("status, current_period_end")
+        .eq("user_id", context.userId)
+        .eq("environment", data.environment)
+        .eq("role", plan.role)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existing) {
+        const end = existing.current_period_end ? new Date(existing.current_period_end as string) : null;
+        const stillActive =
+          ["active", "trialing", "past_due"].includes(existing.status as string) &&
+          (!end || end > new Date());
+        if (stillActive) {
+          return { error: `You already have an active ${plan.role} subscription. Manage it under Settings → Billing.` };
+        }
+      }
+
       const prices = await stripe.prices.list({ lookup_keys: [data.planId], limit: 1 });
       if (!prices.data.length) throw new Error(`Price not configured: ${data.planId}`);
       const price = prices.data[0];
