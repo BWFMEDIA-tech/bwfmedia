@@ -39,7 +39,8 @@ const NAV: Entry[] = [
   {
     kind: "group", key: "analytics", label: "Analytics", icon: BarChart3,
     children: [
-      { to: "/artist-dashboard", label: "Streams", search: { tab: "streams" } },
+      { to: "/artist-analytics", label: "Streaming Map" },
+      { to: "/artist-dashboard", label: "Streams Overview", search: { tab: "streams" } },
       { to: "/artist-dashboard", label: "Followers", search: { tab: "followers" } },
       { to: "/artist-dashboard", label: "Audience Insights", search: { tab: "audience" } },
       { to: "/earnings", label: "Revenue Reports" },
