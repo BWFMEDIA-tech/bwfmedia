@@ -1722,6 +1722,27 @@ export type Database = {
         }
         Relationships: []
       }
+      hook_secrets: {
+        Row: {
+          created_at: string
+          name: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       host_profiles: {
         Row: {
           created_at: string
@@ -4369,6 +4390,7 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          billing_interval: string | null
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
@@ -4386,10 +4408,12 @@ export type Database = {
           stripe_customer_id: string
           stripe_subscription_id: string
           trial_end: string | null
+          trial_reminder_sent_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          billing_interval?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
@@ -4407,10 +4431,12 @@ export type Database = {
           stripe_customer_id: string
           stripe_subscription_id: string
           trial_end?: string | null
+          trial_reminder_sent_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          billing_interval?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
@@ -4428,6 +4454,7 @@ export type Database = {
           stripe_customer_id?: string
           stripe_subscription_id?: string
           trial_end?: string | null
+          trial_reminder_sent_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -5436,6 +5463,7 @@ export type Database = {
         Args: { _stream_id: string }
         Returns: number
       }
+      run_trial_reminders: { Args: never; Returns: undefined }
       set_host_status: {
         Args: { _host_id: string; _reason: string; _status: string }
         Returns: undefined
