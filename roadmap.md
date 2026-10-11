@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Match the video-watch reference with accessible controls, persisted engagement, threaded comments, artist notifications, and phone/desktop verification.
 - [x] Make live alerts read "Live Now: TUNEVIO"; renamed the platform account from BWF NETWORK and refreshed existing alert headlines, links and unread status untouched.
 
 - [x] Organize the main menus and seven Artist Dashboard sections; visitor artist-signup entry and signed-in dashboard verified on desktop/phone, no overflow or page errors; preserve home.
