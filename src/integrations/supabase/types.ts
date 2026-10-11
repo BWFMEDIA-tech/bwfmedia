@@ -4800,6 +4800,132 @@ export type Database = {
         }
         Relationships: []
       }
+      video_comment_reactions: {
+        Row: {
+          comment_id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          reaction: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "video_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_comments_parent_id_video_id_fkey"
+            columns: ["parent_id", "video_id"]
+            isOneToOne: false
+            referencedRelation: "video_comments"
+            referencedColumns: ["id", "video_id"]
+          },
+          {
+            foreignKeyName: "video_comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_reactions: {
+        Row: {
+          created_at: string
+          reaction: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          reaction: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          reaction?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_reactions_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_saves: {
+        Row: {
+          created_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_saves_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
           artist: string | null
@@ -5322,6 +5448,15 @@ export type Database = {
       }
       get_user_rank: { Args: { _user_id: string }; Returns: string }
       get_user_xp: { Args: { _user_id: string }; Returns: number }
+      get_video_engagement: {
+        Args: {
+          p_offset?: number
+          p_parent_id?: string
+          p_sort?: string
+          p_video_id: string
+        }
+        Returns: Json
+      }
       get_waitlist_count: { Args: never; Returns: number }
       grant_boost_credits_purchase: {
         Args: {
