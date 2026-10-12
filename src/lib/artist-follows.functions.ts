@@ -5,21 +5,29 @@ import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 function publicClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-  );
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+  return createClient<Database>(process.env.SUPABASE_URL!, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    global: key.startsWith("sb_")
+      ? {
+          fetch: (input, init) => {
+            const headers = new Headers(init?.headers);
+            if (headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
+            headers.set("apikey", key);
+            return fetch(input, { ...init, headers });
+          },
+        }
+      : undefined,
+  });
 }
+
 
 export const getArtistFollowStats = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ artistId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const sb = publicClient();
-    const { count } = await sb
-      .from("artist_follows")
-      .select("id", { count: "exact", head: true })
-      .eq("artist_id", data.artistId);
+    const { data: count, error } = await sb.rpc("get_artist_follower_count", { _artist_id: data.artistId });
+    if (error) throw error;
     return { count: count ?? 0 };
   });
 
@@ -123,10 +131,7 @@ export const toggleArtistFollow = createServerFn({ method: "POST" })
       following = true;
     }
 
-    const { count, error: countError } = await context.supabase
-      .from("artist_follows")
-      .select("id", { count: "exact", head: true })
-      .eq("artist_id", data.artistId);
+    const { data: count, error: countError } = await context.supabase.rpc("get_artist_follower_count", { _artist_id: data.artistId });
     if (countError) throw countError;
 
     return { following, count: count ?? 0 };
