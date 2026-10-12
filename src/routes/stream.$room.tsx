@@ -212,6 +212,12 @@ function GuestPage() {
                 </div>
               )}
               <AudienceRow participants={participants as StageParticipant[]} />
+              {streamMeta && (
+                <PlayArenaView
+                  stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
+                  showChat={false}
+                />
+              )}
             </StageAudioShell>
           ) : (
             <>
