@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, MessageSquare, Search, Send, UserPlus } from "lucide-react";
+import { ArrowLeft, MessageSquare, Search, Send, UserPlus, X } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -214,6 +214,13 @@ function MessagesPage() {
     nav({ to: "/messages", search: { to: otherId }, replace: true });
   };
 
+  // Close the open thread and go back to the conversation list.
+  const closeConversation = () => {
+    setActiveId(null);
+    setShowNew(false);
+    setSearchQ("");
+    nav({ to: "/messages", search: {}, replace: true });
+  };
   if (auth.loading || !auth.isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] text-white/60 text-sm">
@@ -311,14 +318,22 @@ function MessagesPage() {
               <>
                 <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
                   <button
-                    onClick={() => { setActiveId(null); nav({ to: "/messages", search: {}, replace: true }); }}
+                    onClick={closeConversation}
                     className="md:hidden rounded-md p-1 hover:bg-white/10"
                     aria-label="Back"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
                   <Avatar profile={activeProfile ?? { id: activeId, display_name: null, avatar_url: null }} />
-                  <h2 className="font-medium">{activeProfile?.display_name || "Unknown user"}</h2>
+                  <h2 className="min-w-0 flex-1 truncate font-medium">{activeProfile?.display_name || "Unknown user"}</h2>
+                  <button
+                    onClick={closeConversation}
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+                    aria-label="Close conversation"
+                    title="Close conversation"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </header>
                 <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
                   {activeMessages.length === 0 ? (
