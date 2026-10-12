@@ -46,6 +46,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RightsRouteImport } from './routes/rights'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -77,6 +78,7 @@ import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
+import { Route as AdminRightsRouteImport } from './routes/admin.rights'
 import { Route as AdminSecurityRouteImport } from './routes/admin.security'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
@@ -329,6 +331,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RightsRoute = RightsRouteImport.update({
+  id: '/rights',
+  path: '/rights',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -484,6 +491,11 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
 const AdminRevenueRoute = AdminRevenueRouteImport.update({
   id: '/revenue',
   path: '/revenue',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRightsRoute = AdminRightsRouteImport.update({
+  id: '/rights',
+  path: '/rights',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSecurityRoute = AdminSecurityRouteImport.update({
@@ -867,6 +879,7 @@ export interface FileRoutesByFullPath {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rights': typeof RightsRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
@@ -897,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/revenue': typeof AdminRevenueRoute
+  '/admin/rights': typeof AdminRightsRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
@@ -1002,6 +1016,7 @@ export interface FileRoutesByTo {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rights': typeof RightsRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
@@ -1032,6 +1047,7 @@ export interface FileRoutesByTo {
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/revenue': typeof AdminRevenueRoute
+  '/admin/rights': typeof AdminRightsRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
@@ -1139,6 +1155,7 @@ export interface FileRoutesById {
   '/recordings': typeof RecordingsRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rights': typeof RightsRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
@@ -1169,6 +1186,7 @@ export interface FileRoutesById {
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/revenue': typeof AdminRevenueRoute
+  '/admin/rights': typeof AdminRightsRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/streams': typeof AdminStreamsRoute
@@ -1277,6 +1295,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/rights'
     | '/search'
     | '/settings'
     | '/signup'
@@ -1307,6 +1326,7 @@ export interface FileRouteTypes {
     | '/admin/payouts'
     | '/admin/profile'
     | '/admin/revenue'
+    | '/admin/rights'
     | '/admin/security'
     | '/admin/settings'
     | '/admin/streams'
@@ -1412,6 +1432,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/rights'
     | '/search'
     | '/settings'
     | '/signup'
@@ -1442,6 +1463,7 @@ export interface FileRouteTypes {
     | '/admin/payouts'
     | '/admin/profile'
     | '/admin/revenue'
+    | '/admin/rights'
     | '/admin/security'
     | '/admin/settings'
     | '/admin/streams'
@@ -1548,6 +1570,7 @@ export interface FileRouteTypes {
     | '/recordings'
     | '/refund-policy'
     | '/reset-password'
+    | '/rights'
     | '/search'
     | '/settings'
     | '/signup'
@@ -1578,6 +1601,7 @@ export interface FileRouteTypes {
     | '/admin/payouts'
     | '/admin/profile'
     | '/admin/revenue'
+    | '/admin/rights'
     | '/admin/security'
     | '/admin/settings'
     | '/admin/streams'
@@ -1685,6 +1709,7 @@ export interface RootRouteChildren {
   RecordingsRoute: typeof RecordingsRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RightsRoute: typeof RightsRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
@@ -2003,6 +2028,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rights': {
+      id: '/rights'
+      path: '/rights'
+      fullPath: '/rights'
+      preLoaderRoute: typeof RightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -2218,6 +2250,13 @@ declare module '@tanstack/react-router' {
       path: '/revenue'
       fullPath: '/admin/revenue'
       preLoaderRoute: typeof AdminRevenueRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rights': {
+      id: '/admin/rights'
+      path: '/rights'
+      fullPath: '/admin/rights'
+      preLoaderRoute: typeof AdminRightsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/security': {
@@ -2704,6 +2743,7 @@ interface AdminRouteChildren {
   AdminPayoutsRoute: typeof AdminPayoutsRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminRevenueRoute: typeof AdminRevenueRoute
+  AdminRightsRoute: typeof AdminRightsRoute
   AdminSecurityRoute: typeof AdminSecurityRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
@@ -2734,6 +2774,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPayoutsRoute: AdminPayoutsRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminRevenueRoute: AdminRevenueRoute,
+  AdminRightsRoute: AdminRightsRoute,
   AdminSecurityRoute: AdminSecurityRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminStreamsRoute: AdminStreamsRoute,
@@ -2834,6 +2875,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecordingsRoute: RecordingsRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RightsRoute: RightsRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
