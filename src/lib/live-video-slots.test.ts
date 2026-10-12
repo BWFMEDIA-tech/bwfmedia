@@ -8,7 +8,14 @@ describe("live video slot visibility", () => {
 
   it("reveals only the video boxes selected by the host", () => {
     expect(getVisibleLiveVideoSlots({ artist: "artist-id", cohost: null })).toEqual(["host", "artist"]);
-    expect(getVisibleLiveVideoSlots({ artist: null, cohost: "guest-id" })).toEqual(["host", "guest"]);
-    expect(getVisibleLiveVideoSlots({ artist: "artist-id", cohost: "guest-id" })).toEqual(["host", "artist", "guest"]);
+    expect(getVisibleLiveVideoSlots({ artist: null, cohost: "cohost-id" })).toEqual(["host", "cohost"]);
+    expect(getVisibleLiveVideoSlots({ artist: "artist-id", cohost: "cohost-id" })).toEqual(["host", "artist", "cohost"]);
+    expect(getVisibleLiveVideoSlots({ artist: null, cohost: null, guest: "guest-id" })).toEqual(["host", "guest"]);
+    expect(getVisibleLiveVideoSlots({ artist: "artist-id", cohost: "cohost-id", guest: "guest-id" })).toEqual([
+      "host",
+      "artist",
+      "cohost",
+      "guest",
+    ]);
   });
 });
