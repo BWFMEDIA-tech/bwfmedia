@@ -159,7 +159,7 @@ function VideoDetailPage() {
           <div className="py-16">
             <h1 className="font-display text-3xl uppercase">TUNEVIO Music Videos</h1>
             <Button asChild className="mt-5">
-              <Link to="/auth">Sign in to watch</Link>
+              <Link to="/login">Sign in to watch</Link>
             </Button>
           </div>
         ) : detail.error ? (

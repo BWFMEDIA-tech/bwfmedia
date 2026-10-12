@@ -295,7 +295,7 @@ function CommentRow({
             />
           ) : (
             <Button asChild variant="link">
-              <Link to="/auth">Sign in to reply</Link>
+              <Link to="/login">Sign in to reply</Link>
             </Button>
           ))}
         {!isReply && c.replies > 0 && (
@@ -390,7 +390,7 @@ export function VideoComments({ videoId }: { videoId: string }) {
           </>
         ) : (
           <Button asChild variant="outline">
-            <Link to="/auth">Sign in to comment</Link>
+            <Link to="/login">Sign in to comment</Link>
           </Button>
         )}
       </div>
