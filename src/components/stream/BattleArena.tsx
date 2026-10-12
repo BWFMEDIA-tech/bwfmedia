@@ -167,6 +167,7 @@ export function BattleArena({
 
   return (
     <>
+      {audioEl}
       <BattleView
         roomState={roomState}
         myVote={myVote}
