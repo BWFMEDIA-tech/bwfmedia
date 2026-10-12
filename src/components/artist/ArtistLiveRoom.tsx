@@ -12,7 +12,7 @@ import { endStream, type getArtistLiveStream } from "@/lib/streams.functions";
 import { useStageState } from "@/lib/useStageState";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { supabase } from "@/integrations/supabase/client";
-import { LiveStage, ProfileStage, CameraPublishSync } from "@/components/stream/LiveStage";
+import { LiveStage, ProfileStage, CameraPublishSync, useStreamSpotlight } from "@/components/stream/LiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
@@ -72,6 +72,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   const [viewers, setViewers] = useState(stream.viewer_count ?? 0);
   const topicId = useId();
   const { participants, hands, queue } = useStageState(connection ? stream.id : null);
+  const spotlight = useStreamSpotlight(connection ? stream.id : undefined);
   const isOwner = auth.user?.id === stream.host_id;
   const myRole = participants.find((p) => p.user_id === auth.user?.id)?.stage_role;
   const canManage = isOwner;
@@ -212,7 +213,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
 
       {connection && <section className="profile-stage-room mt-5 min-w-0 space-y-4" aria-label="Live stage">
         {!isOwner && <div className="flex justify-end"><RaiseHandButton streamId={stream.id} auth={auth} label="Raise Hand" /></div>}
-        <StageRoom streamId={stream.id} participants={participants} canManage={canManage} primaryHostId={stream.host_id} />
+        <StageRoom streamId={stream.id} participants={participants} canManage={canManage} primaryHostId={stream.host_id} spotlight={spotlight} />
         {canManage && <RaiseHandPanel streamId={stream.id} hands={hands} />}
       </section>}
 
