@@ -21,7 +21,6 @@ function publicClient() {
   });
 }
 
-export const __followCountError = null;
 
 export const getArtistFollowStats = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ artistId: z.string().uuid() }).parse(d))
