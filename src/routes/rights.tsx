@@ -158,7 +158,7 @@ function Dashboard({ userId }: { userId: string }) {
                 const dispute = sr && d!.disputes.some((x: any) => x.song_rights_id === sr.id && (x.status === "open" || x.status === "under_review"));
                 return (
                   <button key={t.id} onClick={() => setSongOpen(t.id)} className="grid w-full grid-cols-2 gap-2 py-3 text-left text-sm hover:bg-muted/30 md:grid-cols-[2fr_2fr_1fr_1fr_1fr_1fr] md:gap-3">
-                    <span className="col-span-2 flex items-center gap-3 md:col-span-1">{t.cover_url ? <img src={t.cover_url} alt="" className="h-10 w-10 rounded object-cover" /> : <span className="h-10 w-10 rounded bg-muted" />}<span><span className="block font-medium">{t.title}</span><span className="text-xs text-muted-foreground">{t.artist_name}</span></span></span>
+                    <span className="col-span-2 flex items-center gap-3 md:col-span-1">{t.cover_url ? <SignedImg src={t.cover_url} alt="" className="h-10 w-10 rounded object-cover" /> : <span className="h-10 w-10 rounded bg-muted" />}<span><span className="block font-medium">{t.title}</span><span className="text-xs text-muted-foreground">{t.artist_name}</span></span></span>
                     <span className="text-muted-foreground">{sp.filter((x: any) => x.role !== "publisher").map((x: any) => x.name).join(", ") || "—"}</span>
                     <span>{sr?.iswc || "—"}</span>
                     <span>{sr?.isrc || d!.isrc[t.id] || "—"}</span>
