@@ -245,6 +245,22 @@
 .profile-entry-actions button { width: auto; flex: 1; }
 /* "Live Now" join button: brand cyan→blue, always visible on a live profile. */
 .live-now-button { background: linear-gradient(90deg, var(--primary), var(--brand-blue)); color: #fff; border: 0; box-shadow: 0 8px 28px color-mix(in srgb, var(--primary) 35%, transparent); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+
+/* Followed state reads as an active brand action: logo blue fill, white text. */
+.artist-follow-on {
+  border-color: color-mix(in srgb, var(--brand-cyan) 55%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--brand-blue) 30%, transparent);
+}
+.artist-follow-on .artist-follow-main,
+.artist-follow-on .artist-follow-count {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--brand-cyan) 35%, var(--brand-blue)), var(--brand-blue));
+  color: #fff;
+}
+.artist-follow-on .artist-follow-main:hover,
+.artist-follow-on .artist-follow-count:hover {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--brand-cyan) 52%, var(--brand-blue)), color-mix(in srgb, var(--brand-blue) 82%, var(--brand-cyan)));
+}
+.artist-follow-on .artist-follow-count { border-left-color: color-mix(in srgb, var(--brand-cyan) 35%, transparent); }
 .live-now-button:hover { filter: brightness(1.12); }
 .live-now-button:disabled { opacity: .65; }
 .live-now-dot { width: .5rem; height: .5rem; border-radius: 9999px; background: #fff; animation: live-now-pulse 1.2s ease-in-out infinite; }
