@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, LayoutDashboard, Compass, User } from "lucide-react";
+import { Home, Radio, LayoutDashboard, Inbox, User } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
@@ -14,7 +14,7 @@ type Tab = {
 
 const TABS: Tab[] = [
   { to: "/", label: "Home", icon: Home, match: (p) => p === "/" },
-  { to: "/discover", label: "Discover", icon: Compass, match: (p) => p.startsWith("/discover") || p.startsWith("/search") },
+  { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
   { to: "/artist-dashboard", label: "Artist Hub", icon: LayoutDashboard, match: (p) => p.startsWith("/artist-dashboard") },
   { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
