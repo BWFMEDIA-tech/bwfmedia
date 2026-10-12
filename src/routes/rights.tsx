@@ -45,7 +45,7 @@ function RightsPage() {
   const auth = useAuth();
   if (auth.loading || auth.rolesLoading) return <div className="p-8 text-muted-foreground" role="status">Loading…</div>;
   if (!auth.user) return <div className="mx-auto max-w-xl p-10 text-foreground"><h1 className="text-2xl font-bold">Music Rights & Royalties</h1><Button asChild className="mt-4"><Link to="/login">Sign in</Link></Button></div>;
-  if (!hasArtistTools(auth.roles)) return <div className="mx-auto max-w-xl p-10 text-foreground"><h1 className="text-2xl font-bold">Music Rights & Royalties</h1><p className="mt-2 text-muted-foreground">This tool is for artists.</p><Button asChild className="mt-4"><Link to="/signup" search={{ as: "artist" } as any}>Sign up as an artist</Link></Button></div>;
+  if (!hasArtistTools(auth.roles)) return <div className="mx-auto max-w-7xl p-4 sm:p-6"><Dashboard userId={auth.user.id} /></div>;
   return <ArtistDashboardShell><Dashboard userId={auth.user.id} /></ArtistDashboardShell>;
 }
 
