@@ -29,11 +29,14 @@ export function BattleArena({
   isHost,
   participants,
   onStageIds,
+  playAudio = false,
 }: {
   streamId: string;
   isHost: boolean;
   participants: Participant[];
   onStageIds?: Set<string>;
+  /** Render the battle's on-air track audio (pages without the arena player). */
+  playAudio?: boolean;
 }) {
   const stateFn = useServerFn(getBattleRoomState);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
@@ -104,6 +107,11 @@ export function BattleArena({
     })();
     return () => { cancelled = true; };
   }, [currentRound?.id]);
+
+  const onAirTrack: any =
+    roomState?.activeSide === "b" ? (roomState as any)?.bTrack : roomState?.activeSide === "a" ? (roomState as any)?.aTrack : null;
+  const onAirUrl = playAudio && onAirTrack?.status === "playing" ? (onAirTrack.audio_url as string | null) : null;
+  const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} /> : null;
 
   // Visible to everyone (artists, hosts, listeners) even before a battle starts.
   if (!match && !isHost) {
