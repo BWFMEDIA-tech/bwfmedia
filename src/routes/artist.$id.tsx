@@ -349,15 +349,15 @@ function FollowButton({ artistId }: { artistId: string }) {
   return (
     <>
       <div className={`inline-flex items-stretch rounded-full overflow-hidden border transition ${
-        following ? "border-white" : "border-white/10"
+        following ? "artist-follow-on" : "border-white/10"
       }`}>
         <button
           onClick={handleClick}
           disabled={mut.isPending}
           aria-pressed={following}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm transition disabled:opacity-60 ${
+          className={`artist-follow-main inline-flex items-center gap-2 px-4 py-2.5 text-sm transition disabled:opacity-60 ${
             following
-              ? "bg-white text-black hover:bg-white/90"
+              ? ""
               : "bg-white/[0.04] hover:bg-white/[0.08] text-white"
           }`}
         >
@@ -368,9 +368,9 @@ function FollowButton({ artistId }: { artistId: string }) {
           type="button"
           onClick={() => setFollowersOpen(true)}
           aria-label="View followers"
-          className={`px-3 text-xs tabular-nums border-l transition ${
+          className={`artist-follow-count px-3 text-xs tabular-nums border-l transition ${
             following
-              ? "border-black/10 bg-white text-black hover:bg-white/90"
+              ? ""
               : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70"
           }`}
         >
