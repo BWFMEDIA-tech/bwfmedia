@@ -1,5 +1,6 @@
 # Live artist profile
 - [x] Add a visible mobile-friendly Inbox/Message action on normal and live artist profiles using existing messaging.
+- [x] Add an X to the open message conversation so members can close it when done messaging; verified closing on desktop and phone.
 - [x] Add a Go Live button to the mobile bottom bar; signed-in opens the live setup, signed-out asks to sign in first.
 - [ ] Match the video-watch reference with accessible controls, persisted engagement, threaded comments, artist notifications, and phone/desktop verification.
 - [x] Make live alerts read "Live Now: TUNEVIO"; renamed the platform account from BWF NETWORK and refreshed existing alert headlines, links and unread status untouched.
