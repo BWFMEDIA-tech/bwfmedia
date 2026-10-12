@@ -15,10 +15,10 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { RecordButton } from "./RecordButton";
+import { RecordButton } from "@/components/stream/RecordButton";
 import { supabase } from "@/integrations/supabase/client";
-import { DeviceSelector } from "./DeviceSelector";
-import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
+import { DeviceSelector } from "@/components/stream/DeviceSelector";
+import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "@/components/stream/LiveKitConnectionGuard";
 import { setRealtimeHealth } from "@/lib/realtime-health";
 import { LocalSpeakingSignalPublisher, StageConnectionProvider } from "@/lib/stage-connection-context";
 import { useServerFn } from "@tanstack/react-start";
