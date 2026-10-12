@@ -346,7 +346,7 @@ function VideoDetailPage() {
                 {v.description}
               </p>
             )}
-            <VideoComments key={id} videoId={id} />
+            <VideoComments key={`comments-${id}`} videoId={id} />
           </>
         )}
       </main>
