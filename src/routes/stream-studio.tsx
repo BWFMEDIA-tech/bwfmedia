@@ -22,13 +22,13 @@ import { LIVE_CATEGORIES } from "@/lib/live-categories";
 import { getMyActiveStream } from "@/lib/streams.functions";
 import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
-import { LiveStage, LiveStageContent, CameraPublishSync, useStreamSpotlight } from "@/components/stream/LiveStage";
+import { StudioLiveStageContent, StudioCameraPublishSync, useStudioStreamSpotlight } from "@/components/studio/StudioLiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { LiveEarningsTicker } from "@/components/stream/LiveEarningsTicker";
 import { HostEarningsCard } from "@/components/stream/HostEarningsCard";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
-import { StageRoom, AudienceRow } from "@/components/stream/StageRoom";
+import { StudioStageRoom, StudioAudienceRow } from "@/components/studio/StudioStageRoom";
 import { setHostTransferMode as setHostTransferModeFn, updateStreamMode } from "@/lib/stage.functions";
 import { StageAudioShell } from "@/components/stream/StageAudioShell";
 
@@ -775,7 +775,7 @@ function StreamStudio() {
   const [streamCategory, setStreamCategory] = useState<string>(LIVE_CATEGORIES[0].id);
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
-  const spotlight = useStreamSpotlight(stream?.id ?? undefined);
+  const spotlight = useStudioStreamSpotlight(stream?.id ?? undefined);
   const [thumbOpen, setThumbOpen] = useState(false);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
@@ -1161,10 +1161,10 @@ function StreamStudio() {
                   >
                     {/* Camera follows the UI mode WITHOUT touching the mic
                         or the room connection. */}
-                    <CameraPublishSync publish={streamMode === "broadcast"} />
+                    <StudioCameraPublishSync publish={streamMode === "broadcast"} />
 
                     {streamMode === "broadcast" && (
-                      <LiveStageContent
+                      <StudioLiveStageContent
                         onEnd={stop}
                         onInvite={copyInvite}
                         hostImage={hostImg}
@@ -1180,7 +1180,7 @@ function StreamStudio() {
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                     )}
 
-                    <StageRoom
+                    <StudioStageRoom
                       streamId={stream.id}
                       participants={participants}
                       canManage
@@ -1192,7 +1192,7 @@ function StreamStudio() {
                     {streamMode !== "play" && (
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                     )}
-                    {streamMode === "stage" && <AudienceRow participants={participants} />}
+                    {streamMode === "stage" && <StudioAudienceRow participants={participants} />}
                   </StageAudioShell>
                 )}
                 {/* Guest tools sit at the bottom of the stage. */}
@@ -1224,7 +1224,7 @@ function StreamStudio() {
                 <h3 className="mb-3 text-sm tracking-[0.2em] text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
                   AUDIENCE
                 </h3>
-                <AudienceRow participants={participants} />
+                <StudioAudienceRow participants={participants} />
               </div>
               </StudioBlock>
             </StudioColumn>

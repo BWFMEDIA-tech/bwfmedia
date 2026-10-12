@@ -10,7 +10,8 @@
 - Keep profile video sizing and control styling scoped to the profile selectors, because phone layouts must stack without changing shared broadcast tools or participant assignments.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
-- Keep stage dropdown navigation and mute actions in the shared StageRoom, because Studio and profile lives must reuse the same roster and existing permission checks.
+- Keep Stream Studio on its own stage forks (src/components/studio/StudioStageRoom.tsx, StudioLiveStage.tsx) and profile lives on the stream/ copies, because the user wants Studio and profile stages to evolve separately; apply roster/permission changes to both copies when behavior (not styling) must stay aligned.
+- Use the shared profile stage and chat presentation on `/go-live`, because starting a profile broadcast must show the same updated design as watching it without adding a second room connection.
 - Derive profile video-box visibility from host spotlight selections, because unselected artist and guest boxes must stay hidden on every device.
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
 - Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
