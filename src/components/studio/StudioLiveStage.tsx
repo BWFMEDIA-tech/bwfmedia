@@ -1,0 +1,1064 @@
+/** Stream Studio-owned fork of the video stage. Intentionally independent of components/stream/StudioLiveStage.tsx — Studio and profile stages must evolve separately. */
+import {
+  LiveKitRoom,
+  useTracks,
+  useLocalParticipant,
+  useParticipants,
+  ParticipantTile,
+  TrackRefContext,
+  useRoomContext,
+  RoomAudioRenderer,
+} from "@livekit/components-react";
+import "@livekit/components-styles";
+import { Track, ConnectionQuality, ConnectionState, RoomEvent, type Participant } from "livekit-client";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { RecordButton } from "./RecordButton";
+import { supabase } from "@/integrations/supabase/client";
+import { DeviceSelector } from "./DeviceSelector";
+import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from "./LiveKitConnectionGuard";
+import { setRealtimeHealth } from "@/lib/realtime-health";
+import { LocalSpeakingSignalPublisher, StageConnectionProvider } from "@/lib/stage-connection-context";
+import { useServerFn } from "@tanstack/react-start";
+import { setStreamSpotlight } from "@/lib/stage.functions";
+import { Pin, PinOff, X as XIcon } from "lucide-react";
+import { SignedImg } from "@/components/ui/signed-img";
+import { Button } from "@/components/ui/button";
+import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
+import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
+
+const PURPLE = "#00E6FF";
+const BLUE = "#0000FF";
+
+interface LiveStageProps {
+  token: string;
+  serverUrl: string;
+  onEnd: () => void;
+  onInvite: () => void;
+  hostImage?: string;
+  guestImage?: string;
+  onViewerCount?: (n: number) => void;
+  streamId?: string;
+  /** Whether to auto-publish the local camera/mic. Default true (host/guest on stage). Pass false for crowd viewers. */
+  publish?: boolean;
+  /** Show host/admin LiveKit controls (mic, camera, screen-share, end stream, device selector). */
+  showHostTools?: boolean;
+  profileHost?: { id: string; name: string; photo: string | null };
+  /** Podcast mode: keep the mic live but turn the camera off. */
+  audioOnly?: boolean;
+}
+
+export function StudioLiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost, audioOnly = false }: LiveStageProps) {
+  const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
+
+  // Publish health to the global store; reset on unmount so other surfaces
+  // (chat, queue) don't see stale "degraded" state after the user leaves.
+  useEffect(() => {
+    if (!fatal) {
+      setRealtimeHealth("livekit", "connected");
+      return;
+    }
+    const status =
+      fatal.kind === "quota"
+        ? "quota_exceeded"
+        : fatal.kind === "auth"
+          ? "auth_failed"
+          : "degraded";
+    setRealtimeHealth("livekit", status, fatal.detail);
+  }, [fatal]);
+  useEffect(() => () => setRealtimeHealth("livekit", "connected"), []);
+
+  if (fatal) {
+    // Degraded mode: keep parent UI (chat, queue, stage list) alive — render
+    // a compact inline status where the video tiles would have been, instead
+    // of replacing the whole route.
+    return (
+      <LiveKitFatalBanner
+        kind={fatal.kind}
+        detail={fatal.detail}
+        onRetry={() => setFatal(null)}
+      />
+    );
+  }
+  return (
+    <LiveKitRoom
+      token={token}
+      serverUrl={serverUrl}
+      connect={!fatal}
+      video={false}
+      audio={false}
+      onError={(e) => {
+        const kind = classifyLiveKitError(e);
+        if (kind) {
+          setFatal({ kind, detail: e instanceof Error ? e.message : String(e) });
+          return;
+        }
+        toast.error(`Stream error: ${friendlyDeviceError(e)}`);
+      }}
+      onMediaDeviceFailure={(failure) => toast.error(friendlyDeviceError(failure))}
+      className="contents"
+    >
+      <RoomAudioRenderer />
+      <StageConnectionProvider>
+        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} audioOnly={audioOnly} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
+        <PublishSync publish={publish} camera={!audioOnly} />
+        {audioOnly && <AudioOnlySync />}
+        <LocalSpeakingSignalPublisher />
+      </StageConnectionProvider>
+    </LiveKitRoom>
+  );
+}
+
+function AudioOnlySync() {
+  const { localParticipant } = useLocalParticipant();
+  useEffect(() => {
+    void localParticipant.setCameraEnabled(false).catch(() => {});
+  }, [localParticipant]);
+  return null;
+}
+
+function PublishSync({ publish, camera = true }: { publish: boolean; camera?: boolean }) {
+  const prev = useRef<boolean | null>(null);
+  useResilientLocalMediaPublish({
+    publish,
+    microphone: true,
+    camera,
+    onDisabled: () => {
+      if (prev.current === true) toast.info("You're back in the crowd");
+      prev.current = false;
+    },
+    onPublished: () => {
+      if (prev.current === false && publish) toast.success("You're on stage");
+      prev.current = publish;
+    },
+  });
+  return null;
+}
+
+function useResilientLocalMediaPublish({
+  publish,
+  microphone,
+  camera,
+  onPublished,
+  onDisabled,
+}: {
+  publish: boolean;
+  microphone?: boolean;
+  camera?: boolean;
+  onPublished?: () => void;
+  onDisabled?: () => void;
+}) {
+  const { localParticipant } = useLocalParticipant();
+  const room = useRoomContext();
+  const [permissionTick, setPermissionTick] = useState(0);
+  const publishRef = useRef(publish);
+  const inFlightRef = useRef(false);
+  const queuedRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const retryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const onPublishedRef = useRef(onPublished);
+  const onDisabledRef = useRef(onDisabled);
+  const lastErrorRef = useRef<Record<"camera" | "microphone" | "permission", string | null>>({
+    camera: null,
+    microphone: null,
+    permission: null,
+  });
+
+  useEffect(() => {
+    publishRef.current = publish;
+  }, [publish]);
+  useEffect(() => {
+    onPublishedRef.current = onPublished;
+  }, [onPublished]);
+  useEffect(() => {
+    onDisabledRef.current = onDisabled;
+  }, [onDisabled]);
+
+  const clearRetries = useCallback(() => {
+    retryTimersRef.current.forEach((id) => clearTimeout(id));
+    retryTimersRef.current = [];
+  }, []);
+
+  useEffect(() => clearRetries, [clearRetries]);
+
+  const hasLiveLocalTrack = useCallback(
+    (source: Track.Source, kind: Track.Kind) => {
+      if (!localParticipant) return false;
+      return Array.from(localParticipant.trackPublications.values()).some((publication) => {
+        const pub = publication as unknown as {
+          source?: Track.Source;
+          kind?: Track.Kind;
+          track?: { isMuted?: boolean; mediaStreamTrack?: MediaStreamTrack } | null;
+        };
+        const matchesSource = pub.source === source || (!pub.source && pub.kind === kind);
+        if (!matchesSource) return false;
+        const mediaTrack = pub.track?.mediaStreamTrack;
+        return !!pub.track && pub.track.isMuted !== true && mediaTrack?.readyState !== "ended";
+      });
+    },
+    [localParticipant],
+  );
+
+  const showDeviceError = useCallback((kind: "camera" | "microphone", error: unknown) => {
+    const msg = friendlyDeviceError(error);
+    console.warn(`[live-stage] ${kind} publish failed`, error);
+    if (lastErrorRef.current[kind] !== msg) {
+      lastErrorRef.current[kind] = msg;
+      toast.error(msg);
+    }
+  }, []);
+
+  const ensureMedia = useCallback(
+    async (reason: string) => {
+      if (!localParticipant) return;
+      if (inFlightRef.current) {
+        queuedRef.current = true;
+        return;
+      }
+      inFlightRef.current = true;
+      queuedRef.current = false;
+
+      try {
+        if (!publishRef.current) {
+          clearRetries();
+          retryCountRef.current = 0;
+          await Promise.allSettled([
+            microphone ? localParticipant.setMicrophoneEnabled(false) : Promise.resolve(),
+            camera ? localParticipant.setCameraEnabled(false) : Promise.resolve(),
+          ]);
+          onDisabledRef.current?.();
+          return;
+        }
+
+        if (localParticipant.permissions?.canPublish === false) {
+          const msg = camera && !microphone
+            ? "You don't have permission to publish video on this stage."
+            : "You don't have permission to publish media on this stage.";
+          if (lastErrorRef.current.permission !== msg) {
+            lastErrorRef.current.permission = msg;
+            toast.error(msg);
+          }
+          return;
+        }
+
+        const jobs: Array<Promise<void>> = [];
+        const labels: Array<"microphone" | "camera"> = [];
+
+        if (microphone && !hasLiveLocalTrack(Track.Source.Microphone, Track.Kind.Audio)) {
+          labels.push("microphone");
+          jobs.push(localParticipant.setMicrophoneEnabled(true).then(() => undefined));
+        }
+
+        if (camera && !hasLiveLocalTrack(Track.Source.Camera, Track.Kind.Video)) {
+          labels.push("camera");
+          // Clear a stale/ended camera publication first. On mobile Safari and
+          // spotty Wi-Fi the SDK can keep the publication object while the
+          // underlying MediaStreamTrack is ended, so a plain enable can no-op.
+          jobs.push(
+            localParticipant
+              .setCameraEnabled(false)
+              .catch(() => undefined)
+              .then(() => localParticipant.setCameraEnabled(true))
+              .then(() => undefined),
+          );
+        }
+
+        if (!jobs.length) return;
+
+        console.log("[live-stage] restoring local media", { reason, labels });
+        const results = await Promise.allSettled(jobs);
+        let restored = false;
+        let retryableFailure = false;
+
+        results.forEach((result, index) => {
+          const label = labels[index];
+          if (result.status === "fulfilled") {
+            lastErrorRef.current[label] = null;
+            restored = true;
+            return;
+          }
+          showDeviceError(label, result.reason);
+          if (isRetryableDeviceError(result.reason)) retryableFailure = true;
+        });
+
+        if (restored) {
+          retryCountRef.current = 0;
+          onPublishedRef.current?.();
+        }
+
+        if (retryableFailure && publishRef.current && retryCountRef.current < 4) {
+          retryCountRef.current += 1;
+          const delay = Math.min(5000, 750 * retryCountRef.current);
+          const timer = setTimeout(() => {
+            retryTimersRef.current = retryTimersRef.current.filter((id) => id !== timer);
+            void ensureMedia(`retry-${retryCountRef.current}`);
+          }, delay);
+          retryTimersRef.current.push(timer);
+        }
+      } finally {
+        inFlightRef.current = false;
+        if (queuedRef.current) {
+          queuedRef.current = false;
+          setTimeout(() => void ensureMedia("queued"), 100);
+        }
+      }
+    },
+    [camera, clearRetries, hasLiveLocalTrack, localParticipant, microphone, showDeviceError],
+  );
+
+  useEffect(() => {
+    if (!room) return;
+    const onPermissionsChanged = (_prev: unknown, participant: Participant) => {
+      if (participant.identity === localParticipant?.identity) {
+        setPermissionTick((tick) => tick + 1);
+      }
+    };
+    room.on(RoomEvent.ParticipantPermissionsChanged, onPermissionsChanged);
+    return () => {
+      room.off(RoomEvent.ParticipantPermissionsChanged, onPermissionsChanged);
+    };
+  }, [room, localParticipant?.identity]);
+
+  useEffect(() => {
+    void ensureMedia("publish-state");
+  }, [ensureMedia, permissionTick, publish]);
+
+  useEffect(() => {
+    if (!room) return;
+    const scheduleRestore = (reason: string) => {
+      if (!publishRef.current) return;
+      [0, 750, 2000].forEach((delay) => {
+        const timer = setTimeout(() => {
+          retryTimersRef.current = retryTimersRef.current.filter((id) => id !== timer);
+          void ensureMedia(reason);
+        }, delay);
+        retryTimersRef.current.push(timer);
+      });
+    };
+    const onConnected = () => scheduleRestore("room-reconnected");
+    const onState = (state: ConnectionState) => {
+      if (state === ConnectionState.Connected) scheduleRestore("connection-state-connected");
+    };
+    const onMediaDevicesChanged = () => scheduleRestore("media-devices-changed");
+
+    room.on(RoomEvent.Reconnected, onConnected);
+    room.on(RoomEvent.SignalConnected, onConnected);
+    room.on(RoomEvent.ConnectionStateChanged, onState);
+    room.on(RoomEvent.MediaDevicesChanged, onMediaDevicesChanged);
+    return () => {
+      room.off(RoomEvent.Reconnected, onConnected);
+      room.off(RoomEvent.SignalConnected, onConnected);
+      room.off(RoomEvent.ConnectionStateChanged, onState);
+      room.off(RoomEvent.MediaDevicesChanged, onMediaDevicesChanged);
+    };
+  }, [room, ensureMedia]);
+}
+
+function isRetryableDeviceError(error: unknown) {
+  const message = error instanceof Error ? `${error.name} ${error.message}` : String(error ?? "");
+  return !/notallowed|permission|denied|notfound|no device|overconstrained|security/i.test(message);
+}
+
+function friendlyDeviceError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  const name = error instanceof Error ? error.name : "";
+  if (/notfound|requested device not found|no device/i.test(`${name} ${message}`)) {
+    return "No camera or microphone was found. You can still stay live and connect a device anytime.";
+  }
+  if (/notallowed|permission|denied/i.test(`${name} ${message}`)) {
+    return "Allow camera and microphone permissions in your browser to broadcast.";
+  }
+  return message || "Could not enable camera or microphone.";
+}
+
+export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean }) {
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    { onlySubscribed: false },
+  );
+  const participants = useParticipants();
+  // Keep camera tracks that have a real publication (drop placeholders for
+  // listeners/crowd viewers who have no camera). Remote publications may not
+  // be subscribed yet — especially on mobile where subscription lands a beat
+  // after the publish event — so we must NOT require `publication.track`
+  // here, or the artist tile falls back to "Waiting for Artist" forever.
+  const cameraTracks = tracks.filter((t) => {
+    if (t.source !== Track.Source.Camera) return false;
+    const pub = (t as any).publication;
+    return !!pub && (!!pub.track || pub.isSubscribed !== undefined);
+  });
+
+  // Ensure remote camera publications are actually subscribed. With
+  // adaptive stream / mobile publishers the subscription can stay pending.
+  useEffect(() => {
+    for (const t of tracks) {
+      const pub = (t as any).publication;
+      if (!pub || t.source !== Track.Source.Camera) continue;
+      if (typeof pub.setSubscribed === "function" && pub.isSubscribed === false) {
+        try { pub.setSubscribed(true); } catch { /* ignore */ }
+      }
+    }
+  }, [tracks]);
+
+
+  useEffect(() => {
+    onViewerCount?.(participants.length);
+  }, [participants.length, onViewerCount]);
+
+  const profiles = useParticipantProfiles(participants.map((p) => p.identity));
+  const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
+  const spotlight = useStudioStreamSpotlight(streamId);
+  const visibleSlots = getVisibleLiveVideoSlots(spotlight);
+
+  // Bucket camera tracks by role panel.
+  type Panel = "admin" | "middle" | "host" | "guest";
+  const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [], guest: [] };
+  for (const t of cameraTracks) {
+    const id = t.participant?.identity ?? "";
+    // Spotlight overrides: pin a participant exclusively to a panel.
+    if (spotlight.host && id === spotlight.host) {
+      buckets.admin.push(t);
+      continue;
+    }
+    if (spotlight.artist && id === spotlight.artist) {
+      buckets.middle.push(t);
+      continue;
+    }
+    if (spotlight.cohost && id === spotlight.cohost) {
+      buckets.host.push(t);
+      continue;
+    }
+    if (spotlight.guest && id === spotlight.guest) {
+      buckets.guest.push(t);
+      continue;
+    }
+    const role = roleMap[id];
+    const isAdminRole =
+      role === "admin" || role === "administrator" || role === "owner" || role === "moderator";
+    const isCoHostRole = role === "cohost" || role === "co_host";
+    const isHostRole = role === "host";
+    // Only people the host has actually promoted to the stage get a video box.
+    // Listeners, green-room guests and unknown roles stay in the audience.
+    const isStageRole = role === "speaker" || role === "artist" || role === "guest";
+    if (!isAdminRole && !isHostRole && !isCoHostRole && !isStageRole) continue;
+    // Co-hosts always land in the CO-HOST box (on every device size).
+    // Box 1 (left) = Host, box 3 (right) = Co-Host, on every device size.
+    const panel: Panel = isHostRole ? "admin" : isAdminRole || isCoHostRole ? "host" : "middle";
+    // When a spotlight is active for a panel, suppress catch-alls there.
+    if (spotlight.artist && panel === "middle") continue;
+    if (spotlight.host && panel === "admin") continue;
+    if (spotlight.cohost && panel === "host") continue;
+    buckets[panel].push(t);
+
+  }
+  // A spotlighted participant with camera OFF must still appear in their
+  // box — otherwise "Bring to artist video box" looks like it does nothing.
+  // Pull their placeholder tile (avatar fallback) into the pinned panel.
+  const ensureSpotlightEntry = (panel: Panel, id: string | null) => {
+    if (!id || buckets[panel].length) return;
+    const t = tracks.find(
+      (tr) => tr.source === Track.Source.Camera && tr.participant?.identity === id,
+    );
+    if (t) buckets[panel].push(t);
+  };
+  ensureSpotlightEntry("middle", spotlight.artist);
+  ensureSpotlightEntry("admin", spotlight.host);
+  ensureSpotlightEntry("host", spotlight.cohost);
+  ensureSpotlightEntry("guest", spotlight.guest);
+  // Priority: active speaker first within each bucket.
+  const sortByActive = (arr: typeof cameraTracks) =>
+    [...arr].sort((a, b) => Number(!!b.participant?.isSpeaking) - Number(!!a.participant?.isSpeaking));
+
+  const renderPanel = (panel: Panel, label: string, placeholder: string, fallback?: string) => {
+    const items = sortByActive(buckets[panel]);
+    const primary = items[0] ?? null;
+    const primaryId = primary?.participant?.identity ?? null;
+    // Show the live video whenever the participant has an unmuted camera
+    // publication — the media may still be arriving (common on phones).
+    // Only fall back to the avatar when the camera is genuinely off.
+    const pub = primary ? (primary as any).publication : null;
+    const primaryTrack = pub && !pub.isMuted ? primary : null;
+
+    return (
+      <div className="flex min-w-0 flex-col gap-2">
+        <StageTile
+          track={primaryTrack}
+          label={label}
+          fallbackImage={fallback}
+          profile={primaryId ? profiles[primaryId] : undefined}
+          placeholder={placeholder}
+        />
+        {panel === "middle" && showHostTools && streamId && (
+          <SpotlightControls
+            streamId={streamId}
+            spotlightUserId={spotlight.artist}
+            participants={participants}
+            profiles={profiles}
+            slot="artist"
+          />
+        )}
+        {panel === "admin" && showHostTools && streamId && (
+          <SpotlightControls
+            streamId={streamId}
+            spotlightUserId={spotlight.host}
+            participants={participants}
+            profiles={profiles}
+            slot="host"
+          />
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {/* Desktop / tablet: 3-column grid. Mobile: swipeable horizontal carousel. */}
+      <div
+        className={cn(
+          "gap-4",
+          "flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "md:grid md:items-start md:overflow-visible md:pb-0",
+          visibleSlots.length === 1 && "md:grid-cols-1",
+          visibleSlots.length === 2 && "md:grid-cols-2",
+          visibleSlots.length === 3 && "md:grid-cols-3",
+          visibleSlots.length === 4 && "md:grid-cols-4",
+        )}
+      >
+        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+          {renderPanel("admin", "HOST", "Waiting for Host", hostImage)}
+        </div>
+        {spotlight.artist && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+          {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
+        </div>}
+        {spotlight.cohost && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+          {renderPanel("host", "CO-HOST", "Waiting for Co-Host")}
+        </div>}
+        {spotlight.guest && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+          {renderPanel("guest", "GUEST", "Waiting for Guest")}
+        </div>}
+      </div>
+      {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
+    </>
+  );
+}
+
+const StageInner = StudioLiveStageContent;
+
+export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, onInvite, onViewerCount, audioOnly = false }: {
+  host: { id: string; name: string; photo: string | null }; streamId?: string;
+  showHostTools: boolean; publish: boolean; onEnd: () => void; onInvite: () => void;
+  onViewerCount?: (count: number) => void; audioOnly?: boolean;
+}) {
+  const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: true }], { onlySubscribed: false });
+  const participants = useParticipants();
+  useEffect(() => { onViewerCount?.(participants.length); }, [participants.length, onViewerCount]);
+  const roles = useParticipantRoles(streamId, participants.map(p => p.identity));
+  const profiles = useParticipantProfiles(participants.map(p => p.identity));
+  const spotlight = useStudioStreamSpotlight(streamId);
+  const guests = participants.filter(p => p.identity !== host.id && ["speaker", "artist", "guest", "co_host", "host"].includes(roles[p.identity] ?? ""));
+  const featured = spotlight.artist ? guests.find(p => p.identity === spotlight.artist) : undefined;
+  const cohost = spotlight.cohost ? guests.find(p => p.identity === spotlight.cohost) : undefined;
+  const guest = spotlight.guest ? guests.find(p => p.identity === spotlight.guest) : undefined;
+  const slots = [
+    { label: "Host", icon: Crown, identity: host.id, name: host.name, photo: host.photo },
+    ...(featured ? [{ label: "Artist", icon: Music2, identity: featured.identity, name: featured.name, photo: null }] : []),
+    ...(cohost ? [{ label: "Co-Host", icon: UserRound, identity: cohost.identity, name: cohost.name, photo: null }] : []),
+    ...(guest ? [{ label: "Guest", icon: UserRound, identity: guest.identity, name: guest.name, photo: null }] : []),
+  ];
+  return <>
+    {audioOnly ? (
+      <div className="profile-podcast-banner flex items-center gap-3 rounded-2xl border border-border p-4">
+        <Headphones className="h-5 w-5 shrink-0 text-primary" />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground">Podcast mode — audio only</p>
+          <p className="text-xs text-muted-foreground">Video is off. Mics stay live for everyone on stage.</p>
+        </div>
+      </div>
+    ) : <div className="profile-video-grid">
+      {slots.map(({ label, icon: Icon, identity, name, photo }) => {
+        const track = tracks.find(t => t.participant.identity === identity);
+        const publication = track && "publication" in track ? track.publication : null;
+        const profile = identity ? profiles[identity] : undefined;
+        const avatar = profile?.avatar_url ?? photo;
+        const displayName = profile?.display_name ?? name;
+        return <div key={label} className="profile-video-tile">
+          {track && publication && !publication.isMuted ? <TrackRefContext.Provider value={track}><ParticipantTile className="!h-full !w-full" /></TrackRefContext.Provider> : avatar ? <SignedImg src={avatar} alt={displayName ?? label} className="h-full w-full object-cover" /> : <div className="profile-video-empty"><Icon className="h-10 w-10" /><span>{identity ? "Camera off" : `Waiting for ${label.toLowerCase()}`}</span></div>}
+          <span className="profile-video-badge"><Icon className="h-4 w-4" />{label}</span>
+          {displayName && <div className="profile-video-identity">{avatar && <SignedImg src={avatar} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />}<div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{displayName}</p><p className="text-xs text-muted-foreground">{label === "Host" ? "Live host" : "On stage"}</p></div><AudioLines className={cn("h-6 w-6 text-primary", track?.participant.isSpeaking ? "opacity-100" : "opacity-30")} /></div>}
+        </div>;
+      })}
+    </div>}
+    {publish && <ProfileMediaControls streamId={streamId} owner={showHostTools} onEnd={onEnd} onInvite={onInvite} />}
+  </>;
+}
+
+function ProfileMediaControls({ streamId, owner, onEnd, onInvite }: { streamId?: string; owner: boolean; onEnd: () => void; onInvite: () => void }) {
+  const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
+  const toggle = async (kind: "mic" | "cam" | "screen") => {
+    try {
+      if (kind === "mic") await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+      if (kind === "cam") await localParticipant.setCameraEnabled(!isCameraEnabled);
+      if (kind === "screen") await localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+    } catch (error) { toast.error(friendlyDeviceError(error)); }
+  };
+  return <div className="profile-media-controls">
+    <Button variant="ghost" aria-pressed={!isMicrophoneEnabled} title={isMicrophoneEnabled ? "Mute microphone" : "Unmute microphone"} onClick={() => void toggle("mic")}><span>{isMicrophoneEnabled ? <Mic /> : <MicOff />}</span>{isMicrophoneEnabled ? "Mute" : "Unmute"}</Button>
+    <Button variant="ghost" aria-pressed={isCameraEnabled} title={isCameraEnabled ? "Turn camera off" : "Turn camera on"} onClick={() => void toggle("cam")}><span>{isCameraEnabled ? <Camera /> : <CameraOff />}</span>Camera</Button>
+    <Button variant="ghost" aria-pressed={isScreenShareEnabled} title="Share screen" onClick={() => void toggle("screen")}><span><MonitorUp /></span>{isScreenShareEnabled ? "Stop Share" : "Screen"}</Button>
+    {owner && <Button variant="ghost" onClick={onInvite} title="Invite guest"><span><UserPlus /></span>Guests</Button>}
+    {owner && streamId && <RecordButton streamId={streamId} />}
+    {owner && <Button variant="ghost" onClick={onEnd} className="profile-end-action"><span><PhoneOff /></span>End Live</Button>}
+  </div>;
+}
+
+/**
+ * Camera-only publish sync. Use inside an existing LiveKitRoom (e.g. the
+ * persistent StageAudioShell) so flipping UI modes turns the camera on/off
+ * WITHOUT touching the microphone or the room connection.
+ */
+export function StudioCameraPublishSync({ publish }: { publish: boolean }) {
+  useResilientLocalMediaPublish({
+    publish,
+    camera: true,
+    microphone: false,
+  });
+  return null;
+}
+
+/**
+ * Resolve LiveKit identities → role string for 3-panel broadcast routing.
+ * Combines `user_roles` (admin/moderator) with `stage_participants.stage_role`
+ * (host/co_host/speaker/listener), subscribed in realtime so role changes
+ * move feeds across panels without a refresh.
+ */
+function useParticipantRoles(streamId: string | undefined, identities: string[]): Record<string, string> {
+  const [map, setMap] = useState<Record<string, string>>({});
+  const key = [...new Set(identities)].sort().join(",");
+  useEffect(() => {
+    const ids = [...new Set(identities)].filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+    if (!ids.length) { setMap({}); return; }
+    let cancelled = false;
+    const refresh = async () => {
+      const next: Record<string, string> = {};
+      const [{ data: adminRows }, stageRes] = await Promise.all([
+        supabase.from("user_roles").select("user_id, role").in("user_id", ids),
+        streamId
+          ? supabase.from("stage_participants").select("user_id, stage_role").eq("stream_id", streamId).in("user_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      (stageRes.data ?? []).forEach((r: any) => { next[r.user_id] = r.stage_role; });
+      // Admin/moderator overrides stage role for left-panel routing.
+      (adminRows ?? []).forEach((r: any) => {
+        // The stream's own host / co-host role always wins so the host
+        // stays in the HOST box even if they're also a site admin.
+        if (next[r.user_id] === "host" || next[r.user_id] === "co_host") return;
+        if (r.role === "admin" || r.role === "moderator" || r.role === "owner" || r.role === "administrator") {
+          next[r.user_id] = r.role;
+        }
+      });
+      if (!cancelled) setMap(next);
+    };
+    refresh();
+    const ch = streamId
+      ? supabase
+          .channel(`lk-roles-${streamId}`)
+          .on("postgres_changes", { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` }, refresh)
+          .on("postgres_changes", { event: "*", schema: "public", table: "user_roles" }, refresh)
+          .subscribe()
+      : null;
+    return () => { cancelled = true; if (ch) supabase.removeChannel(ch); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, streamId]);
+  return map;
+}
+
+type ProfileLite = { display_name: string | null; avatar_url: string | null };
+
+function useParticipantProfiles(identities: string[]): Record<string, ProfileLite> {
+  const [map, setMap] = useState<Record<string, ProfileLite>>({});
+  const key = [...new Set(identities)].sort().join(",");
+  useEffect(() => {
+    const ids = [...new Set(identities)].filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+    if (!ids.length) { setMap({}); return; }
+    let cancelled = false;
+    (async () => {
+      const { IDENTITY_COLUMNS, effectiveIdentity } = await import("@/lib/host-identity");
+      const { data } = await supabase
+        .from("public_profiles")
+        .select(IDENTITY_COLUMNS)
+        .in("id", ids);
+      if (cancelled) return;
+      const next: Record<string, ProfileLite> = {};
+      (data ?? []).forEach((p: any) => {
+        const eff = effectiveIdentity(p);
+        next[p.id] = { display_name: eff.display_name, avatar_url: eff.avatar_url };
+      });
+      setMap(next);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return map;
+}
+
+function StageTile({ track, label, fallbackImage, placeholder, profile, small }: { track: any; label: string; fallbackImage?: string; placeholder?: string; profile?: ProfileLite; small?: boolean }) {
+  const avatar = profile?.avatar_url ?? fallbackImage;
+  return (
+    <div className={cn("stage-tile-glow relative mx-auto aspect-square w-full max-w-full shrink-0 rounded-2xl p-[2px]", small && "rounded-xl")}>
+      <div className="stage-tile relative h-full w-full overflow-hidden rounded-[14px] bg-[#0d0d18]">
+      {track ? (
+        <TrackRefContext.Provider value={track}>
+          <ParticipantTile className="!h-full !w-full" />
+        </TrackRefContext.Provider>
+      ) : avatar ? (
+        <>
+          <SignedImg src={avatar} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs text-white/70">
+            {placeholder ?? "Connecting…"}
+          </div>
+        </>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1e1b4b] to-[#581c87] text-xs text-white/70">
+          {placeholder ?? "Connecting…"}
+        </div>
+      )}
+      <div className="pointer-events-none absolute left-3 top-3">
+        <span className={cn("rounded-md bg-black/60 px-2 py-1 font-bold tracking-widest text-white backdrop-blur", small ? "text-[9px]" : "text-[10px]")}>
+          {label}
+        </span>
+      </div>
+      {profile?.display_name && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-2 bg-background/80 px-3 py-3 text-foreground backdrop-blur">
+          {avatar && <SignedImg src={avatar} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />}
+          <span className="min-w-0 truncate text-xs font-semibold">{profile.display_name}</span>
+        </div>
+      )}
+      </div>
+    </div>
+  );
+}
+
+function StreamControlBar({ onEnd, onInvite, streamId }: { onEnd: () => void; onInvite: () => void; streamId?: string }) {
+  const { localParticipant } = useLocalParticipant();
+  const room = useRoomContext();
+  const [micOn, setMicOn] = useState(true);
+  const [camOn, setCamOn] = useState(true);
+  const [sharing, setSharing] = useState(false);
+  const [quality, setQuality] = useState<ConnectionQuality>(ConnectionQuality.Unknown);
+
+  useEffect(() => {
+    if (!localParticipant) return;
+    const update = () => setQuality(localParticipant.connectionQuality);
+    update();
+    localParticipant.on("connectionQualityChanged" as any, update);
+    return () => { localParticipant.off("connectionQualityChanged" as any, update); };
+  }, [localParticipant]);
+
+  const toggleMic = async () => {
+    const next = !micOn;
+    await localParticipant.setMicrophoneEnabled(next);
+    setMicOn(next);
+  };
+  const toggleCam = async () => {
+    const next = !camOn;
+    await localParticipant.setCameraEnabled(next);
+    setCamOn(next);
+  };
+  const toggleShare = async () => {
+    const next = !sharing;
+    try {
+      await localParticipant.setScreenShareEnabled(next);
+      setSharing(next);
+    } catch (e: any) {
+      toast.error(e?.message || "Screen share failed");
+    }
+  };
+
+  const qualityLabel = quality === ConnectionQuality.Excellent ? "Excellent"
+    : quality === ConnectionQuality.Good ? "Good"
+    : quality === ConnectionQuality.Poor ? "Poor" : "Connecting";
+  const qualityColor = quality === ConnectionQuality.Excellent || quality === ConnectionQuality.Good ? "#22c55e"
+    : quality === ConnectionQuality.Poor ? "#f59e0b" : "#94a3b8";
+
+  return (
+    <div className="studio-media-controls">
+      <div className="mr-2 flex items-center gap-2 px-2">
+        <Wifi className="h-3.5 w-3.5" style={{ color: qualityColor }} />
+        <div className="text-xs">
+          <div className="font-semibold text-foreground">LiveKit</div>
+          <div className="text-[10px] text-muted-foreground">{qualityLabel} connection</div>
+        </div>
+      </div>
+      <CtrlBtn icon={micOn ? Mic : MicOff} label={micOn ? "Mute" : "Unmute"} onClick={toggleMic} active={!micOn} />
+      <CtrlBtn icon={camOn ? Camera : CameraOff} label="Camera" onClick={toggleCam} active={!camOn} />
+      <CtrlBtn icon={MonitorUp} label={sharing ? "Stop Share" : "Screen"} onClick={toggleShare} active={sharing} />
+      <CtrlBtn icon={UserPlus} label="Guests" onClick={onInvite} />
+      {streamId && <RecordButton streamId={streamId} />}
+      <DeviceSelector compact />
+      <button
+        onClick={async () => { await room?.disconnect(); onEnd(); }}
+        className="studio-end-action"
+        aria-label="End live"
+      >
+        <span><PhoneOff /></span>
+        <span>End Live</span>
+      </button>
+    </div>
+  );
+}
+
+function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: string; onClick?: () => void; active?: boolean }) {
+  return (
+    <button onClick={onClick} aria-pressed={!!active} title={label}>
+      <span><Icon /></span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+type SpotlightStore = {
+  current: { host: string | null; artist: string | null; cohost: string | null; guest: string | null };
+  channel: ReturnType<typeof supabase.channel> | null;
+  listeners: Set<() => void>;
+};
+
+const spotlightStores = new Map<string, SpotlightStore>();
+
+function getSpotlightStore(streamId: string): SpotlightStore {
+  let store = spotlightStores.get(streamId);
+  if (!store) {
+    store = { current: { host: null, artist: null, cohost: null, guest: null }, channel: null, listeners: new Set() };
+    spotlightStores.set(streamId, store);
+
+    const channel = supabase.channel(`spotlight-${streamId}`);
+    store.channel = channel;
+
+    // Register postgres_changes callback BEFORE calling subscribe().
+    channel.on(
+      "postgres_changes",
+      { event: "UPDATE", schema: "public", table: "streams", filter: `id=eq.${streamId}` },
+      (payload) => {
+        const row = payload.new as any;
+        const next = {
+          artist: row?.spotlight_user_id ?? null,
+          host: row?.spotlight_host_user_id ?? null,
+          cohost: row?.spotlight_cohost_user_id ?? null,
+          guest: row?.spotlight_guest_user_id ?? null,
+        };
+        if (
+          store!.current.host === next.host &&
+          store!.current.artist === next.artist &&
+          store!.current.cohost === next.cohost &&
+          store!.current.guest === next.guest
+        )
+          return;
+        store!.current = next;
+        store!.listeners.forEach((cb) => cb());
+      },
+    );
+
+    channel.subscribe((status, err) => {
+      if (status === "CHANNEL_ERROR") {
+        console.error("[useStudioStreamSpotlight] realtime channel error:", err);
+      }
+    });
+
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("streams")
+          .select("spotlight_user_id, spotlight_host_user_id, spotlight_cohost_user_id, spotlight_guest_user_id")
+          .eq("id", streamId)
+          .maybeSingle();
+        const live = spotlightStores.get(streamId);
+        if (!live || live !== store) return;
+        const next = {
+          artist: (data as any)?.spotlight_user_id ?? null,
+          host: (data as any)?.spotlight_host_user_id ?? null,
+          cohost: (data as any)?.spotlight_cohost_user_id ?? null,
+          guest: (data as any)?.spotlight_guest_user_id ?? null,
+        };
+        if (
+          live.current.host === next.host &&
+          live.current.artist === next.artist &&
+          live.current.cohost === next.cohost &&
+          live.current.guest === next.guest
+        )
+          return;
+        live.current = next;
+        live.listeners.forEach((cb) => cb());
+      } catch (err) {
+        console.error("[useStudioStreamSpotlight] initial fetch failed:", err);
+      }
+    })();
+  }
+  return store;
+}
+
+function subscribeSpotlight(streamId: string, callback: () => void): () => void {
+  const store = getSpotlightStore(streamId);
+  store.listeners.add(callback);
+  return () => {
+    store.listeners.delete(callback);
+    if (store.listeners.size === 0) {
+      if (store.channel) {
+        supabase.removeChannel(store.channel);
+        store.channel = null;
+      }
+      spotlightStores.delete(streamId);
+    }
+  };
+}
+
+const EMPTY_SPOTLIGHT = { host: null, artist: null, cohost: null, guest: null } as const;
+export type SpotlightState = { host: string | null; artist: string | null; cohost: string | null; guest: string | null };
+function getSpotlightSnapshot(streamId: string): SpotlightState {
+  return spotlightStores.get(streamId)?.current ?? EMPTY_SPOTLIGHT;
+}
+
+/**
+ * Real-time hook: returns the current spotlighted user id for the stream,
+ * or null. Updates instantly when a host pins/unpins via Postgres realtime.
+ *
+ * Uses a single shared realtime subscription per streamId so re-renders and
+ * multiple mounted instances never register duplicate postgres_changes listeners.
+ */
+export function useStudioStreamSpotlight(streamId: string | undefined): SpotlightState {
+  return useSyncExternalStore(
+    useCallback(
+      (callback) => (streamId ? subscribeSpotlight(streamId, callback) : () => {}),
+      [streamId],
+    ),
+    useCallback(() => (streamId ? getSpotlightSnapshot(streamId) : EMPTY_SPOTLIGHT), [streamId]),
+    () => EMPTY_SPOTLIGHT,
+  );
+}
+
+/**
+ * Host-only control row under the middle ARTIST panel. Lets the host pin
+ * any participant currently in the room into that slot, or clear it.
+ */
+function SpotlightControls({
+  streamId,
+  spotlightUserId,
+  participants,
+  profiles,
+  slot = "artist",
+}: {
+  streamId: string;
+  spotlightUserId: string | null;
+  participants: ReturnType<typeof useParticipants>;
+  profiles: Record<string, ProfileLite>;
+  slot?: "host" | "artist" | "cohost";
+}) {
+  const [open, setOpen] = useState(false);
+  const setSpotlight = useServerFn(setStreamSpotlight);
+  const pinned = spotlightUserId
+    ? profiles[spotlightUserId] ?? null
+    : null;
+  const slotLabel = slot === "host" ? "host box" : "artist box";
+  const pin = async (targetUserId: string | null) => {
+    try {
+      await setSpotlight({ data: { streamId, targetUserId, slot } });
+      setOpen(false);
+      toast.success(targetUserId ? `Pinned to ${slotLabel}` : "Spotlight cleared");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to update spotlight");
+    }
+  };
+  // Only show participants with a real uuid identity (skip ghost / placeholder ids)
+  const pickable = participants.filter((p) =>
+    /^[0-9a-f-]{36}$/i.test(p.identity ?? ""),
+  );
+  return (
+    <>
+      <div className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5">
+        <div className="flex min-w-0 items-center gap-2 text-[11px] text-white/70">
+          <Pin className="h-3 w-3 shrink-0 text-fuchsia-400" />
+          {pinned ? (
+            <span className="truncate">
+              Pinned: <span className="font-semibold text-white">{pinned.display_name ?? "Guest"}</span>
+            </span>
+          ) : (
+            <span>No spotlight</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/85 hover:bg-white/5"
+          >
+            <UserPlus className="h-3 w-3" /> Add Guest
+          </button>
+          {spotlightUserId && (
+            <button
+              onClick={() => pin(null)}
+              className="flex items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[10px] font-semibold text-white/85 hover:bg-white/5"
+            >
+              <PinOff className="h-3 w-3" /> Unpin
+            </button>
+          )}
+        </div>
+      </div>
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0d18] p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm font-bold text-white">Pin to {slotLabel}</div>
+              <button onClick={() => setOpen(false)} className="text-white/60 hover:text-white">
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+            {pickable.length === 0 ? (
+              <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4 text-center text-xs text-white/50">
+                No one is in the room yet. Invite a guest first.
+              </div>
+            ) : (
+              <ul className="max-h-80 space-y-1 overflow-y-auto">
+                {pickable.map((p) => {
+                  const prof = profiles[p.identity];
+                  const isCurrent = p.identity === spotlightUserId;
+                  return (
+                    <li key={p.identity}>
+                      <button
+                        onClick={() => pin(p.identity)}
+                        disabled={isCurrent}
+                        className={cn(
+                          "flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-white/5",
+                          isCurrent && "opacity-50",
+                        )}
+                      >
+                        {prof?.avatar_url ? (
+                          <SignedImg src={prof.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-fuchsia-600 to-blue-600" />
+                        )}
+                        <span className="flex-1 text-sm text-white">
+                          {prof?.display_name ?? p.name ?? "Guest"}
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">
+                          {isCurrent ? "Pinned" : "Pin"}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
