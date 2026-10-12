@@ -105,7 +105,19 @@ export function BattleArena({
     return () => { cancelled = true; };
   }, [currentRound?.id]);
 
-  if (!match && !isHost) return null;
+  // Visible to everyone (artists, hosts, listeners) even before a battle starts.
+  if (!match && !isHost) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0a1a2e] to-[#0d0d18] p-4">
+        <div className="flex items-center gap-2 text-sm font-bold text-white">
+          <Swords className="h-4 w-4 text-[#00E6FF]" /> Battle Arena
+        </div>
+        <p className="mt-2 text-xs text-white/60">
+          No battle running right now. When the host starts a 1v1, you'll see it here and can vote each round.
+        </p>
+      </div>
+    );
+  }
 
   if (!match && isHost) {
     return (
