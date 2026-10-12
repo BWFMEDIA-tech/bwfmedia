@@ -30,6 +30,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
+import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { getArtistLiveStream } from "@/lib/streams.functions";
 
 const artistMetaOptions = (id: string) =>
@@ -42,8 +43,8 @@ export const Route = createFileRoute("/artist/$id")({
   loader: ({ params }) => getArtistMeta({ data: { id: params.id } }),
   head: ({ params, loaderData }) => {
     const name = loaderData?.name?.trim() || "Artist Profile";
-    const title = `${name} — BWF Network`;
-    const desc = `Stream ${name}'s music, watch live sessions, support with tips, and join the community on BWF Network — the creator-powered entertainment platform.`;
+    const title = `${name} — TUNEVIO`;
+    const desc = `Stream ${name}'s music, watch live sessions, support with tips, and join the community on TUNEVIO — the creator-powered entertainment platform.`;
     const url = `https://bwfnetwork.com/artist/${params.id}`;
     const meta: Array<Record<string, string>> = [
       { title },
@@ -260,6 +261,7 @@ function HeroBanner({
         </div>
       </div>
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
+        <div className="w-full sm:w-auto"><ProfileMessageButton artistId={artist.id} /></div>
         {isOwner && !canUseTools ? (
           <Link to="/signup" search={{ as: "artist" } as any} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">Become an artist to go live</Link>
         ) : isOwner ? (

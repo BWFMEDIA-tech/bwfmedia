@@ -22,6 +22,7 @@ import { BackstageQueue } from "@/components/stream/BackstageQueue";
 import { TipModal } from "@/components/stream/TipModal";
 import { LiveSetlist, type SetlistTrack } from "@/components/artist/LiveSetlist";
 import { saveHostReferral } from "@/lib/host-referral";
+import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
@@ -168,6 +169,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
           </div>
         )}
         {followSlot && <div className="shrink-0">{followSlot}</div>}
+        <div className="w-full sm:w-auto"><ProfileMessageButton artistId={stream.host_id} /></div>
       </section>
 
       {connection ? (
