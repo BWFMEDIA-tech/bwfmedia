@@ -23,6 +23,7 @@ import { TipModal } from "@/components/stream/TipModal";
 import { LiveSetlist, type SetlistTrack } from "@/components/artist/LiveSetlist";
 import { saveHostReferral } from "@/lib/host-referral";
 import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
+import { BattleArena } from "@/components/stream/BattleArena";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
@@ -216,6 +217,18 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         <StageRoom streamId={stream.id} participants={participants} canManage={canManage} primaryHostId={stream.host_id} spotlight={spotlight} />
         {canManage && <RaiseHandPanel streamId={stream.id} hands={hands} />}
       </section>}
+
+      {/* Battle Arena — visible to every viewer (artists, hosts, listeners), joined or not. */}
+      <section className="profile-battle-arena mt-5 min-w-0" aria-label="Battle Arena">
+        <BattleArena
+          streamId={stream.id}
+          isHost={isOwner}
+          participants={participants
+            .filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room")
+            .map((p) => ({ user_id: p.user_id, display_name: p.display_name ?? null, avatar_url: p.avatar_url ?? null, role: "on_stage" as const, stage_role: p.stage_role }))}
+          onStageIds={new Set(participants.filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room").map((p) => p.user_id))}
+        />
+      </section>
 
       <div className="profile-room-content mt-5 grid min-w-0 gap-4 md:grid-cols-[minmax(0,1.27fr)_minmax(0,1fr)]">
         <div className="artist-live-chat min-w-0">
