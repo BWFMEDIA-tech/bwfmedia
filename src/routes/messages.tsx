@@ -221,7 +221,101 @@ function MessagesPage() {
     setSearchQ("");
     nav({ to: "/messages", search: {}, replace: true });
   };
-...
+  if (auth.loading || !auth.isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] text-white/60 text-sm">
+        Loading…
+      </div>
+    );
+  }
+
+  const activeProfile = activeId ? (profiles[activeId] ?? null) : null;
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] bg-[#0a0a12] text-bone">
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <MessageSquare className="h-6 w-6" /> Messages
+          </h1>
+          <button
+            onClick={() => setShowNew((v) => !v)}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+          >
+            <UserPlus className="h-4 w-4" /> New message
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 h-[70vh] min-h-[500px]">
+          {/* Sidebar */}
+          <aside className={`rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden flex flex-col ${activeId ? "hidden md:flex" : "flex"}`}>
+            {showNew && (
+              <div className="border-b border-white/10 p-3">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                  <input
+                    autoFocus
+                    value={searchQ}
+                    onChange={(e) => setSearchQ(e.target.value)}
+                    placeholder="Search by name…"
+                    className="w-full rounded-lg border border-white/10 bg-black/40 pl-8 pr-3 py-2 text-sm outline-none focus:border-violet-500/60"
+                  />
+                </div>
+                <div className="mt-2 max-h-60 overflow-y-auto">
+                  {searchResults.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        setProfiles((prev) => ({ ...prev, [p.id]: p }));
+                        openConversation(p.id);
+                        setSearchQ("");
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-2 py-2 hover:bg-white/5"
+                    >
+                      <Avatar profile={p} />
+                      <span className="text-sm">{p.display_name || "Unknown user"}</span>
+                    </button>
+                  ))}
+                  {searchQ.length >= 2 && searchResults.length === 0 && (
+                    <p className="px-2 py-3 text-xs text-white/40">No users found.</p>
+                  )}
+                </div>
+              </div>
+            )}
+            <div className="flex-1 overflow-y-auto">
+              {loading ? (
+                <p className="p-4 text-xs text-white/40">Loading…</p>
+              ) : conversations.length === 0 ? (
+                <div className="p-6 text-center text-xs text-white/50">
+                  No conversations yet.<br />Tap "New message" to start one.
+                </div>
+              ) : (
+                conversations.map((c) => (
+                  <button
+                    key={c.other.id}
+                    onClick={() => openConversation(c.other.id)}
+                    className={`flex w-full items-center gap-3 border-b border-white/5 px-3 py-3 text-left hover:bg-white/5 ${activeId === c.other.id ? "bg-white/10" : ""}`}
+                  >
+                    <Avatar profile={c.other} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm font-medium">{c.other.display_name || "Unknown user"}</span>
+                        {c.unread > 0 && (
+                          <span className="rounded-full bg-violet-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{c.unread}</span>
+                        )}
+                      </div>
+                      <p className="truncate text-xs text-white/50">{c.last.body || "Start the conversation"}</p>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </aside>
+
+          {/* Thread */}
+          <section className={`rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden flex-col ${activeId ? "flex" : "hidden md:flex"}`}>
+            {activeId ? (
+              <>
                 <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
                   <button
                     onClick={closeConversation}
