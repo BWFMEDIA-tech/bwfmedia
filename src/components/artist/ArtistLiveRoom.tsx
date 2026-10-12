@@ -223,6 +223,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         <BattleArena
           streamId={stream.id}
           isHost={isOwner}
+          playAudio
           participants={participants
             .filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room")
             .map((p) => ({ user_id: p.user_id, display_name: p.display_name ?? null, avatar_url: p.avatar_url ?? null, role: "on_stage" as const, stage_role: p.stage_role }))}

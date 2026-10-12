@@ -13,6 +13,8 @@ import { BattleHostControls } from "./BattleHostControls";
 import { HypePassPanel } from "./HypePassPanel";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
+import { useSignedAudioUrl } from "@/lib/useSignedAudio";
+import { Volume2 } from "lucide-react";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -29,11 +31,14 @@ export function BattleArena({
   isHost,
   participants,
   onStageIds,
+  playAudio = false,
 }: {
   streamId: string;
   isHost: boolean;
   participants: Participant[];
   onStageIds?: Set<string>;
+  /** Render the battle's on-air track audio (pages without the arena player). */
+  playAudio?: boolean;
 }) {
   const stateFn = useServerFn(getBattleRoomState);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
@@ -105,6 +110,11 @@ export function BattleArena({
     return () => { cancelled = true; };
   }, [currentRound?.id]);
 
+  const onAirTrack: any =
+    roomState?.activeSide === "b" ? (roomState as any)?.bTrack : roomState?.activeSide === "a" ? (roomState as any)?.aTrack : null;
+  const onAirUrl = playAudio && onAirTrack?.status === "playing" ? (onAirTrack.audio_url as string | null) : null;
+  const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} /> : null;
+
   // Visible to everyone (artists, hosts, listeners) even before a battle starts.
   if (!match && !isHost) {
     return (
@@ -157,6 +167,7 @@ export function BattleArena({
 
   return (
     <>
+      {audioEl}
       <BattleView
         roomState={roomState}
         myVote={myVote}
@@ -1379,5 +1390,50 @@ function TrackSelect({
         </div>
       )}
     </label>
+  );
+}
+/**
+ * Plays the battle's on-air track for viewers on pages without the arena
+ * player. Mobile browsers (iOS Safari, Android Chrome) block sound until a tap,
+ * so a "Tap to listen" button appears and any tap on the page also unlocks it.
+ */
+function BattleTrackAudio({ audioUrl, title }: { audioUrl: string | null; title: string | null }) {
+  const src = useSignedAudioUrl(audioUrl);
+  const ref = useRef<HTMLAudioElement | null>(null);
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const a = ref.current;
+    if (!a) return;
+    if (!src) { a.pause(); setBlocked(false); return; }
+    a.play().then(() => setBlocked(false)).catch(() => setBlocked(true));
+  }, [src]);
+
+  useEffect(() => {
+    if (!blocked) return;
+    const unlock = () => {
+      ref.current?.play().then(() => setBlocked(false)).catch(() => {});
+    };
+    document.addEventListener("touchend", unlock, { passive: true });
+    document.addEventListener("click", unlock);
+    return () => {
+      document.removeEventListener("touchend", unlock);
+      document.removeEventListener("click", unlock);
+    };
+  }, [blocked]);
+
+  return (
+    <>
+      <audio ref={ref} src={src ?? undefined} preload="auto" playsInline className="hidden" />
+      {blocked && src && (
+        <button
+          type="button"
+          onClick={() => ref.current?.play().then(() => setBlocked(false)).catch(() => {})}
+          className="flex w-full items-center justify-center gap-2 bg-[#0000FF] px-4 py-3 text-sm font-bold text-white"
+        >
+          <Volume2 className="h-4 w-4" /> Tap to listen{title ? ` — ${title}` : ""}
+        </button>
+      )}
+    </>
   );
 }

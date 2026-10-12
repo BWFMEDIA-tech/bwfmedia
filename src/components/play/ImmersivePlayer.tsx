@@ -643,6 +643,21 @@ export function ImmersivePlayer({
     }
   };
 
+  // Mobile browsers block sound until a tap: any tap on the page unlocks it.
+  useEffect(() => {
+    if (!needsUnlock) return;
+    const unlock = () => {
+      resume();
+      audioRef.current?.play().then(() => setNeedsUnlock(false)).catch(() => {});
+    };
+    document.addEventListener("touchend", unlock, { passive: true });
+    document.addEventListener("click", unlock);
+    return () => {
+      document.removeEventListener("touchend", unlock);
+      document.removeEventListener("click", unlock);
+    };
+  }, [needsUnlock, resume]);
+
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
@@ -877,6 +892,7 @@ export function ImmersivePlayer({
           ref={audioRef}
           src={trackAudioSrc ?? ""}
           autoPlay
+          playsInline
           preload="auto"
           crossOrigin="anonymous"
           className="hidden"
