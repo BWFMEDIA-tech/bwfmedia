@@ -120,6 +120,13 @@
       "when": 1791778247790,
       "tag": "0016_music_rights_royalties",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1791781815278,
+      "tag": "0017_artist_follower_count_fn",
+      "breakpoints": true
     }
   ]
 }
