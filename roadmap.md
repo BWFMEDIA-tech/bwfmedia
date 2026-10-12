@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Add a visible mobile-friendly Inbox/Message action on normal and live artist profiles using existing messaging.
 - [ ] Match the video-watch reference with accessible controls, persisted engagement, threaded comments, artist notifications, and phone/desktop verification.
 - [x] Make live alerts read "Live Now: TUNEVIO"; renamed the platform account from BWF NETWORK and refreshed existing alert headlines, links and unread status untouched.
 
