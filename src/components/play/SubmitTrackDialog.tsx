@@ -63,8 +63,10 @@ export function SubmitTrackDialog({
         const unique: ProfileTrack[] = [];
         for (const t of data as any[]) {
           const key = (t.title ?? "").trim().toLowerCase();
-          if (!key || seen.has(key)) continue;
+          const fileKey = t.audio_url ? String(t.audio_url).split("?")[0] : "";
+          if (!key || !t.audio_url || seen.has(key) || seen.has(fileKey)) continue;
           seen.add(key);
+          seen.add(fileKey);
           unique.push({ id: t.id, title: t.title, audio_url: t.audio_url, cover_url: t.cover_url });
         }
         setProfileTracks(unique);
