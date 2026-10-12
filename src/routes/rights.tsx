@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth-context";
 import { hasArtistTools } from "@/lib/artist-navigation";
 import { RIGHTS_ORGS, STATUS_LABEL, canAddSplit, countRights, splitTotal, type OrgKey, type RightsStatus } from "@/lib/rights";
 import shield from "@/assets/rights-shield.jpg";
+import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/rights")({
   ssr: false,
