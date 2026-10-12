@@ -26,10 +26,8 @@ export const getArtistFollowStats = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ artistId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const sb = publicClient();
-    const { count } = await sb
-      .from("artist_follows")
-      .select("id", { count: "exact", head: true })
-      .eq("artist_id", data.artistId);
+    const { data: count, error } = await sb.rpc("get_artist_follower_count", { _artist_id: data.artistId });
+    if (error) throw error;
     return { count: count ?? 0 };
   });
 
@@ -133,10 +131,7 @@ export const toggleArtistFollow = createServerFn({ method: "POST" })
       following = true;
     }
 
-    const { count, error: countError } = await context.supabase
-      .from("artist_follows")
-      .select("id", { count: "exact", head: true })
-      .eq("artist_id", data.artistId);
+    const { data: count, error: countError } = await context.supabase.rpc("get_artist_follower_count", { _artist_id: data.artistId });
     if (countError) throw countError;
 
     return { following, count: count ?? 0 };
