@@ -11,6 +11,7 @@ const GROUPS = [
     { to: "/settings/music-media", label: "Songs & Albums" },
     { to: "/upload", label: "Upload Music & Video" },
     { to: "/distribution", label: "Distribution" },
+    { to: "/rights", label: "Music Rights & Royalties" },
   ] },
   { key: "performances", label: "Performances", icon: Radio, children: [
     { to: "/go-live", label: "Go Live" },
