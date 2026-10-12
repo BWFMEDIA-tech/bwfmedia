@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, MoreHorizontal, Pause, Play, Radio, Users } from "lucide-react";
 import type { ReactNode } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
+import { getIsFollowingArtist, toggleArtistFollow } from "@/lib/artist-follows.functions";
 import { cn } from "@/lib/utils";
 import { SignedImg } from "@/components/ui/signed-img";
 import { usePlayer, type PlayerTrack } from "@/lib/player-context";
@@ -302,6 +307,40 @@ export function ArtistCard({
   onFollow?: () => void;
   following?: boolean;
 }) {
+  const { isAuthenticated, user } = useAuth();
+  const qc = useQueryClient();
+  const fetchIsFollowing = useServerFn(getIsFollowingArtist);
+  const toggleFn = useServerFn(toggleArtistFollow);
+  const selfManaged = !onFollow;
+  const followingQ = useQuery({
+    queryKey: ["artist-following", artist.id],
+    queryFn: () => fetchIsFollowing({ data: { artistId: artist.id } }),
+    enabled: selfManaged && isAuthenticated,
+  });
+  const mut = useMutation({
+    mutationFn: () => toggleFn({ data: { artistId: artist.id } }),
+    onMutate: () => {
+      const prev = followingQ.data?.following ?? false;
+      qc.setQueryData(["artist-following", artist.id], { following: !prev });
+      return { prev };
+    },
+    onSuccess: (res) => {
+      qc.setQueryData(["artist-following", artist.id], { following: res.following });
+      qc.setQueryData(["artist-follow-stats", artist.id], { count: res.count });
+      toast.success(res.following ? `Following ${artist.name}` : `Unfollowed ${artist.name}`);
+    },
+    onError: (e: any, _v, ctx) => {
+      qc.setQueryData(["artist-following", artist.id], { following: ctx?.prev ?? false });
+      toast.error(e?.message ?? "Could not update follow");
+    },
+  });
+  const isFollowing = selfManaged ? (followingQ.data?.following ?? false) : !!following;
+  const isSelf = user?.id === artist.id;
+  const handleFollow = () => {
+    if (onFollow) return onFollow();
+    if (!isAuthenticated) return void toast.error("Sign in to follow artists");
+    mut.mutate();
+  };
   return (
     <CardShell className="p-3 text-center">
       <Link to="/artist/$id" params={{ id: artist.id }} className="block">
@@ -313,15 +352,17 @@ export function ArtistCard({
       </Link>
       <button
         type="button"
-        onClick={onFollow}
+        onClick={handleFollow}
+        disabled={mut.isPending || isSelf}
+        aria-pressed={isFollowing}
         className={cn(
-          "mt-3 w-full rounded-full border px-3 py-1.5 text-xs font-bold transition",
-          following
+          "mt-3 w-full rounded-full border px-3 py-1.5 text-xs font-bold transition disabled:opacity-50",
+          isFollowing
             ? "border-tv-cyan/60 bg-tv-cyan/10 text-tv-cyan"
             : "border-white/20 text-white hover:border-white/50 hover:bg-white/5",
         )}
       >
-        {following ? "Following" : "Follow"}
+        {isSelf ? "You" : isFollowing ? "Following" : "Follow"}
       </button>
     </CardShell>
   );
