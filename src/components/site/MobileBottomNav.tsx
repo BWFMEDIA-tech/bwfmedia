@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, LayoutDashboard, Inbox, User } from "lucide-react";
+import { Home, Radio, LayoutDashboard, Inbox, User, Video } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
@@ -16,6 +16,7 @@ const TABS: Tab[] = [
   { to: "/", label: "Home", icon: Home, match: (p) => p === "/" },
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
+  { to: "/go-live", label: "Go Live", icon: Video, match: (p) => p.startsWith("/go-live") },
   { to: "/artist-dashboard", label: "Artist Hub", icon: LayoutDashboard, match: (p) => p.startsWith("/artist-dashboard") },
   { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
@@ -36,12 +37,15 @@ export function MobileBottomNav() {
       className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/85 backdrop-blur-xl md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="mx-auto grid max-w-md grid-cols-5">
+      <ul
+        className="mx-auto max-w-md grid"
+        style={{ gridTemplateColumns: `repeat(${TABS.length}, minmax(0, 1fr))` }}
+      >
         {TABS.map((tab) => {
           const active = tab.match(pathname);
           const Icon = tab.icon;
           const dashboardTo = artistDashboardDestination(auth.roles);
-          const to = tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
+          const to = tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to === "/go-live" ? (auth.user ? "/go-live" : "/login") : tab.to;
           return (
             <li key={tab.to} className="flex">
               <Link
