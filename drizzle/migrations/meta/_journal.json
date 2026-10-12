@@ -113,6 +113,13 @@
       "when": 1791682927806,
       "tag": "0015_video_engagement_and_threaded_comments",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1791778247790,
+      "tag": "0016_music_rights_royalties",
+      "breakpoints": true
     }
   ]
 }

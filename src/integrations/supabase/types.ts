@@ -3457,6 +3457,116 @@ export type Database = {
         }
         Relationships: []
       }
+      rights_activity: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          summary: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          summary: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          summary?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rights_disputes: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          organization: string | null
+          song_rights_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          organization?: string | null
+          song_rights_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          organization?: string | null
+          song_rights_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rights_disputes_song_rights_id_fkey"
+            columns: ["song_rights_id"]
+            isOneToOne: false
+            referencedRelation: "song_rights"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rights_registrations: {
+        Row: {
+          admin_note: string | null
+          applied_at: string | null
+          checklist: Json
+          created_at: string
+          id: string
+          member_id: string | null
+          notes: string | null
+          organization: string
+          reference: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          applied_at?: string | null
+          checklist?: Json
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          organization: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          applied_at?: string | null
+          checklist?: Json
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          organization?: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       room_host_earnings: {
         Row: {
           calculated_at: string
@@ -3506,6 +3616,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      royalty_statements: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          organization: string
+          period: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          organization: string
+          period: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          organization?: string
+          period?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       saved_releases: {
         Row: {
@@ -3669,6 +3806,101 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      song_rights: {
+        Row: {
+          created_at: string
+          id: string
+          isrc: string | null
+          iswc: string | null
+          publisher: string | null
+          registration_refs: Json
+          status: string
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          isrc?: string | null
+          iswc?: string | null
+          publisher?: string | null
+          registration_refs?: Json
+          status?: string
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          isrc?: string | null
+          iswc?: string | null
+          publisher?: string | null
+          registration_refs?: Json
+          status?: string
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_rights_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: true
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "song_rights_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: true
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      song_rights_splits: {
+        Row: {
+          created_at: string
+          id: string
+          ipi: string | null
+          name: string
+          role: string
+          share_pct: number
+          song_rights_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ipi?: string | null
+          name: string
+          role?: string
+          share_pct: number
+          song_rights_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ipi?: string | null
+          name?: string
+          role?: string
+          share_pct?: number
+          song_rights_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_rights_splits_song_rights_id_fkey"
+            columns: ["song_rights_id"]
+            isOneToOne: false
+            referencedRelation: "song_rights"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stage_participants: {
         Row: {
