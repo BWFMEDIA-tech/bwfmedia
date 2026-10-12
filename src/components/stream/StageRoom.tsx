@@ -795,6 +795,7 @@ function SpeakerBubble({
   spotlightHostId,
   spotlightArtistId,
   spotlightCohostId,
+  spotlightGuestId,
   onPromote,
   onDemote,
   onRevoke,
@@ -824,7 +825,7 @@ function SpeakerBubble({
   isStreamMod?: boolean;
   onToggleModerator?: () => void;
   onToggleMute?: () => void;
-  onSpotlight?: (slot: "host" | "artist" | "cohost", currentlyPinned: boolean) => void;
+  onSpotlight?: (slot: "host" | "artist" | "cohost" | "guest", currentlyPinned: boolean) => void;
   hostSlotOpen?: boolean;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;

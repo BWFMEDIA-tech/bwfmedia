@@ -452,7 +452,6 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     if (spotlight.artist && panel === "middle") continue;
     if (spotlight.host && panel === "admin") continue;
     if (spotlight.cohost && panel === "host") continue;
-    if (spotlight.guest && panel === "guest") continue;
     buckets[panel].push(t);
 
   }
@@ -822,7 +821,7 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
 }
 
 type SpotlightStore = {
-  current: { host: string | null; artist: string | null; cohost: string | null };
+  current: { host: string | null; artist: string | null; cohost: string | null; guest: string | null };
   channel: ReturnType<typeof supabase.channel> | null;
   listeners: Set<() => void>;
 };
