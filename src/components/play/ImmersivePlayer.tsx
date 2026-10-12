@@ -877,6 +877,7 @@ export function ImmersivePlayer({
           ref={audioRef}
           src={trackAudioSrc ?? ""}
           autoPlay
+          playsInline
           preload="auto"
           crossOrigin="anonymous"
           className="hidden"

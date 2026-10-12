@@ -13,6 +13,8 @@ import { BattleHostControls } from "./BattleHostControls";
 import { HypePassPanel } from "./HypePassPanel";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
+import { useSignedAudioUrl } from "@/lib/useSignedAudio";
+import { Volume2 } from "lucide-react";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -339,6 +341,7 @@ function BattleView({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18]">
+      {audioEl}
       <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-2">
         <div className="flex items-center gap-2 text-xs font-bold text-white">
           <Swords className="h-3.5 w-3.5 text-[#00E6FF]" />
@@ -1387,5 +1390,50 @@ function TrackSelect({
         </div>
       )}
     </label>
+  );
+}
+/**
+ * Plays the battle's on-air track for viewers on pages without the arena
+ * player. Mobile browsers (iOS Safari, Android Chrome) block sound until a tap,
+ * so a "Tap to listen" button appears and any tap on the page also unlocks it.
+ */
+function BattleTrackAudio({ audioUrl, title }: { audioUrl: string | null; title: string | null }) {
+  const src = useSignedAudioUrl(audioUrl);
+  const ref = useRef<HTMLAudioElement | null>(null);
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const a = ref.current;
+    if (!a) return;
+    if (!src) { a.pause(); setBlocked(false); return; }
+    a.play().then(() => setBlocked(false)).catch(() => setBlocked(true));
+  }, [src]);
+
+  useEffect(() => {
+    if (!blocked) return;
+    const unlock = () => {
+      ref.current?.play().then(() => setBlocked(false)).catch(() => {});
+    };
+    document.addEventListener("touchend", unlock, { passive: true });
+    document.addEventListener("click", unlock);
+    return () => {
+      document.removeEventListener("touchend", unlock);
+      document.removeEventListener("click", unlock);
+    };
+  }, [blocked]);
+
+  return (
+    <>
+      <audio ref={ref} src={src ?? undefined} preload="auto" playsInline className="hidden" />
+      {blocked && src && (
+        <button
+          type="button"
+          onClick={() => ref.current?.play().then(() => setBlocked(false)).catch(() => {})}
+          className="flex w-full items-center justify-center gap-2 bg-[#0000FF] px-4 py-3 text-sm font-bold text-white"
+        >
+          <Volume2 className="h-4 w-4" /> Tap to listen{title ? ` — ${title}` : ""}
+        </button>
+      )}
+    </>
   );
 }
