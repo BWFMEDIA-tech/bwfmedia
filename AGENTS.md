@@ -16,3 +16,4 @@
 - Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
 - Resolve Artist Dashboard menu destinations through the shared navigation helper and reuse existing section routes, because non-artists need a signup entry and dashboard links must not point to unimplemented tabs.
 - Count song plays in the shared player on the audio's first real playback start per load, saving a stream event plus the song count server-side, because page opens, rerenders and repeated clicks must never add plays.
+- Keep rights verification admin-only (DB trigger blocks artist self-verify; admin server functions write admin_audit_log), and keep third-party rights adapters server-side and disconnected until partner access is approved, because statuses and royalties must never be fabricated.
