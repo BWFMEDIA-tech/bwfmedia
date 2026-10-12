@@ -4431,6 +4431,7 @@ export type Database = {
           mode: string
           room_name: string
           spotlight_cohost_user_id: string | null
+          spotlight_guest_user_id: string | null
           spotlight_host_user_id: string | null
           spotlight_user_id: string | null
           stage_locked: boolean
@@ -4452,6 +4453,7 @@ export type Database = {
           mode?: string
           room_name: string
           spotlight_cohost_user_id?: string | null
+          spotlight_guest_user_id?: string | null
           spotlight_host_user_id?: string | null
           spotlight_user_id?: string | null
           stage_locked?: boolean
@@ -4473,6 +4475,7 @@ export type Database = {
           mode?: string
           room_name?: string
           spotlight_cohost_user_id?: string | null
+          spotlight_guest_user_id?: string | null
           spotlight_host_user_id?: string | null
           spotlight_user_id?: string | null
           stage_locked?: boolean
