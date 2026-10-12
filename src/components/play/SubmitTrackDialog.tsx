@@ -63,8 +63,10 @@ export function SubmitTrackDialog({
         const unique: ProfileTrack[] = [];
         for (const t of data as any[]) {
           const key = (t.title ?? "").trim().toLowerCase();
-          if (!key || seen.has(key)) continue;
+          const fileKey = t.audio_url ? String(t.audio_url).split("?")[0] : "";
+          if (!key || !t.audio_url || seen.has(key) || seen.has(fileKey)) continue;
           seen.add(key);
+          seen.add(fileKey);
           unique.push({ id: t.id, title: t.title, audio_url: t.audio_url, cover_url: t.cover_url });
         }
         setProfileTracks(unique);
@@ -178,23 +180,35 @@ export function SubmitTrackDialog({
       // guard — they're re-queueing their own song into this stream.
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
-      if (uid && !pickedProfileId) {
-        const { data: existing } = await supabase
+      let finalAudio = audioUrl;
+      let finalCover = coverUrl;
+      if (uid) {
+        // Never queue the same song twice in this live.
+        const { data: inQueue } = await supabase
           .from("play_tracks")
-          .select("id, title, status")
+          .select("id")
           .eq("artist_user_id", uid)
-          .neq("status", "removed")
+          .eq("stream_id", streamId)
+          .in("status", ["queued", "playing"])
           .ilike("title", title.trim());
-        if (existing && existing.length > 0) {
+        if (inQueue && inQueue.length > 0) {
           setBusy(false);
-          toast.error("You've already uploaded this track", {
-            description:
-              "Pick it from your profile or rename the file — only brand-new tracks can be submitted.",
-          });
+          toast.error("This track is already in the live queue");
           return;
         }
+        // If the song already exists on the site, reuse it instead of adding a copy.
+        if (!pickedProfileId) {
+          const existing = profileTracks.find(
+            (t) => t.title.trim().toLowerCase() === title.trim().toLowerCase(),
+          );
+          if (existing) {
+            if (existing.audio_url) finalAudio = existing.audio_url;
+            if (existing.cover_url && !finalCover) finalCover = existing.cover_url;
+            toast.message("Using your existing track", { description: existing.title });
+          }
+        }
       }
-      const res: any = await submitFn({ data: { streamId, title, artistName, audioUrl, coverUrl, useBoost } });
+      const res: any = await submitFn({ data: { streamId, title, artistName, audioUrl: finalAudio, coverUrl: finalCover, useBoost } });
       if (res?.routedToBattle) {
         toast.success(`Routed to Side ${String(res.battleSide).toUpperCase()} of the live battle`);
       } else {
