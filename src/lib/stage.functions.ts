@@ -575,7 +575,7 @@ export const setStreamSpotlight = createServerFn({ method: "POST" })
       .object({
         streamId: z.string().uuid(),
         targetUserId: z.string().uuid().nullable(),
-        slot: z.enum(["host", "artist", "cohost"]).default("artist"),
+        slot: z.enum(["host", "artist", "cohost", "guest"]).default("artist"),
       })
       .parse(d),
   )
@@ -585,6 +585,7 @@ export const setStreamSpotlight = createServerFn({ method: "POST" })
     const column =
       data.slot === "host" ? "spotlight_host_user_id"
       : data.slot === "cohost" ? "spotlight_cohost_user_id"
+      : data.slot === "guest" ? "spotlight_guest_user_id"
       : "spotlight_user_id";
     const { error } = await supabase
       .from("streams")

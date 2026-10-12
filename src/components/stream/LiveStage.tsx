@@ -415,8 +415,8 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
   const visibleSlots = getVisibleLiveVideoSlots(spotlight);
 
   // Bucket camera tracks by role panel.
-  type Panel = "admin" | "middle" | "host";
-  const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [] };
+  type Panel = "admin" | "middle" | "host" | "guest";
+  const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [], guest: [] };
   for (const t of cameraTracks) {
     const id = t.participant?.identity ?? "";
     // Spotlight overrides: pin a participant exclusively to a panel.
@@ -430,6 +430,10 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
     }
     if (spotlight.cohost && id === spotlight.cohost) {
       buckets.host.push(t);
+      continue;
+    }
+    if (spotlight.guest && id === spotlight.guest) {
+      buckets.guest.push(t);
       continue;
     }
     const role = roleMap[id];
@@ -464,6 +468,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
   ensureSpotlightEntry("middle", spotlight.artist);
   ensureSpotlightEntry("admin", spotlight.host);
   ensureSpotlightEntry("host", spotlight.cohost);
+  ensureSpotlightEntry("guest", spotlight.guest);
   // Priority: active speaker first within each bucket.
   const sortByActive = (arr: typeof cameraTracks) =>
     [...arr].sort((a, b) => Number(!!b.participant?.isSpeaking) - Number(!!a.participant?.isSpeaking));
@@ -520,6 +525,7 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
           visibleSlots.length === 1 && "md:grid-cols-1",
           visibleSlots.length === 2 && "md:grid-cols-2",
           visibleSlots.length === 3 && "md:grid-cols-3",
+          visibleSlots.length === 4 && "md:grid-cols-4",
         )}
       >
         <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
@@ -530,6 +536,9 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         </div>}
         {spotlight.cohost && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("host", "CO-HOST", "Waiting for Co-Host")}
+        </div>}
+        {spotlight.guest && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+          {renderPanel("guest", "GUEST", "Waiting for Guest")}
         </div>}
       </div>
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
@@ -552,10 +561,12 @@ export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, on
   const spotlight = useStreamSpotlight(streamId);
   const guests = participants.filter(p => p.identity !== host.id && ["speaker", "artist", "guest", "co_host", "host"].includes(roles[p.identity] ?? ""));
   const featured = spotlight.artist ? guests.find(p => p.identity === spotlight.artist) : undefined;
-  const guest = spotlight.cohost ? guests.find(p => p.identity === spotlight.cohost) : undefined;
+  const cohost = spotlight.cohost ? guests.find(p => p.identity === spotlight.cohost) : undefined;
+  const guest = spotlight.guest ? guests.find(p => p.identity === spotlight.guest) : undefined;
   const slots = [
     { label: "Host", icon: Crown, identity: host.id, name: host.name, photo: host.photo },
     ...(featured ? [{ label: "Artist", icon: Music2, identity: featured.identity, name: featured.name, photo: null }] : []),
+    ...(cohost ? [{ label: "Co-Host", icon: UserRound, identity: cohost.identity, name: cohost.name, photo: null }] : []),
     ...(guest ? [{ label: "Guest", icon: UserRound, identity: guest.identity, name: guest.name, photo: null }] : []),
   ];
   return <>
@@ -810,7 +821,7 @@ function CtrlBtn({ icon: Icon, label, onClick, active }: { icon: any; label: str
 }
 
 type SpotlightStore = {
-  current: { host: string | null; artist: string | null; cohost: string | null };
+  current: { host: string | null; artist: string | null; cohost: string | null; guest: string | null };
   channel: ReturnType<typeof supabase.channel> | null;
   listeners: Set<() => void>;
 };
@@ -820,7 +831,7 @@ const spotlightStores = new Map<string, SpotlightStore>();
 function getSpotlightStore(streamId: string): SpotlightStore {
   let store = spotlightStores.get(streamId);
   if (!store) {
-    store = { current: { host: null, artist: null, cohost: null }, channel: null, listeners: new Set() };
+    store = { current: { host: null, artist: null, cohost: null, guest: null }, channel: null, listeners: new Set() };
     spotlightStores.set(streamId, store);
 
     const channel = supabase.channel(`spotlight-${streamId}`);
@@ -836,11 +847,13 @@ function getSpotlightStore(streamId: string): SpotlightStore {
           artist: row?.spotlight_user_id ?? null,
           host: row?.spotlight_host_user_id ?? null,
           cohost: row?.spotlight_cohost_user_id ?? null,
+          guest: row?.spotlight_guest_user_id ?? null,
         };
         if (
           store!.current.host === next.host &&
           store!.current.artist === next.artist &&
-          store!.current.cohost === next.cohost
+          store!.current.cohost === next.cohost &&
+          store!.current.guest === next.guest
         )
           return;
         store!.current = next;
@@ -858,7 +871,7 @@ function getSpotlightStore(streamId: string): SpotlightStore {
       try {
         const { data } = await supabase
           .from("streams")
-          .select("spotlight_user_id, spotlight_host_user_id, spotlight_cohost_user_id")
+          .select("spotlight_user_id, spotlight_host_user_id, spotlight_cohost_user_id, spotlight_guest_user_id")
           .eq("id", streamId)
           .maybeSingle();
         const live = spotlightStores.get(streamId);
@@ -867,11 +880,13 @@ function getSpotlightStore(streamId: string): SpotlightStore {
           artist: (data as any)?.spotlight_user_id ?? null,
           host: (data as any)?.spotlight_host_user_id ?? null,
           cohost: (data as any)?.spotlight_cohost_user_id ?? null,
+          guest: (data as any)?.spotlight_guest_user_id ?? null,
         };
         if (
           live.current.host === next.host &&
           live.current.artist === next.artist &&
-          live.current.cohost === next.cohost
+          live.current.cohost === next.cohost &&
+          live.current.guest === next.guest
         )
           return;
         live.current = next;
@@ -899,8 +914,8 @@ function subscribeSpotlight(streamId: string, callback: () => void): () => void 
   };
 }
 
-const EMPTY_SPOTLIGHT = { host: null, artist: null, cohost: null } as const;
-export type SpotlightState = { host: string | null; artist: string | null; cohost: string | null };
+const EMPTY_SPOTLIGHT = { host: null, artist: null, cohost: null, guest: null } as const;
+export type SpotlightState = { host: string | null; artist: string | null; cohost: string | null; guest: string | null };
 function getSpotlightSnapshot(streamId: string): SpotlightState {
   return spotlightStores.get(streamId)?.current ?? EMPTY_SPOTLIGHT;
 }

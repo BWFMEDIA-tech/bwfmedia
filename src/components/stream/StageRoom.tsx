@@ -68,7 +68,7 @@ export function StageRoom({
   selfProfile?: { user_id: string; display_name?: string | null; avatar_url?: string | null } | null;
   primaryHostId?: string | null;
   hostTransferMode?: "co_host" | "transfer";
-  spotlight?: { host: string | null; artist: string | null; cohost?: string | null };
+  spotlight?: { host: string | null; artist: string | null; cohost?: string | null; guest?: string | null };
 }) {
   const hostsRef = useRef<HTMLDivElement>(null);
   const modsRef = useRef<HTMLDivElement>(null);
@@ -323,7 +323,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
   const doSpotlight = async (
     uid: string,
     name: string,
-    slot: "host" | "artist" | "cohost",
+    slot: "host" | "artist" | "cohost" | "guest",
     currentlyPinned: boolean,
   ) => {
     if (!streamId) return;
@@ -335,7 +335,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           slot,
         },
       });
-      const label = slot === "host" ? "host box" : slot === "cohost" ? "co-host box" : "artist video box";
+      const label = slot === "host" ? "host box" : slot === "cohost" ? "co-host box" : slot === "guest" ? "guest video box" : "artist video box";
       toast.success(
         currentlyPinned
           ? `${name ?? "Guest"} removed from ${label}`
@@ -448,6 +448,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             spotlightHostId={spotlight?.host ?? null}
             spotlightArtistId={spotlight?.artist ?? null}
             spotlightCohostId={spotlight?.cohost ?? null}
+            spotlightGuestId={spotlight?.guest ?? null}
             onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "This user", mode)}
             onRevoke={() => doRevoke(p.user_id, p.display_name ?? "This user")}
             onKick={() => doKick(p.user_id, p.display_name ?? "This user")}
@@ -514,6 +515,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
                 spotlightHostId={spotlight?.host ?? null}
                 spotlightArtistId={spotlight?.artist ?? null}
                 spotlightCohostId={spotlight?.cohost ?? null}
+                spotlightGuestId={spotlight?.guest ?? null}
                 onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Moderator", mode)}
                 onDemote={() => demote(p.user_id)}
                 onKick={() => doKick(p.user_id, p.display_name ?? "Moderator")}
@@ -557,6 +559,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
               spotlightHostId={spotlight?.host ?? null}
               spotlightArtistId={spotlight?.artist ?? null}
             spotlightCohostId={spotlight?.cohost ?? null}
+              spotlightGuestId={spotlight?.guest ?? null}
               onPromote={(mode) => doPromote(p.user_id, p.display_name ?? "Guest", mode)}
               onDemote={() => demote(p.user_id)}
               onKick={() => doKick(p.user_id, p.display_name ?? "Guest")}
@@ -792,6 +795,7 @@ function SpeakerBubble({
   spotlightHostId,
   spotlightArtistId,
   spotlightCohostId,
+  spotlightGuestId,
   onPromote,
   onDemote,
   onRevoke,
@@ -812,6 +816,7 @@ function SpeakerBubble({
   spotlightHostId?: string | null;
   spotlightArtistId?: string | null;
   spotlightCohostId?: string | null;
+  spotlightGuestId?: string | null;
   onPromote?: (mode: "host" | "co_host" | "transfer") => void;
   onDemote?: () => void;
   onRevoke?: () => void;
@@ -820,7 +825,7 @@ function SpeakerBubble({
   isStreamMod?: boolean;
   onToggleModerator?: () => void;
   onToggleMute?: () => void;
-  onSpotlight?: (slot: "host" | "artist" | "cohost", currentlyPinned: boolean) => void;
+  onSpotlight?: (slot: "host" | "artist" | "cohost" | "guest", currentlyPinned: boolean) => void;
   hostSlotOpen?: boolean;
 }) {
   const ringColor = kind === "host" ? PURPLE : kind === "co_host" ? "#dc2626" : ACCENT;
@@ -842,6 +847,7 @@ function SpeakerBubble({
   const isHostSpot = spotlightHostId === p.user_id;
   const isArtistSpot = spotlightArtistId === p.user_id;
   const isCohostSpot = !!spotlightCohostId && spotlightCohostId === p.user_id;
+  const isGuestSpot = !!spotlightGuestId && spotlightGuestId === p.user_id;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -1032,6 +1038,15 @@ function SpeakerBubble({
                       >
                         {isCohostSpot ? "Remove from co-host box" : "Bring to co-host box"}
                       </MenuItem>
+                      <MenuItem
+                        icon={isGuestSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          onSpotlight("guest", isGuestSpot);
+                        }}
+                      >
+                        {isGuestSpot ? "Remove from guest video box" : "Bring to guest video box"}
+                      </MenuItem>
                     </>
                   )}
                   <MenuDivider />
@@ -1145,17 +1160,26 @@ function SpeakerBubble({
                       >
                         {isArtistSpot ? "Remove from artist video box" : "Bring to artist video box"}
                       </MenuItem>
-                      <MenuItem
-                        icon={isCohostSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
-                        onClick={() => {
-                          setMenuOpen(false);
-                          onSpotlight("cohost", isCohostSpot);
-                        }}
-                      >
-                        {isCohostSpot ? "Remove from co-host box" : "Bring to co-host box"}
-                      </MenuItem>
-                    </>
-                  )}
+                        <MenuItem
+                          icon={isCohostSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            onSpotlight("cohost", isCohostSpot);
+                          }}
+                        >
+                          {isCohostSpot ? "Remove from co-host box" : "Bring to co-host box"}
+                        </MenuItem>
+                        <MenuItem
+                          icon={isGuestSpot ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            onSpotlight("guest", isGuestSpot);
+                          }}
+                        >
+                          {isGuestSpot ? "Remove from guest video box" : "Bring to guest video box"}
+                        </MenuItem>
+                      </>
+                    )}
                   {onSpotlight && <MenuDivider />}
                   {kind === "co_host" && onPromote && (
                     <MenuItem
