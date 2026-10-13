@@ -77,6 +77,7 @@ import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminHostTiersRouteImport } from './routes/admin.host-tiers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
+import { Route as AdminMerchandiseRouteImport } from './routes/admin.merchandise'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminNfcOrdersRouteImport } from './routes/admin.nfc-orders'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
@@ -501,6 +502,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const AdminMerchRoute = AdminMerchRouteImport.update({
   id: '/merch',
   path: '/merch',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMerchandiseRoute = AdminMerchandiseRouteImport.update({
+  id: '/merchandise',
+  path: '/merchandise',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
@@ -999,6 +1005,7 @@ export interface FileRoutesByFullPath {
   '/admin/host-tiers': typeof AdminHostTiersRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
+  '/admin/merchandise': typeof AdminMerchandiseRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
@@ -1150,6 +1157,7 @@ export interface FileRoutesByTo {
   '/admin/host-tiers': typeof AdminHostTiersRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
+  '/admin/merchandise': typeof AdminMerchandiseRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
@@ -1304,6 +1312,7 @@ export interface FileRoutesById {
   '/admin/host-tiers': typeof AdminHostTiersRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
+  '/admin/merchandise': typeof AdminMerchandiseRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
@@ -1459,6 +1468,7 @@ export interface FileRouteTypes {
     | '/admin/host-tiers'
     | '/admin/login'
     | '/admin/merch'
+    | '/admin/merchandise'
     | '/admin/messages'
     | '/admin/nfc-orders'
     | '/admin/ops'
@@ -1610,6 +1620,7 @@ export interface FileRouteTypes {
     | '/admin/host-tiers'
     | '/admin/login'
     | '/admin/merch'
+    | '/admin/merchandise'
     | '/admin/messages'
     | '/admin/nfc-orders'
     | '/admin/ops'
@@ -1763,6 +1774,7 @@ export interface FileRouteTypes {
     | '/admin/host-tiers'
     | '/admin/login'
     | '/admin/merch'
+    | '/admin/merchandise'
     | '/admin/messages'
     | '/admin/nfc-orders'
     | '/admin/ops'
@@ -2429,6 +2441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMerchRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/merchandise': {
+      id: '/admin/merchandise'
+      path: '/merchandise'
+      fullPath: '/admin/merchandise'
+      preLoaderRoute: typeof AdminMerchandiseRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/messages': {
       id: '/admin/messages'
       path: '/messages'
@@ -3028,6 +3047,7 @@ interface AdminRouteChildren {
   AdminHostTiersRoute: typeof AdminHostTiersRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMerchRoute: typeof AdminMerchRoute
+  AdminMerchandiseRoute: typeof AdminMerchandiseRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNfcOrdersRoute: typeof AdminNfcOrdersRoute
   AdminOpsRoute: typeof AdminOpsRoute
@@ -3061,6 +3081,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHostTiersRoute: AdminHostTiersRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMerchRoute: AdminMerchRoute,
+  AdminMerchandiseRoute: AdminMerchandiseRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNfcOrdersRoute: AdminNfcOrdersRoute,
   AdminOpsRoute: AdminOpsRoute,

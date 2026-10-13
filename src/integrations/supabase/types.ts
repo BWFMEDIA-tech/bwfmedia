@@ -4338,6 +4338,62 @@ export type Database = {
         }
         Relationships: []
       }
+      store_earnings_ledger: {
+        Row: {
+          artist_bps: number
+          artist_cents: number
+          cost_cents: number
+          created_at: string
+          entry_type: string
+          environment: string
+          fee_cents: number
+          id: string
+          order_id: string
+          platform_cents: number
+          reason: string | null
+          revenue_cents: number
+          seller_user_id: string
+        }
+        Insert: {
+          artist_bps: number
+          artist_cents: number
+          cost_cents: number
+          created_at?: string
+          entry_type: string
+          environment: string
+          fee_cents: number
+          id?: string
+          order_id: string
+          platform_cents: number
+          reason?: string | null
+          revenue_cents: number
+          seller_user_id: string
+        }
+        Update: {
+          artist_bps?: number
+          artist_cents?: number
+          cost_cents?: number
+          created_at?: string
+          entry_type?: string
+          environment?: string
+          fee_cents?: number
+          id?: string
+          order_id?: string
+          platform_cents?: number
+          reason?: string | null
+          revenue_cents?: number
+          seller_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_earnings_ledger_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "store_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_nfc_links: {
         Row: {
           code: string
@@ -4428,9 +4484,12 @@ export type Database = {
           amount_total_cents: number | null
           buyer_email: string | null
           buyer_user_id: string | null
+          carrier: string | null
           created_at: string
           currency: string
+          delivered_at: string | null
           environment: string
+          fee_cents: number | null
           fulfillment_status: string
           id: string
           paid_at: string | null
@@ -4439,21 +4498,30 @@ export type Database = {
           quantity: number
           refunded_at: string | null
           seller_user_id: string
+          shipped_at: string | null
           shipping_address: Json | null
+          shipping_cents: number
+          shipping_region: string | null
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           tracking_number: string | null
+          unit_cost_cents: number | null
           unit_price_cents: number
           updated_at: string
+          variant_id: string | null
+          variant_label: string | null
         }
         Insert: {
           amount_total_cents?: number | null
           buyer_email?: string | null
           buyer_user_id?: string | null
+          carrier?: string | null
           created_at?: string
           currency?: string
+          delivered_at?: string | null
           environment?: string
+          fee_cents?: number | null
           fulfillment_status?: string
           id?: string
           paid_at?: string | null
@@ -4462,21 +4530,30 @@ export type Database = {
           quantity?: number
           refunded_at?: string | null
           seller_user_id: string
+          shipped_at?: string | null
           shipping_address?: Json | null
+          shipping_cents?: number
+          shipping_region?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           tracking_number?: string | null
+          unit_cost_cents?: number | null
           unit_price_cents: number
           updated_at?: string
+          variant_id?: string | null
+          variant_label?: string | null
         }
         Update: {
           amount_total_cents?: number | null
           buyer_email?: string | null
           buyer_user_id?: string | null
+          carrier?: string | null
           created_at?: string
           currency?: string
+          delivered_at?: string | null
           environment?: string
+          fee_cents?: number | null
           fulfillment_status?: string
           id?: string
           paid_at?: string | null
@@ -4485,13 +4562,19 @@ export type Database = {
           quantity?: number
           refunded_at?: string | null
           seller_user_id?: string
+          shipped_at?: string | null
           shipping_address?: Json | null
+          shipping_cents?: number
+          shipping_region?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           tracking_number?: string | null
+          unit_cost_cents?: number | null
           unit_price_cents?: number
           updated_at?: string
+          variant_id?: string | null
+          variant_label?: string | null
         }
         Relationships: [
           {
@@ -4501,10 +4584,68 @@ export type Database = {
             referencedRelation: "store_products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "store_orders_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "store_product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_product_variants: {
+        Row: {
+          active: boolean
+          cost_cents: number | null
+          created_at: string
+          id: string
+          inventory: number
+          label: string
+          options: Json
+          price_cents: number
+          product_id: string
+          sort: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cost_cents?: number | null
+          created_at?: string
+          id?: string
+          inventory?: number
+          label: string
+          options?: Json
+          price_cents: number
+          product_id: string
+          sort?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cost_cents?: number | null
+          created_at?: string
+          id?: string
+          inventory?: number
+          label?: string
+          options?: Json
+          price_cents?: number
+          product_id?: string
+          sort?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
         ]
       }
       store_products: {
         Row: {
+          cost_cents: number | null
           created_at: string
           currency: string
           description: string | null
@@ -4512,9 +4653,14 @@ export type Database = {
           image_urls: string[]
           inventory: number
           is_featured: boolean
+          made_to_order: boolean
+          min_quantity: number
           price_cents: number
           product_type: string
           release_id: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           shipping_info: string | null
           status: string
           title: string
@@ -4522,6 +4668,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cost_cents?: number | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -4529,9 +4676,14 @@ export type Database = {
           image_urls?: string[]
           inventory?: number
           is_featured?: boolean
+          made_to_order?: boolean
+          min_quantity?: number
           price_cents?: number
           product_type?: string
           release_id?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           shipping_info?: string | null
           status?: string
           title: string
@@ -4539,6 +4691,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cost_cents?: number | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -4546,9 +4699,14 @@ export type Database = {
           image_urls?: string[]
           inventory?: number
           is_featured?: boolean
+          made_to_order?: boolean
+          min_quantity?: number
           price_cents?: number
           product_type?: string
           release_id?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           shipping_info?: string | null
           status?: string
           title?: string
@@ -4564,6 +4722,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      store_revenue_settings: {
+        Row: {
+          artist_bps: number
+          id: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          artist_bps?: number
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          artist_bps?: number
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      store_shipping_rules: {
+        Row: {
+          active: boolean
+          additional_item_cents: number
+          category: string
+          first_item_cents: number
+          id: string
+          region: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          additional_item_cents?: number
+          category: string
+          first_item_cents: number
+          id?: string
+          region: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          additional_item_cents?: number
+          category?: string
+          first_item_cents?: number
+          id?: string
+          region?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       stream_anomaly_flags: {
         Row: {

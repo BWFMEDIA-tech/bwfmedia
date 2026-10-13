@@ -3,12 +3,12 @@ import { z } from "zod";
 import type Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { PRODUCT_TYPES, FULFILLMENT_STATUSES, checkPurchasable, isSafeNfcPath } from "@/lib/artist-store";
+import { PRODUCT_TYPES, FULFILLMENT_STATUSES, SHIPPING_REGIONS, DEFAULT_ARTIST_BPS, categoryOf, checkPurchasable, computeShipping, isSafeNfcPath } from "@/lib/artist-store";
 import { validateReturnUrl } from "@/lib/validate-return-url";
 
 const BUCKET = "store-products";
 const PRODUCT_COLS =
-  "id, user_id, release_id, title, description, product_type, price_cents, currency, inventory, shipping_info, image_urls, status, is_featured, created_at";
+  "id, user_id, release_id, title, description, product_type, price_cents, currency, inventory, shipping_info, image_urls, status, is_featured, created_at, review_status, min_quantity, made_to_order";
 
 function publicClient() {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
@@ -73,7 +73,9 @@ export const getStoreProduct = createServerFn({ method: "GET" })
       const { data: r } = await c.from("distribution_releases").select("id, title").eq("id", row.release_id).maybeSingle();
       release = r ?? null;
     }
-    return { product: { ...signed, release } };
+    const { data: variants } = await c.from("store_product_variants").select("id, label, options, price_cents, inventory, sort").eq("product_id", row.id).eq("active", true).order("sort");
+    const { data: rules } = await c.from("store_shipping_rules").select("region, first_item_cents, additional_item_cents").eq("category", categoryOf(row.product_type)).eq("active", true);
+    return { product: { ...signed, release, variants: variants ?? [], shipping: rules ?? [] } };
   });
 
 // ---------- Artist management ----------
@@ -86,6 +88,10 @@ export const getMyStore = createServerFn({ method: "GET" })
     const { data: orders } = await sb.from("store_orders").select("*").or(`seller_user_id.eq.${context.userId}`).order("created_at", { ascending: false }).limit(200);
     const { data: releases } = await sb.from("distribution_releases").select("id, title").eq("user_id", context.userId).order("created_at", { ascending: false });
     const { data: isAdmin } = await sb.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    const pids = (products ?? []).map((p: any) => p.id);
+    const { data: variants } = pids.length ? await sb.from("store_product_variants").select("*").in("product_id", pids).order("sort") : { data: [] };
+    const { data: ledger } = await sb.from("store_earnings_ledger").select("order_id, entry_type, revenue_cents, cost_cents, fee_cents, artist_bps, artist_cents, platform_cents, environment, created_at").eq("seller_user_id", context.userId).order("created_at", { ascending: false }).limit(500);
+    const { data: split } = await sb.from("store_revenue_settings").select("artist_bps").eq("id", 1).maybeSingle();
     let allOrders: any[] = [];
     if (isAdmin) {
       const { data: a } = await sb.from("store_orders").select("*").order("created_at", { ascending: false }).limit(300);
@@ -98,6 +104,9 @@ export const getMyStore = createServerFn({ method: "GET" })
       allOrders,
       isAdmin: !!isAdmin,
       releases: releases ?? [],
+      variants: variants ?? [],
+      ledger: ledger ?? [],
+      artistBps: (split?.artist_bps ?? DEFAULT_ARTIST_BPS) as number,
     };
   });
 
@@ -113,6 +122,9 @@ const productSchema = z.object({
   release_id: z.string().uuid().nullable(),
   status: z.enum(["draft", "published", "archived"]),
   is_featured: z.boolean(),
+  min_quantity: z.number().int().min(1).max(10).optional().default(1),
+  made_to_order: z.boolean().optional().default(false),
+  submit_for_review: z.boolean().optional().default(false),
 });
 
 export const saveStoreProduct = createServerFn({ method: "POST" })
@@ -126,7 +138,9 @@ export const saveStoreProduct = createServerFn({ method: "POST" })
       const { data: rel } = await sb.from("distribution_releases").select("id").eq("id", data.release_id).eq("user_id", context.userId).maybeSingle();
       if (!rel) throw new Error("That release isn't yours.");
     }
-    const row = { ...data, user_id: context.userId, currency: "usd", updated_at: new Date().toISOString() };
+    const { submit_for_review, ...fields } = data;
+    const row: any = { ...fields, user_id: context.userId, currency: "usd", updated_at: new Date().toISOString() };
+    if (submit_for_review) row.review_status = "pending";
     const { id, ...rest } = row;
     const q = id
       ? sb.from("store_products").update(rest).eq("id", id).eq("user_id", context.userId).select("id").single()
@@ -142,6 +156,39 @@ export const deleteStoreProduct = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await (context.supabase as any).from("store_products").delete().eq("id", data.id).eq("user_id", context.userId);
     if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const saveStoreVariants = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({
+      productId: z.string().uuid(),
+      variants: z.array(z.object({
+        id: z.string().uuid().optional(),
+        label: z.string().trim().min(1).max(80),
+        price_cents: z.number().int().min(0).max(10_000_000),
+        inventory: z.number().int().min(0).max(1_000_000),
+        active: z.boolean(),
+      })).max(50),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: prod } = await sb.from("store_products").select("id").eq("id", data.productId).eq("user_id", context.userId).maybeSingle();
+    if (!prod) throw new Error("Product not found");
+    const { data: existing } = await sb.from("store_product_variants").select("id").eq("product_id", prod.id);
+    const keep = new Set(data.variants.map((v) => v.id).filter(Boolean));
+    const removed = (existing ?? []).map((v: any) => v.id).filter((id: string) => !keep.has(id));
+    // Variants used by past orders stay in place but are switched off.
+    if (removed.length) await sb.from("store_product_variants").update({ active: false }).in("id", removed);
+    for (const [i, v] of data.variants.entries()) {
+      const row = { label: v.label, price_cents: v.price_cents, inventory: v.inventory, active: v.active, sort: i, updated_at: new Date().toISOString() };
+      const { error } = v.id
+        ? await sb.from("store_product_variants").update(row).eq("id", v.id).eq("product_id", prod.id)
+        : await sb.from("store_product_variants").insert({ ...row, product_id: prod.id });
+      if (error) throw new Error(error.message);
+    }
     return { ok: true };
   });
 
@@ -189,16 +236,33 @@ export const confirmNfcProgrammed = createServerFn({ method: "POST" })
 export const updateOrderFulfillment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ orderId: z.string().uuid(), fulfillment_status: z.enum(FULFILLMENT_STATUSES), tracking_number: z.string().trim().max(120).optional().default("") }).parse(d),
+    z.object({
+      orderId: z.string().uuid(), fulfillment_status: z.enum(FULFILLMENT_STATUSES),
+      tracking_number: z.string().trim().max(120).optional().default(""),
+      carrier: z.string().trim().max(60).optional(),
+    }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
-    const { data: o, error } = await sb.from("store_orders")
-      .update({ fulfillment_status: data.fulfillment_status, tracking_number: data.tracking_number || null })
-      .eq("id", data.orderId).select("id").maybeSingle();
+    const { data: before } = await sb.from("store_orders").select("id, fulfillment_status, buyer_user_id, product_title, shipped_at, delivered_at").eq("id", data.orderId).maybeSingle();
+    if (!before) throw new Error("Order not found");
+    const now = new Date().toISOString();
+    const patch: any = { fulfillment_status: data.fulfillment_status, tracking_number: data.tracking_number || null };
+    if (data.carrier !== undefined) patch.carrier = data.carrier || null;
+    if (data.fulfillment_status === "shipped" && !before.shipped_at) patch.shipped_at = now;
+    if (data.fulfillment_status === "delivered" && !before.delivered_at) patch.delivered_at = now;
+    const { data: o, error } = await sb.from("store_orders").update(patch).eq("id", data.orderId).select("id").maybeSingle();
     if (error || !o) throw new Error(error?.message ?? "Order not found");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await (supabaseAdmin as any).from("store_order_events").insert({ order_id: o.id, actor_user_id: context.userId, event: `fulfillment:${data.fulfillment_status}`, details: { tracking: data.tracking_number || null } });
+    await (supabaseAdmin as any).from("store_order_events").insert({ order_id: o.id, actor_user_id: context.userId, event: `fulfillment:${data.fulfillment_status}`, details: { tracking: data.tracking_number || null, carrier: data.carrier ?? null } });
+    if (before.buyer_user_id && before.fulfillment_status !== data.fulfillment_status && (data.fulfillment_status === "shipped" || data.fulfillment_status === "delivered")) {
+      await (supabaseAdmin as any).from("notifications").insert({
+        user_id: before.buyer_user_id, actor_id: context.userId, type: "store_order",
+        title: data.fulfillment_status === "shipped" ? `Your order shipped: ${before.product_title}` : `Delivered: ${before.product_title}`,
+        body: data.tracking_number ? `${data.carrier ? data.carrier + " · " : ""}Tracking ${data.tracking_number}` : null,
+        link: "/artist-store/orders",
+      });
+    }
     return { ok: true };
   });
 
@@ -221,6 +285,8 @@ export const refundStoreOrder = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await (supabaseAdmin as any).from("store_orders").update({ status: "refunded", refunded_at: new Date().toISOString(), fulfillment_status: "cancelled" }).eq("id", o.id);
     await (supabaseAdmin as any).from("store_order_events").insert({ order_id: o.id, actor_user_id: context.userId, event: "refunded" });
+    const { reverseStoreSale } = await import("@/lib/store-ledger.server");
+    await reverseStoreSale(supabaseAdmin, o.id, "refund");
     return { error: null as string | null };
   });
 
@@ -229,7 +295,7 @@ export const listMyStoreOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data } = await (context.supabase as any).from("store_orders")
-      .select("id, product_id, product_title, quantity, unit_price_cents, amount_total_cents, currency, status, fulfillment_status, tracking_number, created_at, paid_at")
+      .select("id, product_id, product_title, variant_label, quantity, unit_price_cents, shipping_cents, amount_total_cents, currency, status, fulfillment_status, tracking_number, carrier, shipped_at, delivered_at, created_at, paid_at")
       .eq("buyer_user_id", context.userId).order("created_at", { ascending: false });
     return { orders: data ?? [] };
   });
@@ -240,6 +306,8 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
     z.object({
       productId: z.string().uuid(),
       quantity: z.number().int().min(1).max(10),
+      variantId: z.string().uuid().nullable().optional(),
+      region: z.enum(SHIPPING_REGIONS).optional().default("domestic"),
       returnUrl: z.string().url(),
       environment: z.enum(["sandbox", "live"]),
     }).parse(d),
@@ -249,11 +317,23 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
     // Price and stock are always read from the database, never from the client.
-    const { data: p } = await admin.from("store_products").select("id, user_id, title, description, price_cents, currency, inventory, status, product_type").eq("id", data.productId).maybeSingle();
+    const { data: p } = await admin.from("store_products").select("id, user_id, title, description, price_cents, cost_cents, currency, inventory, status, review_status, min_quantity, made_to_order, product_type").eq("id", data.productId).maybeSingle();
     if (!p) return { error: "Product not found", clientSecret: null };
     if (p.user_id === context.userId) return { error: "You can't buy your own product.", clientSecret: null };
-    const problem = checkPurchasable(p, data.quantity);
+    const { data: variants } = await admin.from("store_product_variants").select("id, label, price_cents, cost_cents, inventory").eq("product_id", p.id).eq("active", true);
+    let variant: any = null;
+    if ((variants ?? []).length) {
+      variant = (variants ?? []).find((v: any) => v.id === data.variantId);
+      if (!variant) return { error: "Choose an option first.", clientSecret: null };
+    }
+    const unitPrice = variant ? variant.price_cents : p.price_cents;
+    const unitCost = variant ? (variant.cost_cents ?? p.cost_cents) : p.cost_cents;
+    const { data: rule } = await admin.from("store_shipping_rules").select("first_item_cents, additional_item_cents").eq("category", categoryOf(p.product_type)).eq("region", data.region).eq("active", true).maybeSingle();
+    const problem = checkPurchasable({ ...p, price_cents: unitPrice, cost_cents: unitCost, inventory: variant ? variant.inventory : p.inventory }, data.quantity, { hasShippingRule: !!rule });
     if (problem) return { error: problem, clientSecret: null };
+    const shippingCents = computeShipping(rule, data.quantity)!;
+    const countries = data.region === "domestic" ? ["US"] : ["CA", "GB", "AU", "DE", "FR", "NL", "IE", "SE", "NO", "DK", "ES", "IT"];
+    const name = variant ? `${p.title} — ${variant.label}` : p.title;
 
     const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
     try {
@@ -267,19 +347,21 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
           quantity: data.quantity,
           price_data: {
             currency: p.currency || "usd",
-            unit_amount: p.price_cents,
-            product_data: { name: p.title, tax_code: "txcd_99999999", ...(p.description ? { description: String(p.description).slice(0, 300) } : {}) },
+            unit_amount: unitPrice,
+            product_data: { name, tax_code: "txcd_99999999", ...(p.description ? { description: String(p.description).slice(0, 300) } : {}) },
           },
         }],
         automatic_tax: { enabled: true },
-        shipping_address_collection: { allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "NL", "IE", "SE", "NO", "DK", "ES", "IT"] },
+        shipping_address_collection: { allowed_countries: countries as any },
+        shipping_options: [{ shipping_rate_data: { type: "fixed_amount", display_name: data.region === "domestic" ? "U.S. shipping" : "International shipping", fixed_amount: { amount: shippingCents, currency: p.currency || "usd" } } }],
         ...(email ? { customer_email: email } : {}),
         metadata: { kind: "store_order", productId: p.id, buyerUserId: context.userId },
         payment_intent_data: { metadata: { kind: "store_order", productId: p.id } },
       } as Stripe.Checkout.SessionCreateParams);
       const { error } = await admin.from("store_orders").insert({
         buyer_user_id: context.userId, buyer_email: email ?? null, seller_user_id: p.user_id, product_id: p.id, product_title: p.title,
-        quantity: data.quantity, unit_price_cents: p.price_cents, currency: p.currency || "usd", status: "pending",
+        quantity: data.quantity, unit_price_cents: unitPrice, unit_cost_cents: unitCost, variant_id: variant?.id ?? null, variant_label: variant?.label ?? null,
+        shipping_cents: shippingCents, shipping_region: data.region, currency: p.currency || "usd", status: "pending",
         environment: data.environment, stripe_session_id: session.id,
       });
       if (error) return { error: error.message, clientSecret: null };
