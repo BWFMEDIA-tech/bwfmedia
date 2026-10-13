@@ -234,14 +234,6 @@ function MusicEditor({ tab, update, upload, urls, tracks }: EdProps & { upload: 
   );
 }
 
-/** Moves an id one step up (-1) or down (+1) in the ordered list. */
-function moveId(ids: string[], index: number, dir: -1 | 1): string[] {
-  const to = index + dir;
-  if (index < 0 || index >= ids.length || to < 0 || to >= ids.length) return ids;
-  const next = ids.slice();
-  [next[index], next[to]] = [next[to], next[index]];
-  return next;
-}
 
 function VideoEditor({ tab, update, videos }: EdProps & { videos: any[] }) {
   return (
