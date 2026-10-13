@@ -58,6 +58,7 @@ function ManagePage() {
         </div>
         <div className="flex gap-2">
           <Link to="/artist/$id" params={{ id: user.id }} className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm"><Eye className="h-4 w-4" /> Preview storefront</Link>
+          <Link to="/artist-store/pages" className="inline-flex items-center gap-1.5 rounded-xl border border-primary px-3 py-2 text-sm text-primary"><Nfc className="h-4 w-4" /> NFC pages & tags</Link>
           <button onClick={() => { setTab("products"); setDraft({ ...EMPTY }); }} className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground"><Plus className="h-4 w-4" /> New product</button>
         </div>
       </div>
