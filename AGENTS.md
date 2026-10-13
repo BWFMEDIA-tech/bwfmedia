@@ -20,3 +20,4 @@
 - Keep rights verification admin-only (DB trigger blocks artist self-verify; admin server functions write admin_audit_log), and keep third-party rights adapters server-side and disconnected until partner access is approved, because statuses and royalties must never be fabricated.
 - Reuse ProfileMessageButton on normal and live artist profiles with the resolved account ID and existing private messages route, because owners need their own inbox and visitors need the correct recipient without duplicating messaging storage.
 - Keep a close control in the open message conversation header that returns to the conversation list at every screen size, because members need to end a conversation without leaving Messages.
+- Keep the public store on existing published merch catalog reads and artist-hosted checkout links, because presentation changes must not duplicate catalogs, invent stock or prices, or imply unconfigured NFC fulfillment.
