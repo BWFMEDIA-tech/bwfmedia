@@ -10,7 +10,7 @@ describe("nfc pages", () => {
   it("reorders tracks within bounds", () => {
     expect(moveId(["a", "b", "c"], 0, 1)).toEqual(["b", "a", "c"]);
     expect(moveId(["a", "b", "c"], 2, 1)).toEqual(["a", "b", "c"]);
-    expect(moveId(["a", "b", "c"], 2, -1)).toEqual(["a", "b", "c"]);
+    expect(moveId(["a", "b", "c"], 2, -1)).toEqual(["a", "c", "b"]);
     expect(moveId(["a", "b"], 0, -1)).toEqual(["a", "b"]);
   });
   it("drops duplicate tracks", () => expect(uniqueIds(["x", "y", "x"])).toEqual(["x", "y"]));
