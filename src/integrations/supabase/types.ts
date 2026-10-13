@@ -2572,6 +2572,153 @@ export type Database = {
           },
         ]
       }
+      nfc_pages: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          status: string
+          tabs: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          id?: string
+          name: string
+          status?: string
+          tabs?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          status?: string
+          tabs?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      nfc_tag_orders: {
+        Row: {
+          amount_total_cents: number | null
+          buyer_user_id: string
+          created_at: string
+          currency: string
+          environment: string
+          fulfillment_status: string
+          id: string
+          page_id: string | null
+          paid_at: string | null
+          product_name: string
+          quantity: number
+          shipping_address: Json | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          tag_product_id: string | null
+          tracking_number: string | null
+          unit_price_cents: number
+        }
+        Insert: {
+          amount_total_cents?: number | null
+          buyer_user_id: string
+          created_at?: string
+          currency?: string
+          environment?: string
+          fulfillment_status?: string
+          id?: string
+          page_id?: string | null
+          paid_at?: string | null
+          product_name: string
+          quantity: number
+          shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tag_product_id?: string | null
+          tracking_number?: string | null
+          unit_price_cents: number
+        }
+        Update: {
+          amount_total_cents?: number | null
+          buyer_user_id?: string
+          created_at?: string
+          currency?: string
+          environment?: string
+          fulfillment_status?: string
+          id?: string
+          page_id?: string | null
+          paid_at?: string | null
+          product_name?: string
+          quantity?: number
+          shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tag_product_id?: string | null
+          tracking_number?: string | null
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nfc_tag_orders_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_pages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nfc_tag_orders_tag_product_id_fkey"
+            columns: ["tag_product_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_tag_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nfc_tag_products: {
+        Row: {
+          active: boolean
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          min_quantity: number
+          name: string
+          price_cents: number
+          tag_type: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          min_quantity?: number
+          name: string
+          price_cents: number
+          tag_type: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          min_quantity?: number
+          name?: string
+          price_cents?: number
+          tag_type?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           email: boolean

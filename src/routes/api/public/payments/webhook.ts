@@ -347,6 +347,19 @@ async function markStoreOrderPaid(session: any, env: StripeEnv) {
   else console.log('Webhook: store order', session.id, data);
 }
 
+async function markTagOrderPaid(session: any, env: StripeEnv) {
+  if (session.payment_status === 'unpaid') return;
+  const supabase = getSupabase();
+  const { data: order } = await supabase.from('nfc_tag_orders').select('id, environment, status').eq('stripe_session_id', session.id).maybeSingle();
+  if (!order || order.environment !== env || order.status === 'paid') return;
+  const shipping = session.collected_information?.shipping_details ?? session.shipping_details ?? null;
+  const { error } = await supabase.from('nfc_tag_orders').update({
+    status: 'paid', paid_at: new Date().toISOString(), amount_total_cents: session.amount_total ?? null,
+    stripe_payment_intent_id: session.payment_intent ?? null, shipping_address: shipping,
+  }).eq('id', order.id);
+  if (error) console.error('Webhook: tag order paid failed', error);
+}
+
 function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
   if (meta.kind === 'tip') return recordTip(session);
@@ -375,6 +388,10 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
             case 'checkout.session.async_payment_succeeded':
               // Artist Store orders carry their own environment column, so
               // they are matched by session + env and handled in both modes.
+              if ((event.data.object as any)?.metadata?.kind === 'nfc_tag_order') {
+                await markTagOrderPaid(event.data.object, env);
+                break;
+              }
               if ((event.data.object as any)?.metadata?.kind === 'store_order') {
                 await markStoreOrderPaid(event.data.object, env);
                 break;

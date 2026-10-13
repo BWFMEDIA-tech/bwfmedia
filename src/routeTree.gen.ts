@@ -93,6 +93,7 @@ import { Route as ArtistStoreIndexRouteImport } from './routes/artist-store.inde
 import { Route as ArtistStoreProductIdRouteImport } from './routes/artist-store.$productId'
 import { Route as ArtistStoreManageRouteImport } from './routes/artist-store.manage'
 import { Route as ArtistStoreOrdersRouteImport } from './routes/artist-store.orders'
+import { Route as ArtistStoreTagsRouteImport } from './routes/artist-store.tags'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -111,6 +112,7 @@ import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code
 import { Route as LabelsIndexRouteImport } from './routes/labels.index'
 import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
 import { Route as NfcCodeRouteImport } from './routes/nfc.$code'
+import { Route as PCodeRouteImport } from './routes/p.$code'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
@@ -141,6 +143,8 @@ import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
+import { Route as ArtistStorePagesIndexRouteImport } from './routes/artist-store.pages.index'
+import { Route as ArtistStorePagesPageIdRouteImport } from './routes/artist-store.pages.$pageId'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
@@ -575,6 +579,11 @@ const ArtistStoreOrdersRoute = ArtistStoreOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => ArtistStoreRoute,
 } as any)
+const ArtistStoreTagsRoute = ArtistStoreTagsRouteImport.update({
+  id: '/tags',
+  path: '/tags',
+  getParentRoute: () => ArtistStoreRoute,
+} as any)
 const ArtistIdRoute = ArtistIdRouteImport.update({
   id: '/artist/$id',
   path: '/artist/$id',
@@ -667,6 +676,11 @@ const LabelsLabelIdRoute = LabelsLabelIdRouteImport.update({
 const NfcCodeRoute = NfcCodeRouteImport.update({
   id: '/nfc/$code',
   path: '/nfc/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PCodeRoute = PCodeRouteImport.update({
+  id: '/p/$code',
+  path: '/p/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayBookingIdRoute = PayBookingIdRouteImport.update({
@@ -821,6 +835,16 @@ const ApiPublicStudioBookingRoute = ApiPublicStudioBookingRouteImport.update({
   path: '/api/public/studio-booking',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArtistStorePagesIndexRoute = ArtistStorePagesIndexRouteImport.update({
+  id: '/pages/',
+  path: '/pages/',
+  getParentRoute: () => ArtistStoreRoute,
+} as any)
+const ArtistStorePagesPageIdRoute = ArtistStorePagesPageIdRouteImport.update({
+  id: '/pages/$pageId',
+  path: '/pages/$pageId',
+  getParentRoute: () => ArtistStoreRoute,
+} as any)
 const BroadcastBroadcastIdManageRoute =
   BroadcastBroadcastIdManageRouteImport.update({
     id: '/manage',
@@ -966,6 +990,7 @@ export interface FileRoutesByFullPath {
   '/artist-store/$productId': typeof ArtistStoreProductIdRoute
   '/artist-store/manage': typeof ArtistStoreManageRoute
   '/artist-store/orders': typeof ArtistStoreOrdersRoute
+  '/artist-store/tags': typeof ArtistStoreTagsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -982,6 +1007,7 @@ export interface FileRoutesByFullPath {
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/nfc/$code': typeof NfcCodeRoute
+  '/p/$code': typeof PCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1016,9 +1042,11 @@ export interface FileRoutesByFullPath {
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
+  '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/artist-store/pages/': typeof ArtistStorePagesIndexRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1109,6 +1137,7 @@ export interface FileRoutesByTo {
   '/artist-store/$productId': typeof ArtistStoreProductIdRoute
   '/artist-store/manage': typeof ArtistStoreManageRoute
   '/artist-store/orders': typeof ArtistStoreOrdersRoute
+  '/artist-store/tags': typeof ArtistStoreTagsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1125,6 +1154,7 @@ export interface FileRoutesByTo {
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/nfc/$code': typeof NfcCodeRoute
+  '/p/$code': typeof PCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1159,9 +1189,11 @@ export interface FileRoutesByTo {
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
+  '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/artist-store/pages': typeof ArtistStorePagesIndexRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1255,6 +1287,7 @@ export interface FileRoutesById {
   '/artist-store/$productId': typeof ArtistStoreProductIdRoute
   '/artist-store/manage': typeof ArtistStoreManageRoute
   '/artist-store/orders': typeof ArtistStoreOrdersRoute
+  '/artist-store/tags': typeof ArtistStoreTagsRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1271,6 +1304,7 @@ export interface FileRoutesById {
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
   '/nfc/$code': typeof NfcCodeRoute
+  '/p/$code': typeof PCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1305,9 +1339,11 @@ export interface FileRoutesById {
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
+  '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
+  '/artist-store/pages/': typeof ArtistStorePagesIndexRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1402,6 +1438,7 @@ export interface FileRouteTypes {
     | '/artist-store/$productId'
     | '/artist-store/manage'
     | '/artist-store/orders'
+    | '/artist-store/tags'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/$slug'
@@ -1418,6 +1455,7 @@ export interface FileRouteTypes {
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/nfc/$code'
+    | '/p/$code'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1452,9 +1490,11 @@ export interface FileRouteTypes {
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
+    | '/artist-store/pages/$pageId'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/events'
     | '/play/audience/$room'
+    | '/artist-store/pages/'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
@@ -1545,6 +1585,7 @@ export interface FileRouteTypes {
     | '/artist-store/$productId'
     | '/artist-store/manage'
     | '/artist-store/orders'
+    | '/artist-store/tags'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/$slug'
@@ -1561,6 +1602,7 @@ export interface FileRouteTypes {
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/nfc/$code'
+    | '/p/$code'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1595,9 +1637,11 @@ export interface FileRouteTypes {
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
+    | '/artist-store/pages/$pageId'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/events'
     | '/play/audience/$room'
+    | '/artist-store/pages'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
@@ -1690,6 +1734,7 @@ export interface FileRouteTypes {
     | '/artist-store/$productId'
     | '/artist-store/manage'
     | '/artist-store/orders'
+    | '/artist-store/tags'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/$slug'
@@ -1706,6 +1751,7 @@ export interface FileRouteTypes {
     | '/label-invite/$code'
     | '/labels/$labelId'
     | '/nfc/$code'
+    | '/p/$code'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1740,9 +1786,11 @@ export interface FileRouteTypes {
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
+    | '/artist-store/pages/$pageId'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/events'
     | '/play/audience/$room'
+    | '/artist-store/pages/'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
@@ -1822,6 +1870,7 @@ export interface RootRouteChildren {
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
   NfcCodeRoute: typeof NfcCodeRoute
+  PCodeRoute: typeof PCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
@@ -2442,6 +2491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistStoreOrdersRouteImport
       parentRoute: typeof ArtistStoreRoute
     }
+    '/artist-store/tags': {
+      id: '/artist-store/tags'
+      path: '/tags'
+      fullPath: '/artist-store/tags'
+      preLoaderRoute: typeof ArtistStoreTagsRouteImport
+      parentRoute: typeof ArtistStoreRoute
+    }
     '/artist/$id': {
       id: '/artist/$id'
       path: '/artist/$id'
@@ -2566,6 +2622,13 @@ declare module '@tanstack/react-router' {
       path: '/nfc/$code'
       fullPath: '/nfc/$code'
       preLoaderRoute: typeof NfcCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$code': {
+      id: '/p/$code'
+      path: '/p/$code'
+      fullPath: '/p/$code'
+      preLoaderRoute: typeof PCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay/$bookingId': {
@@ -2778,6 +2841,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStudioBookingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/artist-store/pages/': {
+      id: '/artist-store/pages/'
+      path: '/pages'
+      fullPath: '/artist-store/pages/'
+      preLoaderRoute: typeof ArtistStorePagesIndexRouteImport
+      parentRoute: typeof ArtistStoreRoute
+    }
+    '/artist-store/pages/$pageId': {
+      id: '/artist-store/pages/$pageId'
+      path: '/pages/$pageId'
+      fullPath: '/artist-store/pages/$pageId'
+      preLoaderRoute: typeof ArtistStorePagesPageIdRouteImport
+      parentRoute: typeof ArtistStoreRoute
+    }
     '/broadcast/$broadcastId/manage': {
       id: '/broadcast/$broadcastId/manage'
       path: '/manage'
@@ -2926,14 +3003,20 @@ interface ArtistStoreRouteChildren {
   ArtistStoreProductIdRoute: typeof ArtistStoreProductIdRoute
   ArtistStoreManageRoute: typeof ArtistStoreManageRoute
   ArtistStoreOrdersRoute: typeof ArtistStoreOrdersRoute
+  ArtistStoreTagsRoute: typeof ArtistStoreTagsRoute
   ArtistStoreIndexRoute: typeof ArtistStoreIndexRoute
+  ArtistStorePagesPageIdRoute: typeof ArtistStorePagesPageIdRoute
+  ArtistStorePagesIndexRoute: typeof ArtistStorePagesIndexRoute
 }
 
 const ArtistStoreRouteChildren: ArtistStoreRouteChildren = {
   ArtistStoreProductIdRoute: ArtistStoreProductIdRoute,
   ArtistStoreManageRoute: ArtistStoreManageRoute,
   ArtistStoreOrdersRoute: ArtistStoreOrdersRoute,
+  ArtistStoreTagsRoute: ArtistStoreTagsRoute,
   ArtistStoreIndexRoute: ArtistStoreIndexRoute,
+  ArtistStorePagesPageIdRoute: ArtistStorePagesPageIdRoute,
+  ArtistStorePagesIndexRoute: ArtistStorePagesIndexRoute,
 }
 
 const ArtistStoreRouteWithChildren = ArtistStoreRoute._addFileChildren(
@@ -3061,6 +3144,7 @@ const rootRouteChildren: RootRouteChildren = {
   LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
   NfcCodeRoute: NfcCodeRoute,
+  PCodeRoute: PCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
