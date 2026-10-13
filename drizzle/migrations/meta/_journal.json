@@ -148,6 +148,13 @@
       "when": 1791862622465,
       "tag": "0020_store_images_owner_read",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791862785455,
+      "tag": "0021_store_images_published_read",
+      "breakpoints": true
     }
   ]
 }
