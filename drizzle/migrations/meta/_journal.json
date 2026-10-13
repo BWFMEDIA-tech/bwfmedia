@@ -183,6 +183,13 @@
       "when": 1791902664227,
       "tag": "0025_nfc_tag_order_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1791904068897,
+      "tag": "0026_store_merch_pricing_split",
+      "breakpoints": true
     }
   ]
 }

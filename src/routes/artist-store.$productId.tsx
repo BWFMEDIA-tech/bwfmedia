@@ -6,7 +6,7 @@ import { ArrowLeft, Loader2, Minus, Plus, Truck, Nfc, ShieldCheck } from "lucide
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
 import { getStoreProduct, createStoreCheckout } from "@/lib/artist-store.functions";
-import { PRODUCT_TYPE_LABELS, formatPrice, isNfcType, type ProductType } from "@/lib/artist-store";
+import { PRODUCT_TYPE_LABELS, computeShipping, formatPrice, isNfcType, type ProductType } from "@/lib/artist-store";
 import { useAuth } from "@/lib/auth-context";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 
@@ -33,12 +33,16 @@ function ProductPage() {
   const [qty, setQty] = useState(1);
   const [img, setImg] = useState(0);
   const [checkout, setCheckout] = useState(false);
+  const [variantId, setVariantId] = useState<string | null>(null);
+  const [region, setRegion] = useState<"domestic" | "international">("domestic");
 
   const fetchClientSecret = useCallback(async () => {
     const r = await startCheckout({
       data: {
         productId,
         quantity: qty,
+        variantId,
+        region,
         environment: getStripeEnvironment(),
         returnUrl: `${window.location.origin}/artist-store/orders?session_id={CHECKOUT_SESSION_ID}`,
       },
@@ -49,7 +53,7 @@ function ProductPage() {
       throw new Error(r.error ?? "Checkout failed");
     }
     return r.clientSecret;
-  }, [productId, qty, startCheckout]);
+  }, [productId, qty, variantId, region, startCheckout]);
 
   if (isLoading) return <div className="grid h-[60vh] place-items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   const p: any = data?.product;
@@ -60,7 +64,16 @@ function ProductPage() {
         <Link to="/artist-store" className="mt-4 inline-block text-sm text-primary">Back to the store</Link>
       </main>
     );
-  const soldOut = p.inventory <= 0;
+  const variants: any[] = p.variants ?? [];
+  const variant = variants.find((v) => v.id === variantId) ?? null;
+  const unit = variant ? variant.price_cents : p.price_cents;
+  const stock = variant ? variant.inventory : p.inventory;
+  const minQ = Math.max(1, p.min_quantity ?? 1);
+  const soldOut = !p.made_to_order && (variants.length ? variants.every((v) => v.inventory <= 0) : p.inventory <= 0);
+  const rules: any[] = p.shipping ?? [];
+  const rule = rules.find((r) => r.region === region) ?? null;
+  const shipCents = computeShipping(rule, qty);
+  const needsOption = variants.length > 0 && !variant;
   const isOwner = user?.id === p.user_id;
 
   return (
@@ -85,8 +98,29 @@ function ProductPage() {
           {p.artist_name && (
             <Link to="/artist/$id" params={{ id: p.user_id }} className="mt-1 inline-block text-sm text-muted-foreground hover:text-primary">by {p.artist_name}</Link>
           )}
-          <div className="mt-4 text-3xl font-bold">{formatPrice(p.price_cents, p.currency)}</div>
-          <div className={`mt-1 text-sm ${soldOut ? "text-destructive" : "text-muted-foreground"}`}>{soldOut ? "Sold out" : `${p.inventory} available`}</div>
+          <div className="mt-4 text-3xl font-bold">{formatPrice(unit, p.currency)}</div>
+          <div className={`mt-1 text-sm ${soldOut ? "text-destructive" : "text-muted-foreground"}`}>{soldOut ? "Sold out" : p.made_to_order ? "Made to order" : `${stock} available`}{minQ > 1 ? ` · minimum ${minQ}` : ""}</div>
+          {variants.length > 0 && (
+            <div className="mt-4">
+              <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Choose an option</div>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v) => {
+                  const out = !p.made_to_order && v.inventory <= 0;
+                  return <button key={v.id} disabled={out} onClick={() => { setVariantId(v.id); setQty(minQ); }} className={`rounded-xl border px-3 py-2 text-sm ${variantId === v.id ? "border-primary text-primary" : "border-border"} disabled:opacity-40`}>{v.label} · {formatPrice(v.price_cents, p.currency)}</button>;
+                })}
+              </div>
+            </div>
+          )}
+          <div className="mt-4">
+            <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ship to</div>
+            <div className="flex gap-2">
+              {(["domestic", "international"] as const).map((r) => {
+                const has = rules.some((x) => x.region === r);
+                return <button key={r} disabled={!has} onClick={() => setRegion(r)} className={`rounded-xl border px-3 py-2 text-sm ${region === r ? "border-primary text-primary" : "border-border"} disabled:opacity-40`}>{r === "domestic" ? "United States" : "International"}</button>;
+              })}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">{shipCents == null ? "Shipping isn't available for this destination yet." : `Shipping ${formatPrice(shipCents, p.currency)} for ${qty} item${qty > 1 ? "s" : ""}`}</div>
+          </div>
           {p.release && <div className="mt-3 text-sm text-muted-foreground">Release: <span className="text-foreground">{p.release.title}</span></div>}
           {p.description && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{p.description}</p>}
           {isNfcType(p.product_type) && (
@@ -100,20 +134,20 @@ function ProductPage() {
           {!checkout && (
             <div className="sticky bottom-20 mt-6 flex items-center gap-3 rounded-2xl border border-border bg-background/90 p-3 backdrop-blur md:static md:border-0 md:bg-transparent md:p-0">
               <div className="flex items-center rounded-xl border border-border">
-                <button aria-label="Less" className="p-3" onClick={() => setQty((n) => Math.max(1, n - 1))}><Minus className="h-4 w-4" /></button>
+                <button aria-label="Less" className="p-3" onClick={() => setQty((n) => Math.max(minQ, n - 1))}><Minus className="h-4 w-4" /></button>
                 <span className="w-8 text-center text-sm font-bold">{qty}</span>
-                <button aria-label="More" className="p-3" onClick={() => setQty((n) => Math.min(10, Math.min(p.inventory, n + 1)))}><Plus className="h-4 w-4" /></button>
+                <button aria-label="More" className="p-3" onClick={() => setQty((n) => Math.min(10, p.made_to_order ? n + 1 : Math.min(stock, n + 1)))}><Plus className="h-4 w-4" /></button>
               </div>
               {user ? (
-                <button disabled={soldOut || isOwner} onClick={() => setCheckout(true)} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">
-                  {isOwner ? "This is your product" : soldOut ? "Sold out" : `Buy now · ${formatPrice(p.price_cents * qty, p.currency)}`}
+                <button disabled={soldOut || isOwner || needsOption || shipCents == null} onClick={() => setCheckout(true)} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">
+                  {isOwner ? "This is your product" : soldOut ? "Sold out" : needsOption ? "Choose an option" : `Buy now · ${formatPrice(unit * qty + (shipCents ?? 0), p.currency)}`}
                 </button>
               ) : (
                 <Link to="/login" className="flex-1 rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-foreground">Sign in to buy</Link>
               )}
             </div>
           )}
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" /> Secure checkout. Tax and shipping address collected at checkout.</div>
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" /> Secure checkout. Price includes shipping; tax is added at checkout.</div>
         </div>
       </div>
       {checkout && (

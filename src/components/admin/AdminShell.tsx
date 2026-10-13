@@ -67,6 +67,7 @@ const NAV: NavEntry[] = [
   { kind: "link", to: "/admin/artist-referrals", label: "Artist Referrals", icon: BarChart3 },
   { kind: "link", to: "/admin/rights", label: "Music Rights", icon: ShieldCheck },
   { kind: "link", to: "/admin/nfc-orders", label: "NFC Tag Orders", icon: BarChart3 },
+  { kind: "link", to: "/admin/merchandise", label: "Merchandise", icon: BarChart3 },
   { kind: "link", to: "/admin/assistant", label: "AI Assistant", icon: BarChart3 },
   {
     kind: "group", key: "trust", label: "Trust & Safety", icon: ShieldCheck,

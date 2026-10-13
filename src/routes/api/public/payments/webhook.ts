@@ -343,8 +343,22 @@ async function markStoreOrderPaid(session: any, env: StripeEnv) {
     _email: session.customer_details?.email ?? null,
     _shipping: shipping,
   });
-  if (error) console.error('Webhook: store order paid failed', error);
-  else console.log('Webhook: store order', session.id, data);
+  if (error) { console.error('Webhook: store order paid failed', error); return; }
+  console.log('Webhook: store order', session.id, data);
+  const { recordStoreSale } = await import('@/lib/store-ledger.server');
+  await recordStoreSale(supabase, order.id, env);
+}
+
+async function closeStoreOrderByIntent(intent: string, env: StripeEnv, reason: 'refund' | 'chargeback') {
+  const supabase: any = getSupabase();
+  const { data: o } = await supabase.from('store_orders').select('id, status').eq('stripe_payment_intent_id', intent).eq('environment', env).maybeSingle();
+  if (!o) return;
+  if (o.status === 'paid') {
+    await supabase.from('store_orders').update({ status: 'refunded', refunded_at: new Date().toISOString(), fulfillment_status: 'cancelled' }).eq('id', o.id).eq('status', 'paid');
+    await supabase.from('store_order_events').insert({ order_id: o.id, event: reason === 'refund' ? 'refunded' : 'chargeback' });
+  }
+  const { reverseStoreSale } = await import('@/lib/store-ledger.server');
+  await reverseStoreSale(supabase, o.id, reason);
 }
 
 async function markTagOrderPaid(session: any, env: StripeEnv) {
@@ -445,17 +459,27 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
             }
             case 'charge.refunded': {
               const ch: any = event.data.object;
-              if (ch.refunded && ch.payment_intent) await markTagOrderClosed({ intent: ch.payment_intent }, env, 'refunded');
+              if (ch.refunded && ch.payment_intent) {
+                await markTagOrderClosed({ intent: ch.payment_intent }, env, 'refunded');
+                await closeStoreOrderByIntent(ch.payment_intent, env, 'refund');
+              }
+              break;
+            }
+            case 'charge.dispute.created': {
+              const d: any = event.data.object;
+              if (d.payment_intent) await closeStoreOrderByIntent(d.payment_intent, env, 'chargeback');
               break;
             }
             case 'checkout.session.async_payment_failed': {
               const s: any = event.data.object;
               if (s?.metadata?.kind === 'nfc_tag_order') await markTagOrderClosed({ session: s.id }, env, 'cancelled');
+              if (s?.metadata?.kind === 'store_order') await getSupabase().from('store_orders').update({ status: 'failed' }).eq('stripe_session_id', s.id).eq('status', 'pending');
               break;
             }
             case 'checkout.session.expired': {
               const s: any = event.data.object;
               if (s?.metadata?.kind === 'nfc_tag_order') await markTagOrderClosed({ session: s.id }, env, 'cancelled');
+              if (s?.metadata?.kind === 'store_order') await getSupabase().from('store_orders').update({ status: 'expired' }).eq('stripe_session_id', s.id).eq('status', 'pending');
               await sendStripeCancellationEmail(getSupabase(), s.customer_email ?? s.customer_details?.email, s.id);
               break;
             }

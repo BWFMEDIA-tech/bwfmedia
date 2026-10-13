@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
-  getMyStore, saveStoreProduct, deleteStoreProduct, saveNfcLink, confirmNfcProgrammed, updateOrderFulfillment, refundStoreOrder,
+  getMyStore, saveStoreProduct, saveStoreVariants, deleteStoreProduct, saveNfcLink, confirmNfcProgrammed, updateOrderFulfillment, refundStoreOrder,
 } from "@/lib/artist-store.functions";
-import { PRODUCT_TYPES, PRODUCT_TYPE_LABELS, FULFILLMENT_STATUSES, formatPrice, isNfcType, isSafeNfcPath, type ProductType } from "@/lib/artist-store";
+import { PRODUCT_TYPES, PRODUCT_TYPE_LABELS, FULFILLMENT_STATUSES, SUGGESTED_PRICE_CENTS, computeSplit, formatPrice, isNfcType, isSafeNfcPath, type ProductType } from "@/lib/artist-store";
 
 export const Route = createFileRoute("/artist-store/manage")({
   head: () => ({
@@ -29,8 +29,9 @@ export const Route = createFileRoute("/artist-store/manage")({
 type Draft = {
   id?: string; title: string; description: string; product_type: ProductType; price: string; inventory: string;
   shipping_info: string; image_urls: string[]; previews: string[]; release_id: string | null; status: "draft" | "published" | "archived"; is_featured: boolean;
+  min_quantity: string; made_to_order: boolean; review_status: string; cost_cents: number | null; variants: { id?: string; label: string; price: string; inventory: string; active: boolean }[];
 };
-const EMPTY: Draft = { title: "", description: "", product_type: "vinyl", price: "", inventory: "0", shipping_info: "", image_urls: [], previews: [], release_id: null, status: "draft", is_featured: false };
+const EMPTY: Draft = { title: "", description: "", product_type: "vinyl", price: "", inventory: "0", shipping_info: "", image_urls: [], previews: [], release_id: null, status: "draft", is_featured: false, min_quantity: "1", made_to_order: false, review_status: "draft", cost_cents: null, variants: [] };
 
 function ManagePage() {
   const { user, loading } = useAuth();
@@ -48,6 +49,10 @@ function ManagePage() {
   const orders = data.isAdmin ? data.allOrders : data.orders;
   const paid = data.orders.filter((o: any) => o.status === "paid");
   const sales = paid.reduce((s: number, o: any) => s + (o.amount_total_cents ?? 0), 0);
+  const earned = (data.ledger ?? []).filter((l: any) => l.environment === "live").reduce((s: number, l: any) => s + l.artist_cents, 0);
+  const toDraft = (p: any): Draft => ({ id: p.id, title: p.title, description: p.description ?? "", product_type: p.product_type, price: (p.price_cents / 100).toFixed(2), inventory: String(p.inventory), shipping_info: p.shipping_info ?? "", image_urls: p.image_urls ?? [], previews: p.images, release_id: p.release_id, status: p.status, is_featured: p.is_featured,
+    min_quantity: String(p.min_quantity ?? 1), made_to_order: !!p.made_to_order, review_status: p.review_status ?? "draft", cost_cents: p.cost_cents ?? null,
+    variants: (data.variants ?? []).filter((v: any) => v.product_id === p.id && v.active).map((v: any) => ({ id: v.id, label: v.label, price: (v.price_cents / 100).toFixed(2), inventory: String(v.inventory), active: true })) });
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-6 sm:px-6">
@@ -68,6 +73,11 @@ function ManagePage() {
         <Stat label="Paid orders" value={String(paid.length)} />
         <Stat label="Sales" value={formatPrice(sales)} />
       </div>
+      <div className="mt-2 rounded-2xl border border-border bg-card p-3 text-sm">
+        <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Your finalized earnings</div>
+        <div className="mt-1 text-lg font-bold">{formatPrice(earned)}</div>
+        <p className="text-xs text-muted-foreground">You receive {(data.artistBps / 100).toFixed(0)}% of net profit (price minus product cost and payment fee; tax and shipping excluded). Refunds and chargebacks are taken back automatically.</p>
+      </div>
 
       <div className="mt-5 flex gap-2 border-b border-border">
         {(["products", "orders"] as const).map((t) => (
@@ -79,7 +89,7 @@ function ManagePage() {
 
       {tab === "products" && (
         <>
-          {draft && <ProductEditor draft={draft} setDraft={setDraft} releases={data.releases} userId={user.id} nfcLink={data.nfcLinks.find((l: any) => l.product_id === draft.id)} onSaved={() => qc.invalidateQueries({ queryKey: ["my-artist-store"] })} />}
+          {draft && <ProductEditor artistBps={data.artistBps} draft={draft} setDraft={setDraft} releases={data.releases} userId={user.id} nfcLink={data.nfcLinks.find((l: any) => l.product_id === draft.id)} onSaved={() => qc.invalidateQueries({ queryKey: ["my-artist-store"] })} />}
           {data.products.length === 0 && !draft ? (
             <div className="mt-6 rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">No products yet. Tap <strong>New product</strong> to add your first physical release.</div>
           ) : (
@@ -91,8 +101,9 @@ function ManagePage() {
                     <div className="truncate text-sm font-semibold">{p.title}</div>
                     <div className="text-xs text-muted-foreground">{PRODUCT_TYPE_LABELS[p.product_type as ProductType]} · {formatPrice(p.price_cents)} · {p.inventory} left</div>
                     <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${p.status === "published" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>{p.status}</span>
+                    <span className={`ml-1 mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${p.review_status === "approved" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>{p.review_status === "approved" ? "Approved" : p.review_status === "pending" ? "In review" : p.review_status === "disabled" ? "Disabled" : "Not submitted"}</span>
                     <div className="mt-2 flex gap-1">
-                      <button aria-label="Edit" onClick={() => setDraft({ id: p.id, title: p.title, description: p.description ?? "", product_type: p.product_type, price: (p.price_cents / 100).toFixed(2), inventory: String(p.inventory), shipping_info: p.shipping_info ?? "", image_urls: p.image_urls ?? [], previews: p.images, release_id: p.release_id, status: p.status, is_featured: p.is_featured })} className="rounded-lg border border-border p-1.5"><Pencil className="h-3.5 w-3.5" /></button>
+                      <button aria-label="Edit" onClick={() => setDraft(toDraft(p))} className="rounded-lg border border-border p-1.5"><Pencil className="h-3.5 w-3.5" /></button>
                       <button aria-label="Delete" onClick={async () => { if (!confirm("Delete this product?")) return; try { await del({ data: { id: p.id } }); toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["my-artist-store"] }); } catch (e: any) { toast.error(e.message); } }} className="rounded-lg border border-border p-1.5"><Trash2 className="h-3.5 w-3.5" /></button>
                       {p.status === "published" && <Link to="/artist-store/$productId" params={{ productId: p.id }} className="rounded-lg border border-border p-1.5"><ExternalLink className="h-3.5 w-3.5" /></Link>}
                     </div>
@@ -115,17 +126,23 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 const field = "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
 
-function ProductEditor({ draft, setDraft, releases, userId, nfcLink, onSaved }: { draft: Draft; setDraft: (d: Draft | null) => void; releases: any[]; userId: string; nfcLink?: any; onSaved: () => void }) {
+function ProductEditor({ artistBps, draft, setDraft, releases, userId, nfcLink, onSaved }: { artistBps: number; draft: Draft; setDraft: (d: Draft | null) => void; releases: any[]; userId: string; nfcLink?: any; onSaved: () => void }) {
   const save = useServerFn(saveStoreProduct);
+  const saveVariants = useServerFn(saveStoreVariants);
   const [uploading, setUploading] = useState(false);
   const set = (patch: Partial<Draft>) => setDraft({ ...draft, ...patch });
   const m = useMutation({
-    mutationFn: () => save({ data: {
-      id: draft.id, title: draft.title, description: draft.description, product_type: draft.product_type,
-      price_cents: Math.round(Number(draft.price || 0) * 100), inventory: Math.max(0, parseInt(draft.inventory || "0", 10) || 0),
-      shipping_info: draft.shipping_info, image_urls: draft.image_urls, release_id: draft.release_id, status: draft.status, is_featured: draft.is_featured,
-    } }),
-    onSuccess: (r) => { toast.success("Product saved"); setDraft({ ...draft, id: r.id }); onSaved(); },
+    mutationFn: async (submit: boolean) => {
+      const r = await save({ data: {
+        id: draft.id, title: draft.title, description: draft.description, product_type: draft.product_type,
+        price_cents: Math.round(Number(draft.price || 0) * 100), inventory: Math.max(0, parseInt(draft.inventory || "0", 10) || 0),
+        shipping_info: draft.shipping_info, image_urls: draft.image_urls, release_id: draft.release_id, status: draft.status, is_featured: draft.is_featured,
+        min_quantity: Math.min(10, Math.max(1, parseInt(draft.min_quantity || "1", 10) || 1)), made_to_order: draft.made_to_order, submit_for_review: submit,
+      } });
+      await saveVariants({ data: { productId: r.id, variants: draft.variants.filter((v) => v.label.trim()).map((v) => ({ id: v.id, label: v.label.trim(), price_cents: Math.round(Number(v.price || 0) * 100), inventory: Math.max(0, parseInt(v.inventory || "0", 10) || 0), active: v.active })) } });
+      return { ...r, submit };
+    },
+    onSuccess: (r) => { toast.success(r.submit ? "Sent to Tunevio for review" : "Product saved"); setDraft({ ...draft, id: r.id, review_status: r.submit ? "pending" : draft.review_status }); onSaved(); },
     onError: (e: any) => toast.error(e.message ?? "Save failed"),
   });
 
@@ -162,8 +179,29 @@ function ProductEditor({ draft, setDraft, releases, userId, nfcLink, onSaved }: 
             {releases.map((r) => <option key={r.id} value={r.id}>{r.title}</option>)}
           </select>
         </label>
-        <label className="text-xs text-muted-foreground">Price (USD)<input className={field} inputMode="decimal" value={draft.price} onChange={(e) => set({ price: e.target.value.replace(/[^0-9.]/g, "") })} placeholder="25.00" /></label>
+        <label className="text-xs text-muted-foreground">Price (USD)<input className={field} inputMode="decimal" value={draft.price} onChange={(e) => set({ price: e.target.value.replace(/[^0-9.]/g, "") })} placeholder="25.00" />
+          {SUGGESTED_PRICE_CENTS[draft.product_type] && <button type="button" onClick={() => set({ price: (SUGGESTED_PRICE_CENTS[draft.product_type]! / 100).toFixed(2) })} className="mt-1 text-[11px] text-primary">Use suggested {formatPrice(SUGGESTED_PRICE_CENTS[draft.product_type]!)}</button>}
+        </label>
         <label className="text-xs text-muted-foreground">Inventory<input className={field} inputMode="numeric" value={draft.inventory} onChange={(e) => set({ inventory: e.target.value.replace(/\D/g, "") })} /></label>
+        <label className="text-xs text-muted-foreground">Minimum per order<input className={field} inputMode="numeric" value={draft.min_quantity} onChange={(e) => set({ min_quantity: e.target.value.replace(/\D/g, "") })} /></label>
+        <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" checked={draft.made_to_order} onChange={(e) => set({ made_to_order: e.target.checked })} /> Made to order (no stock limit)</label>
+        <div className="sm:col-span-2 rounded-xl border border-border p-3">
+          <div className="flex items-center justify-between text-xs"><span className="font-semibold">Options (sizes, colors, editions)</span>
+            <button type="button" className="text-primary" onClick={() => set({ variants: [...draft.variants, { label: "", price: draft.price, inventory: "0", active: true }] })}>+ Add option</button></div>
+          {draft.variants.length === 0 && <p className="mt-1 text-[11px] text-muted-foreground">Optional. Each option has its own price and stock.</p>}
+          {draft.variants.map((v, i) => {
+            const up = (patch: Partial<typeof v>) => set({ variants: draft.variants.map((x, j) => (j === i ? { ...x, ...patch } : x)) });
+            return (
+              <div key={i} className="mt-2 grid grid-cols-[1fr_5rem_4rem_auto] gap-2">
+                <input className={field} placeholder="e.g. Large / Black" value={v.label} onChange={(e) => up({ label: e.target.value })} maxLength={80} aria-label="Option name" />
+                <input className={field} inputMode="decimal" value={v.price} onChange={(e) => up({ price: e.target.value.replace(/[^0-9.]/g, "") })} aria-label="Option price" />
+                <input className={field} inputMode="numeric" value={v.inventory} onChange={(e) => up({ inventory: e.target.value.replace(/\D/g, "") })} aria-label="Option stock" />
+                <button type="button" aria-label="Remove option" onClick={() => set({ variants: draft.variants.filter((_, j) => j !== i) })}><X className="h-4 w-4" /></button>
+              </div>
+            );
+          })}
+        </div>
+        <EarningsEstimate price={draft.price} cost={draft.cost_cents} bps={artistBps} />
         <label className="sm:col-span-2 text-xs text-muted-foreground">Description<textarea className={field} rows={3} value={draft.description} onChange={(e) => set({ description: e.target.value })} maxLength={4000} /></label>
         <label className="sm:col-span-2 text-xs text-muted-foreground">Shipping details<textarea className={field} rows={2} value={draft.shipping_info} onChange={(e) => set({ shipping_info: e.target.value })} placeholder="Ships in 3–5 business days from …" maxLength={2000} /></label>
         <div className="sm:col-span-2">
@@ -188,12 +226,28 @@ function ProductEditor({ draft, setDraft, releases, userId, nfcLink, onSaved }: 
         </label>
         <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" checked={draft.is_featured} onChange={(e) => set({ is_featured: e.target.checked })} /> Feature in store</label>
       </div>
-      <button disabled={m.isPending || !draft.title} onClick={() => m.mutate()} className="mt-4 w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50 sm:w-auto sm:px-6">
-        {m.isPending ? "Saving…" : "Save product"}
-      </button>
+      <p className="mt-3 text-xs text-muted-foreground">
+        {draft.review_status === "approved" ? "Approved for sale. Changing the price, type or options sends it back to review." : draft.review_status === "pending" ? "Waiting for Tunevio review. Fans can buy once it's approved." : draft.review_status === "disabled" ? "Disabled by Tunevio. Contact support." : "Not on sale yet. Submit it for review when it's ready."}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button disabled={m.isPending || !draft.title} onClick={() => m.mutate(false)} className="w-full rounded-xl border border-primary py-2.5 text-sm font-bold text-primary disabled:opacity-50 sm:w-auto sm:px-6">
+          {m.isPending ? "Saving…" : "Save product"}
+        </button>
+        {draft.review_status === "draft" && (
+          <button disabled={m.isPending || !draft.title || !draft.image_urls.length} onClick={() => m.mutate(true)} className="w-full rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50 sm:w-auto sm:px-6">Save & submit for review</button>
+        )}
+      </div>
       {isNfcType(draft.product_type) && (draft.id ? <NfcPanel productId={draft.id} userId={userId} link={nfcLink} releases={releases} onSaved={onSaved} /> : <p className="mt-4 text-xs text-muted-foreground">Save the product first to set up its NFC tag.</p>)}
     </section>
   );
+}
+
+function EarningsEstimate({ price, cost, bps }: { price: string; cost: number | null; bps: number }) {
+  const cents = Math.round(Number(price || 0) * 100);
+  if (!cents) return null;
+  if (cost == null) return <p className="sm:col-span-2 text-xs text-muted-foreground">Estimated earnings appear after Tunevio confirms the product cost.</p>;
+  const est = computeSplit({ revenue_cents: cents, cost_cents: cost, fee_cents: Math.round(cents * 0.029 + 30), artist_bps: bps });
+  return <p className="sm:col-span-2 text-xs text-muted-foreground">Estimated per item: you earn about <strong className="text-foreground">{formatPrice(est.artist_cents)}</strong> (cost {formatPrice(cost)}, estimated payment fee). Final amounts use the actual fee.</p>;
 }
 
 function NfcPanel({ productId, userId, link, releases, onSaved }: { productId: string; userId: string; link?: any; releases: any[]; onSaved: () => void }) {
@@ -276,6 +330,7 @@ function OrdersTable({ orders, onChanged }: { orders: any[]; onChanged: () => vo
                 {FULFILLMENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
               <input defaultValue={o.tracking_number ?? ""} placeholder="Tracking #" onBlur={async (e) => { if (e.target.value === (o.tracking_number ?? "")) return; await update({ data: { orderId: o.id, fulfillment_status: o.fulfillment_status, tracking_number: e.target.value } }); toast.success("Tracking saved"); onChanged(); }} className="rounded-lg border border-border bg-background px-2 py-1 text-xs" />
+              <input defaultValue={o.carrier ?? ""} placeholder="Carrier" onBlur={async (e) => { if (e.target.value === (o.carrier ?? "")) return; await update({ data: { orderId: o.id, fulfillment_status: o.fulfillment_status, tracking_number: o.tracking_number ?? "", carrier: e.target.value } }); toast.success("Carrier saved"); onChanged(); }} className="w-24 rounded-lg border border-border bg-background px-2 py-1 text-xs" />
               <button onClick={async () => { if (!confirm("Refund this order in full?")) return; const r = await refund({ data: { orderId: o.id } }); if (r.error) toast.error(r.error); else { toast.success("Refunded"); onChanged(); } }} className="ml-auto rounded-lg border border-destructive/50 px-2 py-1 text-xs text-destructive">Refund</button>
             </div>
           )}
