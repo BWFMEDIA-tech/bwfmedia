@@ -1,5 +1,5 @@
 export type StoreCategory = "All" | "Vinyl" | "CDs & cassettes" | "Apparel" | "NFC & collectibles";
-export const storeCategories: StoreCategory[] = ["All", "Vinyl", "CDs & cassettes", "Apparel", "NFC & collectibles"];
+export const storeCategories: StoreCategory[] = ["All", "NFC & collectibles", "CDs & cassettes", "Apparel", "Vinyl"];
 export interface StoreVariant { shopify_variant_id: string; available: boolean; }
 export interface StoreProduct {
   id: string;
