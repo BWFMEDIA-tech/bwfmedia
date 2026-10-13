@@ -200,10 +200,47 @@ function MusicEditor({ tab, update, upload, urls, tracks }: EdProps & { upload: 
             ); })}
           </div>
         )}
+        {ids.length > 1 && (
+          <div className="mt-4 border border-border p-3">
+            <p className="text-xs font-bold uppercase tracking-wider">Song order</p>
+            <p className="mt-1 text-xs text-muted-foreground">Fans hear them in this order. Use the arrows to move a song up or down.</p>
+            <ul className="mt-2 space-y-1">
+              {ids.map((id, idx) => { const t = tracks.find((x: any) => x.id === id); if (!t) return null; return (
+                <li key={id} className="flex items-center gap-2 border border-border px-3 py-2 text-sm">
+                  <span className="w-5 shrink-0 text-xs tabular-nums text-muted-foreground">{idx + 1}.</span>
+                  <span className="min-w-0 flex-1 truncate">{t.title}</span>
+                  <button
+                    type="button"
+                    aria-label={`Move ${t.title} up`}
+                    disabled={idx === 0}
+                    onClick={() => update({ trackIds: moveId(ids, idx, -1) })}
+                    className="grid h-7 w-7 place-items-center border border-border text-muted-foreground hover:text-foreground disabled:opacity-30"
+                  ><ArrowUp className="h-3.5 w-3.5" /></button>
+                  <button
+                    type="button"
+                    aria-label={`Move ${t.title} down`}
+                    disabled={idx === ids.length - 1}
+                    onClick={() => update({ trackIds: moveId(ids, idx, 1) })}
+                    className="grid h-7 w-7 place-items-center border border-border text-muted-foreground hover:text-foreground disabled:opacity-30"
+                  ><ArrowDown className="h-3.5 w-3.5" /></button>
+                </li>
+              ); })}
+            </ul>
+          </div>
+        )}
         <p className="mt-2 text-xs text-muted-foreground">Only songs already on Tunevio. Each song can be added once. <Link to="/upload" className="text-primary">Upload a new song</Link></p>
       </div>
     </>
   );
+}
+
+/** Moves an id one step up (-1) or down (+1) in the ordered list. */
+function moveId(ids: string[], index: number, dir: -1 | 1): string[] {
+  const to = index + dir;
+  if (index < 0 || index >= ids.length || to < 0 || to >= ids.length) return ids;
+  const next = ids.slice();
+  [next[index], next[to]] = [next[to], next[index]];
+  return next;
 }
 
 function VideoEditor({ tab, update, videos }: EdProps & { videos: any[] }) {
