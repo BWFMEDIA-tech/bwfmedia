@@ -52,7 +52,7 @@ function ArtistStorePage() {
             Turn your releases into collectible products. Let fans own your music on vinyl, CDs, NFC keychains, and other physical formats.
           </p>
           <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
-            <Link to="/artist-store/manage" className="flex flex-col items-center gap-1.5 rounded-xl bg-primary px-2 py-4 text-center text-xs font-bold text-primary-foreground shadow-[0_0_24px_hsl(var(--primary)/0.35)] transition hover:opacity-90 sm:text-sm">
+            <Link to="/artist-store/manage" className="flex flex-col items-center gap-1.5 rounded-xl bg-primary px-2 py-4 text-center text-xs font-bold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 sm:text-sm">
               <Store className="h-4 w-4" /> Artist Store
             </Link>
             <button onClick={() => setCat("nfc_keychain")} className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background/60 px-2 py-4 text-xs font-bold transition hover:border-primary sm:text-sm">
