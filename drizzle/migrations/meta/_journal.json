@@ -141,6 +141,13 @@
       "when": 1791861020415,
       "tag": "0019_artist_store",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791862622465,
+      "tag": "0020_store_images_owner_read",
+      "breakpoints": true
     }
   ]
 }
