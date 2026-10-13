@@ -19,7 +19,7 @@ export function NfcPagePreview({ name, tabs, artistName, full }: { name: string;
       <div className="min-h-0 flex-1 overflow-y-auto">
         {!t ? <div className="grid h-full place-items-center text-sm font-bold uppercase tracking-widest text-muted-foreground">Preview</div> : t.type === "music" ? (
           <div>
-            <div className="aspect-square bg-gradient-to-br from-muted via-secondary to-muted">{t.coverUrl && <img src={t.coverUrl} alt="" className="h-full w-full object-cover" />}</div>
+            <KeychainCover src={t.coverUrl} />
             <div className="space-y-1 p-4">
               <h2 className="text-xl font-bold">{t.subtitle || name}</h2>
               <p className="text-sm text-primary">{t.artist || artistName}</p>
