@@ -66,6 +66,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminArtistReferralsRouteImport } from './routes/admin.artist-referrals'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
+import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-bookings'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
@@ -444,6 +445,11 @@ const AdminArtistReferralsRoute = AdminArtistReferralsRouteImport.update({
 const AdminArtistsRoute = AdminArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAssistantRoute = AdminAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
@@ -976,6 +982,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -1125,6 +1132,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -1277,6 +1285,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -1430,6 +1439,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/artist-referrals'
     | '/admin/artists'
+    | '/admin/assistant'
     | '/admin/audit'
     | '/admin/block-bookings'
     | '/admin/bookings'
@@ -1579,6 +1589,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/artist-referrals'
     | '/admin/artists'
+    | '/admin/assistant'
     | '/admin/audit'
     | '/admin/block-bookings'
     | '/admin/bookings'
@@ -1730,6 +1741,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/artist-referrals'
     | '/admin/artists'
+    | '/admin/assistant'
     | '/admin/audit'
     | '/admin/block-bookings'
     | '/admin/bookings'
@@ -2326,6 +2338,13 @@ declare module '@tanstack/react-router' {
       path: '/artists'
       fullPath: '/admin/artists'
       preLoaderRoute: typeof AdminArtistsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/assistant': {
+      id: '/admin/assistant'
+      path: '/assistant'
+      fullPath: '/admin/assistant'
+      preLoaderRoute: typeof AdminAssistantRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/audit': {
@@ -2979,6 +2998,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminArtistReferralsRoute: typeof AdminArtistReferralsRoute
   AdminArtistsRoute: typeof AdminArtistsRoute
+  AdminAssistantRoute: typeof AdminAssistantRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBlockBookingsRoute: typeof AdminBlockBookingsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
@@ -3010,6 +3030,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminArtistReferralsRoute: AdminArtistReferralsRoute,
   AdminArtistsRoute: AdminArtistsRoute,
+  AdminAssistantRoute: AdminAssistantRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBlockBookingsRoute: AdminBlockBookingsRoute,
   AdminBookingsRoute: AdminBookingsRoute,

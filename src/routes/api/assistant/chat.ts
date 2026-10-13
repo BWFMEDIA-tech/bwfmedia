@@ -135,10 +135,14 @@ ${kb}`;
             }
             if (!userId || !userDb) return;
             const userMsg = all[all.length - 2];
-            const rows = [userMsg, responseMessage].filter(Boolean).map((m) => ({
-              user_id: userId!, message_id: m.id, role: m.role, parts: m.parts as any,
-            }));
-            const { error } = await userDb.from("assistant_messages").upsert(rows, { onConflict: "user_id,message_id", ignoreDuplicates: true });
+            let error: { message: string } | null = null;
+            for (const m of [userMsg, responseMessage].filter(Boolean)) {
+              const r = await userDb.from("assistant_messages").upsert(
+                { user_id: userId!, message_id: m.id, role: m.role, parts: m.parts as any },
+                { onConflict: "user_id,message_id", ignoreDuplicates: true },
+              );
+              if (r.error) error = r.error;
+            }
             if (error) console.error("[assistant] save failed", error.message);
           },
         });
