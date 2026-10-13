@@ -58,7 +58,7 @@ function ArtistStorePage() {
             <button onClick={() => setCat("nfc_keychain")} className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background/60 px-2 py-4 text-xs font-bold transition hover:border-primary sm:text-sm">
               <Nfc className="h-4 w-4" /> NFC Products
             </button>
-            <Link to="/artist-store/orders" className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background/60 px-2 py-4 text-xs font-bold transition hover:border-primary sm:text-sm">
+            <Link to="/artist-store/orders" search={{ session_id: undefined }} className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background/60 px-2 py-4 text-xs font-bold transition hover:border-primary sm:text-sm">
               <Package className="h-4 w-4" /> Orders
             </Link>
           </div>
