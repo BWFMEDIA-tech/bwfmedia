@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Add the physical music and NFC store page with original visuals, existing catalog purchase links, mobile navigation, and desktop/phone verification.
 - [x] Add a visible mobile-friendly Inbox/Message action on normal and live artist profiles using existing messaging.
 - [x] Add an X to the open message conversation so members can close it when done messaging; verified closing on desktop and phone.
 - [x] Add a Go Live button to the mobile bottom bar; signed-in opens the live setup, signed-out asks to sign in first.
