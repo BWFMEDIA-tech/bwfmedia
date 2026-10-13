@@ -78,6 +78,7 @@ import { Route as AdminHostTiersRouteImport } from './routes/admin.host-tiers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminNfcOrdersRouteImport } from './routes/admin.nfc-orders'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
@@ -505,6 +506,11 @@ const AdminMerchRoute = AdminMerchRouteImport.update({
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNfcOrdersRoute = AdminNfcOrdersRouteImport.update({
+  id: '/nfc-orders',
+  path: '/nfc-orders',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminOpsRoute = AdminOpsRouteImport.update({
@@ -994,6 +1000,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
@@ -1144,6 +1151,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
@@ -1297,6 +1305,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/merch': typeof AdminMerchRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
@@ -1451,6 +1460,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
+    | '/admin/nfc-orders'
     | '/admin/ops'
     | '/admin/payouts'
     | '/admin/profile'
@@ -1601,6 +1611,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
+    | '/admin/nfc-orders'
     | '/admin/ops'
     | '/admin/payouts'
     | '/admin/profile'
@@ -1753,6 +1764,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/merch'
     | '/admin/messages'
+    | '/admin/nfc-orders'
     | '/admin/ops'
     | '/admin/payouts'
     | '/admin/profile'
@@ -2424,6 +2436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMessagesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/nfc-orders': {
+      id: '/admin/nfc-orders'
+      path: '/nfc-orders'
+      fullPath: '/admin/nfc-orders'
+      preLoaderRoute: typeof AdminNfcOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ops': {
       id: '/admin/ops'
       path: '/ops'
@@ -3010,6 +3029,7 @@ interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMerchRoute: typeof AdminMerchRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminNfcOrdersRoute: typeof AdminNfcOrdersRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPayoutsRoute: typeof AdminPayoutsRoute
   AdminProfileRoute: typeof AdminProfileRoute
@@ -3042,6 +3062,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminMerchRoute: AdminMerchRoute,
   AdminMessagesRoute: AdminMessagesRoute,
+  AdminNfcOrdersRoute: AdminNfcOrdersRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPayoutsRoute: AdminPayoutsRoute,
   AdminProfileRoute: AdminProfileRoute,
