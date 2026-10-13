@@ -3991,6 +3991,233 @@ export type Database = {
         }
         Relationships: []
       }
+      store_nfc_links: {
+        Row: {
+          code: string
+          created_at: string
+          destination_path: string
+          destination_type: string
+          id: string
+          last_scanned_at: string | null
+          product_id: string
+          programmed_confirmed_at: string | null
+          scan_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          destination_path?: string
+          destination_type?: string
+          id?: string
+          last_scanned_at?: string | null
+          product_id: string
+          programmed_confirmed_at?: string | null
+          scan_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          destination_path?: string
+          destination_type?: string
+          id?: string
+          last_scanned_at?: string | null
+          product_id?: string
+          programmed_confirmed_at?: string | null
+          scan_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_nfc_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_order_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          details: Json | null
+          event: string
+          id: string
+          order_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json | null
+          event: string
+          id?: string
+          order_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json | null
+          event?: string
+          id?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "store_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_orders: {
+        Row: {
+          amount_total_cents: number | null
+          buyer_email: string | null
+          buyer_user_id: string | null
+          created_at: string
+          currency: string
+          environment: string
+          fulfillment_status: string
+          id: string
+          paid_at: string | null
+          product_id: string | null
+          product_title: string
+          quantity: number
+          refunded_at: string | null
+          seller_user_id: string
+          shipping_address: Json | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          tracking_number: string | null
+          unit_price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          amount_total_cents?: number | null
+          buyer_email?: string | null
+          buyer_user_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          fulfillment_status?: string
+          id?: string
+          paid_at?: string | null
+          product_id?: string | null
+          product_title: string
+          quantity?: number
+          refunded_at?: string | null
+          seller_user_id: string
+          shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tracking_number?: string | null
+          unit_price_cents: number
+          updated_at?: string
+        }
+        Update: {
+          amount_total_cents?: number | null
+          buyer_email?: string | null
+          buyer_user_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          fulfillment_status?: string
+          id?: string
+          paid_at?: string | null
+          product_id?: string | null
+          product_title?: string
+          quantity?: number
+          refunded_at?: string | null
+          seller_user_id?: string
+          shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tracking_number?: string | null
+          unit_price_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_products: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          image_urls: string[]
+          inventory: number
+          is_featured: boolean
+          price_cents: number
+          product_type: string
+          release_id: string | null
+          shipping_info: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_urls?: string[]
+          inventory?: number
+          is_featured?: boolean
+          price_cents?: number
+          product_type?: string
+          release_id?: string | null
+          shipping_info?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_urls?: string[]
+          inventory?: number
+          is_featured?: boolean
+          price_cents?: number
+          product_type?: string
+          release_id?: string | null
+          shipping_info?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_products_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_anomaly_flags: {
         Row: {
           anomaly_score: number
@@ -5860,6 +6087,17 @@ export type Database = {
           incentive_pool_cents: number
           platform_pool_cents: number
         }[]
+      }
+      store_can_manage: { Args: { _artist: string }; Returns: boolean }
+      store_mark_order_paid: {
+        Args: {
+          _amount: number
+          _email: string
+          _payment_intent: string
+          _session_id: string
+          _shipping: Json
+        }
+        Returns: string
       }
     }
     Enums: {

@@ -134,6 +134,13 @@
       "when": 1791784404219,
       "tag": "0018_stream_spotlight_guest_slot",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791861020415,
+      "tag": "0019_artist_store",
+      "breakpoints": true
     }
   ]
 }

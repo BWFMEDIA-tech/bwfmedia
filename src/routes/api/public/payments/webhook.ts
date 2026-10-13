@@ -327,6 +327,26 @@ async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
   }
 }
 
+async function markStoreOrderPaid(session: any, env: StripeEnv) {
+  if (session.payment_status === 'unpaid') return; // async methods settle later
+  const supabase = getSupabase();
+  const { data: order } = await supabase.from('store_orders').select('id, environment').eq('stripe_session_id', session.id).maybeSingle();
+  if (!order || order.environment !== env) {
+    console.warn('Webhook: store order not found for env', session.id, env);
+    return;
+  }
+  const shipping = session.collected_information?.shipping_details ?? session.shipping_details ?? null;
+  const { data, error } = await supabase.rpc('store_mark_order_paid', {
+    _session_id: session.id,
+    _payment_intent: session.payment_intent ?? null,
+    _amount: session.amount_total ?? null,
+    _email: session.customer_details?.email ?? null,
+    _shipping: shipping,
+  });
+  if (error) console.error('Webhook: store order paid failed', error);
+  else console.log('Webhook: store order', session.id, data);
+}
+
 function routeSessionPaid(session: any) {
   const meta = session.metadata || {};
   if (meta.kind === 'tip') return recordTip(session);
@@ -353,6 +373,12 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
           switch (event.type) {
             case 'checkout.session.completed':
             case 'checkout.session.async_payment_succeeded':
+              // Artist Store orders carry their own environment column, so
+              // they are matched by session + env and handled in both modes.
+              if ((event.data.object as any)?.metadata?.kind === 'store_order') {
+                await markStoreOrderPaid(event.data.object, env);
+                break;
+              }
               // Environment fence: tips / boosts / bookings live in ONE
               // production database with no environment column, so a
               // signature-valid SANDBOX event (test-card payment) must never

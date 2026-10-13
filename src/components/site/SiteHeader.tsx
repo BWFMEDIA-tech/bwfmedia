@@ -19,6 +19,7 @@ import {
   Newspaper,
   Calendar,
   ShoppingCart,
+  Disc3,
   Trophy,
   LayoutDashboard,
 } from "lucide-react";
@@ -63,6 +64,7 @@ const PRIMARY: NavItem[] = [
 // "Book a Shoot" (/studio) and "Off Da Block" (/off-the-block) hidden for now — restore when ready.
 const BROWSE: NavItem[] = [
   { to: "/store", label: "Tunevio Store", icon: ShoppingCart },
+  { to: "/artist-store", label: "Artist Store", icon: Disc3 },
   { to: "/play", label: "Arena", icon: Music },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/videos", label: "Videos", icon: Mic },

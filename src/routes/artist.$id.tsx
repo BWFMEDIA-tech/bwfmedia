@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
+import { ArtistStoreSection } from "@/components/store/ArtistStoreSection";
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
@@ -193,6 +194,7 @@ function ArtistProfilePage() {
               <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
               <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
               <ArtistMerchSection userId={id} />
+              <ArtistStoreSection artistId={id} />
             </>
           )}
         </div>
