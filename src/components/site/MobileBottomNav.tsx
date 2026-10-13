@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, LayoutDashboard, Inbox, User, Video } from "lucide-react";
+import { Home, Radio, LayoutDashboard, Inbox, User, Video, ShoppingCart } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
