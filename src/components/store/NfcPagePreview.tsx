@@ -19,7 +19,7 @@ export function NfcPagePreview({ name, tabs, artistName, full }: { name: string;
       <div className="min-h-0 flex-1 overflow-y-auto">
         {!t ? <div className="grid h-full place-items-center text-sm font-bold uppercase tracking-widest text-muted-foreground">Preview</div> : t.type === "music" ? (
           <div>
-            <div className="aspect-square bg-gradient-to-br from-muted via-secondary to-muted">{t.coverUrl && <img src={t.coverUrl} alt="" className="h-full w-full object-cover" />}</div>
+            <KeychainCover src={t.coverUrl} />
             <div className="space-y-1 p-4">
               <h2 className="text-xl font-bold">{t.subtitle || name}</h2>
               <p className="text-sm text-primary">{t.artist || artistName}</p>
@@ -59,6 +59,27 @@ export function NfcPagePreview({ name, tabs, artistName, full }: { name: string;
         )}
       </div>
       <p className="py-2 text-center text-[9px] uppercase tracking-widest text-muted-foreground">Powered by Tunevio</p>
+    </div>
+  );
+}
+
+const grooves = (c: number, gap: number) => `repeating-radial-gradient(circle at center, color-mix(in oklab, var(--foreground) ${c}%, var(--background)) 0 1px, var(--background) 1px ${gap}px)`;
+
+/** Cover shown as a sleeve + vinyl keychain on a grooved black surface. */
+function KeychainCover({ src }: { src: string | null }) {
+  const art = src ? <img src={src} alt="" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-gradient-to-br from-muted via-secondary to-muted" />;
+  return (
+    <div className="relative aspect-square overflow-hidden" style={{ background: grooves(9, 4) }}>
+      <div className="absolute left-[8%] top-[32%] aspect-square w-[48%] -rotate-6 overflow-hidden rounded-sm border border-border shadow-2xl">{art}</div>
+      <div className="absolute right-[7%] top-[28%] aspect-square w-[46%]">
+        <div className="absolute left-1/2 -top-[24%] h-[22%] w-[2px] -translate-x-1/2 bg-muted-foreground" />
+        <div className="absolute left-1/2 -top-[38%] h-[16%] w-[16%] -translate-x-1/2 rounded-full border-[3px] border-muted-foreground" />
+        <div className="absolute left-1/2 -top-[6%] h-[9%] w-[9%] -translate-x-1/2 rounded-full border-2 border-muted-foreground bg-background" />
+        <div className="relative h-full w-full rounded-full border border-border shadow-2xl" style={{ background: grooves(16, 3) }}>
+          <div className="absolute left-1/2 top-1/2 h-[42%] w-[42%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-border">{art}</div>
+          <div className="absolute left-1/2 top-1/2 h-[5%] w-[5%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+        </div>
+      </div>
     </div>
   );
 }
