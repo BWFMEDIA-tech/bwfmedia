@@ -5,8 +5,8 @@ export interface StoreProduct {
   id: string;
   title: string;
   image_url: string | null;
-  min_price_cents: number;
-  max_price_cents: number;
+  min_price_cents: number | null;
+  max_price_cents: number | null;
   currency: string | null;
   store: { shop_domain: string; shop_name: string | null } | null;
   variants: StoreVariant[] | null;
@@ -23,8 +23,8 @@ export function storeCheckout(product: StoreProduct): string | null {
   if (!domain || !/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/i.test(domain) || !variant || !/^\d+$/.test(variant.shopify_variant_id)) return null;
   return `https://${domain}/cart/${variant.shopify_variant_id}:1`;
 }
-export function storePrice(cents: number, currency: string | null) {
-  if (!currency || !Number.isFinite(cents)) return "Price at checkout";
+export function storePrice(cents: number | null, currency: string | null) {
+  if (!currency || cents === null || !Number.isFinite(cents)) return "Price at checkout";
   try { return new Intl.NumberFormat("en", { style: "currency", currency }).format(cents / 100); }
   catch { return "Price at checkout"; }
 }

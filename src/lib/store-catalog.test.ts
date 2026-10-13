@@ -11,6 +11,9 @@ describe("existing store catalog", () => {
   it("preserves the catalog price and currency", () => {
     expect(storePrice(2500, "USD")).toBe("$25.00");
   });
+  it("never invents a zero price for missing catalog prices", () => {
+    expect(storePrice(null, "USD")).toBe("Price at checkout");
+  });
   it("rejects malformed store purchase destinations", () => {
     expect(storeCheckout({ ...product, store: {shop_domain: "artist.com/evil", shop_name: null} })).toBeNull();
   });
