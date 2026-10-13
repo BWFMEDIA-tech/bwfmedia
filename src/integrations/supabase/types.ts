@@ -2737,66 +2737,128 @@ export type Database = {
         }
         Relationships: []
       }
+      nfc_tag_order_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          field: string
+          from_value: string | null
+          id: string
+          order_id: string
+          to_value: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          field: string
+          from_value?: string | null
+          id?: string
+          order_id: string
+          to_value?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          field?: string
+          from_value?: string | null
+          id?: string
+          order_id?: string
+          to_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nfc_tag_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_tag_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nfc_tag_orders: {
         Row: {
           amount_total_cents: number | null
           buyer_user_id: string
+          carrier: string | null
           created_at: string
           currency: string
+          customer_email: string | null
+          delivered_at: string | null
           environment: string
           fulfillment_status: string
           id: string
+          order_number: string
           page_id: string | null
           paid_at: string | null
           product_name: string
           quantity: number
+          refunded_at: string | null
+          shipped_at: string | null
           shipping_address: Json | null
+          shipping_cents: number
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           tag_product_id: string | null
           tracking_number: string | null
           unit_price_cents: number
+          updated_at: string
         }
         Insert: {
           amount_total_cents?: number | null
           buyer_user_id: string
+          carrier?: string | null
           created_at?: string
           currency?: string
+          customer_email?: string | null
+          delivered_at?: string | null
           environment?: string
           fulfillment_status?: string
           id?: string
+          order_number?: string
           page_id?: string | null
           paid_at?: string | null
           product_name: string
           quantity: number
+          refunded_at?: string | null
+          shipped_at?: string | null
           shipping_address?: Json | null
+          shipping_cents?: number
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           tag_product_id?: string | null
           tracking_number?: string | null
           unit_price_cents: number
+          updated_at?: string
         }
         Update: {
           amount_total_cents?: number | null
           buyer_user_id?: string
+          carrier?: string | null
           created_at?: string
           currency?: string
+          customer_email?: string | null
+          delivered_at?: string | null
           environment?: string
           fulfillment_status?: string
           id?: string
+          order_number?: string
           page_id?: string | null
           paid_at?: string | null
           product_name?: string
           quantity?: number
+          refunded_at?: string | null
+          shipped_at?: string | null
           shipping_address?: Json | null
+          shipping_cents?: number
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           tag_product_id?: string | null
           tracking_number?: string | null
           unit_price_cents?: number
+          updated_at?: string
         }
         Relationships: [
           {
@@ -2825,7 +2887,9 @@ export type Database = {
           min_quantity: number
           name: string
           price_cents: number
+          shipping_cents: number
           tag_type: string
+          updated_at: string
         }
         Insert: {
           active?: boolean
@@ -2836,7 +2900,9 @@ export type Database = {
           min_quantity?: number
           name: string
           price_cents: number
+          shipping_cents?: number
           tag_type: string
+          updated_at?: string
         }
         Update: {
           active?: boolean
@@ -2847,7 +2913,9 @@ export type Database = {
           min_quantity?: number
           name?: string
           price_cents?: number
+          shipping_cents?: number
           tag_type?: string
+          updated_at?: string
         }
         Relationships: []
       }

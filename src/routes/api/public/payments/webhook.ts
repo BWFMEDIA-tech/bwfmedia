@@ -356,8 +356,18 @@ async function markTagOrderPaid(session: any, env: StripeEnv) {
   const { error } = await supabase.from('nfc_tag_orders').update({
     status: 'paid', paid_at: new Date().toISOString(), amount_total_cents: session.amount_total ?? null,
     stripe_payment_intent_id: session.payment_intent ?? null, shipping_address: shipping,
-  }).eq('id', order.id);
+    customer_email: session.customer_details?.email ?? null,
+  }).eq('id', order.id).eq('status', 'pending');
   if (error) console.error('Webhook: tag order paid failed', error);
+}
+
+async function markTagOrderClosed(match: { session?: string; intent?: string }, env: StripeEnv, status: 'cancelled' | 'refunded') {
+  const supabase = getSupabase();
+  let q: any = supabase.from('nfc_tag_orders').update(status === 'refunded' ? { status, refunded_at: new Date().toISOString() } : { status }).eq('environment', env);
+  q = match.session ? q.eq('stripe_session_id', match.session) : q.eq('stripe_payment_intent_id', match.intent);
+  q = status === 'refunded' ? q.eq('status', 'paid') : q.eq('status', 'pending');
+  const { error } = await q;
+  if (error) console.error('Webhook: tag order', status, 'failed', error);
 }
 
 function routeSessionPaid(session: any) {
@@ -433,8 +443,19 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
               await bumpTunevioRenewalFromInvoice(inv, env);
               break;
             }
+            case 'charge.refunded': {
+              const ch: any = event.data.object;
+              if (ch.refunded && ch.payment_intent) await markTagOrderClosed({ intent: ch.payment_intent }, env, 'refunded');
+              break;
+            }
+            case 'checkout.session.async_payment_failed': {
+              const s: any = event.data.object;
+              if (s?.metadata?.kind === 'nfc_tag_order') await markTagOrderClosed({ session: s.id }, env, 'cancelled');
+              break;
+            }
             case 'checkout.session.expired': {
               const s: any = event.data.object;
+              if (s?.metadata?.kind === 'nfc_tag_order') await markTagOrderClosed({ session: s.id }, env, 'cancelled');
               await sendStripeCancellationEmail(getSupabase(), s.customer_email ?? s.customer_details?.email, s.id);
               break;
             }

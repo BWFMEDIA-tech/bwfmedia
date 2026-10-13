@@ -176,6 +176,13 @@
       "when": 1791874610479,
       "tag": "0024_store_images_drop_public_read",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791902664227,
+      "tag": "0025_nfc_tag_order_admin",
+      "breakpoints": true
     }
   ]
 }

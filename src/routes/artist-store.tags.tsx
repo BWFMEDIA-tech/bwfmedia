@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { ArrowLeft, Loader2, Nfc, ShieldCheck } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
+import { tagOrderStatus } from "@/lib/nfc-pages";
 import { listTagProducts, createTagCheckout, listMyPages } from "@/lib/nfc-pages.functions";
 import { formatPrice } from "@/lib/artist-store";
 import { useAuth } from "@/lib/auth-context";
@@ -63,6 +64,7 @@ function TagsPage() {
               <button key={p.id} onClick={() => { setProductId(p.id); setQty((n) => Math.max(n, p.min_quantity)); }} className={`border p-4 text-left ${productId === p.id ? "border-primary" : "border-border"}`}>
                 <div className="font-bold">{p.name}</div>
                 <div className="text-sm text-primary">{formatPrice(p.price_cents, p.currency)} each</div>
+                {p.shipping_cents > 0 && <div className="text-xs text-muted-foreground">+ {formatPrice(p.shipping_cents, p.currency)} shipping</div>}
                 {p.min_quantity > 1 && <div className="text-xs text-muted-foreground">Minimum {p.min_quantity}</div>}
                 {p.description && <p className="mt-1 text-xs text-muted-foreground">{p.description}</p>}
               </button>
@@ -79,7 +81,7 @@ function TagsPage() {
               <input type="number" min={sel?.min_quantity ?? 1} max={1000} value={qty} onChange={(e) => setQty(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))} className="mt-1 w-full border border-border bg-background px-3 py-2 text-sm text-foreground" />
             </label>
           </div>
-          <button disabled={!sel || qty < (sel?.min_quantity ?? 1)} onClick={() => setCheckout(true)} className="w-full bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">{sel ? `Checkout · ${formatPrice(sel.price_cents * qty, sel.currency)}` : "Choose a tag"}</button>
+          <button disabled={!sel || qty < (sel?.min_quantity ?? 1)} onClick={() => setCheckout(true)} className="w-full bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">{sel ? `Checkout · ${formatPrice(sel.price_cents * qty + (sel.shipping_cents ?? 0), sel.currency)}` : "Choose a tag"}</button>
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" /> Secure checkout. Tax and shipping address collected at checkout.</p>
         </div>
       ) : (
@@ -93,11 +95,12 @@ function TagsPage() {
         <div className="mt-3 divide-y divide-border border border-border">
           {orders.map((o: any) => (
             <div key={o.id} className="flex flex-wrap items-center justify-between gap-2 p-3 text-sm">
-              <div><div className="font-semibold">{o.quantity} × {o.product_name}</div><div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div></div>
+              <div><div className="font-semibold">{o.quantity} × {o.product_name}</div>{o.order_number && <div className="text-xs text-muted-foreground">{o.order_number}</div>}<div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div></div>
               <div className="text-right">
                 <div>{formatPrice(o.amount_total_cents ?? o.unit_price_cents * o.quantity, o.currency)}</div>
-                <div className={`text-xs font-semibold uppercase ${o.status === "paid" ? "text-primary" : "text-muted-foreground"}`}>{o.status === "paid" ? `Paid · ${o.fulfillment_status}` : o.status === "pending" ? "Awaiting payment" : o.status}</div>
-                {o.tracking_number && <div className="text-xs text-muted-foreground">Tracking {o.tracking_number}</div>}
+                <div className={`text-xs font-semibold uppercase ${o.status === "paid" ? "text-primary" : "text-muted-foreground"}`}>{tagOrderStatus(o)}</div>
+                {o.tracking_number && <div className="text-xs text-muted-foreground">Tracking {[o.carrier, o.tracking_number].filter(Boolean).join(" ")}</div>}
+                {o.shipped_at && <div className="text-xs text-muted-foreground">Shipped {new Date(o.shipped_at).toLocaleDateString()}</div>}
               </div>
             </div>
           ))}

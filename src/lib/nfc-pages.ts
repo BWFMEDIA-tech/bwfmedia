@@ -52,3 +52,35 @@ export function checkTagQuantity(p: { active: boolean; price_cents: number; min_
   if (!Number.isInteger(qty) || qty < Math.max(1, p.min_quantity) || qty > 1000) return `Order between ${Math.max(1, p.min_quantity)} and 1000.`;
   return null;
 }
+
+// ---------- Tag order statuses ----------
+export const FULFILLMENT_STEPS = ["unfulfilled", "processing", "shipped", "delivered", "cancelled"] as const;
+export type Fulfillment = (typeof FULFILLMENT_STEPS)[number];
+const NEXT: Record<Fulfillment, Fulfillment[]> = {
+  unfulfilled: ["processing", "shipped", "cancelled"],
+  processing: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: [],
+  cancelled: [],
+};
+/** Fulfillment moves an admin may make; only paid orders can move at all. */
+export function allowedFulfillment(payment: string, from: string): Fulfillment[] {
+  if (payment !== "paid") return [];
+  return NEXT[from as Fulfillment] ?? [];
+}
+export type OrderStatusLabel = "Pending Payment" | "Paid" | "Processing" | "Shipped" | "Delivered" | "Cancelled" | "Refunded";
+/** Single customer-facing status combining payment and fulfillment. */
+export function tagOrderStatus(o: { status: string; fulfillment_status: string }): OrderStatusLabel {
+  if (o.status === "refunded") return "Refunded";
+  if (o.status === "cancelled" || o.status === "failed" || o.fulfillment_status === "cancelled") return "Cancelled";
+  if (o.status !== "paid") return "Pending Payment";
+  return ({ processing: "Processing", shipped: "Shipped", delivered: "Delivered" } as Record<string, OrderStatusLabel>)[o.fulfillment_status] ?? "Paid";
+}
+/** Server-side validation for admin pricing input. Returns an error or null. */
+export function checkTagPricing(p: { price_cents: number; shipping_cents: number; min_quantity: number; active: boolean }): string | null {
+  for (const k of ["price_cents", "shipping_cents", "min_quantity"] as const) if (!Number.isInteger(p[k])) return "Prices and quantities must be whole numbers.";
+  if (p.shipping_cents < 0 || p.price_cents < 0) return "Prices can't be negative.";
+  if (p.min_quantity < 1 || p.min_quantity > 1000) return "Minimum quantity must be 1–1000.";
+  if (p.active && p.price_cents < 50) return "Set a unit price of at least $0.50 before turning ordering on.";
+  return null;
+}
