@@ -25,7 +25,11 @@ function publicClient() {
   });
 }
 
-async function signImages<T extends { image_urls: string[] | null }>(client: any, rows: T[]): Promise<(T & { images: string[] })[]> {
+async function signImages<T extends { image_urls: string[] | null }>(_client: any, rows: T[]): Promise<(T & { images: string[] })[]> {
+  // Rows are already limited to published products; signing happens server-side
+  // so the private bucket needs no public read rule.
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const client = supabaseAdmin as any;
   const paths = Array.from(new Set(rows.flatMap((r) => r.image_urls ?? [])));
   const map = new Map<string, string>();
   if (paths.length) {
