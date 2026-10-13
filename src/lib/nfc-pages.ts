@@ -32,6 +32,15 @@ export function moveTab<T>(tabs: T[], index: number, dir: -1 | 1): T[] {
   return next;
 }
 
+/** Moves an id one step up (-1) or down (+1) in an ordered list. */
+export function moveId(ids: string[], index: number, dir: -1 | 1): string[] {
+  const to = index + dir;
+  if (index < 0 || index >= ids.length || to < 0 || to >= ids.length) return ids;
+  const next = ids.slice();
+  [next[index], next[to]] = [next[to], next[index]];
+  return next;
+}
+
 /** Removes duplicate track ids while keeping order. */
 export function uniqueIds(ids: string[]): string[] {
   return Array.from(new Set(ids));
