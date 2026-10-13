@@ -169,6 +169,13 @@
       "when": 1791871008687,
       "tag": "0023_tunevio_ai_assistant",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791874610479,
+      "tag": "0024_store_images_drop_public_read",
+      "breakpoints": true
     }
   ]
 }
