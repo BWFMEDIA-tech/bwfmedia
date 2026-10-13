@@ -4,14 +4,8 @@
 - Keep site branding in shared semantic palette tokens and a legacy utility color bridge, because existing pages use both tokens and older color utilities.
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
-- Use opt-in profile layouts for shared LiveStage and LiveChat tools, because reference-matched profile presentation must not alter Arena or Studio layouts.
-- Use the shared profile stage and chat presentation on `/go-live`, because starting a profile broadcast must show the same updated design as watching it without adding a second room connection.
-- Order the profile roster explicitly below media controls and reuse shared hand-request controls for viewers and owners, because profile pages use CSS ordering and must share the existing approval workflow.
-- Keep profile video sizing and control styling scoped to the profile selectors, because phone layouts must stack without changing shared broadcast tools or participant assignments.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
-- Keep Stream Studio on its own stage forks (src/components/studio/StudioStageRoom.tsx, StudioLiveStage.tsx) and profile lives on the stream/ copies, because the user wants Studio and profile stages to evolve separately; apply roster/permission changes to both copies when behavior (not styling) must stay aligned.
-- Derive profile video-box visibility from host spotlight selections, because unselected artist and guest boxes must stay hidden on every device.
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
 - Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
 - Resolve Artist Dashboard menu destinations through the shared navigation helper and reuse existing section routes, because non-artists need a signup entry and dashboard links must not point to unimplemented tabs.
@@ -21,7 +15,6 @@
 - Keep a close control in the open message conversation header that returns to the conversation list at every screen size, because members need to end a conversation without leaving Messages.
 - Keep the public store on existing published merch catalog reads and artist-hosted checkout links, because presentation changes must not duplicate catalogs, invent stock or prices, or imply unconfigured NFC fulfillment.
 - Keep the Artist Store (/artist-store) on its own store_* tables with prices and stock read server-side at checkout and orders marked paid only by the verified payment webhook, because client confirmations must never grant goods; NFC tags point at stable /nfc/<code> links that redirect only to internal paths so destinations can change without reprogramming.
-- Store NFC experience pages as one row with validated tabs JSON referencing only the owner's songs, videos and images, served at /p/<code> with server-signed images; price NFC tag orders only from admin-managed tag products, paid only via the verified webhook, because pages must stay editable and no client price may grant goods.
+- Store NFC experience pages as one row with validated tabs JSON referencing only the owner's songs, videos and images, served at /p/<code> with server-signed images; price NFC tag orders only from admin-managed tag products, paid/cancelled/refunded only via the verified webhook, with admin fulfilment updates made as the admin and logged by a DB trigger, because pages must stay editable and no client price may grant goods.
 - Ground the AI Assistant only in admin-editable assistant_articles and the allow-listed pages in src/lib/assistant.ts, with no model tools, because answers must never invent features or perform actions; history is per-user, capped at 50 rows.
-
-- NFC tag order fulfilment changes go through admin server functions updating as the admin, and a DB trigger logs every payment/fulfilment/tracking change with the actor, because order history must be tamper-evident; payment, cancel and refund states come only from the verified webhook.
+- Subdirectories have their own AGENTS.md (e.g. src/components/stream/); read it before changing files there.
