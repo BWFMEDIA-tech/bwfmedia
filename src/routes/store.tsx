@@ -27,7 +27,7 @@ function StorePage() {
   const [category, setCategory] = useState<StoreCategory>("All");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("featured");
-  const products = (catalog.data?.products ?? []) as StoreProduct[];
+  const products: StoreProduct[] = (catalog.data?.products ?? []).map((product) => ({ ...product, min_price_cents: product.min_price_cents ?? 0, max_price_cents: product.max_price_cents ?? 0, variants: product.variants.map((variant) => ({ ...variant, shopify_variant_id: String(variant.shopify_variant_id) })) }));
   const visible = products.filter((product) => (category === "All" || productCategory(product.title) === category) && `${product.title} ${product.store?.shop_name ?? ""}`.toLowerCase().includes(search.toLowerCase())).sort((a, b) => sort === "price-low" ? a.min_price_cents - b.min_price_cents : sort === "name" ? a.title.localeCompare(b.title) : 0);
   function showCollection() { document.getElementById("store-catalog")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); }
   return <main className="tunevio-store bg-background text-foreground">
@@ -48,7 +48,7 @@ function StorePage() {
       </div>
     </div>
     <section id="store-catalog" className="mx-auto max-w-[1440px] scroll-mt-28 px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
-      <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase text-primary">From the artists</p><h2 className="store-title mt-2 text-3xl font-semibold sm:text-4xl">The collection</h2></div><Button asChild variant="outline" className="gap-3"><Link to="/settings/merch">Connect your store <ArrowUpRight /></Link></Button></div>
+      <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase text-primary">From the artists</p><h2 className="store-title mt-2 text-3xl font-semibold sm:text-4xl">The collection</h2></div><Button asChild variant="outline" className="gap-3"><Link to="/settings/merch" search={{ connected: false }}>Connect your store <ArrowUpRight /></Link></Button></div>
       <div className="mt-7 flex flex-col gap-4 border-b border-border pb-5 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex gap-1 overflow-x-auto pb-1" aria-label="Product categories">{storeCategories.map((item) => <Button key={item} variant={category === item ? "secondary" : "ghost"} aria-pressed={category === item} onClick={() => setCategory(item)} className={category === item ? "shrink-0 border border-primary/40 text-primary" : "shrink-0 text-muted-foreground"}>{item}</Button>)}</div>
         <div className="flex gap-3"><label className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-input px-3"><Search className="h-4 w-4 shrink-0 text-muted-foreground" /><input aria-label="Search collection" placeholder="Search collection" value={search} onChange={(event) => setSearch(event.target.value)} className="h-10 w-full min-w-0 bg-transparent text-sm outline-none" /></label><label className="flex items-center gap-2 rounded-md border border-input px-2"><SlidersHorizontal className="h-4 w-4 text-muted-foreground" /><select aria-label="Sort collection" value={sort} onChange={(event) => setSort(event.target.value)} className="h-10 max-w-28 bg-background text-xs outline-none"><option value="featured">Featured</option><option value="price-low">Price: low first</option><option value="name">Name: A–Z</option></select></label></div>
