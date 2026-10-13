@@ -19,6 +19,7 @@ type LiveStream = {
   viewer_count: number;
   started_at: string | null;
   host_id: string;
+  kind?: "stream" | "stage";
   host: { display_name: string | null; avatar_url: string | null; stage_name: string | null } | null;
 };
 
@@ -57,9 +58,10 @@ function LivePage() {
     const ch = supabase
       .channel("live-now")
       .on("postgres_changes", { event: "*", schema: "public", table: "streams" }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "stage_rooms" }, refresh)
       .subscribe();
     // Realtime is filtered by access rules for visitors, so also poll to pick up new profile lives.
-    const poll = setInterval(refresh, 15_000);
+    const poll = setInterval(refresh, 10_000);
     return () => { cancelled = true; clearInterval(poll); supabase.removeChannel(ch); };
   }, []);
 
@@ -116,8 +118,9 @@ function LivePage() {
             {visibleStreams.map((s) => (
               <Link
                 key={s.id}
-                to="/artist/$id"
-                params={{ id: s.host_id }}
+                {...(s.kind === "stage"
+                  ? { to: "/stage/$roomId" as const, params: { roomId: s.id } }
+                  : { to: "/artist/$id" as const, params: { id: s.host_id } })}
                 className="group rounded-2xl border border-white/10 bg-[#0d0d18] overflow-hidden hover:border-violet-500/50 transition"
               >
                 <div className="relative aspect-video bg-gradient-to-br from-violet-900 to-blue-900">
@@ -131,7 +134,7 @@ function LivePage() {
                   <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
                     <Eye className="h-3 w-3" /> {s.viewer_count ?? 0}
                   </span>
-                  {(isAdmin || auth.user?.id === s.host_id) && (
+                  {s.kind !== "stage" && (isAdmin || auth.user?.id === s.host_id) && (
                     <button
                       onClick={(e) => handleDelete(e, s.id)}
                       title="Delete stream"
