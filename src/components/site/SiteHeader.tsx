@@ -19,6 +19,7 @@ import {
   Newspaper,
   Calendar,
   ShoppingCart,
+  Disc3,
   Trophy,
   LayoutDashboard,
 } from "lucide-react";
