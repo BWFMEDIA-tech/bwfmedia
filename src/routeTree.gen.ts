@@ -139,6 +139,7 @@ import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as ApiAssistantChatRouteImport } from './routes/api/assistant/chat'
 import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
@@ -814,6 +815,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAssistantChatRoute = ApiAssistantChatRouteImport.update({
+  id: '/api/assistant/chat',
+  path: '/api/assistant/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBattleReactRoute = ApiBattleReactRouteImport.update({
   id: '/api/battle/react',
   path: '/api/battle/react',
@@ -1038,6 +1044,7 @@ export interface FileRoutesByFullPath {
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/assistant/chat': typeof ApiAssistantChatRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1185,6 +1192,7 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/assistant/chat': typeof ApiAssistantChatRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1335,6 +1343,7 @@ export interface FileRoutesById {
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/assistant/chat': typeof ApiAssistantChatRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1486,6 +1495,7 @@ export interface FileRouteTypes {
     | '/videos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/assistant/chat'
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -1633,6 +1643,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/assistant/chat'
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -1782,6 +1793,7 @@ export interface FileRouteTypes {
     | '/videos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/assistant/chat'
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -1885,6 +1897,7 @@ export interface RootRouteChildren {
   VideosIndexRoute: typeof VideosIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiAssistantChatRoute: typeof ApiAssistantChatRoute
   ApiBattleReactRoute: typeof ApiBattleReactRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
@@ -2813,6 +2826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/assistant/chat': {
+      id: '/api/assistant/chat'
+      path: '/api/assistant/chat'
+      fullPath: '/api/assistant/chat'
+      preLoaderRoute: typeof ApiAssistantChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/battle/react': {
       id: '/api/battle/react'
       path: '/api/battle/react'
@@ -3159,6 +3179,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideosIndexRoute: VideosIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiAssistantChatRoute: ApiAssistantChatRoute,
   ApiBattleReactRoute: ApiBattleReactRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
