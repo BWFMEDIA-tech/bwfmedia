@@ -30,6 +30,7 @@ import { Route as EarningsRouteImport } from './routes/earnings'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GoLiveRouteImport } from './routes/go-live'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as HostEarningsRouteImport } from './routes/host-earnings'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LiveRouteImport } from './routes/live'
@@ -65,6 +66,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminArtistReferralsRouteImport } from './routes/admin.artist-referrals'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
+import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-bookings'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
@@ -139,6 +141,7 @@ import { Route as VideosIndexRouteImport } from './routes/videos.index'
 import { Route as VideosIdRouteImport } from './routes/videos.$id'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as ApiAssistantChatRouteImport } from './routes/api/assistant/chat'
 import { Route as ApiBattleReactRouteImport } from './routes/api/battle/react'
 import { Route as ApiPublicBlockBookingRouteImport } from './routes/api/public/block-booking'
 import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes/api/public/checkout-cancellation-email'
@@ -260,6 +263,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const GoLiveRoute = GoLiveRouteImport.update({
   id: '/go-live',
   path: '/go-live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HostEarningsRoute = HostEarningsRouteImport.update({
@@ -437,6 +445,11 @@ const AdminArtistReferralsRoute = AdminArtistReferralsRouteImport.update({
 const AdminArtistsRoute = AdminArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAssistantRoute = AdminAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
@@ -814,6 +827,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAssistantChatRoute = ApiAssistantChatRouteImport.update({
+  id: '/api/assistant/chat',
+  path: '/api/assistant/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiBattleReactRoute = ApiBattleReactRouteImport.update({
   id: '/api/battle/react',
   path: '/api/battle/react',
@@ -929,6 +947,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
+  '/help': typeof HelpRoute
   '/host-earnings': typeof HostEarningsRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
@@ -963,6 +982,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -1038,6 +1058,7 @@ export interface FileRoutesByFullPath {
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/assistant/chat': typeof ApiAssistantChatRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1076,6 +1097,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
+  '/help': typeof HelpRoute
   '/host-earnings': typeof HostEarningsRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
@@ -1110,6 +1132,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -1185,6 +1208,7 @@ export interface FileRoutesByTo {
   '/videos': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/assistant/chat': typeof ApiAssistantChatRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1226,6 +1250,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/go-live': typeof GoLiveRoute
+  '/help': typeof HelpRoute
   '/host-earnings': typeof HostEarningsRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
@@ -1260,6 +1285,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
+  '/admin/assistant': typeof AdminAssistantRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
@@ -1335,6 +1361,7 @@ export interface FileRoutesById {
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/assistant/chat': typeof ApiAssistantChatRoute
   '/api/battle/react': typeof ApiBattleReactRoute
   '/api/public/block-booking': typeof ApiPublicBlockBookingRoute
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
@@ -1377,6 +1404,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/go-live'
+    | '/help'
     | '/host-earnings'
     | '/leaderboard'
     | '/live'
@@ -1411,6 +1439,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/artist-referrals'
     | '/admin/artists'
+    | '/admin/assistant'
     | '/admin/audit'
     | '/admin/block-bookings'
     | '/admin/bookings'
@@ -1486,6 +1515,7 @@ export interface FileRouteTypes {
     | '/videos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/assistant/chat'
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -1524,6 +1554,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/go-live'
+    | '/help'
     | '/host-earnings'
     | '/leaderboard'
     | '/live'
@@ -1558,6 +1589,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/artist-referrals'
     | '/admin/artists'
+    | '/admin/assistant'
     | '/admin/audit'
     | '/admin/block-bookings'
     | '/admin/bookings'
@@ -1633,6 +1665,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/assistant/chat'
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -1673,6 +1706,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/forgot-password'
     | '/go-live'
+    | '/help'
     | '/host-earnings'
     | '/leaderboard'
     | '/live'
@@ -1707,6 +1741,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/artist-referrals'
     | '/admin/artists'
+    | '/admin/assistant'
     | '/admin/audit'
     | '/admin/block-bookings'
     | '/admin/bookings'
@@ -1782,6 +1817,7 @@ export interface FileRouteTypes {
     | '/videos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/assistant/chat'
     | '/api/battle/react'
     | '/api/public/block-booking'
     | '/api/public/checkout-cancellation-email'
@@ -1823,6 +1859,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GoLiveRoute: typeof GoLiveRoute
+  HelpRoute: typeof HelpRoute
   HostEarningsRoute: typeof HostEarningsRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LiveRoute: typeof LiveRoute
@@ -1885,6 +1922,7 @@ export interface RootRouteChildren {
   VideosIndexRoute: typeof VideosIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiAssistantChatRoute: typeof ApiAssistantChatRoute
   ApiBattleReactRoute: typeof ApiBattleReactRoute
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
@@ -2048,6 +2086,13 @@ declare module '@tanstack/react-router' {
       path: '/go-live'
       fullPath: '/go-live'
       preLoaderRoute: typeof GoLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/host-earnings': {
@@ -2293,6 +2338,13 @@ declare module '@tanstack/react-router' {
       path: '/artists'
       fullPath: '/admin/artists'
       preLoaderRoute: typeof AdminArtistsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/assistant': {
+      id: '/admin/assistant'
+      path: '/assistant'
+      fullPath: '/admin/assistant'
+      preLoaderRoute: typeof AdminAssistantRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/audit': {
@@ -2813,6 +2865,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/assistant/chat': {
+      id: '/api/assistant/chat'
+      path: '/api/assistant/chat'
+      fullPath: '/api/assistant/chat'
+      preLoaderRoute: typeof ApiAssistantChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/battle/react': {
       id: '/api/battle/react'
       path: '/api/battle/react'
@@ -2939,6 +2998,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminArtistReferralsRoute: typeof AdminArtistReferralsRoute
   AdminArtistsRoute: typeof AdminArtistsRoute
+  AdminAssistantRoute: typeof AdminAssistantRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBlockBookingsRoute: typeof AdminBlockBookingsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
@@ -2970,6 +3030,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminArtistReferralsRoute: AdminArtistReferralsRoute,
   AdminArtistsRoute: AdminArtistsRoute,
+  AdminAssistantRoute: AdminAssistantRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBlockBookingsRoute: AdminBlockBookingsRoute,
   AdminBookingsRoute: AdminBookingsRoute,
@@ -3094,6 +3155,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GoLiveRoute: GoLiveRoute,
+  HelpRoute: HelpRoute,
   HostEarningsRoute: HostEarningsRoute,
   LeaderboardRoute: LeaderboardRoute,
   LiveRoute: LiveRoute,
@@ -3159,6 +3221,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideosIndexRoute: VideosIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiAssistantChatRoute: ApiAssistantChatRoute,
   ApiBattleReactRoute: ApiBattleReactRoute,
   ApiPublicBlockBookingRoute: ApiPublicBlockBookingRoute,
   ApiPublicCheckoutCancellationEmailRoute:
