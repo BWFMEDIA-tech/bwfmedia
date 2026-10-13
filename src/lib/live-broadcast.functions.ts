@@ -138,7 +138,22 @@ export const listLiveStreams = createServerFn({ method: "POST" })
       .order("started_at", { ascending: false })
       .limit(data.limit);
     if (error) throw new Error(error.message);
-    const hostIds = [...new Set((streams ?? []).map((s: any) => s.host_id))];
+    // Also include live stage rooms so every artist who goes live is listed.
+    const { data: stages } = await client
+      .from("stage_rooms")
+      .select("id, title, host_id, audience_count, started_at")
+      .eq("status", "live")
+      .order("started_at", { ascending: false })
+      .limit(data.limit);
+    const all = [
+      ...(streams ?? []).map((s: any) => ({ ...s, kind: "stream" as const })),
+      ...(stages ?? []).map((r: any) => ({
+        id: r.id, title: r.title, room_name: r.id, status: "live", host_id: r.host_id,
+        category: null, thumbnail_url: null, viewer_count: r.audience_count ?? 0,
+        started_at: r.started_at, mode: "stage", kind: "stage" as const,
+      })),
+    ].sort((a, b) => String(b.started_at ?? "").localeCompare(String(a.started_at ?? "")));
+    const hostIds = [...new Set(all.map((s: any) => s.host_id))];
     let profileMap = new Map<string, { display_name: string | null; avatar_url: string | null; stage_name: string | null }>();
     if (hostIds.length) {
       const { data: profs } = await client
@@ -148,7 +163,7 @@ export const listLiveStreams = createServerFn({ method: "POST" })
       (profs ?? []).forEach((p: any) => profileMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url, stage_name: p.stage_name }));
     }
     return {
-      streams: (streams ?? []).map((s: any) => ({
+      streams: all.map((s: any) => ({
         ...s,
         host: profileMap.get(s.host_id) ?? null,
       })),
