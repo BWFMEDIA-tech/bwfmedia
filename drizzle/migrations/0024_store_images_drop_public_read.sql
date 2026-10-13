@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Store images published read" ON storage.objects;
