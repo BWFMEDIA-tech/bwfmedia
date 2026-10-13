@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { ArrowRight, Loader2, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
+import { ArrowRight, Loader2, ThumbsDown, ThumbsUp, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -31,7 +31,7 @@ export function AssistantRobot({ className = "h-9 w-9" }: { className?: string }
   return <img src={robot} alt="Tunevio AI Assistant" width={816} height={816} className={`${className} shrink-0 object-contain`} />;
 }
 
-export function AssistantChat({ compact = false, onNavigate }: { compact?: boolean; onNavigate?: () => void }) {
+export function AssistantChat({ compact = false, onNavigate, onClose }: { compact?: boolean; onNavigate?: () => void; onClose?: () => void }) {
   const auth = useAuth();
   const userId = auth.user?.id ?? null;
   const audience = audienceFromRoles(auth.user ? auth.roles : null);
@@ -111,6 +111,11 @@ export function AssistantChat({ compact = false, onNavigate }: { compact?: boole
         {messages.length > 0 && (
           <button type="button" onClick={clear} className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground">
             <Trash2 className="h-3.5 w-3.5" /> Clear chat
+          </button>
+        )}
+        {onClose && (
+          <button type="button" aria-label="Close assistant" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-full border border-border text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
           </button>
         )}
       </div>
