@@ -155,6 +155,13 @@
       "when": 1791862785455,
       "tag": "0021_store_images_published_read",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791864359337,
+      "tag": "0022_nfc_pages_and_tag_orders",
+      "breakpoints": true
     }
   ]
 }
