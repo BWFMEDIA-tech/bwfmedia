@@ -140,8 +140,8 @@ export const listTagProducts = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const sb = context.supabase as any;
     const [{ data: products }, { data: orders }] = await Promise.all([
-      sb.from("nfc_tag_products").select("id, name, tag_type, description, price_cents, currency, min_quantity, active").eq("active", true).order("price_cents"),
-      sb.from("nfc_tag_orders").select("id, product_name, quantity, amount_total_cents, unit_price_cents, currency, status, fulfillment_status, tracking_number, created_at, page_id").eq("buyer_user_id", context.userId).order("created_at", { ascending: false }).limit(50),
+      sb.from("nfc_tag_products").select("id, name, tag_type, description, price_cents, shipping_cents, currency, min_quantity, active").eq("active", true).gte("price_cents", 50).order("price_cents"),
+      sb.from("nfc_tag_orders").select("id, order_number, product_name, quantity, amount_total_cents, unit_price_cents, shipping_cents, currency, status, fulfillment_status, tracking_number, carrier, shipped_at, delivered_at, created_at, page_id").eq("buyer_user_id", context.userId).order("created_at", { ascending: false }).limit(50),
     ]);
     return { products: products ?? [], orders: orders ?? [] };
   });
@@ -157,7 +157,7 @@ export const createTagCheckout = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
     // Price always read from the database.
-    const { data: p } = await admin.from("nfc_tag_products").select("id, name, description, price_cents, currency, min_quantity, active").eq("id", data.productId).maybeSingle();
+    const { data: p } = await admin.from("nfc_tag_products").select("id, name, description, price_cents, shipping_cents, currency, min_quantity, active").eq("id", data.productId).maybeSingle();
     if (!p) return { error: "Tag not found", clientSecret: null };
     const problem = checkTagQuantity(p, data.quantity);
     if (problem) return { error: problem, clientSecret: null };
@@ -176,12 +176,13 @@ export const createTagCheckout = createServerFn({ method: "POST" })
         line_items: [{ quantity: data.quantity, price_data: { currency: p.currency || "usd", unit_amount: p.price_cents, product_data: { name: p.name, tax_code: "txcd_99999999", ...(p.description ? { description: String(p.description).slice(0, 300) } : {}) } } }],
         automatic_tax: { enabled: true },
         shipping_address_collection: { allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR", "NL", "IE", "SE", "NO", "DK", "ES", "IT"] },
+        ...(p.shipping_cents > 0 ? { shipping_options: [{ shipping_rate_data: { type: "fixed_amount", display_name: "Shipping", fixed_amount: { amount: p.shipping_cents, currency: p.currency || "usd" } } }] } : {}),
         ...(email ? { customer_email: email } : {}),
         metadata: { kind: "nfc_tag_order", buyerUserId: context.userId },
       } as Stripe.Checkout.SessionCreateParams);
       const { error } = await admin.from("nfc_tag_orders").insert({
         buyer_user_id: context.userId, tag_product_id: p.id, page_id: data.pageId, product_name: p.name, quantity: data.quantity,
-        unit_price_cents: p.price_cents, currency: p.currency || "usd", environment: data.environment, stripe_session_id: session.id,
+        unit_price_cents: p.price_cents, shipping_cents: p.shipping_cents ?? 0, customer_email: email ?? null, currency: p.currency || "usd", environment: data.environment, stripe_session_id: session.id,
       });
       if (error) return { error: error.message, clientSecret: null };
       return { error: null as string | null, clientSecret: session.client_secret as string };
