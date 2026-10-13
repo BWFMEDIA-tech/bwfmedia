@@ -150,7 +150,7 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
             return (
               <Message from="assistant" key={m.id}>
                 <MessageContent className="bg-transparent p-0">
-                  {text ? <MessageResponse>{text}</MessageResponse> : <span className="text-sm text-muted-foreground">Thinking…</span>}
+                  {text ? <MessageResponse className="[&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5">{text}</MessageResponse> : <span className="text-sm text-muted-foreground">Thinking…</span>}
                   {done && links.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2">
                       {links.map((l, i) => (

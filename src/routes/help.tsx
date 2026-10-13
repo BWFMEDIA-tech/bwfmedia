@@ -17,7 +17,7 @@ export const Route = createFileRoute("/help")({
 
 function HelpPage() {
   return (
-    <div className="mx-auto flex h-[calc(100dvh-72px-64px-env(safe-area-inset-bottom))] max-w-3xl flex-col px-2 py-3 md:h-[calc(100dvh-80px)] md:px-4 md:py-6">
+    <div className="mx-auto flex h-[calc(100dvh-var(--bwf-banner-h,0px)-72px-64px-env(safe-area-inset-bottom))] max-w-3xl flex-col px-2 py-3 md:h-[calc(100dvh-80px)] md:px-4 md:py-6">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card/40">
         <AssistantChat />
       </div>
