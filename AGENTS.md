@@ -11,7 +11,6 @@
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
 - Keep Stream Studio on its own stage forks (src/components/studio/StudioStageRoom.tsx, StudioLiveStage.tsx) and profile lives on the stream/ copies, because the user wants Studio and profile stages to evolve separately; apply roster/permission changes to both copies when behavior (not styling) must stay aligned.
-- Use the shared profile stage and chat presentation on `/go-live`, because starting a profile broadcast must show the same updated design as watching it without adding a second room connection.
 - Derive profile video-box visibility from host spotlight selections, because unselected artist and guest boxes must stay hidden on every device.
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
 - Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
@@ -22,5 +21,4 @@
 - Keep a close control in the open message conversation header that returns to the conversation list at every screen size, because members need to end a conversation without leaving Messages.
 - Keep the public store on existing published merch catalog reads and artist-hosted checkout links, because presentation changes must not duplicate catalogs, invent stock or prices, or imply unconfigured NFC fulfillment.
 - Keep the Artist Store (/artist-store) on its own store_* tables with prices and stock read server-side at checkout and orders marked paid only by the verified payment webhook, because client confirmations must never grant goods; NFC tags point at stable /nfc/<code> links that redirect only to internal paths so destinations can change without reprogramming.
-- Store NFC experience pages as one row per page with a validated tabs JSON (music/video/product referencing the owner's own songs, videos and store-products images), served publicly at /p/<code> with server-signed images, because tags must open editable pages without duplicating catalogs.
-- Price Tunevio NFC tag orders only from admin-managed tag products and mark them paid only from the verified payment webhook, because no client or default price may grant goods.
+- Store NFC experience pages as one row with validated tabs JSON referencing only the owner's songs, videos and images, served at /p/<code> with server-signed images; price NFC tag orders only from admin-managed tag products, paid only via the verified webhook, because pages must stay editable and no client price may grant goods.
