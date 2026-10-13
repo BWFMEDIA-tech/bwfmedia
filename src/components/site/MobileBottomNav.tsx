@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, LayoutDashboard, Inbox, User, Video } from "lucide-react";
+import { Home, Radio, LayoutDashboard, Inbox, User, Video, ShoppingCart } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
@@ -17,6 +17,7 @@ const TABS: Tab[] = [
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
   { to: "/go-live", label: "Go Live", icon: Video, match: (p) => p.startsWith("/go-live") },
+  { to: "/store", label: "Store", icon: ShoppingCart, match: (p) => p.startsWith("/store") },
   { to: "/artist-dashboard", label: "Artist Hub", icon: LayoutDashboard, match: (p) => p.startsWith("/artist-dashboard") },
   { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
