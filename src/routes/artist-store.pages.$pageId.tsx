@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { getMyPage, savePage, deletePage } from "@/lib/nfc-pages.functions";
-import { TAB_LABELS, TAB_TYPES, moveTab, newTab, uniqueIds, type PageTab, type TabType } from "@/lib/nfc-pages";
+import { TAB_LABELS, TAB_TYPES, moveId, moveTab, newTab, uniqueIds, type PageTab, type TabType } from "@/lib/nfc-pages";
 import { NfcPagePreview, type PreviewTab } from "@/components/store/NfcPagePreview";
 
 export const Route = createFileRoute("/artist-store/pages/$pageId")({
