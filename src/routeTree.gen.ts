@@ -90,6 +90,8 @@ import { Route as AdminTransactionsRouteImport } from './routes/admin.transactio
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminVoteAttemptsRouteImport } from './routes/admin.vote-attempts'
 import { Route as ArtistStoreIndexRouteImport } from './routes/artist-store.index'
+import { Route as ArtistStoreProductIdRouteImport } from './routes/artist-store.$productId'
+import { Route as ArtistStoreOrdersRouteImport } from './routes/artist-store.orders'
 import { Route as ArtistIdRouteImport } from './routes/artist.$id'
 import { Route as ArtistUpgradeRouteImport } from './routes/artist.upgrade'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -557,6 +559,16 @@ const ArtistStoreIndexRoute = ArtistStoreIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ArtistStoreRoute,
 } as any)
+const ArtistStoreProductIdRoute = ArtistStoreProductIdRouteImport.update({
+  id: '/$productId',
+  path: '/$productId',
+  getParentRoute: () => ArtistStoreRoute,
+} as any)
+const ArtistStoreOrdersRoute = ArtistStoreOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => ArtistStoreRoute,
+} as any)
 const ArtistIdRoute = ArtistIdRouteImport.update({
   id: '/artist/$id',
   path: '/artist/$id',
@@ -945,6 +957,8 @@ export interface FileRoutesByFullPath {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
+  '/artist-store/$productId': typeof ArtistStoreProductIdRoute
+  '/artist-store/orders': typeof ArtistStoreOrdersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1085,6 +1099,8 @@ export interface FileRoutesByTo {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
+  '/artist-store/$productId': typeof ArtistStoreProductIdRoute
+  '/artist-store/orders': typeof ArtistStoreOrdersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1228,6 +1244,8 @@ export interface FileRoutesById {
   '/admin/transactions': typeof AdminTransactionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vote-attempts': typeof AdminVoteAttemptsRoute
+  '/artist-store/$productId': typeof ArtistStoreProductIdRoute
+  '/artist-store/orders': typeof ArtistStoreOrdersRoute
   '/artist/$id': typeof ArtistIdRoute
   '/artist/upgrade': typeof ArtistUpgradeRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1372,6 +1390,8 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/admin/vote-attempts'
+    | '/artist-store/$productId'
+    | '/artist-store/orders'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/$slug'
@@ -1512,6 +1532,8 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/admin/vote-attempts'
+    | '/artist-store/$productId'
+    | '/artist-store/orders'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/$slug'
@@ -1654,6 +1676,8 @@ export interface FileRouteTypes {
     | '/admin/transactions'
     | '/admin/users'
     | '/admin/vote-attempts'
+    | '/artist-store/$productId'
+    | '/artist-store/orders'
     | '/artist/$id'
     | '/artist/upgrade'
     | '/blog/$slug'
@@ -2385,6 +2409,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistStoreIndexRouteImport
       parentRoute: typeof ArtistStoreRoute
     }
+    '/artist-store/$productId': {
+      id: '/artist-store/$productId'
+      path: '/$productId'
+      fullPath: '/artist-store/$productId'
+      preLoaderRoute: typeof ArtistStoreProductIdRouteImport
+      parentRoute: typeof ArtistStoreRoute
+    }
+    '/artist-store/orders': {
+      id: '/artist-store/orders'
+      path: '/orders'
+      fullPath: '/artist-store/orders'
+      preLoaderRoute: typeof ArtistStoreOrdersRouteImport
+      parentRoute: typeof ArtistStoreRoute
+    }
     '/artist/$id': {
       id: '/artist/$id'
       path: '/artist/$id'
@@ -2866,10 +2904,14 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ArtistStoreRouteChildren {
+  ArtistStoreProductIdRoute: typeof ArtistStoreProductIdRoute
+  ArtistStoreOrdersRoute: typeof ArtistStoreOrdersRoute
   ArtistStoreIndexRoute: typeof ArtistStoreIndexRoute
 }
 
 const ArtistStoreRouteChildren: ArtistStoreRouteChildren = {
+  ArtistStoreProductIdRoute: ArtistStoreProductIdRoute,
+  ArtistStoreOrdersRoute: ArtistStoreOrdersRoute,
   ArtistStoreIndexRoute: ArtistStoreIndexRoute,
 }
 
