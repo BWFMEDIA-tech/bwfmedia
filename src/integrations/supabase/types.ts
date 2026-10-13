@@ -526,6 +526,138 @@ export type Database = {
         }
         Relationships: []
       }
+      assistant_articles: {
+        Row: {
+          audience: string
+          body: string
+          confirmed: boolean
+          created_at: string
+          id: string
+          links: Json
+          published: boolean
+          slug: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audience?: string
+          body: string
+          confirmed?: boolean
+          created_at?: string
+          id?: string
+          links?: Json
+          published?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audience?: string
+          body?: string
+          confirmed?: boolean
+          created_at?: string
+          id?: string
+          links?: Json
+          published?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      assistant_feedback: {
+        Row: {
+          created_at: string
+          helpful: boolean
+          id: string
+          question: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          helpful: boolean
+          id?: string
+          question: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          helpful?: boolean
+          id?: string
+          question?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      assistant_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message_id: string
+          parts: Json
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_id: string
+          parts: Json
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_id?: string
+          parts?: Json
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      assistant_unanswered: {
+        Row: {
+          audience: string
+          created_at: string
+          id: string
+          question: string
+        }
+        Insert: {
+          audience?: string
+          created_at?: string
+          id?: string
+          question: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          id?: string
+          question?: string
+        }
+        Relationships: []
+      }
+      assistant_usage: {
+        Row: {
+          audience: string
+          day: string
+          questions: number
+        }
+        Insert: {
+          audience: string
+          day: string
+          questions?: number
+        }
+        Update: {
+          audience?: string
+          day?: string
+          questions?: number
+        }
+        Relationships: []
+      }
       battle_matches: {
         Row: {
           a_wins: number
