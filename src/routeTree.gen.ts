@@ -51,6 +51,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StoreRouteImport } from './routes/store'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -354,6 +355,11 @@ const SignupRoute = SignupRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreRoute = StoreRouteImport.update({
+  id: '/store',
+  path: '/store',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StreamStudioRoute = StreamStudioRouteImport.update({
@@ -884,6 +890,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
@@ -1021,6 +1028,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
@@ -1160,6 +1168,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
@@ -1300,6 +1309,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
+    | '/store'
     | '/stream-studio'
     | '/studio'
     | '/terms'
@@ -1437,6 +1447,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
+    | '/store'
     | '/stream-studio'
     | '/studio'
     | '/terms'
@@ -1575,6 +1586,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
+    | '/store'
     | '/stream-studio'
     | '/studio'
     | '/terms'
@@ -1714,6 +1726,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StoreRoute: typeof StoreRoute
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
   TermsRoute: typeof TermsRoute
@@ -2061,6 +2074,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store': {
+      id: '/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof StoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stream-studio': {
@@ -2880,6 +2900,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StoreRoute: StoreRoute,
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
   TermsRoute: TermsRoute,
