@@ -24,3 +24,14 @@ describe("nfc pages", () => {
   });
   it("allows page links as NFC destinations", () => expect(isSafeNfcPath("/p/abc123def0")).toBe(true));
 });
+
+import { allowedFulfillment, tagOrderStatus, checkTagPricing } from "./nfc-pages";
+describe("tag order rules", () => {
+  it("unpaid orders cannot be fulfilled", () => { expect(allowedFulfillment("pending", "unfulfilled")).toEqual([]); });
+  it("delivered orders are final", () => { expect(allowedFulfillment("paid", "delivered")).toEqual([]); });
+  it("shipped can only become delivered", () => { expect(allowedFulfillment("paid", "shipped")).toEqual(["delivered"]); });
+  it("refund wins over shipping", () => { expect(tagOrderStatus({ status: "refunded", fulfillment_status: "shipped" })).toBe("Refunded"); });
+  it("unpaid shows pending payment", () => { expect(tagOrderStatus({ status: "pending", fulfillment_status: "unfulfilled" })).toBe("Pending Payment"); });
+  it("can't turn on ordering without a price", () => { expect(checkTagPricing({ price_cents: 0, shipping_cents: 0, min_quantity: 1, active: true })).not.toBeNull(); });
+  it("rejects negative shipping", () => { expect(checkTagPricing({ price_cents: 500, shipping_cents: -1, min_quantity: 1, active: true })).not.toBeNull(); });
+});
