@@ -105,6 +105,7 @@ import { Route as JoinUsernameRouteImport } from './routes/join.$username'
 import { Route as LabelInviteCodeRouteImport } from './routes/label-invite.$code'
 import { Route as LabelsIndexRouteImport } from './routes/labels.index'
 import { Route as LabelsLabelIdRouteImport } from './routes/labels.$labelId'
+import { Route as NfcCodeRouteImport } from './routes/nfc.$code'
 import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
@@ -633,6 +634,11 @@ const LabelsLabelIdRoute = LabelsLabelIdRouteImport.update({
   path: '/labels/$labelId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NfcCodeRoute = NfcCodeRouteImport.update({
+  id: '/nfc/$code',
+  path: '/nfc/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PayBookingIdRoute = PayBookingIdRouteImport.update({
   id: '/pay/$bookingId',
   path: '/pay/$bookingId',
@@ -941,6 +947,7 @@ export interface FileRoutesByFullPath {
   '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
+  '/nfc/$code': typeof NfcCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1079,6 +1086,7 @@ export interface FileRoutesByTo {
   '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
+  '/nfc/$code': typeof NfcCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1219,6 +1227,7 @@ export interface FileRoutesById {
   '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
   '/labels/$labelId': typeof LabelsLabelIdRoute
+  '/nfc/$code': typeof NfcCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
@@ -1360,6 +1369,7 @@ export interface FileRouteTypes {
     | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
+    | '/nfc/$code'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1498,6 +1508,7 @@ export interface FileRouteTypes {
     | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
+    | '/nfc/$code'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1637,6 +1648,7 @@ export interface FileRouteTypes {
     | '/join/$username'
     | '/label-invite/$code'
     | '/labels/$labelId'
+    | '/nfc/$code'
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
@@ -1750,6 +1762,7 @@ export interface RootRouteChildren {
   JoinUsernameRoute: typeof JoinUsernameRoute
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
   LabelsLabelIdRoute: typeof LabelsLabelIdRoute
+  NfcCodeRoute: typeof NfcCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
@@ -2454,6 +2467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabelsLabelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nfc/$code': {
+      id: '/nfc/$code'
+      path: '/nfc/$code'
+      fullPath: '/nfc/$code'
+      preLoaderRoute: typeof NfcCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pay/$bookingId': {
       id: '/pay/$bookingId'
       path: '/pay/$bookingId'
@@ -2927,6 +2947,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinUsernameRoute: JoinUsernameRoute,
   LabelInviteCodeRoute: LabelInviteCodeRoute,
   LabelsLabelIdRoute: LabelsLabelIdRoute,
+  NfcCodeRoute: NfcCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
