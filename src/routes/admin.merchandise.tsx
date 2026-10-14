@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin/merchandise")({
 const input = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm";
 const toCents = (v: string) => (v.trim() === "" ? null : Math.round(Number(v) * 100));
 const dollars = (c: number | null | undefined) => (c == null ? "" : (c / 100).toFixed(2));
-type Tab = "products" | "shipping" | "split" | "orders" | "log";
+type Tab = "products" | "shipping" | "orders" | "log";
 
 function MerchAdmin() {
   const auth = useAuth();
@@ -30,10 +30,9 @@ function MerchAdmin() {
   const q = useQuery({ queryKey: ["admin-merch-store"], queryFn: () => fn(), enabled: isAdmin });
   const [tab, setTab] = useState<Tab>("products");
   if (!isAdmin) return <SectionPage title="Merchandise" subtitle="Admins only."><EmptyState icon={ShoppingBag} title="Admins only" hint="Sign in with an admin account." /></SectionPage>;
-  const d: any = q.data ?? { products: [], variants: [], rules: [], orders: [], ledger: [], log: [], names: {}, artistBps: 6000 };
+  const d: any = q.data ?? { products: [], variants: [], rules: [], orders: [], ledger: [], log: [], names: {}, artistBps: 10000 };
   const pending = d.products.filter((p: any) => p.review_status === "pending").length;
   const live = d.ledger.filter((l: any) => l.environment === "live");
-  const platform = live.reduce((s: number, l: any) => s + l.platform_cents, 0);
   const artist = live.reduce((s: number, l: any) => s + l.artist_cents, 0);
   return (
     <SectionPage title="Merchandise" subtitle="Review artist products, set real costs and shipping. Nothing sells until approved here; every change is logged."
@@ -186,24 +185,6 @@ function RuleRow({ category, region, rule }: { category: StoreMerchCategory; reg
   );
 }
 
-function Split({ bps }: { bps: number }) {
-  const qc = useQueryClient();
-  const save = useServerFn(adminSaveSplit);
-  const [pct, setPct] = useState(String(bps / 100));
-  return (
-    <div className="max-w-md rounded-2xl border border-border bg-card p-4">
-      <p className="mb-3 text-sm text-muted-foreground">Share of net merchandise profit (after cost and payment fee, excluding tax and shipping). Applies to sales confirmed after the change; past sales keep their recorded split.</p>
-      <label className="text-xs text-muted-foreground">Artist share (%)<input className={input} inputMode="decimal" value={pct} onChange={(e) => setPct(e.target.value)} /></label>
-      <p className="mt-2 text-xs">Tunevio share: {Math.max(0, 100 - Number(pct || 0)).toFixed(2)}%</p>
-      <Button className="mt-3" size="sm" onClick={async () => {
-        const v = Math.round(Number(pct) * 100);
-        if (!Number.isFinite(v) || v < 0 || v > 10000) return toast.error("Enter 0–100");
-        const r = await save({ data: { artist_bps: v } });
-        if (r.error) toast.error(r.error); else { toast.success("Split saved"); qc.invalidateQueries({ queryKey: ["admin-merch-store"] }); }
-      }}>Save split</Button>
-    </div>
-  );
-}
 
 function Orders({ d }: { d: any }) {
   const [search, setSearch] = useState("");
