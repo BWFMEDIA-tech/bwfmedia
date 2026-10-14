@@ -12,6 +12,7 @@ import {
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
+import { TrialGate } from "@/components/site/TrialGate";
 import { hasArtistTools } from "@/lib/artist-navigation";
 import { usePlayer } from "@/lib/player-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -78,7 +79,7 @@ export const Route = createFileRoute("/artist/$id")({
       }],
     };
   },
-  component: ArtistProfilePage,
+  component: GatedArtistProfilePage,
   errorComponent: () => <div className="px-6 py-16 text-center text-foreground"><h1 className="text-2xl font-semibold">Unable to load artist</h1><p className="mt-2 text-muted-foreground">Please refresh and try again.</p></div>,
   notFoundComponent: () => <div className="px-6 py-16 text-center text-foreground">Artist not found.</div>,
 });
@@ -98,6 +99,17 @@ const SOCIAL_ICONS: Record<string, any> = {
   facebook: Facebook, tiktok: Music2, spotify: Music2, soundcloud: Music2,
   website: Link2,
 };
+
+function GatedArtistProfilePage() {
+  const { id: routeId } = useParams({ from: "/artist/$id" });
+  const { data: meta } = useSuspenseQuery(artistMetaOptions(routeId));
+  const { user } = useAuth();
+  return (
+    <TrialGate enabled={!!user && user.id === meta.artistId}>
+      <ArtistProfilePage />
+    </TrialGate>
+  );
+}
 
 function ArtistProfilePage() {
   const { id: routeId } = useParams({ from: "/artist/$id" });

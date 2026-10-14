@@ -135,7 +135,7 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
                 ))}
               </div>
               {audience === "guest" && (
-                <p className="text-xs text-muted-foreground">New here? <Link to="/signup" className="text-primary" onClick={onNavigate}>Create an account</Link> to save your chat.</p>
+                <p className="text-xs text-muted-foreground">New here? <Link to="/pricing" className="text-primary" onClick={onNavigate}>Create an account</Link> to save your chat.</p>
               )}
             </div>
           )}

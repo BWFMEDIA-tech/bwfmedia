@@ -202,7 +202,7 @@ function LoginPage() {
         )}
         <div className="flex justify-between mt-5 text-xs text-bone/60">
           <Link to="/forgot-password" className="hover:text-blood transition-colors">Forgot password?</Link>
-          <Link to="/signup" className="hover:text-blood transition-colors">Create account</Link>
+          <Link to="/pricing" className="hover:text-blood transition-colors">Create account</Link>
         </div>
       </div>
     </div>

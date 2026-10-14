@@ -332,13 +332,13 @@ function MovementCTA() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <RouterLink
-              to="/signup"
+              to="/pricing"
               className="inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
             >
               <Mic size={14} /> Join as an Artist
             </RouterLink>
             <RouterLink
-              to="/signup"
+              to="/pricing"
               className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
             >
               <Headphones size={14} /> Join as a Listener
