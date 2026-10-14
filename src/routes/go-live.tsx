@@ -342,7 +342,6 @@ function GoLivePage() {
                 const key = link.provider.toLowerCase();
                 const url = safePlatformUrl(key, link.url);
                 if (!url) return [];
-                const platform = PROFILE_PLATFORMS.find((p) => p.key === key);
                 const Icon = platformIcons[key as keyof typeof platformIcons] ?? Link2;
                 const label = platformLabel(link.provider);
                 return [

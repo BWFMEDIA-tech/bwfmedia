@@ -20,7 +20,6 @@ export function ProfilePlatformLinks({ links, isOwner = false }: { links: Profil
       {!!visible.length && <div className="flex flex-wrap gap-2">
         {visible.map(link => {
           const key = link.provider.toLowerCase();
-          const platform = PROFILE_PLATFORMS.find(p => p.key === key);
           const Icon = icons[key as keyof typeof icons] ?? Link2;
           return <Button key={link.provider + link.url} asChild variant="outline" size="sm"><a href={link.url} target="_blank" rel="noopener noreferrer" title={link.handle || platformLabel(link.provider)}><Icon /><span>{platformLabel(link.provider)}</span><ExternalLink className="size-3" /></a></Button>;
         })}
