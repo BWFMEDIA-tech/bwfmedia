@@ -210,10 +210,10 @@ async function markArtistSubscriptionDeleted(sub: any, env: StripeEnv) {
 }
 
 const TUNEVIO_PLAN_META: Record<string, { role: 'listener' | 'artist'; priceCents: number }> = {
-  listener_premium:     { role: 'listener', priceCents:  999 },
+  listener_premium:     { role: 'listener', priceCents:  699 },
   listener_fan_premium: { role: 'listener', priceCents: 1499 },
   listener_student:     { role: 'listener', priceCents:  499 },
-  artist_starter:       { role: 'artist',   priceCents:  999 },
+  artist_starter:       { role: 'artist',   priceCents:  699 },
   artist_pro:           { role: 'artist',   priceCents: 1999 },
   label_plan:           { role: 'artist',   priceCents: 9900 },
 };
