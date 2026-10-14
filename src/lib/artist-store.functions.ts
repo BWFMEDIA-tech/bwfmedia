@@ -91,7 +91,8 @@ export const getMyStore = createServerFn({ method: "GET" })
     const pids = (products ?? []).map((p: any) => p.id);
     const { data: variants } = pids.length ? await sb.from("store_product_variants").select("*").in("product_id", pids).order("sort") : { data: [] };
     const { data: ledger } = await sb.from("store_earnings_ledger").select("order_id, entry_type, revenue_cents, cost_cents, fee_cents, artist_bps, artist_cents, platform_cents, environment, created_at").eq("seller_user_id", context.userId).order("created_at", { ascending: false }).limit(500);
-    const { data: split } = await sb.from("store_revenue_settings").select("artist_bps").eq("id", 1).maybeSingle();
+    // Split settings are admin-only now; artists see their applied share from their own ledger rows.
+    const lastLedgerBps = (ledger ?? []).find((r: any) => typeof r.artist_bps === "number")?.artist_bps;
     let allOrders: any[] = [];
     if (isAdmin) {
       const { data: a } = await sb.from("store_orders").select("*").order("created_at", { ascending: false }).limit(300);
