@@ -26,8 +26,8 @@ export async function recordStoreSale(admin: any, orderId: string, env: StripeEn
       return; // retry on the next delivery rather than record a wrong fee
     }
   }
-  const { data: s } = await admin.from("store_revenue_settings").select("artist_bps").eq("id", 1).maybeSingle();
-  const bps = s?.artist_bps ?? DEFAULT_ARTIST_BPS;
+  // The split feature was removed: artists keep 100% of net profit.
+  const bps = DEFAULT_ARTIST_BPS;
   const cost = (o.unit_cost_cents ?? 0) * o.quantity;
   const split = computeSplit({ revenue_cents: revenue, cost_cents: cost, fee_cents: fee, artist_bps: bps });
   await admin.from("store_orders").update({ fee_cents: fee }).eq("id", o.id);

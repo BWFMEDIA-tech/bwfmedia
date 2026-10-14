@@ -6,7 +6,7 @@ import { ShoppingBag, ClipboardCheck, DollarSign, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { SectionPage, EmptyState } from "@/components/admin/SectionPage";
 import { Button } from "@/components/ui/button";
-import { adminStoreOverview, adminReviewProduct, adminSaveShippingRule, adminSaveSplit } from "@/lib/store-admin.functions";
+import { adminStoreOverview, adminReviewProduct, adminSaveShippingRule } from "@/lib/store-admin.functions";
 import {
   CATEGORY_LABELS, PRODUCT_TYPE_LABELS, REVIEW_STATUSES, SHIPPING_REGIONS, STORE_CATEGORIES, SUGGESTED_PRICE_CENTS,
   categoryOf, computeSplit, formatPrice, type ProductType, type ReviewStatus, type StoreMerchCategory, type ShippingRegion,
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/admin/merchandise")({
 const input = "w-full rounded-md border border-border bg-background px-3 py-2 text-sm";
 const toCents = (v: string) => (v.trim() === "" ? null : Math.round(Number(v) * 100));
 const dollars = (c: number | null | undefined) => (c == null ? "" : (c / 100).toFixed(2));
-type Tab = "products" | "shipping" | "split" | "orders" | "log";
+type Tab = "products" | "shipping" | "orders" | "log";
 
 function MerchAdmin() {
   const auth = useAuth();
@@ -30,26 +30,23 @@ function MerchAdmin() {
   const q = useQuery({ queryKey: ["admin-merch-store"], queryFn: () => fn(), enabled: isAdmin });
   const [tab, setTab] = useState<Tab>("products");
   if (!isAdmin) return <SectionPage title="Merchandise" subtitle="Admins only."><EmptyState icon={ShoppingBag} title="Admins only" hint="Sign in with an admin account." /></SectionPage>;
-  const d: any = q.data ?? { products: [], variants: [], rules: [], orders: [], ledger: [], log: [], names: {}, artistBps: 6000 };
+  const d: any = q.data ?? { products: [], variants: [], rules: [], orders: [], ledger: [], log: [], names: {}, artistBps: 10000 };
   const pending = d.products.filter((p: any) => p.review_status === "pending").length;
   const live = d.ledger.filter((l: any) => l.environment === "live");
-  const platform = live.reduce((s: number, l: any) => s + l.platform_cents, 0);
   const artist = live.reduce((s: number, l: any) => s + l.artist_cents, 0);
   return (
-    <SectionPage title="Merchandise" subtitle="Review artist products, set real costs, shipping and the revenue split. Nothing sells until approved here; every change is logged."
+    <SectionPage title="Merchandise" subtitle="Review artist products, set real costs and shipping. Nothing sells until approved here; every change is logged."
       stats={[
         { label: "Waiting for review", value: String(pending), icon: ClipboardCheck, color: "#00E6FF" },
         { label: "Artist earnings (live)", value: formatPrice(artist), icon: DollarSign, color: "#004BFF" },
-        { label: "Tunevio share (live)", value: formatPrice(platform), icon: Truck, color: "#94a3b8" },
       ]}>
       <div className="mb-4 flex flex-wrap gap-2">
-        {(["products", "shipping", "split", "orders", "log"] as Tab[]).map((t) => (
+        {(["products", "shipping", "orders", "log"] as Tab[]).map((t) => (
           <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)} className="capitalize">{t === "log" ? "Change log" : t}</Button>
         ))}
       </div>
       {tab === "products" && <Products d={d} />}
       {tab === "shipping" && <Shipping rules={d.rules} />}
-      {tab === "split" && <Split bps={d.artistBps} />}
       {tab === "orders" && <Orders d={d} />}
       {tab === "log" && (
         <div className="rounded-2xl border border-border bg-card p-4">
@@ -188,24 +185,6 @@ function RuleRow({ category, region, rule }: { category: StoreMerchCategory; reg
   );
 }
 
-function Split({ bps }: { bps: number }) {
-  const qc = useQueryClient();
-  const save = useServerFn(adminSaveSplit);
-  const [pct, setPct] = useState(String(bps / 100));
-  return (
-    <div className="max-w-md rounded-2xl border border-border bg-card p-4">
-      <p className="mb-3 text-sm text-muted-foreground">Share of net merchandise profit (after cost and payment fee, excluding tax and shipping). Applies to sales confirmed after the change; past sales keep their recorded split.</p>
-      <label className="text-xs text-muted-foreground">Artist share (%)<input className={input} inputMode="decimal" value={pct} onChange={(e) => setPct(e.target.value)} /></label>
-      <p className="mt-2 text-xs">Tunevio share: {Math.max(0, 100 - Number(pct || 0)).toFixed(2)}%</p>
-      <Button className="mt-3" size="sm" onClick={async () => {
-        const v = Math.round(Number(pct) * 100);
-        if (!Number.isFinite(v) || v < 0 || v > 10000) return toast.error("Enter 0–100");
-        const r = await save({ data: { artist_bps: v } });
-        if (r.error) toast.error(r.error); else { toast.success("Split saved"); qc.invalidateQueries({ queryKey: ["admin-merch-store"] }); }
-      }}>Save split</Button>
-    </div>
-  );
-}
 
 function Orders({ d }: { d: any }) {
   const [search, setSearch] = useState("");
