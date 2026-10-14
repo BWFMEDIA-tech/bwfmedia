@@ -33,6 +33,7 @@ import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
 import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
+import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { getArtistLiveStream } from "@/lib/streams.functions";
 
 const artistMetaOptions = (id: string) =>
@@ -172,6 +173,7 @@ function ArtistProfilePage() {
         stream={liveQuery.data}
         artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null, tracks: (meta?.tracks ?? []).map((t) => ({ id: t.id, title: t.title, cover_url: t.cover_url })) }}
         followSlot={!isOwner ? <FollowButton artistId={id} /> : null}
+        platformSlot={<ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />}
         onEnded={onLiveEnded}
       />
     );
@@ -191,9 +193,10 @@ function ArtistProfilePage() {
             canUseTools={hasArtistTools(auth.roles)}
           />
           <ProfileLiveBar artistId={id} isOwner={ownerTools} />
+          <ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
-            <AboutBlock name={artist.name} bio={meta?.bio ?? null} socials={meta?.socials ?? []} />
+            <AboutBlock name={artist.name} bio={meta?.bio ?? null} />
           )}
           {isBlank && !isOwner ? (
             <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
@@ -396,7 +399,7 @@ function FollowButton({ artistId }: { artistId: string }) {
   );
 }
 
-function AboutBlock({ name, bio, socials }: { name: string; bio: string | null; socials: Array<{ provider: string; url: string; handle: string | null }> }) {
+function AboutBlock({ name, bio }: { name: string; bio: string | null }) {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 md:p-6">
       <h2 className="text-lg font-semibold mb-2">About {name}</h2>
@@ -404,18 +407,6 @@ function AboutBlock({ name, bio, socials }: { name: string; bio: string | null; 
         <p className="text-sm text-white/70 leading-relaxed max-w-2xl whitespace-pre-wrap">{bio}</p>
       ) : (
         <p className="text-sm text-white/40 italic">No bio yet.</p>
-      )}
-      {socials.length > 0 && (
-        <div className="mt-4 flex items-center gap-3 text-white/60 flex-wrap">
-          {socials.map((s) => {
-            const Icon = SOCIAL_ICONS[s.provider?.toLowerCase()] ?? Link2;
-            return (
-              <a key={s.provider + s.url} href={s.url} target="_blank" rel="noopener noreferrer" title={s.handle ?? s.provider} className="grid h-9 w-9 place-items-center rounded-full bg-white/5 hover:bg-white/10 hover:text-white">
-                <Icon className="h-4 w-4" />
-              </a>
-            );
-          })}
-        </div>
       )}
     </section>
   );
