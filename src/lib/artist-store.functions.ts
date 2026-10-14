@@ -91,8 +91,8 @@ export const getMyStore = createServerFn({ method: "GET" })
     const pids = (products ?? []).map((p: any) => p.id);
     const { data: variants } = pids.length ? await sb.from("store_product_variants").select("*").in("product_id", pids).order("sort") : { data: [] };
     const { data: ledger } = await sb.from("store_earnings_ledger").select("order_id, entry_type, revenue_cents, cost_cents, fee_cents, artist_bps, artist_cents, platform_cents, environment, created_at").eq("seller_user_id", context.userId).order("created_at", { ascending: false }).limit(500);
-    // Split settings are admin-only now; artists see their applied share from their own ledger rows.
-    const lastLedgerBps = (ledger ?? []).find((r: any) => typeof r.artist_bps === "number")?.artist_bps;
+    // The split feature was removed: artists keep 100% of net profit.
+
     let allOrders: any[] = [];
     if (isAdmin) {
       const { data: a } = await sb.from("store_orders").select("*").order("created_at", { ascending: false }).limit(300);
@@ -107,7 +107,7 @@ export const getMyStore = createServerFn({ method: "GET" })
       releases: releases ?? [],
       variants: variants ?? [],
       ledger: ledger ?? [],
-      artistBps: (lastLedgerBps ?? DEFAULT_ARTIST_BPS) as number,
+      artistBps: DEFAULT_ARTIST_BPS as number,
     };
   });
 

@@ -17,11 +17,10 @@ export const adminStoreOverview = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context);
     const sb = context.supabase as any;
-    const [{ data: products }, { data: variants }, { data: rules }, { data: split }, { data: orders }, { data: ledger }, { data: log }] = await Promise.all([
+    const [{ data: products }, { data: variants }, { data: rules }, { data: orders }, { data: ledger }, { data: log }] = await Promise.all([
       sb.from("store_products").select("id, user_id, title, product_type, price_cents, cost_cents, inventory, min_quantity, made_to_order, status, review_status, reviewed_at, updated_at").neq("status", "archived").order("updated_at", { ascending: false }).limit(500),
       sb.from("store_product_variants").select("id, product_id, label, price_cents, cost_cents, inventory, active").order("sort"),
       sb.from("store_shipping_rules").select("*"),
-      sb.from("store_revenue_settings").select("*").eq("id", 1).maybeSingle(),
       sb.from("store_orders").select("id, product_title, variant_label, seller_user_id, buyer_email, quantity, unit_price_cents, shipping_cents, amount_total_cents, fee_cents, currency, status, fulfillment_status, tracking_number, carrier, environment, created_at").order("created_at", { ascending: false }).limit(500),
       sb.from("store_earnings_ledger").select("order_id, entry_type, artist_cents, platform_cents, revenue_cents, environment"),
       sb.from("admin_audit_log").select("id, actor_email, action, summary, created_at").like("action", "store.%").order("created_at", { ascending: false }).limit(100),
@@ -31,7 +30,7 @@ export const adminStoreOverview = createServerFn({ method: "GET" })
     const names: Record<string, string> = {};
     for (const p of profs ?? []) names[p.id] = p.display_name || p.username || "";
     return {
-      products: products ?? [], variants: variants ?? [], rules: rules ?? [], artistBps: (split?.artist_bps ?? DEFAULT_ARTIST_BPS) as number,
+      products: products ?? [], variants: variants ?? [], rules: rules ?? [], artistBps: DEFAULT_ARTIST_BPS as number,
       orders: orders ?? [], ledger: ledger ?? [], log: log ?? [], names,
     };
   });
@@ -97,15 +96,3 @@ export const adminSaveShippingRule = createServerFn({ method: "POST" })
     return { error: null as string | null };
   });
 
-export const adminSaveSplit = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ artist_bps: z.number().int().min(0).max(10000) }).parse(d))
-  .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const sb = context.supabase as any;
-    const { data: before } = await sb.from("store_revenue_settings").select("artist_bps").eq("id", 1).maybeSingle();
-    const { error } = await sb.from("store_revenue_settings").upsert({ id: 1, artist_bps: data.artist_bps, updated_by: context.userId, updated_at: new Date().toISOString() });
-    if (error) return { error: error.message };
-    await audit(context, "store.split.save", "store_revenue_settings", "1", `Artist share ${(before?.artist_bps ?? DEFAULT_ARTIST_BPS) / 100}% → ${data.artist_bps / 100}%`, { before: before?.artist_bps ?? null, after: data.artist_bps });
-    return { error: null as string | null };
-  });

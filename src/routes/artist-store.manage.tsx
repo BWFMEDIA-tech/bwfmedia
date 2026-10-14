@@ -76,7 +76,7 @@ function ManagePage() {
       <div className="mt-2 rounded-2xl border border-border bg-card p-3 text-sm">
         <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Your finalized earnings</div>
         <div className="mt-1 text-lg font-bold">{formatPrice(earned)}</div>
-        <p className="text-xs text-muted-foreground">You receive {(data.artistBps / 100).toFixed(0)}% of net profit (price minus product cost and payment fee; tax and shipping excluded). Refunds and chargebacks are taken back automatically.</p>
+        <p className="text-xs text-muted-foreground">You receive 100% of net profit (price minus product cost and payment fee; tax and shipping excluded). Refunds and chargebacks are taken back automatically.</p>
       </div>
 
       <div className="mt-5 flex gap-2 border-b border-border">

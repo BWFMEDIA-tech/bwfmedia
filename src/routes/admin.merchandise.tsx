@@ -142,7 +142,7 @@ function ReviewForm({ p, variants, bps }: { p: any; variants: any[]; bps: number
           ))}
         </div>
       )}
-      {est && <p className="text-xs text-muted-foreground">Estimate per item (fee estimated at 2.9% + 30¢): profit {formatPrice(est.profit_cents)} · artist {formatPrice(est.artist_cents)} · Tunevio {formatPrice(est.platform_cents)}. Final amounts use the real payment fee.</p>}
+      {est && <p className="text-xs text-muted-foreground">Estimate per item (fee estimated at 2.9% + 30¢): profit {formatPrice(est.profit_cents)} · artist {formatPrice(est.artist_cents)}. Final amounts use the real payment fee.</p>}
       <div className="flex flex-wrap gap-2">
         <Button size="sm" disabled={busy} onClick={() => submit("approved")}>Approve for sale</Button>
         <Button size="sm" variant="outline" disabled={busy} onClick={() => submit("pending")}>Save, keep in review</Button>

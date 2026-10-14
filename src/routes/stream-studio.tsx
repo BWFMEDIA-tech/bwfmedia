@@ -24,7 +24,6 @@ import { broadcastStreamStarted } from "@/lib/live-broadcast.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { StudioLiveStageContent, StudioCameraPublishSync, useStudioStreamSpotlight } from "@/components/studio/StudioLiveStage";
 import { LiveChat } from "@/components/stream/LiveChat";
-import { LiveEarningsTicker } from "@/components/stream/LiveEarningsTicker";
 import { HostEarningsCard } from "@/components/stream/HostEarningsCard";
 import { useStageState } from "@/lib/useStageState";
 import { ModeToggle } from "@/components/stream/ModeToggle";
@@ -1214,7 +1213,7 @@ function StreamStudio() {
             {/* Right rail — sticky console */}
             <StudioColumn className="flex flex-col gap-3 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)]">
               <StudioBlock id="earnings" label="Live Earnings">
-              <>{stream?.id && <div className="space-y-3"><LiveEarningsTicker streamId={stream.id} /><HostEarningsCard streamId={stream.id} /></div>}</>
+              <>{stream?.id && <div className="space-y-3"><HostEarningsCard streamId={stream.id} /></div>}</>
               </StudioBlock>
               <StudioBlock id="chat" label="Live Chat">
               <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
