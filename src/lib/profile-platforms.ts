@@ -16,7 +16,7 @@ export function platformLabel(provider: string): string {
     .trim()
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
-    .replace(/^./, char => char.toUpperCase());
+    .replace(/\b\w/g, char => char.toUpperCase());
 }
 
 export function safePlatformUrl(provider: string, value: string): string | null {
