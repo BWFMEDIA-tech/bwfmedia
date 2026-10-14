@@ -64,6 +64,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
 import { Route as AdminArtistReferralsRouteImport } from './routes/admin.artist-referrals'
 import { Route as AdminArtistsRouteImport } from './routes/admin.artists'
 import { Route as AdminAssistantRouteImport } from './routes/admin.assistant'
@@ -437,6 +438,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminArtistReferralsRoute = AdminArtistReferralsRouteImport.update({
@@ -992,6 +998,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/assistant': typeof AdminAssistantRoute
@@ -1144,6 +1151,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/assistant': typeof AdminAssistantRoute
@@ -1299,6 +1307,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/announcements': typeof AdminAnnouncementsRoute
   '/admin/artist-referrals': typeof AdminArtistReferralsRoute
   '/admin/artists': typeof AdminArtistsRoute
   '/admin/assistant': typeof AdminAssistantRoute
@@ -1455,6 +1464,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
+    | '/admin/announcements'
     | '/admin/artist-referrals'
     | '/admin/artists'
     | '/admin/assistant'
@@ -1607,6 +1617,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
+    | '/admin/announcements'
     | '/admin/artist-referrals'
     | '/admin/artists'
     | '/admin/assistant'
@@ -1761,6 +1772,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/analytics'
+    | '/admin/announcements'
     | '/admin/artist-referrals'
     | '/admin/artists'
     | '/admin/assistant'
@@ -2348,6 +2360,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/admin/analytics'
       preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/announcements': {
+      id: '/admin/announcements'
+      path: '/announcements'
+      fullPath: '/admin/announcements'
+      preLoaderRoute: typeof AdminAnnouncementsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/artist-referrals': {
@@ -3034,6 +3053,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
   AdminArtistReferralsRoute: typeof AdminArtistReferralsRoute
   AdminArtistsRoute: typeof AdminArtistsRoute
   AdminAssistantRoute: typeof AdminAssistantRoute
@@ -3068,6 +3088,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAnnouncementsRoute: AdminAnnouncementsRoute,
   AdminArtistReferralsRoute: AdminArtistReferralsRoute,
   AdminArtistsRoute: AdminArtistsRoute,
   AdminAssistantRoute: AdminAssistantRoute,
