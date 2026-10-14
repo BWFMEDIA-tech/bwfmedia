@@ -38,6 +38,8 @@ export const Route = createFileRoute("/go-live")({
 
 type ActiveStream = { id: string; room_name: string; title: string };
 
+const platformIcons = { twitch: Twitch, youtube: Youtube, facebook: Facebook, tiktok: Music2, kick: Radio };
+
 function GoLivePage() {
   const auth = useAuth();
   const navigate = useNavigate();
@@ -167,6 +169,16 @@ function GoLivePage() {
     setStartedAt(null);
     setViewerCount(0);
     toast.success("Live ended");
+  };
+
+  const copyPlatform = async (url: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedPlatform(key);
+      setTimeout(() => setCopiedPlatform(null), 1500);
+    } catch {
+      toast.error("Could not copy the link");
+    }
   };
 
   const copyLink = async () => {
