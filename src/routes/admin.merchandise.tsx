@@ -36,20 +36,18 @@ function MerchAdmin() {
   const platform = live.reduce((s: number, l: any) => s + l.platform_cents, 0);
   const artist = live.reduce((s: number, l: any) => s + l.artist_cents, 0);
   return (
-    <SectionPage title="Merchandise" subtitle="Review artist products, set real costs, shipping and the revenue split. Nothing sells until approved here; every change is logged."
+    <SectionPage title="Merchandise" subtitle="Review artist products, set real costs and shipping. Nothing sells until approved here; every change is logged."
       stats={[
         { label: "Waiting for review", value: String(pending), icon: ClipboardCheck, color: "#00E6FF" },
         { label: "Artist earnings (live)", value: formatPrice(artist), icon: DollarSign, color: "#004BFF" },
-        { label: "Tunevio share (live)", value: formatPrice(platform), icon: Truck, color: "#94a3b8" },
       ]}>
       <div className="mb-4 flex flex-wrap gap-2">
-        {(["products", "shipping", "split", "orders", "log"] as Tab[]).map((t) => (
+        {(["products", "shipping", "orders", "log"] as Tab[]).map((t) => (
           <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)} className="capitalize">{t === "log" ? "Change log" : t}</Button>
         ))}
       </div>
       {tab === "products" && <Products d={d} />}
       {tab === "shipping" && <Shipping rules={d.rules} />}
-      {tab === "split" && <Split bps={d.artistBps} />}
       {tab === "orders" && <Orders d={d} />}
       {tab === "log" && (
         <div className="rounded-2xl border border-border bg-card p-4">
