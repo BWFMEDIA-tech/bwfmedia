@@ -10,15 +10,23 @@ import { useServerFn } from "@tanstack/react-start";
 import { listMyEvents, createMyEvent, updateMyEvent, deleteMyEvent, type EventRow } from "@/lib/events.functions";
 
 export const Route = createFileRoute("/settings/profile")({
+  head: () => ({ meta: [
+    { title: "Profile Settings | Tunevio" },
+    { name: "description", content: "Manage your Tunevio profile, photos, social links and upcoming events." },
+    { property: "og:title", content: "Profile Settings | Tunevio" },
+    { property: "og:description", content: "Manage your Tunevio profile, photos, social links and upcoming events." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ProfileSettingsPage,
 });
 
 const SOCIAL_PROVIDERS = [
-  { key: "instagram", label: "Instagram", color: "bg-gradient-to-br from-pink-500 to-purple-600" },
+  { key: "instagram", label: "Instagram", color: "bg-gradient-to-br from-primary to-accent" },
   { key: "tiktok", label: "TikTok", color: "bg-black border border-white/20" },
-  { key: "youtube", label: "YouTube", color: "bg-red-600" },
+  { key: "youtube", label: "YouTube", color: "bg-accent" },
   { key: "x", label: "X (Twitter)", color: "bg-black border border-white/20" },
-  { key: "facebook", label: "Facebook", color: "bg-blue-600" },
+  { key: "facebook", label: "Facebook", color: "bg-accent" },
 ];
 
 const GENRE_OPTIONS = ["Hip-Hop / R&B", "R&B", "Hip-Hop", "Pop", "Trap", "Soul", "Afrobeats", "EDM", "Rock", "Country", "Jazz", "Reggae", "Latin", "Gospel", "Lo-Fi"];
@@ -203,7 +211,7 @@ function ProfileSettingsPage() {
   }
 
   if (loading) {
-    return <div className="grid h-96 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-white/60" /></div>;
+    return <div className="grid h-96 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-foreground/60" /></div>;
   }
 
   return (
@@ -211,29 +219,29 @@ function ProfileSettingsPage() {
       <div className="min-w-0 space-y-6">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Profile Settings</h1>
-          <p className="mt-1 text-sm text-white/60">Manage how your profile appears to fans across BWF Network.</p>
+          <p className="mt-1 text-sm text-foreground/60">Manage how your profile appears to fans across BWF Network.</p>
         </div>
 
         <Section>
           <Field title="Profile Photo" hint="This is your profile image">
             <div className="flex flex-wrap items-center gap-4">
-              <div className="relative h-20 w-20 cursor-pointer overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-red-600/30 to-purple-600/30" onClick={() => avatarInput.current?.click()}>
-                {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-xl font-black text-white/30">{initials || "?"}</div>}
-                <div className="absolute -bottom-0 -right-0 grid h-6 w-6 place-items-center rounded-full bg-red-600 text-white"><Camera className="h-3 w-3" /></div>
+              <div className="relative h-20 w-20 cursor-pointer overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-primary/30 to-accent/30" onClick={() => avatarInput.current?.click()}>
+                {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-xl font-black text-foreground/30">{initials || "?"}</div>}
+                <div className="absolute -bottom-0 -right-0 grid h-6 w-6 place-items-center rounded-full bg-accent text-foreground"><Camera className="h-3 w-3" /></div>
               </div>
               <button onClick={() => avatarInput.current?.click()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"><Upload className="h-4 w-4" /> Upload New Photo</button>
-              <div className="text-xs text-white/40">JPG, PNG or WEBP. Max 5MB.</div>
+              <div className="text-xs text-foreground/40">JPG, PNG or WEBP. Max 5MB.</div>
               <input ref={avatarInput} type="file" accept="image/*" className="hidden" onChange={(e) => handleFile(e, "avatar")} />
             </div>
           </Field>
 
           <Field title="Banner Image" hint="This image appears at the top of your profile">
             <div className="relative aspect-[24/6] w-full overflow-hidden rounded-xl border border-white/10 bg-white/5">
-              {(bannerPreview || bannerUrl) ? <img src={bannerPreview || bannerUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-white/30"><ImageIcon className="h-6 w-6" /></div>}
-              <button onClick={() => bannerInput.current?.click()} className="absolute bottom-3 right-3 grid h-8 w-8 place-items-center rounded-md bg-black/60 text-white hover:bg-black/80"><Camera className="h-4 w-4" /></button>
+              {(bannerPreview || bannerUrl) ? <img src={bannerPreview || bannerUrl} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-foreground/30"><ImageIcon className="h-6 w-6" /></div>}
+              <button onClick={() => bannerInput.current?.click()} className="absolute bottom-3 right-3 grid h-8 w-8 place-items-center rounded-md bg-black/60 text-foreground hover:bg-black/80"><Camera className="h-4 w-4" /></button>
             </div>
             <button onClick={() => bannerInput.current?.click()} className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"><Upload className="h-4 w-4" /> Upload New Banner</button>
-            <span className="ml-3 text-xs text-white/40">Recommended 2400×600px. Max 5MB.</span>
+            <span className="ml-3 text-xs text-foreground/40">Recommended 2400×600px. Max 5MB.</span>
             <input ref={bannerInput} type="file" accept="image/*" className="hidden" onChange={(e) => handleFile(e, "banner")} />
           </Field>
         </Section>
@@ -243,20 +251,20 @@ function ProfileSettingsPage() {
             <Input label="Artist Name" value={displayName} onChange={setDisplayName} maxLength={80} />
             <Input label="Username" value={username} onChange={(v) => setUsername(v.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase())} maxLength={30} prefix="@" />
             <div className="md:col-span-2">
-              <Input label="Location" value={location} onChange={setLocation} maxLength={100} icon={<MapPin className="h-4 w-4 text-white/40" />} />
+              <Input label="Location" value={location} onChange={setLocation} maxLength={100} icon={<MapPin className="h-4 w-4 text-foreground/40" />} />
             </div>
             <div className="relative">
-              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-white/50">Genres</label>
+              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-foreground/50">Genres</label>
               <button onClick={() => setGenreOpen((o) => !o)} className="flex w-full flex-wrap items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-left text-sm hover:bg-white/10 min-h-[42px]">
-                {genres.length === 0 && <span className="text-white/40">Select genres…</span>}
+                {genres.length === 0 && <span className="text-foreground/40">Select genres…</span>}
                 {genres.map((g) => (
-                  <span key={g} className="inline-flex items-center gap-1 rounded-md bg-red-600/20 px-2 py-0.5 text-xs text-red-300">{g}<X className="h-3 w-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleGenre(g); }} /></span>
+                  <span key={g} className="inline-flex items-center gap-1 rounded-md bg-accent/20 px-2 py-0.5 text-xs text-primary">{g}<X className="h-3 w-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleGenre(g); }} /></span>
                 ))}
               </button>
               {genreOpen && (
-                <div className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-white/10 bg-[#0a0a0a] p-2 shadow-2xl">
+                <div className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-white/10 bg-background p-2 shadow-2xl">
                   {GENRE_OPTIONS.map((g) => (
-                    <button key={g} onClick={() => toggleGenre(g)} className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-white/5 ${genres.includes(g) ? "text-red-400" : "text-white/80"}`}>
+                    <button key={g} onClick={() => toggleGenre(g)} className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-white/5 ${genres.includes(g) ? "text-primary" : "text-foreground/80"}`}>
                       {g}{genres.includes(g) && <CheckCircle2 className="h-3.5 w-3.5" />}
                     </button>
                   ))}
@@ -265,15 +273,15 @@ function ProfileSettingsPage() {
             </div>
             <Input label="Member Since" value={memberSince ? new Date(memberSince).toLocaleString("en-US", { month: "long", year: "numeric" }) : "—"} onChange={() => {}} disabled />
             <div className="md:col-span-2">
-              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-white/50">Bio</label>
-              <textarea value={bio} onChange={(e) => setBio(e.target.value.slice(0, 500))} rows={4} placeholder="Tell people who you are…" className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm focus:border-red-600/40 focus:outline-none" />
-              <div className="mt-1 text-right text-xs text-white/40">{bio.length}/500</div>
+              <label className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-foreground/50">Bio</label>
+              <textarea value={bio} onChange={(e) => setBio(e.target.value.slice(0, 500))} rows={4} placeholder="Tell people who you are…" className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+              <div className="mt-1 text-right text-xs text-foreground/40">{bio.length}/500</div>
             </div>
           </div>
         </Section>
 
-        <Section title="Brand / Network Identity" icon={<Sparkles className="h-4 w-4 text-red-500" />}>
-          <p className="mb-3 text-xs text-white/50">
+        <Section title="Brand / Network Identity" icon={<Sparkles className="h-4 w-4 text-primary" />}>
+          <p className="mb-3 text-xs text-foreground/50">
             If you broadcast on behalf of a network, brand, or organization, set the name here.
             When set, this name and logo replace your personal name everywhere on stage —
             stage roster, video tiles, audio tiles, chat header, and audience view. Your personal
@@ -284,27 +292,27 @@ function ProfileSettingsPage() {
             <Input label="Brand Logo URL" value={brandAvatarUrl} onChange={setBrandAvatarUrl} maxLength={500} />
           </div>
           {brandName.trim() && (
-            <div className="mt-3 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-primary/20 bg-accent/5 p-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-white/10 bg-black/40">
                 {brandAvatarUrl
                   ? <SignedImg src={brandAvatarUrl} alt="" className="h-full w-full object-cover" />
-                  : <Sparkles className="h-4 w-4 text-red-400" />}
+                  : <Sparkles className="h-4 w-4 text-primary" />}
               </div>
               <div className="min-w-0">
-                <div className="truncate text-sm font-bold text-white">{brandName.trim()}</div>
-                <div className="text-[10px] uppercase tracking-widest text-red-300">Host identity — shown on stage</div>
+                <div className="truncate text-sm font-bold text-foreground">{brandName.trim()}</div>
+                <div className="text-[10px] uppercase tracking-widest text-primary">Host identity — shown on stage</div>
               </div>
             </div>
           )}
         </Section>
 
-        <Section title="Links & Socials" icon={<Share2 className="h-4 w-4 text-red-500" />}>
+        <Section title="Links & Socials" icon={<Share2 className="h-4 w-4 text-primary" />}>
           <div className="space-y-2">
             {socials.map((s, idx) => {
               const meta = SOCIAL_PROVIDERS.find((p) => p.key === s.provider)!;
               return (
                 <div key={s.provider} className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto]">
-                  <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-white text-xs font-bold ${meta.color}`} title={meta.label}>{meta.label[0]}</div>
+                  <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-foreground text-xs font-bold ${meta.color}`} title={meta.label}>{meta.label[0]}</div>
                   <input aria-label={`${meta.label} handle`} value={s.handle} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, handle: e.target.value } : c))} placeholder="@handle" className="min-w-0 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs" />
                   <input aria-label={`${meta.label} URL`} value={s.url} onChange={(e) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, url: e.target.value } : c))} placeholder="https://" className="col-span-3 row-start-2 min-w-0 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs sm:col-span-1 sm:row-start-auto" />
                   <Switch aria-label={`Show ${meta.label}`} checked={s.enabled} onCheckedChange={(v) => setSocials((cur) => cur.map((c, i) => i === idx ? { ...c, enabled: v } : c))} />
@@ -314,26 +322,26 @@ function ProfileSettingsPage() {
           </div>
         </Section>
 
-        <Section title="Music & Media Settings" icon={<Music2 className="h-4 w-4 text-red-500" />}>
+        <Section title="Music & Media Settings" icon={<Music2 className="h-4 w-4 text-primary" />}>
           <div className="space-y-2">
             <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="text-[10px] uppercase tracking-widest text-white/40 w-20 shrink-0">Featured Track</div>
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded bg-gradient-to-br from-red-600/40 to-purple-600/30"><Music className="h-4 w-4" /></div>
+                <div className="text-[10px] uppercase tracking-widest text-foreground/40 w-20 shrink-0">Featured Track</div>
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded bg-gradient-to-br from-primary/40 to-accent/30"><Music className="h-4 w-4" /></div>
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold">No Turning Back</div>
-                  <div className="truncate text-xs text-white/50">{displayName || "Artist"}</div>
+                  <div className="truncate text-xs text-foreground/50">{displayName || "Artist"}</div>
                 </div>
               </div>
               <a href="/settings/music-media" className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Change</a>
             </div>
             <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] p-3">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="text-[10px] uppercase tracking-widest text-white/40 w-20 shrink-0">Featured Video</div>
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded bg-gradient-to-br from-red-600/40 to-purple-600/30"><VideoIcon className="h-4 w-4" /></div>
+                <div className="text-[10px] uppercase tracking-widest text-foreground/40 w-20 shrink-0">Featured Video</div>
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded bg-gradient-to-br from-primary/40 to-accent/30"><VideoIcon className="h-4 w-4" /></div>
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold">No Turning Back (Official Video)</div>
-                  <div className="truncate text-xs text-white/50">3:24</div>
+                  <div className="truncate text-xs text-foreground/50">3:24</div>
                 </div>
               </div>
               <a href="/settings/music-media" className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Change</a>
@@ -341,24 +349,24 @@ function ProfileSettingsPage() {
           </div>
         </Section>
 
-        <Section title="Upcoming Events" icon={<Calendar className="h-4 w-4 text-red-500" />}>
+        <Section title="Upcoming Events" icon={<Calendar className="h-4 w-4 text-primary" />}>
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs text-white/50">Add and manage your upcoming shows and events.</p>
-            <button onClick={newEvent} className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Event</button>
+            <p className="text-xs text-foreground/50">Add and manage your upcoming shows and events.</p>
+            <button onClick={newEvent} className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent"><Plus className="h-3 w-3" /> Add Event</button>
           </div>
           {editingEvent && (
-            <div className="mb-3 space-y-2 rounded-lg border border-red-600/30 bg-red-600/[0.03] p-3">
-              <div className="text-xs font-semibold uppercase tracking-wider text-red-400">{editingEvent.id ? "Edit event" : "New event"}</div>
-              <input value={editingEvent.title ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })} placeholder="Event title" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+            <div className="mb-3 space-y-2 rounded-lg border border-primary/30 bg-accent/[0.03] p-3">
+              <div className="text-xs font-semibold uppercase tracking-wider text-primary">{editingEvent.id ? "Edit event" : "New event"}</div>
+              <input value={editingEvent.title ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })} placeholder="Event title" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-primary" />
               <div className="grid min-w-0 gap-2 sm:grid-cols-2">
-                <input type="datetime-local" value={editingEvent.starts_at ? new Date(editingEvent.starts_at).toISOString().slice(0, 16) : ""} onChange={(e) => setEditingEvent({ ...editingEvent, starts_at: e.target.value })} className="min-w-0 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-                <input value={editingEvent.location ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, location: e.target.value })} placeholder="Location (e.g. Atlanta, GA)" className="min-w-0 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+                <input type="datetime-local" value={editingEvent.starts_at ? new Date(editingEvent.starts_at).toISOString().slice(0, 16) : ""} onChange={(e) => setEditingEvent({ ...editingEvent, starts_at: e.target.value })} className="min-w-0 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-primary" />
+                <input value={editingEvent.location ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, location: e.target.value })} placeholder="Location (e.g. Atlanta, GA)" className="min-w-0 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-primary" />
               </div>
-              <input value={editingEvent.link_url ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, link_url: e.target.value })} placeholder="Ticket / info link (optional)" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
-              <textarea value={editingEvent.description ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })} placeholder="Description (optional)" rows={2} className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-red-500" />
+              <input value={editingEvent.link_url ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, link_url: e.target.value })} placeholder="Ticket / info link (optional)" className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-primary" />
+              <textarea value={editingEvent.description ?? ""} onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })} placeholder="Description (optional)" rows={2} className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-primary" />
               <div className="flex justify-end gap-2 pt-1">
                 <button onClick={() => setEditingEvent(null)} className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">Cancel</button>
-                <button onClick={saveEvent} disabled={savingEvent} className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500 disabled:opacity-50">
+                <button onClick={saveEvent} disabled={savingEvent} className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent disabled:opacity-50">
                   {savingEvent && <Loader2 className="h-3 w-3 animate-spin" />} {editingEvent.id ? "Save changes" : "Add event"}
                 </button>
               </div>
@@ -366,8 +374,8 @@ function ProfileSettingsPage() {
           )}
           <div className="space-y-2">
             {events.length === 0 && !editingEvent && (
-              <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-xs text-white/50">
-                No events yet. Click <span className="text-red-400 font-semibold">Add Event</span> to create your first show.
+              <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] p-6 text-center text-xs text-foreground/50">
+                No events yet. Click <span className="text-primary font-semibold">Add Event</span> to create your first show.
               </div>
             )}
             {events.map((e) => {
@@ -381,45 +389,45 @@ function ProfileSettingsPage() {
                     <DateBlock month={month} day={day} />
                     <div className="min-w-0">
                       <div className="truncate text-sm font-semibold">{e.title}</div>
-                      <div className="truncate text-xs text-white/50">{e.location || "TBA"} • {time}</div>
+                      <div className="truncate text-xs text-foreground/50">{e.location || "TBA"} • {time}</div>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <button onClick={() => setEditingEvent(e)} className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"><Pencil className="h-3 w-3 inline mr-1" />Edit</button>
-                    <button onClick={() => removeEvent(e.id)} className="grid h-8 w-8 place-items-center rounded-md border border-red-600/30 text-red-500 hover:bg-red-600/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <button onClick={() => removeEvent(e.id)} className="grid h-8 w-8 place-items-center rounded-md border border-primary/30 text-primary hover:bg-accent/10"><Trash2 className="h-3.5 w-3.5" /></button>
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-red-500 hover:underline">View public events →</a></div>
+          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-primary hover:underline">View public events →</a></div>
         </Section>
 
-        <Section title="Merch Store" icon={<ShoppingBag className="h-4 w-4 text-red-500" />}>
+        <Section title="Merch Store" icon={<ShoppingBag className="h-4 w-4 text-primary" />}>
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs text-white/50">Manage the products in your official store.</p>
-            <a href="/artist-store/manage" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Product</a>
+            <p className="text-xs text-foreground/50">Manage the products in your official store.</p>
+            <a href="/artist-store/manage" className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent"><Plus className="h-3 w-3" /> Add Product</a>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {SAMPLE_MERCH.map((m) => (
               <div key={m.name} className="overflow-hidden rounded-lg border border-white/10 bg-white/[0.02]">
-                <div className="aspect-square bg-gradient-to-br from-zinc-800 to-black grid place-items-center text-white/30"><ShoppingBag className="h-6 w-6" /></div>
+                <div className="aspect-square bg-gradient-to-br from-zinc-800 to-black grid place-items-center text-foreground/30"><ShoppingBag className="h-6 w-6" /></div>
                 <div className="p-2">
                   <div className="truncate text-xs font-semibold">{m.name}</div>
-                  <div className="text-[11px] text-white/50">{m.price}</div>
+                  <div className="text-[11px] text-foreground/50">{m.price}</div>
                   <button className="mt-1.5 w-full rounded border border-white/10 bg-white/5 py-1 text-[10px] uppercase tracking-wider hover:bg-white/10">Edit</button>
                 </div>
               </div>
             ))}
-            <a href="/artist-store/manage" className="grid aspect-square place-items-center rounded-lg border border-dashed border-white/20 bg-white/[0.02] text-white/40 hover:bg-white/[0.04]">
+            <a href="/artist-store/manage" className="grid aspect-square place-items-center rounded-lg border border-dashed border-white/20 bg-white/[0.02] text-foreground/40 hover:bg-white/[0.04]">
               <div className="text-center"><Plus className="mx-auto h-5 w-5" /><div className="mt-1 text-[10px] uppercase tracking-wider">Add Product</div></div>
             </a>
           </div>
         </Section>
 
-        <div className="sticky bottom-24 z-10 flex justify-end gap-3 rounded-xl border border-white/10 bg-[#0a0a0a]/90 p-3 backdrop-blur">
+        <div className="sticky bottom-24 z-10 flex justify-end gap-3 rounded-xl border border-white/10 bg-background/90 p-3 backdrop-blur">
           <button onClick={() => window.location.reload()} className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Reset Changes</button>
-          <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-sm font-bold text-white hover:bg-red-500 disabled:opacity-50">
+          <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-sm font-bold text-foreground hover:bg-accent disabled:opacity-50">
             {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save Changes
           </button>
         </div>
@@ -430,34 +438,34 @@ function ProfileSettingsPage() {
         <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.02]">
           <div className="px-4 pt-4">
             <div className="text-sm font-semibold">Profile Preview</div>
-            <p className="text-xs text-white/50 mt-0.5">See how your profile appears to listeners.</p>
+            <p className="text-xs text-foreground/50 mt-0.5">See how your profile appears to listeners.</p>
           </div>
           <div className="relative mt-3 aspect-[3/2]">
-            {(bannerPreview || bannerUrl) ? <img src={bannerPreview || bannerUrl} className="absolute inset-0 h-full w-full object-cover" alt="" /> : <div className="absolute inset-0 bg-gradient-to-br from-red-600/30 to-purple-600/30" />}
+            {(bannerPreview || bannerUrl) ? <img src={bannerPreview || bannerUrl} className="absolute inset-0 h-full w-full object-cover" alt="" /> : <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/30" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 h-20 w-20 overflow-hidden rounded-full border-4 border-[#0a0a0a] bg-black">
-              {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} className="h-full w-full object-cover" alt="" /> : <div className="grid h-full w-full place-items-center text-2xl font-black text-white/40">{initials}</div>}
-              <div className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-red-600 text-white"><CheckCircle2 className="h-3 w-3" /></div>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 h-20 w-20 overflow-hidden rounded-full border-4 border-background bg-black">
+              {(avatarPreview || avatarUrl) ? <SignedImg src={avatarPreview || avatarUrl} className="h-full w-full object-cover" alt="" /> : <div className="grid h-full w-full place-items-center text-2xl font-black text-foreground/40">{initials}</div>}
+              <div className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-accent text-foreground"><CheckCircle2 className="h-3 w-3" /></div>
             </div>
           </div>
           <div className="pt-12 px-4 pb-4 text-center">
             <div className="text-lg font-black tracking-tight">{displayName || "Your Name"}</div>
-            <div className="text-xs text-white/50">@{username || "username"}</div>
-            <div className="mt-1 text-[11px] text-white/60">{location || "Add location"} {genres[0] && <>• {genres[0]}</>}</div>
+            <div className="text-xs text-foreground/50">@{username || "username"}</div>
+            <div className="mt-1 text-[11px] text-foreground/60">{location || "Add location"} {genres[0] && <>• {genres[0]}</>}</div>
             <div className="mt-4 grid grid-cols-3 gap-2 border-t border-white/10 pt-3">
               <Stat label="Followers" value={stats.followers} />
               <Stat label="Monthly" value={stats.monthly} />
               <Stat label="Streams" value={stats.streams} />
             </div>
-            <a href="/profile" className="mt-3 block w-full rounded-lg bg-red-600 py-2 text-center text-xs font-bold uppercase tracking-wider text-white hover:bg-red-500">View Profile</a>
+            <a href="/profile" className="mt-3 block w-full rounded-lg bg-accent py-2 text-center text-xs font-bold uppercase tracking-wider text-foreground hover:bg-accent">View Profile</a>
           </div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
           <div className="text-sm font-semibold">Upcoming Events Preview</div>
-          <p className="text-xs text-white/50 mt-0.5">Your next 3 upcoming events.</p>
+          <p className="text-xs text-foreground/50 mt-0.5">Your next 3 upcoming events.</p>
           <div className="mt-3 space-y-2">
-            {events.length === 0 && <div className="text-xs text-white/40">No upcoming events.</div>}
+            {events.length === 0 && <div className="text-xs text-foreground/40">No upcoming events.</div>}
             {events.slice(0, 3).map((e) => {
               const d = new Date(e.starts_at);
               const month = d.toLocaleString("en-US", { month: "short" }).toUpperCase();
@@ -468,34 +476,34 @@ function ProfileSettingsPage() {
                   <DateBlock month={month} day={day} />
                   <div className="min-w-0">
                     <div className="truncate text-xs font-semibold">{e.title}</div>
-                    <div className="truncate text-[11px] text-white/50">{e.location || "TBA"} • {time}</div>
+                    <div className="truncate text-[11px] text-foreground/50">{e.location || "TBA"} • {time}</div>
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-red-500 hover:underline">View Public Calendar</a></div>
+          <div className="mt-3 text-center"><a href="/events" className="text-xs font-semibold text-primary hover:underline">View Public Calendar</a></div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
           <div className="text-sm font-semibold">Merch Store Preview</div>
-          <p className="text-xs text-white/50 mt-0.5">See how your store appears to fans.</p>
+          <p className="text-xs text-foreground/50 mt-0.5">See how your store appears to fans.</p>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {SAMPLE_MERCH.slice(0, 3).map((m) => (
               <div key={m.name} className="overflow-hidden rounded-md border border-white/10 bg-white/[0.02]">
-                <div className="aspect-square bg-gradient-to-br from-zinc-800 to-black grid place-items-center text-white/30"><ShoppingBag className="h-4 w-4" /></div>
+                <div className="aspect-square bg-gradient-to-br from-zinc-800 to-black grid place-items-center text-foreground/30"><ShoppingBag className="h-4 w-4" /></div>
                 <div className="p-1.5">
                   <div className="truncate text-[10px] font-semibold">{m.name}</div>
-                  <div className="text-[10px] text-white/50">{m.price}</div>
+                  <div className="text-[10px] text-foreground/50">{m.price}</div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-3 text-center"><a href="/artist-store/manage" className="text-xs font-semibold text-red-500 hover:underline">View Store</a></div>
+          <div className="mt-3 text-center"><a href="/artist-store/manage" className="text-xs font-semibold text-primary hover:underline">View Store</a></div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <div className="flex items-center gap-2 text-sm font-semibold"><Sparkles className="h-4 w-4 text-red-500" /> Profile Tips</div>
+          <div className="flex items-center gap-2 text-sm font-semibold"><Sparkles className="h-4 w-4 text-primary" /> Profile Tips</div>
           <ul className="mt-3 space-y-3 text-xs">
             <Tip icon={<Camera className="h-3.5 w-3.5" />} title="Add a clear profile photo" body="Profiles with a photo get more engagement." />
             <Tip icon={<BookText className="h-3.5 w-3.5" />} title="Write a strong bio" body="Tell your story and connect with fans." />
@@ -523,7 +531,7 @@ const SAMPLE_MERCH = [
 function DateBlock({ month, day }: { month: string; day: string }) {
   return (
     <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-center">
-      <div className="text-[9px] font-bold uppercase tracking-widest text-red-500">{month}</div>
+      <div className="text-[9px] font-bold uppercase tracking-widest text-primary">{month}</div>
       <div className="text-base font-black leading-none mt-0.5">{day}</div>
     </div>
   );
@@ -542,7 +550,7 @@ function Field({ title, hint, children }: { title: string; hint?: string; childr
     <div className="mb-5 last:mb-0">
       <div className="mb-2">
         <div className="text-sm font-semibold">{title}</div>
-        {hint && <div className="text-xs text-white/50">{hint}</div>}
+        {hint && <div className="text-xs text-foreground/50">{hint}</div>}
       </div>
       {children}
     </div>
@@ -551,9 +559,9 @@ function Field({ title, hint, children }: { title: string; hint?: string; childr
 function Input({ label, value, onChange, maxLength, prefix, icon, disabled }: { label: string; value: string; onChange: (v: string) => void; maxLength?: number; prefix?: string; icon?: React.ReactNode; disabled?: boolean }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-white/50">{label}</span>
-      <div className={`flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 ${disabled ? "opacity-60" : "focus-within:border-red-600/40"}`}>
-        {prefix && <span className="text-sm text-white/40">{prefix}</span>}
+      <span className="mb-1.5 block text-[10px] uppercase tracking-[0.25em] text-foreground/50">{label}</span>
+      <div className={`flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 ${disabled ? "opacity-60" : "focus-within:border-primary/40"}`}>
+        {prefix && <span className="text-sm text-foreground/40">{prefix}</span>}
         {icon}
         <input value={value} onChange={(e) => onChange(maxLength ? e.target.value.slice(0, maxLength) : e.target.value)} disabled={disabled} className="w-full bg-transparent py-2 text-sm focus:outline-none" />
       </div>
@@ -565,17 +573,17 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div>
       <div className="text-base font-black">{fmt}</div>
-      <div className="text-[9px] uppercase tracking-widest text-white/40">{label}</div>
+      <div className="text-[9px] uppercase tracking-widest text-foreground/40">{label}</div>
     </div>
   );
 }
 function Tip({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <li className="flex gap-2">
-      <div className="mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-md bg-red-600/20 text-red-400">{icon}</div>
+      <div className="mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-md bg-accent/20 text-primary">{icon}</div>
       <div>
-        <div className="font-semibold text-white">{title}</div>
-        <div className="text-white/50">{body}</div>
+        <div className="font-semibold text-foreground">{title}</div>
+        <div className="text-foreground/50">{body}</div>
       </div>
     </li>
   );

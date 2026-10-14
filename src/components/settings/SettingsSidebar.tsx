@@ -36,9 +36,9 @@ export function SettingsSidebar() {
         })}
       </nav>
       <div className="mt-6 hidden rounded-xl border border-white/10 bg-white/[0.02] p-4 lg:block">
-        <div className="flex items-center gap-2 text-sm font-semibold text-white"><HelpCircle className="h-4 w-4 text-red-500" /> Need Help?</div>
+        <div className="flex items-center gap-2 text-sm font-semibold text-white"><HelpCircle className="h-4 w-4 text-primary" /> Need Help?</div>
         <p className="mt-1.5 text-xs text-white/60">Visit our Help Center for guides and support.</p>
-        <a href="/contact" className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-red-600/40 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-red-500 hover:bg-red-600/10">
+        <a href="/contact" className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-primary/40 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary hover:bg-primary/10">
           <ExternalLink className="h-3 w-3" /> Visit Help Center
         </a>
       </div>
