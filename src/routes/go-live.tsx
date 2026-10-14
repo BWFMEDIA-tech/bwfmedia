@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Radio, Copy, Check, Users, Headphones, Music2, Twitch, Youtube, Facebook, Link2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { canGoLive } from "@/lib/artist-navigation";
-import { PROFILE_PLATFORMS, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
+import { PROFILE_PLATFORMS, platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
 import { supabase } from "@/integrations/supabase/client";
 import { startOrResumeStream, endStream, getMyActiveStream } from "@/lib/streams.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
@@ -344,7 +344,7 @@ function GoLivePage() {
                 if (!url) return [];
                 const platform = PROFILE_PLATFORMS.find((p) => p.key === key);
                 const Icon = platformIcons[key as keyof typeof platformIcons] ?? Link2;
-                const label = platform?.label ?? link.provider;
+                const label = platformLabel(link.provider);
                 return [
                   <span key={link.provider + url} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.05] pr-1 text-xs text-white/85">
                     <a
