@@ -73,8 +73,8 @@ async function recordTip(session: any) {
     return;
   }
 
-  // Revenue: write to the ledger (single source of truth). The ledger
-  // mirrors into revenue_pool_entries internally.
+  // Revenue: write to the ledger (single source of truth for artist royalties
+  // and payouts; the revenue pool feature was removed).
   await getSupabase().rpc('record_revenue_ledger', {
     _source_type: 'tip',
     _source_id: session.id,
@@ -293,7 +293,7 @@ async function bumpTunevioRenewalFromInvoice(invoice: any, env: StripeEnv) {
     .eq('environment', env);
   }
 
-  // Revenue pool: record invoice payment, classified by subscription role
+  // Revenue: record invoice payment, classified by subscription role
   const amountPaid = invoice?.amount_paid ?? 0;
   if (amountPaid > 0) {
     const { data: subRow } = await supabase
