@@ -8,7 +8,7 @@ export const TUNEVIO_PLANS = {
   listener_premium:     { role: "listener", label: "Premium",      priceCents:  999 },
   listener_fan_premium: { role: "listener", label: "Fan Premium",  priceCents: 1499 },
   listener_student:     { role: "listener", label: "Student",      priceCents:  499 },
-  artist_starter:       { role: "artist",   label: "Artist Starter", priceCents:  999 },
+  artist_starter:       { role: "artist",   label: "Artist Starter", priceCents:  699 },
   artist_pro:           { role: "artist",   label: "Artist Pro",     priceCents: 1999 },
   label_plan:           { role: "artist",   label: "Label Plan",     priceCents: 9900 },
 } as const;
