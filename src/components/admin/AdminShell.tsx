@@ -48,6 +48,7 @@ const NAV: NavEntry[] = [
       { to: "/admin/streams", label: "Live Broadcast Control" },
       { to: "/admin/streams", label: "Featured Artist Streams", search: { tab: "featured" } },
       { to: "/admin/events", label: "Event Scheduling" },
+      { to: "/admin/announcements", label: "Announcements" },
     ],
   },
   {
