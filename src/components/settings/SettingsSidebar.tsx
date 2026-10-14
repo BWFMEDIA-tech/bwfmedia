@@ -7,7 +7,7 @@ const items = [
   { to: "/settings/social-links", label: "Social Links", icon: Link2 },
   { to: "/settings/music-media", label: "Music & Media", icon: Music },
   { to: "/settings/events", label: "Upcoming Events", icon: Calendar },
-  { to: "/settings/merch", label: "Merch Store", icon: ShoppingBag },
+  { to: "/artist-store/manage", label: "Merch Store", icon: ShoppingBag },
   { to: "/settings/membership", label: "Membership", icon: CreditCard },
   { to: "/settings/payouts", label: "Payouts", icon: Banknote },
   { to: "/settings/notifications", label: "Notifications", icon: Bell },

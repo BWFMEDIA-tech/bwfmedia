@@ -39,7 +39,7 @@ const GROUPS = [
     { to: "/settings/connected-apps", label: "Connected Apps" },
     { to: "/settings/membership", label: "Membership" },
     { to: "/settings/payouts", label: "Payouts" },
-    { to: "/settings/merch", label: "Merch Store" },
+    { to: "/artist-store/manage", label: "Merch Store" },
     { to: "/settings/broadcast-help", label: "Broadcast Help" },
   ] },
 ];
