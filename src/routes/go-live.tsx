@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createStreamInvite } from "@/lib/invites.functions";
 import { toast } from "sonner";
-import { Radio, Copy, Check, Users, Headphones, Music2, ExternalLink, Twitch, Youtube, Facebook, Link2 } from "lucide-react";
+import { Radio, Copy, Check, Users, Headphones, Music2, Twitch, Youtube, Facebook, Link2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { canGoLive } from "@/lib/artist-navigation";
 import { PROFILE_PLATFORMS, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
