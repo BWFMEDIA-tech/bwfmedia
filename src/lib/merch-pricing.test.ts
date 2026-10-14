@@ -14,16 +14,16 @@ describe("suggested retail prices", () => {
 });
 
 describe("revenue split", () => {
-  it("defaults to 60% artist", () => expect(DEFAULT_ARTIST_BPS).toBe(6000));
-  it("splits the $29.99 tee example into $11.29 / $7.53", () => {
-    expect(computeSplit({ revenue_cents: 2999, cost_cents: 1000, fee_cents: 117, artist_bps: 6000 })).toEqual({ profit_cents: 1882, artist_cents: 1129, platform_cents: 753 });
+  it("pays artists 100% of net profit", () => expect(DEFAULT_ARTIST_BPS).toBe(10000));
+  it("gives the artist the full $29.99 tee example profit", () => {
+    expect(computeSplit({ revenue_cents: 2999, cost_cents: 1000, fee_cents: 117, artist_bps: 10000 })).toEqual({ profit_cents: 1882, artist_cents: 1882, platform_cents: 0 });
   });
   it("never pays more than the profit", () => {
-    const r = computeSplit({ revenue_cents: 1001, cost_cents: 0, fee_cents: 0, artist_bps: 6000 });
+    const r = computeSplit({ revenue_cents: 1001, cost_cents: 0, fee_cents: 0, artist_bps: 10000 });
     expect(r.artist_cents + r.platform_cents).toBe(1001);
   });
   it("pays nobody when there is no profit", () => {
-    expect(computeSplit({ revenue_cents: 1000, cost_cents: 900, fee_cents: 200, artist_bps: 6000 })).toMatchObject({ artist_cents: 0, platform_cents: 0 });
+    expect(computeSplit({ revenue_cents: 1000, cost_cents: 900, fee_cents: 200, artist_bps: 10000 })).toMatchObject({ artist_cents: 0, platform_cents: 0 });
   });
 });
 
