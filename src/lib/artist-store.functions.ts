@@ -107,7 +107,7 @@ export const getMyStore = createServerFn({ method: "GET" })
       releases: releases ?? [],
       variants: variants ?? [],
       ledger: ledger ?? [],
-      artistBps: (split?.artist_bps ?? DEFAULT_ARTIST_BPS) as number,
+      artistBps: (lastLedgerBps ?? DEFAULT_ARTIST_BPS) as number,
     };
   });
 
