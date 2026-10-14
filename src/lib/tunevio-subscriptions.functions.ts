@@ -5,7 +5,7 @@ import { validateReturnUrl } from "@/lib/validate-return-url";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const TUNEVIO_PLANS = {
-  listener_premium:     { role: "listener", label: "Premium",      priceCents:  999 },
+  listener_premium:     { role: "listener", label: "Premium",      priceCents:  699 },
   listener_fan_premium: { role: "listener", label: "Fan Premium",  priceCents: 1499 },
   listener_student:     { role: "listener", label: "Student",      priceCents:  499 },
   artist_starter:       { role: "artist",   label: "Artist Starter", priceCents:  699 },
