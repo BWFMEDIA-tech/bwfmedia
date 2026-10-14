@@ -24,6 +24,9 @@ import { LiveSetlist, type SetlistTrack } from "@/components/artist/LiveSetlist"
 import { saveHostReferral } from "@/lib/host-referral";
 import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { BattleArena } from "@/components/stream/BattleArena";
+import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
+import { useQuery } from "@tanstack/react-query";
+import { getArtistMeta } from "@/lib/artist-meta.functions";
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
@@ -52,10 +55,11 @@ function LiveNowButton({
 
 
 
-export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
+export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnded }: {
   stream: LiveStream;
   artist: { name: string; photo: string | null; handle?: string; genre?: string | null; featuredTrack?: { title: string; cover: string | null; plays: number } | null; tracks?: SetlistTrack[] };
   followSlot?: ReactNode;
+  platformSlot?: ReactNode;
   onEnded: () => void;
 }) {
   const auth = useAuth();
@@ -75,6 +79,11 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
   const { participants, hands, queue } = useStageState(connection ? stream.id : null);
   const spotlight = useStreamSpotlight(connection ? stream.id : undefined);
   const isOwner = auth.user?.id === stream.host_id;
+  const profile = useQuery({
+    queryKey: ["artist-meta", stream.host_id],
+    queryFn: () => getArtistMeta({ data: { id: stream.host_id } }),
+    enabled: platformSlot === undefined,
+  });
   const myRole = participants.find((p) => p.user_id === auth.user?.id)?.stage_role;
   const canManage = isOwner;
   const onStage = isOwner || myRole === "host" || myRole === "co_host" || myRole === "speaker";
@@ -173,6 +182,8 @@ export function ArtistLiveRoom({ stream, artist, followSlot, onEnded }: {
         {followSlot && <div className="shrink-0">{followSlot}</div>}
         <div className="w-full sm:w-auto"><ProfileMessageButton artistId={stream.host_id} /></div>
       </section>
+
+      {platformSlot ?? <ProfilePlatformLinks links={profile.data?.socials ?? []} isOwner={isOwner} />}
 
       {connection ? (
         <div className="artist-live-stage flex min-w-0 flex-col gap-4">

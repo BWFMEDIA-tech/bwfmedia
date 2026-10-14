@@ -22,6 +22,8 @@ export const Route = createFileRoute("/settings/profile")({
 });
 
 const SOCIAL_PROVIDERS = [
+  { key: "twitch", label: "Twitch", color: "bg-primary text-primary-foreground" },
+  { key: "kick", label: "Kick", color: "bg-accent text-accent-foreground" },
   { key: "instagram", label: "Instagram", color: "bg-gradient-to-br from-primary to-accent" },
   { key: "tiktok", label: "TikTok", color: "bg-black border border-white/20" },
   { key: "youtube", label: "YouTube", color: "bg-accent" },
