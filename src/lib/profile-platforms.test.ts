@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PROFILE_PLATFORMS, safePlatformUrl } from "./profile-platforms";
+import { PROFILE_PLATFORMS, platformLabel, safePlatformUrl } from "./profile-platforms";
 
 describe("profile platform links", () => {
   it("supports the five requested platforms", () => {
@@ -12,5 +12,10 @@ describe("profile platform links", () => {
     expect(safePlatformUrl("twitch", "javascript:alert(1)")).toBeNull();
     expect(safePlatformUrl("twitch", "https://twitch.tv.evil.test/name")).toBeNull();
     expect(safePlatformUrl("kick", "https://user:password@kick.com/name")).toBeNull();
+  });
+  it("shows a friendly name for saved and older providers", () => {
+    expect(platformLabel("instagram")).toBe("Instagram");
+    expect(platformLabel("tiktok")).toBe("TikTok");
+    expect(platformLabel("sound_cloud")).toBe("Sound Cloud");
   });
 });

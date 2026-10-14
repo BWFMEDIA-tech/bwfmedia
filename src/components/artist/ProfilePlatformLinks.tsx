@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, Twitch, Youtube, Facebook, Music2, Radio, Link2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PROFILE_PLATFORMS, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
+import { platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
 
 const icons = { twitch: Twitch, youtube: Youtube, facebook: Facebook, tiktok: Music2, kick: Radio };
 
@@ -20,9 +20,8 @@ export function ProfilePlatformLinks({ links, isOwner = false }: { links: Profil
       {!!visible.length && <div className="flex flex-wrap gap-2">
         {visible.map(link => {
           const key = link.provider.toLowerCase();
-          const platform = PROFILE_PLATFORMS.find(p => p.key === key);
           const Icon = icons[key as keyof typeof icons] ?? Link2;
-          return <Button key={link.provider + link.url} asChild variant="outline" size="sm"><a href={link.url} target="_blank" rel="noopener noreferrer" title={link.handle || platform?.label || link.provider}><Icon /><span>{platform?.label || link.provider}</span><ExternalLink className="size-3" /></a></Button>;
+          return <Button key={link.provider + link.url} asChild variant="outline" size="sm"><a href={link.url} target="_blank" rel="noopener noreferrer" title={link.handle || platformLabel(link.provider)}><Icon /><span>{platformLabel(link.provider)}</span><ExternalLink className="size-3" /></a></Button>;
         })}
       </div>}
     </section>

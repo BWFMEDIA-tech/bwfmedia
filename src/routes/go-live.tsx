@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createStreamInvite } from "@/lib/invites.functions";
 import { toast } from "sonner";
-import { Radio, Copy, Check, Users, Headphones, Music2 } from "lucide-react";
+import { Radio, Copy, Check, Users, Headphones, Music2, Twitch, Youtube, Facebook, Link2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { canGoLive } from "@/lib/artist-navigation";
+import { platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
 import { supabase } from "@/integrations/supabase/client";
 import { startOrResumeStream, endStream, getMyActiveStream } from "@/lib/streams.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
@@ -37,6 +38,8 @@ export const Route = createFileRoute("/go-live")({
 
 type ActiveStream = { id: string; room_name: string; title: string };
 
+const platformIcons = { twitch: Twitch, youtube: Youtube, facebook: Facebook, tiktok: Music2, kick: Radio };
+
 function GoLivePage() {
   const auth = useAuth();
   const navigate = useNavigate();
@@ -55,6 +58,8 @@ function GoLivePage() {
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [artist, setArtist] = useState<{ name: string; photo: string | null }>({ name: "", photo: null });
+  const [platforms, setPlatforms] = useState<ProfilePlatformLink[]>([]);
+  const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null);
   const { participants, hands } = useStageState(stream?.id ?? null);
   const updateModeFn = useServerFn(updateStreamMode);
   const [podcast, setPodcast] = useState(false);
@@ -78,6 +83,24 @@ function GoLivePage() {
       const identity = effectiveIdentity(data);
       setArtist({ name: identity.display_name ?? "", photo: identity.avatar_url });
     });
+    return () => { cancelled = true; };
+  }, [auth.user?.id]);
+
+  // Platform links the artist already saved, shown while they get ready to go live.
+  useEffect(() => {
+    const userId = auth.user?.id;
+    if (!userId) return;
+    let cancelled = false;
+    void supabase
+      .from("user_social_links")
+      .select("provider, url, handle")
+      .eq("user_id", userId)
+      .eq("enabled", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        if (cancelled) return;
+        setPlatforms((data ?? []) as ProfilePlatformLink[]);
+      });
     return () => { cancelled = true; };
   }, [auth.user?.id]);
 
@@ -146,6 +169,16 @@ function GoLivePage() {
     setStartedAt(null);
     setViewerCount(0);
     toast.success("Live ended");
+  };
+
+  const copyPlatform = async (url: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedPlatform(key);
+      setTimeout(() => setCopiedPlatform(null), 1500);
+    } catch {
+      toast.error("Could not copy the link");
+    }
   };
 
   const copyLink = async () => {
@@ -295,6 +328,49 @@ function GoLivePage() {
               </button>
             ))}
           </div>
+        </div>
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-white/60">Your platforms</span>
+            <Link to="/settings/connected-apps" className="text-[11px] font-semibold text-[#00E6FF] hover:underline">
+              {platforms.length ? "Edit platforms" : "Add platforms"}
+            </Link>
+          </div>
+          {platforms.length ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {platforms.flatMap((link) => {
+                const key = link.provider.toLowerCase();
+                const url = safePlatformUrl(key, link.url);
+                if (!url) return [];
+                const Icon = platformIcons[key as keyof typeof platformIcons] ?? Link2;
+                const label = platformLabel(link.provider);
+                return [
+                  <span key={link.provider + url} className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.05] pr-1 text-xs text-white/85">
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold hover:bg-white/[0.08]"
+                    >
+                      <Icon className="h-3.5 w-3.5" /> {label}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => void copyPlatform(url, key)}
+                      aria-label={`Copy ${label} link`}
+                      className="rounded-full p-1.5 text-white/50 hover:bg-white/10 hover:text-white"
+                    >
+                      {copiedPlatform === key ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    </button>
+                  </span>,
+                ];
+              })}
+            </div>
+          ) : (
+            <p className="mt-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-[11px] text-white/50">
+              Add your Twitch, YouTube, Facebook, TikTok or Kick links so fans can find you on every platform.
+            </p>
+          )}
         </div>
         <button
           onClick={goLive}

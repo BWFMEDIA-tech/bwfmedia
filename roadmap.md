@@ -25,3 +25,4 @@
 - [x] Verify the setlist panel and the header join button on a live page at phone and desktop widths.
 - [ ] Host tiers phase 2: bonuses, host notifications, host payouts via existing payout flow, paid submissions/boosts counted per room once they are tied to a live room
 - [x] Artist Store (/artist-store): fan store, product pages, artist manage dashboard, NFC links, orders, checkout via webhook
+- [x] Show saved platform links with copy buttons on the /go-live prep screen; verified signed-in at 531x1494 that the chip renders, copies the real link, and that Edit platforms opens the connected-platforms settings.

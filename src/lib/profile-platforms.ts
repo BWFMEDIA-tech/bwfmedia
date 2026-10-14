@@ -8,6 +8,17 @@ export const PROFILE_PLATFORMS = [
 
 export type ProfilePlatformLink = { provider: string; url: string; handle: string | null };
 
+// Friendly name for any provider, including older ones that aren't in the picker list.
+export function platformLabel(provider: string): string {
+  const match = PROFILE_PLATFORMS.find(p => p.key === provider.trim().toLowerCase());
+  if (match) return match.label;
+  return provider
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+
 export function safePlatformUrl(provider: string, value: string): string | null {
   try {
     const url = new URL(value.trim());
