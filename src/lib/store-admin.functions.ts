@@ -96,15 +96,3 @@ export const adminSaveShippingRule = createServerFn({ method: "POST" })
     return { error: null as string | null };
   });
 
-export const adminSaveSplit = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ artist_bps: z.number().int().min(0).max(10000) }).parse(d))
-  .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const sb = context.supabase as any;
-    const { data: before } = await sb.from("store_revenue_settings").select("artist_bps").eq("id", 1).maybeSingle();
-    const { error } = await sb.from("store_revenue_settings").upsert({ id: 1, artist_bps: data.artist_bps, updated_by: context.userId, updated_at: new Date().toISOString() });
-    if (error) return { error: error.message };
-    await audit(context, "store.split.save", "store_revenue_settings", "1", `Artist share ${(before?.artist_bps ?? DEFAULT_ARTIST_BPS) / 100}% → ${data.artist_bps / 100}%`, { before: before?.artist_bps ?? null, after: data.artist_bps });
-    return { error: null as string | null };
-  });
