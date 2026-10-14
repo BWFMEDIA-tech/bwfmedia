@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, Twitch, Youtube, Facebook, Music2, Radio, Link2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PROFILE_PLATFORMS, platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
+import { platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
 
 const icons = { twitch: Twitch, youtube: Youtube, facebook: Facebook, tiktok: Music2, kick: Radio };
 

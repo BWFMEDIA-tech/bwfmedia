@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Radio, Copy, Check, Users, Headphones, Music2, Twitch, Youtube, Facebook, Link2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { canGoLive } from "@/lib/artist-navigation";
-import { PROFILE_PLATFORMS, platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
+import { platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
 import { supabase } from "@/integrations/supabase/client";
 import { startOrResumeStream, endStream, getMyActiveStream } from "@/lib/streams.functions";
 import { getLiveKitToken } from "@/lib/livekit.functions";
