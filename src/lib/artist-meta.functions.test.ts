@@ -7,9 +7,13 @@ const fixtures = vi.hoisted(() => ({
 }));
 
 vi.mock("@tanstack/react-start", () => ({
-  createServerFn: () => ({
-    inputValidator: () => ({ handler: (handler: unknown) => handler }),
-  }),
+  createServerFn: () => {
+    const chain: Record<string, unknown> = {};
+    chain.validator = () => chain;
+    chain.inputValidator = () => chain;
+    chain.handler = (handler: unknown) => handler;
+    return chain;
+  },
 }));
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
