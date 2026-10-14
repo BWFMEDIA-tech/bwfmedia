@@ -41,7 +41,7 @@ export const SUGGESTED_PRICE_CENTS: Partial<Record<ProductType, number>> = {
   vinyl: 2999,
 };
 
-export const DEFAULT_ARTIST_BPS = 6000; // 60% artist / 40% Tunevio of net profit
+export const DEFAULT_ARTIST_BPS = 10000; // artists keep 100% of net profit (split removed)
 
 export const FULFILLMENT_STATUSES = ["unfulfilled", "processing", "shipped", "delivered", "cancelled"] as const;
 export type FulfillmentStatus = (typeof FULFILLMENT_STATUSES)[number];
