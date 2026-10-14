@@ -398,7 +398,7 @@ function ProfileSettingsPage() {
         <Section title="Merch Store" icon={<ShoppingBag className="h-4 w-4 text-red-500" />}>
           <div className="mb-3 flex items-center justify-between">
             <p className="text-xs text-white/50">Manage the products in your official store.</p>
-            <a href="/settings/merch" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Product</a>
+            <a href="/artist-store/manage" className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"><Plus className="h-3 w-3" /> Add Product</a>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {SAMPLE_MERCH.map((m) => (
@@ -411,7 +411,7 @@ function ProfileSettingsPage() {
                 </div>
               </div>
             ))}
-            <a href="/settings/merch" className="grid aspect-square place-items-center rounded-lg border border-dashed border-white/20 bg-white/[0.02] text-white/40 hover:bg-white/[0.04]">
+            <a href="/artist-store/manage" className="grid aspect-square place-items-center rounded-lg border border-dashed border-white/20 bg-white/[0.02] text-white/40 hover:bg-white/[0.04]">
               <div className="text-center"><Plus className="mx-auto h-5 w-5" /><div className="mt-1 text-[10px] uppercase tracking-wider">Add Product</div></div>
             </a>
           </div>
@@ -491,7 +491,7 @@ function ProfileSettingsPage() {
               </div>
             ))}
           </div>
-          <div className="mt-3 text-center"><a href="/settings/merch" className="text-xs font-semibold text-red-500 hover:underline">View Store</a></div>
+          <div className="mt-3 text-center"><a href="/artist-store/manage" className="text-xs font-semibold text-red-500 hover:underline">View Store</a></div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">

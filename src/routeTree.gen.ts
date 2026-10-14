@@ -129,7 +129,6 @@ import { Route as SettingsBroadcastHelpRouteImport } from './routes/settings.bro
 import { Route as SettingsConnectedAppsRouteImport } from './routes/settings.connected-apps'
 import { Route as SettingsEventsRouteImport } from './routes/settings.events'
 import { Route as SettingsMembershipRouteImport } from './routes/settings.membership'
-import { Route as SettingsMerchRouteImport } from './routes/settings.merch'
 import { Route as SettingsMusicMediaRouteImport } from './routes/settings.music-media'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings.notifications'
 import { Route as SettingsPayoutsRouteImport } from './routes/settings.payouts'
@@ -156,8 +155,6 @@ import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$ro
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
 import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
-import { Route as ApiPublicShopifyCallbackRouteImport } from './routes/api/public/shopify/callback'
-import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api/public/shopify/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -768,11 +765,6 @@ const SettingsMembershipRoute = SettingsMembershipRouteImport.update({
   path: '/membership',
   getParentRoute: () => SettingsRoute,
 } as any)
-const SettingsMerchRoute = SettingsMerchRouteImport.update({
-  id: '/merch',
-  path: '/merch',
-  getParentRoute: () => SettingsRoute,
-} as any)
 const SettingsMusicMediaRoute = SettingsMusicMediaRouteImport.update({
   id: '/music-media',
   path: '/music-media',
@@ -909,17 +901,6 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicShopifyCallbackRoute =
-  ApiPublicShopifyCallbackRouteImport.update({
-    id: '/api/public/shopify/callback',
-    path: '/api/public/shopify/callback',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicShopifyWebhookRoute = ApiPublicShopifyWebhookRouteImport.update({
-  id: '/api/public/shopify/webhook',
-  path: '/api/public/shopify/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -1053,7 +1034,6 @@ export interface FileRoutesByFullPath {
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
-  '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/payouts': typeof SettingsPayoutsRoute
@@ -1085,8 +1065,6 @@ export interface FileRoutesByFullPath {
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
-  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -1205,7 +1183,6 @@ export interface FileRoutesByTo {
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
-  '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/payouts': typeof SettingsPayoutsRoute
@@ -1237,8 +1214,6 @@ export interface FileRoutesByTo {
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
-  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -1360,7 +1335,6 @@ export interface FileRoutesById {
   '/settings/connected-apps': typeof SettingsConnectedAppsRoute
   '/settings/events': typeof SettingsEventsRoute
   '/settings/membership': typeof SettingsMembershipRoute
-  '/settings/merch': typeof SettingsMerchRoute
   '/settings/music-media': typeof SettingsMusicMediaRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
   '/settings/payouts': typeof SettingsPayoutsRoute
@@ -1392,8 +1366,6 @@ export interface FileRoutesById {
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/public/shopify/callback': typeof ApiPublicShopifyCallbackRoute
-  '/api/public/shopify/webhook': typeof ApiPublicShopifyWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -1516,7 +1488,6 @@ export interface FileRouteTypes {
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
-    | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
     | '/settings/payouts'
@@ -1548,8 +1519,6 @@ export interface FileRouteTypes {
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
-    | '/api/public/shopify/callback'
-    | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1668,7 +1637,6 @@ export interface FileRouteTypes {
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
-    | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
     | '/settings/payouts'
@@ -1700,8 +1668,6 @@ export interface FileRouteTypes {
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
-    | '/api/public/shopify/callback'
-    | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1822,7 +1788,6 @@ export interface FileRouteTypes {
     | '/settings/connected-apps'
     | '/settings/events'
     | '/settings/membership'
-    | '/settings/merch'
     | '/settings/music-media'
     | '/settings/notifications'
     | '/settings/payouts'
@@ -1854,8 +1819,6 @@ export interface FileRouteTypes {
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
     | '/api/public/payments/webhook'
-    | '/api/public/shopify/callback'
-    | '/api/public/shopify/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1956,8 +1919,6 @@ export interface RootRouteChildren {
   ApiOauthPlatformCallbackRoute: typeof ApiOauthPlatformCallbackRoute
   ApiPublicHooksProcessPayoutsRoute: typeof ApiPublicHooksProcessPayoutsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
-  ApiPublicShopifyCallbackRoute: typeof ApiPublicShopifyCallbackRoute
-  ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -2805,13 +2766,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsMembershipRouteImport
       parentRoute: typeof SettingsRoute
     }
-    '/settings/merch': {
-      id: '/settings/merch'
-      path: '/merch'
-      fullPath: '/settings/merch'
-      preLoaderRoute: typeof SettingsMerchRouteImport
-      parentRoute: typeof SettingsRoute
-    }
     '/settings/music-media': {
       id: '/settings/music-media'
       path: '/music-media'
@@ -2994,20 +2948,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/shopify/callback': {
-      id: '/api/public/shopify/callback'
-      path: '/api/public/shopify/callback'
-      fullPath: '/api/public/shopify/callback'
-      preLoaderRoute: typeof ApiPublicShopifyCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/shopify/webhook': {
-      id: '/api/public/shopify/webhook'
-      path: '/api/public/shopify/webhook'
-      fullPath: '/api/public/shopify/webhook'
-      preLoaderRoute: typeof ApiPublicShopifyWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -3134,7 +3074,6 @@ interface SettingsRouteChildren {
   SettingsConnectedAppsRoute: typeof SettingsConnectedAppsRoute
   SettingsEventsRoute: typeof SettingsEventsRoute
   SettingsMembershipRoute: typeof SettingsMembershipRoute
-  SettingsMerchRoute: typeof SettingsMerchRoute
   SettingsMusicMediaRoute: typeof SettingsMusicMediaRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
   SettingsPayoutsRoute: typeof SettingsPayoutsRoute
@@ -3151,7 +3090,6 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsConnectedAppsRoute: SettingsConnectedAppsRoute,
   SettingsEventsRoute: SettingsEventsRoute,
   SettingsMembershipRoute: SettingsMembershipRoute,
-  SettingsMerchRoute: SettingsMerchRoute,
   SettingsMusicMediaRoute: SettingsMusicMediaRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
   SettingsPayoutsRoute: SettingsPayoutsRoute,
@@ -3274,8 +3212,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiOauthPlatformCallbackRoute: ApiOauthPlatformCallbackRoute,
   ApiPublicHooksProcessPayoutsRoute: ApiPublicHooksProcessPayoutsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
-  ApiPublicShopifyCallbackRoute: ApiPublicShopifyCallbackRoute,
-  ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
