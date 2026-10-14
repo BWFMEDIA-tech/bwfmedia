@@ -6,7 +6,7 @@ import { ShoppingBag, ClipboardCheck, DollarSign, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { SectionPage, EmptyState } from "@/components/admin/SectionPage";
 import { Button } from "@/components/ui/button";
-import { adminStoreOverview, adminReviewProduct, adminSaveShippingRule, adminSaveSplit } from "@/lib/store-admin.functions";
+import { adminStoreOverview, adminReviewProduct, adminSaveShippingRule } from "@/lib/store-admin.functions";
 import {
   CATEGORY_LABELS, PRODUCT_TYPE_LABELS, REVIEW_STATUSES, SHIPPING_REGIONS, STORE_CATEGORIES, SUGGESTED_PRICE_CENTS,
   categoryOf, computeSplit, formatPrice, type ProductType, type ReviewStatus, type StoreMerchCategory, type ShippingRegion,
