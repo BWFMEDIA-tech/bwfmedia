@@ -251,7 +251,7 @@ function DiscoverPage() {
               The world is listening.
             </p>
             <RouterLink
-              to="/signup"
+              to="/pricing"
               className="mt-5 inline-flex items-center justify-center w-full px-4 py-3 bg-blood text-white font-cond font-bold tracking-[0.2em] text-[11px] uppercase rounded-md hover:bg-blood-glow transition-colors"
             >
               Create Your Profile
@@ -295,7 +295,7 @@ function DiscoverPage() {
           <PathCard
             title="Sign"
             blurb="Join the BWF Network and start your journey."
-            to="/signup"
+            to="/pricing"
             cta="Sign Up Now"
             tone="blood"
           >
@@ -460,13 +460,13 @@ function DiscoverPage() {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <RouterLink
-              to="/signup"
+              to="/pricing"
               className="inline-flex items-center gap-2 px-7 py-4 bg-blood text-white font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors rounded-md"
             >
               <Mic size={14} /> Join as an Artist
             </RouterLink>
             <RouterLink
-              to="/signup"
+              to="/pricing"
               className="inline-flex items-center gap-2 px-7 py-4 border border-white/20 bg-white/5 text-bone font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-white/10 transition-colors rounded-md"
             >
               Join as a Listener

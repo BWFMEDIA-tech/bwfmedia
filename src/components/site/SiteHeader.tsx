@@ -329,7 +329,7 @@ export function SiteHeader() {
                 Sign In
               </RouterLink>
               <RouterLink
-                to="/signup"
+                to="/pricing"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-blood text-white text-sm font-semibold hover:bg-blood-glow transition-colors"
               >
                 Sign Up
@@ -464,7 +464,7 @@ export function SiteHeader() {
                       Sign In
                     </RouterLink>
                     <RouterLink
-                      to="/signup"
+                      to="/pricing"
                       className="text-center px-4 py-3 rounded-md bg-blood text-white text-sm font-semibold"
                     >
                       Sign Up

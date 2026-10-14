@@ -48,7 +48,7 @@ function SignupPage() {
       return toast.error("Password must be 8+ chars with upper, lower, and a number.");
     }
     setLoading(true);
-    const redirectTo = role === "artist" ? "/artist/upgrade" : role === "host" ? "/host-earnings" : "/";
+    const redirectTo = "/pricing";
     const meta: Record<string, unknown> = {
       display_name: displayName,
       role,
