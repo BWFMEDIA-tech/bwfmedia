@@ -49,7 +49,7 @@ function PricingPage() {
 
   async function startCheckout(planId: TunevioPlanId) {
     if (!user) {
-      window.location.href = `/login?next=/pricing`;
+      window.location.href = `/signup`;
       return;
     }
     setLoadingPlan(planId);
@@ -91,6 +91,10 @@ function PricingPage() {
           <p className="mt-4 text-white/60 max-w-xl mx-auto">
             Premium streaming for fans. Pro tools for artists and labels. Cancel anytime.
           </p>
+          <div className="mt-6 mx-auto max-w-xl rounded-2xl border border-[#00E6FF]/60 bg-gradient-to-r from-[#0000FF]/30 to-[#00E6FF]/20 px-5 py-4 shadow-[0_0_60px_-15px_rgba(0,230,255,0.6)]">
+            <div className="text-2xl md:text-3xl font-black uppercase tracking-tight">30-day free trial</div>
+            <p className="mt-1 text-sm text-white/80">For artists, listeners and hosts. Add your card to unlock your profile — you won't be charged until day 31. Cancel anytime.</p>
+          </div>
         </div>
 
         <div className="flex justify-center mb-10">
@@ -139,6 +143,7 @@ function PricingPage() {
                   <span className="text-5xl font-black">${(plan.priceCents / 100).toFixed(2)}</span>
                   <span className="text-white/50 text-sm">/mo</span>
                 </div>
+                <div className="mt-2 inline-block rounded-full bg-[#00E6FF]/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#00E6FF]">First 30 days free</div>
                 <ul className="mt-6 space-y-3 text-sm">
                   {FEATURES[planId].map((f) => (
                     <li key={f} className="flex gap-2 text-white/80">
@@ -156,7 +161,7 @@ function PricingPage() {
                       : "bg-white text-black hover:bg-white/90"
                   }`}
                 >
-                  {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe"}
+                  {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : "Start 30-day free trial"}
                 </Button>
               </div>
             );
