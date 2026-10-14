@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Add Twitch, YouTube, Facebook, TikTok and Kick profile links for artists and hosts using existing profile storage; verify save/read and phone layouts. Account authorization is not configured.
 - [x] Add the physical music and NFC store page with original visuals, existing catalog purchase links, mobile navigation, and desktop/phone verification. No published products currently; NFC remains explicitly coming soon, real checkout awaits inventory.
 - [x] Add a visible mobile-friendly Inbox/Message action on normal and live artist profiles using existing messaging.
 - [x] Add an X to the open message conversation so members can close it when done messaging; verified closing on desktop and phone.
