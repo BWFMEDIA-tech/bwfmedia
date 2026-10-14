@@ -24,7 +24,7 @@ const FEATURES: Record<TunevioPlanId, string[]> = {
   listener_premium:     ["Ad-free streaming", "Unlimited skips", "High-quality audio", "Offline listening"],
   listener_fan_premium: ["Everything in Premium", "Exclusive fan-only drops", "Early access to releases", "Direct artist messaging"],
   listener_student:     ["Ad-free streaming", "Verified student discount", "Unlimited skips", "Cancel anytime"],
-  artist_starter:       ["Upload unlimited tracks", "Basic analytics", "Artist profile page", "Standard payouts"],
+  artist_starter:       ["Upload unlimited tracks", "Manage your rights, registrations and royalties all in one place", "Basic analytics", "Artist profile page", "Standard payouts"],
   artist_pro:           ["Everything in Starter", "Advanced analytics", "Featured placement boosts", "Priority support"],
   label_plan:           ["Manage multiple artists", "Label dashboard & roster tools", "Bulk uploads & scheduling", "Dedicated success manager"],
 };
