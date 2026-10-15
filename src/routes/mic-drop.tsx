@@ -147,6 +147,15 @@ function MicDropArena() {
               : "No battle is running right now. Open the arena to start or join one."
           }
         />
+        {isLive && (
+          <div className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-widest text-white/60">
+            <Users className="h-3.5 w-3.5 text-red-500" />
+            {battlers[0].name} {battlers[0].pct}% · {battlers[0].votes.toLocaleString()} votes
+            <span className="text-white/25">vs</span>
+            {battlers[1].name} {battlers[1].pct}% · {battlers[1].votes.toLocaleString()} votes
+            <span className="ml-1 text-white/40">({totalVotes.toLocaleString()} total)</span>
+          </div>
+        )}
         {isLive ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {battlers.map((b, i) => (
