@@ -164,7 +164,7 @@ function RootComponent() {
         {isChrome && <SiteHeader />}
         <div
           className={
-            "pt-[calc(var(--bwf-banner-h,0px)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+80px)]" +
+            "pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+80px)]" +
             (showBottomNav ? " pb-[calc(env(safe-area-inset-bottom)+64px)] md:pb-0" : "")
           }
         >
