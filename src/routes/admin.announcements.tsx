@@ -50,7 +50,7 @@ function AnnouncementsAdmin() {
       }
       const r = await send({ data: { audiences: aud as any, kind, title, body: body || undefined, link: link || undefined, email, mediaPath, mediaType } });
       toast.success(`Sent to ${r.sent} members${r.skipped ? ` (${r.skipped} have notifications off)` : ""}.${email ? ` Emailed ${r.emailed}.` : ""}`);
-      if (r.emailError) toast.error(`Some emails failed: ${r.emailError}`);
+      if (r.emailError) toast.error(`Emails not sent: ${r.emailError}`);
       setTitle(""); setBody(""); setLink(""); setFile(null);
     } catch (e: any) {
       toast.error(e?.message ?? "Couldn't send");

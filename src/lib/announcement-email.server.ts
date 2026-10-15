@@ -43,7 +43,7 @@ export async function emailAnnouncement(
     if (!res.ok) {
       const t = await res.text();
       console.error(`[announcement-email] ${res.status}: ${t}`);
-      errors.push(`${res.status}: ${t.slice(0, 200)}`);
+      errors.push(/not verified/i.test(t) ? "tunevio.com isn't verified in Resend yet. Add and verify it at resend.com/domains, then emails will send." : `Email service error (${res.status}).`);
       continue;
     }
     sent += batch.length;
