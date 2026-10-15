@@ -16,7 +16,7 @@ export function useUnreadCount(source: Source) {
     const col = source === "messages" ? "recipient_id" : "user_id";
     let cancelled = false;
     const refresh = async () => {
-      const { count: c } = await supabase
+      const { count: c } = await (supabase as any)
         .from(table)
         .select("id", { count: "exact", head: true })
         .eq(col, uid)
