@@ -16,6 +16,7 @@ import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { Volume2 } from "lucide-react";
+import { BattleReplays } from "./BattleReplays";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -27,7 +28,16 @@ type Participant = {
   stage_role?: string | null;
 };
 
-export function BattleArena({
+export function BattleArena(props: Parameters<typeof BattleArenaLive>[0]) {
+  return (
+    <>
+      <BattleArenaLive {...props} />
+      <BattleReplays streamId={props.streamId} />
+    </>
+  );
+}
+
+function BattleArenaLive({
   streamId,
   isHost,
   participants,
