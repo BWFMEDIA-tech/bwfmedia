@@ -16,6 +16,14 @@ export type PlayArenaLive = {
     totalRounds: number;
     aVotes: number;
     bVotes: number;
+    /** Match-wide cumulative raw votes for Artist A. */
+    aTotalVotes: number;
+    /** Match-wide cumulative raw votes for Artist B. */
+    bTotalVotes: number;
+    /** Match-wide weighted display percentage for Artist A. */
+    aTotalPct: number;
+    /** Match-wide weighted display percentage for Artist B. */
+    bTotalPct: number;
     viewers: number;
     startedAt: string | null;
   };
