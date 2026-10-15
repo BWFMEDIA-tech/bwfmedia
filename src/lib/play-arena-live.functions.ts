@@ -76,7 +76,7 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
     if (featuredMatch?.current_round_id) {
       const { data: round } = await sb
         .from("battle_rounds")
-        .select("a_votes, b_votes")
+        .select("a_votes, b_votes, a_weight, b_weight")
         .eq("id", featuredMatch.current_round_id)
         .maybeSingle();
       aVotes = round?.a_votes ?? 0;
@@ -86,16 +86,41 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
     // Derive true round wins from completed battle_rounds instead of trusting the cached column.
     let trueAWins = featuredMatch?.a_wins ?? 0;
     let trueBWins = featuredMatch?.b_wins ?? 0;
+    // Cumulative match-wide vote tracking for both artists.
+    let aTotalVotes = 0;
+    let bTotalVotes = 0;
+    let aTotalWeight = 0;
+    let bTotalWeight = 0;
     if (featuredMatch?.id) {
-      const { data: decidedRounds } = await sb
+      const { data: matchRounds } = await sb
         .from("battle_rounds")
-        .select("winner_choice")
-        .eq("match_id", featuredMatch.id)
-        .not("winner_choice", "is", null);
-      const rows = (decidedRounds ?? []) as { winner_choice: string | null }[];
+        .select("winner_choice, a_votes, b_votes, a_weight, b_weight")
+        .eq("match_id", featuredMatch.id);
+      const rows = (matchRounds ?? []) as {
+        winner_choice: string | null;
+        a_votes: number | null;
+        b_votes: number | null;
+        a_weight: number | null;
+        b_weight: number | null;
+      }[];
       trueAWins = rows.filter((r) => r.winner_choice === "a").length;
       trueBWins = rows.filter((r) => r.winner_choice === "b").length;
+      for (const r of rows) {
+        aTotalVotes += r.a_votes ?? 0;
+        bTotalVotes += r.b_votes ?? 0;
+        aTotalWeight += r.a_weight ?? 0;
+        bTotalWeight += r.b_weight ?? 0;
+      }
     }
+
+    // Weighted display percentages, consistent with the arena's vote math.
+    const { buildVoteTotals } = await import("@/lib/vote-math");
+    const totals = buildVoteTotals({
+      a_weight: aTotalWeight,
+      b_weight: bTotalWeight,
+      a_votes: aTotalVotes,
+      b_votes: bTotalVotes,
+    });
 
     return {
       activeBattles,
