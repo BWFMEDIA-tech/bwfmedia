@@ -1,0 +1,2 @@
+DROP POLICY IF EXISTS "Public read announcement media" ON storage.objects;
+CREATE POLICY "Admins read announcement media" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'announcement-media' AND public.has_role(auth.uid(), 'admin'));
