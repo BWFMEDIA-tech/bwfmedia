@@ -357,13 +357,17 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
 
     if (updated) return { ok: true, participant: updated };
 
+    // The stream owner always re-enters as host (e.g. after a page refresh).
+    const { data: ownStream } = await supabaseAdmin
+      .from("streams").select("host_id").eq("id", data.streamId).maybeSingle();
+    const seedRole = ownStream?.host_id === context.userId ? "host" : "listener";
     const { data: seeded, error: insErr } = await supabaseAdmin
       .from("stage_participants")
       .upsert(
         {
           stream_id: data.streamId,
           user_id: context.userId,
-          stage_role: "listener",
+          stage_role: seedRole,
           ...patch,
         },
         { onConflict: "stream_id,user_id", ignoreDuplicates: true },
@@ -417,7 +421,9 @@ export const joinStage = createServerFn({ method: "POST" })
               user_id: userId,
               stage_role: "listener",
             },
-            { onConflict: "stream_id,user_id", ignoreDuplicates: false },
+            // Never overwrite an existing seat: a refresh must not demote
+            // hosts, co-hosts or speakers back to the audience.
+            { onConflict: "stream_id,user_id", ignoreDuplicates: true },
           )
           .select("id, stage_role, connection_status")
           .maybeSingle();
