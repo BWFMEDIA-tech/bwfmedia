@@ -204,6 +204,13 @@
       "when": 1792028255878,
       "tag": "0028_drop_public_announcement_media_read",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792037905367,
+      "tag": "0029_keep_on_stage_participants",
+      "breakpoints": true
     }
   ]
 }
