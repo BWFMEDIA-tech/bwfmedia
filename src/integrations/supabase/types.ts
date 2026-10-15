@@ -673,6 +673,11 @@ export type Database = {
           ended_at: string | null
           host_id: string
           id: string
+          replay_a_votes: number
+          replay_b_votes: number
+          replay_finalized_at: string | null
+          replay_result: string | null
+          replay_voting_ends_at: string | null
           round_seconds: number
           started_at: string | null
           status: string
@@ -695,6 +700,11 @@ export type Database = {
           ended_at?: string | null
           host_id: string
           id?: string
+          replay_a_votes?: number
+          replay_b_votes?: number
+          replay_finalized_at?: string | null
+          replay_result?: string | null
+          replay_voting_ends_at?: string | null
           round_seconds?: number
           started_at?: string | null
           status?: string
@@ -717,6 +727,11 @@ export type Database = {
           ended_at?: string | null
           host_id?: string
           id?: string
+          replay_a_votes?: number
+          replay_b_votes?: number
+          replay_finalized_at?: string | null
+          replay_result?: string | null
+          replay_voting_ends_at?: string | null
           round_seconds?: number
           started_at?: string | null
           status?: string
@@ -771,6 +786,38 @@ export type Database = {
           {
             foreignKeyName: "battle_reactions_battle_id_fkey"
             columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      battle_replay_votes: {
+        Row: {
+          choice: string
+          created_at: string
+          id: string
+          match_id: string
+          voter_id: string
+        }
+        Insert: {
+          choice: string
+          created_at?: string
+          id?: string
+          match_id: string
+          voter_id: string
+        }
+        Update: {
+          choice?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          voter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_replay_votes_match_id_fkey"
+            columns: ["match_id"]
             isOneToOne: false
             referencedRelation: "battle_matches"
             referencedColumns: ["id"]
@@ -6341,6 +6388,10 @@ export type Database = {
         }
         Returns: Json
       }
+      cast_replay_vote: {
+        Args: { _choice: string; _match_id: string }
+        Returns: Json
+      }
       check_rate_limit: {
         Args: {
           _action: string
@@ -6373,6 +6424,7 @@ export type Database = {
       enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
       ensure_host_referral_code: { Args: { _user_id: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
+      finalize_battle_replays: { Args: never; Returns: number }
       finalize_room_earnings: { Args: { _stream_id: string }; Returns: Json }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
       get_artist_earnings_summary: {
@@ -6398,6 +6450,7 @@ export type Database = {
           username: string
         }[]
       }
+      get_battle_replay: { Args: { _match_id: string }; Returns: Json }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
@@ -6541,6 +6594,10 @@ export type Database = {
       label_role_of: {
         Args: { _label_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["label_role"]
+      }
+      list_recent_battle_replays: {
+        Args: { _stream_id: string }
+        Returns: string[]
       }
       log_battle_vote_blocked: {
         Args: { _match_id: string; _metadata?: Json; _reason: string }
