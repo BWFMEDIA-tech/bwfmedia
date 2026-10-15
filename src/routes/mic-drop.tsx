@@ -57,13 +57,11 @@ function MicDropArena() {
   const isLive = !!featured;
   const battlers = featured
     ? [
-        { name: featured.artistA, sub: `Round wins: ${featured.aWins}`, votes: featured.aVotes },
-        { name: featured.artistB, sub: `Round wins: ${featured.bWins}`, votes: featured.bVotes },
+        { name: featured.artistA, sub: `Round wins: ${featured.aWins}`, votes: featured.aTotalVotes, pct: featured.aTotalPct },
+        { name: featured.artistB, sub: `Round wins: ${featured.bWins}`, votes: featured.bTotalVotes, pct: featured.bTotalPct },
       ]
     : [];
   const totalVotes = battlers.reduce((s, b) => s + b.votes, 0);
-  const pct = (i: number) =>
-    totalVotes > 0 ? Math.round((battlers[i].votes / totalVotes) * 100) : 0;
 
   const leaders = (board ?? []).slice(0, 5);
   const upcoming = (events ?? [])
