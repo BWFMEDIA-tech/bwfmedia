@@ -33,7 +33,7 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
     } else {
       for (let from = 0; ; from += 1000) {
         const { data: rows, error } = await supabaseAdmin
-          .from("user_roles").select("user_id").in("role", data.audiences as any).range(from, from + 999);
+          .from("user_roles").select("user_id").in("role", (data.audiences.includes("listener") ? [...data.audiences, "member"] : data.audiences) as any).range(from, from + 999);
         if (error) throw new Error(error.message);
         rows?.forEach((r: any) => ids.add(r.user_id));
         if (!rows || rows.length < 1000) break;
