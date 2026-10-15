@@ -12,6 +12,8 @@ type Notif = {
   body: string | null;
   link: string | null;
   read_at: string | null;
+  media_url?: string | null;
+  media_type?: string | null;
   created_at: string;
 };
 
@@ -42,7 +44,7 @@ function NotificationsPage() {
     const refresh = async () => {
       const { data } = await supabase
         .from("notifications")
-        .select("id, type, title, body, link, read_at, created_at")
+        .select("id, type, title, body, link, read_at, created_at, media_url, media_type")
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
         .limit(100);
@@ -115,6 +117,8 @@ function NotificationsPage() {
                         <span className="text-[10px] text-white/40 shrink-0">{new Date(n.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                       </div>
                       {n.body && <p className="text-sm text-white/70 mt-1 line-clamp-2">{n.body}</p>}
+                      {n.media_url && n.media_type === "image" && <img src={n.media_url} alt="" loading="lazy" className="mt-3 w-full max-h-80 rounded-lg object-cover" />}
+                      {n.media_url && n.media_type === "video" && <video src={n.media_url} controls playsInline preload="metadata" onClick={(e) => e.stopPropagation()} className="mt-3 w-full max-h-80 rounded-lg bg-black" />}
                       {!n.read_at && <span className="inline-block mt-2 rounded-full bg-violet-500/20 text-violet-300 px-2 py-0.5 text-[10px] font-semibold">New</span>}
                     </div>
                   </div>
