@@ -138,6 +138,10 @@ export const getPlayArenaLive = createServerFn({ method: "GET" }).handler(
             totalRounds: featuredMatch.total_rounds ?? 3,
             aVotes,
             bVotes,
+            aTotalVotes: totals.aVotes,
+            bTotalVotes: totals.bVotes,
+            aTotalPct: totals.aPctDisplay,
+            bTotalPct: totals.bPctDisplay,
             viewers: featuredStreamViewers,
             startedAt: featuredMatch.started_at ?? null,
           }
