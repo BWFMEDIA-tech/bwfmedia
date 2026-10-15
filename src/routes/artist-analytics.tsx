@@ -27,7 +27,7 @@ const fmt = (value: number) => Number(value || 0).toLocaleString();
 function ArtistAnalyticsPage() {
   const [days, setDays] = useState(30);
   const fetchAnalytics = useServerFn(getMyStreamingAnalytics);
-  const query = useQuery({ queryKey: ["my-streaming-analytics", days], queryFn: () => fetchAnalytics({ data: { days } }) });
+  const query = useQuery({ queryKey: ["my-streaming-analytics", days], queryFn: () => fetchAnalytics({ data: { days } }), refetchInterval: 15000, refetchOnWindowFocus: true });
   const data = query.data;
   const summary = data?.summary;
   const hasLocations = !!data?.countries?.some((country) => country.name !== "Unknown");
@@ -50,7 +50,7 @@ function ArtistAnalyticsPage() {
         <header className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Streaming Map</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Explore where your music is being streamed around the world.</p>
+            <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-2 py-0.5 text-[11px] font-semibold text-primary"><i className="h-2 w-2 animate-pulse rounded-full bg-primary" />LIVE · updates every 15s{query.dataUpdatedAt ? ` · ${new Date(query.dataUpdatedAt).toLocaleTimeString()}` : ""}</span>Explore where your music is being streamed around the world.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="inline-flex items-center rounded-md border border-border bg-card p-1" aria-label="Analytics date range">
