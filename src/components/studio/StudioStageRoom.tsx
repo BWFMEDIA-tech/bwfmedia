@@ -176,7 +176,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
   // The primary host is always pinned to the first (left) slot; any other
   // hosts or co-hosts are added to the right in the order they joined.
   const hosts = participants
-    .filter((p) => p.stage_role === "host" || p.stage_role === "co_host")
+    .filter((p) => p.stage_role === "host" || p.stage_role === "co_host" || (!!primaryHostId && p.user_id === primaryHostId))
     .map((p, i) => ({ p, i }))
     .sort((a, b) => {
       const ap = primaryHostId && a.p.user_id === primaryHostId ? 0 : 1;
