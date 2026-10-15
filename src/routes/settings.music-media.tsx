@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BarChart3, Headphones, Loader2, Music, Play, Plus, Rocket, Trash2 } from "lucide-react";
+import { BarChart3, Check, Headphones, Loader2, Music, Pencil, Play, Plus, Rocket, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
@@ -21,6 +21,18 @@ function MusicMediaPage() {
   const [submitSong, setSubmitSong] = useState<any | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+
+  async function saveTitle(id: string) {
+    const title = editTitle.trim();
+    if (!title) return toast.error("Title can't be empty");
+    const { error } = await supabase.from("play_tracks").update({ title } as any).eq("id", id);
+    if (error) return toast.error(error.message);
+    setTracks((ts) => ts.map((t) => (t.id === id ? { ...t, title } : t)));
+    setEditingId(null);
+    toast.success("Title updated");
+  }
 
   function toggleSelect(id: string) {
     setSelected((s) => {
@@ -126,7 +138,25 @@ function MusicMediaPage() {
                 />
                 <div className="h-10 w-10 overflow-hidden rounded bg-white/5">{t.cover_url && <SignedImg src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
                 <div className="flex-1 min-w-0">
-                  <div className="truncate text-sm font-semibold">{t.title}</div>
+                  {editingId === t.id ? (
+                    <div className="flex items-center gap-1">
+                      <input
+                        autoFocus
+                        value={editTitle}
+                        maxLength={200}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") void saveTitle(t.id); if (e.key === "Escape") setEditingId(null); }}
+                        className="min-w-0 flex-1 rounded border border-white/15 bg-black/40 px-2 py-1 text-sm"
+                      />
+                      <button onClick={() => void saveTitle(t.id)} title="Save" className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground"><Check className="h-3.5 w-3.5" /></button>
+                      <button onClick={() => setEditingId(null)} title="Cancel" className="grid h-7 w-7 place-items-center rounded-full border border-white/10 text-white/60"><X className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate text-sm font-semibold">{t.title}</span>
+                      <button onClick={() => { setEditingId(t.id); setEditTitle(t.title ?? ""); }} title="Edit title" className="text-white/40 hover:text-white"><Pencil className="h-3.5 w-3.5" /></button>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 truncate text-xs text-white/50">
                     <span className="truncate">{t.artist_name}</span>
                     <span className="inline-flex items-center gap-1 text-white/40" title={`${(t.play_count ?? 0).toLocaleString()} plays`}>
