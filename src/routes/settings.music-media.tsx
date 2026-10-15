@@ -24,6 +24,7 @@ export const Route = createFileRoute("/settings/music-media")({
 });
 
 function MusicMediaPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const player = usePlayer();
   const [tracks, setTracks] = useState<any[]>([]);
