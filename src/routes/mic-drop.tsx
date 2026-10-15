@@ -57,13 +57,11 @@ function MicDropArena() {
   const isLive = !!featured;
   const battlers = featured
     ? [
-        { name: featured.artistA, sub: `Round wins: ${featured.aWins}`, votes: featured.aVotes },
-        { name: featured.artistB, sub: `Round wins: ${featured.bWins}`, votes: featured.bVotes },
+        { name: featured.artistA, sub: `Round wins: ${featured.aWins}`, votes: featured.aTotalVotes, pct: featured.aTotalPct },
+        { name: featured.artistB, sub: `Round wins: ${featured.bWins}`, votes: featured.bTotalVotes, pct: featured.bTotalPct },
       ]
     : [];
   const totalVotes = battlers.reduce((s, b) => s + b.votes, 0);
-  const pct = (i: number) =>
-    totalVotes > 0 ? Math.round((battlers[i].votes / totalVotes) * 100) : 0;
 
   const leaders = (board ?? []).slice(0, 5);
   const upcoming = (events ?? [])
@@ -149,6 +147,15 @@ function MicDropArena() {
               : "No battle is running right now. Open the arena to start or join one."
           }
         />
+        {isLive && (
+          <div className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-widest text-white/60">
+            <Users className="h-3.5 w-3.5 text-red-500" />
+            {battlers[0].name} {battlers[0].pct}% · {battlers[0].votes.toLocaleString()} votes
+            <span className="text-white/25">vs</span>
+            {battlers[1].name} {battlers[1].pct}% · {battlers[1].votes.toLocaleString()} votes
+            <span className="ml-1 text-white/40">({totalVotes.toLocaleString()} total)</span>
+          </div>
+        )}
         {isLive ? (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {battlers.map((b, i) => (
@@ -170,7 +177,7 @@ function MicDropArena() {
                     <div className="truncate text-xs text-white/60">{b.sub}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-black">{pct(i)}%</div>
+                    <div className="text-2xl font-black">{b.pct}%</div>
                     <div className="text-[10px] uppercase tracking-widest text-white/40">
                       {b.votes.toLocaleString()} votes
                     </div>
@@ -179,7 +186,7 @@ function MicDropArena() {
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r ${SIDES[i].color} transition-all duration-500`}
-                    style={{ width: `${pct(i)}%` }}
+                    style={{ width: `${b.pct}%` }}
                   />
                 </div>
                 <div className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white/80">
