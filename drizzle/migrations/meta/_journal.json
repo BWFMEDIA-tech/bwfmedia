@@ -211,6 +211,13 @@
       "when": 1792037905367,
       "tag": "0029_keep_on_stage_participants",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1792041517658,
+      "tag": "0030_battle_replay_voting",
+      "breakpoints": true
     }
   ]
 }
