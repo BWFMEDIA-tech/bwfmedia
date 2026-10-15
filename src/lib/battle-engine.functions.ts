@@ -192,7 +192,7 @@ export async function runBattleEvent(
             }
             await supabase
               .from("play_tracks")
-              .update({ status: "playing" })
+              .update({ status: "playing", updated_at: new Date().toISOString() } as any)
               .eq("id", aTrack.id);
             await supabase
               .from("battle_rounds")
@@ -357,7 +357,7 @@ export async function runBattleEvent(
                 if (t.status === "queued") {
                   await supabase
                     .from("play_tracks")
-                    .update({ status: "playing" })
+                    .update({ status: "playing", updated_at: new Date().toISOString() } as any)
                     .eq("id", t.id);
                 }
                 await supabase
@@ -652,7 +652,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
     if (trackIds.length) {
       const { data: tracks } = await trackSb
         .from("play_tracks")
-        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status")
+        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, updated_at")
         .in("id", trackIds);
       aTrack =
         (tracks ?? []).find((t: any) => t.id === currentRound?.a_playing_track_id) ??
@@ -673,7 +673,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       const artistIds = needFallback.map((n) => n.artistId!).filter(Boolean);
       const { data: subs } = await trackSb
         .from("play_tracks")
-        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at")
+        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at, updated_at")
         .eq("stream_id", data.streamId)
         .in("artist_user_id", artistIds)
         .in("status", ["queued", "playing"])
