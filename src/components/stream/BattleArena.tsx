@@ -113,7 +113,7 @@ export function BattleArena({
   const onAirTrack: any =
     roomState?.activeSide === "b" ? (roomState as any)?.bTrack : roomState?.activeSide === "a" ? (roomState as any)?.aTrack : null;
   const onAirUrl = playAudio && onAirTrack?.status === "playing" ? (onAirTrack.audio_url as string | null) : null;
-  const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} /> : null;
+  const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} startedAt={onAirTrack?.updated_at ?? null} /> : null;
 
   // Visible to everyone (artists, hosts, listeners) even before a battle starts.
   if (!match && !isHost) {
@@ -1397,22 +1397,61 @@ function TrackSelect({
  * player. Mobile browsers (iOS Safari, Android Chrome) block sound until a tap,
  * so a "Tap to listen" button appears and any tap on the page also unlocks it.
  */
-function BattleTrackAudio({ audioUrl, title }: { audioUrl: string | null; title: string | null }) {
+function BattleTrackAudio({ audioUrl, title, startedAt }: { audioUrl: string | null; title: string | null; startedAt?: string | null }) {
   const src = useSignedAudioUrl(audioUrl);
   const ref = useRef<HTMLAudioElement | null>(null);
   const [blocked, setBlocked] = useState(false);
+  const offsetRef = useRef(0);
+  const startRef = useRef<number | null>(null);
+  startRef.current = startedAt ? Date.parse(startedAt) : null;
+
+  // Estimate server clock offset once so everyone lines up on the same position.
+  useEffect(() => {
+    const sent = Date.now();
+    getServerTime().then(({ nowMs }) => {
+      offsetRef.current = nowMs - (sent + Date.now()) / 2;
+    }).catch(() => {});
+  }, []);
+
+  // Seconds into the track everyone should currently be at.
+  const targetSec = () => {
+    const s = startRef.current;
+    if (!s || Number.isNaN(s)) return null;
+    const t = (Date.now() + offsetRef.current - s) / 1000;
+    return t > 0 ? t : 0;
+  };
+  const alignAndPlay = (a: HTMLAudioElement) => {
+    const t = targetSec();
+    if (t !== null && Number.isFinite(a.duration) && t < a.duration && Math.abs(a.currentTime - t) > 1) {
+      try { a.currentTime = t; } catch { /* not seekable yet */ }
+    }
+    return a.play();
+  };
 
   useEffect(() => {
     const a = ref.current;
     if (!a) return;
     if (!src) { a.pause(); setBlocked(false); return; }
+    const onMeta = () => { alignAndPlay(a).then(() => setBlocked(false)).catch(() => setBlocked(true)); };
+    a.addEventListener("loadedmetadata", onMeta);
     a.play().then(() => setBlocked(false)).catch(() => setBlocked(true));
-  }, [src]);
+    if (a.readyState >= 1) onMeta();
+    // Periodic drift correction so the host, artists and listeners stay together.
+    const iv = setInterval(() => {
+      if (a.paused) return;
+      const t = targetSec();
+      if (t !== null && Number.isFinite(a.duration) && t < a.duration && Math.abs(a.currentTime - t) > 1.5) {
+        try { a.currentTime = t; } catch { /* ignore */ }
+      }
+    }, 5000);
+    return () => { a.removeEventListener("loadedmetadata", onMeta); clearInterval(iv); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src, startedAt]);
 
   useEffect(() => {
     if (!blocked) return;
     const unlock = () => {
-      ref.current?.play().then(() => setBlocked(false)).catch(() => {});
+      if (ref.current) alignAndPlay(ref.current).then(() => setBlocked(false)).catch(() => {});
     };
     document.addEventListener("touchend", unlock, { passive: true });
     document.addEventListener("click", unlock);
@@ -1420,6 +1459,7 @@ function BattleTrackAudio({ audioUrl, title }: { audioUrl: string | null; title:
       document.removeEventListener("touchend", unlock);
       document.removeEventListener("click", unlock);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blocked]);
 
   return (
