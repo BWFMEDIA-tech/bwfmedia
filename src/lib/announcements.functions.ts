@@ -11,6 +11,7 @@ const Schema = z.object({
   body: z.string().trim().max(500).optional(),
   // Internal links only, so announcements can't send members off-site.
   link: z.string().trim().regex(/^\/[A-Za-z0-9/_\-?=&.#]*$/).max(200).optional().or(z.literal("")),
+  email: z.boolean().default(false),
 });
 
 /** Admin-only: sends an in-app notification to every member in the chosen groups. */
@@ -62,5 +63,30 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       sent += Math.min(500, rows.length - i);
     }
-    return { sent, skipped: off.size };
+    let emailed = 0;
+    let emailError: string | null = null;
+    if (data.email) {
+      // Respect members who turned email alerts off.
+      const noEmail = new Set<string>();
+      for (let i = 0; i < all.length; i += 500) {
+        const { data: prefs } = await supabaseAdmin.from("notification_preferences")
+          .select("user_id").eq("email", false).in("user_id", all.slice(i, i + 500));
+        prefs?.forEach((p: any) => noEmail.add(p.user_id));
+      }
+      const want = new Set(all.filter((id) => !noEmail.has(id)));
+      const emails: string[] = [];
+      for (let page = 1; ; page++) {
+        const { data: list, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
+        if (error) throw new Error(error.message);
+        list.users.forEach((u) => { if (u.email && want.has(u.id)) emails.push(u.email); });
+        if (list.users.length < 1000) break;
+      }
+      const { emailAnnouncement } = await import("@/lib/announcement-email.server");
+      const r = await emailAnnouncement(emails, {
+        kind: data.kind, title: data.title, body: data.body || undefined, link: data.link || undefined,
+      });
+      emailed = r.sent;
+      emailError = r.error;
+    }
+    return { sent, skipped: off.size, emailed, emailError };
   });
