@@ -1,3 +1,4 @@
+import { pushSpotlight } from "@/components/stream/LiveStage";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -327,6 +328,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
     currentlyPinned: boolean,
   ) => {
     if (!streamId) return;
+    const rollback = pushSpotlight(streamId, slot, currentlyPinned ? null : uid);
     try {
       await setSpotlight({
         data: {
@@ -342,6 +344,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           : `${name ?? "Guest"} moved to ${label}`,
       );
     } catch (e: any) {
+      rollback();
       toast.error(e?.message ?? "Failed");
     }
   };

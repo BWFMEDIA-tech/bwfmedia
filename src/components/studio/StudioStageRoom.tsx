@@ -1,3 +1,4 @@
+import { pushSpotlight } from "@/components/studio/StudioLiveStage";
 /** Stream Studio-owned fork of the profile stage roster. Intentionally independent of components/stream/StudioStageRoom.tsx — Studio and profile stages must evolve separately. */
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -328,6 +329,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
     currentlyPinned: boolean,
   ) => {
     if (!streamId) return;
+    const rollback = pushSpotlight(streamId, slot, currentlyPinned ? null : uid);
     try {
       await setSpotlight({
         data: {
@@ -343,6 +345,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           : `${name ?? "Guest"} moved to ${label}`,
       );
     } catch (e: any) {
+      rollback();
       toast.error(e?.message ?? "Failed");
     }
   };
