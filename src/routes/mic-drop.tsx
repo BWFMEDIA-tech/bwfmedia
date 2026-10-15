@@ -177,7 +177,7 @@ function MicDropArena() {
                     <div className="truncate text-xs text-white/60">{b.sub}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-black">{pct(i)}%</div>
+                    <div className="text-2xl font-black">{b.pct}%</div>
                     <div className="text-[10px] uppercase tracking-widest text-white/40">
                       {b.votes.toLocaleString()} votes
                     </div>
@@ -186,7 +186,7 @@ function MicDropArena() {
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r ${SIDES[i].color} transition-all duration-500`}
-                    style={{ width: `${pct(i)}%` }}
+                    style={{ width: `${b.pct}%` }}
                   />
                 </div>
                 <div className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-white/80">
