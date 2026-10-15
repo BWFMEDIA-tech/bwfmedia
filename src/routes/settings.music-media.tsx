@@ -9,8 +9,19 @@ import { toast } from "sonner";
 import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
 import { SignedImg } from "@/components/ui/signed-img";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
+import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/settings/music-media")({ component: MusicMediaPage });
+export const Route = createFileRoute("/settings/music-media")({
+  head: () => ({ meta: [
+    { title: "Music & Media — TUNEVIO" },
+    { name: "description", content: "Manage your uploaded Tunevio tracks, titles and featured music." },
+    { property: "og:title", content: "Music & Media — TUNEVIO" },
+    { property: "og:description", content: "Manage your uploaded Tunevio tracks, titles and featured music." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: MusicMediaPage,
+});
 
 function MusicMediaPage() {
   const { user } = useAuth();
@@ -81,13 +92,13 @@ function MusicMediaPage() {
   }
 
   async function deleteTrack(id: string) {
-    if (!confirm("Delete this track? This cannot be undone.")) return;
+    if (!user || !confirm("Delete this track? This cannot be undone.")) return;
     const prev = tracks;
     setTracks((ts) => ts.filter((x) => x.id !== id));
     const { error } = await supabase.from("play_tracks").delete().eq("id", id);
     if (error) { setTracks(prev); return toast.error(error.message); }
     if (featuredTrack === id) {
-      await supabase.from("profiles").update({ featured_track_id: null } as any).eq("id", user!.id);
+      await supabase.from("profiles").update({ featured_track_id: null } as any).eq("id", user.id);
       setFeaturedTrack(null);
     }
     toast.success("Track deleted");
@@ -97,87 +108,56 @@ function MusicMediaPage() {
 
   return (
     <SettingsShell title="Music & Media" blurb="Pick what fans see first.">
-      <Card title="Your Tracks" icon={<Music className="h-4 w-4 text-red-500" />}>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <Card title="Your Tracks" icon={<Music className="h-4 w-4 text-primary" />}>
+        <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          {tracks.length > 0 ? (
+            <label className="flex min-w-0 cursor-pointer select-none items-center gap-2 text-sm font-medium text-muted-foreground">
+              <input type="checkbox" checked={selected.size > 0 && selected.size === tracks.length} onChange={toggleSelectAll} className="h-5 w-5 shrink-0 accent-primary" />
+              Select all
+            </label>
+          ) : <div />}
+          <Button onClick={() => setShowAdd(true)} className="h-11 shrink-0 px-3">
+            <Plus /> Add Track
+          </Button>
           {tracks.length > 0 && (
-            <div className="flex items-center gap-2">
-              <label className="flex cursor-pointer select-none items-center gap-2 text-xs font-semibold text-white/70 hover:text-white">
-                <input
-                  type="checkbox"
-                  checked={selected.size > 0 && selected.size === tracks.length}
-                  onChange={toggleSelectAll}
-                  className="h-4 w-4 accent-cyan-400"
-                />
-                Select all
-              </label>
-              <button
-                onClick={deleteSelected}
-                disabled={selected.size === 0}
-                className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 disabled:opacity-40 disabled:hover:bg-transparent"
-              >
-                <Trash2 className="h-3.5 w-3.5" /> Delete selected ({selected.size})
-              </button>
-            </div>
+            <Button variant="outline" onClick={deleteSelected} disabled={selected.size === 0} className="col-span-2 h-11 border-destructive/40 text-destructive sm:col-span-1 sm:w-fit">
+              <Trash2 /> Delete selected ({selected.size})
+            </Button>
           )}
-          <button
-            onClick={() => setShowAdd(true)}
-            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow shadow-violet-500/30 hover:from-violet-400 hover:to-blue-400"
-          >
-            <Plus className="h-3.5 w-3.5" /> Add Track
-          </button>
         </div>
-        {tracks.length === 0 ? <div className="py-6 text-center text-sm text-white/50">No tracks yet. Tap “Add Track” to upload one.</div> : (
-          <ul className="divide-y divide-white/5">
+        {tracks.length === 0 ? <div className="py-6 text-center text-sm text-muted-foreground">No tracks yet.</div> : (
+          <ul className="divide-y divide-border">
             {tracks.map((t) => (
-              <li key={t.id} className="flex items-center gap-2 py-2">
-                <input
-                  type="checkbox"
-                  checked={selected.has(t.id)}
-                  onChange={() => toggleSelect(t.id)}
-                  className="h-4 w-4 shrink-0 accent-cyan-400"
-                />
-                <div className="h-10 w-10 overflow-hidden rounded bg-white/5">{t.cover_url && <SignedImg src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
-                <div className="flex-1 min-w-0">
-                  {editingId === t.id ? (
-                    <div className="flex items-center gap-1">
-                      <input
-                        autoFocus
-                        value={editTitle}
-                        maxLength={200}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") void saveTitle(t.id); if (e.key === "Escape") setEditingId(null); }}
-                        className="min-w-0 flex-1 rounded border border-white/15 bg-black/40 px-2 py-1 text-sm"
-                      />
-                      <button onClick={() => void saveTitle(t.id)} title="Save" className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground"><Check className="h-3.5 w-3.5" /></button>
-                      <button onClick={() => setEditingId(null)} title="Cancel" className="grid h-7 w-7 place-items-center rounded-full border border-white/10 text-white/60"><X className="h-3.5 w-3.5" /></button>
+              <li key={t.id} className="grid min-w-0 gap-3 py-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+                <div className="grid min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-2">
+                  <input aria-label={`Select ${t.title}`} type="checkbox" checked={selected.has(t.id)} onChange={() => toggleSelect(t.id)} className="h-5 w-5 shrink-0 accent-primary" />
+                  <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-muted">{t.cover_url && <SignedImg src={t.cover_url} className="h-full w-full object-cover" alt="" />}</div>
+                  <div className="min-w-0">
+                    {editingId === t.id ? (
+                      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-1">
+                        <input aria-label="Song title" autoFocus value={editTitle} maxLength={200} onChange={(e) => setEditTitle(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void saveTitle(t.id); if (e.key === "Escape") setEditingId(null); }} className="h-11 min-w-0 w-full rounded border border-input bg-background px-2 text-base" />
+                        <Button onClick={() => void saveTitle(t.id)} title="Save title" aria-label="Save title" size="icon" className="h-11 w-9"><Check /></Button>
+                        <Button onClick={() => setEditingId(null)} title="Cancel" aria-label="Cancel title edit" variant="ghost" size="icon" className="h-11 w-9"><X /></Button>
+                      </div>
+                    ) : (
+                      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-1">
+                        <span className="min-w-0 whitespace-normal break-words text-sm font-semibold leading-5 [overflow-wrap:anywhere]">{t.title}</span>
+                        <Button onClick={() => { setEditingId(t.id); setEditTitle(t.title ?? ""); }} title="Edit title" aria-label={`Edit title for ${t.title}`} variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-muted-foreground"><Pencil /></Button>
+                      </div>
+                    )}
+                    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                      <span className="min-w-0 break-words [overflow-wrap:anywhere]">{t.artist_name}</span>
+                      <span className="inline-flex shrink-0 items-center gap-1" title={`${(t.play_count ?? 0).toLocaleString()} plays`}><Headphones className="h-3 w-3" /><span className="tabular-nums">{fmtCount(t.play_count ?? 0)}</span></span>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      <span className="truncate text-sm font-semibold">{t.title}</span>
-                      <button onClick={() => { setEditingId(t.id); setEditTitle(t.title ?? ""); }} title="Edit title" className="text-white/40 hover:text-white"><Pencil className="h-3.5 w-3.5" /></button>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 truncate text-xs text-white/50">
-                    <span className="truncate">{t.artist_name}</span>
-                    <span className="inline-flex items-center gap-1 text-white/40" title={`${(t.play_count ?? 0).toLocaleString()} plays`}>
-                      <Headphones className="h-3 w-3" />
-                      <span className="tabular-nums">{fmtCount(t.play_count ?? 0)}</span>
-                    </span>
                   </div>
                 </div>
-                {t.audio_url && <button onClick={() => player.play({ id: t.id, title: t.title, artist: t.artist_name, audioUrl: t.audio_url, coverUrl: t.cover_url }, tracks.filter((x) => x.audio_url).map((x) => ({ id: x.id, title: x.title, artist: x.artist_name, audioUrl: x.audio_url, coverUrl: x.cover_url })))} className="grid h-8 w-8 place-items-center rounded-full bg-red-600 text-white hover:bg-red-500"><Play className="h-3.5 w-3.5" /></button>}
-                <button title="Analytics" className="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/60 hover:bg-white/5 hover:text-white"><BarChart3 className="h-3.5 w-3.5" /></button>
-                {t.audio_url && (
-                  <button
-                    onClick={() => setSubmitSong(t)}
-                    title="Submit to Play Arena"
-                    className="flex items-center gap-1 rounded-full bg-gradient-to-r from-fuchsia-600 to-pink-600 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white shadow shadow-fuchsia-500/30 hover:from-fuchsia-500 hover:to-pink-500"
-                  >
-                    <Rocket className="h-3 w-3" /> Arena
-                  </button>
-                )}
-                <button onClick={() => setFeatured(featuredTrack === t.id ? null : t.id)} className={`rounded-md border px-2 py-1 text-[10px] uppercase tracking-wider ${featuredTrack === t.id ? "border-red-600 text-red-400" : "border-white/10 text-white/60 hover:bg-white/5"}`}>{featuredTrack === t.id ? "Featured" : "Feature"}</button>
-                <button onClick={() => deleteTrack(t.id)} title="Delete track" className="grid h-8 w-8 place-items-center rounded-full border border-red-500/30 text-red-400 hover:bg-red-500/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                <div className="grid min-w-0 grid-cols-3 gap-2 sm:grid-cols-[2.75rem_2.75rem_minmax(0,1fr)_minmax(0,1fr)_2.75rem] xl:w-80">
+                  {t.audio_url ? <Button onClick={() => player.play({ id: t.id, title: t.title, artist: t.artist_name, audioUrl: t.audio_url, coverUrl: t.cover_url }, tracks.filter((x) => x.audio_url).map((x) => ({ id: x.id, title: x.title, artist: x.artist_name, audioUrl: x.audio_url, coverUrl: x.cover_url })))} title="Play track" aria-label={`Play ${t.title}`} size="icon" className="h-11 w-full sm:w-11"><Play /></Button> : <div />}
+                  <Button title="Analytics" aria-label={`Analytics for ${t.title}`} variant="outline" size="icon" className="h-11 w-full text-muted-foreground sm:w-11"><BarChart3 /></Button>
+                  {t.audio_url ? <Button onClick={() => setSubmitSong(t)} title="Submit to Play Arena" variant="secondary" className="h-11 min-w-0 gap-1 px-2 text-xs text-primary"><Rocket className="!size-3" /> Arena</Button> : <div />}
+                  <Button onClick={() => setFeatured(featuredTrack === t.id ? null : t.id)} variant="outline" className={`col-span-2 h-11 min-w-0 px-2 text-xs sm:col-span-1 ${featuredTrack === t.id ? "border-primary text-primary" : "text-muted-foreground"}`}>{featuredTrack === t.id ? "Featured" : "Feature"}</Button>
+                  <Button onClick={() => deleteTrack(t.id)} title="Delete track" aria-label={`Delete ${t.title}`} variant="outline" size="icon" className="h-11 w-full border-destructive/30 text-destructive sm:w-11"><Trash2 /></Button>
+                </div>
               </li>
             ))}
           </ul>
