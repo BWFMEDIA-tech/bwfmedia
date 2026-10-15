@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -25,6 +26,7 @@ function AnnouncementsAdmin() {
   const [link, setLink] = useState("");
   const [busy, setBusy] = useState(false);
   const [email, setEmail] = useState(true);
+  const [file, setFile] = useState<File | null>(null);
 
   if (!auth.roles.includes("admin")) return <SectionPage title="Announcements" subtitle="Admins only." />;
 
@@ -37,10 +39,19 @@ function AnnouncementsAdmin() {
     if (!confirm(`Send "${title}" to ${who}?`)) return;
     setBusy(true);
     try {
-      const r = await send({ data: { audiences: aud as any, kind, title, body: body || undefined, link: link || undefined, email } });
+      let mediaPath: string | undefined;
+      let mediaType: "image" | "video" | undefined;
+      if (file) {
+        mediaType = file.type.startsWith("video/") ? "video" : "image";
+        const ext = (file.name.split(".").pop() || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase();
+        mediaPath = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("announcement-media").upload(mediaPath, file, { contentType: file.type });
+        if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
+      }
+      const r = await send({ data: { audiences: aud as any, kind, title, body: body || undefined, link: link || undefined, email, mediaPath, mediaType } });
       toast.success(`Sent to ${r.sent} members${r.skipped ? ` (${r.skipped} have notifications off)` : ""}.${email ? ` Emailed ${r.emailed}.` : ""}`);
       if (r.emailError) toast.error(`Some emails failed: ${r.emailError}`);
-      setTitle(""); setBody(""); setLink("");
+      setTitle(""); setBody(""); setLink(""); setFile(null);
     } catch (e: any) {
       toast.error(e?.message ?? "Couldn't send");
     } finally { setBusy(false); }
@@ -72,6 +83,22 @@ function AnnouncementsAdmin() {
         <input className={input} placeholder="Title (e.g. Friday Night Battle starts at 8pm)" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} />
         <textarea className={input} rows={3} placeholder="Message (optional)" maxLength={500} value={body} onChange={(e) => setBody(e.target.value)} />
         <input className={input} placeholder="Link on Tunevio (optional, e.g. /live)" value={link} onChange={(e) => setLink(e.target.value)} />
+        <div>
+          <div className="mb-2 text-xs uppercase tracking-wider text-white/50">Photo or video (optional)</div>
+          <input type="file" accept="image/*,video/*" onChange={(e) => {
+            const f = e.target.files?.[0] ?? null;
+            if (f && f.size > 100 * 1024 * 1024) { toast.error("Files must be under 100 MB."); e.target.value = ""; return; }
+            setFile(f);
+          }} className="block w-full text-sm text-white/70 file:mr-3 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-white" />
+          {file && (
+            <div className="mt-2 overflow-hidden rounded-lg border border-white/10">
+              {file.type.startsWith("video/")
+                ? <video src={URL.createObjectURL(file)} controls playsInline className="w-full max-h-64" />
+                : <img src={URL.createObjectURL(file)} alt="Preview" className="w-full max-h-64 object-contain" />}
+              <button type="button" onClick={() => setFile(null)} className="w-full py-1.5 text-xs text-white/60 hover:text-white">Remove</button>
+            </div>
+          )}
+        </div>
         <label className="flex items-center gap-2 text-sm text-white/80">
           <input type="checkbox" checked={email} onChange={(e) => setEmail(e.target.checked)} className="h-4 w-4" />
           Also email these members

@@ -1,0 +1,4 @@
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS media_url text, ADD COLUMN IF NOT EXISTS media_type text CHECK (media_type IN ('image','video'));
+CREATE POLICY "Public read announcement media" ON storage.objects FOR SELECT USING (bucket_id = 'announcement-media');
+CREATE POLICY "Admins upload announcement media" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'announcement-media' AND public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins delete announcement media" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'announcement-media' AND public.has_role(auth.uid(), 'admin'));

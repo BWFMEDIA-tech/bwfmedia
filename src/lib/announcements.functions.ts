@@ -12,6 +12,9 @@ const Schema = z.object({
   // Internal links only, so announcements can't send members off-site.
   link: z.string().trim().regex(/^\/[A-Za-z0-9/_\-?=&.#]*$/).max(200).optional().or(z.literal("")),
   email: z.boolean().default(false),
+  // Path inside the announcement-media bucket (uploaded by the admin).
+  mediaPath: z.string().regex(/^[A-Za-z0-9/_\-.]+$/).max(300).optional(),
+  mediaType: z.enum(["image", "video"]).optional(),
 });
 
 /** Admin-only: sends an in-app notification to every member in the chosen groups. */
@@ -23,6 +26,13 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    let mediaUrl: string | null = null;
+    if (data.mediaPath && data.mediaType) {
+      const { data: signed, error } = await supabaseAdmin.storage.from("announcement-media")
+        .createSignedUrl(data.mediaPath, 60 * 60 * 24 * 365);
+      if (error || !signed) throw new Error("Couldn't read the uploaded file");
+      mediaUrl = signed.signedUrl;
+    }
     const ids = new Set<string>();
     if (data.audiences.includes("everyone")) {
       for (let from = 0; ; from += 1000) {
@@ -56,6 +66,8 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
       body: data.body || null,
       link: data.link || null,
       actor_id: context.userId,
+      media_url: mediaUrl,
+      media_type: mediaUrl ? data.mediaType! : null,
     }));
     let sent = 0;
     for (let i = 0; i < rows.length; i += 500) {
@@ -84,6 +96,7 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
       const { emailAnnouncement } = await import("@/lib/announcement-email.server");
       const r = await emailAnnouncement(emails, {
         kind: data.kind, title: data.title, body: data.body || undefined, link: data.link || undefined,
+        mediaUrl: mediaUrl ?? undefined, mediaType: data.mediaType,
       });
       emailed = r.sent;
       emailError = r.error;

@@ -2953,6 +2953,8 @@ export type Database = {
           created_at: string
           id: string
           link: string | null
+          media_type: string | null
+          media_url: string | null
           read_at: string | null
           stream_id: string | null
           title: string
@@ -2965,6 +2967,8 @@ export type Database = {
           created_at?: string
           id?: string
           link?: string | null
+          media_type?: string | null
+          media_url?: string | null
           read_at?: string | null
           stream_id?: string | null
           title: string
@@ -2977,6 +2981,8 @@ export type Database = {
           created_at?: string
           id?: string
           link?: string | null
+          media_type?: string | null
+          media_url?: string | null
           read_at?: string | null
           stream_id?: string | null
           title?: string
