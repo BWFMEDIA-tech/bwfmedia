@@ -772,6 +772,8 @@ function StreamStudio() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
   const [streamCategory, setStreamCategory] = useState<string>(LIVE_CATEGORIES[0].id);
+  const [streamTitle, setStreamTitle] = useState("BWF Live: LIVE ARENA");
+  const [streamDescription, setStreamDescription] = useState("");
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
   const spotlight = useStudioStreamSpotlight(stream?.id ?? undefined);
@@ -828,6 +830,8 @@ function StreamStudio() {
         setStageLocked(!!existing.stage_locked);
         setHostTransferMode(((existing as any).host_transfer_mode ?? "co_host") as "co_host" | "transfer");
         if ((existing as any).category) setStreamCategory((existing as any).category);
+        if (existing.title) setStreamTitle(existing.title);
+        if ((existing as any).description) setStreamDescription((existing as any).description);
         // Re-register stage participant. If ownership was transferred while we
         // were away, preserve the existing role (e.g. co_host) instead of
         // forcing back to host.
@@ -901,7 +905,7 @@ function StreamStudio() {
     if (going) return;
     setGoing(true);
     try {
-      const s = await startFn({ data: { title: "BWF Live: LIVE ARENA", category: streamCategory } });
+      const s = await startFn({ data: { title: streamTitle.trim() || "BWF Live: LIVE ARENA", category: streamCategory, description: streamDescription.trim() || undefined } });
       const t = await tokenFn({ data: { roomName: s.room_name } });
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
@@ -1026,6 +1030,35 @@ function StreamStudio() {
                         {c.label}
                       </Button>
                     ))}
+                  </div>
+                  <div className="grid w-full gap-2">
+                    <div className="grid gap-1">
+                      <label htmlFor="stream-title-input" className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Stream title</label>
+                      <input
+                        id="stream-title-input"
+                        value={streamTitle}
+                        onChange={(e) => setStreamTitle(e.target.value)}
+                        maxLength={120}
+                        disabled={!!lk}
+                        placeholder="BWF Live: LIVE ARENA"
+                        title={lk ? "Title is set when you go live" : "Shown everywhere your live appears"}
+                        className="w-full rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-[#00E6FF]/50 focus:outline-none disabled:opacity-60"
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <label htmlFor="stream-description-input" className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Description</label>
+                      <textarea
+                        id="stream-description-input"
+                        value={streamDescription}
+                        onChange={(e) => setStreamDescription(e.target.value)}
+                        maxLength={500}
+                        rows={2}
+                        disabled={!!lk}
+                        placeholder="Tell listeners what this live is about (optional)"
+                        title={lk ? "Description is set when you go live" : "Optional description for your live"}
+                        className="w-full resize-none rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-[#00E6FF]/50 focus:outline-none disabled:opacity-60"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 items-center gap-2 text-xs sm:flex sm:flex-wrap">

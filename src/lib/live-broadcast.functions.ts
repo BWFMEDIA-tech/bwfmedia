@@ -133,7 +133,7 @@ export const listLiveStreams = createServerFn({ method: "POST" })
     const client = supabaseAdmin as any;
     const { data: streams, error } = await client
       .from("streams")
-      .select("id, title, room_name, status, host_id, category, thumbnail_url, viewer_count, started_at, mode")
+      .select("id, title, room_name, status, host_id, category, description, thumbnail_url, viewer_count, started_at, mode")
       .eq("status", "live")
       .order("started_at", { ascending: false })
       .limit(data.limit);

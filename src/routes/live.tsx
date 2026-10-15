@@ -15,6 +15,7 @@ type LiveStream = {
   title: string;
   room_name: string;
   category: string | null;
+  description: string | null;
   thumbnail_url: string | null;
   viewer_count: number;
   started_at: string | null;
@@ -146,6 +147,9 @@ function LivePage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-white line-clamp-2">{s.title}</h3>
+                  {s.description && (
+                    <p className="mt-1 line-clamp-2 text-xs text-white/55">{s.description}</p>
+                  )}
                   <div className="mt-3 flex items-center gap-2">
                     {s.host?.avatar_url ? (
                       <SignedImg src={s.host.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
