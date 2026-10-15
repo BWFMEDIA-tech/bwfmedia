@@ -24,6 +24,7 @@ function AnnouncementsAdmin() {
   const [body, setBody] = useState("");
   const [link, setLink] = useState("");
   const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState(true);
 
   if (!auth.roles.includes("admin")) return <SectionPage title="Announcements" subtitle="Admins only." />;
 
@@ -36,8 +37,9 @@ function AnnouncementsAdmin() {
     if (!confirm(`Send "${title}" to ${who}?`)) return;
     setBusy(true);
     try {
-      const r = await send({ data: { audiences: aud as any, kind, title, body: body || undefined, link: link || undefined } });
-      toast.success(`Sent to ${r.sent} members${r.skipped ? ` (${r.skipped} have notifications off)` : ""}.`);
+      const r = await send({ data: { audiences: aud as any, kind, title, body: body || undefined, link: link || undefined, email } });
+      toast.success(`Sent to ${r.sent} members${r.skipped ? ` (${r.skipped} have notifications off)` : ""}.${email ? ` Emailed ${r.emailed}.` : ""}`);
+      if (r.emailError) toast.error(`Some emails failed: ${r.emailError}`);
       setTitle(""); setBody(""); setLink("");
     } catch (e: any) {
       toast.error(e?.message ?? "Couldn't send");
@@ -70,6 +72,10 @@ function AnnouncementsAdmin() {
         <input className={input} placeholder="Title (e.g. Friday Night Battle starts at 8pm)" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} />
         <textarea className={input} rows={3} placeholder="Message (optional)" maxLength={500} value={body} onChange={(e) => setBody(e.target.value)} />
         <input className={input} placeholder="Link on Tunevio (optional, e.g. /live)" value={link} onChange={(e) => setLink(e.target.value)} />
+        <label className="flex items-center gap-2 text-sm text-white/80">
+          <input type="checkbox" checked={email} onChange={(e) => setEmail(e.target.checked)} className="h-4 w-4" />
+          Also email these members
+        </label>
         <button disabled={busy} onClick={submit} className="w-full rounded-md bg-blue-600 py-2.5 text-sm font-bold hover:bg-blue-500 disabled:opacity-50">
           {busy ? "Sending…" : "Send notification"}
         </button>
