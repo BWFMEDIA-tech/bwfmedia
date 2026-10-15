@@ -862,6 +862,15 @@ function getSpotlightStore(streamId: string): SpotlightStore {
       },
     );
 
+    // Instant path: hosts broadcast the change the moment they click, so
+    // every viewer swaps the video box without waiting for the database
+    // change feed. The postgres_changes listener above still confirms it.
+    channel.on("broadcast", { event: "spotlight" }, ({ payload }) => {
+      const next = (payload as any)?.state;
+      if (!next) return;
+      applySpotlight(streamId, next);
+    });
+
     channel.subscribe((status, err) => {
       if (status === "CHANNEL_ERROR") {
         console.error("[useStudioStreamSpotlight] realtime channel error:", err);
@@ -915,6 +924,39 @@ function subscribeSpotlight(streamId: string, callback: () => void): () => void 
   };
 }
 
+function applySpotlight(streamId: string, next: SpotlightState) {
+  const store = spotlightStores.get(streamId);
+  if (!store) return;
+  const c = store.current;
+  if (c.host === next.host && c.artist === next.artist && c.cohost === next.cohost && c.guest === next.guest) return;
+  store.current = { host: next.host ?? null, artist: next.artist ?? null, cohost: next.cohost ?? null, guest: next.guest ?? null };
+  store.listeners.forEach((cb) => cb());
+}
+
+/**
+ * Optimistically move someone into (or out of) a video box: updates this
+ * screen immediately and broadcasts to every viewer. Returns a rollback.
+ */
+export function pushSpotlight(
+  streamId: string,
+  slot: "host" | "artist" | "cohost" | "guest",
+  userId: string | null,
+): () => void {
+  const store = spotlightStores.get(streamId);
+  const prev = store ? { ...store.current } : null;
+  const base = prev ?? { host: null, artist: null, cohost: null, guest: null };
+  const next: SpotlightState = { ...base, [slot]: userId };
+  // A person can only sit in one box at a time.
+  if (userId) (["host", "artist", "cohost", "guest"] as const).forEach((k) => { if (k !== slot && next[k] === userId) next[k] = null; });
+  applySpotlight(streamId, next);
+  void store?.channel?.send({ type: "broadcast", event: "spotlight", payload: { state: next } });
+  return () => {
+    if (!prev) return;
+    applySpotlight(streamId, prev);
+    void store?.channel?.send({ type: "broadcast", event: "spotlight", payload: { state: prev } });
+  };
+}
+
 const EMPTY_SPOTLIGHT = { host: null, artist: null, cohost: null, guest: null } as const;
 export type SpotlightState = { host: string | null; artist: string | null; cohost: string | null; guest: string | null };
 function getSpotlightSnapshot(streamId: string): SpotlightState {
@@ -963,11 +1005,13 @@ function SpotlightControls({
     : null;
   const slotLabel = slot === "host" ? "host box" : "artist box";
   const pin = async (targetUserId: string | null) => {
+    const rollback = pushSpotlight(streamId, slot, targetUserId);
     try {
       await setSpotlight({ data: { streamId, targetUserId, slot } });
       setOpen(false);
       toast.success(targetUserId ? `Pinned to ${slotLabel}` : "Spotlight cleared");
     } catch (e: any) {
+      rollback();
       toast.error(e?.message ?? "Failed to update spotlight");
     }
   };
