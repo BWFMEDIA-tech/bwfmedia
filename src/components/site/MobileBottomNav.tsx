@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { artistDashboardDestination } from "@/lib/artist-navigation";
+import { UnreadBadge, useUnreadCount } from "@/components/UnreadBadge";
 
 type Tab = {
   to: string;
@@ -24,6 +25,7 @@ const TABS: Tab[] = [
 
 export function MobileBottomNav() {
   const auth = useAuth();
+  const inboxCount = useUnreadCount("messages");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const root = document.documentElement;
@@ -59,7 +61,10 @@ export function MobileBottomNav() {
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <Icon className={cn("h-5 w-5", active && "drop-shadow-[0_0_8px_rgba(0,230,255,0.7)]")} />
+                <span className="relative">
+                  <Icon className={cn("h-5 w-5", active && "drop-shadow-[0_0_8px_rgba(0,230,255,0.7)]")} />
+                  {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
+                </span>
                 <span>{tab.label}</span>
               </Link>
             </li>
