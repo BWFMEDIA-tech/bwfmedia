@@ -106,7 +106,7 @@ function GatedArtistProfilePage() {
   const { data: meta } = useSuspenseQuery(artistMetaOptions(routeId));
   const { user } = useAuth();
   return (
-    {/* Charging paused per owner request: no card required to use the platform yet. Re-enable by restoring enabled={!!user && user.id === meta.artistId}. */}
+    // Charging paused per owner request: no card required to use the platform yet. Re-enable by restoring enabled={!!user && user.id === meta.artistId}.
     <TrialGate enabled={false}>
       <ArtistProfilePage />
     </TrialGate>
