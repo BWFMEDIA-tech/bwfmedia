@@ -7,6 +7,7 @@ import { getSavedVideos, setVideoSaved } from "@/lib/video-engagement.functions"
 import { Button } from "@/components/ui/button";
 import { Upload, Play, Pause, Plus, Check, Search, ChevronLeft, ChevronRight, ArrowLeft, Bookmark, Share2, Volume2, VolumeX, Maximize, ListVideo, Shuffle, Repeat, SkipBack, SkipForward, X, Film, LoaderCircle } from "lucide-react";
 import logo from "@/assets/tunevio-logo.png.asset.json";
+import { OFF_THE_BLOCK_VIDEOS } from "@/lib/off-the-block-videos";
 
 export const Route = createFileRoute("/videos/")({
   validateSearch: (s: Record<string, unknown>): { upload?: boolean } => (s.upload ? { upload: true } : {}),
@@ -103,6 +104,9 @@ function VideosPage() {
   const [savedIds, setSavedIds] = useState<string[]>([]), [saving, setSaving] = useState(false);
   const save = useServerFn(setVideoSaved), savedFetch = useServerFn(getSavedVideos);
   const [activeId, setActiveId] = useState<string | null>(null), [playerOpen, setPlayerOpen] = useState(false);
+  const [interviewId, setInterviewId] = useState<string | null>(null);
+  const interview = OFF_THE_BLOCK_VIDEOS.find(v => v.id === interviewId);
+  const interviews = OFF_THE_BLOCK_VIDEOS.filter(v => `${v.title} ${v.subtitle}`.toLowerCase().includes(search.trim().toLowerCase()));
   const [playing, setPlaying] = useState(false), [queueOpen, setQueueOpen] = useState(false);
   const [shuffleEnabled, setShuffleEnabled] = useState(false), [repeatEnabled, setRepeatEnabled] = useState(false);
   const [volume, setVolume] = useState(0.8), [muted, setMuted] = useState(false);
@@ -210,6 +214,19 @@ function VideosPage() {
         </div>
         {error && <div role="status" className="flex flex-wrap items-center gap-3 text-sm text-brand-silver">{error}<Button variant="ghost" size="sm" onClick={() => { setError(""); void load(); }}>Retry</Button></div>}
         {loading ? <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[1,2,3,4].map(i => <div key={i} className="aspect-video animate-pulse rounded-md bg-muted" />)}</div> : tab !== "Discover" || search || genre !== "All genres" ? <Shelf title={search ? "Search results" : genre !== "All genres" ? genre : tab} videos={filtered} onPlay={playVideo} savedIds={savedIds} onSave={toggleSaved} saving={saving} /> : rows.map(row => <Shelf key={row.title} title={row.title} number={row.number} videos={row.items} onPlay={playVideo} savedIds={savedIds} onSave={toggleSaved} saving={saving} />)}
+        {tab === "Discover" && genre === "All genres" && interviews.length > 0 && <section aria-label="Off the Block">
+          <h2 className="mb-4 text-lg font-semibold sm:text-2xl">Off the Block</h2>
+          <div className="cinema-rail flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+            {interviews.map(v => <article key={v.id} className="w-[260px] shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
+              <Button variant="secondary" onClick={() => setInterviewId(v.id)} aria-label={`Play ${v.title}`} className="relative aspect-video h-auto w-full overflow-hidden p-0">
+                <span className="flex flex-col items-center gap-2"><Film className="size-10" /><span>Off the Block</span></span>
+                <span className="absolute bottom-3 left-3 grid size-9 place-items-center rounded-full bg-background/80"><Play className="size-4" fill="currentColor" /></span>
+              </Button>
+              <Button variant="link" onClick={() => setInterviewId(v.id)} className="mt-3 h-auto justify-start whitespace-normal p-0 text-left text-sm font-semibold text-foreground">{v.title}</Button>
+              <Link to="/off-the-block" className="mt-1 block text-xs text-muted-foreground">{v.subtitle}</Link>
+            </article>)}
+          </div>
+        </section>}
       </div>
     </main>
     {playerOpen && hero && <div className="fixed inset-0 z-50 overflow-y-auto bg-background/95 p-3 backdrop-blur-md sm:p-8" role="dialog" aria-modal="true" aria-label={`Watching ${hero.title}`} onKeyDown={e => { if (e.key === "Escape") setPlayerOpen(false); }}>
@@ -227,6 +244,13 @@ function VideosPage() {
       </div>
     </div>}
     {showUpload && userId && <UploadModal userId={userId} onClose={() => setShowUpload(false)} onUploaded={() => { setShowUpload(false); void load(); }} />}
+    {interview && <div role="dialog" aria-modal="true" aria-label={`Watching ${interview.title}`} className="fixed inset-0 z-50 overflow-y-auto bg-background/95 p-3 backdrop-blur-md sm:p-8" onKeyDown={e => { if (e.key === "Escape") setInterviewId(null); }}>
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-4 flex items-center justify-between gap-3"><h2 className="min-w-0 break-words text-lg font-semibold">{interview.title}</h2><Button autoFocus variant="secondary" size="icon" aria-label="Close interview" onClick={() => setInterviewId(null)}><X /></Button></div>
+        <iframe key={interview.id} src={`https://www.youtube.com/embed/${interview.id}?autoplay=1&rel=0`} title={interview.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen className="aspect-video w-full rounded-md border border-border" />
+        <div className="mt-4 flex flex-wrap gap-2">{OFF_THE_BLOCK_VIDEOS.map(v => <Button key={v.id} variant={v.id === interview.id ? "default" : "secondary"} onClick={() => setInterviewId(v.id)} className="h-auto whitespace-normal text-left"><Play />{v.title}</Button>)}</div>
+      </div>
+    </div>}
     <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-7 text-xs text-muted-foreground sm:px-10 lg:px-14"><span>TUNEVIO · VIDEO NETWORK</span><div className="flex gap-5"><Link to="/help">Help</Link><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link></div></footer>
   </div>;
 }
