@@ -865,6 +865,36 @@
 [style*="gradient"][style*="168,85,247"] { background-image: var(--gradient-blood) !important; }
 [style*="gradient"][style*="236,72,153"] { background-image: var(--gradient-blood) !important; }
 
+/* Page-scoped cinematic discovery palette. */
+.video-cinema {
+  --background: oklch(0.11 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.18 0 0);
+  --secondary: oklch(0.25 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.2 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  --primary: oklch(0.59 0.23 27);
+  --primary-foreground: oklch(0.99 0 0);
+  --accent: oklch(0.27 0 0);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0 0);
+  --ring: var(--primary);
+  --cinema-shade: linear-gradient(90deg, color-mix(in oklch, var(--background) 92%, transparent), color-mix(in oklch, var(--background) 48%, transparent) 48%, transparent 85%), linear-gradient(0deg, var(--background), transparent 65%);
+  letter-spacing: 0;
+}
+.cinema-header { padding-top: env(safe-area-inset-top); background: var(--background); }
+.cinema-hero { height: 560px; max-height: 65svh; min-height: 430px; }
+.cinema-hero-shade { background: var(--cinema-shade); }
+.cinema-title { font-family: var(--font-body); overflow-wrap: anywhere; letter-spacing: 0; }
+.cinema-mark { font-family: var(--font-display); font-size: 26px; color: var(--primary); }
+.cinema-tab-active { box-shadow: inset 0 -2px var(--primary); }
+.cinema-rail { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+@media (max-width: 640px) {
+  .cinema-hero { height: 520px; max-height: 66svh; min-height: 400px; }
+  .cinema-hero > img, .cinema-hero > video { object-position: 65% center; }
+  .cinema-hero-shade { background: linear-gradient(0deg, var(--background) 3%, color-mix(in oklch, var(--background) 70%, transparent) 55%, color-mix(in oklch, var(--background) 15%, transparent)); }
+}
 /* Video catalog's legacy red accents are branding, not destructive actions. */
 .video-network .bg-red-500 { background-color: var(--brand-blue); }
 .video-network .hover\:bg-red-600:hover { background-color: var(--brand-blue); filter: brightness(1.15); }
