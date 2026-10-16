@@ -1,7 +1,7 @@
 - Keep the legacy `/email/unsubscribe` token endpoint as a compatibility bridge to Lovable-managed subscription state, because already-sent emails still link to it; new email links remain Lovable-hosted.
 - Give each mounted notification bell its own Realtime topic, because the desktop and mobile headers coexist and subscribed channels cannot accept new database callbacks.
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
-- Use semantic tokens and a legacy utility bridge for branding; /videos uses scoped tokens, existing video_saves/functions and signed URLs, with metadata-derived collections, to avoid duplicate systems or fabricated metrics.
+- Use semantic branding tokens; /videos reuses saves/signed URLs and metadata collections. Share Off the Block's YouTube list across both pages without duplicate uploads.
 - Reuse the shared logo asset pointer and derive app icons from its symbol, because all brand surfaces must stay consistent without distorting a horizontal logo.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
