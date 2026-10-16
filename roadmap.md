@@ -1,5 +1,5 @@
 # Live artist profile
-- [ ] Redesign video discovery with cinematic featured playback, real saved videos, search and horizontal rows; verify existing playback and mobile layout without backend changes.
+- [x] Redesign video discovery with cinematic banner, existing saved-video persistence, search and horizontal rows; desktop and 320/393/531px layouts verified without overflow, saved state survived reload and upload form opened. Existing signed video returned 200 with H.264/AAC media; test Chromium rejected playback (format error), so audible playback remains unverified. No backend changes or publishing.
 - [x] Add Twitch, YouTube, Facebook, TikTok and Kick profile links for artists and hosts using existing profile storage; saved/reloaded/read a real temporary link on the public profile, restored account data, and verified the phone layout without overflow. Normal/live profiles share the display; live broadcast rendering not exercised. Account authorization is not configured.
 - [x] Add the physical music and NFC store page with original visuals, existing catalog purchase links, mobile navigation, and desktop/phone verification. No published products currently; NFC remains explicitly coming soon, real checkout awaits inventory.
 - [x] Add a visible mobile-friendly Inbox/Message action on normal and live artist profiles using existing messaging.
