@@ -95,7 +95,7 @@ export const createArtistTrialCheckout = createServerFn({ method: "POST" })
         customer: customerId,
         payment_method_collection: "always",
         subscription_data: {
-          trial_period_days: 7,
+          trial_period_days: 30,
           metadata: { userId, kind: "artist_membership" },
         },
         metadata: { userId, kind: "artist_membership" },

@@ -37,7 +37,7 @@ export function ArtistTrialBanner() {
       <div ref={ref} style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)" }} className="fixed top-0 inset-x-0 z-[60] w-full bg-gradient-to-r from-fuchsia-600/90 via-pink-600/90 to-cyan-500/90 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
         <Clock size={16} className="shrink-0" />
         <span className="font-medium">
-          Free trial: {daysLeft ?? 7} day{daysLeft === 1 ? "" : "s"} left
+          Free trial: {daysLeft ?? 30} day{daysLeft === 1 ? "" : "s"} left
         </span>
         <Link to="/pricing" className="underline font-semibold hover:opacity-90">
           Manage billing
@@ -49,7 +49,7 @@ export function ArtistTrialBanner() {
   return (
     <div ref={ref} style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)" }} className="fixed top-0 inset-x-0 z-[60] w-full bg-gradient-to-r from-fuchsia-700 to-cyan-600 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
         <Sparkles size={16} className="shrink-0" />
-        <span className="font-medium">Start your 7-day free Artist trial — $6.99/mo after.</span>
+        <span className="font-medium">Start your 30-day free Artist trial — $9.99/mo after.</span>
         <Link
           to="/pricing"
           className="bg-white text-fuchsia-700 font-semibold px-3 py-1 rounded-full text-xs hover:bg-white/90"
