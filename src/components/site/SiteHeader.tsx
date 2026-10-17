@@ -57,8 +57,8 @@ const PRIMARY: NavItem[] = [
   { to: "/discover", label: "Discover Music", icon: Compass },
   { to: "/live", label: "Live Stage", icon: Radio },
   { to: "/artists", label: "Artists", icon: Music },
-  { to: "/artist-dashboard", label: "Artist Dashboard", icon: LayoutDashboard },
   { to: "/profile", label: "My Profile", icon: User },
+  { to: "/artist-dashboard", label: "Artist Dashboard", icon: LayoutDashboard },
 ];
 
 // "Book a Shoot" (/studio) and "Off Da Block" (/off-the-block) hidden for now — restore when ready.
