@@ -80,6 +80,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminMerchRouteImport } from './routes/admin.merch'
 import { Route as AdminMerchandiseRouteImport } from './routes/admin.merchandise'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminNavigationRouteImport } from './routes/admin.navigation'
 import { Route as AdminNfcOrdersRouteImport } from './routes/admin.nfc-orders'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
@@ -514,6 +515,11 @@ const AdminMerchandiseRoute = AdminMerchandiseRouteImport.update({
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNavigationRoute = AdminNavigationRouteImport.update({
+  id: '/navigation',
+  path: '/navigation',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminNfcOrdersRoute = AdminNfcOrdersRouteImport.update({
@@ -989,6 +995,7 @@ export interface FileRoutesByFullPath {
   '/admin/merch': typeof AdminMerchRoute
   '/admin/merchandise': typeof AdminMerchandiseRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/navigation': typeof AdminNavigationRoute
   '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
@@ -1138,6 +1145,7 @@ export interface FileRoutesByTo {
   '/admin/merch': typeof AdminMerchRoute
   '/admin/merchandise': typeof AdminMerchandiseRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/navigation': typeof AdminNavigationRoute
   '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
@@ -1290,6 +1298,7 @@ export interface FileRoutesById {
   '/admin/merch': typeof AdminMerchRoute
   '/admin/merchandise': typeof AdminMerchandiseRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/navigation': typeof AdminNavigationRoute
   '/admin/nfc-orders': typeof AdminNfcOrdersRoute
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
@@ -1443,6 +1452,7 @@ export interface FileRouteTypes {
     | '/admin/merch'
     | '/admin/merchandise'
     | '/admin/messages'
+    | '/admin/navigation'
     | '/admin/nfc-orders'
     | '/admin/ops'
     | '/admin/payouts'
@@ -1592,6 +1602,7 @@ export interface FileRouteTypes {
     | '/admin/merch'
     | '/admin/merchandise'
     | '/admin/messages'
+    | '/admin/navigation'
     | '/admin/nfc-orders'
     | '/admin/ops'
     | '/admin/payouts'
@@ -1743,6 +1754,7 @@ export interface FileRouteTypes {
     | '/admin/merch'
     | '/admin/merchandise'
     | '/admin/messages'
+    | '/admin/navigation'
     | '/admin/nfc-orders'
     | '/admin/ops'
     | '/admin/payouts'
@@ -2423,6 +2435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMessagesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/navigation': {
+      id: '/admin/navigation'
+      path: '/navigation'
+      fullPath: '/admin/navigation'
+      preLoaderRoute: typeof AdminNavigationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/nfc-orders': {
       id: '/admin/nfc-orders'
       path: '/nfc-orders'
@@ -2990,6 +3009,7 @@ interface AdminRouteChildren {
   AdminMerchRoute: typeof AdminMerchRoute
   AdminMerchandiseRoute: typeof AdminMerchandiseRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminNavigationRoute: typeof AdminNavigationRoute
   AdminNfcOrdersRoute: typeof AdminNfcOrdersRoute
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPayoutsRoute: typeof AdminPayoutsRoute
@@ -3024,6 +3044,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminMerchRoute: AdminMerchRoute,
   AdminMerchandiseRoute: AdminMerchandiseRoute,
   AdminMessagesRoute: AdminMessagesRoute,
+  AdminNavigationRoute: AdminNavigationRoute,
   AdminNfcOrdersRoute: AdminNfcOrdersRoute,
   AdminOpsRoute: AdminOpsRoute,
   AdminPayoutsRoute: AdminPayoutsRoute,

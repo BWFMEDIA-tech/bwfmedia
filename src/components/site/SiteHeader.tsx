@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link as RouterLink, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getSiteNav } from "@/lib/site-nav.functions";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
