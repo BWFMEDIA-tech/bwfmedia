@@ -87,12 +87,12 @@ function NavigationEditor() {
       title="Navigation Bar"
       subtitle="Rename, reorder, hide or add the links in your site navigation. Changes apply across the whole site after saving."
       stats={[{ label: "Links", value: String(rows.length), icon: List, color: "#00E6FF" }]}
-      actions={
+    >
+      <div className="mb-4 flex justify-end">
         <Button onClick={persist} disabled={saving || !dirty}>
           <Save className="size-4" /> {saving ? "Saving…" : dirty ? "Save changes" : "No changes"}
         </Button>
-      }
-    >
+      </div>
       <div className="space-y-6">
         {SLOTS.map((s) => {
           const list = rows.filter((r) => r.slot === s.key).sort((a, b) => a.position - b.position);
