@@ -76,6 +76,9 @@ const BROWSE: NavItem[] = [
   { to: "/contact", label: "Contact", icon: Mail },
 ];
 
+// Editable navigation (admin "Navigation Bar" page) overrides these defaults when saved.
+const NAV_ICONS: Record<string, any> = { Home, Compass, Radio, Music, User, LayoutDashboard, ShoppingCart, Disc3, Trophy, BarChart3, Calendar, Newspaper, Mail, Mic };
+
 function useActivePath() {
   return useRouterState({ select: (s) => s.location.pathname });
 }
@@ -94,7 +97,13 @@ export function SiteHeader() {
   const isAdmin = auth.roles.includes("admin");
   const isManager = auth.roles.includes("manager");
   const canBroadcast = isAdmin || isManager;
-  const primary = PRIMARY.map((item) => {
+  const navQ = useQuery({ queryKey: ["site-nav"], queryFn: () => getSiteNav(), staleTime: 60_000 });
+  const dbPrimary = (navQ.data?.items ?? []).filter((i) => i.slot === "primary" && i.visible);
+  const dbBrowse = (navQ.data?.items ?? []).filter((i) => i.slot === "browse" && i.visible);
+  const toNavItem = (i: { to_path: string; label: string; icon: string }): NavItem => ({ to: i.to_path, label: i.label, icon: NAV_ICONS[i.icon] ?? Music });
+  const primarySource: NavItem[] = dbPrimary.length ? dbPrimary.map(toNavItem) : PRIMARY;
+  const browseSource: NavItem[] = dbBrowse.length ? dbBrowse.map(toNavItem) : BROWSE;
+  const primary = primarySource.map((item) => {
     if (item.to === "/artist-dashboard") {
       const to = artistDashboardDestination(auth.roles);
       return { ...item, to, search: to === "/signup" ? { as: "artist" } : undefined, params: undefined };
@@ -217,9 +226,9 @@ export function SiteHeader() {
                   transition={{ duration: 0.15 }}
                   className="absolute left-0 mt-2 w-64 rounded-xl border border-white/10 bg-[#0d0d12]/98 backdrop-blur-xl shadow-2xl overflow-hidden p-1.5"
                 >
-                  {BROWSE.map((item) => (
+                  {browseSource.map((item) => (
                     <RouterLink
-                      key={item.label}
+                      key={`${item.to}-${item.label}`}
                       to={item.to}
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-bone/80 rounded-lg hover:bg-blood/15 hover:text-bone transition-colors"
                     >
@@ -402,9 +411,9 @@ export function SiteHeader() {
               <div>
                 <div className="font-cond text-[10px] tracking-[0.4em] uppercase text-bone/40 mb-2 px-1">More</div>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {BROWSE.map((item) => (
+                  {browseSource.map((item) => (
                     <RouterLink
-                      key={item.label}
+                      key={`${item.to}-${item.label}`}
                       to={item.to}
                       className="flex items-center gap-2 px-3 py-3 rounded-lg border border-white/10 bg-white/[0.03] text-sm text-bone/75 hover:text-bone transition-colors"
                     >
