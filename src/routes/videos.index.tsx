@@ -168,12 +168,12 @@ function VideosPage() {
   });
   const music = filtered.filter(v => v.category === "music");
   const rows = [
-    { title: "Trending Music Videos", items: music, number: "01" },
-    { title: "New Releases", items: music, number: "02" },
-    { title: "Tunevio Originals", items: filtered.filter(v => matches(v, /(?:tunevio|bwf)\s+original/i)), number: "03" },
-    { title: "Live Performances", items: music.filter(v => matches(v, /\blive\b|performance|concert|session/i)), number: "04" },
-    { title: "Underground Spotlight", items: music.filter(v => !matches(v, /(?:tunevio|bwf)\s+original|\blive\b|concert/i)), number: "05" },
-    { title: "Sponsored & Partners", items: filtered.filter(v => v.category === "sponsored"), number: "06" },
+    { title: "Trending Music Videos", items: music },
+    { title: "New Releases", items: music },
+    { title: "Tunevio Originals", items: filtered.filter(v => matches(v, /(?:tunevio|bwf)\s+original/i)) },
+    { title: "Live Performances", items: music.filter(v => matches(v, /\blive\b|performance|concert|session/i)) },
+    { title: "Underground Spotlight", items: music.filter(v => !matches(v, /(?:tunevio|bwf)\s+original|\blive\b|concert/i)) },
+    { title: "Sponsored & Partners", items: filtered.filter(v => v.category === "sponsored") },
   ];
   return <div className="video-cinema min-h-screen bg-background text-foreground font-body">
     <header className="cinema-header border-b border-border">
@@ -213,7 +213,7 @@ function VideosPage() {
           <div className="flex w-full gap-2 overflow-x-auto pb-1" aria-label="Genres">{GENRES.map(name => <Button key={name} size="sm" variant={genre === name ? "default" : "secondary"} aria-pressed={genre === name} onClick={() => setGenre(name)} className="shrink-0">{name}</Button>)}</div>
         </div>
         {error && <div role="status" className="flex flex-wrap items-center gap-3 text-sm text-brand-silver">{error}<Button variant="ghost" size="sm" onClick={() => { setError(""); void load(); }}>Retry</Button></div>}
-        {loading ? <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[1,2,3,4].map(i => <div key={i} className="aspect-video animate-pulse rounded-md bg-muted" />)}</div> : tab !== "Discover" || search || genre !== "All genres" ? <Shelf title={search ? "Search results" : genre !== "All genres" ? genre : tab} videos={filtered} onPlay={playVideo} savedIds={savedIds} onSave={toggleSaved} saving={saving} /> : rows.map(row => <Shelf key={row.title} title={row.title} number={row.number} videos={row.items} onPlay={playVideo} savedIds={savedIds} onSave={toggleSaved} saving={saving} />)}
+        {loading ? <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{[1,2,3,4].map(i => <div key={i} className="aspect-video animate-pulse rounded-md bg-muted" />)}</div> : tab !== "Discover" || search || genre !== "All genres" ? <Shelf title={search ? "Search results" : genre !== "All genres" ? genre : tab} videos={filtered} onPlay={playVideo} savedIds={savedIds} onSave={toggleSaved} saving={saving} /> : rows.map(row => <Shelf key={row.title} title={row.title} videos={row.items} onPlay={playVideo} savedIds={savedIds} onSave={toggleSaved} saving={saving} />)}
         {tab === "Discover" && genre === "All genres" && interviews.length > 0 && <section aria-label="Off the Block">
           <h2 className="mb-4 text-lg font-semibold sm:text-2xl">Off the Block</h2>
           <div className="cinema-rail flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
@@ -254,9 +254,9 @@ function VideosPage() {
     <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-7 text-xs text-muted-foreground sm:px-10 lg:px-14"><span>TUNEVIO · VIDEO NETWORK</span><div className="flex gap-5"><Link to="/help">Help</Link><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link></div></footer>
   </div>;
 }
-function Shelf({ title, number, videos, onPlay, savedIds, onSave, saving }: { title: string; number?: string; videos: VideoRow[]; onPlay: (v: VideoRow) => void; savedIds: string[]; onSave: (v: VideoRow) => Promise<void>; saving: boolean }) {
+function Shelf({ title, videos, onPlay, savedIds, onSave, saving }: { title: string; videos: VideoRow[]; onPlay: (v: VideoRow) => void; savedIds: string[]; onSave: (v: VideoRow) => Promise<void>; saving: boolean }) {
   const rail = useRef<HTMLDivElement>(null);
-  return <section aria-label={title}><div className="mb-4 flex items-center justify-between gap-3"><div className="flex items-center gap-3">{number && <span className="text-xs font-semibold text-primary">{number}</span>}<h2 className="text-lg font-semibold sm:text-2xl">{title}</h2></div><div className="flex shrink-0 gap-1"><Button variant="ghost" size="icon" aria-label={`Scroll ${title} left`} disabled={!videos.length} onClick={() => rail.current?.scrollBy({ left: -rail.current.clientWidth * .8, behavior: "smooth" })}><ChevronLeft /></Button><Button variant="ghost" size="icon" aria-label={`Scroll ${title} right`} disabled={!videos.length} onClick={() => rail.current?.scrollBy({ left: rail.current.clientWidth * .8, behavior: "smooth" })}><ChevronRight /></Button></div></div>
+  return <section aria-label={title}><div className="mb-4 flex items-center justify-between gap-3"><div className="flex items-center gap-3"><h2 className="text-lg font-semibold sm:text-2xl">{title}</h2></div><div className="flex shrink-0 gap-1"><Button variant="ghost" size="icon" aria-label={`Scroll ${title} left`} disabled={!videos.length} onClick={() => rail.current?.scrollBy({ left: -rail.current.clientWidth * .8, behavior: "smooth" })}><ChevronLeft /></Button><Button variant="ghost" size="icon" aria-label={`Scroll ${title} right`} disabled={!videos.length} onClick={() => rail.current?.scrollBy({ left: rail.current.clientWidth * .8, behavior: "smooth" })}><ChevronRight /></Button></div></div>
     {videos.length ? <div ref={rail} className="cinema-rail -mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-3">{videos.map(v => <article key={v.id} className="group w-[260px] shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
       <div className="relative aspect-video overflow-hidden rounded-md border border-border bg-card"><Button variant="ghost" onClick={() => onPlay(v)} aria-label={`Play ${v.title}`} className="h-full w-full rounded-none p-0 hover:bg-transparent"><VideoThumb v={v} className="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105" /><span className="absolute bottom-3 left-3 grid size-9 place-items-center rounded-full bg-background/80 text-foreground"><Play className="size-4" fill="currentColor" /></span></Button><Button size="icon" variant="secondary" title={savedIds.includes(v.id) ? "Remove from My List" : "Add to My List"} aria-label={`${savedIds.includes(v.id) ? "Remove" : "Save"} ${v.title}`} disabled={saving} onClick={() => void onSave(v)} className="absolute bottom-3 right-3 h-9 w-9 rounded-full bg-background/80">{savedIds.includes(v.id) ? <Check /> : <Plus />}</Button></div>
       <Link to="/videos/$id" params={{ id: v.id }} className="mt-3 block break-words text-sm font-semibold leading-snug hover:text-primary">{v.title}</Link><Link to="/artist/$id" params={{ id: v.user_id }} className="mt-1 block text-xs text-muted-foreground hover:text-foreground">{v.artist ?? "Tunevio artist"}</Link>
