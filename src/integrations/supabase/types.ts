@@ -4207,6 +4207,39 @@ export type Database = {
         }
         Relationships: []
       }
+      site_nav_items: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          label: string
+          position: number
+          slot: string
+          to_path: string
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          label: string
+          position?: number
+          slot: string
+          to_path: string
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          label?: string
+          position?: number
+          slot?: string
+          to_path?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
       song_rights: {
         Row: {
           created_at: string

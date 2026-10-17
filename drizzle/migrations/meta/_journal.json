@@ -218,6 +218,13 @@
       "when": 1792041517658,
       "tag": "0030_battle_replay_voting",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792196007465,
+      "tag": "0031_site_nav_items",
+      "breakpoints": true
     }
   ]
 }
