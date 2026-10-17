@@ -659,11 +659,11 @@ function ArenaPass() {
           ))}
         </ul>
         <div className="lg:col-span-4 grid grid-cols-2 gap-3">
-          <Link to="/artist/upgrade" className="block rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-left hover:bg-amber-500/20">
+          <Link to="/pricing" className="block rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-left hover:bg-amber-500/20">
             <p className="text-xs font-bold text-amber-300">ARENA PASS</p>
             <p className="text-lg font-black">$4.99<span className="text-xs font-normal text-white/60"> / month</span></p>
           </Link>
-          <Link to="/artist/upgrade" className="block rounded-xl border border-[#0000FF]/40 bg-[#0000FF]/10 p-3 text-left hover:bg-[#0000FF]/20">
+          <Link to="/pricing" className="block rounded-xl border border-[#0000FF]/40 bg-[#0000FF]/10 p-3 text-left hover:bg-[#0000FF]/20">
             <p className="text-xs font-bold text-[#0000FF]">ARENA PASS PRO</p>
             <p className="text-lg font-black">$9.99<span className="text-xs font-normal text-white/60"> / month</span></p>
           </Link>
