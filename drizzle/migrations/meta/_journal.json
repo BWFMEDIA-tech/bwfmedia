@@ -225,6 +225,13 @@
       "when": 1792196007465,
       "tag": "0031_site_nav_items",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792251625397,
+      "tag": "0032_stream_playback_progress",
+      "breakpoints": true
     }
   ]
 }

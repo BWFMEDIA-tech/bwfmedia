@@ -6754,6 +6754,10 @@ export type Database = {
         }
         Returns: string
       }
+      update_stream_playback_progress: {
+        Args: { p_duration_played_seconds: number; p_event_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
