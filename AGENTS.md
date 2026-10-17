@@ -9,7 +9,7 @@
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
 - Aggregate artist streaming analytics in an authenticated database function scoped to `auth.uid()`, because raw event rows must never be exposed or aggregated in the browser.
 - Resolve Artist Dashboard menu destinations through the shared navigation helper and reuse existing section routes, because non-artists need a signup entry and dashboard links must not point to unimplemented tabs.
-- Count song plays in the shared player on the audio's first real playback start per load, saving a stream event plus the song count server-side, because page opens, rerenders and repeated clicks must never add plays.
+- Count shared-player starts once per load; update the same event after measured 30s, excluding seeks/pauses and bounding by owner/server elapsed time, because starts cannot fabricate royalties. Highlight only recorded stream countries.
 - Keep rights verification admin-only (DB trigger blocks artist self-verify; admin server functions write admin_audit_log), and keep third-party rights adapters server-side and disconnected until partner access is approved, because statuses and royalties must never be fabricated.
 - Reuse ProfileMessageButton on normal and live artist profiles with the resolved account ID and existing private messages route, because owners need their own inbox and visitors need the correct recipient without duplicating messaging storage.
 - Keep a close control in the open message conversation header that returns to the conversation list at every screen size, because members need to end a conversation without leaving Messages.

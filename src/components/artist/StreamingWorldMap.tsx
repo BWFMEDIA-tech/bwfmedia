@@ -2,13 +2,16 @@ import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import world from "world-atlas/countries-110m.json";
 
+import { countryStreams } from "@/lib/playback-progress";
+
 type MapCountry = { type: "Feature"; id?: string | number; properties?: Record<string, unknown> };
 
 const countries = (feature(world as any, (world as any).objects.countries) as any).features as MapCountry[];
 const projection = geoNaturalEarth1().fitSize([1000, 440], { type: "FeatureCollection", features: countries } as any);
 const path = geoPath(projection);
 
-export function StreamingWorldMap({ hasLocationData }: { hasLocationData: boolean }) {
+export function StreamingWorldMap({ countries: streamCountries }: { countries: Array<{ name: string; streams: number }> }) {
+  const hasLocationData = streamCountries.some(c => c.name !== "Unknown" && c.streams > 0);
   return (
     <div className="relative min-h-[240px] overflow-hidden rounded-md border border-border bg-background/35 sm:min-h-[320px]">
       <svg viewBox="0 0 1000 440" role="img" aria-label="World map showing stream locations" className="h-full min-h-[240px] w-full sm:min-h-[320px]">
@@ -22,11 +25,11 @@ export function StreamingWorldMap({ hasLocationData }: { hasLocationData: boolea
           <path
             key={`${country.id ?? "country"}-${index}`}
             d={path(country as any) ?? undefined}
-            fill={hasLocationData ? "url(#stream-map-fill)" : "var(--muted)"}
-            fillOpacity={hasLocationData ? 0.74 : 0.55}
+            fill={countryStreams(String(country.properties?.name ?? ""), streamCountries) > 0 ? "url(#stream-map-fill)" : "var(--muted)"}
+            fillOpacity={countryStreams(String(country.properties?.name ?? ""), streamCountries) > 0 ? 0.9 : 0.35}
             stroke="var(--background)"
             strokeWidth="0.7"
-          />
+          ><title>{String(country.properties?.name ?? "Country")}: {countryStreams(String(country.properties?.name ?? ""), streamCountries)} streams</title></path>
         ))}
       </svg>
       {!hasLocationData ? (

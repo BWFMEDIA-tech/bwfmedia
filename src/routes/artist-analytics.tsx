@@ -30,7 +30,6 @@ function ArtistAnalyticsPage() {
   const query = useQuery({ queryKey: ["my-streaming-analytics", days], queryFn: () => fetchAnalytics({ data: { days } }), refetchInterval: 15000, refetchOnWindowFocus: true });
   const data = query.data;
   const summary = data?.summary;
-  const hasLocations = !!data?.countries?.some((country) => country.name !== "Unknown");
 
   const exportCsv = () => {
     if (!data) return;
@@ -76,7 +75,7 @@ function ArtistAnalyticsPage() {
         </section>
 
         <Panel className="mt-3" title="Streams by location" action={<span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><CalendarDays className="h-3.5 w-3.5" /> Last {days} days</span>}>
-          <StreamingWorldMap hasLocationData={hasLocations} />
+          <StreamingWorldMap countries={data?.countries ?? []} />
         </Panel>
 
         <div className="mt-3 grid gap-3 xl:grid-cols-[1fr_1fr_1.45fr]">
