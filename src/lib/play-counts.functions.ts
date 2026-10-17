@@ -15,7 +15,7 @@ export const incrementTrackPlayCount = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
-    const { error: eventError } = await sb.rpc("record_stream_event", {
+    const { data: event, error: eventError } = await sb.rpc("record_stream_event", {
       p_track_id: data.trackId,
       p_duration_played_seconds: 0,
       p_client_session_id: data.playId ?? null,
@@ -32,7 +32,7 @@ export const incrementTrackPlayCount = createServerFn({ method: "POST" })
       console.error("[play-count] increment failed", error.message);
       throw new Error("Could not save this play.");
     }
-    return { trackId: data.trackId, play_count: (count as number | null) ?? 0 };
+    return { eventId: String(event.id), trackId: data.trackId, play_count: (count as number | null) ?? 0 };
   });
 
 /** Approximate listener location from the hosting edge (country/city only, never the IP). */
@@ -58,3 +58,14 @@ function listenerLocation(): Record<string, string> {
     return {};
   }
 }
+
+export const updatePlaybackProgress = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ eventId: z.string().uuid(), seconds: z.number().int().min(0).max(36000) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: qualified, error } = await context.supabase.rpc("update_stream_playback_progress", {
+      p_event_id: data.eventId, p_duration_played_seconds: data.seconds,
+    });
+    if (error) throw new Error("Could not save playback progress.");
+    return { qualified: !!qualified };
+  });

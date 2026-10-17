@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getSignedAudioUrl } from "@/lib/useSignedAudio";
 import { supabase } from "@/integrations/supabase/client";
-import { incrementTrackPlayCount } from "@/lib/play-counts.functions";
+import { incrementTrackPlayCount, updatePlaybackProgress } from "@/lib/play-counts.functions";
+
+import { PlaybackProgress } from "@/lib/playback-progress";
 
 /** Fired after a play has been saved; detail = { trackId, playCount }. */
 export const PLAY_COUNT_EVENT = "tunevio:play-count";
@@ -51,6 +53,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const playTokenRef = useRef(0);
   // One pending count per playback start; cleared once the audio really plays.
   const pendingCountRef = useRef<{ token: number; trackId: string } | null>(null);
+  const progressSessionRef = useRef<{ trackId: string; progress: PlaybackProgress; eventId: string | null; qualified: boolean; saving: boolean; nextSave: number } | null>(null);
   const [state, setState] = useState<PlayerState>({
     track: null,
     queue: [],
@@ -72,7 +75,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const a = audioRef.current;
     if (!a) return;
     const token = ++playTokenRef.current;
-    pendingCountRef.current = { token, trackId: track.id };
+    if (progressSessionRef.current?.trackId !== track.id || a.ended) {
+      pendingCountRef.current = { token, trackId: track.id };
+      progressSessionRef.current = null;
+    } else if (pendingCountRef.current) {
+      pendingCountRef.current.token = token;
+    }
     const src = (await getSignedAudioUrl(track.audioUrl)) ?? track.audioUrl;
     if (token !== playTokenRef.current || audioRef.current !== a) return;
     if (a.src !== src) a.src = src;
@@ -91,6 +99,18 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     a.volume = stateRef.current?.volume ?? 0.8;
     audioRef.current = a;
     const onTime = () => {
+      const session = progressSessionRef.current;
+      if (session) {
+        const seconds = session.progress.sample(a.currentTime, performance.now(), !a.paused, a.seeking);
+        if (session.eventId && seconds >= session.nextSave && !session.saving && !session.qualified) {
+          session.saving = true;
+          session.nextSave = seconds + 5;
+          void updatePlaybackProgress({ data: { eventId: session.eventId, seconds } })
+            .then((result) => { session.qualified = result.qualified; })
+            .catch((error) => console.error("[player] failed to save playback progress", error))
+            .finally(() => { session.saving = false; });
+        }
+      }
       const s = stateRef.current;
       if (s?.track?.preview && a.currentTime >= PREVIEW_LIMIT_SEC) {
         a.pause();
@@ -104,9 +124,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const onMeta = () => setState((s) => ({ ...s, duration: a.duration || 0 }));
     const onPlay = () => setState((s) => ({ ...s, isPlaying: true }));
     const onPlaying = () => {
+      progressSessionRef.current?.progress.resetPosition(a.currentTime, performance.now());
       const pending = pendingCountRef.current;
       if (!pending || pending.token !== playTokenRef.current) return;
       pendingCountRef.current = null;
+      const session = { trackId: pending.trackId, progress: new PlaybackProgress(), eventId: null as string | null, qualified: false, saving: false, nextSave: 30 };
+      session.progress.resetPosition(a.currentTime, performance.now());
+      progressSessionRef.current = session;
       void (async () => {
         const { data } = await supabase.auth.getSession();
         if (!data.session) return; // signed-out previews are not counted
@@ -114,6 +138,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           const res = await incrementTrackPlayCount({
             data: { trackId: pending.trackId, playId: `${pending.trackId}:${Date.now()}:${pending.token}` },
           });
+          session.eventId = res.eventId;
           window.dispatchEvent(new CustomEvent(PLAY_COUNT_EVENT, {
             detail: { trackId: res.trackId, playCount: res.play_count },
           }));
@@ -122,7 +147,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         }
       })();
     };
-    const onPause = () => setState((s) => ({ ...s, isPlaying: false }));
+    const onPause = () => {
+      progressSessionRef.current?.progress.resetPosition(a.currentTime, performance.now());
+      setState((s) => ({ ...s, isPlaying: false }));
+    };
+    const onSeek = () => progressSessionRef.current?.progress.resetPosition(a.currentTime, performance.now());
     const onEnd = () => {
       const s = stateRef.current; if (!s) return;
       if (s.repeat === "one") { a.currentTime = 0; a.play().catch(() => {}); return; }
@@ -142,6 +171,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     a.addEventListener("playing", onPlaying);
     a.addEventListener("pause", onPause);
     a.addEventListener("ended", onEnd);
+    a.addEventListener("seeking", onSeek);
+    a.addEventListener("seeked", onSeek);
     return () => {
       a.pause();
       a.removeEventListener("timeupdate", onTime);
@@ -151,12 +182,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       a.removeEventListener("playing", onPlaying);
       a.removeEventListener("pause", onPause);
       a.removeEventListener("ended", onEnd);
+      a.removeEventListener("seeking", onSeek);
+      a.removeEventListener("seeked", onSeek);
     };
   }, [playAudio]);
 
   const play = useCallback((track?: PlayerTrack, queue?: PlayerTrack[]) => {
     const a = audioRef.current; if (!a) return;
-    const s = stateRef.current!;
+    const s = stateRef.current; if (!s) return;
     const t = track ?? s.track; if (!t) return;
     const nextQueue = queue ?? (s.queue.length ? s.queue : [t]);
     void playAudio(t);
