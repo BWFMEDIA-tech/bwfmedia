@@ -27,3 +27,4 @@
 - [ ] Host tiers phase 2: bonuses, host notifications, host payouts via existing payout flow, paid submissions/boosts counted per room once they are tied to a live room
 - [x] Artist Store (/artist-store): fan store, product pages, artist manage dashboard, NFC links, orders, checkout via webhook
 - [x] Show saved platform links with copy buttons on the /go-live prep screen; verified signed-in at 531x1494 that the chip renders, copies the real link, and that Edit platforms opens the connected-platforms settings.
+- [x] Remove the 01-06 labels above the video rows on /videos; verified no numbered labels remain and all row titles still show.
