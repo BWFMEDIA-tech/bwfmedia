@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar,
   BarChart3, Settings, Menu, Search, Bell, ChevronDown, ChevronRight,
-  LogOut, User as UserIcon, Crown, Music2, Video, Mic2, Sparkles, ShieldCheck,
+  LogOut, User as UserIcon, Crown, Music2, Video, Mic2, Sparkles, ShieldCheck, List,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -69,6 +69,7 @@ const NAV: NavEntry[] = [
   { kind: "link", to: "/admin/nfc-orders", label: "NFC Tag Orders", icon: BarChart3 },
   { kind: "link", to: "/admin/merchandise", label: "Merchandise", icon: BarChart3 },
   { kind: "link", to: "/admin/assistant", label: "AI Assistant", icon: BarChart3 },
+  { kind: "link", to: "/admin/navigation", label: "Navigation Bar", icon: List },
   {
     kind: "group", key: "trust", label: "Trust & Safety", icon: ShieldCheck,
     children: [
