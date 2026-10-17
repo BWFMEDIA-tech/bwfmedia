@@ -219,7 +219,7 @@ function VideosPage() {
           <div className="cinema-rail flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
             {interviews.map(v => <article key={v.id} className="w-[260px] shrink-0 snap-start sm:w-[320px] lg:w-[360px]">
               <Button variant="secondary" onClick={() => setInterviewId(v.id)} aria-label={`Play ${v.title}`} className="relative aspect-video h-auto w-full overflow-hidden p-0">
-                <span className="flex flex-col items-center gap-2"><Film className="size-10" /><span>Off the Block</span></span>
+                <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt={v.title} loading="lazy" className="h-full w-full object-cover" />
                 <span className="absolute bottom-3 left-3 grid size-9 place-items-center rounded-full bg-background/80"><Play className="size-4" fill="currentColor" /></span>
               </Button>
               <Button variant="link" onClick={() => setInterviewId(v.id)} className="mt-3 h-auto justify-start whitespace-normal p-0 text-left text-sm font-semibold text-foreground">{v.title}</Button>
