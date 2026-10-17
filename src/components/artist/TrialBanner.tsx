@@ -39,7 +39,7 @@ export function ArtistTrialBanner() {
         <span className="font-medium">
           Free trial: {daysLeft ?? 7} day{daysLeft === 1 ? "" : "s"} left
         </span>
-        <Link to="/artist/upgrade" className="underline font-semibold hover:opacity-90">
+        <Link to="/pricing" className="underline font-semibold hover:opacity-90">
           Manage billing
         </Link>
       </div>
@@ -51,7 +51,7 @@ export function ArtistTrialBanner() {
         <Sparkles size={16} className="shrink-0" />
         <span className="font-medium">Start your 7-day free Artist trial — $6.99/mo after.</span>
         <Link
-          to="/artist/upgrade"
+          to="/pricing"
           className="bg-white text-fuchsia-700 font-semibold px-3 py-1 rounded-full text-xs hover:bg-white/90"
         >
           Start trial
