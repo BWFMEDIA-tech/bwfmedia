@@ -11,6 +11,7 @@ export function ArtistStatusProvider({ children }: { children: ReactNode }) {
   const [statuses, setStatuses] = useState<Record<string, ArtistStatus>>({});
   const ids = useRef(new Map<string, number>());
   const refreshRef = useRef<() => void>(() => {});
+  const broadcastRef = useRef<() => void>(() => {});
   const read = useServerFn(getArtistStatuses);
   const touch = useServerFn(touchPresence);
   const { user } = useAuth();
@@ -41,14 +42,19 @@ export function ArtistStatusProvider({ children }: { children: ReactNode }) {
       .on("postgres_changes", { event: "*", schema: "public", table: "streams" }, schedule)
       .on("postgres_changes", { event: "*", schema: "public", table: "stage_rooms" }, schedule)
       .subscribe();
+    // Broadcast is only an invalidation hint; all labels still come from trusted records.
+    const activity = supabase.channel("artist-status-activity")
+      .on("broadcast", { event: "changed" }, schedule)
+      .subscribe();
+    broadcastRef.current = () => { void activity.send({ type: "broadcast", event: "changed", payload: {} }); };
     const interval = setInterval(schedule, 15_000);
     document.addEventListener("visibilitychange", schedule);
     schedule();
-    return () => { disposed = true; clearTimeout(timer); clearInterval(interval); document.removeEventListener("visibilitychange", schedule); refreshRef.current = () => {}; void supabase.removeChannel(channel); };
+    return () => { disposed = true; clearTimeout(timer); clearInterval(interval); document.removeEventListener("visibilitychange", schedule); refreshRef.current = () => {}; broadcastRef.current = () => {}; void supabase.removeChannel(channel); void supabase.removeChannel(activity); };
   }, [read]);
   useEffect(() => {
     if (!user) return;
-    const heartbeat = () => { if (document.visibilityState !== "hidden") void touch().then(() => refreshRef.current()).catch(() => {}); };
+    const heartbeat = () => { if (document.visibilityState !== "hidden") void touch().then(() => { refreshRef.current(); broadcastRef.current(); }).catch(() => {}); };
     heartbeat();
     const interval = setInterval(heartbeat, 30_000);
     document.addEventListener("visibilitychange", heartbeat);
