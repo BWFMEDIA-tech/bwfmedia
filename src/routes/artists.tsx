@@ -8,6 +8,7 @@ import { Check, Search, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { useAuth } from "@/lib/auth-context";
 import { toggleArtistFollow, listFollowedArtistIds } from "@/lib/artist-follows.functions";
 import { getArtistsDirectory, type ArtistDirectoryItem } from "@/lib/artists-directory.functions";
@@ -21,14 +22,15 @@ const artistsQuery = queryOptions({
 export const Route = createFileRoute("/artists")({
   head: () => ({
     meta: [
-      { title: "Artists — BWF Network" },
-      { name: "description", content: "Discover independent artists on BWF Network — browse profiles, stream music, watch live sets, and connect with the creators shaping the next wave of culture." },
-      { property: "og:title", content: "Artists — BWF Network" },
-      { property: "og:description", content: "Discover independent artists on BWF Network — browse profiles, stream music, watch live sets, and connect with the creators shaping the next wave of culture." },
+      { title: "Artists — Tunevio" },
+      { name: "description", content: "Discover Tunevio artists, browse profiles, stream music and watch live sets." },
+      { property: "og:title", content: "Artists — Tunevio" },
+      { property: "og:description", content: "Discover Tunevio artists, browse profiles, stream music and watch live sets." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfnetwork.com/artists" },
+      { property: "og:url", content: "https://tunevio.com/artists" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/artists" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/artists" }],
   }),
   component: ArtistsPage,
 });
@@ -217,6 +219,7 @@ function ArtistDirectoryCard({
             <AvatarImage src={a.avatarUrl ?? undefined} alt={a.name} className="object-cover" />
             <AvatarFallback className="text-lg font-bold">{a.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
+          <ArtistStatusBeacon userId={a.id} />
         </span>
         {a.featured && (
           <Badge className="absolute -right-1 top-0 gap-1 bg-background/90 text-foreground backdrop-blur">

@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 import { useMaybeRoomContext } from "@livekit/components-react";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
@@ -653,6 +654,7 @@ function ModBubble({
               {(m.display_name ?? "M").charAt(0).toUpperCase()}
             </div>
           )}
+          <ArtistStatusBeacon userId={m.user_id} />
         </div>
         <span
           className="absolute -top-0.5 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white shadow-lg shadow-black/50 ring-1 ring-black/40"
@@ -765,7 +767,7 @@ function InviteModal({
                     to="/user/$id"
                     params={{ id: p.user_id }}
                     onClick={(e) => e.stopPropagation()}
-                    className="shrink-0"
+                    className="relative shrink-0"
                   >
                     {p.avatar_url ? (
                       <SignedImg src={p.avatar_url} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
@@ -775,6 +777,7 @@ function InviteModal({
                         style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
                       />
                     )}
+                    <ArtistStatusBeacon userId={p.user_id} />
                   </Link>
                   <span className="flex-1 text-sm text-white">{p.display_name ?? "Listener"}</span>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">Invite</span>
@@ -918,7 +921,7 @@ function SpeakerBubble({
             />
           </>
         )}
-        <Link to="/artist/$id" params={{ id: p.user_id }}>
+        <Link to="/artist/$id" params={{ id: p.user_id }} className="relative block">
           {p.avatar_url ? (
             <SignedImg src={p.avatar_url} alt="" className="h-[96px] w-[96px] rounded-full border-2 border-[#0d0d18] object-cover" />
           ) : (
@@ -927,6 +930,7 @@ function SpeakerBubble({
               style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
             />
           )}
+          <ArtistStatusBeacon userId={p.user_id} className="top-1 right-1 bottom-auto" />
         </Link>
         <button
           type="button"
@@ -1380,7 +1384,7 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
       title={`View ${p.display_name ?? "listener"}'s page`}
     >
       <div
-        className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-full p-0.5 transition group-hover:scale-105"
+        className="relative flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-full p-0.5 transition group-hover:scale-105"
         style={{ background: `linear-gradient(135deg, ${BLUE}88, transparent)` }}
       >
         {p.avatar_url ? (
@@ -1395,6 +1399,7 @@ function ListenerBubble({ p }: { p: StageParticipant }) {
             style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
           />
         )}
+        <ArtistStatusBeacon userId={p.user_id} />
       </div>
       <div className="text-[10px] font-medium text-white truncate max-w-[80px]">{p.display_name ?? "Listener"}</div>
       <div className="text-[9px] text-white/40">Listener</div>

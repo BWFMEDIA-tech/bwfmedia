@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { StageParticipant } from "@/lib/useStageState";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 
 type AppRole = "admin" | "host" | "artist" | "moderator" | "member" | "listener";
 
@@ -169,7 +170,6 @@ export function CrowdPanel({
             const roles = roleMap.get(p.user_id) ?? [];
             const primary = pickPrimaryRole(roles);
             const RoleMeta = ROLE_STYLE[primary];
-            const onStageNow = p.stage_role === "host" || p.stage_role === "speaker";
             return (
               <li
                 key={p.id}
@@ -183,9 +183,7 @@ export function CrowdPanel({
                       {(p.display_name ?? "?").slice(0, 1).toUpperCase()}
                     </div>
                   )}
-                  {onStageNow && (
-                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0d0d18]" />
-                  )}
+                  <ArtistStatusBeacon userId={p.user_id} />
                 </Link>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-white truncate leading-tight">

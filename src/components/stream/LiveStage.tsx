@@ -24,6 +24,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { setStreamSpotlight } from "@/lib/stage.functions";
 import { Pin, PinOff, X as XIcon } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
 import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
@@ -588,7 +589,7 @@ export function ProfileStage({ host, streamId, showHostTools, publish, onEnd, on
         return <div key={label} className="profile-video-tile">
           {track && publication && !publication.isMuted ? <TrackRefContext.Provider value={track}><ParticipantTile className="!h-full !w-full" /></TrackRefContext.Provider> : avatar ? <SignedImg src={avatar} alt={displayName ?? label} className="h-full w-full object-cover" /> : <div className="profile-video-empty"><Icon className="h-10 w-10" /><span>{identity ? "Camera off" : `Waiting for ${label.toLowerCase()}`}</span></div>}
           <span className="profile-video-badge"><Icon className="h-4 w-4" />{label}</span>
-          {displayName && <div className="profile-video-identity">{avatar && <SignedImg src={avatar} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />}<div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{displayName}</p><p className="text-xs text-muted-foreground">{label === "Host" ? "Live host" : "On stage"}</p></div><AudioLines className={cn("h-6 w-6 text-primary", track?.participant.isSpeaking ? "opacity-100" : "opacity-30")} /></div>}
+          {displayName && <div className="profile-video-identity">{avatar && <div className="relative shrink-0"><SignedImg src={avatar} alt="" className="h-9 w-9 rounded-full object-cover" />{profile && <ArtistStatusBeacon userId={profile.id} />}</div>}<div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{displayName}</p><p className="text-xs text-muted-foreground">{label === "Host" ? "Live host" : "On stage"}</p></div><AudioLines className={cn("h-6 w-6 text-primary", track?.participant.isSpeaking ? "opacity-100" : "opacity-30")} /></div>}
         </div>;
       })}
     </div>}
@@ -676,7 +677,7 @@ function useParticipantRoles(streamId: string | undefined, identities: string[])
   return map;
 }
 
-type ProfileLite = { display_name: string | null; avatar_url: string | null };
+type ProfileLite = { id: string; display_name: string | null; avatar_url: string | null };
 
 function useParticipantProfiles(identities: string[]): Record<string, ProfileLite> {
   const [map, setMap] = useState<Record<string, ProfileLite>>({});
@@ -695,7 +696,7 @@ function useParticipantProfiles(identities: string[]): Record<string, ProfileLit
       const next: Record<string, ProfileLite> = {};
       (data ?? []).forEach((p: any) => {
         const eff = effectiveIdentity(p);
-        next[p.id] = { display_name: eff.display_name, avatar_url: eff.avatar_url };
+        next[p.id] = { id: p.id, display_name: eff.display_name, avatar_url: eff.avatar_url };
       });
       setMap(next);
     })();
@@ -733,7 +734,7 @@ function StageTile({ track, label, fallbackImage, placeholder, profile, small }:
       </div>
       {profile?.display_name && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-2 bg-background/80 px-3 py-3 text-foreground backdrop-blur">
-          {avatar && <SignedImg src={avatar} alt="" className="h-7 w-7 shrink-0 rounded-full object-cover" />}
+          {avatar && <div className="relative shrink-0"><SignedImg src={avatar} alt="" className="h-7 w-7 rounded-full object-cover" /><ArtistStatusBeacon userId={profile.id} /></div>}
           <span className="min-w-0 truncate text-xs font-semibold">{profile.display_name}</span>
         </div>
       )}

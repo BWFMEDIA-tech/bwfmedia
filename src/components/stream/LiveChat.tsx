@@ -29,6 +29,7 @@ import { deleteMessage, timeoutUser, banUser } from "@/lib/moderation.functions"
 import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 
 // BWF Immersive Cinema palette
@@ -204,7 +205,7 @@ export function LiveChat({
     <div ref={listRef} className="profile-chat-messages">
       {messages.length === 0 && <div className="grid h-full min-h-48 place-content-center text-center"><MessageCircle className="mx-auto mb-3 h-8 w-8 text-primary" /><p className="text-sm text-muted-foreground">No messages yet</p></div>}
       {messages.map(c => <div key={c.id} className={cn("profile-chat-message", c.body.startsWith("💎 TIP") && "profile-chat-tip")}>
-        {c.avatar_url ? <SignedImg src={c.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" /> : <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-sm text-primary">{(c.display_name ?? "V").charAt(0)}</div>}
+        <div className="relative shrink-0">{c.avatar_url ? <SignedImg src={c.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" /> : <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-sm text-primary">{(c.display_name ?? "V").charAt(0)}</div>}<ArtistStatusBeacon userId={c.user_id} /></div>
         <div className="min-w-0 flex-1"><p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-medium">{c.display_name}{c.user_id === hostId && <span className="rounded bg-trust/20 px-1.5 py-0.5 text-[10px] text-primary">Host</span>}</p><p className="break-words text-sm text-muted-foreground">{c.body}</p>{canMod && c.user_id !== auth.user?.id && <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Delete message" onClick={() => void onDelete(c.id)}><Trash2 className="h-3 w-3" /></Button>}</div>
       </div>)}
     </div>
@@ -341,6 +342,7 @@ export function LiveChat({
                   />
                 )}
               </div>
+              <ArtistStatusBeacon userId={c.user_id} className="-top-0.5 -right-0.5 bottom-auto" />
               {isHost && (
                 <span
                   className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full border border-[#07070f]"

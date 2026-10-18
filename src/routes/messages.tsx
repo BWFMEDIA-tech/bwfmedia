@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { sendDirectMessage, markConversationRead } from "@/lib/direct-messages.functions";
 import { toast } from "sonner";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 
 const searchSchema = z.object({
   to: z.string().uuid().optional(),
@@ -17,8 +18,12 @@ export const Route = createFileRoute("/messages")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Messages — BWF Network" },
+      { title: "Messages — Tunevio" },
       { name: "description", content: "Direct messages with artists, hosts, and your network." },
+      { property: "og:title", content: "Messages — Tunevio" },
+      { property: "og:description", content: "Connect privately with Tunevio artists, hosts and your network." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MessagesPage,
@@ -399,13 +404,8 @@ function MessagesPage() {
 }
 
 function Avatar({ profile }: { profile: ProfileLite }) {
-  if (profile.avatar_url) {
-    return <SignedImg src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />;
-  }
   const initial = (profile.display_name || "?").charAt(0).toUpperCase();
   return (
-    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-xs font-bold text-white">
-      {initial}
-    </div>
+    <div className="relative shrink-0">{profile.avatar_url ? <SignedImg src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" /> : <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-xs font-bold text-foreground">{initial}</div>}<ArtistStatusBeacon userId={profile.id} /></div>
   );
 }

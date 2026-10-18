@@ -92,6 +92,9 @@
 
   --trust: #0000FF;
   --success: #00C853;
+  --status-live: #FF3434;
+  --status-active: var(--success);
+  --status-offline: var(--ash);
 
   --brand-cyan: oklch(0.84 0.15 207);
   --brand-blue: #0000FF;
@@ -102,6 +105,10 @@
   --shadow-blood: 0 20px 60px -10px rgb(0 230 255 / 0.45);
   --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
+
+.artist-status-beacon { position: absolute; right: 0; bottom: 0; z-index: 2; width: 11px; height: 11px; border: 2px solid var(--background); border-radius: 50%; background: var(--status-offline); pointer-events: auto; }
+.artist-status-beacon[data-artist-status="live"] { background: var(--status-live); box-shadow: 0 0 7px color-mix(in srgb, var(--status-live) 65%, transparent); }
+.artist-status-beacon[data-artist-status="active"] { background: var(--status-active); }
 
 .tunevio-store { --store-shade: linear-gradient(90deg, var(--background) 0%, color-mix(in oklch, var(--background) 94%, transparent) 24%, color-mix(in oklch, var(--background) 25%, transparent) 62%, transparent); }
 .store-cover { height: 540px; max-height: calc(100svh - 180px); min-height: 430px; }

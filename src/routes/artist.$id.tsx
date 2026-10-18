@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { ArtistStoreSection } from "@/components/store/ArtistStoreSection";
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -257,6 +258,7 @@ function HeroBanner({
                 <div className="h-full w-full grid place-items-center bg-gradient-to-br from-[#00E6FF]/25 to-black text-3xl font-black">{initials}</div>
               )}
             </div>
+            <ArtistStatusBeacon userId={artist.id} className="bottom-2 right-2 h-4 w-4" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
