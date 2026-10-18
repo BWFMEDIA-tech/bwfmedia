@@ -172,10 +172,17 @@ function ArtistsPage() {
   );
 }
 
-function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
+function ArtistDirectoryCard({
+  a,
+  following,
+  onFollowed,
+}: {
+  a: ArtistDirectoryItem;
+  following: boolean;
+  onFollowed: (artistId: string, following: boolean) => void;
+}) {
   const { isAuthenticated } = useAuth();
   const toggleFn = useServerFn(toggleArtistFollow);
-  const [following, setFollowing] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function handleFollow() {
@@ -183,15 +190,15 @@ function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
       toast.error("Sign in to follow artists");
       return;
     }
-    setBusy(true);
     const prev = following;
-    setFollowing(!prev);
+    setBusy(true);
+    onFollowed(a.id, !prev);
     try {
       const res = await toggleFn({ data: { artistId: a.id } });
-      setFollowing(res.following);
+      onFollowed(a.id, res.following);
       toast.success(res.following ? `Following ${a.name}` : `Unfollowed ${a.name}`);
     } catch (e: any) {
-      setFollowing(prev);
+      onFollowed(a.id, prev);
       toast.error(e?.message ?? "Could not update follow");
     } finally {
       setBusy(false);
@@ -229,13 +236,17 @@ function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
         onClick={handleFollow}
         disabled={busy}
         aria-pressed={following}
-        className={`mt-4 w-full max-w-[9rem] rounded-full border px-5 py-1.5 text-sm font-semibold transition disabled:opacity-60 ${
-          following
-            ? "border-primary bg-primary/10 text-primary"
-            : "border-border text-foreground hover:border-primary hover:text-primary"
+        className={`follow-pill mt-4 w-full max-w-[9rem] rounded-full px-5 py-1.5 text-sm font-semibold transition disabled:opacity-60 ${
+          following ? "follow-pill-on" : ""
         }`}
       >
-        {following ? "Following" : "Follow"}
+        {following ? (
+          <>
+            <Check className="h-3.5 w-3.5" /> Following
+          </>
+        ) : (
+          "Follow"
+        )}
       </button>
     </div>
   );
