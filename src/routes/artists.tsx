@@ -130,64 +130,84 @@ function ArtistsPage() {
             </p>
           </div>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {filtered.map((a) => (
               <li key={a.id}>
-                <Link
-                  to="/artist/$id"
-                  params={{ id: a.publicId }}
-                  className="group block overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/60 hover:shadow-lg"
-                >
-                  <div
-                    className="relative h-24 w-full bg-gradient-to-br from-primary/30 via-purple-500/20 to-pink-500/20"
-                    style={
-                      a.bannerUrl
-                        ? { backgroundImage: `url(${a.bannerUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-                        : undefined
-                    }
-                  >
-                    {a.featured && (
-                      <Badge className="absolute right-2 top-2 gap-1 bg-background/80 text-foreground backdrop-blur">
-                        <Sparkles className="h-3 w-3" /> Featured
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="-mt-8 px-4 pb-4">
-                    <Avatar className="h-16 w-16 border-4 border-card">
-                      <AvatarImage src={a.avatarUrl ?? undefined} alt={a.name} />
-                      <AvatarFallback>{a.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <h2 className="mt-2 truncate text-base font-semibold group-hover:text-primary">
-                      {a.name}
-                    </h2>
-                    {a.username && (
-                      <p className="text-xs text-muted-foreground">@{a.username}</p>
-                    )}
-                    {a.bio && (
-                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                        {a.bio}
-                      </p>
-                    )}
-                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                      {a.location && (
-                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          {a.location}
-                        </span>
-                      )}
-                      {a.genres.slice(0, 3).map((g) => (
-                        <Badge key={g} variant="secondary" className="text-[10px]">
-                          {g}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </Link>
+                <ArtistDirectoryCard a={a} />
               </li>
             ))}
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
+  const { isAuthenticated } = useAuth();
+  const toggleFn = useServerFn(toggleArtistFollow);
+  const [following, setFollowing] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  async function handleFollow() {
+    if (!isAuthenticated) {
+      toast.error("Sign in to follow artists");
+      return;
+    }
+    setBusy(true);
+    const prev = following;
+    setFollowing(!prev);
+    try {
+      const res = await toggleFn({ data: { artistId: a.id } });
+      setFollowing(res.following);
+      toast.success(res.following ? `Following ${a.name}` : `Unfollowed ${a.name}`);
+    } catch (e: any) {
+      setFollowing(prev);
+      toast.error(e?.message ?? "Could not update follow");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex h-full flex-col items-center rounded-2xl border border-border bg-card/40 px-4 pb-5 pt-8 text-center transition hover:border-primary/50">
+      <Link to="/artist/$id" params={{ id: a.publicId }} className="group relative">
+        <span
+          aria-hidden
+          className="absolute -inset-1.5 rounded-full bg-gradient-to-br from-primary via-brand-blue to-primary opacity-70 blur-md"
+        />
+        <span className="relative block h-24 w-24 rounded-full bg-gradient-to-br from-primary via-brand-blue to-primary p-[2px]">
+          <Avatar className="h-full w-full">
+            <AvatarImage src={a.avatarUrl ?? undefined} alt={a.name} className="object-cover" />
+            <AvatarFallback className="text-lg font-bold">{a.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        </span>
+        {a.featured && (
+          <Badge className="absolute -right-1 top-0 gap-1 bg-background/90 text-foreground backdrop-blur">
+            <Sparkles className="h-3 w-3" /> Featured
+          </Badge>
+        )}
+      </Link>
+      <Link to="/artist/$id" params={{ id: a.publicId }} className="mt-4 block w-full">
+        <h2 className="truncate text-base font-semibold group-hover:text-primary">{a.name}</h2>
+        {a.username && <p className="truncate text-xs text-muted-foreground">@{a.username}</p>}
+        {a.genres.length > 0 && (
+          <p className="mt-1 truncate text-xs text-muted-foreground">{a.genres.slice(0, 3).join(" / ")}</p>
+        )}
+      </Link>
+      <button
+        type="button"
+        onClick={handleFollow}
+        disabled={busy}
+        aria-pressed={following}
+        className={`mt-4 w-full max-w-[9rem] rounded-full border px-5 py-1.5 text-sm font-semibold transition disabled:opacity-60 ${
+          following
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border text-foreground hover:border-primary hover:text-primary"
+        }`}
+      >
+        {following ? "Following" : "Follow"}
+      </button>
     </div>
   );
 }
