@@ -1,3 +1,4 @@
+import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Radio, Eye, Trash2 } from "lucide-react";
@@ -27,10 +28,12 @@ type LiveStream = {
 export const Route = createFileRoute("/live")({
   head: () => ({
     meta: [
-      { title: "Live Now — BWF Network" },
-      { name: "description", content: "Discover and join all currently active live streams on BWF Network." },
-      { property: "og:title", content: "Live Now on BWF Network" },
-      { property: "og:description", content: "Join active live streams from BWF artists and hosts." },
+      { title: "Live Now — Tunevio" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "description", content: "Discover and join all currently active live streams on Tunevio." },
+      { property: "og:title", content: "Live Now on Tunevio" },
+      { property: "og:description", content: "Join active live streams from Tunevio artists and hosts." },
     ],
   }),
   component: LivePage,
@@ -86,7 +89,7 @@ function LivePage() {
           <span className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-widest">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE NOW
           </span>
-          <h1 className="text-2xl font-bold sm:text-3xl">Live on BWF Network</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl">Live on Tunevio</h1>
         </div>
         <p className="text-white/60 mb-4">Drop into any active stream. Listen, react, or request the stage.</p>
 
@@ -126,7 +129,7 @@ function LivePage() {
               >
                 <div className="relative aspect-video bg-gradient-to-br from-violet-900 to-blue-900">
                   {s.thumbnail_url && (
-                    <img src={s.thumbnail_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />
+                    <StreamThumbnailImage src={s.thumbnail_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                   <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded bg-red-600 px-2 py-1 text-[10px] font-bold tracking-wider">

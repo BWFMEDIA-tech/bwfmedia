@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Upload, Check, ImageIcon, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { updateStreamThumbnail } from "@/lib/streams.functions";
+import { streamThumbnailPath } from "@/lib/stream-thumbnail";
+import { signVideoPaths } from "@/lib/video-sign.functions";
 import { cn } from "@/lib/utils";
 
 import discoverHero from "@/assets/discover-hero.jpg.asset.json";
@@ -42,10 +44,24 @@ export function StreamThumbnailDialog({
 }) {
   const auth = useAuth();
   const updateFn = useServerFn(updateStreamThumbnail);
+  const signFn = useServerFn(signVideoPaths);
+  const [preview, setPreview] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(currentUrl);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { if (open) setSelected(currentUrl); }, [open, currentUrl, streamId]);
+  useEffect(() => {
+    const path = selected ? streamThumbnailPath(selected) : null;
+    if (!path) { setPreview(selected); return; }
+    let cancelled = false;
+    setPreview(null);
+    signFn({ data: { paths: [path] } }).then(({ results }) => {
+      if (!cancelled) setPreview(results[path] ?? null);
+    }).catch(() => { if (!cancelled) toast.error("Couldn't load thumbnail preview"); });
+    return () => { cancelled = true; };
+  }, [selected, signFn]);
 
   const onUpload = async (file: File) => {
     if (!auth.user) return toast.error("Sign in required");
@@ -76,9 +92,9 @@ export function StreamThumbnailDialog({
     if (!streamId) return;
     setSaving(true);
     try {
-      await updateFn({ data: { streamId, thumbnailUrl: selected } });
+      const saved = await updateFn({ data: { streamId, thumbnailUrl: selected } });
       toast.success("Thumbnail updated");
-      onSaved?.(selected);
+      onSaved?.(saved.thumbnailUrl);
       onOpenChange(false);
     } catch (e: any) {
       toast.error(e?.message || "Failed to save");
@@ -89,50 +105,53 @@ export function StreamThumbnailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-[#0d0d18] border-white/10 text-white">
+      <DialogContent className="max-w-2xl bg-card border-border text-foreground">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ImageIcon className="h-4 w-4" /> Stream Thumbnail
           </DialogTitle>
-          <DialogDescription className="text-white/60">
+          <DialogDescription className="text-muted-foreground">
             Pick a preset or upload your own image. Shown on the Live page and shares.
           </DialogDescription>
         </DialogHeader>
 
         {/* Preview */}
-        <div className="aspect-video w-full overflow-hidden rounded-lg border border-white/10 bg-black/40">
-          {selected ? (
-            <img src={selected} alt="Selected thumbnail" className="h-full w-full object-cover" />
+        <div className="aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted">
+          {preview ? (
+            <img src={preview} alt="Selected thumbnail" className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-white/40 text-sm">
-              No thumbnail selected
+            <div className="flex h-full w-full items-center justify-center text-muted-foreground text-sm">
+              {selected ? "Loading thumbnail…" : "No thumbnail selected"}
             </div>
           )}
         </div>
 
         {/* Presets */}
         <div>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">Presets</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Presets</div>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {PRESETS.map((p) => {
               const active = selected === p.url;
               return (
-                <button
+                <Button
+                  variant="ghost"
+                  aria-label={p.label}
+                  disabled={saving || uploading}
                   key={p.url}
                   type="button"
                   onClick={() => setSelected(p.url)}
                   className={cn(
-                    "group relative aspect-video overflow-hidden rounded-md border transition",
-                    active ? "border-fuchsia-500 ring-2 ring-fuchsia-500/40" : "border-white/10 hover:border-white/30",
+                    "group relative h-auto p-0 aspect-video overflow-hidden rounded-md border transition",
+                    active ? "border-primary ring-2 ring-primary/40" : "border-border hover:border-primary/30",
                   )}
                 >
                   <img src={p.url} alt={p.label} className="h-full w-full object-cover" />
                   {active && (
-                    <div className="absolute right-1 top-1 rounded-full bg-fuchsia-500 p-1">
-                      <Check className="h-3 w-3 text-white" />
+                    <div className="absolute right-1 top-1 rounded-full bg-primary p-1">
+                      <Check className="h-3 w-3 text-foreground" />
                     </div>
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -155,8 +174,8 @@ export function StreamThumbnailDialog({
             type="button"
             variant="outline"
             onClick={() => fileRef.current?.click()}
-            disabled={uploading || !streamId}
-            className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+            disabled={saving || uploading || !streamId}
+            className="border-border bg-muted text-foreground hover:bg-muted"
           >
             {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
             Upload custom
@@ -166,19 +185,19 @@ export function StreamThumbnailDialog({
               type="button"
               variant="ghost"
               onClick={() => setSelected(null)}
-              className="text-white/60 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               <Trash2 className="mr-2 h-4 w-4" /> Clear
             </Button>
           )}
           <div className="ml-auto flex gap-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-white/70 hover:text-white">
+            <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-muted-foreground hover:text-foreground">
               Cancel
             </Button>
             <Button
               onClick={onSave}
-              disabled={saving || !streamId}
-              className="bg-gradient-to-r from-fuchsia-600 to-blue-600 text-white hover:opacity-90"
+              disabled={saving || uploading || !streamId}
+              className="bg-primary text-foreground hover:opacity-90"
             >
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
               Save
@@ -187,7 +206,7 @@ export function StreamThumbnailDialog({
         </div>
 
         {!streamId && (
-          <p className="text-xs text-amber-400/90">Go live first to attach a thumbnail to this stream.</p>
+          <p className="text-xs text-muted-foreground">Go live first to attach a thumbnail to this stream.</p>
         )}
       </DialogContent>
     </Dialog>
