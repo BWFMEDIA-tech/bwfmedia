@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { useQuery, queryOptions } from "@tanstack/react-query";
-import { Search, MapPin, Sparkles, Users } from "lucide-react";
+import { toast } from "sonner";
+import { Search, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/lib/auth-context";
+import { toggleArtistFollow } from "@/lib/artist-follows.functions";
 import { getArtistsDirectory } from "@/lib/artists-directory.functions";
 
 const artistsQuery = queryOptions({
