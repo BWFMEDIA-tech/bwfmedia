@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Add and verify real live/active/offline artist photo beacons across discovery, profiles, messaging and stages without schema changes.
 - [x] Fix Stream Studio thumbnail save/restore and private-image display; real custom upload saved, survived refresh, and rendered on Live; restored the original thumbnail, two tests passed and preview build OK. Not published.
 - [x] Record actual 30-second playback on the existing event; signed-in song playback saved duration 30 and analytics counter 1. Country highlighting tests pass; local playback has no edge location, so live geography remains unverified. Four tests pass and preview build OK; not published.
 - [ ] Backfill recent streams: blocked because historic records contain only zero-duration starts, with no evidence of 30-second completion; do not fabricate duration, validity or royalties.

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { ArtistStoreSection } from "@/components/store/ArtistStoreSection";
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {

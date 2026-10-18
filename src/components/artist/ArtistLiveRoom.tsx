@@ -6,6 +6,7 @@ import { Eye, Radio, Share2, LogOut, Users, Crown, Music2, MoreHorizontal, Heart
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { useAuth } from "@/lib/auth-context";
 import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
 import { endStream, type getArtistLiveStream } from "@/lib/streams.functions";
@@ -143,8 +144,8 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
           {/* The title column shrinks first so the right-side actions never get pushed off narrow screens. */}
           <div className="flex min-w-0 flex-auto items-center gap-3">
           <span className="live-pill inline-flex shrink-0 items-center gap-1.5 rounded-md bg-trust px-3 py-1.5 text-xs font-bold tracking-wider text-accent-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-foreground" />LIVE</span>
-          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-primary">
-            {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center bg-card text-primary"><Music2 className="h-5 w-5" /></div>}
+          <div className="relative h-10 w-10 shrink-0 rounded-full border-2 border-primary">
+            {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full rounded-full object-cover" /> : <div className="grid h-full place-items-center rounded-full bg-card text-primary"><Music2 className="h-5 w-5" /></div>}<ArtistStatusBeacon userId={artist.id} />
           </div>
           <div className="min-w-0">
             <h1 className="truncate text-sm font-semibold text-foreground">{stream.title || `${artist.name} is live`}</h1>
@@ -162,8 +163,8 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
       </header>
 
       <section className="live-artist-card mb-5 flex flex-wrap items-center gap-4 rounded-2xl border border-border p-4">
-        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border">
-          {artist.photo ? <SignedImg src={artist.photo} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center bg-card text-primary"><Music2 className="h-6 w-6" /></div>}
+        <div className="relative h-14 w-14 shrink-0 rounded-full border border-border">
+          {artist.photo ? <SignedImg src={artist.photo} alt="" className="h-full w-full rounded-full object-cover" /> : <div className="grid h-full place-items-center rounded-full bg-card text-primary"><Music2 className="h-6 w-6" /></div>}<ArtistStatusBeacon userId={artist.id} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold text-foreground">{artist.name}</p>
