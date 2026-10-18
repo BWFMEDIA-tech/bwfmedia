@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils";
 import { useMaybeRoomContext } from "@livekit/components-react";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
