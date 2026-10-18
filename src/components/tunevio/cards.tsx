@@ -1,3 +1,4 @@
+import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { Link } from "@tanstack/react-router";
 import { Heart, MoreHorizontal, Pause, Play, Radio, Users } from "lucide-react";
 import type { ReactNode } from "react";
@@ -481,7 +482,7 @@ export function LiveStreamCard({ stream }: { stream: FeedStream }) {
     <Link to="/live" className="block">
       <CardShell className="overflow-hidden">
         <div className="relative aspect-video">
-          <Artwork src={stream.thumbnailUrl} alt={stream.title} rounded="rounded-none" className="h-full w-full" />
+          {stream.thumbnailUrl ? <StreamThumbnailImage src={stream.thumbnailUrl} alt={stream.title} className="h-full w-full object-cover" /> : <Artwork alt={stream.title} rounded="rounded-none" className="h-full w-full" />}
           <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-tv-magenta px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white">
             <Radio className="h-3 w-3" /> Live
           </span>

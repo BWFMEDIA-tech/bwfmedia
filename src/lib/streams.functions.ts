@@ -197,7 +197,8 @@ export const updateStreamThumbnail = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("streams")
       .update({ thumbnail_url: data.thumbnailUrl })
-      .eq("id", data.streamId);
+      .eq("id", data.streamId).eq("host_id", userId)
+      .select("thumbnail_url").single();
     if (error) throw new Error(error.message);
     return { ok: true, thumbnailUrl: data.thumbnailUrl };
   });

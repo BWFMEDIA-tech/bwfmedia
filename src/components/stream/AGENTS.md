@@ -4,3 +4,5 @@
 - Keep profile video sizing and control styling scoped to the profile selectors, because phone layouts must stack without changing shared broadcast tools or participant assignments.
 - Keep Stream Studio on its own stage forks (src/components/studio/StudioStageRoom.tsx, StudioLiveStage.tsx) and profile lives on the stream/ copies, because the user wants Studio and profile stages to evolve separately; apply roster/permission changes to both copies when behavior (not styling) must stay aligned.
 - Derive profile video-box visibility from host spotlight selections, because unselected artist and guest boxes must stay hidden on every device.
+
+- Resolve stable stream-thumbnail identifiers using signed URLs after verifying a live stream references the exact image; draft previews use the owner-authenticated video signer, because the videos bucket is private.

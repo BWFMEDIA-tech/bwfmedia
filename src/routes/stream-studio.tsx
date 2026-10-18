@@ -1,3 +1,4 @@
+import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
@@ -74,10 +75,12 @@ const STUDIO_BLOCKS: StudioBlockDef[] = [
 export const Route = createFileRoute("/stream-studio")({
   head: () => ({
     meta: [
-      { title: "BWF Live Studio — Stream Music Reviews & Podcasts" },
-      { name: "description", content: "Premium live streaming studio for BWF Network. Host music reviews and podcasts with LiveKit-powered video, live chat, tips, and real-time analytics." },
-      { property: "og:title", content: "BWF Live Studio" },
+      { title: "Tunevio Stream Studio — Music Reviews & Podcasts" },
+      { name: "description", content: "Premium live streaming studio for Tunevio. Host music reviews and podcasts with LiveKit-powered video, live chat, tips, and real-time analytics." },
+      { property: "og:title", content: "Tunevio Stream Studio" },
       { property: "og:description", content: "Cinematic dark-themed live streaming dashboard built for artists and creators." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -1082,7 +1085,7 @@ function StreamStudio() {
                     title="Stream thumbnail"
                   >
                     {thumbUrl ? (
-                      <img src={thumbUrl} alt="" className="h-4 w-6 rounded-sm object-cover" />
+                      <StreamThumbnailImage src={thumbUrl} alt="" className="h-4 w-6 rounded-sm object-cover" />
                     ) : (
                       <ImageIcon className="h-3 w-3" />
                     )}

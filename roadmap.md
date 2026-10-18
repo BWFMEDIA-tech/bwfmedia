@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Verify Stream Studio thumbnail save/restore and private-image display without interrupting the live show.
 - [x] Record actual 30-second playback on the existing event; signed-in song playback saved duration 30 and analytics counter 1. Country highlighting tests pass; local playback has no edge location, so live geography remains unverified. Four tests pass and preview build OK; not published.
 - [ ] Backfill recent streams: blocked because historic records contain only zero-duration starts, with no evidence of 30-second completion; do not fabricate duration, validity or royalties.
 - [x] Redesign video discovery with cinematic banner, existing saved-video persistence, search and horizontal rows; desktop and 320/393/531px layouts verified without overflow, saved state survived reload and upload form opened. Existing signed video returned 200 with H.264/AAC media; test Chromium rejected playback (format error), so audible playback remains unverified. No backend changes or publishing.
