@@ -49,12 +49,12 @@ export function ArtistTrialBanner() {
   return (
     <div ref={ref} style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)" }} className="fixed top-0 inset-x-0 z-[60] w-full bg-gradient-to-r from-fuchsia-700 to-cyan-600 text-white px-4 py-2.5 flex items-center justify-center gap-3 text-sm">
         <Sparkles size={16} className="shrink-0" />
-        <span className="font-medium">Start your 30-day free Artist trial — $9.99/mo after.</span>
+        <span className="font-medium">Your Artist Starter plan is free — upgrade to Artist Pro for advanced tools.</span>
         <Link
           to="/pricing"
           className="bg-white text-fuchsia-700 font-semibold px-3 py-1 rounded-full text-xs hover:bg-white/90"
         >
-          Start trial
+          See plans
         </Link>
     </div>
   );
