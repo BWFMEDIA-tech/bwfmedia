@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { useQuery, queryOptions } from "@tanstack/react-query";
+import { useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Search, Sparkles, Users } from "lucide-react";
+import { Check, Search, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
-import { toggleArtistFollow } from "@/lib/artist-follows.functions";
+import { toggleArtistFollow, listFollowedArtistIds } from "@/lib/artist-follows.functions";
 import { getArtistsDirectory, type ArtistDirectoryItem } from "@/lib/artists-directory.functions";
 
 const artistsQuery = queryOptions({
@@ -35,8 +35,33 @@ export const Route = createFileRoute("/artists")({
 
 function ArtistsPage() {
   const { data: artists = [] } = useQuery(artistsQuery);
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const [q, setQ] = useState("");
   const [genre, setGenre] = useState<string | null>(null);
+
+  const artistIds = useMemo(() => artists.map((a) => a.id).sort(), [artists]);
+  const idsKey = artistIds.join(",");
+  const followedQ = useQuery({
+    queryKey: ["artist-follows-mine", idsKey],
+    queryFn: () => listFollowedArtistIds({ data: { artistIds } }),
+    enabled: isAuthenticated && artistIds.length > 0,
+    staleTime: 60_000,
+  });
+  const followedIds = useMemo(
+    () => new Set(followedQ.data?.followedIds ?? []),
+    [followedQ.data],
+  );
+
+  function setFollowed(artistId: string, next: boolean) {
+    queryClient.setQueryData(["artist-follows-mine", idsKey], (old: any) => {
+      const current: string[] = old?.followedIds ?? [];
+      const followedIds = next
+        ? Array.from(new Set([...current, artistId]))
+        : current.filter((id) => id !== artistId);
+      return { ...(old ?? {}), followedIds };
+    });
+  }
 
   const allGenres = useMemo(() => {
     const s = new Set<string>();
@@ -133,7 +158,11 @@ function ArtistsPage() {
           <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {filtered.map((a) => (
               <li key={a.id}>
-                <ArtistDirectoryCard a={a} />
+                <ArtistDirectoryCard
+                  a={a}
+                  following={followedIds.has(a.id)}
+                  onFollowed={setFollowed}
+                />
               </li>
             ))}
           </ul>
