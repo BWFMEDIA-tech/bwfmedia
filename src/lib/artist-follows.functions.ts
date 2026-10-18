@@ -136,3 +136,22 @@ export const toggleArtistFollow = createServerFn({ method: "POST" })
 
     return { following, count: count ?? 0 };
   });
+
+/** Bounds the batch lookup so one page can't ask the server to scan the whole table. */
+export const followedArtistIdsInput = z.object({
+  artistIds: z.array(z.string().uuid()).max(500),
+});
+
+export const listFollowedArtistIds = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => followedArtistIdsInput.parse(d))
+  .handler(async ({ data, context }) => {
+    if (data.artistIds.length === 0) return { followedIds: [] as string[] };
+    const { data: rows, error } = await context.supabase
+      .from("artist_follows")
+      .select("artist_id")
+      .eq("follower_id", context.userId)
+      .in("artist_id", data.artistIds);
+    if (error) throw error;
+    return { followedIds: (rows ?? []).map((r) => r.artist_id as string) };
+  });

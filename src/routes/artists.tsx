@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { useQuery, queryOptions } from "@tanstack/react-query";
+import { useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Search, Sparkles, Users } from "lucide-react";
+import { Check, Search, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
-import { toggleArtistFollow } from "@/lib/artist-follows.functions";
+import { toggleArtistFollow, listFollowedArtistIds } from "@/lib/artist-follows.functions";
 import { getArtistsDirectory, type ArtistDirectoryItem } from "@/lib/artists-directory.functions";
 
 const artistsQuery = queryOptions({
@@ -35,8 +35,33 @@ export const Route = createFileRoute("/artists")({
 
 function ArtistsPage() {
   const { data: artists = [] } = useQuery(artistsQuery);
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const [q, setQ] = useState("");
   const [genre, setGenre] = useState<string | null>(null);
+
+  const artistIds = useMemo(() => artists.map((a) => a.id).sort(), [artists]);
+  const idsKey = artistIds.join(",");
+  const followedQ = useQuery({
+    queryKey: ["artist-follows-mine", idsKey],
+    queryFn: () => listFollowedArtistIds({ data: { artistIds } }),
+    enabled: isAuthenticated && artistIds.length > 0,
+    staleTime: 60_000,
+  });
+  const followedIds = useMemo(
+    () => new Set(followedQ.data?.followedIds ?? []),
+    [followedQ.data],
+  );
+
+  function setFollowed(artistId: string, next: boolean) {
+    queryClient.setQueryData(["artist-follows-mine", idsKey], (old: any) => {
+      const current: string[] = old?.followedIds ?? [];
+      const followedIds = next
+        ? Array.from(new Set([...current, artistId]))
+        : current.filter((id) => id !== artistId);
+      return { ...(old ?? {}), followedIds };
+    });
+  }
 
   const allGenres = useMemo(() => {
     const s = new Set<string>();
@@ -133,7 +158,11 @@ function ArtistsPage() {
           <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {filtered.map((a) => (
               <li key={a.id}>
-                <ArtistDirectoryCard a={a} />
+                <ArtistDirectoryCard
+                  a={a}
+                  following={followedIds.has(a.id)}
+                  onFollowed={setFollowed}
+                />
               </li>
             ))}
           </ul>
@@ -143,10 +172,17 @@ function ArtistsPage() {
   );
 }
 
-function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
+function ArtistDirectoryCard({
+  a,
+  following,
+  onFollowed,
+}: {
+  a: ArtistDirectoryItem;
+  following: boolean;
+  onFollowed: (artistId: string, following: boolean) => void;
+}) {
   const { isAuthenticated } = useAuth();
   const toggleFn = useServerFn(toggleArtistFollow);
-  const [following, setFollowing] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function handleFollow() {
@@ -154,15 +190,15 @@ function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
       toast.error("Sign in to follow artists");
       return;
     }
-    setBusy(true);
     const prev = following;
-    setFollowing(!prev);
+    setBusy(true);
+    onFollowed(a.id, !prev);
     try {
       const res = await toggleFn({ data: { artistId: a.id } });
-      setFollowing(res.following);
+      onFollowed(a.id, res.following);
       toast.success(res.following ? `Following ${a.name}` : `Unfollowed ${a.name}`);
     } catch (e: any) {
-      setFollowing(prev);
+      onFollowed(a.id, prev);
       toast.error(e?.message ?? "Could not update follow");
     } finally {
       setBusy(false);
@@ -200,13 +236,17 @@ function ArtistDirectoryCard({ a }: { a: ArtistDirectoryItem }) {
         onClick={handleFollow}
         disabled={busy}
         aria-pressed={following}
-        className={`mt-4 w-full max-w-[9rem] rounded-full border px-5 py-1.5 text-sm font-semibold transition disabled:opacity-60 ${
-          following
-            ? "border-primary bg-primary/10 text-primary"
-            : "border-border text-foreground hover:border-primary hover:text-primary"
+        className={`follow-pill mt-4 w-full max-w-[9rem] rounded-full px-5 py-1.5 text-sm font-semibold transition disabled:opacity-60 ${
+          following ? "follow-pill-on" : ""
         }`}
       >
-        {following ? "Following" : "Follow"}
+        {following ? (
+          <>
+            <Check className="h-3.5 w-3.5" /> Following
+          </>
+        ) : (
+          "Follow"
+        )}
       </button>
     </div>
   );

@@ -917,3 +917,31 @@
   backdrop-filter: blur(14px);
   box-shadow: var(--live-glow, none);
 }
+
+/* Follow pill: quiet silver outline when off, lit blue gradient when following. */
+.follow-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+.follow-pill:hover {
+  border-color: color-mix(in srgb, var(--primary) 60%, transparent);
+  color: var(--primary);
+}
+.follow-pill-on,
+.follow-pill-on:hover {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--brand-cyan) 35%, var(--brand-blue)),
+    var(--brand-blue)
+  );
+  color: #fff;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--primary) 40%, transparent),
+    0 0 34px color-mix(in srgb, var(--brand-blue) 30%, transparent);
+}
