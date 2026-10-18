@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/lib/auth-context";
 import { toggleArtistFollow } from "@/lib/artist-follows.functions";
-import { getArtistsDirectory } from "@/lib/artists-directory.functions";
+import { getArtistsDirectory, type ArtistDirectoryItem } from "@/lib/artists-directory.functions";
 
 const artistsQuery = queryOptions({
   queryKey: ["artists-directory"],
