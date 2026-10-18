@@ -145,7 +145,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
           <div className="flex min-w-0 flex-auto items-center gap-3">
           <span className="live-pill inline-flex shrink-0 items-center gap-1.5 rounded-md bg-trust px-3 py-1.5 text-xs font-bold tracking-wider text-accent-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-foreground" />LIVE</span>
           <div className="relative h-10 w-10 shrink-0 rounded-full border-2 border-primary">
-            {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full rounded-full object-cover" /> : <div className="grid h-full place-items-center rounded-full bg-card text-primary"><Music2 className="h-5 w-5" /></div>}<ArtistStatusBeacon userId={artist.id} />
+            {artist.photo ? <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full rounded-full object-cover" /> : <div className="grid h-full place-items-center rounded-full bg-card text-primary"><Music2 className="h-5 w-5" /></div>}<ArtistStatusBeacon userId={stream.host_id} />
           </div>
           <div className="min-w-0">
             <h1 className="truncate text-sm font-semibold text-foreground">{stream.title || `${artist.name} is live`}</h1>
@@ -164,7 +164,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
 
       <section className="live-artist-card mb-5 flex flex-wrap items-center gap-4 rounded-2xl border border-border p-4">
         <div className="relative h-14 w-14 shrink-0 rounded-full border border-border">
-          {artist.photo ? <SignedImg src={artist.photo} alt="" className="h-full w-full rounded-full object-cover" /> : <div className="grid h-full place-items-center rounded-full bg-card text-primary"><Music2 className="h-6 w-6" /></div>}<ArtistStatusBeacon userId={artist.id} />
+          {artist.photo ? <SignedImg src={artist.photo} alt="" className="h-full w-full rounded-full object-cover" /> : <div className="grid h-full place-items-center rounded-full bg-card text-primary"><Music2 className="h-6 w-6" /></div>}<ArtistStatusBeacon userId={stream.host_id} />
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold text-foreground">{artist.name}</p>
