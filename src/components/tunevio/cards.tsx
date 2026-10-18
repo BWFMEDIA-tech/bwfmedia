@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth-context";
 import { getIsFollowingArtist, toggleArtistFollow } from "@/lib/artist-follows.functions";
 import { cn } from "@/lib/utils";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { usePlayer, type PlayerTrack } from "@/lib/player-context";
 import type { FeedArtist, FeedBattle, FeedStream, FeedTrack } from "@/lib/home-feed.functions";
 
@@ -345,7 +346,7 @@ export function ArtistCard({
   return (
     <CardShell className="p-3 text-center">
       <Link to="/artist/$id" params={{ id: artist.id }} className="block">
-        <Artwork src={artist.avatarUrl} alt={artist.name} rounded="rounded-full" className="aspect-square w-full" />
+        <div className="relative"><Artwork src={artist.avatarUrl} alt={artist.name} rounded="rounded-full" className="aspect-square w-full" /><ArtistStatusBeacon userId={artist.id} className="bottom-2 right-2" /></div>
         <p className="mt-3 truncate text-sm font-bold text-white">{artist.name}</p>
         <p className="mt-0.5 truncate text-xs text-white/50">
           {formatCount(artist.monthlyListeners)} plays

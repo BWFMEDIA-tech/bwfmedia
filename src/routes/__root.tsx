@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { ArtistStatusProvider } from "@/components/artist/ArtistStatusBeacon";
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/contexts/CartContext";
@@ -158,6 +159,7 @@ function RootComponent() {
         <QueryClientProvider client={queryClient}>
       <CartProvider>
         <PlayerProvider>
+        <ArtistStatusProvider>
         {isChrome && <PaymentTestModeBanner />}
         <RealtimeHealthBanner />
         {isChrome && <ArtistTrialBanner />}
@@ -177,6 +179,7 @@ function RootComponent() {
         {showBottomNav && <MobileBottomNav />}
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />
+        </ArtistStatusProvider>
         </PlayerProvider>
       </CartProvider>
     </QueryClientProvider>

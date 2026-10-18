@@ -8,6 +8,7 @@ import { Check, Search, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { useAuth } from "@/lib/auth-context";
 import { toggleArtistFollow, listFollowedArtistIds } from "@/lib/artist-follows.functions";
 import { getArtistsDirectory, type ArtistDirectoryItem } from "@/lib/artists-directory.functions";
@@ -217,6 +218,7 @@ function ArtistDirectoryCard({
             <AvatarImage src={a.avatarUrl ?? undefined} alt={a.name} className="object-cover" />
             <AvatarFallback className="text-lg font-bold">{a.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
+          <ArtistStatusBeacon userId={a.id} />
         </span>
         {a.featured && (
           <Badge className="absolute -right-1 top-0 gap-1 bg-background/90 text-foreground backdrop-blur">
