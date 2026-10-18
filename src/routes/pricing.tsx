@@ -24,7 +24,7 @@ const FEATURES: Record<TunevioPlanId, string[]> = {
   listener_premium:     ["Ad-free streaming", "Unlimited skips", "High-quality audio", "Offline listening"],
   listener_fan_premium: ["Everything in Premium", "Exclusive fan-only drops", "Early access to releases", "Direct artist messaging"],
   listener_student:     ["Ad-free streaming", "Verified student discount", "Unlimited skips", "Cancel anytime"],
-  artist_starter:       ["Upload unlimited tracks", "Manage your rights, registrations and royalties all in one place", "Basic analytics", "Artist profile page", "Standard payouts"],
+  artist_starter:       ["Artist registration and public profile", "Upload eligible music to Tunevio", "Upload a limited number of music videos, subject to storage and moderation limits", "Basic streaming and audience analytics", "Join the Battle Arena and compete in eligible battles", "Join another artist's live stage when invited or permitted", "Go live with reasonable usage limits", "Receive eligible earnings and view payout statements"],
   artist_pro:           ["Everything in Starter", "Advanced analytics", "Featured placement boosts", "Priority support"],
   label_plan:           ["Manage multiple artists", "Label dashboard & roster tools", "Bulk uploads & scheduling", "Dedicated success manager"],
 };
@@ -93,7 +93,7 @@ function PricingPage() {
           </p>
           <div className="mt-6 mx-auto max-w-xl rounded-2xl border border-[#00E6FF]/60 bg-gradient-to-r from-[#0000FF]/30 to-[#00E6FF]/20 px-5 py-4 shadow-[0_0_60px_-15px_rgba(0,230,255,0.6)]">
             <div className="text-2xl md:text-3xl font-black uppercase tracking-tight">30-day free trial</div>
-            <p className="mt-1 text-sm text-white/80">For artists, listeners and hosts. Add your card to unlock your profile — you won't be charged until day 31. Cancel anytime.</p>
+            <p className="mt-1 text-sm text-white/80">Artists can start free with Artist Starter. Paid plans include a 30-day free trial — you won't be charged until day 31. Cancel anytime.</p>
           </div>
         </div>
 
@@ -140,10 +140,12 @@ function PricingPage() {
                 )}
                 <div className="text-sm uppercase tracking-widest text-white/50">{plan.label}</div>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-5xl font-black">${(plan.priceCents / 100).toFixed(2)}</span>
-                  <span className="text-white/50 text-sm">/mo</span>
+                  <span className="text-5xl font-black">${plan.priceCents === 0 ? "0" : (plan.priceCents / 100).toFixed(2)}</span>
+                  <span className="text-white/50 text-sm">/month</span>
                 </div>
-                <div className="mt-2 inline-block rounded-full bg-[#00E6FF]/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#00E6FF]">First 30 days free</div>
+                <div className="mt-2 inline-block rounded-full bg-[#00E6FF]/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#00E6FF]">
+                  {plan.priceCents === 0 ? "Included free" : "First 30 days free"}
+                </div>
                 <ul className="mt-6 space-y-3 text-sm">
                   {FEATURES[planId].map((f) => (
                     <li key={f} className="flex gap-2 text-white/80">
@@ -153,7 +155,7 @@ function PricingPage() {
                   ))}
                 </ul>
                 <Button
-                  onClick={() => startCheckout(planId)}
+                  onClick={() => (plan.priceCents === 0 ? (window.location.href = "/signup") : startCheckout(planId))}
                   disabled={loadingPlan === planId}
                   className={`mt-6 w-full font-bold uppercase tracking-wider ${
                     isHighlighted
@@ -161,7 +163,7 @@ function PricingPage() {
                       : "bg-white text-black hover:bg-white/90"
                   }`}
                 >
-                  {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : "Start 30-day free trial"}
+                  {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : plan.priceCents === 0 ? "Get started free" : "Start 30-day free trial"}
                 </Button>
               </div>
             );
