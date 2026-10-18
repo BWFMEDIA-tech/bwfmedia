@@ -9,7 +9,7 @@ export const TUNEVIO_PLANS = {
   listener_premium:     { role: "listener", label: "Premium",      priceCents:  699 },
   listener_fan_premium: { role: "listener", label: "Fan Premium",  priceCents: 1499 },
   listener_student:     { role: "listener", label: "Student",      priceCents:  499 },
-  artist_starter:       { role: "artist",   label: "Artist Starter", priceCents:  999 },
+  artist_starter:       { role: "artist",   label: "Artist Starter", priceCents:    0 },
   artist_pro:           { role: "artist",   label: "Artist Pro",     priceCents: 1999 },
   label_plan:           { role: "artist",   label: "Label Plan",     priceCents: 9900 },
 } as const;
@@ -67,6 +67,9 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     try {
       const plan = TUNEVIO_PLANS[data.planId];
+      if (plan.priceCents === 0) {
+        return { error: "This plan is free — no checkout needed. Sign up to create your artist profile." };
+      }
       const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({ lookup_keys: [data.planId], limit: 1 });
       if (!prices.data.length) throw new Error(`Price not configured: ${data.planId}`);
