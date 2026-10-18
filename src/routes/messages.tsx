@@ -18,8 +18,12 @@ export const Route = createFileRoute("/messages")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Messages — BWF Network" },
+      { title: "Messages — Tunevio" },
       { name: "description", content: "Direct messages with artists, hosts, and your network." },
+      { property: "og:title", content: "Messages — Tunevio" },
+      { property: "og:description", content: "Connect privately with Tunevio artists, hosts and your network." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MessagesPage,
