@@ -14,6 +14,7 @@ import {
 } from "@/lib/video-engagement.functions";
 import { MusicVideoPlayer } from "@/components/site/MusicVideoPlayer";
 import { VideoComments, CommentAvatar } from "@/components/site/VideoComments";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -195,7 +196,7 @@ function VideoDetailPage() {
               params={{ id: a?.public_id || v.user_id }}
               className="mt-4 flex w-fit min-w-0 items-center gap-3 text-brand-silver hover:text-primary"
             >
-              <CommentAvatar src={a?.avatar_url} name={a?.stage_name || v.artist || "Artist"} />
+              <div className="relative shrink-0"><CommentAvatar src={a?.avatar_url} name={a?.stage_name || v.artist || "Artist"} /><ArtistStatusBeacon userId={v.user_id} /></div>
               <div className="min-w-0">
                 <p className="break-words font-semibold">
                   {a?.stage_name || v.artist || a?.display_name || "Artist"}

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { listArtistFollowers } from "@/lib/artist-follows.functions";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 
 const PAGE_SIZE = 20;
 
@@ -83,12 +84,13 @@ export function FollowersModal({
                       onClick={() => onOpenChange(false)}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/[0.04]"
                     >
-                      <div className="h-9 w-9 rounded-full overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 grid place-items-center text-xs font-bold shrink-0">
+                      <div className="relative h-9 w-9 rounded-full bg-secondary grid place-items-center text-xs font-bold shrink-0">
                         {f.avatarUrl ? (
-                          <SignedImg src={f.avatarUrl} alt="" className="h-full w-full object-cover" />
+                          <SignedImg src={f.avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
                         ) : (
                           <span>{initials}</span>
                         )}
+                        <ArtistStatusBeacon userId={f.id} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium truncate">

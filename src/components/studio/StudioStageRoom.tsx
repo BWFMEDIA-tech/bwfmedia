@@ -919,7 +919,7 @@ function SpeakerBubble({
             />
           </>
         )}
-        <Link to="/artist/$id" params={{ id: p.user_id }}>
+        <Link to="/artist/$id" params={{ id: p.user_id }} className="relative block">
           {p.avatar_url ? (
             <SignedImg src={p.avatar_url} alt="" className="h-[96px] w-[96px] rounded-full border-2 border-[#0d0d18] object-cover" />
           ) : (
@@ -928,6 +928,7 @@ function SpeakerBubble({
               style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
             />
           )}
+          <ArtistStatusBeacon userId={p.user_id} className="top-1 right-1 bottom-auto" />
         </Link>
         <button
           type="button"
