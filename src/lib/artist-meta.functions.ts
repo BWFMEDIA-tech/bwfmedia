@@ -30,7 +30,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           .select("provider, url, handle, sort_order")
           .eq("user_id", id).eq("enabled", true).order("sort_order", { ascending: true }),
         sb.from("play_tracks")
-          .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url")
+          .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
           .eq("artist_user_id", id)
           .order("like_count", { ascending: false })
           .limit(8),
