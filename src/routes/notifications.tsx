@@ -115,7 +115,13 @@ function NotificationsPage() {
           <ul className="flex flex-col gap-2">
             {items.map((n) => (
               <li key={n.id}>
-                <button onClick={() => toggleExpand(n)} className={`w-full text-left rounded-xl border p-4 transition ${n.read_at ? "border-white/5 bg-white/[0.02]" : "border-violet-500/30 bg-violet-500/5"}`}>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => toggleExpand(n)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleExpand(n); } }}
+                  className={`w-full text-left rounded-xl border p-4 transition cursor-pointer ${n.read_at ? "border-white/5 bg-white/[0.02]" : "border-violet-500/30 bg-violet-500/5"}`}
+                >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 h-9 w-9 shrink-0 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00E6FF,#0000FF)" }}>
                       {n.type === "live_stream_started" ? <Radio className="h-4 w-4 text-white" /> : <Bell className="h-4 w-4 text-white" />}
