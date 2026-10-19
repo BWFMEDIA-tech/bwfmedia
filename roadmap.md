@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Match the music-player references with an artwork-first music detail view, expanded Now Playing, persistent mobile controls and existing supported actions; verify playback/navigation and phone layouts without altering live Arena players.
 - [x] Add admin editing for sent announcements with existing media and unchanged recipients/read state; real edit saved across reload and updated 35 notification copies, original title restored. Three tests pass, phone layout verified, build OK; not published.
 - [x] Add shared real live/active/offline artist photo beacons across discovery, profiles, video identities, messaging, followers and both stage variants without schema changes. Four status-rule tests pass; real live and offline displays verified on desktop/phone, no overflow or runtime errors; build OK. Active-account and live-to-offline multi-device transitions remain unverified; no show interrupted, not published.
 - [x] Fix Stream Studio thumbnail save/restore and private-image display; real custom upload saved, survived refresh, and rendered on Live; restored the original thumbnail, two tests passed and preview build OK. Not published.
