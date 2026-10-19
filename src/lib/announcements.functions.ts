@@ -143,12 +143,12 @@ export const editAnnouncement = createServerFn({ method: "POST" })
       metadata: { before: original, after: changes },
     });
     if (auditError) throw new Error("Couldn't record the edit; changes were not saved");
-    let query = supabaseAdmin.from("notifications").update(changes)
+    let query = supabaseAdmin.from("notifications").update(changes, { count: "exact" })
       .eq("created_at", original.created_at).eq("type", original.type).eq("title", original.title);
     for (const key of ["actor_id", "body", "link", "media_url", "media_type"] as const) {
       query = original[key] === null ? query.is(key, null) : query.eq(key, original[key]);
     }
-    const { error, count } = await query.select("id", { count: "exact", head: true });
+    const { error, count } = await query;
     if (error) throw new Error("Couldn't save the announcement");
     return { updated: count ?? 0 };
   });
