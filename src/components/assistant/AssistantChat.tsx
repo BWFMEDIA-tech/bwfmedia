@@ -171,7 +171,8 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
                       </>)}
                     </div>
                   )}
-                </MessageContent>
+                  </MessageContent>
+                </div>
               </Message>
             );
           })}
