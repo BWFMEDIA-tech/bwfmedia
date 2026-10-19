@@ -35,7 +35,7 @@ export function GlobalPlayer({ hidden = false }: { hidden?: boolean }) {
     {p.detailTrack && <MusicDetails key={p.detailTrack.id} nowPlaying={false} onClose={p.closeDetails} />}
     {expanded && track && <MusicDetails nowPlaying onClose={() => setExpanded(false)} />}
     {track && <section aria-label="Music player" className="music-mini-player fixed inset-x-2 z-40 overflow-hidden rounded-lg border border-brand-silver/25 bg-card/95 text-foreground backdrop-blur-xl md:inset-x-4">
-      <input aria-label="Mini player seek" type="range" min={0} max={p.duration || 1} step={0.1} value={Math.min(p.progress, p.duration || 1)} disabled={!p.duration} onChange={(e) => p.seek(Number(e.target.value))} className="music-mini-progress absolute inset-x-0 top-0 w-full accent-primary" />
+      <input aria-label="Mini player seek" type="range" min={0} max={p.duration || 1} step={0.1} value={Math.min(p.progress, p.duration || 1)} disabled={!p.duration} onChange={(e) => p.seek(Number(e.target.value))} style={{ background: `linear-gradient(to right, var(--primary) ${p.duration ? (Math.min(p.progress, p.duration) / p.duration) * 100 : 0}%, color-mix(in oklab, var(--muted-foreground) 30%, transparent) 0)` }} className="music-mini-progress absolute inset-x-0 top-0 w-full accent-primary" />
       <div className="grid h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 md:grid-cols-[minmax(0,1fr)_minmax(240px,1fr)_minmax(0,1fr)] md:gap-6 md:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <Button variant="ghost" aria-label={`Open Now Playing: ${track.title}`} onClick={() => setExpanded(true)} className="h-auto min-w-0 flex-1 justify-start gap-3 px-0 text-left hover:bg-transparent">
