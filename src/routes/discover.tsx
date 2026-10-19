@@ -178,6 +178,7 @@ function DiscoverPage() {
 
   const browseArtists = artists.slice(0, 3);
   const featured = artists.slice(0, 3);
+  const latestArtist = data?.latestArtist ?? null;
 
   return (
     <div

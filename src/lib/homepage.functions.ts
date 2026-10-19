@@ -111,5 +111,5 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
     host: pmap.get(s.host_id) ?? null,
   }));
 
-  return { liveStreams, videos, featuredArtists };
+  return { liveStreams, videos, featuredArtists, latestArtist };
 });
