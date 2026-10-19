@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import introAsset from "@/assets/tunevio-intro.mp4.asset.json";
 
@@ -50,10 +50,9 @@ export function IntroSplash() {
   const enableSound = () => {
     const video = videoRef.current;
     if (!video) return;
-    // A direct tap unlocks audio on mobile. Replay so none is missed.
+    // Unlock audio without seeking or interrupting the ongoing intro.
     video.muted = false;
     video.volume = 1;
-    video.currentTime = 0;
     setNeedsSound(false);
     video.play().catch(() => setNeedsSound(true));
   };
@@ -83,15 +82,15 @@ export function IntroSplash() {
       >
         Skip
       </Button>
-      <Button
+      {needsSound && <Button
         type="button"
         onClick={enableSound}
-        aria-label={needsSound ? "Tap for sound" : "Replay intro with sound"}
+        aria-label="Enable sound"
         className="absolute bottom-24 left-1/2 z-10 -translate-x-1/2 shadow-lg"
       >
-        {needsSound ? <VolumeX /> : <Volume2 />}
-        {needsSound ? "Tap for sound" : "Replay with sound"}
-      </Button>
+        <Volume2 />
+        Enable sound
+      </Button>}
     </div>
   );
 }
