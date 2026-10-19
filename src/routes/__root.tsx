@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MobileBottomNav } from "@/components/site/MobileBottomNav";
+import { IntroSplash } from "@/components/site/IntroSplash";
 import { AssistantLauncher } from "@/components/assistant/AssistantLauncher";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
@@ -181,6 +182,7 @@ function RootComponent() {
         {showBottomNav && <MobileBottomNav />}
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />
+        <IntroSplash />
         </ArtistStatusProvider>
         </PlayerProvider>
       </CartProvider>
