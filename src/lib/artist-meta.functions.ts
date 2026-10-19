@@ -21,16 +21,16 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     if (profileRes.error) throw new Error("Unable to load artist profile. Please try again.");
     const id: string = profileRes.data?.id ?? data.id;
     try {
-      const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes] = await Promise.all([
+      const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes, profileStreamRes] = await Promise.all([
         sb.from("live_queue_public").select("artist_name, photo_url").eq("id", id).maybeSingle(),
-        sb.from("play_tracks").select("like_count, dislike_count").eq("artist_user_id", id),
+        sb.from("play_tracks").select("like_count, dislike_count, stream_id").eq("artist_user_id", id),
         sb.from("videos").select("id", { count: "exact", head: true }).eq("user_id", id),
         sb.from("streams").select("id").eq("host_id", id),
         sb.from("user_social_links")
           .select("provider, url, handle, sort_order")
           .eq("user_id", id).eq("enabled", true).order("sort_order", { ascending: true }),
         sb.from("play_tracks")
-          .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url")
+          .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
           .eq("artist_user_id", id)
           .order("like_count", { ascending: false })
           .limit(8),
@@ -39,6 +39,15 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           .eq("user_id", id)
           .order("created_at", { ascending: false })
           .limit(8),
+        // The artist's profile library lives in a dedicated hidden stream
+        // ("__profile_library__"). Arena submissions create mirror
+        // play_tracks rows in the arena's stream — those must NOT appear
+        // on the profile, or every submission duplicates the track.
+        sb.from("streams")
+          .select("id")
+          .eq("host_id", id)
+          .eq("title", "__profile_library__")
+          .maybeSingle(),
       ]);
 
       const p = profileRes.data ?? {};
@@ -86,7 +95,10 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const { currentStreak, bestStreak } = computeStreaks(timeline, id);
       const title = getArtistTitle(battleWins);
 
-      const songCount = tracks.length;
+      const profileStreamId = (profileStreamRes.data as any)?.id ?? null;
+      const songCount = profileStreamId
+        ? tracks.filter((t: any) => t.stream_id === profileStreamId).length
+        : 0;
       const voteLikes = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
       const likeCount = voteLikes + heartLikes;
       const genres: string[] = Array.isArray(p.genres) ? p.genres : [];
@@ -106,7 +118,9 @@ export const getArtistMeta = createServerFn({ method: "GET" })
 
       const rawPhoto = (p.avatar_url as string | null) ?? (q.photo_url as string | null) ?? null;
       const rawBanner = (p.banner_url as string | null) ?? null;
-      const trackList = (trackListRes.data ?? []) as Array<any>;
+      const trackList = ((trackListRes.data ?? []) as Array<any>).filter(
+        (t) => profileStreamId && t.stream_id === profileStreamId,
+      );
 
       const [photoSigned, bannerSigned, trackCovers] = await Promise.all([
         presign(rawPhoto),
