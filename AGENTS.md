@@ -15,7 +15,7 @@
 - Keep conversation close controls at every size.
 - Keep the public store on existing published merch catalog reads and artist-hosted checkout links, because presentation changes must not duplicate catalogs, invent stock or prices, or imply unconfigured NFC fulfillment.
 - Artist Store uses store_* tables, server-priced stock/checkout, admin-reviewed cost/price/shipping enforced by trigger, webhook-only paid orders and once-per-order store_earnings_ledger with real fees and refund/chargeback reversals; clients never grant goods/payouts. Stable /nfc/<code> links redirect internally for editable destinations.
-- Store NFC experience pages as one row with validated tabs JSON referencing only the owner's songs, videos and images, served at /p/<code> with server-signed images; price NFC tag orders only from admin-managed tag products, paid/cancelled/refunded only via the verified webhook, with admin fulfilment updates made as the admin and logged by a DB trigger, because pages must stay editable and no client price may grant goods.
+- NFC pages use owner-validated tabs JSON at /p/<code> with signed images. Tag prices are admin-managed; payment states are webhook-only; admin fulfillment is trigger-audited. No client price grants goods.
 - Ground the AI Assistant only in admin-editable assistant_articles and the allow-listed pages in src/lib/assistant.ts, with no model tools, because answers must never invent features or perform actions; history is per-user, capped at 50 rows.
 - Read nested AGENTS.md before editing their directories.
 - Batch photo availability in one status provider using existing streams, rooms and owner-only presence; expose only status labels to protect private activity timestamps and avoid per-photo subscriptions.
@@ -24,3 +24,4 @@
 
 - Edit announcement copies by send timestamp, sender and content after server admin checks; preserve recipients/read state, never resend email.
 - Music details/Now Playing reuse PlayerProvider and persistent GlobalPlayer with real queues, no inferred albums or unapproved downloads. Hide the dock on live/Arena production pages to preserve independent controls.
+- PWA uses generateSW and one preview-guarded registrar; cache only static offline help/icons and hashed JS/CSS/fonts, never navigation HTML, APIs or media, to protect accounts and realtime. No forced update reloads.

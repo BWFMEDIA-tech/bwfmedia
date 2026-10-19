@@ -24,6 +24,7 @@ import {
   Disc3,
   Trophy,
   LayoutDashboard,
+  Download,
 } from "lucide-react";
 import bwfLogo from "@/assets/tunevio-logo.png.asset.json";
 import { useAuth } from "@/lib/auth-context";
@@ -238,6 +239,9 @@ export function SiteHeader() {
                       {item.label}
                     </RouterLink>
                   ))}
+                  <RouterLink to="/install" className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground rounded-md hover:bg-secondary">
+                    <Download size={18} className="text-primary" /> Install Tunevio
+                  </RouterLink>
                   {canBroadcast && (
                     <>
                       <div className="h-px my-1.5 bg-white/10" />
@@ -421,6 +425,9 @@ export function SiteHeader() {
                       {item.label}
                     </RouterLink>
                   ))}
+                  <RouterLink to="/install" className="flex min-w-0 items-center gap-2 px-3 py-3 rounded-md border border-border text-sm text-foreground">
+                    <Download size={18} className="shrink-0 text-primary" /> Install Tunevio
+                  </RouterLink>
                   {canBroadcast && (
                     <RouterLink
                       to="/stream-studio"
