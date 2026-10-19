@@ -32,6 +32,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GoLiveRouteImport } from './routes/go-live'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HostEarningsRouteImport } from './routes/host-earnings'
+import { Route as InstallRouteImport } from './routes/install'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as LoginRouteImport } from './routes/login'
@@ -273,6 +274,11 @@ const HelpRoute = HelpRouteImport.update({
 const HostEarningsRoute = HostEarningsRouteImport.update({
   id: '/host-earnings',
   path: '/host-earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstallRoute = InstallRouteImport.update({
+  id: '/install',
+  path: '/install',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -948,6 +954,7 @@ export interface FileRoutesByFullPath {
   '/go-live': typeof GoLiveRoute
   '/help': typeof HelpRoute
   '/host-earnings': typeof HostEarningsRoute
+  '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -1098,6 +1105,7 @@ export interface FileRoutesByTo {
   '/go-live': typeof GoLiveRoute
   '/help': typeof HelpRoute
   '/host-earnings': typeof HostEarningsRoute
+  '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -1251,6 +1259,7 @@ export interface FileRoutesById {
   '/go-live': typeof GoLiveRoute
   '/help': typeof HelpRoute
   '/host-earnings': typeof HostEarningsRoute
+  '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
@@ -1405,6 +1414,7 @@ export interface FileRouteTypes {
     | '/go-live'
     | '/help'
     | '/host-earnings'
+    | '/install'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1555,6 +1565,7 @@ export interface FileRouteTypes {
     | '/go-live'
     | '/help'
     | '/host-earnings'
+    | '/install'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1707,6 +1718,7 @@ export interface FileRouteTypes {
     | '/go-live'
     | '/help'
     | '/host-earnings'
+    | '/install'
     | '/leaderboard'
     | '/live'
     | '/login'
@@ -1860,6 +1872,7 @@ export interface RootRouteChildren {
   GoLiveRoute: typeof GoLiveRoute
   HelpRoute: typeof HelpRoute
   HostEarningsRoute: typeof HostEarningsRoute
+  InstallRoute: typeof InstallRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
@@ -2097,6 +2110,13 @@ declare module '@tanstack/react-router' {
       path: '/host-earnings'
       fullPath: '/host-earnings'
       preLoaderRoute: typeof HostEarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/install': {
+      id: '/install'
+      path: '/install'
+      fullPath: '/install'
+      preLoaderRoute: typeof InstallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -3158,6 +3178,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoLiveRoute: GoLiveRoute,
   HelpRoute: HelpRoute,
   HostEarningsRoute: HostEarningsRoute,
+  InstallRoute: InstallRoute,
   LeaderboardRoute: LeaderboardRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
