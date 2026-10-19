@@ -182,6 +182,7 @@ function RootComponent() {
         {showBottomNav && <MobileBottomNav />}
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />
+        <IntroSplash />
         </ArtistStatusProvider>
         </PlayerProvider>
       </CartProvider>
