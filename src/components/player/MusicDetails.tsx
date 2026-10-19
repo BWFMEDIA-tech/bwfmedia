@@ -35,6 +35,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
   const [credits, setCredits] = useState(false);
   const [showQueue, setShowQueue] = useState(!nowPlaying);
   const [saving, setSaving] = useState(false);
+  const [failedCover, setFailedCover] = useState<string | null>(null);
   const ids = queue.map((t) => t.id);
   const likes = useQuery({ queryKey: ["my-track-likes", ids], queryFn: () => getMyTrackLikes({ data: { trackIds: ids } }), enabled: !!auth.user && ids.length > 0 });
   if (!track) return null;
@@ -61,7 +62,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-11 w-11 rounded-full bg-background/30" aria-label="Music options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
           </header>
           <div className="music-detail-art mx-auto aspect-square overflow-hidden rounded-lg bg-secondary">
-            {track.coverUrl ? <SignedImg src={track.coverUrl} alt={`${track.title} artwork`} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}
+            {track.coverUrl && failedCover !== track.coverUrl ? <SignedImg src={track.coverUrl} alt={`${track.title} artwork`} onError={() => setFailedCover(track.coverUrl ?? null)} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}
           </div>
           <div className={nowPlaying ? "mt-7" : "mt-7 text-center"}>
             <DialogTitle className="break-words text-2xl font-bold leading-tight sm:text-3xl">{track.title}</DialogTitle>
