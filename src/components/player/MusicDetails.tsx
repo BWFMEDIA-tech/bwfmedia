@@ -51,7 +51,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
   const start = (t: PlayerTrack) => { if (p.track?.id === t.id) p.toggle(); else p.play(t, queue.filter((q) => !!q.audioUrl)); };
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="music-detail-dialog block overflow-y-auto p-0">
+      <DialogContent className="music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
         {track.coverUrl && <SignedImg src={track.coverUrl} alt="" aria-hidden className="music-detail-backdrop" />}
         <div className="music-detail-shade" aria-hidden />
         <div className="relative mx-auto max-w-2xl px-5 pb-8 pt-5 sm:px-10">
