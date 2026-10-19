@@ -77,8 +77,12 @@ function MusicMediaPage() {
 
   async function reload() {
     if (!user) return;
+    // Only show the artist's profile-library tracks. Arena submissions
+    // create mirror play_tracks rows in the arena's stream — filtering to
+    // the profile stream keeps those copies out of this list.
+    const { data: profileStreamId } = await supabase.rpc("get_or_create_profile_stream");
     const [{ data: t }, { data: p }] = await Promise.all([
-      supabase.from("play_tracks").select("id, title, artist_name, audio_url, cover_url, play_count, like_count").eq("artist_user_id", user.id).order("created_at", { ascending: false }).limit(50),
+      supabase.from("play_tracks").select("id, title, artist_name, audio_url, cover_url, play_count, like_count").eq("artist_user_id", user.id).eq("stream_id", profileStreamId as unknown as string).order("created_at", { ascending: false }).limit(50),
       supabase.from("profiles").select("featured_track_id").eq("id", user.id).maybeSingle(),
     ]);
     setTracks(t ?? []); setFeaturedTrack((p as any)?.featured_track_id ?? null); setLoading(false);
