@@ -36,7 +36,7 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
   const profilesRes = allIds.length
     ? await sb
         .from("profiles")
-        .select("id, display_name, stage_name, avatar_url, bio")
+        .select("id, display_name, stage_name, avatar_url, bio, created_at")
         .in("id", allIds)
     : { data: [] };
 
@@ -61,6 +61,27 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
     .map((id) => pmap.get(id))
     .filter((p: any) => p && (p.avatar_url || p.bio))
     .slice(0, 10)) as any[];
+
+  // The most recently joined artist (by profile creation time), for the
+  // Discover hero portrait. Always present once any artist exists.
+  const artistProfiles = artistIds
+    .map((id) => pmap.get(id))
+    .filter(Boolean) as any[];
+  const latestArtistRow = artistProfiles.length
+    ? artistProfiles.reduce((a, b) =>
+        String(a.created_at ?? "") > String(b.created_at ?? "") ? a : b,
+      )
+    : null;
+  const latestArtist = latestArtistRow
+    ? {
+        id: latestArtistRow.id,
+        name:
+          latestArtistRow.stage_name ||
+          latestArtistRow.display_name ||
+          "New artist",
+        avatarUrl: latestArtistRow.avatar_url ?? null,
+      }
+    : null;
 
   // Resolve thumbnail URLs for videos.
   const videos = await Promise.all(
