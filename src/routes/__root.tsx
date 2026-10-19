@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { registerTunevioPwa } from "@/lib/pwa";
 import { ArtistStatusProvider } from "@/components/artist/ArtistStatusBeacon";
 
 import appCss from "../styles.css?url";
@@ -48,18 +49,18 @@ export const Route = createRootRoute({
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "BWF" },
-      { title: "BWF Network — Music, Live Streams, and Creator Platform" },
-      { name: "description", content: "BWF Network is the creator-powered entertainment platform for independent artists: stream music, host live audio and video, sell merch, and grow your fanbase." },
+      { name: "apple-mobile-web-app-title", content: "Tunevio" },
+      { title: "Tunevio — Music, Live Streams, and Creator Platform" },
+      { name: "description", content: "Tunevio is the creator-powered entertainment platform for independent artists: stream music, host live audio and video, sell merch, and grow your fanbase." },
       { name: "author", content: "BWF Media TV" },
-      { property: "og:title", content: "BWF Network — Music, Live Streams, and Creator Platform" },
-      { property: "og:description", content: "Stream music, go live, and monetize your audience on BWF Network — the creator-powered entertainment platform from BWF Media TV." },
+      { property: "og:title", content: "Tunevio — Music, Live Streams, and Creator Platform" },
+      { property: "og:description", content: "Stream music, go live, and connect with your audience on Tunevio." },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "BWF Media TV" },
+      { property: "og:site_name", content: "Tunevio" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@bwfmediatv" },
-      { name: "twitter:title", content: "BWF Network — Music, Live Streams, and Creator Platform" },
-      { name: "twitter:description", content: "Stream music, go live, and monetize your audience on BWF Network." },
+      { name: "twitter:title", content: "Tunevio — Music, Live Streams, and Creator Platform" },
+      { name: "twitter:description", content: "Stream music, go live, and connect with your audience on Tunevio." },
     ],
     scripts: [
       {
@@ -138,6 +139,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  useEffect(() => { void registerTunevioPwa().catch(() => { /* Installation must never interrupt the website. */ }); }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
   const showBottomNav =
