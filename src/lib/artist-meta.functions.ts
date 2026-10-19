@@ -39,6 +39,15 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           .eq("user_id", id)
           .order("created_at", { ascending: false })
           .limit(8),
+        // The artist's profile library lives in a dedicated hidden stream
+        // ("__profile_library__"). Arena submissions create mirror
+        // play_tracks rows in the arena's stream — those must NOT appear
+        // on the profile, or every submission duplicates the track.
+        sb.from("streams")
+          .select("id")
+          .eq("host_id", id)
+          .eq("title", "__profile_library__")
+          .maybeSingle(),
       ]);
 
       const p = profileRes.data ?? {};
