@@ -23,7 +23,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     try {
       const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes, profileStreamRes] = await Promise.all([
         sb.from("live_queue_public").select("artist_name, photo_url").eq("id", id).maybeSingle(),
-        sb.from("play_tracks").select("like_count, dislike_count").eq("artist_user_id", id),
+        sb.from("play_tracks").select("like_count, dislike_count, stream_id").eq("artist_user_id", id),
         sb.from("videos").select("id", { count: "exact", head: true }).eq("user_id", id),
         sb.from("streams").select("id").eq("host_id", id),
         sb.from("user_social_links")
@@ -118,7 +118,9 @@ export const getArtistMeta = createServerFn({ method: "GET" })
 
       const rawPhoto = (p.avatar_url as string | null) ?? (q.photo_url as string | null) ?? null;
       const rawBanner = (p.banner_url as string | null) ?? null;
-      const trackList = (trackListRes.data ?? []) as Array<any>;
+      const trackList = ((trackListRes.data ?? []) as Array<any>).filter(
+        (t) => profileStreamId && t.stream_id === profileStreamId,
+      );
 
       const [photoSigned, bannerSigned, trackCovers] = await Promise.all([
         presign(rawPhoto),
