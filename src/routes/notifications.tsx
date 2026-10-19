@@ -115,20 +115,35 @@ function NotificationsPage() {
           <ul className="flex flex-col gap-2">
             {items.map((n) => (
               <li key={n.id}>
-                <button onClick={() => open(n)} className={`w-full text-left rounded-xl border p-4 transition ${n.read_at ? "border-white/5 bg-white/[0.02]" : "border-violet-500/30 bg-violet-500/5"}`}>
+                <button onClick={() => toggleExpand(n)} className={`w-full text-left rounded-xl border p-4 transition ${n.read_at ? "border-white/5 bg-white/[0.02]" : "border-violet-500/30 bg-violet-500/5"}`}>
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 h-9 w-9 shrink-0 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00E6FF,#0000FF)" }}>
                       {n.type === "live_stream_started" ? <Radio className="h-4 w-4 text-white" /> : <Bell className="h-4 w-4 text-white" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="font-semibold text-white truncate">{n.title}</p>
+                        <p className="font-semibold text-white">{n.title}</p>
                         <span className="text-[10px] text-white/40 shrink-0">{new Date(n.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                       </div>
-                      {n.body && <p className="text-sm text-white/70 mt-1 line-clamp-2">{n.body}</p>}
+                      {n.body && (
+                        <p className={`text-sm text-white/70 mt-1 ${expanded[n.id] ? "" : "line-clamp-2"}`}>{n.body}</p>
+                      )}
                       {n.media_url && n.media_type === "image" && <img src={n.media_url} alt="" loading="lazy" className="mt-3 w-full max-h-80 rounded-lg object-cover" />}
                       {n.media_url && n.media_type === "video" && <video src={n.media_url} controls playsInline preload="metadata" onClick={(e) => e.stopPropagation()} className="mt-3 w-full max-h-80 rounded-lg bg-black" />}
-                      {!n.read_at && <span className="inline-block mt-2 rounded-full bg-violet-500/20 text-violet-300 px-2 py-0.5 text-[10px] font-semibold">New</span>}
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        {!n.read_at && <span className="rounded-full bg-violet-500/20 text-violet-300 px-2 py-0.5 text-[10px] font-semibold">New</span>}
+                        {n.body && (n.body.length > 120 || n.body.includes("\n")) && (
+                          <span className="text-[11px] font-medium text-cyan-300/90">{expanded[n.id] ? "Show less" : "Read more"}</span>
+                        )}
+                        {n.link && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); open(n); }}
+                            className="ml-auto rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold text-cyan-300 hover:bg-cyan-400/20 transition"
+                          >
+                            Open page
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </button>
