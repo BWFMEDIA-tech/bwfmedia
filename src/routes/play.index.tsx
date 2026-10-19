@@ -85,7 +85,6 @@ function PlayArenaDashboard() {
           <PowerUps />
         </div>
         <ArenaPass />
-        <PromoBanner />
       </div>
     </div>
   );
@@ -673,39 +672,6 @@ function ArenaPass() {
   );
 }
 
-/* ---------- Promo Banner ---------- */
-function PromoBanner() {
-  return (
-    <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0000FF]/30 via-[#00E6FF]/20 to-[#0000FF]/30 p-6 sm:p-8">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,#00E6FF40,transparent_60%)] pointer-events-none" />
-      <div className="relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        <div>
-          <h3 className="text-3xl sm:text-4xl font-black leading-tight">
-            THE STAGE IS EARNED.<br />NOT GIVEN.
-          </h3>
-          <p className="mt-3 text-lg font-bold text-white/90">
-            JOIN. COMPETE. GET DISCOVERED.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold tracking-wider">
-            <span className="rounded-full bg-white/10 px-3 py-1">CURATED</span>
-            <span className="rounded-full bg-white/10 px-3 py-1">COMPETITIVE</span>
-            <span className="rounded-full bg-white/10 px-3 py-1">HIGH ENERGY</span>
-          </div>
-          <p className="mt-4 text-xs text-white/60 max-w-md">
-            Every performance impacts rankings, visibility, and progression across the entire Play Arena ecosystem.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 md:justify-end">
-          {["Scarcity", "Competition", "Authority", "Momentum"].map((w) => (
-            <span key={w} className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm font-bold">
-              {w}
-            </span>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // silence unused imports kept for future use
 void Radio;

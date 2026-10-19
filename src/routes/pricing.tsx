@@ -5,7 +5,6 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useAuth } from "@/lib/auth-context";
 import { createTunevioCheckout, TUNEVIO_PLANS, type TunevioPlanId } from "@/lib/tunevio-subscriptions.functions";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/pricing")({
@@ -79,7 +78,6 @@ function PricingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white pt-24 pb-24">
-      <PaymentTestModeBanner />
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60 mb-4">

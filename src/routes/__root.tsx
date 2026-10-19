@@ -7,9 +7,7 @@ import { ArtistStatusProvider } from "@/components/artist/ArtistStatusBeacon";
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/contexts/CartContext";
 import { CartButton, CartDrawer } from "@/components/CartDrawer";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { ArtistTrialBanner } from "@/components/artist/TrialBanner";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MobileBottomNav } from "@/components/site/MobileBottomNav";
 import { IntroSplash } from "@/components/site/IntroSplash";
@@ -163,9 +161,7 @@ function RootComponent() {
       <CartProvider>
         <PlayerProvider>
         <ArtistStatusProvider>
-        {isChrome && <PaymentTestModeBanner />}
         <RealtimeHealthBanner />
-        {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div
           className={
