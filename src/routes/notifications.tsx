@@ -152,7 +152,7 @@ function NotificationsPage() {
                       </div>
                     </div>
                   </div>
-                </button>
+                </div>
               </li>
             ))}
           </ul>
