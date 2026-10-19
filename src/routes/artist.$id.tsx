@@ -35,6 +35,24 @@ import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
 import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
+import { useSignedVideoUrl } from "@/lib/video-urls";
+
+function ProfileVideoCard({ v }: { v: { id: string; title: string; thumbnail_path: string | null; created_at: string } }) {
+  const thumb = useSignedVideoUrl(v.thumbnail_path && !/^https?:/.test(v.thumbnail_path) ? v.thumbnail_path : null);
+  const src = v.thumbnail_path && /^https?:/.test(v.thumbnail_path) ? v.thumbnail_path : thumb;
+  return (
+    <Link to="/videos/$id" params={{ id: v.id }} className="block">
+      <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-950 group cursor-pointer">
+        {src && <img src={src} alt={v.title} className="absolute inset-0 h-full w-full object-cover" />}
+        <div className="absolute inset-0 grid place-items-center bg-black/20">
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-black/60 backdrop-blur group-hover:scale-110 transition"><Play className="h-4 w-4 fill-current" /></div>
+        </div>
+      </div>
+      <div className="mt-2 text-sm font-medium truncate">{v.title}</div>
+      <div className="text-xs text-white/40">{new Date(v.created_at).toLocaleDateString()}</div>
+    </Link>
+  );
+}
 import { getArtistLiveStream } from "@/lib/streams.functions";
 
 const artistMetaOptions = (id: string) =>
@@ -843,18 +861,7 @@ function MusicVideos({ videos, isOwner }: { videos: Array<{ id: string; title: s
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {videos.map((v) => (
-            <a key={v.id} href={v.external_url ?? "#"} target={v.external_url ? "_blank" : undefined} rel="noopener noreferrer" className="block">
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-950 group cursor-pointer">
-                {v.thumbnail_path && <img src={v.thumbnail_path} alt={v.title} className="absolute inset-0 h-full w-full object-cover" />}
-                <div className="absolute inset-0 grid place-items-center bg-black/20">
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-black/60 backdrop-blur group-hover:scale-110 transition"><Play className="h-4 w-4 fill-current" /></div>
-                </div>
-              </div>
-              <div className="mt-2 text-sm font-medium truncate">{v.title}</div>
-              <div className="text-xs text-white/40">{new Date(v.created_at).toLocaleDateString()}</div>
-            </a>
-          ))}
+          {videos.map((v) => <ProfileVideoCard key={v.id} v={v} />)}
         </div>
       )}
     </section>
