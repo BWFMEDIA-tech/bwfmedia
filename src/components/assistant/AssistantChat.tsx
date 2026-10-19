@@ -149,7 +149,9 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
             const done = !(busy && idx === messages.length - 1);
             return (
               <Message from="assistant" key={m.id}>
-                <MessageContent className="bg-transparent p-0">
+                <div className="flex items-start gap-2.5">
+                  <AssistantRobot className="mt-0.5 h-8 w-8 shrink-0" />
+                  <MessageContent className="min-w-0 flex-1 bg-transparent p-0">
                   {text ? <MessageResponse className="[&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5">{text}</MessageResponse> : <span className="text-sm text-muted-foreground">Thinking…</span>}
                   {done && links.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2">
