@@ -2,7 +2,7 @@
 - Give each mounted notification bell its own Realtime topic, because the desktop and mobile headers coexist and subscribed channels cannot accept new database callbacks.
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
 - Use semantic branding tokens; /videos reuses saves/signed URLs and metadata collections. Share Off the Block's YouTube list across both pages without duplicate uploads.
-- Derive icons from the shared logo symbol to preserve undistorted branding.
+- Derive icons from the logo symbol to preserve branding.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
@@ -12,7 +12,7 @@
 - Count shared-player starts once per load; update the same event after measured 30s, excluding seeks/pauses and bounding by owner/server elapsed time, because starts cannot fabricate royalties. Highlight only recorded stream countries.
 - Keep rights verification admin-only (DB trigger blocks artist self-verify; admin server functions write admin_audit_log), and keep third-party rights adapters server-side and disconnected until partner access is approved, because statuses and royalties must never be fabricated.
 - Reuse ProfileMessageButton on normal and live artist profiles with the resolved account ID and existing private messages route, because owners need their own inbox and visitors need the correct recipient without duplicating messaging storage.
-- Keep conversation-header close controls at every size to return to the inbox.
+- Keep conversation close controls at every size.
 - Keep the public store on existing published merch catalog reads and artist-hosted checkout links, because presentation changes must not duplicate catalogs, invent stock or prices, or imply unconfigured NFC fulfillment.
 - Keep the Artist Store (/artist-store) on its own store_* tables with prices and stock read server-side at checkout and orders marked paid only by the verified payment webhook, products sellable only after admin review (cost, price, shipping rule) enforced by DB trigger, and artist/Tunevio earnings written once per order to store_earnings_ledger from the provider's real fee with reversal rows for refunds/chargebacks, because client confirmations must never grant goods or payouts; NFC tags point at stable /nfc/<code> links that redirect only to internal paths so destinations can change without reprogramming.
 - Store NFC experience pages as one row with validated tabs JSON referencing only the owner's songs, videos and images, served at /p/<code> with server-signed images; price NFC tag orders only from admin-managed tag products, paid/cancelled/refunded only via the verified webhook, with admin fulfilment updates made as the admin and logged by a DB trigger, because pages must stay editable and no client price may grant goods.
@@ -21,3 +21,5 @@
 - Batch photo availability in one status provider using existing streams, rooms and owner-only presence; expose only status labels to protect private activity timestamps and avoid per-photo subscriptions.
 - Reuse user_social_links and ProfilePlatformLinks for artist/host platform links on profiles and the /go-live prep screen; links are not OAuth-verified, so never show fabricated authorization status or store credentials there.
 - Merchandise earnings go entirely to the artist (artist_bps fixed at 10000) and the revenue pool feature (admin Revenue Pool page, live pool ticker) is removed, because the 60/40 split and pool were removed by request; the DB royalty engine stays for artist payouts.
+
+- Edit announcement copies by send timestamp, sender and content after server admin checks; preserve recipients/read state, never resend email.
