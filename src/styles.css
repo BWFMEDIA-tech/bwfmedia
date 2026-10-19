@@ -952,3 +952,24 @@
     0 0 18px color-mix(in srgb, var(--primary) 40%, transparent),
     0 0 34px color-mix(in srgb, var(--brand-blue) 30%, transparent);
 }
+
+/* Artwork-first music views share the existing player, never the live Arena engine. */
+:root {
+  --music-shade: linear-gradient(180deg, color-mix(in srgb, var(--background) 45%, transparent), color-mix(in srgb, var(--background) 90%, transparent) 55%, var(--background));
+  --music-shadow: 0 16px 60px color-mix(in srgb, var(--background) 65%, transparent);
+}
+.music-detail-dialog { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; border: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); border-radius: 0; background: var(--background); isolation: isolate; }
+.music-detail-dialog > button:last-child { display: none; }
+.music-detail-backdrop { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(60px); transform: scale(1.15); opacity: .6; z-index: -2; pointer-events: none; }
+.music-detail-shade { position: fixed; inset: 0; background: var(--music-shade); z-index: -1; pointer-events: none; }
+.music-detail-art { width: min(100%, 360px); box-shadow: var(--music-shadow); }
+.music-mini-player { bottom: calc(var(--bwf-mobile-nav-h, env(safe-area-inset-bottom)) + 8px); box-shadow: var(--music-shadow); }
+.music-mini-progress { height: 4px; margin: 0; }
+html[data-music-player] body { padding-bottom: 96px; }
+html[data-music-player] .music-assistant-launcher { bottom: calc(var(--bwf-mobile-nav-h, env(safe-area-inset-bottom)) + 104px); }
+@media (min-width: 768px) {
+  .music-mini-player { bottom: 12px; }
+  html[data-music-player] .music-assistant-launcher { bottom: 110px; }
+  .music-detail-art { width: min(100%, 400px); }
+}
+@media (prefers-reduced-motion: reduce) { .music-detail-dialog { animation: none; transition: none; } }

@@ -17,7 +17,7 @@ export function formatPlayerTime(seconds: number) {
 }
 
 export async function shareMusic(track: PlayerTrack) {
-  const url = track.artistId ? `${window.location.origin}/artist/${encodeURIComponent(track.artistId)}` : `${window.location.origin}/?track=${encodeURIComponent(track.id)}`;
+  const url = track.artistId ? `${window.location.origin}/artist/${encodeURIComponent(track.artistId)}` : `${window.location.origin}/`;
   try {
     if (navigator.share) await navigator.share({ title: track.title, text: `${track.title} — ${track.artist}`, url });
     else { await navigator.clipboard.writeText(url); toast.success("Music link copied"); }
