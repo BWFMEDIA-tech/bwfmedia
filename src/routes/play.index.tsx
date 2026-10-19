@@ -85,7 +85,6 @@ function PlayArenaDashboard() {
           <PowerUps />
         </div>
         <ArenaPass />
-        <PromoBanner />
       </div>
     </div>
   );

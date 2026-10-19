@@ -4,9 +4,6 @@ import { Check, Loader2, Sparkles, X } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useAuth } from "@/lib/auth-context";
-import { createTunevioCheckout, TUNEVIO_PLANS, type TunevioPlanId } from "@/lib/tunevio-subscriptions.functions";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
