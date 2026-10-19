@@ -1,20 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { announcementContentSchema, groupAnnouncements } from "./announcement-edit";
 
 export const ANNOUNCEMENT_AUDIENCES = ["everyone", "artist", "host", "listener"] as const;
 
-const Schema = z.object({
+const Schema = announcementContentSchema.extend({
   audiences: z.array(z.enum(ANNOUNCEMENT_AUDIENCES)).min(1),
-  kind: z.enum(["update", "event"]),
-  title: z.string().trim().min(1).max(120),
-  body: z.string().trim().max(500).optional(),
-  // Internal links only, so announcements can't send members off-site.
-  link: z.string().trim().regex(/^\/[A-Za-z0-9/_\-?=&.#]*$/).max(200).optional().or(z.literal("")),
   email: z.boolean().default(false),
-  // Path inside the announcement-media bucket (uploaded by the admin).
-  mediaPath: z.string().regex(/^[A-Za-z0-9/_\-.]+$/).max(300).optional(),
-  mediaType: z.enum(["image", "video"]).optional(),
 });
 
 /** Admin-only: sends an in-app notification to every member in the chosen groups. */
@@ -59,7 +52,9 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
       prefs?.forEach((p: any) => off.add(p.user_id));
     }
     const recipients = all.filter((id) => !off.has(id));
+    const createdAt = new Date().toISOString();
     const rows = recipients.map((uid) => ({
+      created_at: createdAt,
       user_id: uid,
       type: data.kind === "event" ? "announcement_event" : "announcement_update",
       title: data.title,
@@ -67,7 +62,7 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
       link: data.link || null,
       actor_id: context.userId,
       media_url: mediaUrl,
-      media_type: mediaUrl ? data.mediaType! : null,
+      media_type: mediaUrl ? data.mediaType ?? null : null,
     }));
     let sent = 0;
     for (let i = 0; i < rows.length; i += 500) {
@@ -102,4 +97,58 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
       emailError = r.error;
     }
     return { sent, skipped: off.size, emailed, emailError };
+  });
+
+export const listSentAnnouncements = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ before: z.string().optional() }).parse(input ?? {}))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (roleError || !isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let query = supabaseAdmin.from("notifications")
+      .select("id, actor_id, created_at, type, title, body, link, media_url, media_type")
+      .in("type", ["announcement_update", "announcement_event"])
+      .order("created_at", { ascending: false }).limit(1000);
+    if (data.before) query = query.lt("created_at", data.before);
+    const { data: rows, error } = await query;
+    if (error) throw new Error("Couldn't load sent announcements");
+    return { announcements: groupAnnouncements(rows ?? []), next: rows?.length === 1000 ? rows[rows.length - 1]?.created_at : undefined };
+  });
+
+export const editAnnouncement = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => announcementContentSchema.extend({ id: z.string().uuid(), removeMedia: z.boolean().default(false) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (roleError || !isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: original, error: readError } = await supabaseAdmin.from("notifications")
+      .select("id, actor_id, created_at, type, title, body, link, media_url, media_type")
+      .eq("id", data.id).in("type", ["announcement_update", "announcement_event"]).maybeSingle();
+    if (readError || !original) throw new Error("Announcement no longer available");
+    let mediaUrl = data.removeMedia ? null : original.media_url;
+    let mediaType = data.removeMedia ? null : original.media_type;
+    if (data.mediaPath) {
+      if (!data.mediaType) throw new Error("Choose an image or video");
+      const { data: signed, error } = await supabaseAdmin.storage.from("announcement-media").createSignedUrl(data.mediaPath, 60 * 60 * 24 * 365);
+      if (error || !signed) throw new Error("Couldn't read the uploaded file");
+      mediaUrl = signed.signedUrl; mediaType = data.mediaType;
+    }
+    const changes = { title: data.title, body: data.body || null, link: data.link || null,
+      type: data.kind === "event" ? "announcement_event" : "announcement_update", media_url: mediaUrl, media_type: mediaType };
+    const { error: auditError } = await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: context.userId, category: "announcements", action: "edit_announcement",
+      target_id: original.id, target_type: "announcement", summary: "Edit sent announcement",
+      metadata: { before: original, after: changes },
+    });
+    if (auditError) throw new Error("Couldn't record the edit; changes were not saved");
+    let query = supabaseAdmin.from("notifications").update(changes)
+      .eq("created_at", original.created_at).eq("type", original.type).eq("title", original.title);
+    for (const key of ["actor_id", "body", "link", "media_url", "media_type"] as const) {
+      query = original[key] === null ? query.is(key, null) : query.eq(key, original[key]);
+    }
+    const { error, count } = await query.select("id", { count: "exact", head: true });
+    if (error) throw new Error("Couldn't save the announcement");
+    return { updated: count ?? 0 };
   });
