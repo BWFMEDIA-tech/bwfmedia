@@ -2,7 +2,7 @@
 - Give each mounted notification bell its own Realtime topic, because the desktop and mobile headers coexist and subscribed channels cannot accept new database callbacks.
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
 - Use semantic branding tokens; /videos reuses saves/signed URLs and metadata collections. Share Off the Block's YouTube list across both pages without duplicate uploads.
-- Derive icons from the logo symbol to preserve branding.
+- Derive icons from the logo.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` as a redirect to the requested artist profile rather than a duplicate editor, so existing profile links remain usable.
@@ -12,7 +12,7 @@
 - Count shared-player starts once per load; update the same event after measured 30s, excluding seeks/pauses and bounding by owner/server elapsed time, because starts cannot fabricate royalties. Highlight only recorded stream countries.
 - Keep rights verification admin-only (DB trigger blocks artist self-verify; admin server functions write admin_audit_log), and keep third-party rights adapters server-side and disconnected until partner access is approved, because statuses and royalties must never be fabricated.
 - Reuse ProfileMessageButton on normal and live artist profiles with the resolved account ID and existing private messages route, because owners need their own inbox and visitors need the correct recipient without duplicating messaging storage.
-- Keep conversation close controls at every size.
+- Keep conversation close controls at every size; intro audio needs a direct-tap unmute/replay fallback because browsers block audible autoplay.
 - Keep the public store on existing published merch catalog reads and artist-hosted checkout links, because presentation changes must not duplicate catalogs, invent stock or prices, or imply unconfigured NFC fulfillment.
 - Artist Store uses store_* tables, server-priced stock/checkout, admin-reviewed cost/price/shipping enforced by trigger, webhook-only paid orders and once-per-order store_earnings_ledger with real fees and refund/chargeback reversals; clients never grant goods/payouts. Stable /nfc/<code> links redirect internally for editable destinations.
 - NFC pages use owner-validated tabs JSON at /p/<code> with signed images. Tag prices are admin-managed; payment states are webhook-only; admin fulfillment is trigger-audited. No client price grants goods.
