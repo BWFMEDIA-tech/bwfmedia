@@ -32,6 +32,15 @@ function NotificationsPage() {
   const nav = useNavigate();
   const [items, setItems] = useState<Notif[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = async (n: Notif) => {
+    setExpanded((prev) => ({ ...prev, [n.id]: !prev[n.id] }));
+    if (!n.read_at && auth.user) {
+      await supabase.from("notifications").update({ read_at: new Date().toISOString() })
+        .eq("id", n.id).eq("user_id", auth.user.id);
+    }
+  };
 
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
