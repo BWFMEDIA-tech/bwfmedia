@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import introAsset from "@/assets/tunevio-intro.mp4.asset.json";
 
 /**
@@ -10,6 +12,7 @@ const SESSION_KEY = "tunevio:intro-played";
 
 export function IntroSplash() {
   const [show, setShow] = useState(false);
+  const [needsSound, setNeedsSound] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -30,6 +33,7 @@ export function IntroSplash() {
     video.muted = false;
     video.play().catch(() => {
       video.muted = true;
+      setNeedsSound(true);
       video.play().catch(() => {
         // Autoplay fully blocked — dismiss so the site is never blocked.
         setShow(false);
@@ -43,29 +47,51 @@ export function IntroSplash() {
   if (!show) return null;
 
   const dismiss = () => setShow(false);
+  const enableSound = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    // A direct tap unlocks audio on mobile. Replay so none is missed.
+    video.muted = false;
+    video.volume = 1;
+    video.currentTime = 0;
+    setNeedsSound(false);
+    video.play().catch(() => setNeedsSound(true));
+  };
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black"
-      onClick={dismiss}
-      role="presentation"
+      className="fixed inset-0 z-[100] bg-background"
+      role="dialog"
+      aria-label="Tunevio intro"
     >
       <video
         ref={videoRef}
         src={introAsset.url}
         className="h-full w-full object-cover md:object-contain"
         playsInline
+        onVolumeChange={(event) => setNeedsSound(event.currentTarget.muted || event.currentTarget.volume === 0)}
         onEnded={dismiss}
         onError={dismiss}
       />
-      <button
+      <Button
         type="button"
         onClick={dismiss}
         aria-label="Skip intro"
-        className="absolute right-4 top-4 z-10 rounded-full border border-white/20 bg-black/40 px-4 py-1.5 text-xs font-semibold tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white"
+        variant="outline"
+        size="sm"
+        className="absolute right-4 top-4 z-10 border-foreground/20 bg-background/60 text-foreground backdrop-blur-sm"
       >
         Skip
-      </button>
+      </Button>
+      <Button
+        type="button"
+        onClick={enableSound}
+        aria-label={needsSound ? "Tap for sound" : "Replay intro with sound"}
+        className="absolute bottom-24 left-1/2 z-10 -translate-x-1/2 shadow-lg"
+      >
+        {needsSound ? <VolumeX /> : <Volume2 />}
+        {needsSound ? "Tap for sound" : "Replay with sound"}
+      </Button>
     </div>
   );
 }
