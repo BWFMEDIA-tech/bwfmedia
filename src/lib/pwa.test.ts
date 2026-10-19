@@ -27,7 +27,8 @@ describe("Tunevio PWA safety", () => {
     expect(workbox?.runtimeCaching?.[0]?.handler).toBe("NetworkFirst");
     const hook = workbox?.runtimeCaching?.[0]?.options?.plugins?.[0]?.cacheWillUpdate;
     if (typeof hook !== "function") throw new Error("Missing no-cache HTML hook");
-    expect(await hook({ request: new Request("https://tunevio.com/settings"), response: new Response("private"), event: {} as ExtendableEvent })).toBeNull();
+    const params = { request: new Request("https://tunevio.com/settings"), response: new Response("private"), event: {} } as Parameters<typeof hook>[0];
+    expect(await hook(params)).toBeNull();
   });
   it("bypasses APIs, OAuth, private media, signed URLs and bearer requests", () => {
     const match = (index: number, path: string, mode: RequestMode = "cors", token = false) => {
@@ -35,7 +36,7 @@ describe("Tunevio PWA safety", () => {
       if (typeof pattern !== "function") throw new Error("Missing cache matcher");
       const url = new URL(path, "https://tunevio.com");
       const request = { mode, headers: new Headers(token ? { authorization: "Bearer test" } : {}) } as Request;
-      return pattern({ request, url, sameOrigin: true, event: {} as ExtendableEvent });
+      return pattern({ request, url, sameOrigin: true, event: {} } as Parameters<typeof pattern>[0]);
     };
     expect(match(0, "/settings", "navigate")).toBe(true);
     expect(match(0, "/api/public/payments", "navigate")).toBe(false);
