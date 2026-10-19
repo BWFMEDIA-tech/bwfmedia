@@ -175,7 +175,7 @@ function RootComponent() {
         </div>
         {isChrome && pathname === "/" && <SiteFooter fullWidth />}
         <CartDrawer />
-        {(pathname === "/" || pathname === "/charts" || pathname.startsWith("/artist/")) && <GlobalPlayer />}
+         <GlobalPlayer hidden={pathname.startsWith("/play") || pathname.startsWith("/stream/") || pathname.startsWith("/stage/") || pathname.startsWith("/stream-studio") || pathname.startsWith("/broadcast/") || pathname === "/go-live"} />
         {showBottomNav && <MobileBottomNav />}
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />

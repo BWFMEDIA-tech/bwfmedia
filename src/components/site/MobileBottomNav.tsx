@@ -29,7 +29,7 @@ export function MobileBottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--bwf-mobile-nav-h", "64px");
+    root.style.setProperty("--bwf-mobile-nav-h", "calc(64px + env(safe-area-inset-bottom))");
     return () => {
       root.style.removeProperty("--bwf-mobile-nav-h");
     };
@@ -37,7 +37,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/85 backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul
@@ -62,7 +62,7 @@ export function MobileBottomNav() {
                 aria-current={active ? "page" : undefined}
               >
                 <span className="relative">
-                  <Icon className={cn("h-5 w-5", active && "drop-shadow-[0_0_8px_rgba(0,230,255,0.7)]")} />
+                  <Icon className="h-5 w-5" />
                   {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
                 </span>
                 <span>{tab.label}</span>

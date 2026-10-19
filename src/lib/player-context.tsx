@@ -15,6 +15,7 @@ export interface PlayerTrack {
   audioUrl: string;
   coverUrl?: string | null;
   durationSec?: number | null;
+  artistId?: string | null;
   /** When true, playback is capped at PREVIEW_LIMIT_SEC seconds. */
   preview?: boolean;
 }
@@ -33,6 +34,10 @@ interface PlayerState {
 }
 
 interface PlayerApi extends PlayerState {
+  detailTrack: PlayerTrack | null;
+  detailQueue: PlayerTrack[];
+  openDetails: (track: PlayerTrack, queue?: PlayerTrack[]) => void;
+  closeDetails: () => void;
   play: (track?: PlayerTrack, queue?: PlayerTrack[]) => void;
   pause: () => void;
   toggle: () => void;
@@ -48,6 +53,13 @@ interface PlayerApi extends PlayerState {
 const Ctx = createContext<PlayerApi | null>(null);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
+  const [detailTrack, setDetailTrack] = useState<PlayerTrack | null>(null);
+  const [detailQueue, setDetailQueue] = useState<PlayerTrack[]>([]);
+  const openDetails = useCallback((track: PlayerTrack, queue?: PlayerTrack[]) => {
+    setDetailTrack(track);
+    setDetailQueue(queue ?? [track]);
+  }, []);
+  const closeDetails = useCallback(() => setDetailTrack(null), []);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stateRef = useRef<PlayerState | null>(null);
   const playTokenRef = useRef(0);
@@ -238,7 +250,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const toggleShuffle = useCallback(() => setState((s) => ({ ...s, shuffle: !s.shuffle })), []);
   const cycleRepeat = useCallback(() => setState((s) => ({ ...s, repeat: s.repeat === "off" ? "all" : s.repeat === "all" ? "one" : "off" })), []);
 
-  const value = useMemo<PlayerApi>(() => ({ ...state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler }), [state, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler]);
+  const value = useMemo<PlayerApi>(() => ({ ...state, detailTrack, detailQueue, openDetails, closeDetails, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler }), [state, detailTrack, detailQueue, openDetails, closeDetails, play, pause, toggle, next, prev, seek, setVolume, toggleShuffle, cycleRepeat, setPreviewLimitHandler]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

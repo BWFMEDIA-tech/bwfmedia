@@ -23,6 +23,7 @@ export function toPlayerTrack(t: FeedTrack): PlayerTrack {
     audioUrl: t.audioUrl ?? "",
     coverUrl: t.coverUrl,
     durationSec: t.durationSeconds,
+    artistId: t.artistUserId,
   };
 }
 
@@ -139,6 +140,7 @@ export type MediaCardProps = {
   shape?: "square" | "circle";
   badge?: ReactNode;
   onPlay?: () => void;
+  onOpen?: () => void;
   playing?: boolean;
   to?: string;
   params?: Record<string, string>;
@@ -152,6 +154,7 @@ export function MediaCard({
   shape = "square",
   badge,
   onPlay,
+  onOpen,
   playing,
   to,
   params,
@@ -202,11 +205,11 @@ export function MediaCard({
         role="button"
         tabIndex={0}
         aria-label={playing ? `Pause ${title}` : `Play ${title}`}
-        onClick={onPlay}
+        onClick={onOpen ?? onPlay}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onPlay();
+            (onOpen ?? onPlay)();
           }
         }}
         className="block cursor-pointer text-left"
@@ -238,6 +241,7 @@ export function AlbumCard({
       imageUrl={track.coverUrl}
       badge={badge}
       playing={isCurrent && player.isPlaying}
+      onOpen={() => player.openDetails(toPlayerTrack(track), (queue ?? [track]).map(toPlayerTrack))}
       onPlay={() => {
         if (isCurrent) return player.toggle();
         player.play(toPlayerTrack(track), (queue ?? [track]).map(toPlayerTrack));
