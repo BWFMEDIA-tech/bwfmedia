@@ -161,9 +161,7 @@ function RootComponent() {
       <CartProvider>
         <PlayerProvider>
         <ArtistStatusProvider>
-        {isChrome && <PaymentTestModeBanner />}
         <RealtimeHealthBanner />
-        {isChrome && <ArtistTrialBanner />}
         {isChrome && <SiteHeader />}
         <div
           className={
