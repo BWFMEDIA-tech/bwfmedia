@@ -21,7 +21,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     if (profileRes.error) throw new Error("Unable to load artist profile. Please try again.");
     const id: string = profileRes.data?.id ?? data.id;
     try {
-      const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes] = await Promise.all([
+      const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes, profileStreamRes] = await Promise.all([
         sb.from("live_queue_public").select("artist_name, photo_url").eq("id", id).maybeSingle(),
         sb.from("play_tracks").select("like_count, dislike_count").eq("artist_user_id", id),
         sb.from("videos").select("id", { count: "exact", head: true }).eq("user_id", id),
