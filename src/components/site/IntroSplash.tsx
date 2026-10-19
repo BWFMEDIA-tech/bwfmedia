@@ -56,6 +56,7 @@ export function IntroSplash() {
         className="h-full w-full object-cover md:object-contain"
         playsInline
         onEnded={dismiss}
+        onError={dismiss}
       />
       <button
         type="button"
