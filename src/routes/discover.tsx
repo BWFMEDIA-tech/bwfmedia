@@ -225,17 +225,39 @@ function DiscoverPage() {
             </div>
           </div>
 
-          {/* Center: hero portrait */}
-          <div className="relative rounded-2xl overflow-hidden border border-blood/30 aspect-[4/5] lg:aspect-auto lg:h-[460px]">
-            <img
-              src={discoverHero}
-              alt="Featured BWF Network artist"
-              className="absolute inset-0 w-full h-full object-cover"
-              width={1280}
-              height={1280}
-            />
+          {/* Center: latest artist to join */}
+          <RouterLink
+            to="/artist/$id"
+            params={{ id: latestArtist?.id ?? "browse" }}
+            className="group relative block rounded-2xl overflow-hidden border border-blood/30 aspect-[4/5] lg:aspect-auto lg:h-[460px]"
+          >
+            {latestArtist?.avatarUrl ? (
+              <SignedImg
+                src={latestArtist.avatarUrl}
+                alt={latestArtist.name}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={discoverHero}
+                alt={latestArtist?.name ?? "Featured artist"}
+                className="absolute inset-0 w-full h-full object-cover"
+                width={1280}
+                height={1280}
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-          </div>
+            {latestArtist && (
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-blood">
+                  Latest to join
+                </div>
+                <div className="mt-1 font-display text-xl md:text-2xl uppercase text-bone leading-tight group-hover:text-white transition-colors">
+                  {latestArtist.name}
+                </div>
+              </div>
+            )}
+          </RouterLink>
 
           {/* Right: profile release CTA */}
           <aside className="rounded-2xl border border-white/10 bg-[#0d0d18]/85 backdrop-blur p-6 lg:mt-6">
