@@ -78,7 +78,7 @@ export function Artwork({
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-gradient-to-br from-tv-violet/25 via-tv-card to-tv-cyan/20",
+        "relative overflow-hidden bg-gradient-to-br from-tv-cyan/20 via-tv-card to-tv-base",
         rounded,
         className,
       )}
@@ -91,8 +91,10 @@ export function Artwork({
           className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white/25">
-          {alt.slice(0, 1).toUpperCase()}
+        <div className="flex h-full w-full items-center justify-center text-3xl font-black">
+          <span className="bg-gradient-to-b from-white/80 via-white/40 to-white/15 bg-clip-text text-transparent">
+            {alt.slice(0, 1).toUpperCase()}
+          </span>
         </div>
       )}
     </div>
@@ -111,17 +113,16 @@ export function PlayFab({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
-  const dims = size === "lg" ? "h-14 w-14" : size === "sm" ? "h-9 w-9" : "h-11 w-11";
-  const icon = size === "lg" ? "h-6 w-6" : size === "sm" ? "h-4 w-4" : "h-5 w-5";
+  const dims = size === "lg" ? "h-14 w-14" : size === "sm" ? "h-9 w-9" : "h-10 w-10";
+  const icon = size === "lg" ? "h-6 w-6" : size === "sm" ? "h-4 w-4" : "h-4 w-4";
   return (
     <button
       type="button"
       aria-label={playing ? "Pause" : "Play"}
       onClick={onClick}
       className={cn(
-        "grid place-items-center rounded-full bg-tv-cyan text-black shadow-lg shadow-tv-cyan/25 transition",
-        "hover:scale-105 active:scale-95",
-        "md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0",
+        "grid place-items-center rounded-full border border-tv-cyan/70 bg-black/60 text-white shadow-lg shadow-tv-cyan/25 backdrop-blur-sm transition",
+        "hover:scale-105 hover:border-tv-cyan active:scale-95",
         dims,
         className,
       )}
@@ -161,13 +162,13 @@ export function MediaCard({
   footer,
 }: MediaCardProps) {
   const body = (
-    <CardShell className="p-3">
+    <CardShell className="border-tv-cyan/25 p-3 hover:border-tv-cyan/50">
       <div className="relative">
         <Artwork
           src={imageUrl}
           alt={title}
           rounded={shape === "circle" ? "rounded-full" : "rounded-xl"}
-          className="aspect-square w-full"
+          className="aspect-square w-full ring-1 ring-tv-cyan/40"
         />
         {badge ? <div className="absolute left-2 top-2">{badge}</div> : null}
         {onPlay ? (
@@ -184,8 +185,8 @@ export function MediaCard({
         ) : null}
       </div>
       <div className={cn("mt-3", shape === "circle" && "text-center")}>
-        <p className="truncate text-sm font-bold text-white">{title}</p>
-        {subtitle ? <p className="mt-0.5 truncate text-xs text-white/50">{subtitle}</p> : null}
+        <p className="truncate text-base font-bold text-white">{title}</p>
+        {subtitle ? <p className="mt-1 truncate text-sm text-white/55">{subtitle}</p> : null}
         {footer}
       </div>
     </CardShell>
