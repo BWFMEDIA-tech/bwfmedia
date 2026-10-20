@@ -57,7 +57,6 @@ export function IntroSplash() {
         ref={videoRef}
         src={introAsset.url}
         className="h-full w-full object-cover md:object-contain"
-        muted
         playsInline
         onEnded={dismiss}
         onError={dismiss}
