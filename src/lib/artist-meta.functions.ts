@@ -21,6 +21,10 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     if (profileRes.error) throw new Error("Unable to load artist profile. Please try again.");
     const id: string = profileRes.data?.id ?? data.id;
     try {
+      // Fetch the profile library stream first so the track limit applies to library rows only.
+      const libRes = await sb.from("streams").select("id")
+        .eq("host_id", id).eq("title", "__profile_library__").maybeSingle();
+      const profileLibraryId: string | null = (libRes.data as any)?.id ?? null;
       const [queueRes, tracksRes, videosRes, streamsRes, socialsRes, trackListRes, videoListRes, profileStreamRes] = await Promise.all([
         sb.from("live_queue_public").select("artist_name, photo_url").eq("id", id).maybeSingle(),
         sb.from("play_tracks").select("like_count, dislike_count, stream_id").eq("artist_user_id", id),
@@ -32,6 +36,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         sb.from("play_tracks")
           .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
           .eq("artist_user_id", id)
+          .eq("stream_id", profileLibraryId ?? "00000000-0000-0000-0000-000000000000")
           .order("like_count", { ascending: false })
           .limit(8),
         sb.from("videos")
@@ -43,11 +48,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         // ("__profile_library__"). Arena submissions create mirror
         // play_tracks rows in the arena's stream — those must NOT appear
         // on the profile, or every submission duplicates the track.
-        sb.from("streams")
-          .select("id")
-          .eq("host_id", id)
-          .eq("title", "__profile_library__")
-          .maybeSingle(),
+        Promise.resolve({ data: profileLibraryId ? { id: profileLibraryId } : null }),
       ]);
 
       const p = profileRes.data ?? {};

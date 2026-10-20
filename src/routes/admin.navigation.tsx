@@ -40,12 +40,14 @@ function NavigationEditor() {
   const move = (slot: string, id: string, dir: -1 | 1) =>
     setItems((prev) => {
       const list = [...(prev ?? [...(q.data?.items ?? [])])];
-      const idxs = list.map((r, i) => (r.slot === slot ? i : -1)).filter((i) => i >= 0);
-      const pos = idxs.findIndex((i) => list[i].id === id);
-      const swap = idxs[pos + dir];
-      if (swap === undefined) return list;
-      [list[idxs[pos]].position, list[swap].position] = [list[swap].position, list[idxs[pos]].position];
-      return list;
+      // Order by displayed position, swap with the visible neighbour, then renumber.
+      const slotRows = list.filter((r) => r.slot === slot).sort((a, b) => a.position - b.position);
+      const pos = slotRows.findIndex((r) => r.id === id);
+      const target = pos + dir;
+      if (pos < 0 || target < 0 || target >= slotRows.length) return list;
+      [slotRows[pos], slotRows[target]] = [slotRows[target], slotRows[pos]];
+      const newPos = new Map(slotRows.map((r, i) => [r.id, i + 1]));
+      return list.map((r) => (newPos.has(r.id) ? { ...r, position: newPos.get(r.id)! } : r));
     });
 
   const add = (slot: "primary" | "browse") =>
