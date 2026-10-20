@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import introAsset from "@/assets/tunevio-intro.mp4.asset.json";
+import introAsset from "@/assets/tunevio-intro-soundtrack.mp4.asset.json";
 
 /**
- * Site intro: plays the brand video once per browser session before the site
- * is presented — muted so autoplay works everywhere, with no sound step.
+ * Site intro: plays the video with its uploaded soundtrack once per session,
+ * attempting audible autoplay with no sound step.
  * Never traps the user: tap to skip, video end dismisses, and a fail-safe
  * timer removes the splash if playback stalls.
  */
