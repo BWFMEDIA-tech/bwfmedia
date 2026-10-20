@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import introAsset from "@/assets/tunevio-intro.mp4.asset.json";
 
 /**
  * Site intro: plays the brand video once per browser session before the site
- * is presented. Never traps the user — tap to skip, video end dismisses, and
- * a fail-safe timer removes the splash if playback stalls.
+ * is presented — muted so autoplay works everywhere, with no sound step.
+ * Never traps the user: tap to skip, video end dismisses, and a fail-safe
+ * timer removes the splash if playback stalls.
  */
 const SESSION_KEY = "tunevio:intro-played";
 
 export function IntroSplash() {
   const [show, setShow] = useState(false);
-  const [needsSound, setNeedsSound] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -29,15 +28,11 @@ export function IntroSplash() {
     if (!show) return;
     const video = videoRef.current;
     if (!video) return;
-    // Try with sound first; browsers reject unmuted autoplay, so fall back.
-    video.muted = false;
+    // Start muted so autoplay succeeds on every device — no enable step.
+    video.muted = true;
     video.play().catch(() => {
-      video.muted = true;
-      setNeedsSound(true);
-      video.play().catch(() => {
-        // Autoplay fully blocked — dismiss so the site is never blocked.
-        setShow(false);
-      });
+      // Autoplay fully blocked — dismiss so the site is never blocked.
+      setShow(false);
     });
     // Fail-safe: never leave the splash up longer than the clip can be.
     const failSafe = window.setTimeout(() => setShow(false), 12000);
@@ -47,15 +42,6 @@ export function IntroSplash() {
   if (!show) return null;
 
   const dismiss = () => setShow(false);
-  const enableSound = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    // Unlock audio without seeking or interrupting the ongoing intro.
-    video.muted = false;
-    video.volume = 1;
-    setNeedsSound(false);
-    video.play().catch(() => setNeedsSound(true));
-  };
 
   return (
     <div
@@ -67,8 +53,8 @@ export function IntroSplash() {
         ref={videoRef}
         src={introAsset.url}
         className="h-full w-full object-cover md:object-contain"
+        muted
         playsInline
-        onVolumeChange={(event) => setNeedsSound(event.currentTarget.muted || event.currentTarget.volume === 0)}
         onEnded={dismiss}
         onError={dismiss}
       />
@@ -82,15 +68,6 @@ export function IntroSplash() {
       >
         Skip
       </Button>
-      {needsSound && <Button
-        type="button"
-        onClick={enableSound}
-        aria-label="Enable sound"
-        className="absolute bottom-24 left-1/2 z-10 -translate-x-1/2 shadow-lg"
-      >
-        <Volume2 />
-        Enable sound
-      </Button>}
     </div>
   );
 }
