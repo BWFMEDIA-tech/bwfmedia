@@ -399,11 +399,13 @@ export function PlaylistCard({
         {onPlay ? (
           <div className="absolute bottom-2 right-2">
             <PlayFab
+              size="sm"
               onClick={(e) => {
                 e.preventDefault();
                 onPlay();
               }}
             />
+
           </div>
         ) : null}
         <span className="absolute bottom-2 left-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/80">
