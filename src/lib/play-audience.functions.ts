@@ -25,7 +25,9 @@ export const getAudiencePlayState = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!stream) return null;
 
-    const { data: playing } = await client
+    // play_tracks is not anon-readable; read only public-safe columns server-side.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: playing } = await (supabaseAdmin as any)
       .from("play_tracks")
       .select("id, title, artist_name, audio_url, cover_url, score, like_count, dislike_count")
       .eq("stream_id", stream.id)
