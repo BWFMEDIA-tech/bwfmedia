@@ -28,11 +28,15 @@ export function IntroSplash() {
     if (!show) return;
     const video = videoRef.current;
     if (!video) return;
-    // Start muted so autoplay succeeds on every device — no enable step.
-    video.muted = true;
+    // Try with sound first; if the browser blocks unmuted autoplay, keep
+    // playing muted instead of trapping the user.
+    video.muted = false;
     video.play().catch(() => {
-      // Autoplay fully blocked — dismiss so the site is never blocked.
-      setShow(false);
+      video.muted = true;
+      video.play().catch(() => {
+        // Autoplay fully blocked — dismiss so the site is never blocked.
+        setShow(false);
+      });
     });
     // Fail-safe: never leave the splash up longer than the clip can be.
     const failSafe = window.setTimeout(() => setShow(false), 12000);
