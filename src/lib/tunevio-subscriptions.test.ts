@@ -6,6 +6,14 @@ describe("TUNEVIO_PLANS pricing", () => {
     expect(TUNEVIO_PLANS.listener_premium.priceCents).toBe(699);
   });
 
+  it("charges the Artist Pro plan $9.99/mo", () => {
+    expect(TUNEVIO_PLANS.artist_pro.priceCents).toBe(999);
+  });
+
+  it("charges the Label Plan $49.99/mo", () => {
+    expect(TUNEVIO_PLANS.label_plan.priceCents).toBe(4999);
+  });
+
   it("offers the Artist Starter plan free at $0/mo", () => {
     expect(TUNEVIO_PLANS.artist_starter.priceCents).toBe(0);
   });
