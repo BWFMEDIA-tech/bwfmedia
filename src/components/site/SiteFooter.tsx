@@ -58,6 +58,7 @@ const menuGroups: Array<{
     links: [
       { label: "Privacy Policy", to: "/privacy" },
       { label: "Terms of Service", to: "/terms" },
+      { label: "Acceptable Use Policy", to: "/acceptable-use" },
       { label: "DMCA Policy", to: "/dmca" },
       { label: "Creator Agreement", to: "/creator-agreement" },
       { label: "Artist Submission Terms", to: "/artist-submission" },
