@@ -404,8 +404,10 @@ export function TunevioHome() {
             size="md"
             items={(feed?.artists ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
           />
+          )}
 
           {/* Made for you */}
+          {show("music") && (
           <PersonalRail
             id="made-for-you"
             title="Made For You"
@@ -413,8 +415,10 @@ export function TunevioHome() {
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
           />
+          )}
 
           {/* Charts */}
+          {show("music") && (
           <ContentRail
             id="charts"
             title="Tunevio Charts"
@@ -433,8 +437,10 @@ export function TunevioHome() {
               />
             ))}
           />
+          )}
 
           {/* Rising artists */}
+          {show("artists") && (
           <ContentRail
             id="rising"
             title="Rising Artists"
@@ -442,8 +448,10 @@ export function TunevioHome() {
             showAllTo="/leaderboard"
             items={(feed?.rising ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
           />
+          )}
 
           {/* Boosted */}
+          {show("artists") && (
           <ContentRail
             id="boosted"
             title="Boosted Artists"
