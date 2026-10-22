@@ -7,42 +7,45 @@ import logo from "@/assets/tunevio-logo.png.asset.json";
 
 type Leaf = { to: string; label: string; search?: Record<string, string>; params?: { id: string } };
 const GROUPS = [
-  { key: "music", label: "My Music", icon: Music2, children: [
-    { to: "/settings/music-media", label: "Songs & Albums" },
+  { key: "overview", label: "Overview", icon: LayoutDashboard, children: [
+    { to: "/artist-dashboard", label: "Metrics & Quick Actions" },
+    { to: "/notifications", label: "Recent Activity" },
+  ] },
+  { key: "music", label: "Music & Releases", icon: Music2, children: [
     { to: "/upload", label: "Upload Music & Video" },
-    { to: "/distribution", label: "Distribution" },
+    { to: "/settings/music-media", label: "Tracks, Releases & Artwork" },
+    { to: "/distribution", label: "Release Status & Distribution" },
     { to: "/rights", label: "Music Rights & Royalties" },
   ] },
-  { key: "performances", label: "Performances", icon: Radio, children: [
+  { key: "live", label: "Live & Arena", icon: Radio, children: [
     { to: "/go-live", label: "Go Live" },
     { to: "/live", label: "Live Stage" },
-    { to: "/play", label: "Play Arena" },
+    { to: "/play", label: "Battles & Tournaments" },
+    { to: "/recordings", label: "Replays" },
     { to: "/settings/events", label: "Events & Showcases" },
   ] },
-  { key: "profile", label: "My Artist Profile", icon: User, children: [
-    { to: "/settings/profile", label: "Photo, Banner & Biography" },
-    { to: "/settings/social-links", label: "Social Links" },
-  ] },
-  { key: "analytics", label: "Analytics", icon: BarChart3, children: [
+  { key: "performance", label: "Performance", icon: BarChart3, children: [
     { to: "/artist-analytics", label: "Streams & Audience Growth" },
-    { to: "/earnings", label: "Revenue Reports" },
+    { to: "/charts", label: "Charts" },
+    { to: "/leaderboard", label: "Leaderboard" },
   ] },
   { key: "community", label: "Fans & Community", icon: Users, children: [
-    { to: "/messages", label: "Messages" },
+    { to: "/messages", label: "Inbox" },
     { to: "/labels", label: "Labels & Teams" },
   ] },
   { key: "settings", label: "Settings", icon: Settings, children: [
-    { to: "/settings/billing", label: "Account & Billing" },
+    { to: "/settings/artist-info", label: "Artist Profile" },
+    { to: "/settings/profile", label: "Photo, Banner & Biography" },
+    { to: "/settings/social-links", label: "Social Links" },
+    { to: "/settings", label: "Account Preferences" },
+    { to: "/artist-store/manage", label: "Store" },
+    { to: "/earnings", label: "Earnings" },
+    { to: "/settings/payouts", label: "Payouts" },
     { to: "/settings/notifications", label: "Notifications" },
     { to: "/settings/security", label: "Security" },
-    { to: "/settings/appearance", label: "Appearance" },
-    { to: "/settings/connected-apps", label: "Connected Apps" },
-    { to: "/settings/membership", label: "Membership" },
-    { to: "/settings/payouts", label: "Payouts" },
-    { to: "/artist-store/manage", label: "Merch Store" },
-    { to: "/settings/broadcast-help", label: "Broadcast Help" },
   ] },
 ];
+
 
 export function ArtistDashboardShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -72,10 +75,6 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
           <Button variant="ghost" size="icon" aria-label="Close artist menu" className="ml-auto lg:hidden" onClick={() => setMobileOpen(false)}><X /></Button>
         </div>
         <nav aria-label="Artist Dashboard" className="h-[calc(100%-4rem)] overflow-y-auto px-2 py-4">
-          <Link to="/artist-dashboard" title="Overview" aria-current={pathname === "/artist-dashboard" ? "page" : undefined}
-            className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2.5 text-sm ${pathname === "/artist-dashboard" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted"}`}>
-            <LayoutDashboard className="h-4 w-4 shrink-0" /><span className={collapsed ? "lg:hidden" : ""}>Overview</span>
-          </Link>
           {GROUPS.map((group) => {
             const active = group.children.some((c) => c.to === pathname);
             const Icon = group.icon;
@@ -87,7 +86,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
               </Button>
               {open[group.key] && <div className={`ml-4 mt-1 border-l border-border pl-2 ${collapsed ? "lg:hidden" : ""}`}>
                 {group.children.map(navLink)}
-                {(group.key === "profile" || group.key === "community") && auth.user && navLink({ to: "/artist/$id", params: { id: auth.user.id }, label: group.key === "profile" ? "View My Artist Profile" : "Followers & Engagement" })}
+                {(group.key === "community") && auth.user && navLink({ to: "/artist/$id", params: { id: auth.user.id }, label: "Followers, Following & Comments" })}
               </div>}
             </div>;
           })}
