@@ -115,7 +115,7 @@ export function SiteHeader() {
   };
   const savedPrimary = rows.filter((r) => r.slot === "primary").map(toItem);
   const primarySource: NavItem[] = savedPrimary.length ? savedPrimary : DEFAULT_PRIMARY;
-  type Entry = { kind: "link"; to: string; label: string; icon: any; params?: any; search?: any } | { kind: "group"; key: string; label: string; items: NavItem[] };
+  type Entry = { kind: "link"; to: string; label: string; icon?: any; params?: any; search?: any } | { kind: "group"; key: string; label: string; items: NavItem[] };
   const entries: Entry[] = primarySource.flatMap((item): Entry[] => {
     if (item.to.startsWith("#")) {
       const key = item.to.slice(1);
