@@ -1179,20 +1179,47 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 .swara-home .swara-featured h2 { font-size: 28px; }
 
 /* Welcome page follows the imported music theme without changing account entry. */
-.tunevio-welcome { font-family: var(--font-body); letter-spacing: 0; }
-.tunevio-welcome > header { max-width: 1280px; margin-inline: auto; }
+.tunevio-welcome {
+  --welcome-edge: color-mix(in oklch, var(--brand-silver) 22%, transparent);
+  --welcome-glass: linear-gradient(145deg, color-mix(in oklch, var(--brand-silver) 6%, var(--background)), var(--background) 80%);
+  --welcome-shade: linear-gradient(180deg, color-mix(in oklch, var(--background) 40%, transparent), color-mix(in oklch, var(--background) 65%, transparent) 55%, var(--background));
+  --welcome-glow: 0 0 26px color-mix(in oklch, var(--primary) 15%, transparent);
+  --welcome-metal: linear-gradient(180deg, var(--foreground) 20%, var(--brand-silver) 75%, var(--muted-foreground));
+  font-family: var(--font-body); letter-spacing: 0;
+}
+.tunevio-welcome > header { max-width: 1280px; margin-inline: auto; border-bottom: 1px solid var(--welcome-edge); }
 .tunevio-welcome h1, .tunevio-welcome h2 { letter-spacing: 0; font-weight: 600; }
-.tunevio-welcome .welcome-action { border-radius: 24px; box-shadow: none; height: auto; min-height: 40px; white-space: normal; text-align: center; }
+.tunevio-welcome .welcome-action { border-radius: 6px; box-shadow: none; height: auto; min-height: 44px; white-space: normal; text-align: center; border-color: var(--welcome-edge); transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
 .tunevio-welcome .welcome-primary, .tunevio-welcome header a[href="/signup"], .tunevio-welcome a[href^="/signup?as="] { background: var(--reference-action); color: var(--reference-action-foreground); border-color: transparent; }
 .tunevio-welcome .welcome-primary:hover, .tunevio-welcome header a[href="/signup"]:hover, .tunevio-welcome a[href^="/signup?as="]:hover { background: var(--brand-silver); }
-.tunevio-welcome > section:first-of-type { padding-top: 64px; padding-bottom: 88px; }
+.tunevio-welcome > section:first-of-type { padding-top: 76px; padding-bottom: 76px; }
 .tunevio-welcome > section:first-of-type h1 { max-width: 850px; margin-inline: auto; }
-.tunevio-welcome > section:first-of-type h1 span { color: var(--foreground); }
+.tunevio-welcome .welcome-wordmark { font-size: 104px; background: var(--welcome-metal); background-clip: text; color: transparent; }
+.tunevio-welcome .welcome-wordmark span { color: var(--primary); }
+.welcome-hero-video { opacity: .8; object-position: center 40%; }
+.welcome-hero-shade { background: var(--welcome-shade); }
+.welcome-eyebrow { border-bottom: 1px solid var(--welcome-edge); padding-bottom: 12px; }
+.tunevio-welcome .welcome-primary:hover { box-shadow: var(--welcome-glow); }
+.welcome-role { position: relative; background: var(--welcome-glass); border-color: var(--welcome-edge); }
+.welcome-role::before { content: ""; position: absolute; top: -1px; left: 24px; width: 48px; height: 2px; background: var(--primary); }
+.welcome-role:nth-child(2)::before { background: var(--brand-silver); }
+.welcome-role:nth-child(3)::before { background: var(--accent); }
+.welcome-role h3 { font-weight: 500; }
+.welcome-screen > div { background: var(--welcome-glass); border-color: var(--welcome-edge); transition: border-color 200ms ease, box-shadow 200ms ease; }
+.welcome-screen:hover > div { border-color: var(--primary); box-shadow: var(--welcome-glow); }
+.welcome-caption-line { width: 28px; height: 1px; background: var(--primary); }
+.welcome-feature { background: transparent; border: 0; border-top: 1px solid var(--welcome-edge); border-radius: 0; }
+.welcome-poster img, .welcome-battle img { border-radius: 4px; }
+.tunevio-welcome #how-it-works span.rounded-full { border-radius: 4px; background: transparent; border: 1px solid var(--welcome-edge); color: var(--primary); }
 .tunevio-welcome [aria-labelledby="roles-heading"] { padding-top: 24px; }
 .tunevio-welcome li { line-height: 1.6; }
 .tunevio-welcome #how-it-works > div > div:first-of-type > div { border: 0; border-bottom: 1px solid var(--border); background: transparent; border-radius: 0; }
 @media (max-width: 640px) {
-  .tunevio-welcome > section:first-of-type { padding-top: 36px; padding-bottom: 56px; }
-  .tunevio-welcome h1 { font-size: 36px; line-height: 1.15; }
+  .tunevio-welcome > section:first-of-type { padding-top: 44px; padding-bottom: 44px; }
+  .tunevio-welcome .welcome-wordmark { font-size: 64px; line-height: 1.1; }
+  .tunevio-welcome .welcome-tagline { font-size: 24px; line-height: 1.35; }
   .tunevio-welcome header img { max-width: 112px; object-fit: contain; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tunevio-welcome .welcome-action, .welcome-screen > div { transition: none; }
 }
