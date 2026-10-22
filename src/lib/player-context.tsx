@@ -77,6 +77,20 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     repeat: "off",
   });
   stateRef.current = state;
+  // Restore the last queue (not playback) on this device so it survives a new session.
+  const queueRestoredRef = useRef(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("tunevio:queue") ?? "[]");
+      if (Array.isArray(saved) && saved.length) setState((p) => (p.queue.length ? p : { ...p, queue: saved.slice(0, 200) }));
+    } catch { /* ignore corrupt storage */ }
+    queueRestoredRef.current = true;
+  }, []);
+  useEffect(() => {
+    if (!queueRestoredRef.current) return;
+    try { localStorage.setItem("tunevio:queue", JSON.stringify(state.queue.slice(0, 200))); } catch { /* storage full or blocked */ }
+  }, [state.queue]);
+
 
   const previewLimitHandlerRef = useRef<(() => void) | null>(null);
   const setPreviewLimitHandler = useCallback((fn: (() => void) | null) => {
