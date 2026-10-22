@@ -44,3 +44,4 @@
 - [x] Show saved platform links with copy buttons on the /go-live prep screen; verified signed-in at 531x1494 that the chip renders, copies the real link, and that Edit platforms opens the connected-platforms settings.
 - [x] Remove the 01-06 labels above the video rows on /videos; verified no numbered labels remain and all row titles still show.
 - [x] Add welcome-page photo transitions (wipe reveals, scan sweeps, hover shine, slow breathing) and the three-phone app showcase with reveal, float and glow; poster, arena and showcase photos verified revealed at desktop and phone widths, no overflow or page errors, build OK; not published.
+- [x] Reorganize main menu, Artist Dashboard sidebar and General Settings (Oct 22)

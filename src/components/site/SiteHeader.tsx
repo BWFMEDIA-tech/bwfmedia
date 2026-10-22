@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link as RouterLink, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { getSiteNav } from "@/lib/site-nav.functions";
+
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -32,7 +32,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
 import { useCart } from "@/contexts/CartContext";
 import { SignedImg } from "@/components/ui/signed-img";
-import { artistDashboardDestination } from "@/lib/artist-navigation";
+import { artistDashboardDestination, hasArtistTools } from "@/lib/artist-navigation";
 
 function HeaderCartButton() {
   const { totalCount, openCart } = useCart();
@@ -55,31 +55,24 @@ function HeaderCartButton() {
 
 type NavItem = { to: string; label: string; icon?: any };
 
-const PRIMARY: NavItem[] = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/discover", label: "Discover Music", icon: Compass },
-  { to: "/live", label: "Live Stage", icon: Radio },
-  { to: "/artists", label: "Artists", icon: Music },
-  { to: "/profile", label: "My Profile", icon: User },
-  { to: "/artist-dashboard", label: "Artist Dashboard", icon: LayoutDashboard },
+// Main menu: Home · Artist Dashboard (artists) · Live Stage · Discover ▾ · Store ▾ · My Profile
+const MENU_GROUPS: { key: string; label: string; items: NavItem[] }[] = [
+  { key: "discover", label: "Discover", items: [
+    { to: "/discover", label: "Discover Music", icon: Compass },
+    { to: "/artists", label: "Artists", icon: Music },
+    { to: "/library", label: "Music Library", icon: Disc3 },
+    { to: "/videos", label: "Videos", icon: Mic },
+    { to: "/charts", label: "Charts", icon: BarChart3 },
+    { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
+    { to: "/play", label: "Battle Arena", icon: Radio },
+    { to: "/blog", label: "Blog", icon: Newspaper },
+    { to: "/events", label: "Events", icon: Calendar },
+  ] },
+  { key: "store", label: "Store", items: [
+    { to: "/artist-store", label: "Artist Store", icon: Disc3 },
+    { to: "/store", label: "Tunevio Store", icon: ShoppingCart },
+  ] },
 ];
-
-// "Book a Shoot" (/studio) and "Off Da Block" (/off-the-block) hidden for now — restore when ready.
-const BROWSE: NavItem[] = [
-  { to: "/library", label: "Music Library", icon: Music },
-  { to: "/store", label: "Tunevio Store", icon: ShoppingCart },
-  { to: "/artist-store", label: "Artist Store", icon: Disc3 },
-  { to: "/play", label: "Arena", icon: Music },
-  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
-  { to: "/videos", label: "Videos", icon: Mic },
-  { to: "/charts", label: "Charts", icon: BarChart3 },
-  { to: "/events", label: "Events", icon: Calendar },
-  { to: "/blog", label: "Blog", icon: Newspaper },
-  { to: "/contact", label: "Contact", icon: Mail },
-];
-
-// Editable navigation (admin "Navigation Bar" page) overrides these defaults when saved.
-const NAV_ICONS: Record<string, any> = { Home, Compass, Radio, Music, User, LayoutDashboard, ShoppingCart, Disc3, Trophy, BarChart3, Calendar, Newspaper, Mail, Mic };
 
 function useActivePath() {
   return useRouterState({ select: (s) => s.location.pathname });
@@ -89,7 +82,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [browseOpen, setBrowseOpen] = useState(false);
+  const [browseOpen, setBrowseOpen] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const browseRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -99,22 +92,22 @@ export function SiteHeader() {
   const isAdmin = auth.roles.includes("admin");
   const isManager = auth.roles.includes("manager");
   const canBroadcast = isAdmin || isManager;
-  const navQ = useQuery({ queryKey: ["site-nav"], queryFn: () => getSiteNav(), staleTime: 60_000 });
-  const dbPrimary = (navQ.data?.items ?? []).filter((i) => i.slot === "primary" && i.visible);
-  const dbBrowse = (navQ.data?.items ?? []).filter((i) => i.slot === "browse" && i.visible);
-  const toNavItem = (i: { to_path: string; label: string; icon: string }): NavItem => ({ to: i.to_path, label: i.label, icon: NAV_ICONS[i.icon] ?? Music });
-  const primarySource: NavItem[] = dbPrimary.length ? dbPrimary.map(toNavItem) : PRIMARY;
-  const browseSource: NavItem[] = dbBrowse.length ? dbBrowse.map(toNavItem) : BROWSE;
-  const primary = primarySource.map((item) => {
-    if (item.to === "/artist-dashboard") {
-      const to = artistDashboardDestination(auth.roles);
-      return { ...item, to, search: to === "/signup" ? { as: "artist" } : undefined, params: undefined };
-    }
-    if (item.to === "/profile") {
-      return { ...item, to: auth.user ? "/artist/$id" : "/login", params: auth.user ? { id: auth.user.id } : undefined, search: undefined };
-    }
-    return { ...item, search: undefined, params: undefined };
-  });
+  const primary = [
+    { to: "/", label: "Home", icon: Home, search: undefined, params: undefined },
+    ...(hasArtistTools(auth.roles)
+      ? [{ to: artistDashboardDestination(auth.roles), label: "Artist Dashboard", icon: LayoutDashboard, search: undefined, params: undefined }]
+      : []),
+    { to: "/live", label: "Live Stage", icon: Radio, search: undefined, params: undefined },
+    auth.user
+      ? { to: "/artist/$id", label: "My Profile", icon: User, params: { id: auth.user.id }, search: undefined }
+      : { to: "/login", label: "My Profile", icon: User, params: undefined, search: undefined },
+  ];
+  const accountLinks: NavItem[] = [
+    { to: "/settings", label: "Settings", icon: Settings },
+    { to: "/install", label: "Install Tunevio", icon: Download },
+    ...(canBroadcast ? [{ to: "/stream-studio", label: "Stream Studio", icon: Radio }] : []),
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: BarChart3 }] : []),
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -126,7 +119,7 @@ export function SiteHeader() {
   // Close dropdowns on outside click
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (browseRef.current && !browseRef.current.contains(e.target as Node)) setBrowseOpen(false);
+      if (browseRef.current && !browseRef.current.contains(e.target as Node)) setBrowseOpen(null);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
     };
     document.addEventListener("mousedown", onClick);
@@ -136,7 +129,7 @@ export function SiteHeader() {
   // Close mobile menu on route change
   useEffect(() => {
     setOpen(false);
-    setBrowseOpen(false);
+    setBrowseOpen(null);
     setProfileOpen(false);
   }, [pathname]);
 
@@ -183,9 +176,9 @@ export function SiteHeader() {
 
         {/* Desktop primary nav */}
         <div className="hidden lg:flex items-center gap-1 mx-auto">
-          {primary.map((item) => {
+          {primary.map((item, idx) => {
             const active = isActive(item.to);
-            return (
+            const link = (
               <RouterLink
                 key={item.label}
                 to={item.to}
@@ -206,61 +199,59 @@ export function SiteHeader() {
                 )}
               </RouterLink>
             );
+            // Discover and Store dropdowns sit between Live Stage and My Profile.
+            if (idx !== primary.length - 1) return link;
+            return (
+              <div key="groups" className="flex items-center gap-1">
+                <div className="flex items-center gap-1" ref={browseRef}>
+                  {MENU_GROUPS.map((group) => {
+                    const groupActive = group.items.some((i) => isActive(i.to));
+                    const isOpen = browseOpen === group.key;
+                    return (
+                      <div key={group.key} className="relative">
+                        <button
+                          type="button"
+                          aria-expanded={isOpen}
+                          onClick={() => setBrowseOpen(isOpen ? null : group.key)}
+                          className={`inline-flex items-center gap-1 px-2 py-2 text-xs xl:text-sm font-medium transition-colors ${
+                            isOpen || groupActive ? "text-bone" : "text-bone/65 hover:text-bone"
+                          }`}
+                        >
+                          {group.label}
+                          <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -6 }}
+                              transition={{ duration: 0.15 }}
+                              className="absolute left-0 mt-2 w-60 rounded-xl border border-border bg-card/98 backdrop-blur-xl shadow-2xl overflow-hidden p-1.5"
+                            >
+                              {group.items.map((sub) => (
+                                <RouterLink
+                                  key={sub.to}
+                                  to={sub.to}
+                                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-bone/80 rounded-lg hover:bg-blood/15 hover:text-bone transition-colors"
+                                >
+                                  <span className="w-7 h-7 grid place-items-center rounded-md bg-blood/15 text-blood">
+                                    <sub.icon size={14} />
+                                  </span>
+                                  {sub.label}
+                                </RouterLink>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+                {link}
+              </div>
+            );
           })}
-
-          {/* Browse dropdown */}
-          <div className="relative" ref={browseRef}>
-            <button
-              onClick={() => setBrowseOpen((v) => !v)}
-              className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors ${
-                browseOpen ? "text-bone" : "text-bone/65 hover:text-bone"
-              }`}
-            >
-              Browse
-              <ChevronDown size={14} className={`transition-transform ${browseOpen ? "rotate-180" : ""}`} />
-            </button>
-            <AnimatePresence>
-              {browseOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute left-0 mt-2 w-64 rounded-xl border border-white/10 bg-[#0d0d12]/98 backdrop-blur-xl shadow-2xl overflow-hidden p-1.5"
-                >
-                  {browseSource.map((item) => (
-                    <RouterLink
-                      key={`${item.to}-${item.label}`}
-                      to={item.to}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm text-bone/80 rounded-lg hover:bg-blood/15 hover:text-bone transition-colors"
-                    >
-                      <span className="w-7 h-7 grid place-items-center rounded-md bg-blood/15 text-blood">
-                        <item.icon size={14} />
-                      </span>
-                      {item.label}
-                    </RouterLink>
-                  ))}
-                  <RouterLink to="/install" className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground rounded-md hover:bg-secondary">
-                    <Download size={18} className="text-primary" /> Install Tunevio
-                  </RouterLink>
-                  {canBroadcast && (
-                    <>
-                      <div className="h-px my-1.5 bg-white/10" />
-                      <RouterLink
-                        to="/stream-studio"
-                        className="flex items-center gap-3 px-3 py-2.5 text-sm text-bone/80 rounded-lg hover:bg-blood/15 hover:text-bone transition-colors"
-                      >
-                        <span className="w-7 h-7 grid place-items-center rounded-md bg-blood text-white">
-                          <Radio size={14} />
-                        </span>
-                        Stream Studio
-                      </RouterLink>
-                    </>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
 
         {/* Spacer */}
@@ -314,17 +305,11 @@ export function SiteHeader() {
                         <div className="text-sm font-semibold text-bone truncate">{auth.displayName || "User"}</div>
                         <div className="text-[11px] text-bone/50 truncate">{auth.user?.email}</div>
                       </div>
-                      <RouterLink to="/artist/$id" params={{ id: auth.user?.id ?? "" }} className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
-                        <User size={15} /> My Profile
-                      </RouterLink>
-                      <RouterLink to="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
-                        <Settings size={15} /> Settings
-                      </RouterLink>
-                      {isAdmin && (
-                        <RouterLink to="/admin" className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
-                          <BarChart3 size={15} /> Admin
+                      {accountLinks.map((l) => (
+                        <RouterLink key={l.to} to={l.to} className="flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5">
+                          <l.icon size={15} /> {l.label}
                         </RouterLink>
-                      )}
+                      ))}
                       <button
                         onClick={handleSignOut}
                         className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-bone/80 hover:bg-white/5 border-t border-white/10"
@@ -413,32 +398,28 @@ export function SiteHeader() {
                 </div>
               </div>
 
-              <div>
-                <div className="font-cond text-[10px] tracking-[0.4em] uppercase text-bone/40 mb-2 px-1">More</div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {browseSource.map((item) => (
-                    <RouterLink
-                      key={`${item.to}-${item.label}`}
-                      to={item.to}
-                      className="flex items-center gap-2 px-3 py-3 rounded-lg border border-white/10 bg-white/[0.03] text-sm text-bone/75 hover:text-bone transition-colors"
-                    >
-                      <item.icon size={15} className="text-blood/80" />
-                      {item.label}
-                    </RouterLink>
-                  ))}
-                  <RouterLink to="/install" className="flex min-w-0 items-center gap-2 px-3 py-3 rounded-md border border-border text-sm text-foreground">
-                    <Download size={18} className="shrink-0 text-primary" /> Install Tunevio
-                  </RouterLink>
-                  {canBroadcast && (
-                    <RouterLink
-                      to="/stream-studio"
-                      className="flex items-center gap-2 px-3 py-3 rounded-lg border border-blood/40 bg-blood/10 text-sm text-bone font-medium"
-                    >
-                      <Radio size={15} className="text-blood" /> Stream Studio
-                    </RouterLink>
-                  )}
-                </div>
-              </div>
+              {MENU_GROUPS.map((group) => (
+                <details key={group.key} className="group" open={group.items.some((i) => isActive(i.to))}>
+                  <summary className="flex cursor-pointer list-none items-center justify-between px-1 py-2 font-cond text-[10px] tracking-[0.4em] uppercase text-bone/60">
+                    {group.label}
+                    <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="grid grid-cols-2 gap-1.5 pt-1">
+                    {group.items.map((item) => (
+                      <RouterLink
+                        key={item.to}
+                        to={item.to}
+                        aria-current={isActive(item.to) ? "page" : undefined}
+                        className="flex min-w-0 items-center gap-2 px-3 py-3 rounded-lg border border-white/10 bg-white/[0.03] text-sm text-bone/75 hover:text-bone transition-colors"
+                      >
+                        <item.icon size={15} className="shrink-0 text-blood/80" />
+                        <span className="min-w-0">{item.label}</span>
+                      </RouterLink>
+                    ))}
+                  </div>
+                </details>
+              ))}
+
 
               <div className="pt-3 border-t border-white/10">
                 {auth.isAuthenticated ? (
@@ -456,17 +437,11 @@ export function SiteHeader() {
                         <div className="text-[11px] text-bone/50 truncate">{auth.user?.email}</div>
                       </div>
                     </div>
-                    <RouterLink to="/artist/$id" params={{ id: auth.user?.id ?? "" }} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
-                      <User size={15} /> My Profile
-                    </RouterLink>
-                    <RouterLink to="/settings" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
-                      <Settings size={15} /> Settings
-                    </RouterLink>
-                    {isAdmin && (
-                      <RouterLink to="/admin" className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
-                        <BarChart3 size={15} /> Admin
+                    {accountLinks.map((l) => (
+                      <RouterLink key={l.to} to={l.to} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5">
+                        <l.icon size={15} /> {l.label}
                       </RouterLink>
-                    )}
+                    ))}
                     <button
                       onClick={handleSignOut}
                       className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-bone/80 hover:bg-white/5"
