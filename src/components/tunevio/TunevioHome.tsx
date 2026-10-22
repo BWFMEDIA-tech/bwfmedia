@@ -470,6 +470,7 @@ export function TunevioHome() {
               />
             ))}
           />
+          )}
 
           {!isLoading && !feed?.charts.length ? (
             <div className="rounded-2xl border border-tv-line bg-tv-surface p-10 text-center">
