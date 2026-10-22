@@ -32,6 +32,32 @@ const welcomeScreens = [
   { image: waitingPlayer, title: "The Next Drop", alt: "Tunevio music queue waiting for the next track" },
 ];
 
+const easeOutExpo: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const galleryVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.08 } },
+};
+
+const screenVariants = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOutExpo } },
+};
+
+const screenImageVariants = {
+  hidden: { opacity: 0, scale: 1.12, filter: "blur(12px)" },
+  show: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.9, ease: easeOutExpo } },
+};
+
+const scanVariants = {
+  hidden: { opacity: 0, y: "-100%" },
+  show: {
+    opacity: [0, 1, 1, 0],
+    y: ["-100%", "-40%", "55%", "100%"],
+    transition: { duration: 1.25, ease: "easeInOut" },
+  },
+};
+
 function trackCta(label: string) {
   try {
     (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq?.(
@@ -241,12 +267,21 @@ export function LandingPage() {
 
       <section className="welcome-poster px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
         <div className="mx-auto max-w-6xl">
-          <img
-            src={welcomePoster.url}
-            alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
-            className="block h-auto w-full rounded-lg"
-            fetchPriority="high"
-          />
+          <motion.div
+            initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+            whileInView={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 1.1, ease: easeOutExpo }}
+            className="welcome-poster-frame relative overflow-hidden rounded-lg"
+          >
+            <img
+              src={welcomePoster.url}
+              alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
+              className="welcome-poster-img block h-auto w-full"
+              fetchPriority="high"
+            />
+            <span className="welcome-shine" aria-hidden="true" />
+          </motion.div>
         </div>
       </section>
 
@@ -317,32 +352,66 @@ export function LandingPage() {
               nobody misses the moment.
             </p>
           </motion.div>
-          <motion.img
-            src={battlePoster.url}
-            alt="Two artists in a live head-to-head music battle on Tunevio"
-            loading="lazy"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+          <motion.div
+            initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+            whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-            className="w-full rounded-lg border border-border "
-          />
+            transition={{ duration: 1, ease: easeOutExpo }}
+            className="welcome-battle-frame relative overflow-hidden rounded-lg border border-border"
+          >
+            <motion.img
+              src={battlePoster.url}
+              alt="Two artists in a live head-to-head music battle on Tunevio"
+              loading="lazy"
+              initial={{ opacity: 0, scale: 1.12 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 1.2, ease: easeOutExpo }}
+              whileHover={{ scale: 1.04 }}
+              className="welcome-battle-img w-full"
+            />
+            <motion.span
+              className="welcome-scan"
+              aria-hidden="true"
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={scanVariants}
+            />
+            <span className="welcome-shine" aria-hidden="true" />
+          </motion.div>
         </div>
       </section>
 
       <section className="px-5 sm:px-10 pb-24" aria-labelledby="community-images-heading">
         <div className="mx-auto max-w-6xl">
           <h2 id="community-images-heading" className="text-3xl sm:text-4xl text-center">Inside Tunevio</h2>
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+          <motion.div
+            variants={galleryVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-80px" }}
+            className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10"
+          >
             {welcomeScreens.map((screen) => (
-              <figure key={screen.title} className="welcome-screen min-w-0">
-                <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
-                  <img src={screen.image.url} alt={screen.alt} loading="lazy" className="h-full w-full object-contain" />
+              <motion.figure key={screen.title} variants={screenVariants} className="welcome-screen min-w-0">
+                <div className="welcome-screen-frame relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
+                  <motion.img
+                    variants={screenImageVariants}
+                    src={screen.image.url}
+                    alt={screen.alt}
+                    loading="lazy"
+                    whileHover={{ scale: 1.06 }}
+                    transition={{ duration: 0.6, ease: easeOutExpo }}
+                    className="welcome-img h-full w-full object-contain"
+                  />
+                  <motion.span className="welcome-scan" aria-hidden="true" variants={scanVariants} />
+                  <span className="welcome-shine" aria-hidden="true" />
                 </div>
                 <figcaption className="mt-4 flex items-center justify-between text-base font-medium">{screen.title}<span aria-hidden="true" className="welcome-caption-line" /></figcaption>
-              </figure>
+              </motion.figure>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
