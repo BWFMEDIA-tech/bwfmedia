@@ -1223,3 +1223,26 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
   .tunevio-welcome .welcome-action, .welcome-screen > div { transition: none; }
 }
+
+/* Ambient welcome-page lighting: a blue scan line travelling up and down plus glowing corners. */
+.welcome-ambient { position: fixed; inset: 0; z-index: 30; pointer-events: none; mix-blend-mode: screen; overflow: hidden; }
+.welcome-corner { position: absolute; width: 46vmax; height: 46vmax; }
+.welcome-corner-tl { top: -14vmax; left: -14vmax; background: radial-gradient(circle at 32% 32%, color-mix(in srgb, var(--primary) 26%, transparent), transparent 60%); }
+.welcome-corner-tr { top: -14vmax; right: -14vmax; background: radial-gradient(circle at 68% 32%, color-mix(in srgb, var(--brand-blue) 34%, transparent), transparent 60%); }
+.welcome-corner-bl { bottom: -14vmax; left: -14vmax; background: radial-gradient(circle at 32% 68%, color-mix(in srgb, var(--brand-blue) 30%, transparent), transparent 60%); }
+.welcome-corner-br { bottom: -14vmax; right: -14vmax; background: radial-gradient(circle at 68% 68%, color-mix(in srgb, var(--primary) 24%, transparent), transparent 60%); }
+.welcome-rail { position: absolute; top: 0; bottom: 0; width: 1px; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--primary) 34%, transparent) 14%, color-mix(in srgb, var(--primary) 34%, transparent) 86%, transparent); }
+.welcome-rail-left { left: 14px; }
+.welcome-rail-right { right: 14px; }
+.welcome-rail-pulse { position: absolute; left: -1.5px; width: 4px; height: 26vh; border-radius: 999px; background: linear-gradient(180deg, transparent, var(--primary), transparent); box-shadow: 0 0 22px color-mix(in srgb, var(--primary) 65%, transparent); animation: welcome-rail-travel 9s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.welcome-rail-right .welcome-rail-pulse { animation-delay: -4.5s; }
+@keyframes welcome-rail-travel { from { top: -28vh; } to { top: 100%; } }
+@media (max-width: 640px) {
+  .welcome-rail { opacity: .5; }
+  .welcome-rail-left { left: 8px; }
+  .welcome-rail-right { right: 8px; }
+  .welcome-corner { width: 72vw; height: 72vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-rail-pulse { animation: none; top: 34%; }
+}
