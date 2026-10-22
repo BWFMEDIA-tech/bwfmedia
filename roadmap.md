@@ -49,3 +49,4 @@
 - [x] Complete the eight menu pages audit: Library now shows followed artists, recent plays and saved videos; Events shows past events and an Arena link (Oct 22)
 - [x] QA the eight menu pages: unavailable saved/recent tracks now shown, retry buttons, queue kept across sessions on the device; desktop + phone verified (Oct 22)
 
+- [x] Move Music Videos directly below Playlists for You on the home page; verified signed-in at 531px that Playlists sits above Music Videos which sits above Top Songs, section renders real video cards with no page errors, build OK, not published.
