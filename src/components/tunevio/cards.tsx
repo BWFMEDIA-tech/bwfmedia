@@ -51,7 +51,6 @@ export function CardShell({
   children: ReactNode;
   interactive?: boolean;
 }) {
-  const [failed, setFailed] = useState<string | null>(null);
   return (
     <div
       className={cn(
@@ -77,6 +76,7 @@ export function Artwork({
   className?: string;
   rounded?: string;
 }) {
+  const [failed, setFailed] = useState<string | null>(null);
   return (
     <div
       className={cn(

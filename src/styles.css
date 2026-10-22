@@ -1172,3 +1172,8 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 .swara-swatch-blue { background: var(--brand-blue); }
 .swara-swatch-silver { background: var(--brand-silver); }
 .swara-swatch-electric { background: var(--accent); }
+.swara-home .swara-featured { border: 0; border-radius: 0; background: transparent; }
+.swara-home .swara-featured > div:first-child { display: none; }
+.swara-home .swara-featured > div:last-child { padding: 16px 0; }
+.swara-home .swara-featured button:first-child { background: var(--reference-action); color: var(--reference-action-foreground); }
+.swara-home .swara-featured h2 { font-size: 28px; }
