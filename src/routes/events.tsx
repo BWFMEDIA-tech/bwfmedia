@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -43,7 +43,7 @@ function formatDate(iso: string) {
 
 function EventsPage() {
   const fetchEvents = useServerFn(listPublicEvents);
-  const { data: events = [] } = useQuery({
+  const { data: events = [], isPending, isError, refetch } = useQuery({
     queryKey: ["public-events"],
     queryFn: () => fetchEvents(),
     staleTime: 60_000,
@@ -64,6 +64,10 @@ function EventsPage() {
     const now = new Date();
     return events.filter((e) => new Date(e.starts_at) >= now).slice(0, 8);
   }, [events]);
+  const past = useMemo(() => {
+    const now = new Date();
+    return events.filter((e) => new Date(e.ends_at ?? e.starts_at) < now).reverse().slice(0, 8);
+  }, [events]);
 
   return (
     <div className="swara-events min-h-screen bg-background text-foreground">
@@ -78,6 +82,12 @@ function EventsPage() {
           </p>
         </header>
 
+        <Link to="/mic-drop" className="mb-6 flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-card px-4 py-3 text-sm hover:border-primary">
+          <span><span className="font-semibold text-primary">Battle Arena</span> · live battles, voting and 24-hour replays</span>
+          <ExternalLink className="h-4 w-4 shrink-0" />
+        </Link>
+        {isPending && <p className="mb-6 text-sm text-muted-foreground">Loading events…</p>}
+        {isError && <p className="mb-6 text-sm text-destructive">Couldn’t load events. <button className="underline" onClick={() => void refetch()}>Retry</button></p>}
         <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
           <section className="swara-event-calendar rounded-lg border border-border bg-card p-3 sm:p-5 w-fit max-w-full">
             <Calendar
@@ -116,6 +126,14 @@ function EventsPage() {
             )}
           </div>
         </section>
+        {past.length > 0 && (
+          <section className="mt-10">
+            <h2 className="text-xl font-semibold text-foreground">Past events</h2>
+            <div className="mt-3 grid gap-3 opacity-80 sm:grid-cols-2">
+              {past.map((e) => <EventCard key={e.id} event={e} withDate />)}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
