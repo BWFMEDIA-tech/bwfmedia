@@ -63,7 +63,7 @@ export function ArtistDashboardShell({ children }: { children: ReactNode }) {
     </Link>
   );
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="swara-dashboard-shell min-h-screen bg-background text-foreground flex">
       <aside className={`fixed bottom-0 top-[calc(var(--bwf-banner-h,0px)+72px)] left-0 z-40 w-64 border-r border-border bg-card transition-transform lg:sticky lg:top-[calc(var(--bwf-banner-h,0px)+80px)] lg:h-[calc(100vh-80px)] lg:translate-x-0 ${collapsed ? "lg:w-16" : "lg:w-64"} ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-16 items-center border-b border-border px-3">
           <Link to="/" aria-label="Tunevio home" className={collapsed ? "block lg:hidden" : "block"}>

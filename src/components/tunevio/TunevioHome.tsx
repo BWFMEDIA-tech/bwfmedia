@@ -43,6 +43,11 @@ import {
 const SIDEBAR = [
   { to: "/", label: "Home", icon: Home },
   { to: "/search", label: "Search", icon: Search },
+  { to: "/library", label: "Library", icon: ListMusic },
+  { to: "/settings", label: "Account", icon: Users },
+  { to: "/messages", label: "Inbox", icon: Bell },
+  { to: "/events", label: "Events", icon: Clock },
+  { to: "/store", label: "Store", icon: Heart },
   { to: "/charts", label: "Charts", icon: Trophy },
   { to: "/discover", label: "Discover", icon: Compass },
   { to: "/live", label: "Live", icon: Radio },
@@ -84,13 +89,13 @@ export function TunevioHome() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const quickAccess = [
-    { title: "Liked Songs", icon: <Heart className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-magenta to-tv-violet", section: "made-for-you" },
+    { title: "Liked Songs", icon: <Heart className="h-5 w-5" />, gradient: "bg-secondary", to: "/library" },
     { title: "Recently Played", imageUrl: feed?.discover[0]?.coverUrl ?? null, icon: <Clock className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-blue-600", section: "jump-back-in" },
-    { title: "Daily Mix", imageUrl: feed?.discover[1]?.coverUrl ?? feed?.popular[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-violet-500 to-fuchsia-600", section: "made-for-you" },
+    { title: "Daily Mix", imageUrl: feed?.discover[1]?.coverUrl ?? feed?.popular[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-secondary", section: "made-for-you" },
     { title: "Trending Now", imageUrl: feed?.trending[0]?.coverUrl ?? null, icon: <Flame className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-accent", section: "trending" },
     { title: "New Releases", imageUrl: feed?.newReleases[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-accent to-tv-cyan", section: "new-releases" },
-    { title: "Your Playlists", icon: <ListMusic className="h-5 w-5" />, gradient: "bg-gradient-to-br from-brand-silver to-ash", section: "made-for-you" },
-    { title: "Following Artists", icon: <Users className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-violet to-indigo-700", section: "artists-you-follow" },
+    { title: "Your Queue", icon: <ListMusic className="h-5 w-5" />, gradient: "bg-secondary", to: "/library" },
+    { title: "Following Artists", icon: <Users className="h-5 w-5" />, gradient: "bg-secondary", section: "artists-you-follow" },
     { title: "Play Arena", icon: <Mic2 className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-accent", to: "/mic-drop" },
   ];
 
@@ -187,9 +192,64 @@ export function TunevioHome() {
             </div>
           </header>
 
+          {/* Discover playlists */}
+          <ContentRail
+            id="discover"
+            title="Playlists for You"
+            eyebrow="Curated for the culture"
+            showAllTo="/discover"
+            size="md"
+            items={[
+              <PlaylistCard
+                key="fresh"
+                title="Fresh Finds"
+                description="The newest uploads across the network."
+                imageUrl={feed?.newReleases[0]?.coverUrl}
+                count={feed?.newReleases.length ?? 0}
+                onPlay={() => playAll(feed?.newReleases)}
+              />,
+              <PlaylistCard
+                key="hot"
+                title="Hot Right Now"
+                description="What the platform is spinning today."
+                imageUrl={feed?.trending[0]?.coverUrl}
+                count={feed?.trending.length ?? 0}
+                onPlay={() => playAll(feed?.trending)}
+              />,
+              <PlaylistCard
+                key="top"
+                title="Chart Toppers"
+                description="Highest rated tracks on Tunevio."
+                imageUrl={feed?.charts[0]?.coverUrl}
+                count={feed?.charts.length ?? 0}
+                onPlay={() => playAll(feed?.charts)}
+              />,
+              <PlaylistCard
+                key="deep"
+                title="Deep Cuts"
+                description="Hidden gems rotating every 30 minutes."
+                imageUrl={feed?.discover[0]?.coverUrl}
+                count={feed?.discover.length ?? 0}
+                onPlay={() => playAll(feed?.discover)}
+              />,
+            ]}
+          />
+
+          {/* Popular this week */}
+          <ListSection
+            id="popular"
+            title="Top Songs"
+            eyebrow="Most played"
+            showAllTo="/charts"
+          >
+            {(feed?.popular ?? []).slice(0, 10).map((t, i) => (
+              <TrackCard key={t.id} track={t} index={i + 1} queue={feed?.popular} />
+            ))}
+          </ListSection>
+
           {/* Quick access bento grid */}
-          <section>
-            <h2 className="mb-3 px-1 text-lg font-black sm:text-xl">Good to see you</h2>
+          <section className="swara-home-tools">
+            <h2 className="mb-3 px-1 text-lg font-black sm:text-xl">Your Tunevio</h2>
             <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
               {quickAccess.map((q) => (
                 <QuickAccessCard
@@ -199,7 +259,7 @@ export function TunevioHome() {
                   imageUrl={"imageUrl" in q ? q.imageUrl : undefined}
                   gradient={q.gradient}
                   to={q.to}
-                  onClick={q.section ? () => scrollTo(q.section!) : undefined}
+                  onClick={q.section ? () => scrollTo(q.section) : undefined}
                   onPlay={
                     q.title === "Trending Now"
                       ? () => playAll(feed?.trending)
@@ -212,9 +272,6 @@ export function TunevioHome() {
             </div>
           </section>
 
-          {/* Featured hero */}
-          {feed?.featured ? <FeaturedCard track={feed.featured} queue={feed.charts} /> : null}
-
           {isLoading ? (
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -222,6 +279,9 @@ export function TunevioHome() {
               ))}
             </div>
           ) : null}
+
+          {/* Featured hero */}
+          {feed?.featured ? <FeaturedCard track={feed.featured} queue={feed.charts} /> : null}
 
           {/* Live now */}
           <ContentRail
@@ -294,18 +354,6 @@ export function TunevioHome() {
             items={(feed?.artists ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
           />
 
-          {/* Popular this week */}
-          <ListSection
-            id="popular"
-            title="Popular This Week"
-            eyebrow="Most played"
-            showAllTo="/charts"
-          >
-            {(feed?.popular ?? []).slice(0, 10).map((t, i) => (
-              <TrackCard key={t.id} track={t} index={i + 1} queue={feed?.popular} />
-            ))}
-          </ListSection>
-
           {/* Made for you */}
           <PersonalRail
             id="made-for-you"
@@ -362,49 +410,6 @@ export function TunevioHome() {
                 }
               />
             ))}
-          />
-
-          {/* Discover playlists */}
-          <ContentRail
-            id="discover"
-            title="Discover"
-            eyebrow="Curated for the culture"
-            showAllTo="/discover"
-            size="md"
-            items={[
-              <PlaylistCard
-                key="fresh"
-                title="Fresh Finds"
-                description="The newest uploads across the network."
-                imageUrl={feed?.newReleases[0]?.coverUrl}
-                count={feed?.newReleases.length ?? 0}
-                onPlay={() => playAll(feed?.newReleases)}
-              />,
-              <PlaylistCard
-                key="hot"
-                title="Hot Right Now"
-                description="What the platform is spinning today."
-                imageUrl={feed?.trending[0]?.coverUrl}
-                count={feed?.trending.length ?? 0}
-                onPlay={() => playAll(feed?.trending)}
-              />,
-              <PlaylistCard
-                key="top"
-                title="Chart Toppers"
-                description="Highest rated tracks on Tunevio."
-                imageUrl={feed?.charts[0]?.coverUrl}
-                count={feed?.charts.length ?? 0}
-                onPlay={() => playAll(feed?.charts)}
-              />,
-              <PlaylistCard
-                key="deep"
-                title="Deep Cuts"
-                description="Hidden gems rotating every 30 minutes."
-                imageUrl={feed?.discover[0]?.coverUrl}
-                count={feed?.discover.length ?? 0}
-                onPlay={() => playAll(feed?.discover)}
-              />,
-            ]}
           />
 
           {!isLoading && !feed?.charts.length ? (

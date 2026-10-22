@@ -35,6 +35,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as HostEarningsRouteImport } from './routes/host-earnings'
 import { Route as InstallRouteImport } from './routes/install'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -125,6 +126,7 @@ import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
 import { Route as PlayRanksRouteImport } from './routes/play.ranks'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings.appearance'
 import { Route as SettingsArtistInfoRouteImport } from './routes/settings.artist-info'
 import { Route as SettingsBillingRouteImport } from './routes/settings.billing'
@@ -290,6 +292,11 @@ const InstallRoute = InstallRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveRoute = LiveRouteImport.update({
@@ -748,6 +755,11 @@ const PlayRanksRoute = PlayRanksRouteImport.update({
   path: '/play/ranks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const SettingsAppearanceRoute = SettingsAppearanceRouteImport.update({
   id: '/appearance',
   path: '/appearance',
@@ -963,6 +975,7 @@ export interface FileRoutesByFullPath {
   '/host-earnings': typeof HostEarningsRoute
   '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/library': typeof LibraryRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
@@ -1070,6 +1083,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1115,6 +1129,7 @@ export interface FileRoutesByTo {
   '/host-earnings': typeof HostEarningsRoute
   '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/library': typeof LibraryRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
@@ -1132,7 +1147,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/rights': typeof RightsRoute
   '/search': typeof SearchRoute
-  '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/store': typeof StoreRoute
@@ -1222,6 +1236,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/labels': typeof LabelsIndexRoute
   '/play': typeof PlayIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/videos': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1270,6 +1285,7 @@ export interface FileRoutesById {
   '/host-earnings': typeof HostEarningsRoute
   '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/library': typeof LibraryRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
@@ -1377,6 +1393,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/videos/': typeof VideosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1426,6 +1443,7 @@ export interface FileRouteTypes {
     | '/host-earnings'
     | '/install'
     | '/leaderboard'
+    | '/library'
     | '/live'
     | '/login'
     | '/mcp'
@@ -1533,6 +1551,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/labels/'
     | '/play/'
+    | '/settings/'
     | '/videos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1578,6 +1597,7 @@ export interface FileRouteTypes {
     | '/host-earnings'
     | '/install'
     | '/leaderboard'
+    | '/library'
     | '/live'
     | '/login'
     | '/mcp'
@@ -1595,7 +1615,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/rights'
     | '/search'
-    | '/settings'
     | '/signup'
     | '/sitemap.xml'
     | '/store'
@@ -1685,6 +1704,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/labels'
     | '/play'
+    | '/settings'
     | '/videos'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1732,6 +1752,7 @@ export interface FileRouteTypes {
     | '/host-earnings'
     | '/install'
     | '/leaderboard'
+    | '/library'
     | '/live'
     | '/login'
     | '/mcp'
@@ -1839,6 +1860,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/labels/'
     | '/play/'
+    | '/settings/'
     | '/videos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1887,6 +1909,7 @@ export interface RootRouteChildren {
   HostEarningsRoute: typeof HostEarningsRoute
   InstallRoute: typeof InstallRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  LibraryRoute: typeof LibraryRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
@@ -2144,6 +2167,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live': {
@@ -2776,6 +2806,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayRanksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/appearance': {
       id: '/settings/appearance'
       path: '/appearance'
@@ -3141,6 +3178,7 @@ interface SettingsRouteChildren {
   SettingsProfileRoute: typeof SettingsProfileRoute
   SettingsSecurityRoute: typeof SettingsSecurityRoute
   SettingsSocialLinksRoute: typeof SettingsSocialLinksRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 const SettingsRouteChildren: SettingsRouteChildren = {
@@ -3157,6 +3195,7 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsProfileRoute: SettingsProfileRoute,
   SettingsSecurityRoute: SettingsSecurityRoute,
   SettingsSocialLinksRoute: SettingsSocialLinksRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 
 const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
@@ -3201,6 +3240,7 @@ const rootRouteChildren: RootRouteChildren = {
   HostEarningsRoute: HostEarningsRoute,
   InstallRoute: InstallRoute,
   LeaderboardRoute: LeaderboardRoute,
+  LibraryRoute: LibraryRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,

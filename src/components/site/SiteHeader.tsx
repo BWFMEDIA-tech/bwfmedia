@@ -66,6 +66,7 @@ const PRIMARY: NavItem[] = [
 
 // "Book a Shoot" (/studio) and "Off Da Block" (/off-the-block) hidden for now — restore when ready.
 const BROWSE: NavItem[] = [
+  { to: "/library", label: "Music Library", icon: Music },
   { to: "/store", label: "Tunevio Store", icon: ShoppingCart },
   { to: "/artist-store", label: "Artist Store", icon: Disc3 },
   { to: "/play", label: "Arena", icon: Music },

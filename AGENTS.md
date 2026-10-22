@@ -25,4 +25,6 @@
 - Edit announcement copies by send timestamp, sender and content after server admin checks; preserve recipients/read state, never resend email.
 - Music details/Now Playing reuse PlayerProvider and persistent GlobalPlayer with real queues, no inferred albums or unapproved downloads. Hide the dock on live/Arena production pages to preserve independent controls.
 - PWA uses generateSW and one preview-guarded registrar; cache only static offline help/icons and hashed JS/CSS/fonts, never navigation HTML, APIs or media, to protect accounts and realtime. No forced update reloads.
-- Scope reference-kit presentation to explicit Home, player/navigation, settings, pricing, store, events and artist-directory classes; preserve existing handlers and data sources so visual updates never replace music, financial, account or live functionality.
+- Apply imported-reference presentation through semantic global typography/tokens and explicit page classes; preserve existing handlers/data sources and independent live controls, because theme updates must not replace music, financial, account or broadcast functionality.
+- Listener Library reuses the existing public home catalog, authenticated track-likes lookup and PlayerProvider queue; label catalog-limited saved results accurately and never create duplicate music/playlist storage.
+- Keep /settings as a shared Outlet layout with an account overview index, because account tools need a consumer-friendly entry without replacing profile editing or artist navigation.

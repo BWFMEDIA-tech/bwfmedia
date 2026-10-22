@@ -10,7 +10,7 @@ import { getMyTunevioSubscription, createTunevioPortal } from "@/lib/tunevio-sub
 import { getStripeEnvironment } from "@/lib/stripe";
 import { TUNEVIO_PLANS, type TunevioPlanId } from "@/lib/tunevio-subscriptions.functions";
 
-export const Route = createFileRoute("/settings/billing")({ component: BillingPage });
+export const Route = createFileRoute("/settings/billing")({ head: () => ({ meta: [{ title: "Billing & Subscriptions — Tunevio" }, { name: "description", content: "Manage your existing Tunevio subscription and view paid tips." }, { property: "og:title", content: "Billing & Subscriptions — Tunevio" }, { property: "og:description", content: "Your Tunevio subscription and payment history." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: BillingPage });
 
 function BillingPage() {
   const { user } = useAuth();
@@ -45,25 +45,25 @@ function BillingPage() {
   }
 
   const total = tips.reduce((s, t) => s + (t.amount_cents ?? 0), 0);
-  if (loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-white/60" /></div>;
+  if (loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
 
   const planLabel = sub?.plan_type && (TUNEVIO_PLANS as any)[sub.plan_type as TunevioPlanId]?.label;
   const isActive = sub && ["active", "trialing", "past_due"].includes(sub.status);
 
   return (
-    <SettingsShell title="Billing" blurb="Recent tips and payments.">
-      <Card title="Subscription" icon={<CreditCard className="h-4 w-4 text-[#00E6FF]" />}>
+    <SettingsShell title="Manage subscriptions">
+      <Card title="Subscription" icon={<CreditCard className="h-4 w-4 text-primary" />}>
         {isActive ? (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-bold">{planLabel ?? sub.plan_type}</div>
-                <div className="text-xs text-white/50 uppercase tracking-widest">{sub.role} · {sub.status}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-widest">{sub.role} · {sub.status}</div>
               </div>
               <div className="text-right text-sm">
                 {sub.price_cents != null && <div>${(sub.price_cents / 100).toFixed(2)}/mo</div>}
                 {sub.renewal_date && (
-                  <div className="text-xs text-white/50">
+                  <div className="text-xs text-muted-foreground">
                     {sub.cancel_at_period_end ? "Ends" : "Renews"} {new Date(sub.renewal_date).toLocaleDateString()}
                   </div>
                 )}
@@ -75,21 +75,21 @@ function BillingPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="text-sm text-white/60">You're on the free plan.</div>
-            <Button asChild className="w-full bg-gradient-to-r from-[#0000FF] to-[#00E6FF] font-bold uppercase tracking-wider">
+            <div className="text-sm text-muted-foreground">You're on the free plan.</div>
+            <Button asChild className="w-full bg-foreground text-background rounded-full font-medium">
               <Link to="/pricing">See plans</Link>
             </Button>
           </div>
         )}
       </Card>
-      <Card><div className="text-xs uppercase tracking-widest text-white/50">Total sent</div><div className="mt-1 text-3xl font-black">${(total / 100).toFixed(2)}</div></Card>
-      <Card title="Recent Tips" icon={<Receipt className="h-4 w-4 text-red-500" />}>
-        {tips.length === 0 ? <div className="py-6 text-center text-sm text-white/50">No tips yet.</div> : (
-          <ul className="divide-y divide-white/5 text-sm">
+      <Card><div className="text-xs uppercase tracking-widest text-muted-foreground">Total sent</div><div className="mt-1 text-3xl font-black">${(total / 100).toFixed(2)}</div></Card>
+      <Card title="Recent Tips" icon={<Receipt className="h-4 w-4 text-primary" />}>
+        {tips.length === 0 ? <div className="py-6 text-center text-sm text-muted-foreground">No tips yet.</div> : (
+          <ul className="divide-y divide-border/50 text-sm">
             {tips.map((t) => (
               <li key={t.id} className="flex items-center justify-between py-2">
-                <div><div className="font-semibold">${(t.amount_cents / 100).toFixed(2)}</div>{t.message && <div className="text-xs text-white/50">"{t.message}"</div>}</div>
-                <div className="text-xs text-white/40">{new Date(t.created_at).toLocaleDateString()}</div>
+                <div><div className="font-semibold">${(t.amount_cents / 100).toFixed(2)}</div>{t.message && <div className="text-xs text-muted-foreground">"{t.message}"</div>}</div>
+                <div className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</div>
               </li>
             ))}
           </ul>

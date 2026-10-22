@@ -1,7 +1,7 @@
 import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Radio, Eye, Trash2 } from "lucide-react";
+import { Radio, Eye, Trash2, Video, Calendar, Mic2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
 import { deleteStream } from "@/lib/streams.functions";
@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth-context";
 import { LIVE_CATEGORIES, liveCategoryLabel } from "@/lib/live-categories";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 
 type LiveStream = {
@@ -83,39 +84,41 @@ function LivePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050509] text-white pt-24 pb-12 px-4">
+    <div className="swara-live min-h-screen bg-background text-foreground pt-8 pb-24 px-4">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center gap-3 mb-2">
-          <span className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-widest">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE NOW
+          <span className="inline-flex items-center gap-2 rounded-md bg-destructive px-2 py-1 text-[10px] font-bold tracking-widest">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" /> LIVE NOW
           </span>
           <h1 className="text-2xl font-bold sm:text-3xl">Live on Tunevio</h1>
         </div>
-        <p className="text-white/60 mb-4">Drop into any active stream. Listen, react, or request the stage.</p>
+        <div className="my-6 flex flex-wrap gap-3"><Button asChild variant="secondary" className="rounded-full"><Link to="/go-live"><Video />Go live</Link></Button><Button asChild variant="ghost"><Link to="/events"><Calendar />Events</Link></Button><Button asChild variant="ghost"><Link to="/play"><Mic2 />Arena</Link></Button></div>
 
         <div className="-mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
           {[{ id: "all", label: "All" }, ...LIVE_CATEGORIES].map((c) => (
-            <button
+            <Button
+              variant="ghost"
+              aria-pressed={activeCategory === c.id}
               key={c.id}
               onClick={() => setActiveCategory(c.id)}
               className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
                 activeCategory === c.id
-                  ? "border-[#00E6FF]/50 bg-[#00E6FF]/20 text-[#00E6FF]"
-                  : "border-white/10 bg-white/5 text-white/60 hover:text-white"
+                  ? "border-primary bg-foreground text-background"
+                  : "border-border bg-secondary text-muted-foreground hover:text-foreground"
               }`}
             >
               {c.label}
-            </button>
+            </Button>
           ))}
         </div>
 
         {loading ? (
-          <p className="text-white/50">Loading live streams…</p>
+          <p className="text-muted-foreground">Loading live streams…</p>
         ) : visibleStreams.length === 0 ? (
-          <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-16 text-center">
-            <Radio className="mx-auto h-10 w-10 text-white/30 mb-3" />
-            <p className="text-white/60 mb-2">No one's live right now{activeCategory !== "all" ? ` in ${liveCategoryLabel(activeCategory)}` : ""}.</p>
-            <p className="text-white/40 text-sm">Check back soon — or start your own stream.</p>
+          <div className="rounded-2xl border border-border bg-secondary p-16 text-center">
+            <Radio className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+            <p className="text-muted-foreground mb-2">No one's live right now{activeCategory !== "all" ? ` in ${liveCategoryLabel(activeCategory)}` : ""}.</p>
+            <p className="text-muted-foreground text-sm">Check back soon — or start your own stream.</p>
           </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -125,46 +128,47 @@ function LivePage() {
                 {...(s.kind === "stage"
                   ? { to: "/stage/$roomId" as const, params: { roomId: s.id } }
                   : { to: "/artist/$id" as const, params: { id: s.host_id } })}
-                className="group rounded-2xl border border-white/10 bg-[#0d0d18] overflow-hidden hover:border-violet-500/50 transition"
+                className="group rounded-2xl border border-border bg-secondary overflow-hidden hover:border-primary/50 transition"
               >
-                <div className="relative aspect-video bg-gradient-to-br from-violet-900 to-blue-900">
+                <div className="relative aspect-video bg-gradient-to-br from-secondary to-background">
                   {s.thumbnail_url && (
                     <StreamThumbnailImage src={s.thumbnail_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                  <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded bg-red-600 px-2 py-1 text-[10px] font-bold tracking-wider">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> LIVE
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                  <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded bg-destructive px-2 py-1 text-[10px] font-bold tracking-wider">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" /> LIVE
                   </span>
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-background/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
                     <Eye className="h-3 w-3" /> {s.viewer_count ?? 0}
                   </span>
                   {s.kind !== "stage" && (isAdmin || auth.user?.id === s.host_id) && (
-                    <button
+                    <Button
+                      variant="destructive"
                       onClick={(e) => handleDelete(e, s.id)}
                       title="Delete stream"
-                      className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded bg-red-600/90 px-2 py-1 text-[10px] font-semibold text-white hover:bg-red-500"
+                      className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded bg-destructive/90 px-2 py-1 text-[10px] font-semibold text-foreground hover:bg-destructive/80"
                     >
                       <Trash2 className="h-3 w-3" /> Delete
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-white line-clamp-2">{s.title}</h3>
+                  <h3 className="font-bold text-foreground line-clamp-2">{s.title}</h3>
                   {s.description && (
-                    <p className="mt-1 line-clamp-2 text-xs text-white/55">{s.description}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{s.description}</p>
                   )}
                   <div className="mt-3 flex items-center gap-2">
                     {s.host?.avatar_url ? (
                       <SignedImg src={s.host.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
                     ) : (
-                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-violet-500 to-blue-500" />
+                      <div className="h-7 w-7 rounded-full bg-gradient-to-br from-secondary to-muted" />
                     )}
-                    <span className="text-sm text-white/80 truncate">
-                      {s.host?.stage_name || s.host?.display_name || "BWF host"}
+                    <span className="text-sm text-brand-silver truncate">
+                      {s.host?.stage_name || s.host?.display_name || "Tunevio host"}
                     </span>
                   </div>
                   {s.category && (
-                    <span className="mt-3 inline-block rounded-md bg-[#0000FF]/15 border border-[#0000FF]/30 px-2 py-1 text-[10px] font-semibold text-[#0000FF]">
+                    <span className="mt-3 inline-block rounded-md bg-secondary border border-border px-2 py-1 text-[10px] font-semibold text-primary">
                       {liveCategoryLabel(s.category)}
                     </span>
                   )}

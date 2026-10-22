@@ -15,12 +15,14 @@ const artistsQuery = queryOptions({
 export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
-      { title: "Search — BWF Network" },
-      { name: "description", content: "Search artists, live streams, and battles on BWF Network." },
-      { property: "og:title", content: "Search — BWF Network" },
-      { property: "og:description", content: "Find artists and content across BWF Network." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { title: "Search — Tunevio" },
+      { name: "description", content: "Search Tunevio artists by name, genre or location." },
+      { property: "og:title", content: "Search — Tunevio" },
+      { property: "og:description", content: "Find artists and content across Tunevio." },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/search" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/search" }],
   }),
   component: SearchPage,
 });
@@ -44,8 +46,8 @@ function SearchPage() {
   }, [data, q]);
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-24 pt-6 md:max-w-3xl md:pt-10">
-      <h1 className="text-3xl font-black tracking-tight text-foreground">Search</h1>
+    <div className="swara-search mx-auto max-w-4xl px-4 pb-24 pt-6 md:pt-10">
+      <h1 className="text-3xl font-semibold text-foreground">Search</h1>
       <div className="relative mt-4">
         <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -57,7 +59,7 @@ function SearchPage() {
         />
       </div>
 
-      <div className="mt-6 flex flex-col divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03]">
+      <div className="mt-8 grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 md:grid-cols-5">
         {results.length === 0 && (
           <div className="p-6 text-center text-sm text-muted-foreground">
             {q ? "No matches." : "Loading…"}
@@ -68,14 +70,14 @@ function SearchPage() {
             key={a.id}
             to="/artist/$id"
             params={{ id: a.publicId }}
-            className="flex items-center gap-3 p-3 transition-colors hover:bg-white/[0.04]"
+            className="flex min-w-0 flex-col items-center gap-3 text-center transition-colors hover:text-primary"
           >
-            <Avatar className="h-11 w-11 shrink-0">
+            <Avatar className="aspect-square h-auto w-full max-w-28 shrink-0">
               <AvatarImage src={a.avatarUrl ?? undefined} alt={a.name} />
               <AvatarFallback>{a.name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-semibold text-foreground">{a.name}</div>
+            <div className="min-w-0 w-full">
+              <div className="truncate text-sm font-medium text-foreground">{a.name}</div>
               <div className="truncate text-xs text-muted-foreground">
                 {a.location || (a.genres?.[0] ?? "Artist")}
               </div>
