@@ -1260,3 +1260,10 @@ body { font-family: var(--font-body); letter-spacing: 0; }
   .welcome-poster-img, .welcome-hero-video { animation: none; }
   .welcome-shine { transition: none; }
 }
+
+/* Poster wipe reveal is driven by a plain IntersectionObserver class toggle. */
+.welcome-poster-frame { opacity: 0; clip-path: inset(0 0 100% 0); transition: opacity 800ms ease, clip-path 1100ms cubic-bezier(.22, 1, .36, 1); }
+.welcome-poster-frame.is-revealed { opacity: 1; clip-path: inset(0 0 0% 0); }
+@media (prefers-reduced-motion: reduce) {
+  .welcome-poster-frame { transition: none; }
+}

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Mic2,
@@ -57,6 +58,38 @@ const scanVariants = {
     transition: { duration: 1.25, ease: "easeInOut" },
   },
 };
+
+/**
+ * Reveals an element the first time it scrolls into view. Uses a plain
+ * IntersectionObserver so the wipe always plays, even if the route re-renders
+ * while the page is still loading.
+ */
+function useRevealOnScroll(rootMargin = "-80px") {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setShown(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShown(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin, threshold: 0.15 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [rootMargin]);
+
+  return { ref, shown };
+}
 
 function trackCta(label: string) {
   try {
@@ -160,6 +193,7 @@ const steps = [
 ];
 
 export function LandingPage() {
+  const { ref: posterRef, shown: posterShown } = useRevealOnScroll();
   return (
     <MotionConfig reducedMotion="user">
     <div className="tunevio-welcome min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -267,12 +301,9 @@ export function LandingPage() {
 
       <section className="welcome-poster px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
         <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-            whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
-            viewport={{ margin: "-80px" }}
-            transition={{ duration: 1.1, ease: easeOutExpo }}
-            className="welcome-poster-frame relative overflow-hidden rounded-lg"
+          <div
+            ref={posterRef}
+            className={`welcome-poster-frame relative overflow-hidden rounded-lg${posterShown ? " is-revealed" : ""}`}
           >
             <img
               src={welcomePoster.url}
@@ -281,7 +312,7 @@ export function LandingPage() {
               fetchPriority="high"
             />
             <span className="welcome-shine" aria-hidden="true" />
-          </motion.div>
+          </div>
         </div>
       </section>
 
