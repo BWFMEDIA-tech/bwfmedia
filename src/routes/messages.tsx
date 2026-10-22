@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ChevronRight, MessageSquare, Search, Send, UserPlus, X } from "lucide-react";
 import { z } from "zod";
@@ -77,6 +77,7 @@ function MessagesPage() {
   const [searchResults, setSearchResults] = useState<ProfileLite[]>([]);
   const [showNew, setShowNew] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
@@ -175,12 +176,53 @@ function MessagesPage() {
     );
   }, [messages, activeId, auth.user?.id]);
 
+  const scrollToLatest = (smooth = false) => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+  };
+
   // Auto-scroll on new messages
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    scrollToLatest();
   }, [activeMessages.length, activeId]);
+
+  // Focus the composer when a conversation opens
+  useEffect(() => {
+    if (!activeId) return;
+    const t = window.setTimeout(() => composerRef.current?.focus({ preventScroll: true }), 120);
+    return () => window.clearTimeout(t);
+  }, [activeId]);
+
+  // Track the visible viewport so the pop-up composer stays above the phone keyboard
+  const [vv, setVv] = useState<{ h: number; top: number } | null>(null);
+  useEffect(() => {
+    const v = window.visualViewport;
+    if (!v) return;
+    const update = () => {
+      setVv({ h: v.height, top: v.offsetTop });
+      scrollToLatest();
+    };
+    update();
+    v.addEventListener("resize", update);
+    v.addEventListener("scroll", update);
+    return () => { v.removeEventListener("resize", update); v.removeEventListener("scroll", update); };
+  }, []);
+
+  // Lock page scroll behind the mobile pop-up
+  useEffect(() => {
+    if (!activeId || window.matchMedia("(min-width: 768px)").matches) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [activeId]);
+
+  // Auto-grow the composer
+  useEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+  }, [body]);
 
   // Mark conversation read when opened
   useEffect(() => {
@@ -328,10 +370,13 @@ function MessagesPage() {
           </aside>
 
           {/* Thread */}
-          <section className={`flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] ${activeId ? "flex" : "hidden md:flex"}`}>
+          <section
+            style={activeId && vv ? ({ "--vvh": `${vv.h}px`, "--vvt": `${vv.top}px` } as CSSProperties) : undefined}
+            className={`flex-col overflow-hidden bg-black md:bg-white/[0.03] ${activeId ? "fixed inset-x-0 top-[var(--vvt,0px)] z-[60] flex h-[var(--vvh,100dvh)] animate-in slide-in-from-bottom-6 fade-in duration-200 md:static md:z-auto md:h-auto md:animate-none md:rounded-3xl md:border md:border-white/10 md:shadow-2xl md:shadow-brand-blue/10" : "hidden md:flex md:rounded-3xl md:border md:border-white/10"}`}
+          >
             {activeId ? (
               <>
-                <header className="relative flex items-center gap-3 border-b border-white/10 px-3 py-3">
+                <header className="relative flex shrink-0 items-center gap-3 border-b border-white/10 px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3">
                   <button
                     onClick={closeConversation}
                     className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-brand-cyan/60 hover:bg-white/10 md:hidden"
@@ -391,20 +436,23 @@ function MessagesPage() {
                   )}
                 </div>
                 <form
-                  onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                  className="border-t border-white/10 p-3"
+                  onSubmit={(e) => { e.preventDefault(); handleSend(); composerRef.current?.focus(); }}
+                  className="shrink-0 border-t border-white/10 bg-black/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:bg-transparent"
                 >
                   <div className="flex items-end gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pl-4 pr-1.5 transition focus-within:border-brand-cyan/60">
                     <textarea
+                      ref={composerRef}
                       value={body}
                       onChange={(e) => setBody(e.target.value)}
+                      onFocus={() => { window.setTimeout(() => scrollToLatest(true), 250); }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
                       }}
                       placeholder="Write a message…"
                       rows={1}
                       maxLength={4000}
-                      className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-sm outline-none placeholder:text-white/40"
+                      enterKeyHint="send"
+                      className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-base outline-none placeholder:text-white/40 md:text-sm"
                     />
                     <button
                       type="submit"
