@@ -546,36 +546,147 @@ type HomeVideo = {
   thumbnail_path: string | null;
 };
 
-/** Music video card — links to the video page, signed thumbnail with first-frame fallback. */
+const PREVIEW_SECONDS = 30;
+
+function formatElapsed(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/**
+ * Music video card — autoplays a muted 30-second preview while on screen,
+ * with an elapsed-time badge and mute/play controls. Tapping opens the video page.
+ */
 function VideoCard({ video }: { video: HomeVideo }) {
   const thumb = useSignedVideoUrl(video.thumbnail_path);
-  const fallback = useSignedVideoUrl(video.thumbnail_path ? null : video.storage_path);
+  const src = useSignedVideoUrl(video.storage_path);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const vidRef = useRef<HTMLVideoElement>(null);
+  const [activated, setActivated] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [elapsed, setElapsed] = useState(0);
+
+  // Start loading the preview only once the card scrolls near the screen.
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) setActivated(true);
+      },
+      { threshold: 0.35, rootMargin: "150px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Play while visible, pause when scrolled away.
+  useEffect(() => {
+    const v = vidRef.current;
+    if (!v) return;
+    if (inView) {
+      v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  }, [inView, activated, src]);
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const v = vidRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().then(() => setPlaying(true)).catch(() => {});
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const v = vidRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+  };
+
   return (
     <Link
       to="/videos/$id"
       params={{ id: video.id } as never}
       className="group block overflow-hidden rounded-2xl border border-tv-line bg-tv-surface transition hover:border-tv-cyan/50"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-black/40">
-        {thumb ? (
+      <div ref={boxRef} className="relative aspect-video w-full overflow-hidden bg-black/40">
+        {activated && src ? (
+          <video
+            ref={vidRef}
+            src={src}
+            poster={thumb ?? undefined}
+            preload="auto"
+            muted={muted}
+            playsInline
+            className="h-full w-full object-cover"
+            onTimeUpdate={(e) => {
+              const v = e.currentTarget;
+              if (v.currentTime >= PREVIEW_SECONDS) {
+                v.currentTime = 0;
+                setElapsed(0);
+              } else {
+                setElapsed(v.currentTime);
+              }
+            }}
+          />
+        ) : thumb ? (
           <img
             src={thumb}
             alt={video.title}
             loading="lazy"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
-        ) : fallback ? (
-          <video src={fallback} preload="metadata" muted playsInline className="h-full w-full object-cover" />
         ) : (
           <div className="grid h-full w-full place-items-center bg-white/5">
             <Clapperboard className="h-8 w-8 text-white/20" />
           </div>
         )}
-        <span className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-tv-cyan text-black shadow-lg">
-            <Play className="ml-0.5 h-5 w-5 fill-current" />
+        {/* Elapsed preview time */}
+        {activated && src ? (
+          <span className="absolute left-2 top-2 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-white">
+            {formatElapsed(elapsed)}
           </span>
-        </span>
+        ) : null}
+        {/* Preview controls */}
+        {activated && src ? (
+          <div className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-2">
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? "Unmute preview" : "Mute preview"}
+              className="grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80"
+            >
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={togglePlay}
+              aria-label={playing ? "Pause preview" : "Play preview"}
+              className="grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80"
+            >
+              {playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}
+            </button>
+          </div>
+        ) : (
+          <span className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-tv-cyan text-black shadow-lg">
+              <Play className="ml-0.5 h-5 w-5 fill-current" />
+            </span>
+          </span>
+        )}
       </div>
       <div className="p-3">
         <p className="truncate text-sm font-bold">{video.title}</p>
