@@ -179,9 +179,16 @@ export function SiteHeader() {
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(to + "/"));
 
   return (
+    <>
+    {/* Solid black cover for the iOS status bar / Dynamic Island area so content never shows through. */}
+    <div
+      aria-hidden
+      className="tunevio-safe-top fixed inset-x-0 top-0 z-[60] pointer-events-none lg:hidden"
+      style={{ height: "env(safe-area-inset-top)", background: "#000000" }}
+    />
     <nav
       style={{ top: "calc(var(--bwf-banner-h, 0px) + env(safe-area-inset-top))" }}
-      className={`tunevio-site-navigation fixed left-0 right-0 z-50 transition-all duration-300 ${
+      className={`tunevio-site-navigation fixed left-0 right-0 z-50 transition-all duration-300 max-lg:!bg-[#000000] max-lg:backdrop-blur-none ${
         scrolled
           ? "backdrop-blur-xl bg-black/90 border-b border-blood/40 shadow-[0_8px_24px_-12px_rgba(225,29,42,0.35)]"
           : "backdrop-blur bg-background/95 border-b border-border"
@@ -496,5 +503,6 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
     </nav>
+    </>
   );
 }
