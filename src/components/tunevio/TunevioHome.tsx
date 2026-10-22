@@ -333,18 +333,6 @@ export function TunevioHome() {
           />
           )}
 
-          {/* Music videos */}
-          {show("videos") && (
-          <ContentRail
-            id="music-videos"
-            title="Music Videos"
-            eyebrow="Watch now"
-            showAllTo="/videos"
-            size="wide"
-            items={(videos ?? []).map((v) => <VideoCard key={v.id} video={v} />)}
-          />
-          )}
-
           {/* Play Arena */}
           {show("arena") && (
           <ContentRail
