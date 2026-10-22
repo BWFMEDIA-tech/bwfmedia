@@ -26,9 +26,10 @@ function SignupPage() {
     const qs = new URLSearchParams(window.location.search);
     const ref = qs.get("ref");
     if (ref) saveHostReferral({ hostId: ref, source: "link" });
-    if (qs.get("as") === "artist") {
-      setRole("artist");
-      setArtistEntry(true);
+    const as = qs.get("as");
+    if (as === "artist" || as === "listener" || as === "host") {
+      setRole(as);
+      if (as === "artist") setArtistEntry(true);
     }
   }, []);
   const [email, setEmail] = useState("");
