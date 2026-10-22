@@ -217,11 +217,10 @@ function ProfileSettingsPage() {
   }
 
   return (
-    <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="swara-profile-settings grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-6">
         <div>
-          <h1 className="text-2xl font-black tracking-tight">Profile Settings</h1>
-          <p className="mt-1 text-sm text-foreground/60">Manage how your profile appears to fans across BWF Network.</p>
+          <h1 className="text-2xl font-semibold">Profile Settings</h1>
         </div>
 
         <Section>
@@ -541,7 +540,7 @@ function DateBlock({ month, day }: { month: string; day: string }) {
 
 function Section({ title, children, icon }: { title?: string; children: React.ReactNode; icon?: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+    <div className="swara-settings-section border-b border-border py-6">
       {title && <div className="mb-4 flex items-center gap-2 text-sm font-semibold">{icon}{title}</div>}
       {children}
     </div>

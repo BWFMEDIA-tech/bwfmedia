@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, Heart, Info, ListMusic, Mic2, MoreHorizontal, Pause, Play, Repeat, Repeat1, Share2, Shuffle, SkipBack, SkipForward } from "lucide-react";
+import { ArrowLeft, ChevronDown, Download, Heart, Info, ListMusic, Mic2, MoreHorizontal, Pause, Play, Repeat, Repeat1, Share2, Shuffle, SkipBack, SkipForward } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { usePlayer, type PlayerTrack } from "@/lib/player-context";
@@ -52,14 +52,14 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
   const start = (t: PlayerTrack) => { if (p.track?.id === t.id) p.toggle(); else p.play(t, queue.filter((q) => !!q.audioUrl)); };
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
+      <DialogContent className="swara-music-detail music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
         {track.coverUrl && <SignedImg src={track.coverUrl} alt="" aria-hidden className="music-detail-backdrop" />}
         <div className="music-detail-shade" aria-hidden />
-        <div className="relative mx-auto max-w-2xl px-5 pb-8 pt-5 sm:px-10">
+        <div className="music-detail-content relative mx-auto max-w-2xl px-5 pb-8 pt-5 sm:px-10">
           <header className="mb-6 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
-            <Button variant="outline" size="icon" className="h-11 w-11 rounded-full bg-background/30" aria-label="Back to music" onClick={onClose}><ArrowLeft /></Button>
+            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Back to music" onClick={onClose}>{nowPlaying ? <ChevronDown /> : <ArrowLeft />}</Button>
             <div className="min-w-0 text-center text-xs text-brand-silver">{nowPlaying ? "NOW PLAYING" : "TUNEVIO MUSIC"}</div>
-            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon" className="h-11 w-11 rounded-full bg-background/30" aria-label="Music options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Music options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
           </header>
           <div className="music-detail-art mx-auto aspect-square overflow-hidden rounded-lg bg-secondary">
             {track.coverUrl && failedCover !== track.coverUrl ? <SignedImg src={track.coverUrl} alt={`${track.title} artwork`} onError={() => setFailedCover(track.coverUrl ?? null)} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}
@@ -70,7 +70,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
             {track.preview && <p className="mt-2 text-xs text-muted-foreground">30-second preview</p>}
           </div>
           {nowPlaying ? <>
-            <div className="mt-7"><input type="range" aria-label="Seek music" min={0} max={p.duration || 1} step={0.1} value={Math.min(p.progress, p.duration || 1)} disabled={!p.duration} onChange={(e) => p.seek(Number(e.target.value))} className="w-full accent-primary" /><div className="mt-2 flex justify-between text-xs tabular-nums text-brand-silver"><span>{formatPlayerTime(p.progress)}</span><span>−{formatPlayerTime(p.duration - p.progress)}</span></div></div>
+            <div className="mt-7"><input type="range" aria-label="Seek music" min={0} max={p.duration || 1} step={0.1} value={Math.min(p.progress, p.duration || 1)} disabled={!p.duration} onChange={(e) => p.seek(Number(e.target.value))} style={{ background: `linear-gradient(to right, var(--primary) ${p.duration ? Math.min(p.progress / p.duration, 1) * 100 : 0}%, var(--music-progress-track) 0)` }} className="music-expanded-progress w-full" /><div className="mt-3 flex justify-between text-xs tabular-nums text-brand-silver"><span>{formatPlayerTime(p.progress)}</span><span>{formatPlayerTime(p.duration)}</span></div></div>
             <div className="my-7 flex items-center justify-between gap-2">
               <Button variant="ghost" size="icon" aria-label="Shuffle music" aria-pressed={p.shuffle} onClick={p.toggleShuffle} className={p.shuffle ? "text-primary" : "text-muted-foreground"}><Shuffle /></Button>
               <Button variant="ghost" size="icon" aria-label="Previous track" onClick={p.prev} className="h-12 w-12 [&_svg]:size-7"><SkipBack fill="currentColor" /></Button>

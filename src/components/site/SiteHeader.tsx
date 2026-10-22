@@ -157,7 +157,7 @@ export function SiteHeader() {
   return (
     <nav
       style={{ top: "calc(var(--bwf-banner-h, 0px) + env(safe-area-inset-top))" }}
-      className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+      className={`tunevio-site-navigation fixed left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "backdrop-blur-xl bg-black/90 border-b border-blood/40 shadow-[0_8px_24px_-12px_rgba(225,29,42,0.35)]"
           : "backdrop-blur bg-background/95 border-b border-border"

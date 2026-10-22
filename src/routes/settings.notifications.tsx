@@ -7,7 +7,17 @@ import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { SettingsShell, Card, Row } from "@/components/settings/SettingsShell";
 
-export const Route = createFileRoute("/settings/notifications")({ component: NotificationsPage });
+export const Route = createFileRoute("/settings/notifications")({
+  head: () => ({ meta: [
+    { title: "Notification Preferences | Tunevio" },
+    { name: "description", content: "Manage your Tunevio in-app, email, push and live show notifications." },
+    { property: "og:title", content: "Notification Preferences | Tunevio" },
+    { property: "og:description", content: "Manage your Tunevio in-app, email, push and live show notifications." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: NotificationsPage,
+});
 
 function NotificationsPage() {
   const { user } = useAuth();
@@ -33,13 +43,13 @@ function NotificationsPage() {
   if (loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-white/60" /></div>;
 
   return (
-    <SettingsShell title="Notifications" blurb="Choose how BWF reaches you.">
+    <div className="swara-notification-settings"><SettingsShell title="Notifications">
       <Card>
-        <Row label="In-app notifications"><Switch checked={p.in_app} onCheckedChange={(v) => update("in_app", v)} /></Row>
-        <Row label="Email"><Switch checked={p.email} onCheckedChange={(v) => update("email", v)} /></Row>
-        <Row label="Push"><Switch checked={p.push} onCheckedChange={(v) => update("push", v)} /></Row>
-        <Row label="Live show alerts"><Switch checked={p.live_alerts} onCheckedChange={(v) => update("live_alerts", v)} /></Row>
+        <Row label="In-app notifications"><Switch aria-label="In-app notifications" checked={p.in_app} onCheckedChange={(v) => update("in_app", v)} /></Row>
+        <Row label="Email"><Switch aria-label="Email notifications" checked={p.email} onCheckedChange={(v) => update("email", v)} /></Row>
+        <Row label="Push"><Switch aria-label="Push notifications" checked={p.push} onCheckedChange={(v) => update("push", v)} /></Row>
+        <Row label="Live show alerts"><Switch aria-label="Live show alerts" checked={p.live_alerts} onCheckedChange={(v) => update("live_alerts", v)} /></Row>
       </Card>
-    </SettingsShell>
+    </SettingsShell></div>
   );
 }
