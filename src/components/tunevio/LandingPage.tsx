@@ -164,7 +164,7 @@ export function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative px-5 sm:px-10 pt-8 pb-20 sm:pt-14 sm:pb-28 overflow-hidden">
+      <section className="welcome-hero relative px-5 sm:px-10 pt-8 pb-20 sm:pt-14 sm:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
             src={heroRapperVideo.url}
@@ -173,34 +173,34 @@ export function LandingPage() {
             loop
             playsInline
             preload="metadata"
-            className="absolute inset-0 h-full w-full object-cover opacity-70"
+            className="welcome-hero-video absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/65 to-background" />
+          <div className="welcome-hero-shade absolute inset-0" />
         </div>
         <div className="relative z-10 mx-auto max-w-4xl text-center">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-foreground/5 px-3 py-1 text-xs text-muted-foreground backdrop-blur-md"
+            className="welcome-eyebrow inline-flex items-center gap-2 text-xs text-muted-foreground"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+            <Music2 className="h-3.5 w-3.5 text-primary" />
             Tunevio, brought to you by BWFMEDIA
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05 }}
-            className="mt-6 text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-normal leading-[1.05]"
+            className="welcome-wordmark mt-6 font-semibold leading-none"
           >
-            Music Is Better When{" "}
-            <span className="text-primary">You’re Part of It.</span>
+            Tunevio<span className="text-primary">.</span>
           </motion.h1>
+          <p className="welcome-tagline mt-6 text-2xl sm:text-3xl font-medium">Music is better when <span className="text-primary">you’re part of it.</span></p>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto"
+            className="mt-5 text-sm sm:text-base leading-relaxed text-brand-silver max-w-xl mx-auto"
           >
             Discover independent artists. Join live music experiences. Compete
             in battles. Build your audience. Tunevio brings artists and music
@@ -230,7 +230,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
+      <section className="welcome-poster px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
         <div className="mx-auto max-w-6xl">
           <img
             src={welcomePoster.url}
@@ -258,7 +258,7 @@ export function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="flex flex-col rounded-lg border border-border bg-card p-6 sm:p-8  hover:border-primary/50 transition-colors"
+                className="welcome-role flex flex-col rounded-lg border border-border bg-card p-6 sm:p-8 hover:border-primary/50 transition-colors"
               >
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
                   <role.icon className="h-6 w-6 text-primary" />
@@ -287,7 +287,7 @@ export function LandingPage() {
       </section>
 
       {/* Battle Arena highlight */}
-      <section className="relative px-5 sm:px-10 pb-24">
+      <section className="welcome-battle relative px-5 sm:px-10 pb-24">
         <div className="mx-auto max-w-6xl grid lg:grid-cols-2 gap-10 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -326,11 +326,11 @@ export function LandingPage() {
           <h2 id="community-images-heading" className="text-3xl sm:text-4xl text-center">Inside Tunevio</h2>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
             {welcomeScreens.map((screen) => (
-              <figure key={screen.title} className="min-w-0">
+              <figure key={screen.title} className="welcome-screen min-w-0">
                 <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
                   <img src={screen.image.url} alt={screen.alt} loading="lazy" className="h-full w-full object-contain" />
                 </div>
-                <figcaption className="mt-4 text-lg font-semibold">{screen.title}</figcaption>
+                <figcaption className="mt-4 flex items-center justify-between text-base font-medium">{screen.title}<span aria-hidden="true" className="welcome-caption-line" /></figcaption>
               </figure>
             ))}
           </div>
@@ -360,7 +360,7 @@ export function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="rounded-lg border border-border bg-card p-6  hover:border-primary/40 transition-colors"
+                className="welcome-feature rounded-lg border border-border bg-card p-6 hover:border-primary/40 transition-colors"
               >
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 border border-primary/20">
                   <f.icon className="h-5 w-5 text-primary" />
