@@ -83,6 +83,13 @@ function SignupPage() {
       }
       return toast.error(error.message);
     }
+    // The account now exists on this device — future visits to the public
+    // welcome page should go to sign-in, not back to the landing page.
+    try {
+      window.localStorage.setItem("tunevio:has-account", "1");
+    } catch {
+      // Storage unavailable — skip the remember step.
+    }
     toast.success("Check your email to confirm your account");
     nav({ to: "/login" });
   };

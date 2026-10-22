@@ -70,6 +70,13 @@ function LoginPage() {
         toast.error(result.error.message ?? "Google sign-in failed");
         return;
       }
+      // They chose to sign in, so remember on this device that an account
+      // exists and future visits to the public welcome page go to sign-in.
+      try {
+        window.localStorage.setItem("tunevio:has-account", "1");
+      } catch {
+        // Storage unavailable — skip the remember step.
+      }
       if (result.redirected) return;
       const saved = sessionStorage.getItem("bwf:post-login");
       sessionStorage.removeItem("bwf:post-login");
@@ -92,6 +99,13 @@ function LoginPage() {
         // Generic message — never reveal whether the email exists
         setFailed(true);
         return toast.error("Incorrect email or password.");
+      }
+      // Remember on this device that an account exists, so future visits to
+      // the public welcome page go straight to sign-in.
+      try {
+        window.localStorage.setItem("tunevio:has-account", "1");
+      } catch {
+        // Storage unavailable — skip the remember step.
       }
       toast.success("Signed in");
       if (next) {
