@@ -45,3 +45,5 @@
 - [x] Remove the 01-06 labels above the video rows on /videos; verified no numbered labels remain and all row titles still show.
 - [x] Add welcome-page photo transitions (wipe reveals, scan sweeps, hover shine, slow breathing) and the three-phone app showcase with reveal, float and glow; poster, arena and showcase photos verified revealed at desktop and phone widths, no overflow or page errors, build OK; not published.
 - [x] Reorganize main menu, Artist Dashboard sidebar and General Settings (Oct 22)
+- [x] Add a visible cyan-to-blue scrollbar to the admin sidebar menu, pin the account block, and keep every menu item reachable without overlapping the footer; desktop/phone verified, no page errors, build OK; not published.
+
