@@ -35,7 +35,7 @@ export function GlobalPlayer({ hidden = false }: { hidden?: boolean }) {
     {p.detailTrack && <MusicDetails key={p.detailTrack.id} nowPlaying={false} onClose={p.closeDetails} />}
     {expanded && track && <MusicDetails nowPlaying onClose={() => setExpanded(false)} />}
     {track && <section aria-label="Music player" className="music-mini-player fixed inset-x-0 z-40 border-t border-border bg-card/95 text-foreground backdrop-blur-xl">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2 md:grid-cols-[minmax(0,1fr)_minmax(320px,2fr)_minmax(0,1fr)] md:px-5">
+      <div className="music-mini-layout grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_minmax(320px,2fr)_minmax(0,1fr)] md:px-5">
         <div className="flex min-w-0 items-center gap-2">
           <Button variant="ghost" aria-label={`Open Now Playing: ${track.title}`} onClick={() => setExpanded(true)} className="h-auto min-w-0 flex-1 justify-start gap-3 px-0 text-left hover:bg-transparent">
             <span className="h-12 w-12 shrink-0 overflow-hidden rounded bg-secondary">{track.coverUrl ? <SignedImg src={track.coverUrl} alt="" className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center"><Mic2 className="text-muted-foreground" /></span>}</span>

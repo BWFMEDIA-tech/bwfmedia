@@ -978,3 +978,71 @@ html[data-music-player] .music-assistant-launcher { bottom: calc(var(--bwf-mobil
   .music-detail-art { width: min(100%, 400px); }
 }
 @media (prefers-reduced-motion: reduce) { .music-detail-dialog { animation: none; transition: none; } }
+
+/* SWARA reference treatment is presentation-only and scoped to approved surfaces. */
+:root {
+  --music-progress-track: color-mix(in oklab, var(--muted-foreground) 30%, var(--background));
+  --music-player-fill: color-mix(in oklab, var(--brand-silver) 12%, var(--background));
+  --music-detail-wash: linear-gradient(180deg, color-mix(in oklab, var(--brand-silver) 8%, transparent), color-mix(in oklab, var(--background) 75%, transparent) 65%, var(--background));
+}
+.swara-home { font-family: var(--font-body); letter-spacing: 0; }
+.swara-home > div { gap: 32px; }
+.swara-home main { max-width: 1500px; }
+.swara-home main > header { border: 0; background: transparent; padding: 8px 0 20px; border-radius: 0; }
+.swara-home main > section { margin-top: 36px; }
+.swara-home h2 { font-weight: 600; letter-spacing: 0; line-height: 1.4; }
+.swara-home section > div:first-child > div:first-child > p { letter-spacing: 0; font-weight: 500; color: var(--muted-foreground); margin-bottom: 4px; }
+.swara-home .tv-scroll { gap: 20px; }
+.swara-home :is(#trending, #new-releases, #jump-back-in, #made-for-you, #charts, #boosted, #discover) .group { background: transparent; border-color: transparent; border-radius: 8px; padding: 0; box-shadow: none; transform: none; }
+.swara-home :is(#trending, #new-releases, #jump-back-in, #made-for-you, #charts, #boosted, #discover) .group > div:first-child > div:first-child { border-radius: 8px; --tw-ring-shadow: none; }
+.swara-home :is(#trending, #new-releases, #jump-back-in, #made-for-you, #charts, #boosted, #discover) .group p { font-weight: 600; }
+.swara-home :is(#trending, #new-releases, #jump-back-in, #made-for-you, #charts, #boosted, #discover) .group p + p { font-weight: 400; color: var(--muted-foreground); }
+.swara-home #popular .group { border: 0; border-radius: 8px; background: transparent; box-shadow: none; transform: none; padding: 12px 4px; }
+.swara-home #popular .group:hover { background: var(--secondary); }
+.swara-home aside { background: transparent; border: 0; border-radius: 0; border-right: 1px solid var(--border); padding-left: 0; }
+.swara-home aside nav a { border-radius: 8px; font-weight: 500; }
+.tunevio-site-navigation { font-family: var(--font-body); letter-spacing: 0; }
+.tunevio-site-navigation > div:first-child { gap: 12px; }
+.tunevio-site-navigation button { box-shadow: none; }
+.tunevio-phone-navigation { background: var(--background); }
+.tunevio-phone-navigation ul { min-height: 64px; max-width: 600px; padding-inline: 4px; }
+.tunevio-phone-navigation a { min-height: 64px; letter-spacing: 0; }
+.tunevio-phone-navigation a[aria-current="page"] { font-weight: 700; }
+.swara-music-detail { font-family: var(--font-body); --music-shadow: none; }
+.swara-music-detail .music-detail-backdrop { opacity: .7; }
+.swara-music-detail .music-detail-shade { background: var(--music-detail-wash); }
+.swara-music-detail .music-detail-content { max-width: 540px; padding-top: 20px; }
+.swara-music-detail .music-detail-art { width: 100%; max-width: 440px; border-radius: 8px; }
+.swara-music-detail header { margin-bottom: 28px; }
+.swara-music-detail h2 { letter-spacing: 0; font-weight: 600; }
+.swara-music-detail button[aria-label="Play music"], .swara-music-detail button[aria-label="Pause music"] { background: var(--music-player-fill); color: var(--foreground); }
+.music-expanded-progress { appearance: none; -webkit-appearance: none; height: 4px; border-radius: 4px; cursor: pointer; }
+.music-expanded-progress::-webkit-slider-runnable-track { height: 4px; background: transparent; }
+.music-expanded-progress::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 14px; width: 14px; margin-top: -5px; border-radius: 50%; background: var(--foreground); }
+.music-expanded-progress::-moz-range-track { height: 4px; background: transparent; }
+.music-expanded-progress::-moz-range-thumb { height: 14px; width: 14px; border: 0; border-radius: 50%; background: var(--foreground); }
+.music-mini-player { background: var(--music-player-fill); }
+.music-mini-layout button[aria-label="Play"], .music-mini-layout button[aria-label="Pause"] { background: var(--secondary); color: var(--foreground); }
+.swara-profile-settings, .swara-notification-settings { font-family: var(--font-body); letter-spacing: 0; }
+.swara-profile-settings label > span { font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted-foreground); }
+.swara-profile-settings .swara-settings-section > div:first-child { font-size: 16px; font-weight: 600; }
+.swara-profile-settings input, .swara-profile-settings textarea { min-width: 0; color: var(--foreground); }
+.swara-profile-settings .swara-settings-section label > div { background: var(--secondary); border-color: var(--border); }
+.swara-notification-settings { max-width: 760px; }
+.swara-notification-settings h1 { font-weight: 600; letter-spacing: 0; }
+.swara-notification-settings > div > div:nth-child(2) { border: 0; background: transparent; padding: 0; border-radius: 0; }
+.swara-notification-settings > div > div:nth-child(2) > div { min-height: 80px; padding-block: 24px; border-color: var(--border); }
+.swara-notification-settings [role="switch"][data-state="checked"] { background: var(--primary); }
+@media (max-width: 767px) {
+  .swara-home > div { padding-inline: 16px; padding-top: 12px; }
+  .swara-home main > header { padding-bottom: 8px; }
+  .swara-home .tv-scroll { gap: 16px; }
+  .music-mini-layout > div:first-child { gap: 0; }
+  .music-mini-layout > div:first-child > button:first-child { gap: 8px; }
+  .music-mini-layout > div:first-child > button:first-child > span:first-child { width: 40px; height: 40px; }
+  .music-mini-layout > div:first-child > button:last-child { width: 28px; }
+  .music-mini-layout > div:nth-child(2) button { width: 28px; height: 32px; }
+  .music-mini-layout > div:nth-child(2) button[aria-label="Play"], .music-mini-layout > div:nth-child(2) button[aria-label="Pause"] { width: 36px; height: 36px; }
+  .swara-music-detail .music-detail-content { padding-inline: 20px; }
+  .swara-profile-settings .swara-settings-section { padding-block: 20px; }
+}

@@ -102,7 +102,7 @@ export function TunevioHome() {
   };
 
   return (
-    <div className="min-h-screen bg-tv-base text-white">
+    <div className="swara-home min-h-screen bg-background text-foreground">
       <div className="flex w-full gap-6 px-4 pb-40 pt-4 sm:px-6 lg:px-8">
         {/* Desktop sidebar */}
         <aside className="sticky top-24 hidden h-[calc(100vh-8rem)] w-[220px] shrink-0 flex-col rounded-2xl border border-tv-line bg-tv-surface p-4 lg:flex">

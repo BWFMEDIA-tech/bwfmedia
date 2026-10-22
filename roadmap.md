@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Apply approved SWARA first pass to Home, shared player/navigation and profile/notification settings; preserve behavior and verify desktop/phone and signed-in flows.
 - [x] Analyze SWARA UI kit: 27 mobile screen previews plus two overview images; compared existing Home visually and mapped current UI source. Exact Figma fonts/tokens and editable components unavailable; appearance-only proposal awaits approval.
 - [ ] Implement music-only 60/40 monthly streamshare royalties using existing ledgers/statements/Connect; inspect and plan first, preserve records, test calculations and prevent unapproved real payouts.
 - [x] Keep intro autoplay continuous when enabling sound, without replay controls or seeking. Browser-compatible soundtrack test confirmed playback advanced from 1.40s to 1.52s on unmute; control disappears and Skip works. Build OK; native phone audio not tested, not published.
