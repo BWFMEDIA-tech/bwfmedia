@@ -1,7 +1,8 @@
 import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { Link } from "@tanstack/react-router";
-import { Heart, MoreHorizontal, Pause, Play, Radio, Users } from "lucide-react";
-import type { ReactNode } from "react";
+import { Heart, MoreHorizontal, Music2, Pause, Play, Radio, Users } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -50,6 +51,7 @@ export function CardShell({
   children: ReactNode;
   interactive?: boolean;
 }) {
+  const [failed, setFailed] = useState<string | null>(null);
   return (
     <div
       className={cn(
@@ -83,18 +85,17 @@ export function Artwork({
         className,
       )}
     >
-      {src ? (
+      {src && failed !== src ? (
         <SignedImg
           src={src}
           alt={alt}
+          onError={() => setFailed(src)}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-3xl font-black">
-          <span className="bg-gradient-to-b from-white/80 via-white/40 to-white/15 bg-clip-text text-transparent">
-            {alt.slice(0, 1).toUpperCase()}
-          </span>
+        <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground">
+          <Music2 className="h-8 w-8" aria-hidden />
         </div>
       )}
     </div>
@@ -292,13 +293,15 @@ export function TrackCard({
           <Play className="ml-0.5 h-4 w-4 fill-current" />
         )}
       </button>
-      <button
+      <Button
+        variant="ghost"
         type="button"
         aria-label="More options"
+        onClick={() => player.openDetails(toPlayerTrack(track), (queue ?? [track]).map(toPlayerTrack))}
         className="hidden h-9 w-9 shrink-0 place-items-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white sm:grid"
       >
         <MoreHorizontal className="h-4 w-4" />
-      </button>
+      </Button>
     </CardShell>
   );
 }
@@ -523,7 +526,7 @@ export function FeaturedCard({
   const player = usePlayer();
   const isCurrent = player.track?.id === track.id;
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-tv-line bg-tv-surface">
+    <section className="swara-featured relative overflow-hidden rounded-3xl border border-tv-line bg-tv-surface">
       <div className="absolute inset-0 bg-gradient-to-br from-tv-violet/35 via-tv-magenta/10 to-tv-cyan/25" />
       <div className="relative grid gap-6 p-5 sm:p-8 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:items-center">
         <Artwork
@@ -561,7 +564,7 @@ export function FeaturedCard({
             </button>
             <button
               type="button"
-              onClick={onSave}
+              onClick={onSave ?? (() => player.openDetails(toPlayerTrack(track), (queue ?? [track]).map(toPlayerTrack)))}
               className={cn(
                 "inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-bold transition",
                 saved ? "border-tv-magenta bg-tv-magenta/15 text-tv-magenta" : "border-white/25 text-white hover:bg-white/10",
