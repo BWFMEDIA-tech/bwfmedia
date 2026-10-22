@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   Clapperboard,
@@ -11,8 +11,11 @@ import {
   Home,
   ListMusic,
   Mic2,
+  Pause,
   Play,
   Radio,
+  Volume2,
+  VolumeX,
   Rocket,
   Search,
   Sparkles,
@@ -56,6 +59,16 @@ const SIDEBAR = [
   { to: "/leaderboard", label: "Leaderboard", icon: Star },
 ] as const;
 
+type HomeChip = "all" | "music" | "videos" | "live" | "artists" | "arena";
+const HOME_CHIPS: { id: HomeChip; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "music", label: "Music" },
+  { id: "videos", label: "Videos" },
+  { id: "live", label: "Live" },
+  { id: "artists", label: "Artists" },
+  { id: "arena", label: "Arena" },
+];
+
 export function TunevioHome() {
   const { data, isLoading } = useQuery({
     queryKey: ["home-feed"],
@@ -84,6 +97,8 @@ export function TunevioHome() {
   const player = usePlayer();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [chip, setChip] = useState<HomeChip>("all");
+  const show = (cat: HomeChip) => chip === "all" || chip === cat;
 
   const feed = data;
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -192,7 +207,25 @@ export function TunevioHome() {
             </div>
           </header>
 
+          {/* Filter chips */}
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {HOME_CHIPS.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setChip(c.id)}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-bold transition ${
+                  chip === c.id
+                    ? "bg-tv-cyan text-black"
+                    : "border border-white/15 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+
           {/* Discover playlists */}
+          {show("music") && (
           <ContentRail
             id="discover"
             title="Playlists for You"
@@ -234,8 +267,10 @@ export function TunevioHome() {
               />,
             ]}
           />
+          )}
 
           {/* Popular this week */}
+          {show("music") && (
           <ListSection
             id="popular"
             title="Top Songs"
@@ -246,8 +281,10 @@ export function TunevioHome() {
               <TrackCard key={t.id} track={t} index={i + 1} queue={feed?.popular} />
             ))}
           </ListSection>
+          )}
 
           {/* Quick access bento grid */}
+          {chip === "all" && (
           <section className="swara-home-tools">
             <h2 className="mb-3 px-1 text-lg font-black sm:text-xl">Your Tunevio</h2>
             <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
@@ -271,6 +308,7 @@ export function TunevioHome() {
               ))}
             </div>
           </section>
+          )}
 
           {isLoading ? (
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -281,9 +319,10 @@ export function TunevioHome() {
           ) : null}
 
           {/* Featured hero */}
-          {feed?.featured ? <FeaturedCard track={feed.featured} queue={feed.charts} /> : null}
+          {show("music") && feed?.featured ? <FeaturedCard track={feed.featured} queue={feed.charts} /> : null}
 
           {/* Live now */}
+          {show("live") && (
           <ContentRail
             id="live-now"
             title="Live Right Now"
@@ -292,8 +331,10 @@ export function TunevioHome() {
             size="wide"
             items={(feed?.liveStreams ?? []).map((s) => <LiveStreamCard key={s.id} stream={s} />)}
           />
+          )}
 
           {/* Music videos */}
+          {show("videos") && (
           <ContentRail
             id="music-videos"
             title="Music Videos"
@@ -302,8 +343,10 @@ export function TunevioHome() {
             size="wide"
             items={(videos ?? []).map((v) => <VideoCard key={v.id} video={v} />)}
           />
+          )}
 
           {/* Play Arena */}
+          {show("arena") && (
           <ContentRail
             id="play-arena"
             title="Play Arena Battles"
@@ -312,8 +355,10 @@ export function TunevioHome() {
             size="lg"
             items={(feed?.battles ?? []).map((b) => <LiveArenaCard key={b.id} battle={b} />)}
           />
+          )}
 
           {/* Trending */}
+          {show("music") && (
           <ContentRail
             id="trending"
             title="Trending Now"
@@ -323,8 +368,10 @@ export function TunevioHome() {
               <AlbumCard key={t.id} track={t} queue={feed?.trending} />
             ))}
           />
+          )}
 
           {/* Personalized: Jump back in */}
+          {show("music") && (
           <PersonalRail
             id="jump-back-in"
             title="Jump Back In"
@@ -332,8 +379,10 @@ export function TunevioHome() {
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
           />
+          )}
 
           {/* New releases */}
+          {show("music") && (
           <ContentRail
             id="new-releases"
             title="New Releases"
@@ -343,8 +392,10 @@ export function TunevioHome() {
               <AlbumCard key={t.id} track={t} queue={feed?.newReleases} />
             ))}
           />
+          )}
 
           {/* Artists you follow / rising */}
+          {show("artists") && (
           <ContentRail
             id="artists-you-follow"
             title={auth.isAuthenticated ? "Artists You Follow" : "Artists To Follow"}
@@ -353,8 +404,10 @@ export function TunevioHome() {
             size="md"
             items={(feed?.artists ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
           />
+          )}
 
           {/* Made for you */}
+          {show("music") && (
           <PersonalRail
             id="made-for-you"
             title="Made For You"
@@ -362,8 +415,10 @@ export function TunevioHome() {
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
           />
+          )}
 
           {/* Charts */}
+          {show("music") && (
           <ContentRail
             id="charts"
             title="Tunevio Charts"
@@ -382,8 +437,10 @@ export function TunevioHome() {
               />
             ))}
           />
+          )}
 
           {/* Rising artists */}
+          {show("artists") && (
           <ContentRail
             id="rising"
             title="Rising Artists"
@@ -391,8 +448,10 @@ export function TunevioHome() {
             showAllTo="/leaderboard"
             items={(feed?.rising ?? []).map((a) => <ArtistCard key={a.id} artist={a} />)}
           />
+          )}
 
           {/* Boosted */}
+          {show("artists") && (
           <ContentRail
             id="boosted"
             title="Boosted Artists"
@@ -411,6 +470,7 @@ export function TunevioHome() {
               />
             ))}
           />
+          )}
 
           {!isLoading && !feed?.charts.length ? (
             <div className="rounded-2xl border border-tv-line bg-tv-surface p-10 text-center">
@@ -486,36 +546,147 @@ type HomeVideo = {
   thumbnail_path: string | null;
 };
 
-/** Music video card — links to the video page, signed thumbnail with first-frame fallback. */
+const PREVIEW_SECONDS = 30;
+
+function formatElapsed(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/**
+ * Music video card — autoplays a muted 30-second preview while on screen,
+ * with an elapsed-time badge and mute/play controls. Tapping opens the video page.
+ */
 function VideoCard({ video }: { video: HomeVideo }) {
   const thumb = useSignedVideoUrl(video.thumbnail_path);
-  const fallback = useSignedVideoUrl(video.thumbnail_path ? null : video.storage_path);
+  const src = useSignedVideoUrl(video.storage_path);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const vidRef = useRef<HTMLVideoElement>(null);
+  const [activated, setActivated] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [elapsed, setElapsed] = useState(0);
+
+  // Start loading the preview only once the card scrolls near the screen.
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) setActivated(true);
+      },
+      { threshold: 0.35, rootMargin: "150px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Play while visible, pause when scrolled away.
+  useEffect(() => {
+    const v = vidRef.current;
+    if (!v) return;
+    if (inView) {
+      v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  }, [inView, activated, src]);
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const v = vidRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().then(() => setPlaying(true)).catch(() => {});
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const v = vidRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+  };
+
   return (
     <Link
       to="/videos/$id"
       params={{ id: video.id } as never}
       className="group block overflow-hidden rounded-2xl border border-tv-line bg-tv-surface transition hover:border-tv-cyan/50"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-black/40">
-        {thumb ? (
+      <div ref={boxRef} className="relative aspect-video w-full overflow-hidden bg-black/40">
+        {activated && src ? (
+          <video
+            ref={vidRef}
+            src={src}
+            poster={thumb ?? undefined}
+            preload="auto"
+            muted={muted}
+            playsInline
+            className="h-full w-full object-cover"
+            onTimeUpdate={(e) => {
+              const v = e.currentTarget;
+              if (v.currentTime >= PREVIEW_SECONDS) {
+                v.currentTime = 0;
+                setElapsed(0);
+              } else {
+                setElapsed(v.currentTime);
+              }
+            }}
+          />
+        ) : thumb ? (
           <img
             src={thumb}
             alt={video.title}
             loading="lazy"
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
-        ) : fallback ? (
-          <video src={fallback} preload="metadata" muted playsInline className="h-full w-full object-cover" />
         ) : (
           <div className="grid h-full w-full place-items-center bg-white/5">
             <Clapperboard className="h-8 w-8 text-white/20" />
           </div>
         )}
-        <span className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-tv-cyan text-black shadow-lg">
-            <Play className="ml-0.5 h-5 w-5 fill-current" />
+        {/* Elapsed preview time */}
+        {activated && src ? (
+          <span className="absolute left-2 top-2 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-white">
+            {formatElapsed(elapsed)}
           </span>
-        </span>
+        ) : null}
+        {/* Preview controls */}
+        {activated && src ? (
+          <div className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-2">
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? "Unmute preview" : "Mute preview"}
+              className="grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80"
+            >
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={togglePlay}
+              aria-label={playing ? "Pause preview" : "Play preview"}
+              className="grid h-9 w-9 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80"
+            >
+              {playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}
+            </button>
+          </div>
+        ) : (
+          <span className="absolute inset-0 grid place-items-center bg-black/30 opacity-0 transition group-hover:opacity-100">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-tv-cyan text-black shadow-lg">
+              <Play className="ml-0.5 h-5 w-5 fill-current" />
+            </span>
+          </span>
+        )}
       </div>
       <div className="p-3">
         <p className="truncate text-sm font-bold">{video.title}</p>
