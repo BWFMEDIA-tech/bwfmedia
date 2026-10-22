@@ -99,7 +99,7 @@ function LoginPage() {
         return;
       }
       const uid = data.user?.id;
-      let dest: "/stream-studio" | "/" | "/artist-dashboard" = "/stream-studio";
+      let dest: "/stream-studio" | "/home" | "/artist-dashboard" = "/stream-studio";
       if (uid) {
         const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
         const list = (roles ?? []).map((r: { role: string }) => r.role);
@@ -111,7 +111,7 @@ function LoginPage() {
           setLoading(false);
           return nav({ to: "/admin/login" });
         }
-        if (list.includes("listener") && !list.includes("artist")) dest = "/";
+        if (list.includes("listener") && !list.includes("artist")) dest = "/home";
         // Artists do not get Stream Now / hosting tools — only hosts/managers
         // do. Send artist-only accounts to their dashboard, from which they
         // can join existing stages as guests.

@@ -140,7 +140,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   useEffect(() => { void registerTunevioPwa().catch(() => { /* Installation must never interrupt the website. */ }); }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isChrome = !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
+  const isChrome = pathname !== "/" && !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
   const showBottomNav =
     isChrome &&
     !pathname.startsWith("/admin") &&
@@ -172,7 +172,7 @@ function RootComponent() {
 
           <Outlet />
         </div>
-        {isChrome && pathname === "/" && <SiteFooter fullWidth />}
+        {isChrome && pathname === "/home" && <SiteFooter fullWidth />}
         <CartDrawer />
          <GlobalPlayer hidden={pathname.startsWith("/play") || pathname.startsWith("/stream/") || pathname.startsWith("/stage/") || pathname.startsWith("/stream-studio") || pathname.startsWith("/broadcast/") || pathname === "/go-live"} />
         {showBottomNav && <MobileBottomNav />}
