@@ -86,7 +86,19 @@ function useRevealOnScroll(rootMargin = "-80px") {
       { rootMargin, threshold: 0.15 },
     );
     observer.observe(el);
-    return () => observer.disconnect();
+    // A fast jump (scrollbar drag or anchor link) can carry the photo past the
+    // screen between two frames, so reveal anything already scrolled above it.
+    const onScroll = () => {
+      if (el.getBoundingClientRect().bottom < 0) {
+        setShown(true);
+        observer.disconnect();
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [rootMargin]);
 
   return { ref, shown };
