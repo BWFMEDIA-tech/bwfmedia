@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Analyze imported Figma pages/components/tokens/assets against existing website; blocked on identifiable Figma export or enabled desktop Figma connection. No website code changes requested.
 - [ ] Implement music-only 60/40 monthly streamshare royalties using existing ledgers/statements/Connect; inspect and plan first, preserve records, test calculations and prevent unapproved real payouts.
 - [x] Keep intro autoplay continuous when enabling sound, without replay controls or seeking. Browser-compatible soundtrack test confirmed playback advanced from 1.40s to 1.52s on unmute; control disappears and Skip works. Build OK; native phone audio not tested, not published.
 - [x] Fix intro sound with a direct-tap unmute/replay control. Confirmed original AAC soundtrack; browser-compatible transcode verified blocked-autoplay fallback, tap unmute/restart and Skip; build OK. Native phone playback remains unverified; not published.
