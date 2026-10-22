@@ -207,6 +207,23 @@ export function TunevioHome() {
             </div>
           </header>
 
+          {/* Filter chips */}
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {HOME_CHIPS.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setChip(c.id)}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-bold transition ${
+                  chip === c.id
+                    ? "bg-tv-cyan text-black"
+                    : "border border-white/15 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+
           {/* Discover playlists */}
           <ContentRail
             id="discover"
