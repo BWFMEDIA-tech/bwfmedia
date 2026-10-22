@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ChevronRight, MessageSquare, Search, Send, UserPlus, X } from "lucide-react";
 import { z } from "zod";
@@ -371,12 +371,12 @@ function MessagesPage() {
 
           {/* Thread */}
           <section
-            style={activeId && vv ? ({ "--vvh": `${vv.h}px`, "--vvt": `${vv.top}px` } as React.CSSProperties) : undefined}
+            style={activeId && vv ? ({ "--vvh": `${vv.h}px`, "--vvt": `${vv.top}px` } as CSSProperties) : undefined}
             className={`flex-col overflow-hidden bg-black md:bg-white/[0.03] ${activeId ? "fixed inset-x-0 top-[var(--vvt,0px)] z-[60] flex h-[var(--vvh,100dvh)] animate-in slide-in-from-bottom-6 fade-in duration-200 md:static md:z-auto md:h-auto md:animate-none md:rounded-3xl md:border md:border-white/10 md:shadow-2xl md:shadow-brand-blue/10" : "hidden md:flex md:rounded-3xl md:border md:border-white/10"}`}
           >
             {activeId ? (
               <>
-                <header className="relative flex items-center gap-3 border-b border-white/10 px-3 py-3">
+                <header className="relative flex shrink-0 items-center gap-3 border-b border-white/10 px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3">
                   <button
                     onClick={closeConversation}
                     className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-brand-cyan/60 hover:bg-white/10 md:hidden"
