@@ -32,6 +32,8 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
 import { useCart } from "@/contexts/CartContext";
 import { SignedImg } from "@/components/ui/signed-img";
+import { useQuery } from "@tanstack/react-query";
+import { getSiteNav } from "@/lib/site-nav.functions";
 import { artistDashboardDestination, hasArtistTools } from "@/lib/artist-navigation";
 
 function HeaderCartButton() {
@@ -73,6 +75,8 @@ const MENU_GROUPS: { key: string; label: string; items: NavItem[] }[] = [
     { to: "/store", label: "Tunevio Store", icon: ShoppingCart },
   ] },
 ];
+
+const NAV_ICONS: Record<string, any> = { Home, Compass, Radio, Music, User, LayoutDashboard, ShoppingCart, Disc3, Trophy, BarChart3, Calendar, Newspaper, Mail, Mic };
 
 function useActivePath() {
   return useRouterState({ select: (s) => s.location.pathname });
