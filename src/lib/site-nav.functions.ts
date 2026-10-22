@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/admin-guard";
 
 export type NavRow = {
   id: string;
-  slot: "primary" | "browse";
+  slot: "primary" | "discover" | "store";
   to_path: string;
   label: string;
   icon: string;
