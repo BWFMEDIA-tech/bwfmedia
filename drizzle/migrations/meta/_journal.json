@@ -232,6 +232,13 @@
       "when": 1792251625397,
       "tag": "0032_stream_playback_progress",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792676210521,
+      "tag": "0033_site_nav_menu_groups",
+      "breakpoints": true
     }
   ]
 }

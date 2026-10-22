@@ -14,14 +14,16 @@ export const Route = createFileRoute("/admin/navigation")({
   component: NavigationEditor,
 });
 
-const SLOTS: { key: "primary" | "browse"; title: string; hint: string }[] = [
-  { key: "primary", title: "Main navigation", hint: "The links shown across the top of every page." },
-  { key: "browse", title: "Browse menu", hint: "Links inside the Browse dropdown and the mobile menu." },
+type Slot = NavRow["slot"];
+const SLOTS: { key: Slot; title: string; hint: string }[] = [
+  { key: "primary", title: "Main menu", hint: "Top-level items in order. The #discover and #store rows mark where the Discover and Store dropdowns appear; rename, move or hide them like any link." },
+  { key: "discover", title: "Discover dropdown", hint: "Links inside the Discover menu on desktop and phone." },
+  { key: "store", title: "Store dropdown", hint: "Links inside the Store menu on desktop and phone." },
 ];
 
 const ICON_CHOICES = ["Home", "Compass", "Radio", "Music", "User", "LayoutDashboard", "ShoppingCart", "Disc3", "Trophy", "BarChart3", "Calendar", "Newspaper", "Mail", "Mic", "Film"];
 
-const DESTINATIONS = ["/", "/discover", "/live", "/artists", "/profile", "/artist-dashboard", "/store", "/artist-store", "/play", "/leaderboard", "/videos", "/charts", "/events", "/blog", "/contact", "/off-the-block", "/pricing", "/help"];
+const DESTINATIONS = ["#discover", "#store", "/", "/library", "/discover", "/live", "/artists", "/profile", "/artist-dashboard", "/store", "/artist-store", "/play", "/leaderboard", "/videos", "/charts", "/events", "/blog", "/contact", "/off-the-block", "/pricing", "/help"];
 
 function NavigationEditor() {
   const auth = useAuth();
@@ -50,7 +52,7 @@ function NavigationEditor() {
       return list.map((r) => (newPos.has(r.id) ? { ...r, position: newPos.get(r.id)! } : r));
     });
 
-  const add = (slot: "primary" | "browse") =>
+  const add = (slot: Slot) =>
     setItems((prev) => {
       const list = [...(prev ?? [...(q.data?.items ?? [])])];
       const maxPos = Math.max(0, ...list.filter((r) => r.slot === slot).map((r) => r.position));
@@ -156,7 +158,7 @@ function NavigationEditor() {
           {DESTINATIONS.map((d) => <option key={d} value={d} />)}
         </datalist>
         <p className="text-xs text-muted-foreground">
-          "My Profile" and "Artist Dashboard" keep their smart behavior for signed-in members even when you rename or reorder them.
+          "My Profile" always opens the member’s own profile, and "Artist Dashboard" only appears for artists and admins. Settings, Install, Stream Studio, Admin and Sign Out stay in the account menu.
         </p>
       </div>
     </SectionPage>
