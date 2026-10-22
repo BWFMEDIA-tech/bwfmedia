@@ -96,7 +96,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     artists: true, music: false, video: false, broadcast: true, stage: true,
   });
-  const navRef = useRef<HTMLElement | null>(null);
+  const [navEl, setNavEl] = useState<HTMLElement | null>(null);
   const navDrag = useRef<{ y: number; top: number } | null>(null);
   const [navBox, setNavBox] = useState({ top: 0, full: 0, view: 0 });
 
@@ -104,18 +104,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
   // the footer. The bar below is drawn rather than native, because mobile and
   // headless browsers hide native scrollbars until the user is mid-swipe.
   useEffect(() => {
-    const el = navRef.current;
-    if (!el) return;
-    const sync = () => setNavBox({ top: el.scrollTop, full: el.scrollHeight, view: el.clientHeight });
+    if (!navEl) return;
+    const sync = () => setNavBox({ top: navEl.scrollTop, full: navEl.scrollHeight, view: navEl.clientHeight });
     sync();
-    el.addEventListener("scroll", sync, { passive: true });
+    navEl.addEventListener("scroll", sync, { passive: true });
     const observer = new ResizeObserver(sync);
-    observer.observe(el);
+    observer.observe(navEl);
     return () => {
-      el.removeEventListener("scroll", sync);
+      navEl.removeEventListener("scroll", sync);
       observer.disconnect();
     };
-  }, []);
+  }, [navEl]);
+
 
   const navScrolls = navBox.full > navBox.view + 4;
   const navMax = Math.max(1, navBox.full - navBox.view);
@@ -126,14 +126,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const navPercent = Math.round((navBox.top / navMax) * 100);
 
   const onNavThumbDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const el = navRef.current;
+    const el = navEl;
+
     if (!el) return;
     navDrag.current = { y: event.clientY, top: el.scrollTop };
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const onNavThumbMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const el = navRef.current;
+    const el = navEl;
+
     const drag = navDrag.current;
     if (!el || !drag) return;
     const travel = Math.max(1, el.clientHeight - navThumbHeight);
@@ -179,9 +181,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="relative flex min-h-0 flex-1">
         <nav
           id="admin-nav"
-          ref={navRef}
+          ref={setNavEl}
           className="tv-scroll min-h-0 w-full flex-1 overflow-y-auto overscroll-contain px-2 pb-4"
         >
+
 
 
           {NAV.map((entry) => {
