@@ -175,12 +175,53 @@ function MessagesPage() {
     );
   }, [messages, activeId, auth.user?.id]);
 
+  const scrollToLatest = (smooth = false) => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+  };
+
   // Auto-scroll on new messages
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    scrollToLatest();
   }, [activeMessages.length, activeId]);
+
+  // Focus the composer when a conversation opens
+  useEffect(() => {
+    if (!activeId) return;
+    const t = window.setTimeout(() => composerRef.current?.focus({ preventScroll: true }), 120);
+    return () => window.clearTimeout(t);
+  }, [activeId]);
+
+  // Track the visible viewport so the pop-up composer stays above the phone keyboard
+  const [vv, setVv] = useState<{ h: number; top: number } | null>(null);
+  useEffect(() => {
+    const v = window.visualViewport;
+    if (!v) return;
+    const update = () => {
+      setVv({ h: v.height, top: v.offsetTop });
+      scrollToLatest();
+    };
+    update();
+    v.addEventListener("resize", update);
+    v.addEventListener("scroll", update);
+    return () => { v.removeEventListener("resize", update); v.removeEventListener("scroll", update); };
+  }, []);
+
+  // Lock page scroll behind the mobile pop-up
+  useEffect(() => {
+    if (!activeId || window.matchMedia("(min-width: 768px)").matches) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [activeId]);
+
+  // Auto-grow the composer
+  useEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+  }, [body]);
 
   // Mark conversation read when opened
   useEffect(() => {
