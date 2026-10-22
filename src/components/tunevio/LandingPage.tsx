@@ -137,6 +137,15 @@ export function LandingPage() {
   return (
     <MotionConfig reducedMotion="user">
     <div className="tunevio-welcome min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Ambient lighting: blue scan line travelling up and down, plus glowing corners */}
+      <div className="welcome-ambient" aria-hidden="true">
+        <span className="welcome-corner welcome-corner-tl" />
+        <span className="welcome-corner welcome-corner-tr" />
+        <span className="welcome-corner welcome-corner-bl" />
+        <span className="welcome-corner welcome-corner-br" />
+        <span className="welcome-rail welcome-rail-left"><span className="welcome-rail-pulse" /></span>
+        <span className="welcome-rail welcome-rail-right"><span className="welcome-rail-pulse" /></span>
+      </div>
       {/* Top bar */}
       <header className="relative z-20 flex items-center justify-between px-5 sm:px-10 py-5">
         <a href="/" className="flex items-center gap-3" aria-label="Tunevio home">
