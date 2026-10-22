@@ -12,7 +12,11 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Tunevio Pricing — Streaming & Artist Plans" },
-      { name: "description", content: "Premium streaming for listeners and pro tools for artists. Plans starting at $4.99/month." },
+      { name: "description", content: "Explore Tunevio's free Artist Starter and optional listener, artist and label plans." },
+      { property: "og:title", content: "Tunevio Pricing — Streaming & Artist Plans" },
+      { property: "og:description", content: "Explore Tunevio's free Artist Starter and optional listener, artist and label plans." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });
@@ -77,42 +81,43 @@ function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 pb-24">
+    <div className="swara-pricing min-h-screen bg-background text-foreground pt-12 pb-24">
       <div className="mx-auto max-w-6xl px-6">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60 mb-4">
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground mb-4">
             <Sparkles className="h-3 w-3" /> Tunevio Plans
           </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight">
-            Listen. Create. <span className="bg-gradient-to-r from-[#0000FF] via-[#00E6FF] to-[#00E6FF] bg-clip-text text-transparent">Get paid.</span>
+          <h1 className="text-3xl md:text-5xl font-bold">
+            Choose your Tunevio plan
           </h1>
-          <p className="mt-4 text-white/60 max-w-xl mx-auto">
+          <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
             Premium streaming for fans. Pro tools for artists and labels. Cancel anytime.
           </p>
-          <div className="mt-6 mx-auto max-w-xl rounded-2xl border border-[#00E6FF]/60 bg-gradient-to-r from-[#0000FF]/30 to-[#00E6FF]/20 px-5 py-4 shadow-[0_0_60px_-15px_rgba(0,230,255,0.6)]">
-            <div className="text-2xl md:text-3xl font-black uppercase tracking-tight">30-day free trial</div>
-            <p className="mt-1 text-sm text-white/80">Artists can start free with Artist Starter. Paid plans include a 30-day free trial — you won't be charged until day 31. Cancel anytime.</p>
+          <div className="mt-5 mx-auto max-w-xl">
+            <p className="text-sm text-muted-foreground">Artists can start free with Artist Starter. Paid plans include a 30-day free trial — you won't be charged until day 31. Cancel anytime.</p>
           </div>
         </div>
 
         <div className="flex justify-center mb-10">
-          <div className="inline-flex rounded-full bg-white/5 border border-white/10 p-1">
+          <div className="inline-flex gap-2 rounded-full border border-border p-1" role="group" aria-label="Plan audience">
             {(["listener", "artist"] as Tab[]).map((t) => (
-              <button
+              <Button
                 key={t}
                 onClick={() => setTab(t)}
+                aria-pressed={tab === t}
+                variant={tab === t ? "secondary" : "ghost"}
                 className={`px-6 py-2 text-sm font-bold uppercase tracking-wider rounded-full transition ${
-                  tab === t ? "bg-white text-black" : "text-white/70 hover:text-white"
+                  tab === t ? "bg-foreground text-background hover:bg-foreground/90" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {t === "listener" ? "For Listeners" : "For Artists"}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-200 text-sm text-center">
+          <div role="alert" className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm text-center">
             {error}
           </div>
         )}
@@ -125,29 +130,29 @@ function PricingPage() {
             return (
               <div
                 key={planId}
-                className={`relative rounded-2xl p-6 border bg-gradient-to-b from-white/[0.04] to-transparent ${
+                className={`swara-plan-card relative flex flex-col rounded-lg p-6 border bg-card ${
                   isHighlighted
-                    ? "border-[#00E6FF]/60 shadow-[0_0_60px_-15px_rgba(0,0,255,0.5)]"
-                    : "border-white/10"
+                    ? "border-primary/60"
+                    : "border-border"
                 }`}
               >
                 {tag && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-to-r from-[#0000FF] to-[#00E6FF] text-white">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold bg-primary text-primary-foreground">
                     {tag}
                   </div>
                 )}
-                <div className="text-sm uppercase tracking-widest text-white/50">{plan.label}</div>
+                <h2 className="text-xl font-semibold text-primary">{plan.label}</h2>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-5xl font-black">${plan.priceCents === 0 ? "0" : (plan.priceCents / 100).toFixed(2)}</span>
-                  <span className="text-white/50 text-sm">/month</span>
+                  <span className="text-4xl font-bold">${plan.priceCents === 0 ? "0" : (plan.priceCents / 100).toFixed(2)}</span>
+                  <span className="text-muted-foreground text-sm">/month</span>
                 </div>
-                <div className="mt-2 inline-block rounded-full bg-[#00E6FF]/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#00E6FF]">
+                <div className="mt-2 text-xs font-semibold text-muted-foreground">
                   {plan.priceCents === 0 ? "Included free" : "First 30 days free"}
                 </div>
-                <ul className="mt-6 space-y-3 text-sm">
+                <ul className="mt-6 mb-6 flex-1 space-y-4 border-t border-border pt-5 text-sm">
                   {FEATURES[planId].map((f) => (
-                    <li key={f} className="flex gap-2 text-white/80">
-                      <Check className="h-4 w-4 mt-0.5 text-[#00E6FF] shrink-0" />
+                    <li key={f} className="flex gap-3 text-brand-silver">
+                      <Check className="h-4 w-4 mt-0.5 text-primary shrink-0" />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -155,10 +160,10 @@ function PricingPage() {
                 <Button
                   onClick={() => (plan.priceCents === 0 ? (window.location.href = "/signup") : startCheckout(planId))}
                   disabled={loadingPlan === planId}
-                  className={`mt-6 w-full font-bold uppercase tracking-wider ${
+                  className={`h-auto min-h-12 w-full whitespace-normal rounded-full px-4 py-3 font-semibold ${
                     isHighlighted
-                      ? "bg-gradient-to-r from-[#0000FF] to-[#00E6FF] hover:opacity-90"
-                      : "bg-white text-black hover:bg-white/90"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-foreground text-background hover:bg-foreground/90"
                   }`}
                 >
                   {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : plan.priceCents === 0 ? "Get started free" : "Start 30-day free trial"}
@@ -169,22 +174,22 @@ function PricingPage() {
         </div>
 
         {tab === "listener" && (
-          <div className="mt-12 text-center text-sm text-white/40">
-            Just want the basics? <Link to="/" className="text-white underline">Listen free with ads.</Link>
+          <div className="mt-12 text-center text-sm text-muted-foreground">
+            Just want the basics? <Link to="/" className="text-foreground underline">Listen free with ads.</Link>
           </div>
         )}
       </div>
 
       {clientSecret && activePlan && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl overflow-hidden my-8">
-            <button
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-foreground rounded-lg overflow-hidden my-8">
+            <Button
               onClick={closeCheckout}
-              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/80 text-white grid place-items-center hover:bg-black"
+              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-background/80 text-foreground grid place-items-center hover:bg-background"
               aria-label="Close checkout"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
             <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
               <EmbeddedCheckout />
             </EmbeddedCheckoutProvider>
