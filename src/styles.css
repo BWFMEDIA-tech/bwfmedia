@@ -1024,6 +1024,10 @@ html[data-music-player] .music-assistant-launcher { bottom: calc(var(--bwf-mobil
 .music-mini-player { background: var(--music-player-fill); }
 .music-mini-layout button[aria-label="Play"], .music-mini-layout button[aria-label="Pause"] { background: var(--secondary); color: var(--foreground); }
 .swara-profile-settings, .swara-notification-settings { font-family: var(--font-body); letter-spacing: 0; }
+.swara-profile-settings { width: 100%; max-width: 100%; }
+.swara-profile-settings :is(.swara-settings-section, aside, aside > div) { min-width: 0; max-width: 100%; }
+.swara-profile-settings .swara-settings-section > .flex { flex-wrap: wrap; gap: 12px; }
+.swara-profile-settings .swara-settings-section :is(p, span) { overflow-wrap: anywhere; }
 .swara-profile-settings label > span { font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--muted-foreground); }
 .swara-profile-settings .swara-settings-section > div:first-child { font-size: 16px; font-weight: 600; }
 .swara-profile-settings input, .swara-profile-settings textarea { min-width: 0; color: var(--foreground); }
@@ -1045,4 +1049,10 @@ html[data-music-player] .music-assistant-launcher { bottom: calc(var(--bwf-mobil
   .music-mini-layout > div:nth-child(2) button[aria-label="Play"], .music-mini-layout > div:nth-child(2) button[aria-label="Pause"] { width: 36px; height: 36px; }
   .swara-music-detail .music-detail-content { padding-inline: 20px; }
   .swara-profile-settings .swara-settings-section { padding-block: 20px; }
+  .swara-profile-settings .swara-settings-section > .grid { grid-template-columns: minmax(0, 1fr); }
+  .swara-profile-settings .swara-settings-section .grid > .md\:col-span-2 { grid-column: auto; }
+  .swara-profile-settings .sticky { flex-wrap: wrap; padding: 8px; gap: 8px; }
+  .swara-profile-settings .sticky button { padding-inline: 10px; font-size: 12px; }
+  .tunevio-phone-navigation ul { min-height: 62px; }
+  .tunevio-phone-navigation a { min-height: 62px; }
 }
