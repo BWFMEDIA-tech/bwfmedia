@@ -6,6 +6,7 @@ import { Store, Nfc, Package, Search, Loader2 } from "lucide-react";
 import { listStoreProducts } from "@/lib/artist-store.functions";
 import { PRODUCT_TYPE_LABELS, type ProductType } from "@/lib/artist-store";
 import { StoreProductCard } from "@/components/store/StoreProductCard";
+import { Button } from "@/components/ui/button";
 import hero from "@/assets/artist-store-hero.jpg";
 import collection from "@/assets/store-collection.jpg";
 
@@ -43,11 +44,12 @@ function ArtistStorePage() {
   const featured = products.filter((p: any) => p.is_featured).slice(0, 4);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4 sm:px-6">
-      <section className="overflow-hidden rounded-3xl border border-border bg-card">
-        <img src={hero} alt="Vinyl record, CD and NFC keychain" width={1600} height={912} className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]" />
-        <div className="p-5 sm:p-8">
-          <h1 className="text-2xl font-bold sm:text-4xl">Your Music. Something Real.</h1>
+    <main className="swara-artist-store mx-auto w-full max-w-6xl px-4 pb-24 pt-4 sm:px-6">
+      <section className="swara-store-hero relative isolate overflow-hidden">
+        <img src={hero} alt="Vinyl record, CD and NFC keychain" width={1600} height={912} className="absolute inset-0 -z-20 h-full w-full object-cover" />
+        <div className="swara-store-hero-shade absolute inset-0 -z-10" />
+        <div className="flex h-full flex-col justify-end p-5 sm:p-8">
+          <h1 className="text-3xl font-bold sm:text-5xl">Tunevio Artist Store</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
             Turn your releases into collectible products. Let fans own your music on vinyl, CDs, NFC keychains, and other physical formats.
           </p>
@@ -55,9 +57,9 @@ function ArtistStorePage() {
             <Link to="/artist-store/manage" className="flex flex-col items-center gap-1.5 rounded-xl bg-primary px-2 py-4 text-center text-xs font-bold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 sm:text-sm">
               <Store className="h-4 w-4" /> Artist Store
             </Link>
-            <button onClick={() => setCat("nfc_keychain")} className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background/60 px-2 py-4 text-xs font-bold transition hover:border-primary sm:text-sm">
+            <Button variant="outline" onClick={() => setCat("nfc_keychain")} className="flex h-auto flex-col items-center gap-1.5 border border-border bg-background/60 px-2 py-4 text-xs font-bold sm:text-sm">
               <Nfc className="h-4 w-4" /> NFC Products
-            </button>
+            </Button>
             <Link to="/artist-store/orders" search={{ session_id: undefined }} className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background/60 px-2 py-4 text-xs font-bold transition hover:border-primary sm:text-sm">
               <Package className="h-4 w-4" /> Orders
             </Link>
@@ -90,7 +92,7 @@ function ArtistStorePage() {
           <h2 className="text-lg font-bold">Shop</h2>
           <label className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 sm:w-72">
             <Search className="h-4 w-4 text-muted-foreground" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search products or artists" className="w-full bg-transparent text-sm outline-none" />
+            <input aria-label="Search products or artists" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search products or artists" className="w-full min-w-0 bg-transparent text-sm outline-none" />
           </label>
         </div>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">

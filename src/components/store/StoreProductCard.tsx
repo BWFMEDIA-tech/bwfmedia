@@ -19,7 +19,7 @@ export function StoreProductCard({ p }: { p: StoreCardProduct }) {
     <Link
       to="/artist-store/$productId"
       params={{ productId: p.id }}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-0.5 hover:border-primary/60"
+      className="swara-product-card group flex min-w-0 flex-col overflow-hidden rounded-lg transition hover:-translate-y-0.5"
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
         {p.images[0] ? (

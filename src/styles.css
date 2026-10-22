@@ -1056,3 +1056,61 @@ html[data-music-player] .music-assistant-launcher { bottom: calc(var(--bwf-mobil
   .tunevio-phone-navigation ul { min-height: 62px; }
   .tunevio-phone-navigation a { min-height: 62px; }
 }
+
+/* Additional approved reference screens share tokens, never financial behavior. */
+:root {
+  --reference-panel: oklch(0.21 0.012 250);
+  --reference-cover-shade: linear-gradient(180deg, transparent 15%, color-mix(in oklab, var(--background) 30%, transparent) 45%, var(--background) 100%);
+}
+.swara-pricing, .swara-artists, .swara-events, .swara-store, .swara-artist-store, .swara-product-detail { font-family: var(--font-body); letter-spacing: 0; }
+.swara-pricing h1, .swara-artists h1, .swara-events h1 { letter-spacing: 0; font-weight: 600; }
+.swara-pricing .swara-plan-card { background: var(--reference-panel); }
+.swara-pricing [aria-label="Plan audience"] { max-width: 100%; }
+.swara-pricing [aria-label="Plan audience"] button { min-width: 0; padding-inline: 16px; letter-spacing: 0; }
+.swara-pricing [aria-label="Plan audience"] button[aria-pressed="true"] { background: var(--foreground); color: var(--background); }
+.swara-pricing [aria-label="Plan audience"] button[aria-pressed="false"] { background: transparent; color: var(--muted-foreground); }
+.swara-artists header { margin-bottom: 20px; }
+.swara-artists .sticky { position: relative; padding-top: 8px; background: var(--background); }
+.swara-artists input { min-height: 52px; border-radius: 28px; background: var(--reference-panel); padding-left: 42px; }
+.swara-artists .swara-artist-card > a:first-child > span:nth-child(2) { width: 128px; height: 128px; }
+.swara-artists .swara-artist-card > a:first-child > span:first-child { opacity: .3; }
+.swara-artists .swara-artist-card h2 { white-space: normal; overflow-wrap: anywhere; line-height: 1.4; }
+.swara-artists .follow-pill { min-height: 36px; }
+.swara-store .store-cover { height: 460px; min-height: 360px; }
+.swara-store .store-title { font-family: var(--font-body); font-weight: 600; }
+.swara-store .store-cover > div:nth-of-type(2) { justify-content: flex-end; padding-bottom: 60px; }
+.swara-store .store-cover h1 { font-size: 48px; line-height: 1.15; }
+.swara-store .store-cover h1 br { display: none; }
+.swara-store .store-cover h1 span { margin-left: 12px; color: var(--foreground); }
+.swara-store .store-cover button { border-radius: 28px; background: var(--reference-panel); color: var(--foreground); }
+.swara-product-card > div:first-child { border-radius: 8px; }
+.swara-product-card > div:nth-child(2) { padding: 14px 0; }
+.swara-product-card h3 { font-weight: 500; }
+.swara-product-card > div:nth-child(2) > div:first-child { white-space: normal; overflow-wrap: anywhere; }
+.swara-product-card button, .swara-product-card a { border-radius: 24px; }
+.swara-store-hero { height: 460px; max-height: calc(100svh - 180px); min-height: 360px; }
+.swara-store-hero-shade { background: var(--reference-cover-shade); }
+.swara-artist-store > section:nth-child(2) { margin-top: 28px; gap: 20px; }
+.swara-artist-store > section:nth-child(2) button > div:first-child { border-radius: 8px; }
+.swara-product-detail h1 { font-weight: 600; letter-spacing: 0; overflow-wrap: anywhere; }
+.swara-product-detail .sticky { border-radius: 8px; }
+.swara-product-detail .sticky > button, .swara-product-detail .sticky > a { border-radius: 24px; }
+.swara-events .swara-event-row h3 { font-weight: 500; line-height: 1.45; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .swara-pricing > div:first-child { padding-inline: 16px; }
+  .swara-pricing .swara-plan-card { padding: 24px; }
+  .swara-artists > div { padding-top: 28px; }
+  .swara-artists ul { gap: 12px; }
+  .swara-artists .swara-artist-card { padding-inline: 4px; }
+  .swara-artists .swara-artist-card > a:first-child > span:nth-child(2) { width: 104px; height: 104px; }
+  .swara-artists .swara-artist-card .follow-pill { padding-inline: 8px; font-size: 12px; }
+  .swara-store .store-cover { height: 440px; min-height: 360px; }
+  .swara-store .store-cover h1 { font-size: 36px; }
+  .swara-store .store-cover > img { opacity: 1; }
+  .swara-store .store-cover-shade { background: var(--reference-cover-shade); }
+  .swara-store-hero { height: 440px; }
+  .swara-artist-store .swara-store-hero h1 { font-size: 28px; }
+  .swara-events .swara-event-calendar { margin-inline: auto; }
+  .swara-product-detail .sticky { flex-wrap: wrap; }
+  .swara-product-detail .sticky > button, .swara-product-detail .sticky > a { min-width: 160px; white-space: normal; }
+}

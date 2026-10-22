@@ -30,7 +30,7 @@ function StorePage() {
   const products: StoreProduct[] = (catalog.data?.products ?? []).map((product) => ({ ...product, variants: product.variants.map((variant) => ({ ...variant, shopify_variant_id: String(variant.shopify_variant_id) })) }));
   const visible = products.filter((product) => (category === "All" || productCategory(product.title) === category) && `${product.title} ${product.store?.shop_name ?? ""}`.toLowerCase().includes(search.toLowerCase())).sort((a, b) => sort === "price-low" ? (a.min_price_cents ?? Infinity) - (b.min_price_cents ?? Infinity) : sort === "name" ? a.title.localeCompare(b.title) : 0);
   function showCollection() { document.getElementById("store-catalog")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); }
-  return <main className="tunevio-store bg-background text-foreground">
+  return <main className="tunevio-store swara-store bg-background text-foreground">
     <section className="store-cover relative isolate overflow-hidden">
       <img src={collectionImage} width={1920} height={1024} alt="Concept collection of vinyl, a metallic NFC card and artist apparel" className="absolute inset-0 -z-20 h-full w-full object-cover" />
       <div className="store-cover-shade absolute inset-0 -z-10" />
@@ -68,7 +68,7 @@ function StorePage() {
 
 function StoreProductCard({product}: {product: StoreProduct}) {
   const checkout = storeCheckout(product);
-  return <article className="group min-w-0 overflow-hidden rounded-lg border border-border bg-card transition-colors hover:border-primary/40">
+  return <article className="swara-product-card group min-w-0 overflow-hidden rounded-lg transition-colors">
     <div className="aspect-square overflow-hidden bg-muted">{product.image_url ? <SignedImg src={product.image_url} alt={product.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none" /> : <div className="grid h-full place-items-center"><ShoppingBag className="h-12 w-12 text-muted-foreground" /></div>}</div>
     <div className="p-3 sm:p-4"><p className="truncate text-[10px] uppercase text-primary">{product.store?.shop_name ?? "Artist store"}</p><h3 className="mt-2 line-clamp-2 min-h-10 text-sm font-semibold">{product.title}</h3><p className="mt-3 text-sm text-brand-silver">{product.max_price_cents !== null && product.min_price_cents !== null && product.max_price_cents > product.min_price_cents ? "From " : ""}{storePrice(product.min_price_cents, product.currency)}</p>{checkout ? <Button asChild className="mt-4 h-11 w-full px-2"><a href={checkout} target="_blank" rel="noopener noreferrer">Buy now <ArrowUpRight /></a></Button> : <Button disabled variant="secondary" className="mt-4 h-11 w-full px-2">Unavailable</Button>}</div>
   </article>;

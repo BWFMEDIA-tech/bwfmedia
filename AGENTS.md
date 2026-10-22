@@ -25,4 +25,4 @@
 - Edit announcement copies by send timestamp, sender and content after server admin checks; preserve recipients/read state, never resend email.
 - Music details/Now Playing reuse PlayerProvider and persistent GlobalPlayer with real queues, no inferred albums or unapproved downloads. Hide the dock on live/Arena production pages to preserve independent controls.
 - PWA uses generateSW and one preview-guarded registrar; cache only static offline help/icons and hashed JS/CSS/fonts, never navigation HTML, APIs or media, to protect accounts and realtime. No forced update reloads.
-- Scope reference-kit presentation to Home, shared player/navigation and selected settings classes; preserve their existing handlers and data sources so visual updates never replace music, account or live functionality.
+- Scope reference-kit presentation to explicit Home, player/navigation, settings, pricing, store, events and artist-directory classes; preserve existing handlers and data sources so visual updates never replace music, financial, account or live functionality.

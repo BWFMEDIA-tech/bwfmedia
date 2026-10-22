@@ -9,6 +9,7 @@ import { getStoreProduct, createStoreCheckout } from "@/lib/artist-store.functio
 import { PRODUCT_TYPE_LABELS, computeShipping, formatPrice, isNfcType, type ProductType } from "@/lib/artist-store";
 import { useAuth } from "@/lib/auth-context";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/artist-store/$productId")({
   head: () => ({
@@ -77,17 +78,18 @@ function ProductPage() {
   const isOwner = user?.id === p.user_id;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6">
+    <main className="swara-product-detail mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6">
       <Link to="/artist-store" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Artist Store</Link>
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <div className="aspect-square overflow-hidden rounded-3xl border border-border bg-muted">
+          <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
             {p.images[img] ? <img src={p.images[img]} alt={p.title} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-muted-foreground">No image</div>}
+            {p.images.length > 1 && <span className="absolute bottom-3 right-3 rounded-full bg-background/80 px-3 py-1 text-sm text-foreground">{img + 1}/{p.images.length}</span>}
           </div>
           {p.images.length > 1 && (
             <div className="mt-2 flex gap-2 overflow-x-auto">
               {p.images.map((u: string, i: number) => (
-                <button key={u} onClick={() => setImg(i)} className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border ${i === img ? "border-primary" : "border-border"}`}><img src={u} alt="" className="h-full w-full object-cover" /></button>
+                <Button variant="ghost" aria-label={`Product image ${i + 1}`} aria-pressed={i === img} key={u} onClick={() => setImg(i)} className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border p-0 ${i === img ? "border-primary" : "border-border"}`}><img src={u} alt="" className="h-full w-full object-cover" /></Button>
               ))}
             </div>
           )}
@@ -151,7 +153,7 @@ function ProductPage() {
         </div>
       </div>
       {checkout && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-white">
+        <div className="mt-6 overflow-hidden rounded-lg border border-border bg-foreground">
           <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
