@@ -4,26 +4,27 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Calendar as CalendarIcon, MapPin, Clock, ExternalLink, Radio } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { Button } from "@/components/ui/button";
 import { listPublicEvents, type EventRow } from "@/lib/events.functions";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
     meta: [
-      { title: "Events Calendar — BWF Network" },
-      { name: "description", content: "See all upcoming BWF Network live events, competitions, listening parties, and DJ sessions on the events calendar." },
-      { property: "og:title", content: "Events Calendar — BWF Network" },
-      { property: "og:description", content: "Browse upcoming BWF Network live events, competitions, and creator sessions on the calendar." },
+      { title: "Events Calendar — Tunevio" },
+      { name: "description", content: "Browse upcoming Tunevio live events, competitions, listening parties and creator sessions." },
+      { property: "og:title", content: "Events Calendar — Tunevio" },
+      { property: "og:description", content: "Browse upcoming Tunevio live events, competitions, listening parties and creator sessions." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfnetwork.com/events" },
+      { property: "og:url", content: "https://tunevio.com/events" },
+      { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/events" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/events" }],
   }),
   errorComponent: () => (
-    <div className="min-h-screen grid place-items-center text-white/70">Failed to load events.</div>
+    <div className="min-h-screen grid place-items-center text-muted-foreground">Failed to load events.</div>
   ),
   notFoundComponent: () => (
-    <div className="min-h-screen grid place-items-center text-white/70">Page not found.</div>
+    <div className="min-h-screen grid place-items-center text-muted-foreground">Page not found.</div>
   ),
   component: EventsPage,
 });
@@ -65,40 +66,39 @@ function EventsPage() {
   }, [events]);
 
   return (
-    <div className="min-h-screen bg-[#05050a] text-white">
-      <SiteHeader />
+    <div className="swara-events min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
         <header className="mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-bold tracking-widest text-[#00E6FF]">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-primary">
             <CalendarIcon className="h-3.5 w-3.5" /> EVENTS CALENDAR
           </div>
           <h1 className="mt-3 text-3xl sm:text-5xl font-black">Upcoming events</h1>
-          <p className="mt-2 max-w-2xl text-white/60">
-            Every scheduled competition, live show, listening party, and creator session — published by BWF when admins drop a date.
+          <p className="mt-2 max-w-2xl text-muted-foreground">
+            Live shows, listening parties, competitions and creator sessions on Tunevio.
           </p>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[auto,1fr]">
-          <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-3 sm:p-5 w-fit">
+        <div className="grid gap-6 lg:grid-cols-[auto_1fr]">
+          <section className="swara-event-calendar rounded-lg border border-border bg-card p-3 sm:p-5 w-fit max-w-full">
             <Calendar
               mode="single"
               selected={selected}
               onSelect={setSelected}
               modifiers={{ event: eventDates }}
               modifiersClassNames={{
-                event: "relative font-bold text-[#00E6FF] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-[#00E6FF]",
+                event: "relative font-bold text-primary after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary",
               }}
               className="pointer-events-auto"
             />
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-5 sm:p-6">
-            <h2 className="text-xs font-bold tracking-widest text-white/50">
+          <section className="min-w-0 py-3 sm:py-5">
+            <h2 className="text-lg font-semibold text-foreground">
               {selected ? formatDate(selected.toISOString()).toUpperCase() : "PICK A DATE"}
             </h2>
             <div className="mt-3 space-y-3">
               {selectedEvents.length === 0 ? (
-                <p className="text-sm text-white/50">No events on this date.</p>
+                <p className="text-sm text-muted-foreground">No events on this date.</p>
               ) : (
                 selectedEvents.map((e) => <EventCard key={e.id} event={e} />)
               )}
@@ -107,10 +107,10 @@ function EventsPage() {
         </div>
 
         <section className="mt-10">
-          <h2 className="text-xs font-bold tracking-widest text-white/50">NEXT UP</h2>
+          <h2 className="text-xl font-semibold text-foreground">Next up</h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {upcoming.length === 0 ? (
-              <p className="text-sm text-white/50">Nothing scheduled yet. Check back soon.</p>
+              <p className="text-sm text-muted-foreground">Nothing scheduled yet. Check back soon.</p>
             ) : (
               upcoming.map((e) => <EventCard key={e.id} event={e} withDate />)
             )}
@@ -124,24 +124,28 @@ function EventsPage() {
 function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean }) {
   const isLive = event.status === "live";
   return (
-    <article className="rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-[#0000FF]/40">
-      <div className="flex items-start justify-between gap-3">
+    <article className="swara-event-row flex min-w-0 items-start gap-4 border-b border-border py-5">
+      <div className="flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-card">
+        <span className="text-xs text-muted-foreground">{new Date(event.starts_at).toLocaleDateString([], { month: "short" })}</span>
+        <span className="mt-1 text-2xl font-semibold">{new Date(event.starts_at).getDate()}</span>
+      </div>
+      <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-xs text-white/50">
-            <span className="rounded bg-white/5 px-2 py-0.5 font-bold uppercase tracking-wider">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="font-semibold">
               {event.event_type}
             </span>
             {isLive && (
-              <span className="inline-flex items-center gap-1 rounded bg-[#00E6FF]/20 px-2 py-0.5 font-bold text-[#00E6FF]">
+              <span className="inline-flex items-center gap-1 rounded bg-primary/20 px-2 py-0.5 font-bold text-primary">
                 <Radio className="h-3 w-3" /> LIVE
               </span>
             )}
           </div>
           <h3 className="mt-1.5 font-bold leading-tight">{event.title}</h3>
           {event.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-white/60">{event.description}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{event.description}</p>
           )}
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-white/55">
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Clock className="h-3 w-3" />
               {withDate ? `${formatDate(event.starts_at)} · ` : ""}
@@ -156,14 +160,16 @@ function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean })
           </div>
         </div>
         {event.link_url && (
+          <Button asChild variant="ghost" size="icon" className="shrink-0 text-brand-silver">
           <a
             href={event.link_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#0000FF] to-[#0000FF] px-3 py-1.5 text-xs font-bold hover:shadow-[0_0_20px_-5px_#0000FF80]"
+            aria-label={`Open ${event.title}`}
           >
-            Open <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="h-5 w-5" />
           </a>
+          </Button>
         )}
       </div>
     </article>
