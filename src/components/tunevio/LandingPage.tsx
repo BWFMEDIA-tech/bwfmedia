@@ -268,8 +268,8 @@ export function LandingPage() {
       <section className="welcome-poster px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
         <div className="mx-auto max-w-6xl">
           <motion.div
-            initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-            whileInView={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+            initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+            whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 1.1, ease: easeOutExpo }}
             className="welcome-poster-frame relative overflow-hidden rounded-lg"
