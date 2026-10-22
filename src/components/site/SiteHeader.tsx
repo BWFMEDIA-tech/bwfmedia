@@ -76,6 +76,15 @@ const MENU_GROUPS: { key: string; label: string; items: NavItem[] }[] = [
   ] },
 ];
 
+const DEFAULT_PRIMARY: NavItem[] = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/artist-dashboard", label: "Artist Dashboard", icon: LayoutDashboard },
+  { to: "/live", label: "Live Stage", icon: Radio },
+  { to: "#discover", label: "Discover", icon: Compass },
+  { to: "#store", label: "Store", icon: ShoppingCart },
+  { to: "/profile", label: "My Profile", icon: User },
+];
+
 const NAV_ICONS: Record<string, any> = { Home, Compass, Radio, Music, User, LayoutDashboard, ShoppingCart, Disc3, Trophy, BarChart3, Calendar, Newspaper, Mail, Mic };
 
 function useActivePath() {
@@ -96,16 +105,33 @@ export function SiteHeader() {
   const isAdmin = auth.roles.includes("admin");
   const isManager = auth.roles.includes("manager");
   const canBroadcast = isAdmin || isManager;
-  const primary = [
-    { to: "/", label: "Home", icon: Home, search: undefined, params: undefined },
-    ...(hasArtistTools(auth.roles)
-      ? [{ to: artistDashboardDestination(auth.roles), label: "Artist Dashboard", icon: LayoutDashboard, search: undefined, params: undefined }]
-      : []),
-    { to: "/live", label: "Live Stage", icon: Radio, search: undefined, params: undefined },
-    auth.user
-      ? { to: "/artist/$id", label: "My Profile", icon: User, params: { id: auth.user.id }, search: undefined }
-      : { to: "/login", label: "My Profile", icon: User, params: undefined, search: undefined },
-  ];
+  // Admin-editable rows (Admin → Navigation Bar); hardcoded defaults apply when none are saved.
+  const navQ = useQuery({ queryKey: ["site-nav"], queryFn: () => getSiteNav(), staleTime: 60_000 });
+  const rows = (navQ.data?.items ?? []).filter((r) => r.visible).sort((x, y) => x.position - y.position);
+  const toItem = (r: { to_path: string; label: string; icon: string }): NavItem => ({ to: r.to_path, label: r.label, icon: NAV_ICONS[r.icon] ?? Music });
+  const groupItems = (key: string) => {
+    const saved = rows.filter((r) => r.slot === key).map(toItem);
+    return saved.length || rows.length ? saved : MENU_GROUPS.find((g) => g.key === key)?.items ?? [];
+  };
+  const savedPrimary = rows.filter((r) => r.slot === "primary").map(toItem);
+  const primarySource: NavItem[] = savedPrimary.length ? savedPrimary : DEFAULT_PRIMARY;
+  type Entry = { kind: "link"; to: string; label: string; icon: any; params?: any; search?: any } | { kind: "group"; key: string; label: string; items: NavItem[] };
+  const entries: Entry[] = primarySource.flatMap((item): Entry[] => {
+    if (item.to.startsWith("#")) {
+      const key = item.to.slice(1);
+      const items = groupItems(key);
+      return items.length ? [{ kind: "group", key, label: item.label, items }] : [];
+    }
+    if (item.to === "/artist-dashboard") {
+      return hasArtistTools(auth.roles) ? [{ kind: "link", ...item, to: artistDashboardDestination(auth.roles) }] : [];
+    }
+    if (item.to === "/profile") {
+      return [auth.user ? { kind: "link", ...item, to: "/artist/$id", params: { id: auth.user.id } } : { kind: "link", ...item, to: "/login" }];
+    }
+    return [{ kind: "link", ...item }];
+  });
+  const primary = entries.filter((e): e is Extract<Entry, { kind: "link" }> => e.kind === "link");
+  const groups = entries.filter((e): e is Extract<Entry, { kind: "group" }> => e.kind === "group");
   const accountLinks: NavItem[] = [
     { to: "/settings", label: "Settings", icon: Settings },
     { to: "/install", label: "Install Tunevio", icon: Download },
@@ -180,9 +206,55 @@ export function SiteHeader() {
 
         {/* Desktop primary nav */}
         <div className="hidden lg:flex items-center gap-1 mx-auto">
-          {primary.map((item, idx) => {
+          <div className="flex items-center gap-1" ref={browseRef}>
+          {entries.map((entry) => {
+            if (entry.kind === "group") {
+              const group = entry;
+              const groupActive = group.items.some((i) => isActive(i.to));
+              const isOpen = browseOpen === group.key;
+              return (
+                <div key={group.key} className="relative">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => setBrowseOpen(isOpen ? null : group.key)}
+                    className={`inline-flex items-center gap-1 px-2 py-2 text-xs xl:text-sm font-medium transition-colors ${
+                      isOpen || groupActive ? "text-bone" : "text-bone/65 hover:text-bone"
+                    }`}
+                  >
+                    {group.label}
+                    <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 mt-2 w-60 rounded-xl border border-border bg-card/98 backdrop-blur-xl shadow-2xl overflow-hidden p-1.5"
+                      >
+                        {group.items.map((sub) => (
+                          <RouterLink
+                            key={`${sub.to}-${sub.label}`}
+                            to={sub.to}
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-bone/80 rounded-lg hover:bg-blood/15 hover:text-bone transition-colors"
+                          >
+                            <span className="w-7 h-7 grid place-items-center rounded-md bg-blood/15 text-blood">
+                              <sub.icon size={14} />
+                            </span>
+                            {sub.label}
+                          </RouterLink>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+            const item = entry;
             const active = isActive(item.to);
-            const link = (
+            return (
               <RouterLink
                 key={item.label}
                 to={item.to}
@@ -203,59 +275,8 @@ export function SiteHeader() {
                 )}
               </RouterLink>
             );
-            // Discover and Store dropdowns sit between Live Stage and My Profile.
-            if (idx !== primary.length - 1) return link;
-            return (
-              <div key="groups" className="flex items-center gap-1">
-                <div className="flex items-center gap-1" ref={browseRef}>
-                  {MENU_GROUPS.map((group) => {
-                    const groupActive = group.items.some((i) => isActive(i.to));
-                    const isOpen = browseOpen === group.key;
-                    return (
-                      <div key={group.key} className="relative">
-                        <button
-                          type="button"
-                          aria-expanded={isOpen}
-                          onClick={() => setBrowseOpen(isOpen ? null : group.key)}
-                          className={`inline-flex items-center gap-1 px-2 py-2 text-xs xl:text-sm font-medium transition-colors ${
-                            isOpen || groupActive ? "text-bone" : "text-bone/65 hover:text-bone"
-                          }`}
-                        >
-                          {group.label}
-                          <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
-                        </button>
-                        <AnimatePresence>
-                          {isOpen && (
-                            <motion.div
-                              initial={{ opacity: 0, y: -6 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -6 }}
-                              transition={{ duration: 0.15 }}
-                              className="absolute left-0 mt-2 w-60 rounded-xl border border-border bg-card/98 backdrop-blur-xl shadow-2xl overflow-hidden p-1.5"
-                            >
-                              {group.items.map((sub) => (
-                                <RouterLink
-                                  key={sub.to}
-                                  to={sub.to}
-                                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-bone/80 rounded-lg hover:bg-blood/15 hover:text-bone transition-colors"
-                                >
-                                  <span className="w-7 h-7 grid place-items-center rounded-md bg-blood/15 text-blood">
-                                    <sub.icon size={14} />
-                                  </span>
-                                  {sub.label}
-                                </RouterLink>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })}
-                </div>
-                {link}
-              </div>
-            );
           })}
+          </div>
         </div>
 
         {/* Spacer */}
@@ -402,7 +423,7 @@ export function SiteHeader() {
                 </div>
               </div>
 
-              {MENU_GROUPS.map((group) => (
+              {groups.map((group) => (
                 <details key={group.key} className="group" open={group.items.some((i) => isActive(i.to))}>
                   <summary className="flex cursor-pointer list-none items-center justify-between px-1 py-2 font-cond text-[10px] tracking-[0.4em] uppercase text-bone/60">
                     {group.label}
@@ -411,7 +432,7 @@ export function SiteHeader() {
                   <div className="grid grid-cols-2 gap-1.5 pt-1">
                     {group.items.map((item) => (
                       <RouterLink
-                        key={item.to}
+                        key={`${item.to}-${item.label}`}
                         to={item.to}
                         aria-current={isActive(item.to) ? "page" : undefined}
                         className="flex min-w-0 items-center gap-2 px-3 py-3 rounded-lg border border-white/10 bg-white/[0.03] text-sm text-bone/75 hover:text-bone transition-colors"
