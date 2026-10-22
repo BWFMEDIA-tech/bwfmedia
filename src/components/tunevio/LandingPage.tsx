@@ -17,6 +17,7 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import welcomePoster from "@/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json";
 import battlePoster from "@/assets/welcome-IMG_1560.png.asset.json";
+import appShowcase from "@/assets/welcome-apps.png.asset.json";
 import livePlayer from "@/assets/welcome-IMG_1685.png.asset.json";
 import waitingPlayer from "@/assets/welcome-IMG_1684.png.asset.json";
 import artistProfiles from "@/assets/welcome-IMG_1683.png.asset.json";
@@ -194,6 +195,8 @@ const steps = [
 
 export function LandingPage() {
   const { ref: posterRef, shown: posterShown } = useRevealOnScroll();
+  const { ref: battleRef, shown: battleShown } = useRevealOnScroll();
+  const { ref: showcaseRef, shown: showcaseShown } = useRevealOnScroll();
   return (
     <MotionConfig reducedMotion="user">
     <div className="tunevio-welcome min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -301,17 +304,18 @@ export function LandingPage() {
 
       <section className="welcome-poster px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
         <div className="mx-auto max-w-6xl">
-          <div
-            ref={posterRef}
-            className={`welcome-poster-frame relative overflow-hidden rounded-lg${posterShown ? " is-revealed" : ""}`}
-          >
-            <img
-              src={welcomePoster.url}
-              alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
-              className="welcome-poster-img block h-auto w-full"
-              fetchPriority="high"
-            />
-            <span className="welcome-shine" aria-hidden="true" />
+          <div ref={posterRef}>
+            <div
+              className={`welcome-poster-frame relative overflow-hidden rounded-lg${posterShown ? " is-revealed" : ""}`}
+            >
+              <img
+                src={welcomePoster.url}
+                alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
+                className="welcome-poster-img block h-auto w-full"
+                fetchPriority="high"
+              />
+              <span className="welcome-shine" aria-hidden="true" />
+            </div>
           </div>
         </div>
       </section>
@@ -383,34 +387,53 @@ export function LandingPage() {
               nobody misses the moment.
             </p>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-            whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 1, ease: easeOutExpo }}
-            className="welcome-battle-frame relative overflow-hidden rounded-lg border border-border"
-          >
-            <motion.img
-              src={battlePoster.url}
-              alt="Two artists in a live head-to-head music battle on Tunevio"
-              loading="lazy"
-              initial={{ opacity: 0, scale: 1.12 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 1.2, ease: easeOutExpo }}
-              whileHover={{ scale: 1.04 }}
-              className="welcome-battle-img w-full"
-            />
-            <motion.span
-              className="welcome-scan"
-              aria-hidden="true"
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={scanVariants}
-            />
-            <span className="welcome-shine" aria-hidden="true" />
-          </motion.div>
+          <div ref={battleRef} className="min-w-0">
+            <div
+              className={`welcome-battle-frame relative overflow-hidden rounded-lg border border-border${battleShown ? " is-revealed" : ""}`}
+            >
+              <motion.img
+                src={battlePoster.url}
+                alt="Two artists in a live head-to-head music battle on Tunevio"
+                loading="lazy"
+                animate={{ opacity: battleShown ? 1 : 0, scale: battleShown ? 1 : 1.12 }}
+                transition={{ duration: 1.2, ease: easeOutExpo }}
+                whileHover={{ scale: 1.04 }}
+                className="welcome-battle-img w-full"
+              />
+              <motion.span
+                className="welcome-scan"
+                aria-hidden="true"
+                variants={scanVariants}
+                initial="hidden"
+                animate={battleShown ? "show" : "hidden"}
+                transition={{ duration: 1.25, ease: "easeInOut" }}
+              />
+              <span className="welcome-shine" aria-hidden="true" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App showcase */}
+      <section className="welcome-showcase relative px-5 sm:px-10 pb-20" aria-labelledby="showcase-heading">
+        <div className="mx-auto max-w-5xl">
+          <div ref={showcaseRef} className="welcome-showcase-stage">
+            <div className={`welcome-showcase-frame${showcaseShown ? " is-revealed" : ""}`}>
+              <img
+                src={appShowcase.url}
+                alt="Tunevio on three phones: search and browse, home dashboard and now playing"
+                loading="lazy"
+                className="welcome-showcase-img block h-auto w-full"
+              />
+              <span className="welcome-shine" aria-hidden="true" />
+            </div>
+          </div>
+          <h2 id="showcase-heading" className="mt-8 text-center text-xl sm:text-2xl font-semibold">
+            Tunevio, right in your hand
+          </h2>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            Search, play and discover in one place — built for artists, listeners and hosts.
+          </p>
         </div>
       </section>
 
