@@ -56,7 +56,7 @@ const scanVariants = {
   show: {
     opacity: [0, 1, 1, 0],
     y: ["-100%", "-40%", "55%", "100%"],
-    transition: { duration: 1.25, ease: "easeInOut" },
+    transition: { duration: 1.25, ease: "easeInOut" as const },
   },
 };
 
