@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   Clapperboard,
@@ -11,8 +11,11 @@ import {
   Home,
   ListMusic,
   Mic2,
+  Pause,
   Play,
   Radio,
+  Volume2,
+  VolumeX,
   Rocket,
   Search,
   Sparkles,
