@@ -14,7 +14,23 @@ import {
 import { Button } from "@/components/ui/button";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
-import playArena1v1 from "@/assets/play-arena-1v1-battle.png.asset.json";
+import welcomePoster from "@/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json";
+import battlePoster from "@/assets/welcome-IMG_1560.png.asset.json";
+import livePlayer from "@/assets/welcome-IMG_1685.png.asset.json";
+import waitingPlayer from "@/assets/welcome-IMG_1684.png.asset.json";
+import artistProfiles from "@/assets/welcome-IMG_1683.png.asset.json";
+import leaderboard from "@/assets/welcome-IMG_1682.png.asset.json";
+import stageRoom from "@/assets/welcome-IMG_1681.png.asset.json";
+import liveChat from "@/assets/welcome-IMG_1680.png.asset.json";
+
+const welcomeScreens = [
+  { image: livePlayer, title: "Live Music", alt: "Tunevio live music player showing Whole Vibe, playback and audience reactions" },
+  { image: artistProfiles, title: "Meet the Artists", alt: "Tunevio artist portraits with glowing cyan rings and Following buttons" },
+  { image: leaderboard, title: "The Leaderboard", alt: "Tunevio Battle Arena leaderboard with artist rankings, votes and wins" },
+  { image: stageRoom, title: "On Stage", alt: "Tunevio stage room with a host and open host slots" },
+  { image: liveChat, title: "The Conversation", alt: "Tunevio live chat with emoji reactions and audience area" },
+  { image: waitingPlayer, title: "The Next Drop", alt: "Tunevio music queue waiting for the next track" },
+];
 
 function trackCta(label: string) {
   try {
@@ -214,6 +230,17 @@ export function LandingPage() {
         </div>
       </section>
 
+      <section className="px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
+        <div className="mx-auto max-w-6xl">
+          <img
+            src={welcomePoster.url}
+            alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
+            className="block h-auto w-full rounded-lg"
+            fetchPriority="high"
+          />
+        </div>
+      </section>
+
       {/* Three user pathways */}
       <section className="relative px-5 sm:px-10 pb-24" aria-labelledby="roles-heading">
         <div className="mx-auto max-w-6xl">
@@ -282,7 +309,7 @@ export function LandingPage() {
             </p>
           </motion.div>
           <motion.img
-            src={playArena1v1.url}
+            src={battlePoster.url}
             alt="Two artists in a live head-to-head music battle on Tunevio"
             loading="lazy"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -291,6 +318,22 @@ export function LandingPage() {
             transition={{ duration: 0.7 }}
             className="w-full rounded-lg border border-border "
           />
+        </div>
+      </section>
+
+      <section className="px-5 sm:px-10 pb-24" aria-labelledby="community-images-heading">
+        <div className="mx-auto max-w-6xl">
+          <h2 id="community-images-heading" className="text-3xl sm:text-4xl text-center">Inside Tunevio</h2>
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            {welcomeScreens.map((screen) => (
+              <figure key={screen.title} className="min-w-0">
+                <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
+                  <img src={screen.image.url} alt={screen.alt} loading="lazy" className="h-full w-full object-contain" />
+                </div>
+                <figcaption className="mt-4 text-lg font-semibold">{screen.title}</figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 
