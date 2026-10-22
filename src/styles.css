@@ -1246,3 +1246,17 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
   .welcome-rail-pulse { animation: none; top: 34%; }
 }
+
+/* Image transitions: wipe reveals, scan sweeps, hover shine and slow breathing. */
+.welcome-poster-frame, .welcome-battle-frame, .welcome-screen-frame { position: relative; overflow: hidden; }
+.welcome-poster-img { animation: welcome-breathe 26s ease-in-out infinite alternate; transform-origin: 50% 55%; }
+@keyframes welcome-breathe { from { transform: scale(1); } to { transform: scale(1.05); } }
+.welcome-scan { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 74%, color-mix(in srgb, var(--primary) 12%, transparent) 90%, color-mix(in srgb, var(--primary) 80%, transparent) 98%, transparent 100%); }
+.welcome-shine { position: absolute; inset: 0; pointer-events: none; opacity: 0; transform: translateX(-115%); background: linear-gradient(115deg, transparent 42%, color-mix(in srgb, var(--primary) 24%, transparent) 50%, transparent 58%); transition: transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 260ms ease; }
+.welcome-screen:hover .welcome-shine, .welcome-poster-frame:hover .welcome-shine, .welcome-battle-frame:hover .welcome-shine { opacity: 1; transform: translateX(115%); }
+.welcome-hero-video { animation: welcome-hero-in 1.5s ease-out both; }
+@keyframes welcome-hero-in { from { opacity: 0; transform: scale(1.06); } to { opacity: .8; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .welcome-poster-img, .welcome-hero-video { animation: none; }
+  .welcome-shine { transition: none; }
+}
