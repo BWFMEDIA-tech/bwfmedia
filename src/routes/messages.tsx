@@ -77,6 +77,7 @@ function MessagesPage() {
   const [searchResults, setSearchResults] = useState<ProfileLite[]>([]);
   const [showNew, setShowNew] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!auth.loading && !auth.isAuthenticated) nav({ to: "/login" });
@@ -369,7 +370,10 @@ function MessagesPage() {
           </aside>
 
           {/* Thread */}
-          <section className={`flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] ${activeId ? "flex" : "hidden md:flex"}`}>
+          <section
+            style={activeId && vv ? ({ "--vvh": `${vv.h}px`, "--vvt": `${vv.top}px` } as React.CSSProperties) : undefined}
+            className={`flex-col overflow-hidden bg-black md:bg-white/[0.03] ${activeId ? "fixed inset-x-0 top-[var(--vvt,0px)] z-[60] flex h-[var(--vvh,100dvh)] animate-in slide-in-from-bottom-6 fade-in duration-200 md:static md:z-auto md:h-auto md:animate-none md:rounded-3xl md:border md:border-white/10 md:shadow-2xl md:shadow-brand-blue/10" : "hidden md:flex md:rounded-3xl md:border md:border-white/10"}`}
+          >
             {activeId ? (
               <>
                 <header className="relative flex items-center gap-3 border-b border-white/10 px-3 py-3">
@@ -432,20 +436,23 @@ function MessagesPage() {
                   )}
                 </div>
                 <form
-                  onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                  className="border-t border-white/10 p-3"
+                  onSubmit={(e) => { e.preventDefault(); handleSend(); composerRef.current?.focus(); }}
+                  className="shrink-0 border-t border-white/10 bg-black/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:bg-transparent"
                 >
                   <div className="flex items-end gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pl-4 pr-1.5 transition focus-within:border-brand-cyan/60">
                     <textarea
+                      ref={composerRef}
                       value={body}
                       onChange={(e) => setBody(e.target.value)}
+                      onFocus={() => { window.setTimeout(() => scrollToLatest(true), 250); }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
                       }}
                       placeholder="Write a message…"
                       rows={1}
                       maxLength={4000}
-                      className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-sm outline-none placeholder:text-white/40"
+                      enterKeyHint="send"
+                      className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-base outline-none placeholder:text-white/40 md:text-sm"
                     />
                     <button
                       type="submit"
