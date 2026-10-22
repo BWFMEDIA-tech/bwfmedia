@@ -7,7 +7,7 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Sign in — BWF Network" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Tunevio" }] }),
   validateSearch: (s: Record<string, unknown>): { next?: string } => {
     const raw =
       (typeof s.next === "string" && s.next) ||
@@ -70,6 +70,13 @@ function LoginPage() {
         toast.error(result.error.message ?? "Google sign-in failed");
         return;
       }
+      // They chose to sign in, so remember on this device that an account
+      // exists and future visits to the public welcome page go to sign-in.
+      try {
+        window.localStorage.setItem("tunevio:has-account", "1");
+      } catch {
+        // Storage unavailable — skip the remember step.
+      }
       if (result.redirected) return;
       const saved = sessionStorage.getItem("bwf:post-login");
       sessionStorage.removeItem("bwf:post-login");
@@ -92,6 +99,13 @@ function LoginPage() {
         // Generic message — never reveal whether the email exists
         setFailed(true);
         return toast.error("Incorrect email or password.");
+      }
+      // Remember on this device that an account exists, so future visits to
+      // the public welcome page go straight to sign-in.
+      try {
+        window.localStorage.setItem("tunevio:has-account", "1");
+      } catch {
+        // Storage unavailable — skip the remember step.
       }
       toast.success("Signed in");
       if (next) {
@@ -146,7 +160,7 @@ function LoginPage() {
         <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-5">
           <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
           <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
-            BWF Network
+            Tunevio
           </span>
         </div>
         <h1 className="font-display text-4xl uppercase text-bone leading-[0.9]">
