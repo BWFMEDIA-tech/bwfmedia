@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, LayoutDashboard, Inbox, User, Video, ShoppingCart } from "lucide-react";
+import { Home, Radio, Inbox, User, Video } from "lucide-react";
+import goLiveLogo from "@/assets/go-live-logo.png.asset.json";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
@@ -14,12 +15,10 @@ type Tab = {
 };
 
 const TABS: Tab[] = [
-  { to: "/", label: "Home", icon: Home, match: (p) => p === "/" },
+  { to: "/", label: "Home", icon: Home, match: (p) => p === "/" || p === "/home" },
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
-  { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
   { to: "/go-live", label: "Go Live", icon: Video, match: (p) => p.startsWith("/go-live") },
-  { to: "/store", label: "Store", icon: ShoppingCart, match: (p) => p.startsWith("/store") },
-  { to: "/artist-dashboard", label: "Artist Hub", icon: LayoutDashboard, match: (p) => p.startsWith("/artist-dashboard") },
+  { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
   { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
 
@@ -62,7 +61,7 @@ export function MobileBottomNav() {
                 aria-current={active ? "page" : undefined}
               >
                 <span className="relative">
-                  <Icon className="h-5 w-5" />
+                  {tab.to === "/go-live" ? <img src={goLiveLogo.url} alt="" className={cn("h-9 w-9 -my-2 object-contain transition-transform", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
                   {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
                 </span>
                 <span className="w-full text-center leading-tight">{tab.label}</span>
