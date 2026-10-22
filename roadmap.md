@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Apply approved additional SWARA references to existing pricing, stores, events and artist directory; preserve prices, checkout, calendar and follows; verify phone/desktop.
 - [x] Apply SWARA first pass to Home, shared player/navigation and profile/notification settings without changing data or handlers. Signed-in playback advances, preferences survive reload, and layouts fit 320/393/768px with no player/navigation overlap; four playback tests pass, preview build OK, no runtime errors. Existing profile banner image fails to load; exact fonts/tokens unavailable. Not published.
 - [x] Analyze SWARA UI kit: 27 mobile screen previews plus two overview images; compared existing Home visually and mapped current UI source. Exact Figma fonts/tokens and editable components unavailable; first appearance pass completed.
 - [ ] Implement music-only 60/40 monthly streamshare royalties using existing ledgers/statements/Connect; inspect and plan first, preserve records, test calculations and prevent unapproved real payouts.

@@ -6,6 +6,7 @@ import { useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Check, Search, Sparkles, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
@@ -89,7 +90,7 @@ function ArtistsPage() {
   const featuredCount = artists.filter((a) => a.featured).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="swara-artists min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <header className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -100,8 +101,7 @@ function ArtistsPage() {
             Artists
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Browse signed and featured artists across the BWF Network. Profiles,
-            releases, and collabs all in one place.
+            Discover artists on Tunevio.
           </p>
         </header>
 
@@ -208,7 +208,7 @@ function ArtistDirectoryCard({
   }
 
   return (
-    <div className="flex h-full flex-col items-center rounded-2xl border border-border bg-card/40 px-4 pb-5 pt-8 text-center transition hover:border-primary/50">
+    <div className="swara-artist-card flex h-full flex-col items-center px-3 pb-5 pt-6 text-center">
       <Link to="/artist/$id" params={{ id: a.publicId }} className="group relative">
         <span
           aria-hidden
@@ -234,7 +234,7 @@ function ArtistDirectoryCard({
           <p className="mt-1 truncate text-xs text-muted-foreground">{a.genres.slice(0, 3).join(" / ")}</p>
         )}
       </Link>
-      <button
+      <Button
         type="button"
         onClick={handleFollow}
         disabled={busy}
@@ -250,7 +250,7 @@ function ArtistDirectoryCard({
         ) : (
           "Follow"
         )}
-      </button>
+      </Button>
     </div>
   );
 }
