@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link as RouterLink, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { getSiteNav } from "@/lib/site-nav.functions";
+
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -32,7 +32,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
 import { useCart } from "@/contexts/CartContext";
 import { SignedImg } from "@/components/ui/signed-img";
-import { artistDashboardDestination } from "@/lib/artist-navigation";
+import { artistDashboardDestination, hasArtistTools } from "@/lib/artist-navigation";
 
 function HeaderCartButton() {
   const { totalCount, openCart } = useCart();
@@ -119,7 +119,7 @@ export function SiteHeader() {
   // Close dropdowns on outside click
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (browseRef.current && !browseRef.current.contains(e.target as Node)) setBrowseOpen(false);
+      if (browseRef.current && !browseRef.current.contains(e.target as Node)) setBrowseOpen(null);
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
     };
     document.addEventListener("mousedown", onClick);
@@ -129,7 +129,7 @@ export function SiteHeader() {
   // Close mobile menu on route change
   useEffect(() => {
     setOpen(false);
-    setBrowseOpen(false);
+    setBrowseOpen(null);
     setProfileOpen(false);
   }, [pathname]);
 
