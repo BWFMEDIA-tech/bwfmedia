@@ -1167,3 +1167,8 @@ body { font-family: var(--font-body); letter-spacing: 0; }
   .swara-live { padding-top: 28px; }
   .swara-account > header { padding-top: 12px; }
 }
+
+.swara-swatch-cyan { background: var(--primary); }
+.swara-swatch-blue { background: var(--brand-blue); }
+.swara-swatch-silver { background: var(--brand-silver); }
+.swara-swatch-electric { background: var(--accent); }
