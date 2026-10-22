@@ -225,6 +225,7 @@ export function TunevioHome() {
           </div>
 
           {/* Discover playlists */}
+          {show("music") && (
           <ContentRail
             id="discover"
             title="Playlists for You"
@@ -266,8 +267,10 @@ export function TunevioHome() {
               />,
             ]}
           />
+          )}
 
           {/* Popular this week */}
+          {show("music") && (
           <ListSection
             id="popular"
             title="Top Songs"
@@ -278,8 +281,10 @@ export function TunevioHome() {
               <TrackCard key={t.id} track={t} index={i + 1} queue={feed?.popular} />
             ))}
           </ListSection>
+          )}
 
           {/* Quick access bento grid */}
+          {chip === "all" && (
           <section className="swara-home-tools">
             <h2 className="mb-3 px-1 text-lg font-black sm:text-xl">Your Tunevio</h2>
             <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
@@ -303,6 +308,7 @@ export function TunevioHome() {
               ))}
             </div>
           </section>
+          )}
 
           {isLoading ? (
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -313,9 +319,10 @@ export function TunevioHome() {
           ) : null}
 
           {/* Featured hero */}
-          {feed?.featured ? <FeaturedCard track={feed.featured} queue={feed.charts} /> : null}
+          {show("music") && feed?.featured ? <FeaturedCard track={feed.featured} queue={feed.charts} /> : null}
 
           {/* Live now */}
+          {show("live") && (
           <ContentRail
             id="live-now"
             title="Live Right Now"
@@ -324,8 +331,10 @@ export function TunevioHome() {
             size="wide"
             items={(feed?.liveStreams ?? []).map((s) => <LiveStreamCard key={s.id} stream={s} />)}
           />
+          )}
 
           {/* Music videos */}
+          {show("videos") && (
           <ContentRail
             id="music-videos"
             title="Music Videos"
@@ -334,8 +343,10 @@ export function TunevioHome() {
             size="wide"
             items={(videos ?? []).map((v) => <VideoCard key={v.id} video={v} />)}
           />
+          )}
 
           {/* Play Arena */}
+          {show("arena") && (
           <ContentRail
             id="play-arena"
             title="Play Arena Battles"
@@ -344,8 +355,10 @@ export function TunevioHome() {
             size="lg"
             items={(feed?.battles ?? []).map((b) => <LiveArenaCard key={b.id} battle={b} />)}
           />
+          )}
 
           {/* Trending */}
+          {show("music") && (
           <ContentRail
             id="trending"
             title="Trending Now"
@@ -355,8 +368,10 @@ export function TunevioHome() {
               <AlbumCard key={t.id} track={t} queue={feed?.trending} />
             ))}
           />
+          )}
 
           {/* Personalized: Jump back in */}
+          {show("music") && (
           <PersonalRail
             id="jump-back-in"
             title="Jump Back In"
@@ -364,8 +379,10 @@ export function TunevioHome() {
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
           />
+          )}
 
           {/* New releases */}
+          {show("music") && (
           <ContentRail
             id="new-releases"
             title="New Releases"
@@ -375,8 +392,10 @@ export function TunevioHome() {
               <AlbumCard key={t.id} track={t} queue={feed?.newReleases} />
             ))}
           />
+          )}
 
           {/* Artists you follow / rising */}
+          {show("artists") && (
           <ContentRail
             id="artists-you-follow"
             title={auth.isAuthenticated ? "Artists You Follow" : "Artists To Follow"}
