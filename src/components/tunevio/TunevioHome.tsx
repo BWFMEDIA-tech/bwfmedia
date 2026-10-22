@@ -59,6 +59,16 @@ const SIDEBAR = [
   { to: "/leaderboard", label: "Leaderboard", icon: Star },
 ] as const;
 
+type HomeChip = "all" | "music" | "videos" | "live" | "artists" | "arena";
+const HOME_CHIPS: { id: HomeChip; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "music", label: "Music" },
+  { id: "videos", label: "Videos" },
+  { id: "live", label: "Live" },
+  { id: "artists", label: "Artists" },
+  { id: "arena", label: "Arena" },
+];
+
 export function TunevioHome() {
   const { data, isLoading } = useQuery({
     queryKey: ["home-feed"],
@@ -87,6 +97,8 @@ export function TunevioHome() {
   const player = usePlayer();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [chip, setChip] = useState<HomeChip>("all");
+  const show = (cat: HomeChip) => chip === "all" || chip === cat;
 
   const feed = data;
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
