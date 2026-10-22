@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, MessageSquare, Search, Send, UserPlus, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, MessageSquare, Search, Send, UserPlus, X } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -49,6 +49,16 @@ type Conversation = {
   last: Message;
   unread: number;
 };
+
+function dayLabel(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diffDays = Math.round((startOf(now) - startOf(d)) / 86400000);
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  return d.toLocaleDateString([], { month: "long", day: "numeric" });
+}
 
 function MessagesPage() {
   const auth = useAuth();
@@ -228,7 +238,7 @@ function MessagesPage() {
   };
   if (auth.loading || !auth.isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] text-white/60 text-sm">
+      <div className="flex min-h-screen items-center justify-center bg-black text-sm text-white/60">
         Loading…
       </div>
     );
@@ -237,33 +247,33 @@ function MessagesPage() {
   const activeProfile = activeId ? (profiles[activeId] ?? null) : null;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[#0a0a12] text-bone">
+    <div className="min-h-[calc(100vh-4rem)] bg-black text-bone">
       <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <MessageSquare className="h-6 w-6" /> Messages
+          <h1 className="flex items-center gap-2 text-2xl font-bold">
+            <MessageSquare className="h-6 w-6 text-brand-cyan" /> Messages
           </h1>
           <button
             onClick={() => setShowNew((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs transition hover:border-brand-cyan/50 hover:bg-white/10"
           >
             <UserPlus className="h-4 w-4" /> New message
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 h-[70vh] min-h-[500px]">
+        <div className="grid h-[70vh] min-h-[500px] grid-cols-1 gap-4 md:grid-cols-[320px_1fr]">
           {/* Sidebar */}
-          <aside className={`rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden flex flex-col ${activeId ? "hidden md:flex" : "flex"}`}>
+          <aside className={`flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] ${activeId ? "hidden md:flex" : "flex"}`}>
             {showNew && (
               <div className="border-b border-white/10 p-3">
                 <div className="relative">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                   <input
                     autoFocus
                     value={searchQ}
                     onChange={(e) => setSearchQ(e.target.value)}
                     placeholder="Search by name…"
-                    className="w-full rounded-lg border border-white/10 bg-black/40 pl-8 pr-3 py-2 text-sm outline-none focus:border-violet-500/60"
+                    className="w-full rounded-full border border-white/10 bg-black/60 py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-cyan/60"
                   />
                 </div>
                 <div className="mt-2 max-h-60 overflow-y-auto">
@@ -275,7 +285,7 @@ function MessagesPage() {
                         openConversation(p.id);
                         setSearchQ("");
                       }}
-                      className="flex w-full items-center gap-3 rounded-lg px-2 py-2 hover:bg-white/5"
+                      className="flex w-full items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5"
                     >
                       <Avatar profile={p} />
                       <span className="text-sm">{p.display_name || "Unknown user"}</span>
@@ -299,14 +309,14 @@ function MessagesPage() {
                   <button
                     key={c.other.id}
                     onClick={() => openConversation(c.other.id)}
-                    className={`flex w-full items-center gap-3 border-b border-white/5 px-3 py-3 text-left hover:bg-white/5 ${activeId === c.other.id ? "bg-white/10" : ""}`}
+                    className={`flex w-full items-center gap-3 border-b border-white/5 px-3 py-3 text-left transition hover:bg-white/5 ${activeId === c.other.id ? "bg-white/10" : ""}`}
                   >
                     <Avatar profile={c.other} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <span className="truncate text-sm font-medium">{c.other.display_name || "Unknown user"}</span>
                         {c.unread > 0 && (
-                          <span className="rounded-full bg-violet-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{c.unread}</span>
+                          <span className="rounded-full bg-gradient-to-r from-brand-cyan to-brand-blue px-1.5 py-0.5 text-[10px] font-bold text-white">{c.unread}</span>
                         )}
                       </div>
                       <p className="truncate text-xs text-white/50">{c.last.body || "Start the conversation"}</p>
@@ -318,49 +328,63 @@ function MessagesPage() {
           </aside>
 
           {/* Thread */}
-          <section className={`rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden flex-col ${activeId ? "flex" : "hidden md:flex"}`}>
+          <section className={`flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] ${activeId ? "flex" : "hidden md:flex"}`}>
             {activeId ? (
               <>
-                <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
+                <header className="relative flex items-center gap-3 border-b border-white/10 px-3 py-3">
                   <button
                     onClick={closeConversation}
-                    className="md:hidden rounded-md p-1 hover:bg-white/10"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-brand-cyan/60 hover:bg-white/10 md:hidden"
                     aria-label="Back"
                   >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className="h-5 w-5" />
                   </button>
-                  <Avatar profile={activeProfile ?? { id: activeId, display_name: null, avatar_url: null }} />
-                  <h2 className="min-w-0 flex-1 truncate font-medium">{activeProfile?.display_name || "Unknown user"}</h2>
+                  <div className="flex min-w-0 flex-1 items-center justify-center gap-2 md:justify-start">
+                    <Avatar profile={activeProfile ?? { id: activeId, display_name: null, avatar_url: null }} />
+                    <h2 className="min-w-0 truncate text-lg font-semibold">{activeProfile?.display_name || "Unknown user"}</h2>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-white/40" />
+                  </div>
                   <button
                     onClick={closeConversation}
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition hover:border-white/25 hover:bg-white/10 hover:text-white"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 transition hover:border-brand-cyan/60 hover:bg-white/10 hover:text-white"
                     aria-label="Close conversation"
                     title="Close conversation"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-5 w-5" />
                   </button>
                 </header>
-                <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+                <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
                   {activeMessages.length === 0 ? (
-                    <p className="text-center text-xs text-white/40 mt-12">No messages yet. Say hi 👋</p>
+                    <p className="mt-12 text-center text-xs text-white/40">No messages yet. Say hi 👋</p>
                   ) : (
-                    activeMessages.map((m) => {
+                    activeMessages.map((m, i) => {
                       const mine = m.sender_id === auth.user!.id;
+                      const prev = activeMessages[i - 1];
+                      const showDay = !prev || dayLabel(prev.created_at) !== dayLabel(m.created_at);
                       const senderProfile = mine
                         ? { id: auth.user!.id, display_name: auth.user!.user_metadata?.display_name ?? null, avatar_url: auth.user!.user_metadata?.avatar_url ?? null }
                         : (activeProfile ?? { id: m.sender_id, display_name: null, avatar_url: null });
                       return (
-                        <div key={m.id} className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
-                          {!mine && <Avatar profile={senderProfile} />}
-                          <div
-                            className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? "bg-violet-600 text-white" : "bg-white/10 text-bone"}`}
-                          >
-                            <p className="whitespace-pre-wrap break-words">{m.body}</p>
-                            <p className={`mt-1 text-[10px] ${mine ? "text-white/70" : "text-white/40"}`}>
-                              {new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                            </p>
+                        <div key={m.id}>
+                          {showDay && (
+                            <p className="py-3 text-center text-xs font-medium text-white/40">{dayLabel(m.created_at)}</p>
+                          )}
+                          <div className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
+                            {!mine && <Avatar profile={senderProfile} />}
+                            <div
+                              className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm shadow-lg ${
+                                mine
+                                  ? "rounded-br-md bg-gradient-to-r from-brand-cyan to-brand-blue text-white shadow-brand-blue/20"
+                                  : "rounded-bl-md border border-white/10 bg-white/10 text-bone"
+                              }`}
+                            >
+                              <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                              <p className={`mt-1 text-[10px] ${mine ? "text-white/70" : "text-white/40"}`}>
+                                {new Date(m.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                              </p>
+                            </div>
+                            {mine && <Avatar profile={senderProfile} />}
                           </div>
-                          {mine && <Avatar profile={senderProfile} />}
                         </div>
                       );
                     })
@@ -368,27 +392,29 @@ function MessagesPage() {
                 </div>
                 <form
                   onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                  className="border-t border-white/10 p-3 flex items-end gap-2"
+                  className="border-t border-white/10 p-3"
                 >
-                  <textarea
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
-                    }}
-                    placeholder="Type a message…"
-                    rows={1}
-                    maxLength={4000}
-                    className="flex-1 resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-violet-500/60 max-h-32"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!body.trim() || sending}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-40"
-                    aria-label="Send"
-                  >
-                    <Send className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-end gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pl-4 pr-1.5 transition focus-within:border-brand-cyan/60">
+                    <textarea
+                      value={body}
+                      onChange={(e) => setBody(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+                      }}
+                      placeholder="Write a message…"
+                      rows={1}
+                      maxLength={4000}
+                      className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-sm outline-none placeholder:text-white/40"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!body.trim() || sending}
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-blue text-white transition hover:opacity-90 disabled:opacity-40"
+                      aria-label="Send"
+                    >
+                      <Send className="h-4 w-4" />
+                    </button>
+                  </div>
                 </form>
               </>
             ) : (
