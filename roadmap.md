@@ -46,4 +46,5 @@
 - [x] Add welcome-page photo transitions (wipe reveals, scan sweeps, hover shine, slow breathing) and the three-phone app showcase with reveal, float and glow; poster, arena and showcase photos verified revealed at desktop and phone widths, no overflow or page errors, build OK; not published.
 - [x] Reorganize main menu, Artist Dashboard sidebar and General Settings (Oct 22)
 - [x] Add a visible cyan-to-blue scrollbar to the admin sidebar menu, pin the account block, and keep every menu item reachable without overlapping the footer; desktop/phone verified, no page errors, build OK; not published.
+- [x] Complete the eight menu pages audit: Library now shows followed artists, recent plays and saved videos; Events shows past events and an Arena link (Oct 22)
 
