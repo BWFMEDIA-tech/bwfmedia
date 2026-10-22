@@ -1246,3 +1246,62 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
   .welcome-rail-pulse { animation: none; top: 34%; }
 }
+
+/* Image transitions: wipe reveals, scan sweeps, hover shine and slow breathing. */
+.welcome-poster-frame, .welcome-battle-frame, .welcome-screen-frame { position: relative; overflow: hidden; }
+.welcome-poster-img { animation: welcome-breathe 26s ease-in-out infinite alternate; transform-origin: 50% 55%; }
+@keyframes welcome-breathe { from { transform: scale(1); } to { transform: scale(1.05); } }
+.welcome-scan { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, transparent 74%, color-mix(in srgb, var(--primary) 12%, transparent) 90%, color-mix(in srgb, var(--primary) 80%, transparent) 98%, transparent 100%); }
+.welcome-shine { position: absolute; inset: 0; pointer-events: none; opacity: 0; transform: translateX(-115%); background: linear-gradient(115deg, transparent 42%, color-mix(in srgb, var(--primary) 24%, transparent) 50%, transparent 58%); transition: transform 900ms cubic-bezier(.22, 1, .36, 1), opacity 260ms ease; }
+.welcome-screen:hover .welcome-shine, .welcome-poster-frame:hover .welcome-shine, .welcome-battle-frame:hover .welcome-shine { opacity: 1; transform: translateX(115%); }
+.welcome-hero-video { animation: welcome-hero-in 1.5s ease-out both; }
+@keyframes welcome-hero-in { from { opacity: 0; transform: scale(1.06); } to { opacity: .8; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .welcome-poster-img, .welcome-hero-video { animation: none; }
+  .welcome-shine { transition: none; }
+}
+
+/* Poster wipe reveal is driven by a plain IntersectionObserver class toggle. */
+.welcome-poster-frame { opacity: 0; clip-path: inset(0 0 100% 0); transition: opacity 800ms ease, clip-path 1100ms cubic-bezier(.22, 1, .36, 1); }
+.welcome-poster-frame.is-revealed { opacity: 1; clip-path: inset(0 0 0% 0); }
+@media (prefers-reduced-motion: reduce) {
+  .welcome-poster-frame { transition: none; }
+}
+
+/* Battle arena wipe reveal (observed wrapper, clipped inner frame). */
+.welcome-battle-frame { opacity: 0; clip-path: inset(0 0 100% 0); transition: opacity 800ms ease, clip-path 1000ms cubic-bezier(.22, 1, .36, 1); }
+.welcome-battle-frame.is-revealed { opacity: 1; clip-path: inset(0 0 0% 0); }
+
+/* Phone showcase: reveal, slow float and pulsing glow. */
+.welcome-showcase-stage { position: relative; }
+.welcome-showcase-stage::before {
+  content: "";
+  position: absolute;
+  inset: 14% 6% -4% 6%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(55% 55% at 50% 55%, color-mix(in srgb, var(--primary) 34%, transparent), transparent 72%);
+  filter: blur(52px);
+  animation: welcome-showcase-glow 6.5s ease-in-out infinite alternate;
+}
+.welcome-showcase-frame {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  opacity: 0;
+  transform: translateY(26px) scale(.985);
+  transition: opacity 900ms ease, transform 1100ms cubic-bezier(.22, 1, .36, 1);
+}
+.welcome-showcase-frame.is-revealed { opacity: 1; transform: translateY(0) scale(1); }
+.welcome-showcase-img { animation: welcome-showcase-float 9s ease-in-out infinite alternate; transform-origin: 50% 50%; will-change: transform; }
+.welcome-showcase-frame:hover .welcome-shine { opacity: 1; transform: translateX(115%); }
+@keyframes welcome-showcase-float { from { transform: translateY(-8px) scale(1.05); } to { transform: translateY(8px) scale(1.05); } }
+@keyframes welcome-showcase-glow { from { opacity: .35; } to { opacity: .7; } }
+@media (prefers-reduced-motion: reduce) {
+  .welcome-battle-frame { transition: none; }
+  .welcome-showcase-frame { transition: none; }
+  .welcome-showcase-img, .welcome-showcase-stage::before { animation: none; }
+}

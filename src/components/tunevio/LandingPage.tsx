@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { motion, MotionConfig } from "framer-motion";
 import {
   Mic2,
@@ -16,6 +17,7 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import welcomePoster from "@/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json";
 import battlePoster from "@/assets/welcome-IMG_1560.png.asset.json";
+import appShowcase from "@/assets/welcome-apps.png.asset.json";
 import livePlayer from "@/assets/welcome-IMG_1685.png.asset.json";
 import waitingPlayer from "@/assets/welcome-IMG_1684.png.asset.json";
 import artistProfiles from "@/assets/welcome-IMG_1683.png.asset.json";
@@ -31,6 +33,76 @@ const welcomeScreens = [
   { image: liveChat, title: "The Conversation", alt: "Tunevio live chat with emoji reactions and audience area" },
   { image: waitingPlayer, title: "The Next Drop", alt: "Tunevio music queue waiting for the next track" },
 ];
+
+const easeOutExpo: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const galleryVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.08 } },
+};
+
+const screenVariants = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOutExpo } },
+};
+
+const screenImageVariants = {
+  hidden: { opacity: 0, scale: 1.12, filter: "blur(12px)" },
+  show: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.9, ease: easeOutExpo } },
+};
+
+const scanVariants = {
+  hidden: { opacity: 0, y: "-100%" },
+  show: {
+    opacity: [0, 1, 1, 0],
+    y: ["-100%", "-40%", "55%", "100%"],
+    transition: { duration: 1.25, ease: "easeInOut" },
+  },
+};
+
+/**
+ * Reveals an element the first time it scrolls into view. Uses a plain
+ * IntersectionObserver so the wipe always plays, even if the route re-renders
+ * while the page is still loading.
+ */
+function useRevealOnScroll(rootMargin = "-80px") {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setShown(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShown(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin, threshold: 0.15 },
+    );
+    observer.observe(el);
+    // A fast jump (scrollbar drag or anchor link) can carry the photo past the
+    // screen between two frames, so reveal anything already scrolled above it.
+    const onScroll = () => {
+      if (el.getBoundingClientRect().bottom < 0) {
+        setShown(true);
+        observer.disconnect();
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [rootMargin]);
+
+  return { ref, shown };
+}
 
 function trackCta(label: string) {
   try {
@@ -134,6 +206,9 @@ const steps = [
 ];
 
 export function LandingPage() {
+  const { ref: posterRef, shown: posterShown } = useRevealOnScroll();
+  const { ref: battleRef, shown: battleShown } = useRevealOnScroll();
+  const { ref: showcaseRef, shown: showcaseShown } = useRevealOnScroll();
   return (
     <MotionConfig reducedMotion="user">
     <div className="tunevio-welcome min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -241,12 +316,19 @@ export function LandingPage() {
 
       <section className="welcome-poster px-5 sm:px-10 pb-16" aria-label="Tunevio artists, listeners and hosts">
         <div className="mx-auto max-w-6xl">
-          <img
-            src={welcomePoster.url}
-            alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
-            className="block h-auto w-full rounded-lg"
-            fetchPriority="high"
-          />
+          <div ref={posterRef}>
+            <div
+              className={`welcome-poster-frame relative overflow-hidden rounded-lg${posterShown ? " is-revealed" : ""}`}
+            >
+              <img
+                src={welcomePoster.url}
+                alt="Tunevio — Real Music. Real People. Real Opportunity. Artists, listeners and hosts together."
+                className="welcome-poster-img block h-auto w-full"
+                fetchPriority="high"
+              />
+              <span className="welcome-shine" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -317,32 +399,85 @@ export function LandingPage() {
               nobody misses the moment.
             </p>
           </motion.div>
-          <motion.img
-            src={battlePoster.url}
-            alt="Two artists in a live head-to-head music battle on Tunevio"
-            loading="lazy"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-            className="w-full rounded-lg border border-border "
-          />
+          <div ref={battleRef} className="min-w-0">
+            <div
+              className={`welcome-battle-frame relative overflow-hidden rounded-lg border border-border${battleShown ? " is-revealed" : ""}`}
+            >
+              <motion.img
+                src={battlePoster.url}
+                alt="Two artists in a live head-to-head music battle on Tunevio"
+                loading="lazy"
+                animate={{ opacity: battleShown ? 1 : 0, scale: battleShown ? 1 : 1.12 }}
+                transition={{ duration: 1.2, ease: easeOutExpo }}
+                whileHover={{ scale: 1.04 }}
+                className="welcome-battle-img w-full"
+              />
+              <motion.span
+                className="welcome-scan"
+                aria-hidden="true"
+                variants={scanVariants}
+                initial="hidden"
+                animate={battleShown ? "show" : "hidden"}
+                transition={{ duration: 1.25, ease: "easeInOut" }}
+              />
+              <span className="welcome-shine" aria-hidden="true" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App showcase */}
+      <section className="welcome-showcase relative px-5 sm:px-10 pb-20" aria-labelledby="showcase-heading">
+        <div className="mx-auto max-w-5xl">
+          <div ref={showcaseRef} className="welcome-showcase-stage">
+            <div className={`welcome-showcase-frame${showcaseShown ? " is-revealed" : ""}`}>
+              <img
+                src={appShowcase.url}
+                alt="Tunevio on three phones: search and browse, home dashboard and now playing"
+                loading="lazy"
+                className="welcome-showcase-img block h-auto w-full"
+              />
+              <span className="welcome-shine" aria-hidden="true" />
+            </div>
+          </div>
+          <h2 id="showcase-heading" className="mt-8 text-center text-xl sm:text-2xl font-semibold">
+            Tunevio, right in your hand
+          </h2>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            Search, play and discover in one place — built for artists, listeners and hosts.
+          </p>
         </div>
       </section>
 
       <section className="px-5 sm:px-10 pb-24" aria-labelledby="community-images-heading">
         <div className="mx-auto max-w-6xl">
           <h2 id="community-images-heading" className="text-3xl sm:text-4xl text-center">Inside Tunevio</h2>
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+          <motion.div
+            variants={galleryVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-80px" }}
+            className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10"
+          >
             {welcomeScreens.map((screen) => (
-              <figure key={screen.title} className="welcome-screen min-w-0">
-                <div className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
-                  <img src={screen.image.url} alt={screen.alt} loading="lazy" className="h-full w-full object-contain" />
+              <motion.figure key={screen.title} variants={screenVariants} className="welcome-screen min-w-0">
+                <div className="welcome-screen-frame relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
+                  <motion.img
+                    variants={screenImageVariants}
+                    src={screen.image.url}
+                    alt={screen.alt}
+                    loading="lazy"
+                    whileHover={{ scale: 1.06 }}
+                    transition={{ duration: 0.6, ease: easeOutExpo }}
+                    className="welcome-img h-full w-full object-contain"
+                  />
+                  <motion.span className="welcome-scan" aria-hidden="true" variants={scanVariants} />
+                  <span className="welcome-shine" aria-hidden="true" />
                 </div>
                 <figcaption className="mt-4 flex items-center justify-between text-base font-medium">{screen.title}<span aria-hidden="true" className="welcome-caption-line" /></figcaption>
-              </figure>
+              </motion.figure>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
