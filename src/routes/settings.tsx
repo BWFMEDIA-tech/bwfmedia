@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
+import { SettingsShell } from "@/components/settings/SettingsShell";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/settings")({
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsLayout() {
   return (
-    <ArtistDashboardShell>
+    <SettingsShell>
     <div className="swara-settings min-h-screen bg-background text-foreground pb-24">
         <div className="mx-auto max-w-[1600px] px-0 py-4 md:px-4 md:py-6">
           <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:gap-8">
@@ -25,6 +25,6 @@ function SettingsLayout() {
           </div>
         </div>
     </div>
-    </ArtistDashboardShell>
+    </SettingsShell>
   );
 }
