@@ -1177,3 +1177,22 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 .swara-home .swara-featured > div:last-child { padding: 16px 0; }
 .swara-home .swara-featured button:first-child { background: var(--reference-action); color: var(--reference-action-foreground); }
 .swara-home .swara-featured h2 { font-size: 28px; }
+
+/* Welcome page follows the imported music theme without changing account entry. */
+.tunevio-welcome { font-family: var(--font-body); letter-spacing: 0; }
+.tunevio-welcome > header { max-width: 1280px; margin-inline: auto; }
+.tunevio-welcome h1, .tunevio-welcome h2 { letter-spacing: 0; font-weight: 600; }
+.tunevio-welcome .welcome-action { border-radius: 24px; box-shadow: none; height: auto; min-height: 40px; white-space: normal; text-align: center; }
+.tunevio-welcome .welcome-primary, .tunevio-welcome header a[href="/signup"], .tunevio-welcome a[href^="/signup?as="] { background: var(--reference-action); color: var(--reference-action-foreground); border-color: transparent; }
+.tunevio-welcome .welcome-primary:hover, .tunevio-welcome header a[href="/signup"]:hover, .tunevio-welcome a[href^="/signup?as="]:hover { background: var(--brand-silver); }
+.tunevio-welcome > section:first-of-type { padding-top: 64px; padding-bottom: 88px; }
+.tunevio-welcome > section:first-of-type h1 { max-width: 850px; margin-inline: auto; }
+.tunevio-welcome > section:first-of-type h1 span { color: var(--foreground); }
+.tunevio-welcome [aria-labelledby="roles-heading"] { padding-top: 24px; }
+.tunevio-welcome li { line-height: 1.6; }
+.tunevio-welcome #how-it-works > div > div:first-of-type > div { border: 0; border-bottom: 1px solid var(--border); background: transparent; border-radius: 0; }
+@media (max-width: 640px) {
+  .tunevio-welcome > section:first-of-type { padding-top: 36px; padding-bottom: 56px; }
+  .tunevio-welcome h1 { font-size: 36px; line-height: 1.15; }
+  .tunevio-welcome header img { max-width: 112px; object-fit: contain; }
+}
