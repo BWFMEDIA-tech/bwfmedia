@@ -1065,6 +1065,10 @@ html[data-music-player] .music-assistant-launcher { bottom: calc(var(--bwf-mobil
 .swara-pricing, .swara-artists, .swara-events, .swara-store, .swara-artist-store, .swara-product-detail { font-family: var(--font-body); letter-spacing: 0; }
 .swara-pricing h1, .swara-artists h1, .swara-events h1 { letter-spacing: 0; font-weight: 600; }
 .swara-pricing .swara-plan-card { background: var(--reference-panel); }
+.swara-pricing [aria-label="Plan audience"] { max-width: 100%; }
+.swara-pricing [aria-label="Plan audience"] button { min-width: 0; padding-inline: 16px; letter-spacing: 0; }
+.swara-pricing [aria-label="Plan audience"] button[aria-pressed="true"] { background: var(--foreground); color: var(--background); }
+.swara-pricing [aria-label="Plan audience"] button[aria-pressed="false"] { background: transparent; color: var(--muted-foreground); }
 .swara-artists header { margin-bottom: 20px; }
 .swara-artists .sticky { position: relative; padding-top: 8px; background: var(--background); }
 .swara-artists input { min-height: 52px; border-radius: 28px; background: var(--reference-panel); padding-left: 42px; }
