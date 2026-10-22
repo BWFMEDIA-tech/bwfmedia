@@ -1,5 +1,12 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
+
 import {
   LayoutDashboard, Users, Radio, Star, PlayCircle, Calendar,
   BarChart3, Settings, Menu, Search, Bell, ChevronDown, ChevronRight,
@@ -89,7 +96,58 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     artists: true, music: false, video: false, broadcast: true, stage: true,
   });
+  const [navEl, setNavEl] = useState<HTMLElement | null>(null);
+  const navDrag = useRef<{ y: number; top: number } | null>(null);
+  const [navBox, setNavBox] = useState({ top: 0, full: 0, view: 0 });
+
+  // The menu list scrolls inside the sidebar so its items always stay clear of
+  // the footer. The bar below is drawn rather than native, because mobile and
+  // headless browsers hide native scrollbars until the user is mid-swipe.
+  useEffect(() => {
+    if (!navEl) return;
+    const sync = () => setNavBox({ top: navEl.scrollTop, full: navEl.scrollHeight, view: navEl.clientHeight });
+    sync();
+    navEl.addEventListener("scroll", sync, { passive: true });
+    const observer = new ResizeObserver(sync);
+    observer.observe(navEl);
+    return () => {
+      navEl.removeEventListener("scroll", sync);
+      observer.disconnect();
+    };
+  }, [navEl]);
+
+
+  const navScrolls = navBox.full > navBox.view + 4;
+  const navMax = Math.max(1, navBox.full - navBox.view);
+  const navThumbHeight = navScrolls
+    ? Math.max(40, Math.round((navBox.view * navBox.view) / navBox.full))
+    : 0;
+  const navThumbTop = Math.round((navBox.top / navMax) * Math.max(0, navBox.view - navThumbHeight));
+  const navPercent = Math.round((navBox.top / navMax) * 100);
+
+  const onNavThumbDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const el = navEl;
+
+    if (!el) return;
+    navDrag.current = { y: event.clientY, top: el.scrollTop };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onNavThumbMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const el = navEl;
+
+    const drag = navDrag.current;
+    if (!el || !drag) return;
+    const travel = Math.max(1, el.clientHeight - navThumbHeight);
+    el.scrollTop = drag.top + ((event.clientY - drag.y) * (el.scrollHeight - el.clientHeight)) / travel;
+  };
+
+  const onNavThumbUp = () => {
+    navDrag.current = null;
+  };
+
   const isAdmin = auth.roles.includes("admin");
+
 
   useEffect(() => { setMobileOpen(false); setProfileMenu(false); }, [pathname]);
 
@@ -106,20 +164,29 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[#050509] text-white flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 transform border-r border-white/10 bg-[#0a0a14] transition-transform lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 transform flex-col border-r border-white/10 bg-[#0a0a14] transition-transform lg:sticky lg:inset-y-auto lg:top-0 lg:h-screen lg:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
+        <div className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-5">
+
           <div className="text-xl font-black tracking-tight">
             <span className="text-white">BWF</span>
             <span className="ml-1 text-[10px] font-bold tracking-[0.3em] text-violet-400">NETWORK</span>
           </div>
         </div>
-        <div className="px-4 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">
+        <div className="shrink-0 px-4 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">
           Admin Panel
         </div>
-        <nav className="px-2 pb-4">
+        <div className="relative flex min-h-0 flex-1">
+        <nav
+          id="admin-nav"
+          ref={setNavEl}
+          className="tv-scroll min-h-0 w-full flex-1 overflow-y-auto overscroll-contain px-2 pb-4"
+        >
+
+
+
           {NAV.map((entry) => {
             if (entry.kind === "link") {
               const active = pathname === entry.to || (entry.to !== "/admin" && pathname.startsWith(entry.to + "/"));
@@ -198,8 +265,29 @@ export function AdminShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+          {navScrolls && (
+            <div className="pointer-events-none absolute inset-y-0 right-[3px] w-[6px]">
+              <div className="absolute inset-0 rounded-full bg-white/5" />
+              <div
+                role="scrollbar"
+                aria-controls="admin-nav"
+                aria-orientation="vertical"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={navPercent}
+                onPointerDown={onNavThumbDown}
+                onPointerMove={onNavThumbMove}
+                onPointerUp={onNavThumbUp}
+                onPointerCancel={onNavThumbUp}
+                className="pointer-events-auto absolute left-0 w-full cursor-grab touch-none rounded-full bg-gradient-to-b from-brand-cyan to-brand-blue active:cursor-grabbing"
+                style={{ height: navThumbHeight, top: navThumbTop }}
+              />
+            </div>
+          )}
+        </div>
 
-        <div className="mx-3 mt-2 rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-600/15 to-violet-600/10 p-4">
+        <div className="mx-3 mt-2 mb-3 shrink-0 rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-600/15 to-violet-600/10 p-4">
+
           <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-blue-300">
             <Crown className="h-3 w-3" /> BWF PRO ADMIN
           </div>
@@ -209,7 +297,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </Link>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 border-t border-white/10 p-3">
+        <div className="shrink-0 border-t border-white/10 p-3">
           <Link to="/admin/profile" className="flex items-center gap-3 rounded-lg p-2 hover:bg-white/5">
             <Avatar url={auth.avatarUrl} name={auth.displayName} />
             <div className="flex-1 min-w-0">
