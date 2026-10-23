@@ -113,8 +113,9 @@
 .artist-status-beacon[data-artist-status="live"] { background: var(--status-live); box-shadow: 0 0 7px color-mix(in srgb, var(--status-live) 65%, transparent); }
 .artist-status-beacon[data-artist-status="active"] { background: var(--status-active); }
 
-.stage-navigation-indicator { transition: color 220ms ease, filter 220ms ease; }
-.stage-navigation-indicator[data-live="true"] { color: var(--status-live); filter: drop-shadow(0 0 4px var(--status-live)) drop-shadow(0 0 10px color-mix(in srgb, var(--status-live) 70%, transparent)); }
+/* The live glow on navigation entries uses the logo's electric blue, not status red. */
+.stage-navigation-indicator { --stage-glow: color-mix(in srgb, var(--brand-blue) 55%, var(--brand-cyan)); transition: color 220ms ease, filter 220ms ease; }
+.stage-navigation-indicator[data-live="true"] { color: var(--stage-glow); filter: drop-shadow(0 0 4px var(--stage-glow)) drop-shadow(0 0 11px color-mix(in srgb, var(--stage-glow) 75%, transparent)) drop-shadow(0 0 22px color-mix(in srgb, var(--stage-glow) 45%, transparent)); }
 @media (prefers-reduced-motion: reduce) { .stage-navigation-indicator { transition: none; } }
 
 /* Live-people list opened from the phone menu. */
