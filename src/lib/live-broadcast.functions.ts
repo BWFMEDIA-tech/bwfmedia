@@ -91,7 +91,14 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     });
     let emailed = 0;
     if (emailRecipients.length > 0) {
-      const tplData = { hostName, streamTitle: stream.title, streamUrl };
+      // Titles are host-controlled: strip links/control chars and cap length
+      // so the platform email can't be used to deliver arbitrary messages.
+      const safeTitle = String(stream.title ?? "")
+        .replace(/[\u0000-\u001f\u007f]/g, " ")
+        .replace(/\b(?:https?:\/\/|www\.)\S+/gi, "")
+        .replace(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|co|ly|me|app|xyz|info|biz|ru|cn)\b\S*/gi, "")
+        .replace(/\s+/g, " ").trim().slice(0, 80) || "Live now";
+      const tplData = { hostName, streamTitle: safeTitle, streamUrl };
 
       for (let i = 0; i < emailRecipients.length; i += 200) {
         const chunk = emailRecipients.slice(i, i + 200);
