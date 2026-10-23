@@ -3,6 +3,8 @@
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
 - Use semantic branding tokens; /videos reuses saves/signed URLs and metadata collections. Share Off the Block's YouTube list across both pages without duplicate uploads.
 - Derive icons from the logo.
+- Resolve shared Live Stage navigation from the existing public live listing, preferring the signed-in owner's session and using stream/stage joining routes; never grant permissions or use profile/setup redirects for this entry.
+- Suppress the host's navigation glow using its local LiveKit connection while mounted; remote availability still follows backend status, and transport loss must not end or mutate a stream.
 - Share local microphone controls across audio and video stages without granting stage access; treat muted microphone publications as intentional during media recovery so reconnect logic never unmutes a participant.
 - Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.

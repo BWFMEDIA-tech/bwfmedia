@@ -127,7 +127,7 @@ function LivePage() {
                 key={s.id}
                 {...(s.kind === "stage"
                   ? { to: "/stage/$roomId" as const, params: { roomId: s.id } }
-                  : { to: "/artist/$id" as const, params: { id: s.host_id } })}
+                  : { to: "/stream/$room" as const, params: { room: s.room_name } })}
                 className="group rounded-2xl border border-border bg-secondary overflow-hidden hover:border-primary/50 transition"
               >
                 <div className="relative aspect-video bg-gradient-to-br from-secondary to-background">

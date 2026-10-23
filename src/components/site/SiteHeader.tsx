@@ -35,6 +35,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { useQuery } from "@tanstack/react-query";
 import { getSiteNav } from "@/lib/site-nav.functions";
 import { artistDashboardDestination, hasArtistTools } from "@/lib/artist-navigation";
+import { useLiveStageNavigation } from "@/lib/use-live-stage-navigation";
 
 function HeaderCartButton() {
   const { totalCount, openCart } = useCart();
@@ -100,6 +101,7 @@ export function SiteHeader() {
   const browseRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const auth = useAuth();
+  const stage = useLiveStageNavigation();
   const navigate = useNavigate();
   const pathname = useActivePath();
   const isAdmin = auth.roles.includes("admin");
@@ -128,6 +130,7 @@ export function SiteHeader() {
     if (item.to === "/profile") {
       return [auth.user ? { kind: "link", ...item, to: "/artist/$id", params: { id: auth.user.id } } : { kind: "link", ...item, to: "/login" }];
     }
+    if (item.to === "/live") return [{ kind: "link", ...item, to: stage.to, params: stage.params }];
     return [{ kind: "link", ...item }];
   });
   const primary = entries.filter((e): e is Extract<Entry, { kind: "link" }> => e.kind === "link");
@@ -272,7 +275,7 @@ export function SiteHeader() {
                   active ? "text-bone" : "text-bone/65 hover:text-bone"
                 }`}
               >
-                {item.label}
+                <span className={item.label === "Live Stage" ? "stage-navigation-indicator" : undefined} data-live={item.label === "Live Stage" ? stage.live : undefined}>{item.label}</span>
                 {active && (
                   <motion.span
                     layoutId="nav-underline"
@@ -422,7 +425,7 @@ export function SiteHeader() {
                             : "border-white/10 bg-white/[0.03] text-bone/75 hover:text-bone"
                         }`}
                       >
-                        <item.icon size={15} className={`shrink-0 ${active ? "text-blood" : "text-bone/50"}`} />
+                        <item.icon size={15} data-live={item.label === "Live Stage" ? stage.live : undefined} className={`stage-navigation-indicator shrink-0 ${active ? "text-blood" : "text-bone/50"}`} />
                         <span>{item.label}</span>
                       </RouterLink>
                     );

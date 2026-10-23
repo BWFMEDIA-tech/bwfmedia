@@ -1,4 +1,4 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getGuestLiveKitToken, getLiveKitToken } from "@/lib/livekit.functions";
@@ -22,9 +22,17 @@ import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
 
 import joinBgAsset from "@/assets/bwf-join-bg.jpeg.asset.json";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/stream/$room")({
-  head: () => ({ meta: [{ title: "Join Live — BWF Network" }] }),
+  head: () => ({ meta: [
+    { title: "Join Live Stage — Tunevio" },
+    { name: "description", content: "Join a Tunevio live stage with its host, artists and audience." },
+    { property: "og:title", content: "Join Live Stage — Tunevio" },
+    { property: "og:description", content: "Join the live conversation on Tunevio." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ] }),
   component: GuestPage,
 });
 
@@ -37,6 +45,7 @@ function GuestPage() {
   const [name, setName] = useState("");
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [streamMeta, setStreamMeta] = useState<{ title: string; host_id: string; started_at: string | null; status: string | null } | null>(null);
@@ -48,19 +57,31 @@ function GuestPage() {
   useStagePresence(lk ? streamId : null, auth.user?.id ?? null);
 
   const myStageRole = auth.user
-    ? participants.find((p) => p.user_id === auth.user!.id)?.stage_role ?? "listener"
+    ? participants.find((p) => p.user_id === auth.user?.id)?.stage_role ?? "listener"
     : "listener";
-  const isHostLike = myStageRole === "host" || myStageRole === "co_host";
+  const isOwner = !!auth.user && auth.user.id === streamMeta?.host_id;
+  const isHostLike = isOwner || myStageRole === "host" || myStageRole === "co_host";
   const inCrowd = !isHostLike && myStageRole !== "speaker";
 
   useEffect(() => {
-    streamFn({ data: { roomName: room } })
+    let cancelled = false;
+    setLoaded(false);
+    const refresh = () => streamFn({ data: { roomName: room } })
       .then((s: any) => {
+        if (cancelled) return;
         setStreamId(s?.id ?? null);
         if (s?.mode) setStreamMode(s.mode as "broadcast" | "stage" | "play");
-        if (s?.id) setStreamMeta({ title: s.title ?? "", host_id: s.host_id, started_at: (s as any).started_at ?? null, status: (s as any).status ?? null });
+        setStreamMeta(s?.id ? { title: s.title ?? "", host_id: s.host_id, started_at: s.started_at ?? null, status: s.status ?? null } : null);
+        if (s?.status !== "live") setLk(null);
+        setLoaded(true);
       })
-      .catch(() => {});
+      .catch(() => { if (!cancelled) { setLoaded(true); setStreamMeta(null); setLk(null); } });
+    void refresh();
+    const poll = setInterval(refresh, 10_000);
+    const ch = supabase.channel(`stream-status-${room}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "streams", filter: `room_name=eq.${room}` }, refresh)
+      .subscribe();
+    return () => { cancelled = true; clearInterval(poll); void supabase.removeChannel(ch); };
   }, [room]);
 
   // Track host-side mode/lock changes
@@ -96,7 +117,7 @@ function GuestPage() {
   // on unload: the cron cleanup removes rows after 2 minutes of inactivity, so
   // refreshes keep guest status intact without re-approval.
   useEffect(() => {
-    if (!streamId || !auth.user) return;
+    if (!lk || !streamId || !auth.user || streamMeta?.status !== "live") return;
     const uid = auth.user.id;
     (async () => {
       const { data: existing } = await supabase
@@ -111,20 +132,21 @@ function GuestPage() {
           .insert({ stream_id: streamId, user_id: uid, stage_role: "listener" });
       }
     })();
-  }, [lk, streamId, auth.user?.id]);
+  }, [lk, streamId, auth.user?.id, streamMeta?.status]);
 
   // Auto-rejoin: if the signed-in user already has a stage row for this
   // stream (i.e. they were on stage before refreshing), connect to LiveKit
   // immediately without re-prompting for a name.
   useEffect(() => {
-    if (lk || !streamId || !auth.user) return;
+    if (lk || !streamId || !auth.user || streamMeta?.status !== "live") return;
+    const uid = auth.user.id;
     let cancelled = false;
     (async () => {
       const { data: existing } = await supabase
         .from("stage_participants")
         .select("stage_role")
         .eq("stream_id", streamId)
-        .eq("user_id", auth.user!.id)
+        .eq("user_id", uid)
         .maybeSingle();
       if (cancelled || !existing) return;
       try {
@@ -137,10 +159,10 @@ function GuestPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [streamId, auth.user?.id]);
+  }, [streamId, auth.user?.id, streamMeta?.status]);
 
   const join = async () => {
-    if (!name.trim()) return;
+    if ((!auth.user && !name.trim()) || streamMeta?.status !== "live") return;
     setJoining(true);
     try {
       const t = auth.user
@@ -152,13 +174,15 @@ function GuestPage() {
     } finally { setJoining(false); }
   };
 
-  if (streamMeta?.status === "ended") {
+  if (!loaded) return <div className="min-h-screen grid place-items-center bg-background text-muted-foreground">Loading stage…</div>;
+
+  if (streamMeta?.status !== "live") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#050509] p-6 text-white">
         <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18] p-6 text-center">
-          <h1 className="mb-1 text-2xl font-bold">This stream has ended</h1>
-          <p className="mb-4 text-sm text-white/60">{streamMeta.title || "Thanks for tuning in."}</p>
-          <a href="/live" className="inline-block w-full rounded-lg bg-gradient-to-r from-violet-500 to-blue-500 py-2.5 text-sm font-semibold">See who's live</a>
+          <h1 className="mb-1 text-2xl font-bold">{streamMeta?.status === "ended" ? "This stream has ended" : "This stage is offline"}</h1>
+          <p className="mb-4 text-sm text-muted-foreground">{streamMeta?.title || "Waiting for a live stage."}</p>
+          <Button asChild className="w-full"><Link to="/live">See who's live</Link></Button>
         </div>
       </div>
     );
@@ -173,11 +197,11 @@ function GuestPage() {
         <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18]/85 backdrop-blur-md p-6 shadow-2xl">
           <h1 className="text-2xl font-bold mb-1">Join the stream</h1>
           <p className="text-sm text-white/60 mb-4">Room: <span className="text-white">{room}</span></p>
-          <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm mb-3" />
-          <button onClick={join} disabled={joining || !name.trim()} className="w-full rounded-lg bg-gradient-to-r from-violet-500 to-blue-500 py-2.5 text-sm font-semibold disabled:opacity-50">
-            {joining ? "Joining…" : "Join Live"}
-          </button>
+          {!auth.user && <input aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
+            className="w-full rounded-lg border border-input bg-background/40 px-3 py-2 text-sm mb-3" />}
+          <Button onClick={join} disabled={joining || (!auth.user && !name.trim())} className="w-full">
+            {joining ? "Joining…" : isOwner ? "Join as host" : "Join Live"}
+          </Button>
         </div>
       </div>
     );
@@ -193,6 +217,7 @@ function GuestPage() {
               serverUrl={lk.wsUrl}
               streamId={streamId}
               userId={auth.user.id}
+              isHost={isOwner}
               onLeave={() => setLk(null)}
               showHostTools={isHostLike}
               autoConnect
@@ -211,6 +236,7 @@ function GuestPage() {
                 </div>
               )}
               <AudienceRow participants={participants as StageParticipant[]} />
+              {isHostLike && <HostControls streamId={streamId} hands={hands} queue={queue} participants={participants as StageParticipant[]} room={room} onEnded={() => setLk(null)} />}
               {streamMeta && (
                 <PlayArenaView
                   stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}

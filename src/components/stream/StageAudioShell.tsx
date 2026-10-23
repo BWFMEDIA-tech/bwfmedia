@@ -28,6 +28,8 @@ import { setRealtimeHealth } from "@/lib/realtime-health";
 import { SignedImg } from "@/components/ui/signed-img";
 import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
+import { StageNavigationConnection } from "./StageNavigationConnection";
+import { setStageNavigationConnection } from "@/lib/stage-navigation-connection";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -62,6 +64,10 @@ export function StageAudioShell({
   const [connect, setConnect] = useState(autoConnect);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
+  useEffect(() => {
+    if (isHost && (!connect || fatal)) setStageNavigationConnection({ streamId, connected: false });
+  }, [isHost, connect, fatal, streamId]);
+  useEffect(() => () => { if (isHost) setStageNavigationConnection(null); }, [isHost, streamId]);
   // Mirror LiveKit health into the global store so chat/queue surfaces can
   // react and switch to "sync on reconnect" without each page reimplementing.
   useEffect(() => {
@@ -174,6 +180,7 @@ export function StageAudioShell({
       className="contents"
     >
       <StageConnectionProvider>
+        {isHost && <StageNavigationConnection streamId={streamId} />}
         <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
         <MutedSpeakerGuard streamId={streamId} />

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { artistDashboardDestination } from "@/lib/artist-navigation";
 import { UnreadBadge, useUnreadCount } from "@/components/UnreadBadge";
+import { useLiveStageNavigation } from "@/lib/use-live-stage-navigation";
 
 type Tab = {
   to: string;
@@ -24,6 +25,7 @@ const TABS: Tab[] = [
 
 export function MobileBottomNav() {
   const auth = useAuth();
+  const stage = useLiveStageNavigation();
   const inboxCount = useUnreadCount("messages");
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
@@ -44,15 +46,16 @@ export function MobileBottomNav() {
         style={{ gridTemplateColumns: `repeat(${TABS.length}, minmax(0, 1fr))` }}
       >
         {TABS.map((tab) => {
-          const active = tab.match(pathname);
+          const active = tab.match(pathname) || (tab.to === "/live" && (pathname.startsWith("/stream/") || pathname.startsWith("/stage/")));
           const Icon = tab.icon;
           const dashboardTo = artistDashboardDestination(auth.roles);
-          const to = tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
+          const to = tab.to === "/live" ? stage.to : tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
           return (
             <li key={tab.to} className="flex">
               <Link
                 to={to}
-                params={tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
+                params={tab.to === "/live" ? stage.params : tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
+                data-stage-live={tab.to === "/live" ? stage.live : undefined}
                 search={tab.to === "/artist-dashboard" && dashboardTo === "/signup" ? { as: "artist" } as any : undefined}
                 className={cn(
                   "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors",
@@ -60,7 +63,7 @@ export function MobileBottomNav() {
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                <span className="relative">
+                <span className={cn("relative", tab.to === "/live" && "stage-navigation-indicator")} data-live={tab.to === "/live" ? stage.live : undefined}>
                   {tab.to === "/play" ? <img src={arenaLogo.url} alt="" className={cn("h-9 w-9 -my-2 object-contain transition-transform", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
                   {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
                 </span>
