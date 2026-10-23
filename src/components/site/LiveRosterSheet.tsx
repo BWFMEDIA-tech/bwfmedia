@@ -9,7 +9,7 @@ import { useLiveRoster } from "@/lib/use-live-stage-navigation";
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 
-/** The list of people live on Tunevio, opened from the phone menu's Live Arena button. */
+/** The list of people live on Tunevio, opened from the phone menu's Watch Now button. */
 export function LiveRosterSheet({ open, onOpenChange }: Props) {
   const { rows, isLoading, isError, retry } = useLiveRoster();
   const close = () => onOpenChange(false);
