@@ -9,7 +9,7 @@ describe("live stage navigation", () => {
     }
   });
   it("prefers the signed-in owner's stage without granting permissions", () => {
-    expect(liveStageDestination([{ ...stream, room_name: "other", host_id: "other" }, stream], "host").params).toEqual({ room: "host-room" });
+    expect(liveStageDestination([{ ...stream, room_name: "other", host_id: "other" }, stream], "host")).toEqual({ to: "/stream/$room", params: { room: "host-room" }, live: true });
   });
   it("removes the live state for offline, scheduled, idle and ended streams", () => {
     for (const status of ["offline", "scheduled", "idle", "ended", "disconnected"]) {
