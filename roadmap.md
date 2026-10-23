@@ -51,3 +51,4 @@
 - [x] QA the eight menu pages: unavailable saved/recent tracks now shown, retry buttons, queue kept across sessions on the device; desktop + phone verified (Oct 22)
 
 - [x] Move Music Videos directly below Playlists for You on the home page; verified signed-in at 531px that Playlists sits above Music Videos which sits above Top Songs, section renders real video cards with no page errors, build OK, not published.
+- [ ] Replace the phone menu's Go Live button with an Arena button that opens the Arena page; keep the supplied logo as the button mark.
