@@ -18,6 +18,7 @@ import hostImg from "@/assets/stream-host.jpg";
 import guestImg from "@/assets/stream-guest.jpg";
 import { useAuth } from "@/lib/auth-context";
 import { useServerFn } from "@tanstack/react-start";
+import { createStreamInvite } from "@/lib/invites.functions";
 import { startOrResumeStream, endStream } from "@/lib/streams.functions";
 import { LIVE_CATEGORIES } from "@/lib/live-categories";
 import { getMyActiveStream } from "@/lib/streams.functions";
@@ -428,9 +429,16 @@ function OnDeck() {
   );
 }
 
-function InviteGuest() {
+function InviteGuest({ streamId }: { streamId?: string | null }) {
   const [copied, setCopied] = useState(false);
-  const link = "https://live.bwfnetwork.com/invite/bwf-host";
+  const makeInvite = useServerFn(createStreamInvite);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  useEffect(() => {
+    setInviteCode(null);
+    if (!streamId) return;
+    makeInvite({ data: { streamId } }).then((r) => setInviteCode(r.code)).catch(() => setInviteCode(null));
+  }, [streamId]);
+  const link = inviteCode ? `${window.location.origin}/invite/${inviteCode}` : "Go live to create an invite link";
   const copy = () => {
     navigator.clipboard.writeText(link);
     setCopied(true);
@@ -1242,7 +1250,7 @@ function StreamStudio() {
 
               {/* Invite link */}
               <StudioBlock id="invite" label="Invite Guest">
-              <InviteGuest />
+              <InviteGuest streamId={stream?.id} />
               </StudioBlock>
             </StudioColumn>
 

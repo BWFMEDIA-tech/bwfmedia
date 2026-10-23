@@ -43,6 +43,8 @@ export const resolveInvite = createServerFn({ method: "POST" })
       console.error("[invite] lookup error", { error: error.message });
       return { ok: false, reason: "not_found" };
     }
+    // The shared host link was retired; hosts create per-live invites instead.
+    if (row && code === "bwf-host") return { ok: false, reason: "not_found" };
     if (!row) {
       // Shared live links use the room name — let anyone watch that live as a listener.
       const { data: live } = await client
@@ -97,7 +99,7 @@ export const resolveInvite = createServerFn({ method: "POST" })
     return {
       ok: true,
       code: row.code,
-      allowed_role: row.allowed_role as "host" | "speaker" | "listener",
+      allowed_role: (row.stream_id ? row.allowed_role : "listener") as "host" | "speaker" | "listener",
       stream: stream as any,
       expires_at: row.expires_at,
     };
@@ -169,7 +171,9 @@ export const joinStageFromInvite = createServerFn({ method: "POST" })
     if (!row) throw new Error("Invite not found");
     if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) throw new Error("Invite expired");
     if (row.stream_id && row.stream_id !== data.streamId) throw new Error("Invite is for a different live");
-    const allowed = (row.allowed_role ?? "listener") as keyof typeof ROLE_RANK;
+    if (data.code.toLowerCase() === "bwf-host") throw new Error("Invite not found");
+    // Invites not tied to a specific live can only seat listeners.
+    const allowed = (row.stream_id ? (row.allowed_role ?? "listener") : "listener") as keyof typeof ROLE_RANK;
     if (ROLE_RANK[data.role] > ROLE_RANK[allowed]) throw new Error("Invite does not allow this role");
 
     const { data: stream } = await client
