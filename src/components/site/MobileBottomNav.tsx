@@ -19,7 +19,7 @@ const TABS: Tab[] = [
   { to: "/", label: "Home", icon: Home, match: (p) => p === "/" || p === "/home" },
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/play", label: "Arena", icon: Swords, match: (p) => p.startsWith("/play") },
-  { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
+  { to: "/live", label: "Live Arena", icon: Radio, match: (p) => p === "/live" },
   { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
 
