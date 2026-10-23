@@ -94,13 +94,13 @@ function InvitePage() {
       }
       setLk({ token, wsUrl });
       setJoinedAs(role);
-      recordFn({ data: { code, role, userId: auth.user?.id } }).catch(() => {});
       console.log("[invite] joined room", { code, role, room: roomName });
 
       // If host or speaker, register as a stage participant with that role.
       if (auth.user && resolved.stream.mode === "stage") {
         const stageRole = role === "host" ? "host" : role === "speaker" ? "speaker" : "listener";
-await joinStageFn({ data: { code, streamId: resolved.stream.id, role: stageRole } });
+        await joinStageFn({ data: { code, streamId: resolved.stream.id, role: stageRole } });
+        recordFn({ data: { code, role } }).catch(() => {});
       }
     } catch (e: any) {
       console.error("[invite] join failed", e);
