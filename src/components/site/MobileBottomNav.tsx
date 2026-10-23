@@ -64,7 +64,7 @@ export function MobileBottomNav() {
                 aria-current={active ? "page" : undefined}
               >
                 <span className={cn("relative", tab.to === "/live" && "stage-navigation-indicator")} data-live={tab.to === "/live" ? stage.live : undefined}>
-                  {tab.to === "/play" ? <img src={arenaLogo.url} alt="" className={cn("h-9 w-9 -my-2 object-contain transition-transform", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
+                  {tab.to === "/play" ? <img src={arenaLogo.url} alt="" data-live={tab.to === "/play" ? stage.live : undefined} className={cn("h-9 w-9 -my-2 object-contain transition-transform stage-navigation-indicator", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
                   {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
                 </span>
                 <span className="w-full text-center leading-tight">{tab.label}</span>
