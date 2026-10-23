@@ -1,3 +1,8 @@
+/** Self controls never grant publishing or override a host's mute. Muting is always safe. */
+export function canToggleStageMicrophone(microphoneEnabled: boolean, canPublish: boolean, hostMuted: boolean) {
+  return microphoneEnabled || (canPublish && !hostMuted);
+}
+
 /** A muted publication is intentional, not a failed microphone to restart. */
 export function shouldRestoreStageMicrophone(publications: Iterable<{
   source?: string;
