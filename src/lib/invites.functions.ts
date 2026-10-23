@@ -99,7 +99,7 @@ export const resolveInvite = createServerFn({ method: "POST" })
     return {
       ok: true,
       code: row.code,
-      allowed_role: row.allowed_role as "host" | "speaker" | "listener",
+      allowed_role: (row.stream_id ? row.allowed_role : "listener") as "host" | "speaker" | "listener",
       stream: stream as any,
       expires_at: row.expires_at,
     };
