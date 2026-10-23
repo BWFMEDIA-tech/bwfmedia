@@ -4,11 +4,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
+import { liveRosterRows, type LiveRosterEntry, type LiveRosterRow } from "./live-roster";
 import { liveStageDestination } from "./live-stage-navigation";
 import { useStageNavigationConnection } from "./stage-navigation-connection";
 
-export function useLiveStageNavigation() {
-  const auth = useAuth();
+/**
+ * One shared poll of the public live listing (streams + stage rooms). Consumers that
+ * need different views of it — the navigation glow, the live-people list — reuse this
+ * query instead of opening a second subscription to the same table.
+ */
+function useLiveStageFeed() {
   const connection = useStageNavigationConnection();
   const id = useId();
   const fetchLive = useServerFn(listLiveStreams);
@@ -37,7 +42,27 @@ export function useLiveStageNavigation() {
       void supabase.removeChannel(channel);
     };
   }, [id, query.refetch]);
-  const entries = (query.isError ? [] : query.data?.streams ?? [])
+  const entries: LiveRosterEntry[] = (query.isError ? [] : query.data?.streams ?? [])
     .filter((entry) => !connection || entry.id !== connection.streamId || connection.connected);
+  return {
+    entries,
+    online,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    retry: () => { void query.refetch(); },
+  };
+}
+
+/** Where the live entries should go right now: the real broadcast when there is one. */
+export function useLiveStageNavigation() {
+  const auth = useAuth();
+  const { entries, online } = useLiveStageFeed();
   return liveStageDestination(entries, auth.user?.id, online);
+}
+
+/** The people currently live on Tunevio, own broadcast first. */
+export function useLiveRoster(): { rows: LiveRosterRow[]; isLoading: boolean; isError: boolean; retry: () => void } {
+  const auth = useAuth();
+  const { entries, isLoading, isError, retry } = useLiveStageFeed();
+  return { rows: liveRosterRows(entries, auth.user?.id), isLoading, isError, retry };
 }

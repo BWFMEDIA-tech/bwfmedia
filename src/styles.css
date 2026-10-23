@@ -117,6 +117,10 @@
 .stage-navigation-indicator[data-live="true"] { color: var(--status-live); filter: drop-shadow(0 0 4px var(--status-live)) drop-shadow(0 0 10px color-mix(in srgb, var(--status-live) 70%, transparent)); }
 @media (prefers-reduced-motion: reduce) { .stage-navigation-indicator { transition: none; } }
 
+/* Live-people list opened from the phone menu. */
+.live-roster-drawer { max-height: min(80svh, 760px); padding-bottom: calc(env(safe-area-inset-bottom) + 8px); }
+@media (prefers-reduced-motion: reduce) { .live-roster-drawer * { animation: none !important; } }
+
 .tunevio-store { --store-shade: linear-gradient(90deg, var(--background) 0%, color-mix(in oklch, var(--background) 94%, transparent) 24%, color-mix(in oklch, var(--background) 25%, transparent) 62%, transparent); }
 .store-cover { height: 540px; max-height: calc(100svh - 180px); min-height: 430px; }
 .store-cover-shade { background: var(--store-shade); }

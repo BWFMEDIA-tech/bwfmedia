@@ -130,7 +130,7 @@ export function SiteHeader() {
     if (item.to === "/profile") {
       return [auth.user ? { kind: "link", ...item, to: "/artist/$id", params: { id: auth.user.id } } : { kind: "link", ...item, to: "/login" }];
     }
-    if (item.to === "/live") return [{ kind: "link", ...item, to: stage.to, params: stage.params }];
+    if (item.to === "/live") return [{ kind: "link", ...item, to: stage.to, params: stage.live ? stage.params : undefined }];
     return [{ kind: "link", ...item }];
   });
   const primary = entries.filter((e): e is Extract<Entry, { kind: "link" }> => e.kind === "link");

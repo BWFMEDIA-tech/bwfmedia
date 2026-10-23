@@ -1,11 +1,14 @@
+// ============= Full file contents =============
+
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Radio, Inbox, User, Swords } from "lucide-react";
 import arenaLogo from "@/assets/go-live-logo.png.asset.json";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { artistDashboardDestination } from "@/lib/artist-navigation";
 import { UnreadBadge, useUnreadCount } from "@/components/UnreadBadge";
+import { LiveRosterSheet } from "@/components/site/LiveRosterSheet";
 import { useLiveStageNavigation } from "@/lib/use-live-stage-navigation";
 
 type Tab = {
@@ -27,6 +30,7 @@ export function MobileBottomNav() {
   const auth = useAuth();
   const stage = useLiveStageNavigation();
   const inboxCount = useUnreadCount("messages");
+  const [rosterOpen, setRosterOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const root = document.documentElement;
@@ -36,6 +40,7 @@ export function MobileBottomNav() {
     };
   }, []);
   return (
+    <>
     <nav
       aria-label="Primary"
       className="tunevio-phone-navigation fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl md:hidden"
@@ -49,34 +54,56 @@ export function MobileBottomNav() {
           const active = tab.match(pathname) || (tab.to === "/profile" && auth.user ? pathname.startsWith(`/artist/${auth.user.id}`) : false) || (tab.to === "/live" && (pathname.startsWith("/stream/") || pathname.startsWith("/stage/")));
           const Icon = tab.icon;
           const dashboardTo = artistDashboardDestination(auth.roles);
-          // The Arena and Live Arena entries both follow the real live broadcast: when Tunevio is
-          // actually live they open that stream/stage, otherwise they stay on their own pages.
-          const followsStage = tab.to === "/live" || tab.to === "/play";
+          // The Arena entry follows the real live broadcast: when Tunevio is actually live
+          // it opens that stream/stage, otherwise it stays on the Battle Arena.
+          const followsStage = tab.to === "/play";
           const to = followsStage ? (stage.live ? stage.to : tab.to) : tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
+          const className = cn(
+            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors",
+            active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+          );
+          const content = (
+            <>
+              <span className={cn("relative", tab.to === "/live" && "stage-navigation-indicator")} data-live={tab.to === "/live" ? stage.live : undefined}>
+                {tab.to === "/play" ? <img src={arenaLogo.url} alt="" data-live={tab.to === "/play" ? stage.live : undefined} className={cn("h-9 w-9 -my-2 object-contain transition-transform stage-navigation-indicator", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
+                {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
+              </span>
+              <span className="w-full text-center leading-tight">{tab.label}</span>
+            </>
+          );
           return (
             <li key={tab.to} className="flex">
-              <Link
-                to={to}
-                params={followsStage ? (stage.live ? stage.params : undefined) : tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
-                data-stage-live={tab.to === "/live" ? stage.live : undefined}
-                search={tab.to === "/artist-dashboard" && dashboardTo === "/signup" ? { as: "artist" } as any : undefined}
-                className={cn(
-                  "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors",
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground",
-                )}
-                aria-current={active ? "page" : undefined}
-              >
-                <span className={cn("relative", tab.to === "/live" && "stage-navigation-indicator")} data-live={tab.to === "/live" ? stage.live : undefined}>
-                  {tab.to === "/play" ? <img src={arenaLogo.url} alt="" data-live={tab.to === "/play" ? stage.live : undefined} className={cn("h-9 w-9 -my-2 object-contain transition-transform stage-navigation-indicator", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
-                  {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
-                </span>
-                <span className="w-full text-center leading-tight">{tab.label}</span>
-              </Link>
+              {tab.to === "/live" ? (
+                <button
+                  type="button"
+                  onClick={() => setRosterOpen(true)}
+                  aria-expanded={rosterOpen}
+                  aria-controls="live-roster"
+                  aria-label="See people live on Tunevio"
+                  data-stage-live={stage.live}
+                  className={cn(className, "bg-transparent")}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {content}
+                </button>
+              ) : (
+                <Link
+                  to={to}
+                  params={followsStage ? (stage.live ? stage.params : undefined) : tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
+                  search={tab.to === "/artist-dashboard" && dashboardTo === "/signup" ? { as: "artist" } as any : undefined}
+                  className={className}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {content}
+                </Link>
+              )}
             </li>
           );
         })}
       </ul>
     </nav>
+    <LiveRosterSheet open={rosterOpen} onOpenChange={setRosterOpen} />
+    </>
   );
 }
 
