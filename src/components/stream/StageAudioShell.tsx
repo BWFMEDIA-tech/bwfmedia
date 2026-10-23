@@ -28,6 +28,7 @@ import { setRealtimeHealth } from "@/lib/realtime-health";
 import { SignedImg } from "@/components/ui/signed-img";
 import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
+import { StageNavigationConnection } from "./StageNavigationConnection";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -174,6 +175,7 @@ export function StageAudioShell({
       className="contents"
     >
       <StageConnectionProvider>
+        {isHost && <StageNavigationConnection streamId={streamId} />}
         <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
         <MutedSpeakerGuard streamId={streamId} />

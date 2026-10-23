@@ -5,9 +5,11 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
 import { liveStageDestination } from "./live-stage-navigation";
+import { useStageNavigationConnection } from "./stage-navigation-connection";
 
 export function useLiveStageNavigation() {
   const auth = useAuth();
+  const connection = useStageNavigationConnection();
   const id = useId();
   const fetchLive = useServerFn(listLiveStreams);
   const [online, setOnline] = useState(true);
@@ -35,5 +37,7 @@ export function useLiveStageNavigation() {
       void supabase.removeChannel(channel);
     };
   }, [id, query.refetch]);
-  return liveStageDestination(query.isError ? [] : query.data?.streams ?? [], auth.user?.id, online);
+  const entries = (query.isError ? [] : query.data?.streams ?? [])
+    .filter((entry) => entry.id !== connection?.streamId || connection.connected);
+  return liveStageDestination(entries, auth.user?.id, online);
 }
