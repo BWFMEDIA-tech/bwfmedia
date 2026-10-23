@@ -23,7 +23,7 @@
 - NFC pages use owner-validated tabs JSON at /p/<code> with signed images. Tag prices are admin-managed; payment states are webhook-only; admin fulfillment is trigger-audited. No client price grants goods.
 - Ground the AI Assistant only in admin-editable assistant_articles and the allow-listed pages in src/lib/assistant.ts, with no model tools, because answers must never invent features or perform actions; history is per-user, capped at 50 rows.
 - Read nested AGENTS.md before editing their directories.
-- Batch photo availability in one status provider using existing streams, rooms and owner-only presence; expose only status labels to protect private activity timestamps and avoid per-photo subscriptions. The live beacon beside a photo uses the site's electric blue, never status red, because the user asked it to match the page theme.
+- Batch photo availability in one status provider using existing streams, rooms and owner-only presence; expose only status labels to protect private activity timestamps and avoid per-photo subscriptions. The beacon beside a photo uses only logo colors — electric blue live, cyan active, grey offline, never status red or green — because the user asked it to match the theme on every artist and host surface.
 - Reuse user_social_links and ProfilePlatformLinks for artist/host platform links on profiles and the /go-live prep screen; links are not OAuth-verified, so never show fabricated authorization status or store credentials there.
 - Merchandise earnings go entirely to the artist (artist_bps fixed at 10000) and the revenue pool feature (admin Revenue Pool page, live pool ticker) is removed, because the 60/40 split and pool were removed by request; the DB royalty engine stays for artist payouts.
 
