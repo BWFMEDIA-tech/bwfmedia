@@ -26,6 +26,7 @@ import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from 
 import { StageReconnectBanner } from "./StageReconnectBanner";
 import { setRealtimeHealth } from "@/lib/realtime-health";
 import { SignedImg } from "@/components/ui/signed-img";
+import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -182,7 +183,7 @@ export function StageAudioShell({
         <StageReconnectBanner />
         {children}
         {showHostTools && <StageDiagnostics />}
-        {showHostTools && <StageMicBar onLeave={onLeave} />}
+        {showHostTools ? <StageMicBar onLeave={onLeave} /> : <div className="flex justify-center py-3"><SelfMicrophoneButton /></div>}
       </StageConnectionProvider>
     </LiveKitRoom>
   );
@@ -302,7 +303,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     // Auto-enable mic for stage roles. For listeners/guests we do NOT
     // force-disable here — that would override their manual Unmute tap on
     // iOS / iPad / desktop. The host can still mute them via `muted_until`.
-    if (canSpeak) {
+    if (canSpeak && prevCanSpeak !== true) {
       if (localParticipant.permissions?.canPublish === false) return;
       localParticipant
         .setMicrophoneEnabled(true)
