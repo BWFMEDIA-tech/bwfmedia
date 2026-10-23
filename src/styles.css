@@ -96,7 +96,7 @@
   --trust: #0000FF;
   --success: #00C853;
   --status-live: #FF3434;
-  --status-active: var(--success);
+  --status-active: var(--brand-cyan);
   --status-offline: var(--ash);
   /* Live photo beacons follow the logo's electric blue, the same tone as the navigation glow. */
   --status-live-on-air: color-mix(in srgb, var(--brand-blue) 55%, var(--brand-cyan));
