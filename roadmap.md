@@ -53,3 +53,4 @@
 
 - [x] Move Music Videos directly below Playlists for You on the home page; verified signed-in at 531px that Playlists sits above Music Videos which sits above Top Songs, section renders real video cards with no page errors, build OK, not published.
 - [x] Replace the phone menu's Go Live button with an Arena button that opens the Arena page; kept the supplied logo as the button mark, renamed the page's browser title to TUNEVIO. Phone-sized browser verified signed-in: labels read Home/Inbox/Arena/Live Stage/My Account, tapping Arena lands on /play with the tab active, no page errors, build OK; not published.
+- [x] Rename the phone menu's fourth button from "Live Stage" to "Live Arena"; signed-in phone check shows Home/Inbox/Arena/Live Arena/Profile, tapping it opens the live room with no page errors, build OK; not published.
