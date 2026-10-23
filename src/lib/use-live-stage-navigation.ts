@@ -38,6 +38,6 @@ export function useLiveStageNavigation() {
     };
   }, [id, query.refetch]);
   const entries = (query.isError ? [] : query.data?.streams ?? [])
-    .filter((entry) => entry.id !== connection?.streamId || connection.connected);
+    .filter((entry) => !connection || entry.id !== connection.streamId || connection.connected);
   return liveStageDestination(entries, auth.user?.id, online);
 }
