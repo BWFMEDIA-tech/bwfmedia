@@ -31,6 +31,7 @@ import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
 import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
 import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { SelfMicrophoneButton } from "@/components/stream/SelfMicrophoneButton";
+import { StageMuteEnforcement } from "@/components/stream/StageMuteEnforcement";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -108,6 +109,7 @@ export function StudioLiveStage({ token, serverUrl, onEnd, onInvite, hostImage, 
         {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} audioOnly={audioOnly} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
         <PublishSync publish={publish} camera={!audioOnly} />
         {audioOnly && <AudioOnlySync />}
+        {streamId && <StageMuteEnforcement streamId={streamId} />}
         <LocalSpeakingSignalPublisher />
       </StageConnectionProvider>
     </LiveKitRoom>

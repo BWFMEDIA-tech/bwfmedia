@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canToggleStageMicrophone, shouldRestoreStageMicrophone } from "./stage-microphone";
+import { activeMutedUserIds, canToggleStageMicrophone, shouldRestoreStageMicrophone } from "./stage-microphone";
 
 describe("stage self mute", () => {
   it("lets every publishing stage participant mute and unmute their own mic", () => {
@@ -19,5 +19,25 @@ describe("stage self mute", () => {
   it("restores a failed unmuted microphone", () => {
     expect(shouldRestoreStageMicrophone([{ source: "microphone", track: { isMuted: false, mediaStreamTrack: { readyState: "ended" } } }])).toBe(true);
     expect(shouldRestoreStageMicrophone([])).toBe(true);
+  });
+});
+
+describe("host mute enforcement", () => {
+  const future = new Date(Date.now() + 60_000).toISOString();
+  const past = new Date(Date.now() - 60_000).toISOString();
+  it("lists only users whose mute is still in effect", () => {
+    const ids = activeMutedUserIds([
+      { user_id: "a", muted_until: future },
+      { user_id: "b", muted_until: past },
+      { user_id: "c", muted_until: null },
+    ]);
+    expect([...ids]).toEqual(["a"]);
+  });
+  it("treats the host's far-future mute marker as muted", () => {
+    const ids = activeMutedUserIds([{ user_id: "a", muted_until: "9999-12-31T00:00:00.000Z" }]);
+    expect(ids.has("a")).toBe(true);
+  });
+  it("returns an empty set when nobody is muted", () => {
+    expect(activeMutedUserIds([]).size).toBe(0);
   });
 });
