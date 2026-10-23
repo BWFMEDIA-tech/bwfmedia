@@ -44,11 +44,11 @@ const EMPTY_DASHBOARD: ArenaDashboard = {
 export const Route = createFileRoute("/play/")({
   head: () => ({
     meta: [
-      { title: "Play Arena — BWF Network" },
+      { title: "Play Arena — TUNEVIO" },
       {
         name: "description",
         content:
-          "The stage is earned, not given. Join queues, win battles, climb ranks in the BWF Play Arena.",
+          "The stage is earned, not given. Join queues, win battles, climb ranks in the Tunevio Play Arena.",
       },
     ],
   }),

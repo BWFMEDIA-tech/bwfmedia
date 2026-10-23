@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, Inbox, User, Video } from "lucide-react";
-import goLiveLogo from "@/assets/go-live-logo.png.asset.json";
+import { Home, Radio, Inbox, User, Swords } from "lucide-react";
+import arenaLogo from "@/assets/go-live-logo.png.asset.json";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
@@ -17,7 +17,7 @@ type Tab = {
 const TABS: Tab[] = [
   { to: "/", label: "Home", icon: Home, match: (p) => p === "/" || p === "/home" },
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
-  { to: "/go-live", label: "Go Live", icon: Video, match: (p) => p.startsWith("/go-live") },
+  { to: "/play", label: "Arena", icon: Swords, match: (p) => p.startsWith("/play") },
   { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
   { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
@@ -47,7 +47,7 @@ export function MobileBottomNav() {
           const active = tab.match(pathname);
           const Icon = tab.icon;
           const dashboardTo = artistDashboardDestination(auth.roles);
-          const to = tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to === "/go-live" ? (auth.user ? "/go-live" : "/login") : tab.to;
+          const to = tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
           return (
             <li key={tab.to} className="flex">
               <Link
@@ -61,7 +61,7 @@ export function MobileBottomNav() {
                 aria-current={active ? "page" : undefined}
               >
                 <span className="relative">
-                  {tab.to === "/go-live" ? <img src={goLiveLogo.url} alt="" className={cn("h-9 w-9 -my-2 object-contain transition-transform", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
+                  {tab.to === "/play" ? <img src={arenaLogo.url} alt="" className={cn("h-9 w-9 -my-2 object-contain transition-transform", active && "scale-110 drop-shadow-[0_0_8px_var(--primary)]")} /> : <Icon className="h-5 w-5" />}
                   {tab.to === "/messages" && <UnreadBadge count={inboxCount} className="-top-1.5 -right-2.5" />}
                 </span>
                 <span className="w-full text-center leading-tight">{tab.label}</span>
