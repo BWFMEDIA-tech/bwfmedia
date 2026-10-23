@@ -49,12 +49,15 @@ export function MobileBottomNav() {
           const active = tab.match(pathname) || (tab.to === "/profile" && auth.user ? pathname.startsWith(`/artist/${auth.user.id}`) : false) || (tab.to === "/live" && (pathname.startsWith("/stream/") || pathname.startsWith("/stage/")));
           const Icon = tab.icon;
           const dashboardTo = artistDashboardDestination(auth.roles);
-          const to = tab.to === "/live" ? stage.to : tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
+          // The Arena and Live Arena entries both follow the real live broadcast: when Tunevio is
+          // actually live they open that stream/stage, otherwise they stay on their own pages.
+          const followsStage = tab.to === "/live" || tab.to === "/play";
+          const to = followsStage ? (stage.live ? stage.to : tab.to) : tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
           return (
             <li key={tab.to} className="flex">
               <Link
                 to={to}
-                params={tab.to === "/live" ? stage.params : tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
+                params={followsStage ? (stage.live ? stage.params : undefined) : tab.to === "/profile" && auth.user ? { id: auth.user.id } : undefined}
                 data-stage-live={tab.to === "/live" ? stage.live : undefined}
                 search={tab.to === "/artist-dashboard" && dashboardTo === "/signup" ? { as: "artist" } as any : undefined}
                 className={cn(
