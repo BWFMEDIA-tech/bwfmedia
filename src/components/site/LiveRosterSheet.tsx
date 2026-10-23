@@ -17,7 +17,7 @@ export function LiveRosterSheet({ open, onOpenChange }: Props) {
     <Drawer open={open} onOpenChange={onOpenChange} shouldScaleBackground={false}>
       <DrawerContent
         id="live-roster"
-        className="live-roster-drawer border-t border-border bg-background"
+        className="live-roster-drawer rounded-t-3xl border-t border-border bg-background"
         aria-label="People live on Tunevio"
       >
         <DrawerHeader className="pb-1 text-left">
