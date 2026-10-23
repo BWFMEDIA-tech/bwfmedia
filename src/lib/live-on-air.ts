@@ -28,13 +28,14 @@ export async function filterOnAirStreams<T>(
 ): Promise<OnAirCandidate<T>[]> {
   if (!client || candidates.length === 0) return candidates;
   const names = [...new Set(candidates.map((c) => c.room).filter((n): n is string => !!n))];
-  if (names.length === 0) return candidates;
 
-  let rooms: Array<{ name: string; numParticipants?: number }>;
-  try {
-    rooms = await client.listRooms(names);
-  } catch {
-    return candidates;
+  let rooms: Array<{ name: string; numParticipants?: number }> = [];
+  if (names.length > 0) {
+    try {
+      rooms = await client.listRooms(names);
+    } catch {
+      return candidates;
+    }
   }
   const peopleByRoom = new Map(rooms.map((r) => [r.name, r.numParticipants ?? 0]));
 
