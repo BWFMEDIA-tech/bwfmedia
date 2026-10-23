@@ -29,6 +29,8 @@ import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
 import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
+import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
+import { SelfMicrophoneButton } from "@/components/stream/SelfMicrophoneButton";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -247,7 +249,7 @@ function useResilientLocalMediaPublish({
         const jobs: Array<Promise<void>> = [];
         const labels: Array<"microphone" | "camera"> = [];
 
-        if (microphone && !hasLiveLocalTrack(Track.Source.Microphone, Track.Kind.Audio)) {
+        if (microphone && shouldRestoreStageMicrophone(localParticipant.trackPublications.values())) {
           labels.push("microphone");
           jobs.push(localParticipant.setMicrophoneEnabled(true).then(() => undefined));
         }
@@ -544,6 +546,7 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
         </div>}
       </div>
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
+      {!showHostTools && publish && <div className="flex justify-center py-3"><SelfMicrophoneButton /></div>}
     </>
   );
 }

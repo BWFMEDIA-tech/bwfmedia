@@ -26,6 +26,8 @@ import { classifyLiveKitError, LiveKitFatalBanner, type LiveKitFatalKind } from 
 import { StageReconnectBanner } from "./StageReconnectBanner";
 import { setRealtimeHealth } from "@/lib/realtime-health";
 import { SignedImg } from "@/components/ui/signed-img";
+import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
+import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -182,7 +184,7 @@ export function StageAudioShell({
         <StageReconnectBanner />
         {children}
         {showHostTools && <StageDiagnostics />}
-        {showHostTools && <StageMicBar onLeave={onLeave} />}
+        {showHostTools ? <StageMicBar onLeave={onLeave} /> : <div className="flex justify-center py-3"><SelfMicrophoneButton /></div>}
       </StageConnectionProvider>
     </LiveKitRoom>
   );
@@ -302,7 +304,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     // Auto-enable mic for stage roles. For listeners/guests we do NOT
     // force-disable here — that would override their manual Unmute tap on
     // iOS / iPad / desktop. The host can still mute them via `muted_until`.
-    if (canSpeak) {
+    if (canSpeak && prevCanSpeak !== true) {
       if (localParticipant.permissions?.canPublish === false) return;
       localParticipant
         .setMicrophoneEnabled(true)
@@ -460,10 +462,7 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
     const syncMicIntent = () => {
       const lp = room.localParticipant;
       if (!lp) return;
-      const hasAudioPub = Array.from(lp.trackPublications.values()).some(
-        (p) => p.kind === Track.Kind.Audio,
-      );
-      if (hasAudioPub) wantsMic.current = true;
+      wantsMic.current = lp.isMicrophoneEnabled;
     };
     syncMicIntent();
 
@@ -488,17 +487,18 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       const lp = room.localParticipant;
       if (!lp) return;
       if (!wantsMic.current) return;
+      if (lp.permissions?.canPublish !== true || !shouldRestoreStageMicrophone(lp.trackPublications.values())) return;
       const hasLiveAudio = Array.from(lp.trackPublications.values()).some(
         (p) => p.kind === Track.Kind.Audio && p.track && !(p.track as any).isMuted,
       );
       if (hasLiveAudio) return;
       try {
-        await lp.setMicrophoneEnabled(false);
         await lp.setMicrophoneEnabled(true);
         console.log("[stage-audio] Re-published mic after reconnect");
       } catch (err) {
         console.warn("[stage-audio] Mic republish failed, retrying", err);
         setTimeout(() => {
+          if (!wantsMic.current || lp.permissions?.canPublish !== true || !shouldRestoreStageMicrophone(lp.trackPublications.values())) return;
           lp.setMicrophoneEnabled(true).catch((e) =>
             console.error("[stage-audio] Mic republish retry failed", e),
           );
@@ -515,9 +515,7 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       console.log("[stage-audio] Room reconnecting…");
       const lp = room.localParticipant;
       if (lp) {
-        wantsMic.current = Array.from(lp.trackPublications.values()).some(
-          (p) => p.kind === Track.Kind.Audio,
-        );
+        wantsMic.current = lp.isMicrophoneEnabled;
       }
     };
     const onParticipantConnected = () => resubscribeAllRemoteAudio();
@@ -556,6 +554,7 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
         return;
       }
       setTimeout(() => {
+        if (!wantsMic.current || room.localParticipant.permissions?.canPublish !== true || !shouldRestoreStageMicrophone(room.localParticipant.trackPublications.values())) return;
         room.localParticipant
           ?.setMicrophoneEnabled(true)
           .catch((e) => console.error("[stage-audio] Mic retry failed", e));
@@ -610,6 +609,8 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
     room.on(RoomEvent.MediaDevicesError, onMediaFailure as any);
     room.on(RoomEvent.Disconnected, onDisconnected);
     room.on(RoomEvent.LocalTrackPublished, onLocalTrackPublished);
+    room.localParticipant.on("trackMuted", syncMicIntent);
+    room.localParticipant.on("trackUnmuted", syncMicIntent);
     return () => {
       room.off(RoomEvent.Reconnecting, onReconnecting);
       room.off(RoomEvent.Reconnected, onReconnected);
@@ -619,6 +620,8 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       room.off(RoomEvent.MediaDevicesError, onMediaFailure as any);
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.LocalTrackPublished, onLocalTrackPublished);
+      room.localParticipant.off("trackMuted", syncMicIntent);
+      room.localParticipant.off("trackUnmuted", syncMicIntent);
       if (rejoinTimer) clearTimeout(rejoinTimer);
     };
   }, [room]);
