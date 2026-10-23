@@ -20,7 +20,7 @@ const TABS: Tab[] = [
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/play", label: "Arena", icon: Swords, match: (p) => p.startsWith("/play") },
   { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
-  { to: "/profile", label: "My Account", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
+  { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") || (auth.user ? p.startsWith(`/artist/${auth.user.id}`) : false) },
 ];
 
 export function MobileBottomNav() {
