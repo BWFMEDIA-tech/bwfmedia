@@ -3,6 +3,18 @@ import { createServerFn } from "@tanstack/react-start";
 
 const PATH_RE = /^[0-9a-fA-F-]{8,}\/.+$/;
 
+/** Keep only paths that are a profile's current avatar (the public-readable set). */
+async function publicAvatarPaths(admin: any, paths: string[]): Promise<Set<string>> {
+  const allowed = new Set<string>();
+  if (!paths.length) return allowed;
+  const owners = [...new Set(paths.map((p) => p.split("/")[0]))].filter((o) => /^[0-9a-fA-F-]{36}$/.test(o));
+  if (!owners.length) return allowed;
+  const { data } = await admin.from("profiles").select("avatar_url").in("id", owners.slice(0, 500));
+  const refs = (data ?? []).map((r: any) => String(r.avatar_url ?? ""));
+  for (const p of paths) if (refs.some((ref: string) => ref === p || ref.split("?")[0].endsWith(`/avatars/${p}`))) allowed.add(p);
+  return allowed;
+}
+
 function extractAvatarPath(input: string): string | null {
   try {
     const marker = "/storage/v1/object/public/avatars/";
@@ -31,6 +43,7 @@ export const signAvatarUrl = createServerFn({ method: "POST" })
       : null;
     if (!path) return { url: null as string | null, expiresIn: 0 };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!(await publicAvatarPaths(supabaseAdmin, [path])).has(path)) return { url: null as string | null, expiresIn: 0 };
     const expiresIn = Math.min(Math.max(data.expiresIn ?? 3600, 60), 60 * 60 * 24);
     const { data: signed, error } = await supabaseAdmin.storage
       .from("avatars")
@@ -62,6 +75,9 @@ export const signAvatarUrls = createServerFn({ method: "POST" })
     }
     if (pathMap.size === 0) return { results: out, expiresIn };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const allowed = await publicAvatarPaths(supabaseAdmin, Array.from(pathMap.keys()).slice(0, 500));
+    for (const [p, original] of pathMap) if (!allowed.has(p)) { out[original] = null; pathMap.delete(p); }
+    if (pathMap.size === 0) return { results: out, expiresIn };
     const paths = Array.from(pathMap.keys());
     const { data: signed, error } = await supabaseAdmin.storage
       .from("avatars")

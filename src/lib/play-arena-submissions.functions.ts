@@ -99,6 +99,7 @@ export const submitSongToArena = createServerFn({ method: "POST" })
       .maybeSingle();
     if (arenaErr) throw new Error(arenaErr.message);
     if (!arena) throw new Error("Arena not found");
+    if (arena.status !== "live") throw new Error("This arena isn't accepting songs right now");
 
     // 3. Prevent duplicate active submission for (arena, song)
     const { data: existing } = await supabase

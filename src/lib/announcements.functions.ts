@@ -150,5 +150,15 @@ export const editAnnouncement = createServerFn({ method: "POST" })
     }
     const { error, count } = await query;
     if (error) throw new Error("Couldn't save the announcement");
+    // Removed/replaced media: delete the stored object so earlier signed links stop working.
+    if (original.media_url && original.media_url !== mediaUrl) {
+      const m = /\/object\/sign\/announcement-media\/([^?]+)/.exec(original.media_url);
+      if (m) {
+        const oldPath = decodeURIComponent(m[1]);
+        if (oldPath !== data.mediaPath) {
+          await supabaseAdmin.storage.from("announcement-media").remove([oldPath]);
+        }
+      }
+    }
     return { updated: count ?? 0 };
   });

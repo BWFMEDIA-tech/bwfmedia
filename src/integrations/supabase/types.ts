@@ -4340,6 +4340,7 @@ export type Database = {
           allow_camera: boolean
           connection_status: string
           id: string
+          invite_counted: boolean
           joined_at: string
           last_seen_at: string
           muted_until: string | null
@@ -4351,6 +4352,7 @@ export type Database = {
           allow_camera?: boolean
           connection_status?: string
           id?: string
+          invite_counted?: boolean
           joined_at?: string
           last_seen_at?: string
           muted_until?: string | null
@@ -4362,6 +4364,7 @@ export type Database = {
           allow_camera?: boolean
           connection_status?: string
           id?: string
+          invite_counted?: boolean
           joined_at?: string
           last_seen_at?: string
           muted_until?: string | null
