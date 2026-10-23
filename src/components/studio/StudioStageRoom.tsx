@@ -37,6 +37,7 @@ import {
 import type { StageParticipant } from "@/lib/useStageState";
 import { cn } from "@/lib/utils";
 import { useMaybeRoomContext } from "@livekit/components-react";
+import { canToggleStageMicrophone } from "@/lib/stage-microphone";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
@@ -480,6 +481,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             }}
             kind="host"
             canManage={false}
+            isSelf
           />
         )}
         {Array.from({ length: Math.max(0, MAX_HOSTS - hostSlotsTaken) }).map((_, i) => (
@@ -869,23 +871,31 @@ function SpeakerBubble({
   const badgeBg = kind === "host" ? PURPLE : kind === "co_host" ? "#991b1b" : "#c2410c";
   const isMuted = !!p.muted_until && new Date(p.muted_until).getTime() > Date.now();
   const room = useMaybeRoomContext();
+  const isLocal = isSelf || room?.localParticipant.identity === p.user_id;
+  const [micBusy, setMicBusy] = useState(false);
   const [selfMicOn, setSelfMicOn] = useState<boolean | null>(null);
   useEffect(() => {
-    if (!isSelf || !room) return;
+    if (!isLocal || !room) return;
     const sync = () => setSelfMicOn(room.localParticipant.isMicrophoneEnabled);
     sync();
     room.localParticipant.on("trackMuted", sync).on("trackUnmuted", sync).on("localTrackPublished", sync).on("localTrackUnpublished", sync);
     return () => { room.localParticipant.off("trackMuted", sync).off("trackUnmuted", sync).off("localTrackPublished", sync).off("localTrackUnpublished", sync); };
-  }, [isSelf, room]);
-  const micOff = isSelf && selfMicOn !== null ? !selfMicOn : isMuted;
-  const canTapMic = (isSelf && !!room) || (canManage && !isSelf && !!onToggleMute);
+  }, [isLocal, room]);
+  const micOff = isLocal && selfMicOn !== null ? !selfMicOn : isMuted;
+  const canTapMic = (isLocal && !!room) || (canManage && !isLocal && !!onToggleMute);
   const onMicTap = async () => {
-    if (isSelf && room) {
-      if (isMuted) { toast.error("The host has muted you."); return; }
+    if (micBusy) return;
+    if (isLocal && room) {
+      if (!canToggleStageMicrophone(room.localParticipant.isMicrophoneEnabled, room.localParticipant.permissions?.canPublish === true, isMuted)) {
+        toast.error(isMuted ? "The host has muted you." : "Your microphone is available when you're on stage.");
+        return;
+      }
       const next = !room.localParticipant.isMicrophoneEnabled;
+      setMicBusy(true);
       try { await room.localParticipant.setMicrophoneEnabled(next); setSelfMicOn(next); }
       catch { toast.error("Couldn't access your microphone. Check browser permissions."); }
-    } else if (onToggleMute) onToggleMute();
+      finally { setMicBusy(false); }
+    } else if (canManage && onToggleMute) onToggleMute();
   };
   return (
     <div className="relative flex flex-col items-center gap-2 pt-3">
@@ -933,21 +943,23 @@ function SpeakerBubble({
           )}
           <ArtistStatusBeacon userId={p.user_id} className="top-1 right-1 bottom-auto" />
         </Link>
-        <button
+        <Button
+          variant={micOff ? "destructive" : "default"}
+          size="icon"
           type="button"
-          disabled={!canTapMic}
+          disabled={!canTapMic || micBusy}
           onClick={onMicTap}
-          aria-label={micOff ? "Turn microphone on" : "Turn microphone off"}
+          aria-label={isLocal ? (micOff ? "Unmute my microphone" : "Mute my microphone") : `${micOff ? "Unmute" : "Mute"} ${p.display_name ?? "participant"}'s microphone`}
+          aria-pressed={micOff}
           title={canTapMic ? (micOff ? "Unmute mic" : "Mute mic") : undefined}
           className={cn(
-            "absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#0d0d18] transition-transform",
+            "absolute -bottom-1 -right-1 flex h-11 w-11 items-center justify-center rounded-full border-2 border-background transition-transform",
             canTapMic && "cursor-pointer hover:scale-110",
             isSpeaking && !micOff && "scale-125 animate-bounce",
           )}
-          style={{ background: micOff ? "#dc2626" : ringColor }}
         >
-          {micOff ? <MicOff className="h-3.5 w-3.5 text-white" /> : <Mic className="h-3.5 w-3.5 text-white" />}
-        </button>
+          {micOff ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+        </Button>
       </div>
       <div className="text-center">
         <div className="flex items-center justify-center gap-1 text-xs font-bold text-white">
