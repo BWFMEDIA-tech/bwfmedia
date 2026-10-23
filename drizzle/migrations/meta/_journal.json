@@ -239,6 +239,13 @@
       "when": 1792676210521,
       "tag": "0033_site_nav_menu_groups",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792732751465,
+      "tag": "0034_invite_use_marker_and_battle_result_guard",
+      "breakpoints": true
     }
   ]
 }
