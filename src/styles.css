@@ -98,6 +98,8 @@
   --status-live: #FF3434;
   --status-active: var(--success);
   --status-offline: var(--ash);
+  /* Live photo beacons follow the logo's electric blue, the same tone as the navigation glow. */
+  --status-live-on-air: color-mix(in srgb, var(--brand-blue) 55%, var(--brand-cyan));
 
   --brand-cyan: oklch(0.84 0.15 207);
   --brand-blue: #0000FF;
@@ -110,7 +112,7 @@
 }
 
 .artist-status-beacon { position: absolute; right: 0; bottom: 0; z-index: 2; width: 11px; height: 11px; border: 2px solid var(--background); border-radius: 50%; background: var(--status-offline); pointer-events: auto; }
-.artist-status-beacon[data-artist-status="live"] { background: var(--status-live); box-shadow: 0 0 7px color-mix(in srgb, var(--status-live) 65%, transparent); }
+.artist-status-beacon[data-artist-status="live"] { background: var(--status-live-on-air); box-shadow: 0 0 7px color-mix(in srgb, var(--status-live-on-air) 65%, transparent); }
 .artist-status-beacon[data-artist-status="active"] { background: var(--status-active); }
 
 /* The live glow on navigation entries uses the logo's electric blue, not status red. */
