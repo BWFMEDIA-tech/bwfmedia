@@ -1,7 +1,7 @@
 // ============= Full file contents =============
 
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Radio, Inbox, User, Swords } from "lucide-react";
+import { Home, Tv, Inbox, User, Swords } from "lucide-react";
 import arenaLogo from "@/assets/go-live-logo.png.asset.json";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,7 @@ const TABS: Tab[] = [
   { to: "/", label: "Home", icon: Home, match: (p) => p === "/" || p === "/home" },
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/play", label: "Arena", icon: Swords, match: (p) => p.startsWith("/play") },
-  { to: "/live", label: "Watch Now", icon: Radio, match: (p) => p === "/live" },
+  { to: "/live", label: "Watch Now", icon: Tv, match: (p) => p === "/live" },
   { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
 
