@@ -70,7 +70,7 @@ export function LiveRosterSheet({ open, onOpenChange }: Props) {
 
         <DrawerFooter className="gap-2 pt-3">
           <DrawerClose asChild>
-            <Button asChild variant="ghost" size="sm" className="w-full rounded-full text-xs">
+            <Button asChild variant="outline" size="sm" className="w-full rounded-full text-xs">
               <Link to="/live">See the full live page</Link>
             </Button>
           </DrawerClose>
