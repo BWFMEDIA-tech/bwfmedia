@@ -20,7 +20,7 @@ const TABS: Tab[] = [
   { to: "/messages", label: "Inbox", icon: Inbox, match: (p) => p.startsWith("/messages") },
   { to: "/play", label: "Arena", icon: Swords, match: (p) => p.startsWith("/play") },
   { to: "/live", label: "Live Stage", icon: Radio, match: (p) => p === "/live" },
-  { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") || (auth.user ? p.startsWith(`/artist/${auth.user.id}`) : false) },
+  { to: "/profile", label: "Profile", icon: User, match: (p) => p.startsWith("/profile") || p.startsWith("/settings") },
 ];
 
 export function MobileBottomNav() {
@@ -46,7 +46,7 @@ export function MobileBottomNav() {
         style={{ gridTemplateColumns: `repeat(${TABS.length}, minmax(0, 1fr))` }}
       >
         {TABS.map((tab) => {
-          const active = tab.match(pathname) || (tab.to === "/live" && (pathname.startsWith("/stream/") || pathname.startsWith("/stage/")));
+          const active = tab.match(pathname) || (tab.to === "/profile" && auth.user ? pathname.startsWith(`/artist/${auth.user.id}`) : false) || (tab.to === "/live" && (pathname.startsWith("/stream/") || pathname.startsWith("/stage/")));
           const Icon = tab.icon;
           const dashboardTo = artistDashboardDestination(auth.roles);
           const to = tab.to === "/live" ? stage.to : tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
