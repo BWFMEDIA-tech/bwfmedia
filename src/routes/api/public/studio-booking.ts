@@ -66,12 +66,10 @@ export const Route = createFileRoute('/api/public/studio-booking')({
             templateName: 'studio-booking-confirmation',
             to: data.email,
             templateData: {
-              name: data.full_name,
-              sessionType: data.session_type,
+              // Public form: only the validated date and a cleaned-up first name
+              // go in the email, so it can't carry visitor-written messages.
+              name: data.full_name.replace(/https?:\/\/\S+|www\.\S+|\S+\.\S{2,}/gi, '').replace(/[^\p{L}\p{M}' -]/gu, '').trim().split(/\s+/)[0]?.slice(0, 30) || undefined,
               date: formatDate(data.preferred_date),
-              time: data.preferred_time,
-              duration: data.duration,
-              crewSize: data.crew_size,
               payUrl: `${SITE_URL}/pay/${inserted.id}?table=studio_bookings`,
             },
             idempotencyKey: `studio-confirm-${inserted.id}`,
