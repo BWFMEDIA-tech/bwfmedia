@@ -236,6 +236,7 @@ function GuestPage() {
                 </div>
               )}
               <AudienceRow participants={participants as StageParticipant[]} />
+              {isHostLike && <HostControls streamId={streamId} hands={hands} queue={queue} participants={participants as StageParticipant[]} room={room} onEnded={() => setLk(null)} />}
               {streamMeta && (
                 <PlayArenaView
                   stream={{ id: streamId, title: streamMeta.title, host_id: streamMeta.host_id }}
