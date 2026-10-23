@@ -113,6 +113,10 @@
 .artist-status-beacon[data-artist-status="live"] { background: var(--status-live); box-shadow: 0 0 7px color-mix(in srgb, var(--status-live) 65%, transparent); }
 .artist-status-beacon[data-artist-status="active"] { background: var(--status-active); }
 
+.stage-navigation-indicator { transition: color 220ms ease, filter 220ms ease; }
+.stage-navigation-indicator[data-live="true"] { color: var(--status-live); filter: drop-shadow(0 0 4px var(--status-live)) drop-shadow(0 0 10px color-mix(in srgb, var(--status-live) 70%, transparent)); }
+@media (prefers-reduced-motion: reduce) { .stage-navigation-indicator { transition: none; } }
+
 .tunevio-store { --store-shade: linear-gradient(90deg, var(--background) 0%, color-mix(in oklch, var(--background) 94%, transparent) 24%, color-mix(in oklch, var(--background) 25%, transparent) 62%, transparent); }
 .store-cover { height: 540px; max-height: calc(100svh - 180px); min-height: 430px; }
 .store-cover-shade { background: var(--store-shade); }
