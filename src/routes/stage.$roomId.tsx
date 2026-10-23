@@ -9,8 +9,12 @@ import { Mic, MicOff, Video, MessageSquare, Settings, Hand, Radio, LogOut, Users
 export const Route = createFileRoute("/stage/$roomId")({
   head: () => ({
     meta: [
-      { title: "Stage Room — BWF Network" },
+      { title: "Stage Room — Tunevio" },
       { name: "description", content: "Interactive live stage with hosts, artists, and audience." },
+      { property: "og:title", content: "Stage Room — Tunevio" },
+      { property: "og:description", content: "Join Tunevio hosts, artists and listeners in a live stage room." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
