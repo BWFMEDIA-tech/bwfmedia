@@ -141,18 +141,8 @@ function RootComponent() {
   useEffect(() => { void registerTunevioPwa().catch(() => { /* Installation must never interrupt the website. */ }); }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChrome = pathname !== "/" && !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
-  const showBottomNav =
-    isChrome &&
-    !pathname.startsWith("/admin") &&
-    !pathname.startsWith("/settings") &&
-    !pathname.startsWith("/artist-dashboard") &&
-    !pathname.startsWith("/checkout") &&
-    !pathname.startsWith("/broadcast/") &&
-    !pathname.startsWith("/play/") &&
-    !pathname.startsWith("/invite/") &&
-    !pathname.startsWith("/forgot-password") &&
-    !pathname.startsWith("/access-denied") &&
-    !pathname.startsWith("/deck");
+  // The phone bottom navigation shows on every page.
+  const showBottomNav = true;
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
   }));
