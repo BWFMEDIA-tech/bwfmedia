@@ -124,6 +124,23 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     return { notified, emailed };
   });
 
+import { filterOnAirStreams, type OnAirRoomClient } from "./live-on-air";
+
+/**
+ * The live service client used to confirm a host is really connected. Reads the
+ * credentials server-side only, and returns null when the service isn't
+ * configured so callers keep the backend status instead of hiding broadcasts.
+ */
+async function createOnAirRoomClient(): Promise<OnAirRoomClient | null> {
+  const apiKey = process.env.LIVEKIT_API_KEY;
+  const apiSecret = process.env.LIVEKIT_API_SECRET;
+  const wsUrl = process.env.LIVEKIT_URL;
+  if (!apiKey || !apiSecret || !wsUrl) return null;
+  const { RoomServiceClient } = await import("livekit-server-sdk");
+  const serviceUrl = wsUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
+  return new RoomServiceClient(serviceUrl, apiKey, apiSecret) as unknown as OnAirRoomClient;
+}
+
 /** Public list of currently live streams with host display info + viewer count. */
 export const listLiveStreams = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ limit: z.number().int().min(1).max(50).default(20) }).parse(i ?? {}))
@@ -141,7 +158,7 @@ export const listLiveStreams = createServerFn({ method: "POST" })
     // Also include live stage rooms so every artist who goes live is listed.
     const { data: stages } = await client
       .from("stage_rooms")
-      .select("id, title, host_id, audience_count, started_at")
+      .select("id, title, host_id, audience_count, started_at, livekit_room")
       .eq("status", "live")
       .order("started_at", { ascending: false })
       .limit(data.limit);
@@ -153,7 +170,17 @@ export const listLiveStreams = createServerFn({ method: "POST" })
         started_at: r.started_at, mode: "stage", kind: "stage" as const,
       })),
     ].sort((a, b) => String(b.started_at ?? "").localeCompare(String(a.started_at ?? "")));
-    const hostIds = [...new Set(all.map((s: any) => s.host_id))];
+    const roomByRow = new Map<string, string | null>();
+    (streams ?? []).forEach((s: any) => roomByRow.set(s.id, s.room_name ?? null));
+    (stages ?? []).forEach((r: any) => roomByRow.set(r.id, r.livekit_room ?? null));
+    // A row stays listed only while its host is actually connected to the room,
+    // so a broadcast left behind by a closed app can't light up navigation.
+    const onAir = await filterOnAirStreams(
+      all.map((s: any) => ({ row: s, room: roomByRow.get(s.id) ?? null, hostId: s.host_id })),
+      await createOnAirRoomClient(),
+    );
+    const listed = onAir.map((c) => c.row);
+    const hostIds = [...new Set(listed.map((s: any) => s.host_id))];
     let profileMap = new Map<string, { display_name: string | null; avatar_url: string | null; stage_name: string | null }>();
     if (hostIds.length) {
       const { data: profs } = await client
@@ -163,7 +190,7 @@ export const listLiveStreams = createServerFn({ method: "POST" })
       (profs ?? []).forEach((p: any) => profileMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url, stage_name: p.stage_name }));
     }
     return {
-      streams: all.map((s: any) => ({
+      streams: listed.map((s: any) => ({
         ...s,
         host: profileMap.get(s.host_id) ?? null,
       })),
