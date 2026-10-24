@@ -36,9 +36,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         sb.from("play_tracks")
           .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
           .eq("artist_user_id", id)
-          .eq("stream_id", profileLibraryId ?? "00000000-0000-0000-0000-000000000000")
           .order("like_count", { ascending: false })
-          .limit(8),
+          .limit(200),
         sb.from("videos")
           .select("id, title, thumbnail_path, external_url, created_at")
           .eq("user_id", id)
