@@ -198,7 +198,7 @@ function MessagesPage() {
   // Only override the layout while the keyboard is actually open; when it closes we
   // clear the override (back to 100dvh) and undo any scroll offset iOS left behind,
   // which is what caused the blank space and off-screen messages.
-  const [vv, setVv] = useState<{ h: number; top: number } | null>(null);
+  const [vv, setVv] = useState<{ h: number; top: number; left: number; w: number } | null>(null);
   useEffect(() => {
     const v = window.visualViewport;
     let raf = 0;
@@ -210,13 +210,13 @@ function MessagesPage() {
       const visibleH = v ? v.height : layoutH;
       const keyboardOpen = isSoftwareKeyboardOpen(layoutH, visibleH);
       if (keyboardOpen && v) {
-        setVv({ h: v.height, top: v.offsetTop });
+        // Follow the visible area on both axes so the pop-up stays centered even if
+        // iOS pans the view sideways while bringing the caret into view.
+        setVv({ h: v.height, top: v.offsetTop, left: v.offsetLeft, w: v.width });
         scrollToLatest();
       } else {
-        // Keyboard closed (or never opened): restore the full-height layout and
-        // reset the scroll offset iOS pushes onto the page while the keyboard is up.
+        // Keyboard closed (or never opened): restore the full-screen layout.
         setVv(null);
-        if (window.scrollY !== 0) window.scrollTo(0, 0);
       }
     };
     const schedule = () => {
@@ -242,12 +242,41 @@ function MessagesPage() {
     };
   }, []);
 
-  // Lock page scroll behind the mobile pop-up
+  // Lock page scroll behind the mobile pop-up. `overflow: hidden` alone does not stop
+  // iOS Safari/WKWebView from scrolling and side-panning the page when the keyboard
+  // opens, which pushed the pop-up up and to the right. Pinning the body in place
+  // removes that page movement; the scroll position is restored when it closes.
   useEffect(() => {
     if (!activeId || window.matchMedia("(min-width: 768px)").matches) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = window.scrollY;
+    const prev = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      htmlOverflow: html.style.overflow,
+    };
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    html.style.overflow = "hidden";
+    return () => {
+      body.style.overflow = prev.overflow;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.left = prev.left;
+      body.style.right = prev.right;
+      body.style.width = prev.width;
+      html.style.overflow = prev.htmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
   }, [activeId]);
 
   // Auto-grow the composer
