@@ -39,6 +39,8 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
   const ids = queue.map((t) => t.id);
   const likes = useQuery({ queryKey: ["my-track-likes", ids], queryFn: () => getMyTrackLikes({ data: { trackIds: ids } }), enabled: !!auth.user && ids.length > 0 });
   if (!track) return null;
+  // While a track is playing, this page lists only songs by that track's artist.
+  const visibleQueue = nowPlaying && track.artistId ? queue.filter((t) => t.artistId === track.artistId) : queue;
   const current = p.track?.id === track.id;
   const liked = likes.data?.liked.includes(track.id) ?? false;
   const like = async (t: PlayerTrack) => {
@@ -49,7 +51,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
     catch { toast.error("Couldn't save this track"); }
     finally { setSaving(false); }
   };
-  const start = (t: PlayerTrack) => { if (p.track?.id === t.id) p.toggle(); else p.play(t, queue.filter((q) => !!q.audioUrl)); };
+  const start = (t: PlayerTrack) => { if (p.track?.id === t.id) p.toggle(); else p.play(t, visibleQueue.filter((q) => !!q.audioUrl)); };
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="swara-music-detail music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
@@ -86,8 +88,8 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
             <Button variant="ghost" className="h-auto flex-col gap-2 px-1 py-3 text-xs text-brand-silver" onClick={() => void shareMusic(track)}><Share2 className="!size-6" />Share</Button>
           </div>
           {credits && <section className="mb-6 border-y border-border py-4"><h2 className="text-sm font-semibold">Track credits</h2><p className="mt-3 text-xs text-muted-foreground">Artist</p><p className="mt-1 text-sm">{track.artist}</p><p className="mt-3 text-xs text-muted-foreground">Additional credits haven’t been provided for this track.</p></section>}
-          {nowPlaying && <Button variant="ghost" className="mb-2 w-full justify-start" onClick={() => setShowQueue((v) => !v)} aria-expanded={showQueue}><ListMusic /> Up next · {queue.length}</Button>}
-          {showQueue && <ol className="divide-y divide-border/50">{queue.map((t, i) => <li key={`${t.id}:${i}`} className="grid grid-cols-[24px_minmax(0,1fr)_40px] items-center gap-3 py-3"><span className="text-sm tabular-nums text-muted-foreground">{p.track?.id === t.id && p.isPlaying ? <span className="text-primary">♫</span> : i + 1}</span><Button variant="ghost" className="h-auto min-w-0 justify-start whitespace-normal px-0 py-2 text-left hover:bg-transparent hover:text-primary" disabled={!t.audioUrl} onClick={() => start(t)}><span className="min-w-0"><span className={`block break-words text-base font-semibold ${p.track?.id === t.id ? "text-primary" : "text-foreground"}`}>{t.title}</span><span className="mt-1 block text-sm font-normal text-muted-foreground">{t.artist}</span></span></Button><DropdownMenu><DropdownMenuTrigger asChild><Button size="icon" variant="ghost" aria-label={`Options for ${t.title}`}><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem disabled={!t.audioUrl} onSelect={() => start(t)}><Play /> Play / pause</DropdownMenuItem><DropdownMenuItem disabled={saving} onSelect={() => void like(t)}><Heart />{likes.data?.liked.includes(t.id) ? "Remove from saved" : "Save track"}</DropdownMenuItem><DropdownMenuItem onSelect={() => void shareMusic(t)}><Share2 /> Share</DropdownMenuItem></DropdownMenuContent></DropdownMenu></li>)}</ol>}
+          {nowPlaying && <Button variant="ghost" className="mb-2 w-full justify-start" onClick={() => setShowQueue((v) => !v)} aria-expanded={showQueue}><ListMusic /> Up next · {visibleQueue.length}</Button>}
+          {showQueue && <ol className="divide-y divide-border/50">{visibleQueue.map((t, i) => <li key={`${t.id}:${i}`} className="grid grid-cols-[24px_minmax(0,1fr)_40px] items-center gap-3 py-3"><span className="text-sm tabular-nums text-muted-foreground">{p.track?.id === t.id && p.isPlaying ? <span className="text-primary">♫</span> : i + 1}</span><Button variant="ghost" className="h-auto min-w-0 justify-start whitespace-normal px-0 py-2 text-left hover:bg-transparent hover:text-primary" disabled={!t.audioUrl} onClick={() => start(t)}><span className="min-w-0"><span className={`block break-words text-base font-semibold ${p.track?.id === t.id ? "text-primary" : "text-foreground"}`}>{t.title}</span><span className="mt-1 block text-sm font-normal text-muted-foreground">{t.artist}</span></span></Button><DropdownMenu><DropdownMenuTrigger asChild><Button size="icon" variant="ghost" aria-label={`Options for ${t.title}`}><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem disabled={!t.audioUrl} onSelect={() => start(t)}><Play /> Play / pause</DropdownMenuItem><DropdownMenuItem disabled={saving} onSelect={() => void like(t)}><Heart />{likes.data?.liked.includes(t.id) ? "Remove from saved" : "Save track"}</DropdownMenuItem><DropdownMenuItem onSelect={() => void shareMusic(t)}><Share2 /> Share</DropdownMenuItem></DropdownMenuContent></DropdownMenu></li>)}</ol>}
         </div>
       </DialogContent>
     </Dialog>
