@@ -1,4 +1,5 @@
 import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
+import { LiveCardPreview } from "@/components/stream/LiveCardPreview";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Radio, Eye, Trash2, Video, Calendar, Mic2 } from "lucide-react";
@@ -101,6 +102,8 @@ function LivePage() {
                   {s.thumbnail_url && (
                     <StreamThumbnailImage src={s.thumbnail_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />
                   )}
+                  {!s.thumbnail_url && s.host?.avatar_url && <SignedImg src={s.host.avatar_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />}
+                  {s.preview_room_name && <LiveCardPreview roomName={s.preview_room_name} hostId={s.host_id} />}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                   <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded bg-destructive px-2 py-1 text-[10px] font-bold tracking-wider">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" /> LIVE

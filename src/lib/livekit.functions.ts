@@ -4,9 +4,11 @@ import { AccessToken } from "livekit-server-sdk";
 import { TrackSource } from "@livekit/protocol";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { stageRoomAccess } from "./live-directory";
+import { LIVE_PREVIEW_ID_PREFIX, previewGrant } from "./live-preview";
 
 const tokenInput = z.object({
   roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/),
+  preview: z.boolean().optional(),
 });
 
 export const getLiveKitToken = createServerFn({ method: "POST" })
@@ -49,6 +51,12 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       if (error || !stage) throw new Error("Room not found");
       const access = stageRoomAccess(stage, userId);
       if (!access.canJoin) throw new Error("Stage is not live");
+      if (data.preview) {
+        const identity = `${LIVE_PREVIEW_ID_PREFIX}${userId}_${crypto.randomUUID()}`;
+        const at = new AccessToken(apiKey, apiSecret, { identity, name: "Preview", ttl: 60 });
+        at.addGrant(previewGrant(data.roomName));
+        return { token: await at.toJwt(), wsUrl, identity };
+      }
       const at = new AccessToken(apiKey, apiSecret, { identity: userId, name: profile?.display_name || "Listener", ttl: 60 * 60 * 6 });
       at.addGrant({ room: data.roomName, roomJoin: true, canSubscribe: true, canPublishData: true,
         canPublish: access.canPublish, roomAdmin: access.isHost, roomCreate: access.isHost,
@@ -57,6 +65,13 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
     }
     const isHost = stream.host_id === userId;
     if (!isHost && stream.status !== "live") throw new Error("Stream is not live");
+    if (data.preview) {
+      if (stream.status !== "live") throw new Error("Stream is not live");
+      const identity = `${LIVE_PREVIEW_ID_PREFIX}${userId}_${crypto.randomUUID()}`;
+      const at = new AccessToken(apiKey, apiSecret, { identity, name: "Preview", ttl: 60 });
+      at.addGrant(previewGrant(data.roomName));
+      return { token: await at.toJwt(), wsUrl, identity };
+    }
 
     // Mirror LiveKit publish rights to the stage role recorded in
     // `stage_participants`. Only host / co_host / speaker get canPublish;
