@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Recover rejected Home-page session tokens before authenticated requests and verify signed-in Home loading.
 - [ ] Fix queued artist-profile artwork signing and local unsaved cover previews; test upload, save and refresh while preserving private-file restrictions.
 - [x] Add authenticated muted 15-second host-camera previews with thumbnail fallback, isolated receive-only identities and no inflated visitor counts; 28 tests and build pass. Signed-in Live card renders without errors; the available broadcast supplied no camera video, so real video playback/cutoff remains unverified.
 - [x] Add per-broadcast live visitor totals from connected participants, excluding hosts and deduplicating linked-room visitors; 36 targeted tests pass, build OK. Live page opens without runtime errors, but stays loading in this sandbox, so a real visitor join/leave check remains unverified.

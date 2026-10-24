@@ -1,5 +1,5 @@
 import { createMiddleware, createStart } from '@tanstack/react-start';
-import { attachSupabaseAuth } from '@/integrations/supabase/auth-attacher';
+import { attachCurrentSession } from '@/lib/session-auth-middleware';
 
 const securityHeadersMiddleware = createMiddleware({ type: 'request' }).server(
   async ({ next }) => {
@@ -27,5 +27,6 @@ const securityHeadersMiddleware = createMiddleware({ type: 'request' }).server(
 
 export const startInstance = createStart(() => ({
   requestMiddleware: [securityHeadersMiddleware],
-  functionMiddleware: [attachSupabaseAuth],
+  // Project-specific attacher validates/recover sessions; don't add a second attacher.
+  functionMiddleware: [attachCurrentSession],
 }));
