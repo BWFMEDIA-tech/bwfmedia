@@ -193,19 +193,54 @@ function MessagesPage() {
     return () => window.clearTimeout(t);
   }, [activeId]);
 
-  // Track the visible viewport so the pop-up composer stays above the phone keyboard
+  // Track the visible viewport so the pop-up composer stays above the phone keyboard.
+  // Only override the layout while the keyboard is actually open; when it closes we
+  // clear the override (back to 100dvh) and undo any scroll offset iOS left behind,
+  // which is what caused the blank space and off-screen messages.
   const [vv, setVv] = useState<{ h: number; top: number } | null>(null);
   useEffect(() => {
     const v = window.visualViewport;
-    if (!v) return;
+    let raf = 0;
     const update = () => {
-      setVv({ h: v.height, top: v.offsetTop });
-      scrollToLatest();
+      raf = 0;
+      // Layout viewport height: visualViewport.pageTop + height ≈ innerHeight, but
+      // innerHeight is the stable reference on iOS Safari, PWA and Capacitor.
+      const layoutH = window.innerHeight;
+      const visibleH = v ? v.height : layoutH;
+      // The iOS keyboard takes well over 150px; toolbar show/hide is ~50-90px, so a
+      // 150px threshold tells a real keyboard apart from chrome animations.
+      const keyboardOpen = layoutH - visibleH > 150;
+      if (keyboardOpen && v) {
+        setVv({ h: v.height, top: v.offsetTop });
+        scrollToLatest();
+      } else {
+        // Keyboard closed (or never opened): restore the full-height layout and
+        // reset the scroll offset iOS pushes onto the page while the keyboard is up.
+        setVv(null);
+        if (window.scrollY !== 0) window.scrollTo(0, 0);
+      }
+    };
+    const schedule = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
     };
     update();
-    v.addEventListener("resize", update);
-    v.addEventListener("scroll", update);
-    return () => { v.removeEventListener("resize", update); v.removeEventListener("scroll", update); };
+    if (v) {
+      v.addEventListener("resize", schedule);
+      v.addEventListener("scroll", schedule);
+    }
+    // Capacitor iOS / older WKWebView can miss visualViewport events; window resize
+    // still fires when the keyboard changes the view size there.
+    window.addEventListener("resize", schedule);
+    window.addEventListener("orientationchange", schedule);
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      if (v) {
+        v.removeEventListener("resize", schedule);
+        v.removeEventListener("scroll", schedule);
+      }
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("orientationchange", schedule);
+    };
   }, []);
 
   // Lock page scroll behind the mobile pop-up
