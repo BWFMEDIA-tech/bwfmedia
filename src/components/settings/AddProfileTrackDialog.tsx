@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { readAudioDurationSeconds } from "@/lib/audio-duration";
 
 const MAX_BYTES = 50 * 1024 * 1024;
 const MAX_COVER_BYTES = 8 * 1024 * 1024;
@@ -18,6 +19,7 @@ export function AddProfileTrackDialog({
   const [title, setTitle] = useState("");
   const [artistName, setArtistName] = useState(defaultArtistName);
   const [audioUrl, setAudioUrl] = useState("");
+  const [audioDurationSeconds, setAudioDurationSeconds] = useState<number | null>(null);
   const [coverUrl, setCoverUrl] = useState("");
   const [coverPreview, setCoverPreview] = useState("");
   const [uploadedName, setUploadedName] = useState<string | null>(null);
