@@ -1,3 +1,5 @@
+import { LIVE_PREVIEW_ID_PREFIX } from "./live-preview";
+
 /**
  * Deciding whether a broadcast is actually on air.
  *
@@ -56,6 +58,6 @@ export async function filterOnAirStreams<T>(
     ...candidate,
     visitorIds: [...new Set((partsByRoom.get(candidate.room ?? "") ?? [])
       .map(p => p.identity)
-      .filter((identity): identity is string => !!identity && identity !== candidate.hostId))],
+      .filter((identity): identity is string => !!identity && identity !== candidate.hostId && !identity.startsWith(LIVE_PREVIEW_ID_PREFIX)))],
   }));
 }

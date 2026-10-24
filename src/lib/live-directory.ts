@@ -5,6 +5,7 @@ export type DirectoryRow = {
   kind: "stream" | "stage" | "broadcast"; category: string | null;
   description: string | null; thumbnail_url: string | null; viewer_count: number;
   started_at: string | null; mode: string | null;
+  preview_room_name?: string;
 };
 type Stage = { id: string; title: string; host_id: string; status: string; livekit_room: string; audience_count: number; started_at: string | null; description: string | null };
 type Broadcast = { id: string; host_id: string; stream_title: string; stream_status: string; description: string | null; viewer_count: number; started_at: string | null; playback_source: unknown };
@@ -38,7 +39,7 @@ export function directoryRows(candidates: OnAirCandidate<DirectoryRow>[], limit?
   const visitors = new Map<string, Set<string>>();
   for (const candidate of candidates) {
     const key = `${candidate.row.kind}:${candidate.row.id}`;
-    unique.set(key, candidate.row);
+    unique.set(key, { ...candidate.row, preview_room_name: candidate.room ?? undefined });
     if (candidate.visitorIds !== undefined) {
       const identities = visitors.get(key) ?? new Set<string>();
       for (const id of candidate.visitorIds) identities.add(id);

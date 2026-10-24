@@ -17,6 +17,7 @@ describe("unified live directory", () => {
         { identity: "artist", permission: { canPublish: true } },
         { identity: "fan", permission: { canPublish: false } },
         { identity: "guest_123", permission: { canPublish: false } },
+        { identity: "preview_fan_123", permission: { canPublish: false } },
       ],
     };
     const rows = directoryRows(await filterOnAirStreams(directoryCandidates([{ ...stream("artist"), viewer_count: 99 }], [], [], []), liveService));
