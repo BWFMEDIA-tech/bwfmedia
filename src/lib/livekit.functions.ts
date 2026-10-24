@@ -3,6 +3,7 @@ import { z } from "zod";
 import { AccessToken } from "livekit-server-sdk";
 import { TrackSource } from "@livekit/protocol";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { stageRoomAccess } from "./live-directory";
 
 const tokenInput = z.object({
   roomName: z.string().min(1).max(128).regex(/^[a-zA-Z0-9_-]+$/),
@@ -42,7 +43,18 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
       .select("id, host_id, status")
       .eq("room_name", data.roomName)
       .maybeSingle();
-    if (!stream) throw new Error("Stream not found");
+    if (!stream) {
+      const { data: stage, error } = await supabase.from("stage_rooms")
+        .select("host_id,status").eq("livekit_room", data.roomName).maybeSingle();
+      if (error || !stage) throw new Error("Room not found");
+      const access = stageRoomAccess(stage, userId);
+      if (!access.canJoin) throw new Error("Stage is not live");
+      const at = new AccessToken(apiKey, apiSecret, { identity: userId, name: profile?.display_name || "Listener", ttl: 60 * 60 * 6 });
+      at.addGrant({ room: data.roomName, roomJoin: true, canSubscribe: true, canPublishData: true,
+        canPublish: access.canPublish, roomAdmin: access.isHost, roomCreate: access.isHost,
+        canPublishSources: [TrackSource.MICROPHONE, TrackSource.CAMERA, TrackSource.SCREEN_SHARE, TrackSource.SCREEN_SHARE_AUDIO] });
+      return { token: await at.toJwt(), wsUrl, identity: userId };
+    }
     const isHost = stream.host_id === userId;
     if (!isHost && stream.status !== "live") throw new Error("Stream is not live");
 
