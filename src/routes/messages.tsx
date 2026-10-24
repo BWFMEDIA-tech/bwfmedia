@@ -434,8 +434,8 @@ function MessagesPage() {
 
           {/* Thread */}
           <section
-            style={activeId && vv ? ({ "--vvh": `${vv.h}px`, "--vvt": `${vv.top}px` } as CSSProperties) : undefined}
-            className={`flex-col overflow-hidden bg-black md:bg-white/[0.03] ${activeId ? "fixed inset-x-0 top-[var(--vvt,0px)] z-[60] flex h-[var(--vvh,100dvh)] animate-in slide-in-from-bottom-6 fade-in duration-200 md:static md:z-auto md:h-auto md:animate-none md:rounded-3xl md:border md:border-white/10 md:shadow-2xl md:shadow-brand-blue/10" : "hidden md:flex md:rounded-3xl md:border md:border-white/10"}`}
+            style={activeId && vv ? ({ "--vvh": `${vv.h}px`, "--vvt": `${vv.top}px`, "--vvl": `${vv.left}px`, "--vvw": `${vv.w}px` } as CSSProperties) : undefined}
+            className={`flex-col overflow-hidden bg-black md:bg-white/[0.03] ${activeId ? "fixed left-[var(--vvl,0px)] top-[var(--vvt,0px)] z-[60] flex h-[var(--vvh,100dvh)] w-[var(--vvw,100%)] overscroll-none animate-in slide-in-from-bottom-6 fade-in duration-200 md:static md:z-auto md:h-auto md:w-auto md:animate-none md:rounded-3xl md:border md:border-white/10 md:shadow-2xl md:shadow-brand-blue/10" : "hidden md:flex md:rounded-3xl md:border md:border-white/10"}`}
           >
             {activeId ? (
               <>
