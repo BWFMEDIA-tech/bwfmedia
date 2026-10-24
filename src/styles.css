@@ -1322,3 +1322,13 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 
 
 
+
+/* iOS Safari/PWA/Capacitor zoom the page in when a focused field's text is under 16px,
+   which pushed the chat composer off the right edge. Keep every text field at 16px+ on touch screens. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+  textarea,
+  select {
+    font-size: max(16px, 1em) !important;
+  }
+}
