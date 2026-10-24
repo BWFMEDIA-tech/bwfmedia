@@ -48,7 +48,7 @@ function ArtistTile({ artist, tabbable = true }: { artist: FeedArtist; tabbable?
  */
 export function ArtistMarquee() {
   const feed = useQuery({ queryKey: ["home-feed"], queryFn: () => getHomeFeed(), staleTime: 60_000 });
-  const artists = (feed.data?.artists ?? []).slice(0, 12);
+  const artists = (feed.data?.artists ?? []).filter((a) => a.avatarUrl).slice(0, 12);
   if (artists.length < 2) return null;
   return (
     <section className="relative pb-24" aria-labelledby="artist-marquee-heading">
