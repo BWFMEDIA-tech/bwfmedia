@@ -8,7 +8,7 @@ import { LiveStage } from "@/components/stream/LiveStage";
 import { getLiveKitToken } from "@/lib/livekit.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Video, MessageSquare, Settings, Hand, Radio, LogOut, Users } from "lucide-react";
+import { Mic, Settings, Hand, Radio, LogOut, Users } from "lucide-react";
 
 export const Route = createFileRoute("/stage/$roomId")({
   head: () => ({
@@ -57,7 +57,7 @@ function useElapsed(startedAt: string | null | undefined, live: boolean) {
 }
 
 function shortId(id: string) {
-  return `BWF-${id.slice(0, 4).toUpperCase()}-${id.slice(-3).toUpperCase()}`;
+  return `TUNEVIO-${id.slice(0, 4).toUpperCase()}-${id.slice(-3).toUpperCase()}`;
 }
 
 function StagePage() {
@@ -128,8 +128,7 @@ function StagePage() {
       ? { dot: "bg-white/40", text: "text-white/60", border: "border-white/15", bg: "bg-white/5", label: "Ended" }
       : { dot: "bg-[#00E6FF]", text: "text-[#00E6FF]", border: "border-[#00E6FF]/40", bg: "bg-[#00E6FF]/10", label: "Standby" };
 
-  const hostLabel = isHost ? "You · Lead Host" : "Lead Host";
-  const hostInitial = (auth.user.email ?? "H").slice(0, 1).toUpperCase();
+  const hostInitial = "H";
 
   const goLive = async () => {
     if (busy) return;
@@ -237,7 +236,7 @@ function StagePage() {
                   <LiveStage token={tokenQuery.data.token} serverUrl={tokenQuery.data.wsUrl}
                     publish={isHost} showHostTools={isHost} onEnd={() => void endStage()}
                     onInvite={() => { void navigator.clipboard.writeText(window.location.href); }}
-                    profileHost={{ id: room.host_id, name: room.title, photo: null }} />
+                    profileHost={{ id: room.host_id, name: "Host", photo: null }} />
                 ) : <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">
                   {tokenQuery.isError ? <div><p>Unable to connect to the stage.</p><Button onClick={() => void tokenQuery.refetch()}>Retry</Button></div> : "Connecting to stage…"}
                 </div> : <div className="grid h-full place-items-center text-muted-foreground">{isEnded ? "This stage has wrapped" : "Stage is in standby"}</div>}
@@ -263,18 +262,8 @@ function StagePage() {
             {/* Audience strip */}
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex -space-x-3">
-                {[
-                  "from-[#0000FF] to-[#00E6FF]",
-                  "from-[#00E6FF] to-[#0000FF]",
-                  "from-[#00E6FF] to-[#0000FF]",
-                ].map((g, i) => (
-                  <div
-                    key={i}
-                    className={`w-8 h-8 rounded-full ring-2 ring-black bg-gradient-to-br ${g}`}
-                  />
-                ))}
                 <div className="w-auto px-3 h-8 rounded-full ring-2 ring-black bg-[#0000FF] flex items-center justify-center text-[10px] font-bold tabular-nums">
-                  +{Math.max(0, (room.audience_count ?? 0) - 3).toLocaleString()}
+                  {(room.audience_count ?? 0).toLocaleString()}
                 </div>
               </div>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -299,7 +288,7 @@ function StagePage() {
                 <div className="w-1 h-1 rounded-full bg-[#00E6FF]" />
               </div>
               <span className="text-[8px] font-bold uppercase tracking-[0.5em] text-white/20">
-                BWF Cockpit Control
+                TUNEVIO Stage
               </span>
             </div>
 
