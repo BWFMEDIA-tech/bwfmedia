@@ -1,14 +1,14 @@
 import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Radio, Eye, Trash2, Video, Calendar, Mic2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { listLiveStreams } from "@/lib/live-broadcast.functions";
+import { useLiveStageFeed } from "@/lib/use-live-stage-navigation";
+import { stageDestination } from "@/lib/live-stage-navigation";
 import { deleteStream } from "@/lib/streams.functions";
 import { useAuth } from "@/lib/auth-context";
 import { LIVE_CATEGORIES, liveCategoryLabel } from "@/lib/live-categories";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 
@@ -22,7 +22,7 @@ type LiveStream = {
   viewer_count: number;
   started_at: string | null;
   host_id: string;
-  kind?: "stream" | "stage";
+  kind?: "stream" | "stage" | "broadcast";
   host: { display_name: string | null; avatar_url: string | null; stage_name: string | null } | null;
 };
 
@@ -41,34 +41,15 @@ export const Route = createFileRoute("/live")({
 });
 
 function LivePage() {
-  const fetchLive = useServerFn(listLiveStreams);
+  const feed = useLiveStageFeed();
   const delFn = useServerFn(deleteStream);
   const auth = useAuth();
-  const isAdmin = auth.roles?.includes("admin");
-  const [streams, setStreams] = useState<LiveStream[]>([]);
-  const [loading, setLoading] = useState(true);
+  const streams = feed.entries as LiveStream[];
+  const loading = feed.isLoading;
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const visibleStreams = activeCategory === "all"
     ? streams
     : streams.filter((s) => (s.category ?? "") === activeCategory);
-
-  useEffect(() => {
-    let cancelled = false;
-    const refresh = () => {
-      fetchLive({ data: { limit: 50 } })
-        .then((r) => { if (!cancelled) { setStreams(r.streams as LiveStream[]); setLoading(false); } })
-        .catch(() => { if (!cancelled) setLoading(false); });
-    };
-    refresh();
-    const ch = supabase
-      .channel("live-now")
-      .on("postgres_changes", { event: "*", schema: "public", table: "streams" }, refresh)
-      .on("postgres_changes", { event: "*", schema: "public", table: "stage_rooms" }, refresh)
-      .subscribe();
-    // Realtime is filtered by access rules for visitors, so also poll to pick up new profile lives.
-    const poll = setInterval(refresh, 10_000);
-    return () => { cancelled = true; clearInterval(poll); supabase.removeChannel(ch); };
-  }, []);
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.preventDefault();
@@ -76,7 +57,7 @@ function LivePage() {
     if (!confirm("Delete this live stream? This cannot be undone.")) return;
     try {
       await delFn({ data: { streamId: id } });
-      setStreams((prev) => prev.filter((s) => s.id !== id));
+      feed.retry();
       toast.success("Stream deleted");
     } catch (err: any) {
       toast.error(err?.message ?? "Failed to delete");
@@ -112,7 +93,9 @@ function LivePage() {
           ))}
         </div>
 
-        {loading ? (
+        {feed.isError ? (
+          <div className="py-12 text-center"><p className="mb-4 text-muted-foreground">Live broadcasts are temporarily unavailable.</p><Button onClick={feed.retry}>Retry</Button></div>
+        ) : loading ? (
           <p className="text-muted-foreground">Loading live streams…</p>
         ) : visibleStreams.length === 0 ? (
           <div className="rounded-2xl border border-border bg-secondary p-16 text-center">
@@ -124,10 +107,8 @@ function LivePage() {
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visibleStreams.map((s) => (
               <Link
-                key={s.id}
-                {...(s.kind === "stage"
-                  ? { to: "/stage/$roomId" as const, params: { roomId: s.id } }
-                  : { to: "/stream/$room" as const, params: { room: s.room_name } })}
+                key={`${s.kind}:${s.id}`}
+                {...stageDestination({ ...s, status: "live" })}
                 className="group rounded-2xl border border-border bg-secondary overflow-hidden hover:border-primary/50 transition"
               >
                 <div className="relative aspect-video bg-gradient-to-br from-secondary to-background">
@@ -141,7 +122,7 @@ function LivePage() {
                   <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-background/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
                     <Eye className="h-3 w-3" /> {s.viewer_count ?? 0}
                   </span>
-                  {s.kind !== "stage" && (isAdmin || auth.user?.id === s.host_id) && (
+                  {s.kind === "stream" && auth.user?.id === s.host_id && (
                     <Button
                       variant="destructive"
                       onClick={(e) => handleDelete(e, s.id)}
@@ -172,6 +153,7 @@ function LivePage() {
                       {liveCategoryLabel(s.category)}
                     </span>
                   )}
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary"><Radio className="h-4 w-4" />Join</span>
                 </div>
               </Link>
             ))}

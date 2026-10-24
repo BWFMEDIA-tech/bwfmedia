@@ -131,75 +131,10 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     return { notified, emailed };
   });
 
-import { filterOnAirStreams, type OnAirRoomClient } from "./live-on-air";
-
-/**
- * The live service client used to confirm a host is really connected. Reads the
- * credentials server-side only, and returns null when the service isn't
- * configured so callers keep the backend status instead of hiding broadcasts.
- */
-async function createOnAirRoomClient(): Promise<OnAirRoomClient | null> {
-  const apiKey = process.env.LIVEKIT_API_KEY;
-  const apiSecret = process.env.LIVEKIT_API_SECRET;
-  const wsUrl = process.env.LIVEKIT_URL;
-  if (!apiKey || !apiSecret || !wsUrl) return null;
-  const { RoomServiceClient } = await import("livekit-server-sdk");
-  const serviceUrl = wsUrl.replace(/^wss:/, "https:").replace(/^ws:/, "http:");
-  return new RoomServiceClient(serviceUrl, apiKey, apiSecret) as unknown as OnAirRoomClient;
-}
-
-/** Public list of currently live streams with host display info + viewer count. */
+/** Public unified directory; presence is checked before applying an optional limit. */
 export const listLiveStreams = createServerFn({ method: "POST" })
-  .inputValidator((i) => z.object({ limit: z.number().int().min(1).max(50).default(20) }).parse(i ?? {}))
+  .inputValidator((i) => z.object({ limit: z.number().int().min(1).max(500).optional() }).parse(i ?? {}))
   .handler(async ({ data }) => {
-    // Public listing: server-side read limited to live rows and public-safe fields.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const client = supabaseAdmin as any;
-    const { data: streams, error } = await client
-      .from("streams")
-      .select("id, title, room_name, status, host_id, category, description, thumbnail_url, viewer_count, started_at, mode")
-      .eq("status", "live")
-      .order("started_at", { ascending: false })
-      .limit(data.limit);
-    if (error) throw new Error(error.message);
-    // Also include live stage rooms so every artist who goes live is listed.
-    const { data: stages } = await client
-      .from("stage_rooms")
-      .select("id, title, host_id, audience_count, started_at, livekit_room")
-      .eq("status", "live")
-      .order("started_at", { ascending: false })
-      .limit(data.limit);
-    const all = [
-      ...(streams ?? []).map((s: any) => ({ ...s, kind: "stream" as const })),
-      ...(stages ?? []).map((r: any) => ({
-        id: r.id, title: r.title, room_name: r.id, status: "live", host_id: r.host_id,
-        category: null, thumbnail_url: null, viewer_count: r.audience_count ?? 0,
-        started_at: r.started_at, mode: "stage", kind: "stage" as const,
-      })),
-    ].sort((a, b) => String(b.started_at ?? "").localeCompare(String(a.started_at ?? "")));
-    const roomByRow = new Map<string, string | null>();
-    (streams ?? []).forEach((s: any) => roomByRow.set(s.id, s.room_name ?? null));
-    (stages ?? []).forEach((r: any) => roomByRow.set(r.id, r.livekit_room ?? null));
-    // A row stays listed only while its host is actually connected to the room,
-    // so a broadcast left behind by a closed app can't light up navigation.
-    const onAir = await filterOnAirStreams(
-      all.map((s: any) => ({ row: s, room: roomByRow.get(s.id) ?? null, hostId: s.host_id })),
-      await createOnAirRoomClient(),
-    );
-    const listed = onAir.map((c) => c.row);
-    const hostIds = [...new Set(listed.map((s: any) => s.host_id))];
-    let profileMap = new Map<string, { display_name: string | null; avatar_url: string | null; stage_name: string | null }>();
-    if (hostIds.length) {
-      const { data: profs } = await client
-        .from("profiles")
-        .select("id, display_name, avatar_url, stage_name")
-        .in("id", hostIds);
-      (profs ?? []).forEach((p: any) => profileMap.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url, stage_name: p.stage_name }));
-    }
-    return {
-      streams: listed.map((s: any) => ({
-        ...s,
-        host: profileMap.get(s.host_id) ?? null,
-      })),
-    };
+    const { readLiveDirectory } = await import("./live-directory.server");
+    return { streams: await readLiveDirectory(data.limit) };
   });
