@@ -75,19 +75,31 @@ export const createBroadcast = createServerFn({ method: "POST" })
 export const getBroadcast = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    const sb = await sbPublic();
-    const [{ data: row, error }, { data: links }] = await Promise.all([
-      sb.from("broadcasts")
-        .select("id, host_id, stream_title, description, stream_status, viewer_count, playback_source, featured_content, scheduled_for, started_at, ended_at, created_at")
-        .eq("id", data.id)
-        .maybeSingle(),
-      sb.from("broadcast_stage_links")
-        .select("stage_room_id, role")
-        .eq("broadcast_id", data.id),
-    ]);
-    if (error) throw new Error(error.message);
+    const { readLiveDirectory } = await import("./live-directory.server");
+    const directory = await readLiveDirectory();
+    const row = directory.find(r => r.kind === "broadcast" && r.id === data.id);
     if (!row) return null;
-    return { ...row, stage_links: links ?? [] };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: links, error } = await supabaseAdmin.from("broadcast_stage_links")
+      .select("stage_room_id,role").eq("broadcast_id", data.id);
+    if (error) throw new Error("Broadcast temporarily unavailable");
+    const liveStages = new Set(directory.filter(r => r.kind === "stage").map(r => r.id));
+    const stageLinks = (links ?? []).filter(l => liveStages.has(l.stage_room_id));
+    return { id: row.id, host_id: row.host_id, stream_title: row.title, description: row.description,
+      stream_status: "live", viewer_count: row.viewer_count,
+      playback_source: { kind: "stage", stage_room_ids: stageLinks.map(l => l.stage_room_id) },
+      stage_links: stageLinks };
+  });
+
+/** Owner-facing metadata stays authenticated and is never returned by public discovery. */
+export const getManagedBroadcast = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.from("broadcasts").select("*")
+      .eq("id", data.id).eq("host_id", context.userId).maybeSingle();
+    if (error) throw new Error("Broadcast temporarily unavailable");
+    return row;
   });
 
 /** Start the broadcast (mark live, set started_at). Does not touch stage rooms. */
