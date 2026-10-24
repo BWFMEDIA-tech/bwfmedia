@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
 import {
-  getBroadcast, startBroadcast, endBroadcast,
+  getManagedBroadcast, startBroadcast, endBroadcast,
   updateBroadcast, linkStageToBroadcast, unlinkStageFromBroadcast,
 } from "@/lib/broadcasts.functions";
 import { listMyStageRooms } from "@/lib/stage-rooms.functions";
 import { Radio, Tv, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/broadcast/$broadcastId/manage")({
   head: () => ({
@@ -22,11 +23,6 @@ export const Route = createFileRoute("/broadcast/$broadcastId/manage")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  loader: async ({ params }) => {
-    const broadcast = await getBroadcast({ data: { id: params.broadcastId } });
-    if (!broadcast) throw notFound();
-    return { broadcast };
-  },
   errorComponent: ({ error, reset }) => (
     <div className="grid min-h-screen place-items-center bg-black text-white p-8">
       <div className="max-w-md text-center">
@@ -44,7 +40,16 @@ export const Route = createFileRoute("/broadcast/$broadcastId/manage")({
 });
 
 function ManageBroadcastPage() {
-  const { broadcast } = Route.useLoaderData();
+  const { broadcastId } = Route.useParams();
+  const auth = useAuth();
+  const fetchBroadcast = useServerFn(getManagedBroadcast);
+  const query = useQuery({ queryKey: ["managed-broadcast", broadcastId], queryFn: () => fetchBroadcast({ data: { id: broadcastId } }), enabled: !!auth.user });
+  if (!auth.user) return <div className="p-6"><Link to="/login">Sign in to manage your broadcast</Link></div>;
+  if (!query.data) return <div className="p-6">{query.isError ? "Broadcast unavailable" : query.isLoading ? "Loading broadcast…" : "Broadcast not found"}</div>;
+  return <ManageBroadcastForm broadcast={query.data} />;
+}
+
+function ManageBroadcastForm({ broadcast }: { broadcast: NonNullable<Awaited<ReturnType<typeof getManagedBroadcast>>> }) {
   const auth = useAuth();
   const navigate = useNavigate();
   const start = useServerFn(startBroadcast);
