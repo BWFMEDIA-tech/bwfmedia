@@ -301,7 +301,18 @@ function HeroBanner({
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
         <div className="w-full sm:w-auto"><ProfileMessageButton artistId={artist.id} /></div>
         {isOwner && !canUseTools ? (
-          <Link to="/signup" search={{ as: "artist" } as any} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">Become an artist to go live</Link>
+          <Link
+            to="/signup"
+            search={{ as: "artist" } as any}
+            className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+            style={{
+              borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+              background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+              boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+            }}
+          >
+            Become an artist to go live
+          </Link>
         ) : isOwner ? (
           <>
             <Link
