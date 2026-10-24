@@ -1,4 +1,5 @@
 - Keep the legacy `/email/unsubscribe` token endpoint as a compatibility bridge to Lovable-managed subscription state, because already-sent emails still link to it; new email links remain Lovable-hosted.
+- Use the project-specific session bearer middleware in src/start.ts instead of a second generated attacher; validate each new token once and share rejected-token recovery across concurrent requests, while retaining all server authorization checks.
 - Give each mounted notification bell its own Realtime topic, because the desktop and mobile headers coexist and subscribed channels cannot accept new database callbacks.
 - Scope Stream Studio button styling to its page-level control class, because shared site controls must retain their own design while Studio actions use consistent states.
 - Use semantic branding tokens; /videos reuses saves/signed URLs and metadata collections. Share Off the Block's YouTube list across both pages without duplicate uploads.
