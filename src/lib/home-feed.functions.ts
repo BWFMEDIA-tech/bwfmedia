@@ -121,16 +121,17 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
     ]);
 
   // Only songs uploaded by accounts with the artist role appear in the feed.
-  const artistIds = new Set(((artistRoleRes.data ?? []) as any[]).map((r) => r.user_id as string));
-  const artistOnly = (rows: any[] | null) =>
-    (rows ?? []).filter((r) => r.artist_user_id && artistIds.has(r.artist_user_id as string));
+  const artistIds = new Set(
+    ((artistRoleRes.data ?? []) as any[]).map((r) => r.user_id as string),
+  );
+  const { onlyArtistTracks } = await import("@/lib/home-feed-artists");
 
-  const trending = artistOnly(trendingRes.data).slice(0, LIMIT).map(mapTrack);
-  const newReleases = artistOnly(newRes.data).slice(0, LIMIT).map(mapTrack);
-  const popularWeek = artistOnly(weekRes.data).slice(0, LIMIT).map(mapTrack);
-  const popularAll = artistOnly(popularRes.data).slice(0, LIMIT).map(mapTrack);
+  const trending = onlyArtistTracks(trendingRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const newReleases = onlyArtistTracks(newRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const popularWeek = onlyArtistTracks(weekRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const popularAll = onlyArtistTracks(popularRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
   const popular = popularWeek.length ? popularWeek : popularAll;
-  const charts = artistOnly(chartsRes.data).slice(0, LIMIT).map(mapTrack);
+  const charts = onlyArtistTracks(chartsRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
 
   // Discover = catalog shuffled by a stable-ish rotation so it changes over time.
   const pool = [...newReleases, ...popular, ...charts].filter(
