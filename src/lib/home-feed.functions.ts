@@ -85,7 +85,7 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
   const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const since7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [trendingRes, newRes, popularRes, chartsRes, weekRes, allRes, battleRes, streamRes] =
+  const [trendingRes, newRes, popularRes, chartsRes, weekRes, allRes, battleRes, streamRes, artistRoleRes] =
     await Promise.all([
       sb
         .from("play_tracks")
@@ -93,17 +93,17 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
         .in("status", ["playing", "completed"])
         .gte("created_at", since30)
         .order("score", { ascending: false })
-        .limit(LIMIT),
-      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("created_at", { ascending: false }).limit(LIMIT),
-      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("play_count", { ascending: false }).limit(LIMIT),
-      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("score", { ascending: false }).limit(LIMIT),
+        .limit(LIMIT * 4),
+      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("created_at", { ascending: false }).limit(LIMIT * 4),
+      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("play_count", { ascending: false }).limit(LIMIT * 4),
+      sb.from("play_tracks").select(TRACK_COLS).in("status", ["playing", "completed"]).order("score", { ascending: false }).limit(LIMIT * 4),
       sb
         .from("play_tracks")
         .select(TRACK_COLS)
         .in("status", ["playing", "completed"])
         .gte("created_at", since7)
         .order("play_count", { ascending: false })
-        .limit(LIMIT),
+        .limit(LIMIT * 4),
       sb.from("play_tracks").select("artist_user_id, play_count").in("status", ["playing", "completed"]).limit(2000),
       sb
         .from("battle_matches")
@@ -117,12 +117,21 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
         .eq("status", "live")
         .order("started_at", { ascending: false })
         .limit(8),
+      sb.from("user_roles").select("user_id").eq("role", "artist"),
     ]);
 
-  const trending = (trendingRes.data ?? []).map(mapTrack);
-  const newReleases = (newRes.data ?? []).map(mapTrack);
-  const popular = (weekRes.data?.length ? weekRes.data : popularRes.data ?? []).map(mapTrack);
-  const charts = (chartsRes.data ?? []).map(mapTrack);
+  // Only songs uploaded by accounts with the artist role appear in the feed.
+  const artistIds = new Set(
+    ((artistRoleRes.data ?? []) as any[]).map((r) => r.user_id as string),
+  );
+  const { onlyArtistTracks } = await import("@/lib/home-feed-artists");
+
+  const trending = onlyArtistTracks(trendingRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const newReleases = onlyArtistTracks(newRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const popularWeek = onlyArtistTracks(weekRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const popularAll = onlyArtistTracks(popularRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const popular = popularWeek.length ? popularWeek : popularAll;
+  const charts = onlyArtistTracks(chartsRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
 
   // Discover = catalog shuffled by a stable-ish rotation so it changes over time.
   const pool = [...newReleases, ...popular, ...charts].filter(
