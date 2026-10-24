@@ -328,7 +328,14 @@ function HeroBanner({
 
 function PillButton({ icon: Icon, label }: { icon: any; label: string }) {
   return (
-    <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm border border-white/10 bg-white/[0.04] hover:bg-white/[0.08]">
+    <button
+      className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+      style={{
+        borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+        background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+        boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+      }}
+    >
       <Icon className="h-4 w-4" /> {label}
     </button>
   );
