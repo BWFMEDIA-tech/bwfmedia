@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { SignedImg } from "@/components/ui/signed-img";
 
 const MAX_BYTES = 50 * 1024 * 1024;
 const MAX_COVER_BYTES = 8 * 1024 * 1024;
@@ -20,6 +19,7 @@ export function AddProfileTrackDialog({
   const [artistName, setArtistName] = useState(defaultArtistName);
   const [audioUrl, setAudioUrl] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
+  const [coverPreview, setCoverPreview] = useState("");
   const [uploadedName, setUploadedName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -28,6 +28,11 @@ export function AddProfileTrackDialog({
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
+
+  // Unsaved uploads stay private: preview the local file, not a public signature.
+  useEffect(() => () => {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+  }, [coverPreview]);
 
   async function handleAudio(file: File) {
     if (file.size > MAX_BYTES) return toast.error("Max 50MB.");
@@ -73,6 +78,7 @@ export function AddProfileTrackDialog({
       if (error) throw error;
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
       setCoverUrl(pub.publicUrl);
+      setCoverPreview(URL.createObjectURL(file));
       setCoverProgress(100);
     } catch (e: any) {
       toast.error(e?.message ?? "Cover upload failed"); setCoverProgress(0);
@@ -166,8 +172,8 @@ export function AddProfileTrackDialog({
             <input ref={coverRef} type="file" accept="image/*" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleCover(f); }} />
             <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-md bg-black/50 flex items-center justify-center">
-              {coverUrl ? (
-                <SignedImg src={coverUrl} alt="Cover" className="h-full w-full object-cover" />
+              {coverPreview ? (
+                <img src={coverPreview} alt="Cover" className="h-full w-full object-cover" />
               ) : (
                 <ImageIcon className="h-5 w-5 text-white/40" />
               )}

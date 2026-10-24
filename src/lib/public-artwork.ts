@@ -18,7 +18,7 @@ export async function publicArtworkPaths(admin: any, paths: string[]): Promise<S
   if (!owners.length) return allowed;
   const [profiles, tracks] = await Promise.all([
     admin.from("profiles").select("avatar_url, brand_avatar_url, banner_url").in("id", owners),
-    admin.from("play_tracks").select("cover_url").in("status", ["playing", "completed"])
+    admin.from("play_tracks").select("cover_url, status, artist_user_id, streams(title, host_id)").in("status", ["queued", "playing", "completed"])
       .or(owners.map((owner) => `cover_url.like.*${owner}/*`).join(",")),
   ]);
   const references = new Set<string>();
@@ -29,6 +29,12 @@ export async function publicArtworkPaths(admin: any, paths: string[]): Promise<S
     }
   }
   for (const row of tracks.data ?? []) {
+    // Queued Arena submissions are not published profile songs. Only the
+    // artist's own dedicated profile library makes queued artwork public.
+    if (row.status === "queued" && (
+      row.streams?.title !== "__profile_library__" ||
+      !row.artist_user_id || row.streams?.host_id !== row.artist_user_id
+    )) continue;
     const path = typeof row.cover_url === "string" ? avatarObjectPath(row.cover_url) : null;
     if (path) references.add(path);
   }
