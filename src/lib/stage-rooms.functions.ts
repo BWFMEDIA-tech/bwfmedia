@@ -83,12 +83,13 @@ export const setStageStatus = createServerFn({ method: "POST" })
     const patch: { status: "idle" | "live" | "ended"; started_at?: string; ended_at?: string } = { status: data.status };
     if (data.status === "live") patch.started_at = new Date().toISOString();
     if (data.status === "ended") patch.ended_at = new Date().toISOString();
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("stage_rooms")
       .update(patch)
       .eq("id", data.id)
-      .eq("host_id", userId);
+      .eq("host_id", userId).select("id").maybeSingle();
     if (error) throw new Error(error.message);
+    if (!updated) throw new Error("Only the stage owner can change its status");
     return { ok: true };
   });
 
