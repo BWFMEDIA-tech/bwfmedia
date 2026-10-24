@@ -13,6 +13,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ArtistMarquee } from "@/components/tunevio/ArtistMarquee";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import welcomePoster from "@/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json";
@@ -331,6 +332,9 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Slow horizontal scroll highlighting real Tunevio artists */}
+      <ArtistMarquee />
 
       {/* Three user pathways */}
       <section className="relative px-5 sm:px-10 pb-24" aria-labelledby="roles-heading">
