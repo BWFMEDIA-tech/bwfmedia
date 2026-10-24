@@ -301,16 +301,51 @@ function HeroBanner({
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
         <div className="w-full sm:w-auto"><ProfileMessageButton artistId={artist.id} /></div>
         {isOwner && !canUseTools ? (
-          <Link to="/signup" search={{ as: "artist" } as any} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">Become an artist to go live</Link>
+          <Link
+            to="/signup"
+            search={{ as: "artist" } as any}
+            className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+            style={{
+              borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+              background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+              boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+            }}
+          >
+            Become an artist to go live
+          </Link>
         ) : isOwner ? (
           <>
-            <Link to="/go-live" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-wide text-white hover:brightness-110 transition" style={{ background: "linear-gradient(90deg,#00E6FF,#0000FF)", boxShadow: "0 6px 24px rgba(0,0,255,0.4)" }}>
+            <Link
+              to="/go-live"
+              className="inline-flex h-12 items-center gap-2 rounded-full px-7 text-sm font-black uppercase tracking-wide text-white transition hover:brightness-110"
+              style={{
+                background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-blue))",
+                boxShadow:
+                  "0 0 0 1px color-mix(in srgb, var(--brand-cyan) 45%, transparent), 0 8px 32px color-mix(in srgb, var(--brand-blue) 55%, transparent), 0 2px 10px color-mix(in srgb, var(--brand-cyan) 40%, transparent)",
+              }}
+            >
               <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Go Live
             </Link>
-            <Link to="/settings/profile" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition" style={{ background: RED, boxShadow: `0 6px 24px ${RED}55` }}>
+            <Link
+              to="/settings/profile"
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }}
+            >
               Edit Artist Profile
             </Link>
-            <Link to="/distribution" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">
+            <Link
+              to="/distribution"
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }}
+            >
               <Disc3 className="h-4 w-4" /> Distribution
             </Link>
           </>
@@ -318,7 +353,16 @@ function HeroBanner({
           <>
             <FollowButton artistId={artist.id} />
             <PillButton icon={Share2} label="Share" />
-            <button className="grid h-10 w-10 place-items-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10"><MoreHorizontal className="h-4 w-4" /></button>
+            <button
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }}
+            >
+              <MoreHorizontal className="h-4 w-4" /> More
+            </button>
           </>
         )}
       </div>
@@ -328,7 +372,14 @@ function HeroBanner({
 
 function PillButton({ icon: Icon, label }: { icon: any; label: string }) {
   return (
-    <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm border border-white/10 bg-white/[0.04] hover:bg-white/[0.08]">
+    <button
+      className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+      style={{
+        borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+        background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+        boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+      }}
+    >
       <Icon className="h-4 w-4" /> {label}
     </button>
   );
@@ -386,17 +437,28 @@ function FollowButton({ artistId }: { artistId: string }) {
 
   return (
     <>
-      <div className={`inline-flex items-stretch rounded-full overflow-hidden border transition ${
-        following ? "artist-follow-on" : "border-white/10"
-      }`}>
+      <div
+        className={`inline-flex h-12 items-stretch rounded-full overflow-hidden border transition ${
+          following ? "artist-follow-on" : ""
+        }`}
+        style={
+          following
+            ? undefined
+            : {
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }
+        }
+      >
         <button
           onClick={handleClick}
           disabled={mut.isPending}
           aria-pressed={following}
-          className={`artist-follow-main inline-flex items-center gap-2 px-4 py-2.5 text-sm transition disabled:opacity-60 ${
+          className={`artist-follow-main inline-flex items-center gap-2 px-6 text-sm font-semibold transition disabled:opacity-60 ${
             following
               ? ""
-              : "bg-white/[0.04] hover:bg-white/[0.08] text-white"
+              : "text-white hover:bg-white/[0.08]"
           }`}
         >
           <UserPlus className="h-4 w-4" />
@@ -406,11 +468,12 @@ function FollowButton({ artistId }: { artistId: string }) {
           type="button"
           onClick={() => setFollowersOpen(true)}
           aria-label="View followers"
-          className={`artist-follow-count px-3 text-xs tabular-nums border-l transition ${
+          className={`artist-follow-count px-4 text-xs tabular-nums border-l transition ${
             following
               ? ""
-              : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70"
+              : "text-white/70 hover:bg-white/[0.08]"
           }`}
+          style={following ? undefined : { borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)" }}
         >
           {fmtNum(count)}
         </button>
