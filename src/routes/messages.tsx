@@ -9,6 +9,7 @@ import { sendDirectMessage, markConversationRead } from "@/lib/direct-messages.f
 import { toast } from "sonner";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
+import { isSoftwareKeyboardOpen } from "@/lib/mobile-keyboard";
 
 const searchSchema = z.object({
   to: z.string().uuid().optional(),
@@ -207,9 +208,7 @@ function MessagesPage() {
       // innerHeight is the stable reference on iOS Safari, PWA and Capacitor.
       const layoutH = window.innerHeight;
       const visibleH = v ? v.height : layoutH;
-      // The iOS keyboard takes well over 150px; toolbar show/hide is ~50-90px, so a
-      // 150px threshold tells a real keyboard apart from chrome animations.
-      const keyboardOpen = layoutH - visibleH > 150;
+      const keyboardOpen = isSoftwareKeyboardOpen(layoutH, visibleH);
       if (keyboardOpen && v) {
         setVv({ h: v.height, top: v.offsetTop });
         scrollToLatest();
