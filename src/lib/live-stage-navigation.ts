@@ -1,11 +1,13 @@
 export type StageEntry = { id: string; room_name: string; host_id: string; status: string; kind?: string };
 
 export type StageDestination =
+  | { to: "/broadcast/$broadcastId"; params: { broadcastId: string } }
   | { to: "/stage/$roomId"; params: { roomId: string } }
   | { to: "/stream/$room"; params: { room: string } };
 
 /** The joining route for one live room. Choosing a route never grants stage permissions. */
 export function stageDestination(entry: StageEntry): StageDestination {
+  if (entry.kind === "broadcast") return { to: "/broadcast/$broadcastId", params: { broadcastId: entry.id } };
   return entry.kind === "stage"
     ? { to: "/stage/$roomId", params: { roomId: entry.id } }
     : { to: "/stream/$room", params: { room: entry.room_name } };

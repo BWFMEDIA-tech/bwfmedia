@@ -19,14 +19,14 @@ export type OnAirCandidate<T> = { row: T; room: string | null; hostId: string };
  * Keeps only the rows whose host is really connected to the room with broadcast
  * rights. A room that no longer exists, an empty room, and a host who is present
  * only as a listener are all treated as off air. When the live service cannot be
- * reached the candidates are returned untouched — an outage must never hide a
- * real broadcast.
+ * reached the caller receives an availability error, never fabricated live rows.
  */
 export async function filterOnAirStreams<T>(
   candidates: OnAirCandidate<T>[],
   client: OnAirRoomClient | null,
 ): Promise<OnAirCandidate<T>[]> {
-  if (!client || candidates.length === 0) return candidates;
+  if (candidates.length === 0) return candidates;
+  if (!client) throw new Error("Live presence temporarily unavailable");
   const names = [...new Set(candidates.map((c) => c.room).filter((n): n is string => !!n))];
 
   let rooms: Array<{ name: string; numParticipants?: number }> = [];
@@ -34,25 +34,23 @@ export async function filterOnAirStreams<T>(
     try {
       rooms = await client.listRooms(names);
     } catch {
-      return candidates;
+      throw new Error("Live presence temporarily unavailable");
     }
   }
   const peopleByRoom = new Map(rooms.map((r) => [r.name, r.numParticipants ?? 0]));
 
-  const onAir = await Promise.all(
-    candidates.map(async (candidate) => {
-      if (!candidate.room) return false;
-      if ((peopleByRoom.get(candidate.room) ?? 0) <= 0) return false;
-      try {
-        const parts = await client.listParticipants(candidate.room);
-        return parts.some(
-          (p) => p.identity === candidate.hostId && p.permission?.canPublish === true,
-        );
-      } catch {
-        return false;
-      }
-    }),
-  );
+  // One lookup per physical room, even when a broadcast links to a listed stage.
+  const partsByRoom = new Map<string, Awaited<ReturnType<OnAirRoomClient["listParticipants"]>>>();
+  for (let offset = 0; offset < names.length; offset += 10) {
+    await Promise.all(names.slice(offset, offset + 10).map(async name => {
+      if ((peopleByRoom.get(name) ?? 0) <= 0) return;
+      try { partsByRoom.set(name, await client.listParticipants(name)); }
+      catch { /* A room can disappear between the two presence reads. */ }
+    }));
+  }
+  const onAir = candidates.map(candidate => candidate.room && partsByRoom.get(candidate.room)?.some(
+    p => p.identity === candidate.hostId && p.permission?.canPublish === true,
+  ));
 
   return candidates.filter((_, index) => onAir[index]);
 }

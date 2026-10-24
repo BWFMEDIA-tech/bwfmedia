@@ -23,4 +23,7 @@ describe("live stage navigation", () => {
   it("keeps standalone stage room identifiers separate from stream room names", () => {
     expect(liveStageDestination([{ ...stream, kind: "stage" }])).toEqual({ to: "/stage/$roomId", params: { roomId: "stream-1" }, live: true });
   });
+  it("joins programmed broadcasts through their existing viewer page", () => {
+    expect(liveStageDestination([{ ...stream, kind: "broadcast" }])).toEqual({ to: "/broadcast/$broadcastId", params: { broadcastId: "stream-1" }, live: true });
+  });
 });

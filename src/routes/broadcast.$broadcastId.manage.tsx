@@ -13,7 +13,12 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/broadcast/$broadcastId/manage")({
   head: () => ({
     meta: [
-      { title: "Manage Broadcast — BWF Network" },
+      { title: "Manage Broadcast — Tunevio" },
+      { name: "description", content: "Manage your Tunevio broadcast and its linked live stages." },
+      { property: "og:title", content: "Manage Broadcast — Tunevio" },
+      { property: "og:description", content: "Manage your Tunevio broadcast and linked stages." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

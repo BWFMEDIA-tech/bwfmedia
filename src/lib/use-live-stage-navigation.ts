@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
-import { liveRosterRows, type LiveRosterEntry, type LiveRosterRow } from "./live-roster";
+import { liveRosterRows, type LiveRosterRow } from "./live-roster";
 import { liveStageDestination } from "./live-stage-navigation";
 import { useStageNavigationConnection } from "./stage-navigation-connection";
 
@@ -13,15 +13,15 @@ import { useStageNavigationConnection } from "./stage-navigation-connection";
  * need different views of it — the navigation glow, the live-people list — reuse this
  * query instead of opening a second subscription to the same table.
  */
-function useLiveStageFeed() {
+export function useLiveStageFeed() {
   const connection = useStageNavigationConnection();
   const id = useId();
   const fetchLive = useServerFn(listLiveStreams);
   const [online, setOnline] = useState(true);
   const query = useQuery({
     queryKey: ["live-stage-navigation"],
-    queryFn: () => fetchLive({ data: { limit: 50 } }),
-    refetchInterval: 10_000,
+    queryFn: () => fetchLive({ data: {} }),
+    refetchInterval: 5_000,
     staleTime: 5_000,
     retry: false,
   });
@@ -35,6 +35,8 @@ function useLiveStageFeed() {
     const channel = supabase.channel(`stage-navigation-${id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "streams" }, refresh)
       .on("postgres_changes", { event: "*", schema: "public", table: "stage_rooms" }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "broadcasts" }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "broadcast_stage_links" }, refresh)
       .subscribe();
     return () => {
       window.removeEventListener("online", onOnline);
@@ -42,7 +44,7 @@ function useLiveStageFeed() {
       void supabase.removeChannel(channel);
     };
   }, [id, query.refetch]);
-  const entries: LiveRosterEntry[] = (query.isError ? [] : query.data?.streams ?? [])
+  const entries = (query.isError ? [] : query.data?.streams ?? [])
     .filter((entry) => !connection || entry.id !== connection.streamId || connection.connected);
   return {
     entries,

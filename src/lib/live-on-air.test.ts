@@ -88,20 +88,18 @@ describe("filterOnAirStreams", () => {
     expect(ids(rows)).toEqual(["real"]);
   });
 
-  it("keeps every row when the live service cannot be reached", async () => {
+  it("reports unavailable rather than inventing LIVE status during a service outage", async () => {
     const unreachable: OnAirRoomClient = {
       listRooms: async () => {
         throw new Error("network down");
       },
       listParticipants: async () => [],
     };
-    const rows = await filterOnAirStreams([candidate("a", "room-a")], unreachable);
-    expect(ids(rows)).toEqual(["a"]);
+    await expect(filterOnAirStreams([candidate("a", "room-a")], unreachable)).rejects.toThrow("Live presence temporarily unavailable");
   });
 
-  it("keeps every row when the live service is not configured", async () => {
-    const rows = await filterOnAirStreams([candidate("a", "room-a")], null);
-    expect(ids(rows)).toEqual(["a"]);
+  it("never labels unverified records LIVE when the service is not configured", async () => {
+    await expect(filterOnAirStreams([candidate("a", "room-a")], null)).rejects.toThrow("Live presence temporarily unavailable");
   });
 
   it("drops only the row whose participant lookup fails", async () => {

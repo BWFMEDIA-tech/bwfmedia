@@ -1,10 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { getStageRoom, setStageStatus } from "@/lib/stage-rooms.functions";
-import { Mic, MicOff, Video, MessageSquare, Settings, Hand, Radio, LogOut, Users } from "lucide-react";
+import { LiveStage } from "@/components/stream/LiveStage";
+import { getLiveKitToken } from "@/lib/livekit.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Mic, Settings, Hand, Radio, LogOut, Users } from "lucide-react";
 
 export const Route = createFileRoute("/stage/$roomId")({
   head: () => ({
@@ -53,7 +57,7 @@ function useElapsed(startedAt: string | null | undefined, live: boolean) {
 }
 
 function shortId(id: string) {
-  return `BWF-${id.slice(0, 4).toUpperCase()}-${id.slice(-3).toUpperCase()}`;
+  return `TUNEVIO-${id.slice(0, 4).toUpperCase()}-${id.slice(-3).toUpperCase()}`;
 }
 
 function StagePage() {
@@ -62,8 +66,8 @@ function StagePage() {
   const navigate = useNavigate();
   const updateStatus = useServerFn(setStageStatus);
   const fetchRoom = useServerFn(getStageRoom);
-  const [muted, setMuted] = useState(false);
-  const [camOff, setCamOff] = useState(true);
+  const queryClient = useQueryClient();
+  const fetchToken = useServerFn(getLiveKitToken);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -81,6 +85,21 @@ function StagePage() {
   const isHost = !!room && auth.user?.id === room.host_id;
   const isLive = room?.status === "live";
   const isEnded = room?.status === "ended";
+  const tokenQuery = useQuery({
+    queryKey: ["stage-room-token", roomId, room?.status, auth.user?.id],
+    queryFn: () => fetchToken({ data: { roomName: room?.livekit_room ?? "" } }),
+    enabled: !!auth.user && !!room && isLive,
+    retry: false,
+    staleTime: 60 * 60 * 1000,
+  });
+  useEffect(() => {
+    if (!auth.user) return;
+    const refresh = () => { void queryClient.invalidateQueries({ queryKey: ["stage-room", roomId] }); };
+    const channel = supabase.channel(`stage-page-${roomId}-${crypto.randomUUID()}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "stage_rooms", filter: `id=eq.${roomId}` }, refresh).subscribe();
+    const timer = setInterval(refresh, 5000);
+    return () => { clearInterval(timer); void supabase.removeChannel(channel); };
+  }, [roomId, auth.user?.id, queryClient]);
   const elapsed = useElapsed(room?.started_at, !!isLive);
 
   if (auth.loading || !auth.user) {
@@ -109,15 +128,14 @@ function StagePage() {
       ? { dot: "bg-white/40", text: "text-white/60", border: "border-white/15", bg: "bg-white/5", label: "Ended" }
       : { dot: "bg-[#00E6FF]", text: "text-[#00E6FF]", border: "border-[#00E6FF]/40", bg: "bg-[#00E6FF]/10", label: "Standby" };
 
-  const hostLabel = isHost ? "You · Lead Host" : "Lead Host";
-  const hostInitial = (auth.user.email ?? "H").slice(0, 1).toUpperCase();
+  const hostInitial = "H";
 
   const goLive = async () => {
     if (busy) return;
     setBusy(true);
     try {
       await updateStatus({ data: { id: room.id, status: "live" } });
-      navigate({ to: "/stage/$roomId", params: { roomId: room.id } });
+      await queryClient.invalidateQueries({ queryKey: ["stage-room", roomId] });
     } finally {
       setBusy(false);
     }
@@ -203,6 +221,7 @@ function StagePage() {
             <button
               className="w-12 h-12 rounded-full bg-[#00E6FF]/20 border border-[#00E6FF]/50 flex items-center justify-center text-[#00E6FF] shadow-[0_0_20px_rgba(0,0,255,0.2)] hover:scale-105 transition-transform"
               aria-label="Raise hand"
+              disabled
             >
               <Hand className="w-5 h-5" />
             </button>
@@ -213,59 +232,15 @@ function StagePage() {
             <div className="flex-1 grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 min-h-[420px]">
               {/* Lead host tile */}
               <div className="md:col-span-3 md:row-span-2 relative rounded-3xl overflow-hidden border border-white/10 group bg-gradient-to-br from-[#1a0a2a] via-black to-[#0a0a1f]">
-                <div className="absolute inset-0 opacity-50 [background:radial-gradient(60%_50%_at_30%_40%,rgba(0,0,255,0.35),transparent_60%),radial-gradient(50%_45%_at_75%_70%,rgba(0,0,255,0.3),transparent_60%)]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-                <div className="absolute inset-0 border-2 border-[#0000FF]/30 group-hover:border-[#0000FF]/60 transition-colors pointer-events-none rounded-3xl" />
+                {isLive ? tokenQuery.data ? (
+                  <LiveStage token={tokenQuery.data.token} serverUrl={tokenQuery.data.wsUrl}
+                    publish={isHost} showHostTools={isHost} onEnd={() => void endStage()}
+                    onInvite={() => { void navigator.clipboard.writeText(window.location.href); }}
+                    profileHost={{ id: room.host_id, name: "Host", photo: null }} />
+                ) : <div className="grid h-full place-items-center p-6 text-center text-muted-foreground">
+                  {tokenQuery.isError ? <div><p>Unable to connect to the stage.</p><Button onClick={() => void tokenQuery.refetch()}>Retry</Button></div> : "Connecting to stage…"}
+                </div> : <div className="grid h-full place-items-center text-muted-foreground">{isEnded ? "This stage has wrapped" : "Stage is in standby"}</div>}
 
-                {!isLive && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-                    <div className="w-16 h-16 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center">
-                      <Mic className="w-7 h-7 text-white/60" />
-                    </div>
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
-                      {isEnded ? "This stage has wrapped" : "Stage is in standby"}
-                    </p>
-                    {isHost && !isEnded && (
-                      <p className="text-xs text-white/60 max-w-sm">
-                        Hit <span className="text-[#0000FF] font-semibold">Go Live</span> below to open the room to your audience.
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-[#0000FF] overflow-hidden rotate-3 shadow-[0_0_20px_rgba(0,0,255,0.4)] flex items-center justify-center bg-gradient-to-br from-[#0000FF]/50 to-[#0000FF]/40 text-lg font-bold">
-                      {hostInitial}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-xl lg:text-2xl font-bold tracking-tight truncate">
-                        {room.title || "Untitled Stage"}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span className="px-2 py-0.5 bg-[#0000FF]/20 text-[#0000FF] text-[9px] font-bold tracking-widest uppercase rounded border border-[#0000FF]/30">
-                          {hostLabel}
-                        </span>
-                        <span className="text-white/40 text-[10px] font-mono tracking-wide truncate">
-                          {room.livekit_room}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {isLive && (
-                  <div className="absolute top-6 right-6">
-                    <div className="flex items-center gap-3 px-4 py-2 bg-black/60 backdrop-blur-xl border border-white/20 rounded-2xl">
-                      <div className="flex gap-1 items-end h-4 w-6">
-                        <div className="w-1 bg-[#00E6FF] animate-[bounce_0.8s_infinite]" style={{ height: "40%" }} />
-                        <div className="w-1 bg-[#00E6FF] animate-[bounce_1.2s_infinite]" style={{ height: "90%" }} />
-                        <div className="w-1 bg-[#00E6FF] animate-[bounce_1s_infinite]" style={{ height: "60%" }} />
-                      </div>
-                      <span className="text-[10px] font-bold tracking-widest text-[#00E6FF]">AUDIO MASTER</span>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Empty stage seats */}
@@ -287,18 +262,8 @@ function StagePage() {
             {/* Audience strip */}
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex -space-x-3">
-                {[
-                  "from-[#0000FF] to-[#00E6FF]",
-                  "from-[#00E6FF] to-[#0000FF]",
-                  "from-[#00E6FF] to-[#0000FF]",
-                ].map((g, i) => (
-                  <div
-                    key={i}
-                    className={`w-8 h-8 rounded-full ring-2 ring-black bg-gradient-to-br ${g}`}
-                  />
-                ))}
                 <div className="w-auto px-3 h-8 rounded-full ring-2 ring-black bg-[#0000FF] flex items-center justify-center text-[10px] font-bold tabular-nums">
-                  +{Math.max(0, (room.audience_count ?? 0) - 3).toLocaleString()}
+                  {(room.audience_count ?? 0).toLocaleString()}
                 </div>
               </div>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -315,28 +280,6 @@ function StagePage() {
         {/* Cockpit controls */}
         <div className="relative px-6 lg:px-10 py-6 lg:py-8 bg-gradient-to-t from-white/5 to-transparent border-t border-white/10">
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex gap-3">
-              <button
-                onClick={() => setMuted((m) => !m)}
-                aria-label={muted ? "Unmute" : "Mute"}
-                className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl border flex items-center justify-center transition-all ${muted ? "bg-[#00E6FF]/15 border-[#00E6FF]/50 text-[#00E6FF]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-[#00E6FF]/50 hover:text-[#00E6FF]"}`}
-              >
-                {muted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-              </button>
-              <button
-                onClick={() => setCamOff((c) => !c)}
-                aria-label={camOff ? "Turn camera on" : "Turn camera off"}
-                className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl border flex items-center justify-center transition-all ${camOff ? "bg-white/5 border-white/10 text-white/40" : "bg-[#00E6FF]/15 border-[#00E6FF]/50 text-[#00E6FF]"}`}
-              >
-                <Video className="w-5 h-5" />
-              </button>
-              <button
-                aria-label="Chat"
-                className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:bg-white/10 hover:border-[#00E6FF]/50 hover:text-[#00E6FF] transition-all"
-              >
-                <MessageSquare className="w-5 h-5" />
-              </button>
-            </div>
 
             <div className="hidden md:flex flex-col items-center order-3 md:order-2 w-full md:w-auto">
               <div className="flex items-center gap-1.5 mb-1">
@@ -345,7 +288,7 @@ function StagePage() {
                 <div className="w-1 h-1 rounded-full bg-[#00E6FF]" />
               </div>
               <span className="text-[8px] font-bold uppercase tracking-[0.5em] text-white/20">
-                BWF Cockpit Control
+                TUNEVIO Stage
               </span>
             </div>
 
@@ -371,6 +314,7 @@ function StagePage() {
               )}
               <button
                 aria-label="Stage settings"
+                disabled
                 className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:bg-white/10 transition-all"
               >
                 <Settings className="w-5 h-5" />
