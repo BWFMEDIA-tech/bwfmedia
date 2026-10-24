@@ -51,7 +51,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
     catch { toast.error("Couldn't save this track"); }
     finally { setSaving(false); }
   };
-  const start = (t: PlayerTrack) => { if (p.track?.id === t.id) p.toggle(); else p.play(t, queue.filter((q) => !!q.audioUrl)); };
+  const start = (t: PlayerTrack) => { if (p.track?.id === t.id) p.toggle(); else p.play(t, visibleQueue.filter((q) => !!q.audioUrl)); };
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="swara-music-detail music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
