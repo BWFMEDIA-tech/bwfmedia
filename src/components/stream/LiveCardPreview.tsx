@@ -25,14 +25,21 @@ export function LiveCardPreview({ roomName, hostId }: { roomName: string; hostId
   useEffect(() => {
     if (!auth.user || !visible || finished) return;
     let cancelled = false;
+    let ended = false;
     let disconnect = () => {};
     let cancelEnd = () => {};
-    const end = () => { setFinished(true); setPlaying(false); disconnect(); };
+    const end = () => {
+      if (cancelled || ended) return;
+      ended = true;
+      setFinished(true);
+      setPlaying(false);
+      disconnect();
+    };
     // A camera-less/audio-only room or unavailable connection keeps its thumbnail.
     const connectionTimeout = setTimeout(end, 15_000);
     const start = async () => {
       const { Room, RoomEvent, Track } = await import("livekit-client");
-      if (cancelled) return;
+      if (cancelled || ended) return;
       const room = new Room({ adaptiveStream: true, dynacast: true });
       disconnect = () => { void room.disconnect(); };
       const subscribeHost = () => {
@@ -46,21 +53,21 @@ export function LiveCardPreview({ roomName, hostId }: { roomName: string; hostId
       room.on(RoomEvent.ParticipantConnected, subscribeHost);
       room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
         const element = video.current;
-        if (cancelled || !element || participant.identity !== hostId || publication.source !== Track.Source.Camera) return;
+        if (cancelled || ended || !element || participant.identity !== hostId || publication.source !== Track.Source.Camera) return;
         track.attach(element);
         void element.play().catch(end);
       });
       room.on(RoomEvent.TrackUnsubscribed, () => { setPlaying(false); });
       room.on(RoomEvent.Disconnected, end);
       const credentials = await tokenFn({ data: { roomName, preview: true } });
-      if (cancelled) return;
+      if (cancelled || ended) return;
       await room.connect(credentials.wsUrl, credentials.token, { autoSubscribe: false });
-      if (cancelled) { disconnect(); return; }
+      if (cancelled || ended) { disconnect(); return; }
       subscribeHost();
     };
     const element = video.current;
     const onPlaying = () => {
-      if (cancelled) return;
+      if (cancelled || ended) return;
       clearTimeout(connectionTimeout);
       setPlaying(true);
       cancelEnd();
