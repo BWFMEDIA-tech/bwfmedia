@@ -12,20 +12,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 
-type LiveStream = {
-  id: string;
-  title: string;
-  room_name: string;
-  category: string | null;
-  description: string | null;
-  thumbnail_url: string | null;
-  viewer_count: number;
-  started_at: string | null;
-  host_id: string;
-  kind?: "stream" | "stage" | "broadcast";
-  host: { display_name: string | null; avatar_url: string | null; stage_name: string | null } | null;
-};
-
 export const Route = createFileRoute("/live")({
   head: () => ({
     meta: [
@@ -44,7 +30,7 @@ function LivePage() {
   const feed = useLiveStageFeed();
   const delFn = useServerFn(deleteStream);
   const auth = useAuth();
-  const streams = feed.entries as LiveStream[];
+  const streams = feed.entries;
   const loading = feed.isLoading;
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const visibleStreams = activeCategory === "all"

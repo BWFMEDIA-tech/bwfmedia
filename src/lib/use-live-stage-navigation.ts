@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
-import { liveRosterRows, type LiveRosterEntry, type LiveRosterRow } from "./live-roster";
+import { liveRosterRows, type LiveRosterRow } from "./live-roster";
 import { liveStageDestination } from "./live-stage-navigation";
 import { useStageNavigationConnection } from "./stage-navigation-connection";
 
@@ -44,7 +44,7 @@ export function useLiveStageFeed() {
       void supabase.removeChannel(channel);
     };
   }, [id, query.refetch]);
-  const entries: LiveRosterEntry[] = (query.isError ? [] : query.data?.streams ?? [])
+  const entries = (query.isError ? [] : query.data?.streams ?? [])
     .filter((entry) => !connection || entry.id !== connection.streamId || connection.connected);
   return {
     entries,
