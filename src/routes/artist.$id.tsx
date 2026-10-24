@@ -307,10 +307,26 @@ function HeroBanner({
             <Link to="/go-live" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-black uppercase tracking-wide text-white hover:brightness-110 transition" style={{ background: "linear-gradient(90deg,#00E6FF,#0000FF)", boxShadow: "0 6px 24px rgba(0,0,255,0.4)" }}>
               <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Go Live
             </Link>
-            <Link to="/settings/profile" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition" style={{ background: RED, boxShadow: `0 6px 24px ${RED}55` }}>
+            <Link
+              to="/settings/profile"
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }}
+            >
               Edit Artist Profile
             </Link>
-            <Link to="/distribution" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white hover:brightness-110 transition border border-white/15 bg-white/[0.06] hover:bg-white/[0.1]">
+            <Link
+              to="/distribution"
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }}
+            >
               <Disc3 className="h-4 w-4" /> Distribution
             </Link>
           </>
@@ -318,7 +334,16 @@ function HeroBanner({
           <>
             <FollowButton artistId={artist.id} />
             <PillButton icon={Share2} label="Share" />
-            <button className="grid h-10 w-10 place-items-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10"><MoreHorizontal className="h-4 w-4" /></button>
+            <button
+              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
+                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
+                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
+              }}
+            >
+              <MoreHorizontal className="h-4 w-4" /> More
+            </button>
           </>
         )}
       </div>
