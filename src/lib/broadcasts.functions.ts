@@ -8,13 +8,23 @@ const PlaybackSource = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("prerecord"), recording_id: z.string().uuid() }),
 ]);
 
-function sbPublic() {
+async function sbPublic() {
   // Lazily build a publishable-key server client (anon-scoped reads).
-  const { createClient } = require("@supabase/supabase-js");
+  const { createClient } = await import("@supabase/supabase-js");
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) throw new Error("Broadcast temporarily unavailable");
   return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+    url,
+    key,
+    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      global: { fetch: (input, init) => {
+        const headers = new Headers(init?.headers);
+        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
+        headers.set("apikey", key);
+        return fetch(input, { ...init, headers });
+      } },
+    },
   );
 }
 
@@ -65,7 +75,7 @@ export const createBroadcast = createServerFn({ method: "POST" })
 export const getBroadcast = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    const sb = sbPublic();
+    const sb = await sbPublic();
     const [{ data: row, error }, { data: links }] = await Promise.all([
       sb.from("broadcasts")
         .select("id, host_id, stream_title, description, stream_status, viewer_count, playback_source, featured_content, scheduled_for, started_at, ended_at, created_at")
@@ -222,7 +232,7 @@ export const listMyBroadcasts = createServerFn({ method: "GET" })
 /** Public list of currently-live broadcasts. */
 export const listLiveBroadcasts = createServerFn({ method: "GET" })
   .handler(async () => {
-    const sb = sbPublic();
+    const sb = await sbPublic();
     const { data, error } = await sb
       .from("broadcasts")
       .select("id, host_id, stream_title, description, viewer_count, started_at")

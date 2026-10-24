@@ -1,6 +1,9 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { getBroadcast } from "@/lib/broadcasts.functions";
 import { Radio, Eye, Users, Tv } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useLiveStageFeed } from "@/lib/use-live-stage-navigation";
 
 export const Route = createFileRoute("/broadcast/$broadcastId")({
   loader: async ({ params }) => {
@@ -10,8 +13,8 @@ export const Route = createFileRoute("/broadcast/$broadcastId")({
   },
   head: ({ loaderData }) => {
     const b = loaderData?.broadcast;
-    const title = b ? `${b.stream_title} — BWF Live` : "BWF Live Broadcast";
-    const desc = b?.description ?? "Watch live on BWF Network.";
+    const title = b ? `${b.stream_title} — Tunevio Live` : "Tunevio Live Broadcast";
+    const desc = b?.description ?? "Watch live broadcasts and join linked stages on Tunevio.";
     return {
       meta: [
         { title },
@@ -19,6 +22,7 @@ export const Route = createFileRoute("/broadcast/$broadcastId")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "video.other" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
     };
   },
@@ -45,9 +49,14 @@ type PlaybackSource =
   | { kind: "prerecord"; recording_id: string };
 
 function BroadcastViewerPage() {
-  const { broadcast } = Route.useLoaderData();
+  const initial = Route.useLoaderData().broadcast;
+  const fetchBroadcast = useServerFn(getBroadcast);
+  const { data } = useQuery({ queryKey: ["broadcast-view", initial.id], queryFn: () => fetchBroadcast({ data: { id: initial.id } }), initialData: initial, refetchInterval: 5000 });
+  const broadcast = data ?? initial;
+  const feed = useLiveStageFeed();
   const source = broadcast.playback_source as PlaybackSource;
-  const isLive = broadcast.stream_status === "live";
+  const isLive = feed.entries.some(entry => entry.kind === "broadcast" && entry.id === broadcast.id);
+  const linkedStages = [...new Set([...(source.kind === "stage" ? source.stage_room_ids : []), ...(broadcast.stage_links ?? []).map((link: { stage_room_id: string }) => link.stage_room_id)])];
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -63,7 +72,7 @@ function BroadcastViewerPage() {
                   Live
                 </>
               ) : (
-                broadcast.stream_status
+                broadcast.stream_status === "live" ? "Off air" : broadcast.stream_status
               )}
               <span>·</span>
               <Eye className="h-3 w-3" /> {broadcast.viewer_count}
@@ -95,13 +104,13 @@ function BroadcastViewerPage() {
         )}
 
         {/* Linked stage rooms */}
-        {source.kind === "stage" && source.stage_room_ids.length > 0 && (
+        {source.kind === "stage" && linkedStages.length > 0 && (
           <section className="rounded-xl border border-white/10 bg-[#0d0d18] p-4">
             <h3 className="mb-3 flex items-center gap-2 text-[10px] font-bold tracking-widest text-white/60">
               <Users className="h-3.5 w-3.5" /> LINKED STAGES
             </h3>
             <ul className="space-y-2">
-              {source.stage_room_ids.map((sid) => (
+              {linkedStages.map((sid) => (
                 <li key={sid}>
                   <Link
                     to="/stage/$roomId"
