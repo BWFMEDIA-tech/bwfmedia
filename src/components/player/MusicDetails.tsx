@@ -39,6 +39,8 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
   const ids = queue.map((t) => t.id);
   const likes = useQuery({ queryKey: ["my-track-likes", ids], queryFn: () => getMyTrackLikes({ data: { trackIds: ids } }), enabled: !!auth.user && ids.length > 0 });
   if (!track) return null;
+  // While a track is playing, this page lists only songs by that track's artist.
+  const visibleQueue = nowPlaying && track.artistId ? queue.filter((t) => t.artistId === track.artistId) : queue;
   const current = p.track?.id === track.id;
   const liked = likes.data?.liked.includes(track.id) ?? false;
   const like = async (t: PlayerTrack) => {
