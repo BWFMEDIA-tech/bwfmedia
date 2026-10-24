@@ -1,6 +1,7 @@
 // @auth-exempt: public read of non-sensitive data via anon-readable tables / narrow RLS.
 import { createServerFn } from "@tanstack/react-start";
 import { computeStreaks, getArtistTitle } from "@/lib/artist-titles";
+import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
 
 export const getArtistMeta = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => {
@@ -36,9 +37,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         sb.from("play_tracks")
           .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
           .eq("artist_user_id", id)
-          .eq("stream_id", profileLibraryId ?? "00000000-0000-0000-0000-000000000000")
           .order("like_count", { ascending: false })
-          .limit(8),
+          .limit(200),
         sb.from("videos")
           .select("id, title, thumbnail_path, external_url, created_at")
           .eq("user_id", id)
@@ -97,9 +97,11 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const title = getArtistTitle(battleWins);
 
       const profileStreamId = (profileStreamRes.data as any)?.id ?? null;
-      const songCount = profileStreamId
-        ? tracks.filter((t: any) => t.stream_id === profileStreamId).length
-        : 0;
+      const artistTracks = dedupeArtistTracks(
+        (trackListRes.data ?? []) as Array<any>,
+        profileStreamId,
+      );
+      const songCount = artistTracks.length;
       const voteLikes = tracks.reduce((a, r) => a + (r.like_count ?? 0), 0);
       const likeCount = voteLikes + heartLikes;
       const genres: string[] = Array.isArray(p.genres) ? p.genres : [];
@@ -119,9 +121,9 @@ export const getArtistMeta = createServerFn({ method: "GET" })
 
       const rawPhoto = (p.avatar_url as string | null) ?? (q.photo_url as string | null) ?? null;
       const rawBanner = (p.banner_url as string | null) ?? null;
-      const trackList = ((trackListRes.data ?? []) as Array<any>).filter(
-        (t) => profileStreamId && t.stream_id === profileStreamId,
-      );
+      // Show the artist's own songs from their profile library AND from
+      // arena submissions, deduplicated so a song never appears twice.
+      const trackList = artistTracks.slice(0, 8);
 
       const [photoSigned, bannerSigned, trackCovers] = await Promise.all([
         presign(rawPhoto),
