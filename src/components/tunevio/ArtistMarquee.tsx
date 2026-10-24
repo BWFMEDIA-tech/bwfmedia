@@ -10,11 +10,12 @@ function formatListeners(n: number): string {
   return String(n);
 }
 
-function ArtistTile({ artist }: { artist: FeedArtist }) {
+function ArtistTile({ artist, tabbable = true }: { artist: FeedArtist; tabbable?: boolean }) {
   return (
     <Link
       to="/artist/$id"
       params={{ id: artist.id }}
+      tabIndex={tabbable ? undefined : -1}
       className="artist-marquee-card group flex w-44 shrink-0 flex-col items-center rounded-2xl border border-border bg-card px-4 py-6 text-center transition-colors hover:border-primary/50 sm:w-52"
     >
       <span className="relative block h-20 w-20 overflow-hidden rounded-full border border-border bg-secondary sm:h-24 sm:w-24">
@@ -64,9 +65,11 @@ export function ArtistMarquee() {
           {artists.map((a) => (
             <ArtistTile key={a.id} artist={a} />
           ))}
-          {artists.map((a) => (
-            <ArtistTile key={`dup-${a.id}`} artist={a} />
-          ))}
+          <span aria-hidden="true" className="contents">
+            {artists.map((a) => (
+              <ArtistTile key={`dup-${a.id}`} artist={a} tabbable={false} />
+            ))}
+          </span>
         </div>
       </div>
     </section>
