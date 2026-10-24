@@ -13,7 +13,7 @@ export type OnAirRoomClient = {
   listParticipants(room: string): Promise<Array<{ identity?: string; permission?: { canPublish?: boolean } }>>;
 };
 
-export type OnAirCandidate<T> = { row: T; room: string | null; hostId: string };
+export type OnAirCandidate<T> = { row: T; room: string | null; hostId: string; visitorIds?: string[] };
 
 /**
  * Keeps only the rows whose host is really connected to the room with broadcast
@@ -52,5 +52,10 @@ export async function filterOnAirStreams<T>(
     p => p.identity === candidate.hostId && p.permission?.canPublish === true,
   ));
 
-  return candidates.filter((_, index) => onAir[index]);
+  return candidates.filter((_, index) => onAir[index]).map(candidate => ({
+    ...candidate,
+    visitorIds: [...new Set((partsByRoom.get(candidate.room ?? "") ?? [])
+      .map(p => p.identity)
+      .filter((identity): identity is string => !!identity && identity !== candidate.hostId))],
+  }));
 }

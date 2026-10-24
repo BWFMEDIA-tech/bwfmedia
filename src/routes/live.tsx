@@ -105,8 +105,9 @@ function LivePage() {
                   <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded bg-destructive px-2 py-1 text-[10px] font-bold tracking-wider">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-foreground" /> LIVE
                   </span>
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded bg-background/70 px-2 py-1 text-[10px] font-semibold backdrop-blur">
-                    <Eye className="h-3 w-3" /> {s.viewer_count ?? 0}
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded bg-background/70 px-2 py-1 text-xs font-semibold tabular-nums backdrop-blur" title="Visitors connected now, excluding the host">
+                    <Eye aria-hidden="true" className="h-3.5 w-3.5 text-primary" />
+                    {s.viewer_count.toLocaleString()} live {s.viewer_count === 1 ? "visitor" : "visitors"}
                   </span>
                   {s.kind === "stream" && auth.user?.id === s.host_id && (
                     <Button

@@ -34,7 +34,22 @@ export function directoryCandidates(streams: DirectoryRow[], stages: Stage[], br
 }
 
 export function directoryRows(candidates: OnAirCandidate<DirectoryRow>[], limit?: number): DirectoryRow[] {
-  const unique = new Map(candidates.map(c => [`${c.row.kind}:${c.row.id}`, c.row]));
+  const unique = new Map<string, DirectoryRow>();
+  const visitors = new Map<string, Set<string>>();
+  for (const candidate of candidates) {
+    const key = `${candidate.row.kind}:${candidate.row.id}`;
+    unique.set(key, candidate.row);
+    if (candidate.visitorIds !== undefined) {
+      const identities = visitors.get(key) ?? new Set<string>();
+      for (const id of candidate.visitorIds) identities.add(id);
+      visitors.set(key, identities);
+    }
+  }
+  // Linked rooms count each visitor once; only totals leave the server reader.
+  for (const [key, identities] of visitors) {
+    const row = unique.get(key);
+    if (row) unique.set(key, { ...row, viewer_count: identities.size });
+  }
   const rows = [...unique.values()].sort((a, b) => String(b.started_at ?? "").localeCompare(String(a.started_at ?? "")) || a.id.localeCompare(b.id));
   return limit === undefined ? rows : rows.slice(0, limit);
 }

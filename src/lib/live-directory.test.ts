@@ -10,6 +10,30 @@ const service = (connected: Record<string, string>): OnAirRoomClient => ({
   listParticipants: async room => [{ identity: connected[room], permission: { canPublish: true } }],
 });
 describe("unified live directory", () => {
+  it("counts two connected visitors, including a guest, but excludes the host and stale stored counts", async () => {
+    const liveService: OnAirRoomClient = {
+      listRooms: async () => [{ name: "artist", numParticipants: 3 }],
+      listParticipants: async () => [
+        { identity: "artist", permission: { canPublish: true } },
+        { identity: "fan", permission: { canPublish: false } },
+        { identity: "guest_123", permission: { canPublish: false } },
+      ],
+    };
+    const rows = directoryRows(await filterOnAirStreams(directoryCandidates([{ ...stream("artist"), viewer_count: 99 }], [], [], []), liveService));
+    expect(rows[0]?.viewer_count).toBe(2);
+    expect(rows[0]).not.toHaveProperty("visitorIds");
+  });
+  it("updates to zero when the last visitor leaves a host-only room", async () => {
+    const rows = directoryRows(await filterOnAirStreams(directoryCandidates([{ ...stream("artist"), viewer_count: 99 }], [], [], []), service({ artist: "artist" })));
+    expect(rows[0]?.viewer_count).toBe(0);
+  });
+  it("counts each visitor once across a broadcast's linked rooms", () => {
+    const row = { ...stream("show"), kind: "broadcast" as const };
+    expect(directoryRows([
+      { row, room: "a", hostId: "show", visitorIds: ["fan-1", "fan-2"] },
+      { row, room: "b", hostId: "show", visitorIds: ["fan-2", "fan-3"] },
+    ])[0]?.viewer_count).toBe(3);
+  });
   for (const [id, mode] of [["artist", "broadcast"], ["host", "broadcast"], ["audio", "stage"], ["arena", "broadcast"]]) {
     it(`automatically includes connected ${id} streams without role filtering`, async () => {
       const result = await filterOnAirStreams(directoryCandidates([stream(id, mode)], [], [], []), service({ [id]: id }));
