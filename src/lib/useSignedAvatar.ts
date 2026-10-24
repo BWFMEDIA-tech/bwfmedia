@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { signAvatarUrls } from "@/lib/signed-avatar.functions";
+import { avatarObjectPath } from "@/lib/public-artwork";
 
 type CacheEntry = { url: string; expiresAt: number };
 type PendingEntry = Promise<string | null>;
@@ -10,7 +11,6 @@ const inflight = new Map<string, PendingEntry>();
 const TTL_SECONDS = 3600;
 // Refresh ~5 min before expiry to avoid 403 on long-lived UIs.
 const REFRESH_BUFFER_MS = 5 * 60 * 1000;
-const PUBLIC_AVATAR_MARKER = "/storage/v1/object/public/avatars/";
 const BATCH_WINDOW_MS = 25;
 
 let batchQueue: string[] = [];
@@ -42,13 +42,13 @@ function flushBatch() {
 }
 
 function isPrivateAvatarUrl(url: string | null | undefined): url is string {
-  return typeof url === "string" && url.includes(PUBLIC_AVATAR_MARKER);
+  return typeof url === "string" && avatarObjectPath(url) !== null;
 }
 
 function cacheKey(url: string): string {
   // Drop cache-busting query params (e.g. `?v=...`) so the same object reuses
   // one signed URL across renders.
-  return url.split("?")[0];
+  return avatarObjectPath(url) ?? url.split("?")[0];
 }
 
 async function fetchSigned(originalUrl: string): Promise<string | null> {
@@ -85,7 +85,7 @@ export function useSignedAvatarUrl(
   url: string | null | undefined,
 ): string | undefined {
   const isPrivate = isPrivateAvatarUrl(url);
-  const cached = isPrivate ? cache.get(cacheKey(url!)) : null;
+  const cached = isPrivate ? cache.get(cacheKey(url)) : null;
   const initial = isPrivate
     ? cached && cached.expiresAt - REFRESH_BUFFER_MS > Date.now()
       ? cached.url
