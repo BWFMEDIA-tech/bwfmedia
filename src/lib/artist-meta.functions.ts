@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { computeStreaks, getArtistTitle } from "@/lib/artist-titles";
 import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
+import { avatarObjectPath, publicArtworkPaths } from "@/lib/public-artwork";
 
 export const getArtistMeta = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => {
@@ -109,14 +110,13 @@ export const getArtistMeta = createServerFn({ method: "GET" })
 
       // Pre-sign private avatar-bucket URLs server-side so the client
       // doesn't fire a `signAvatarUrl` POST per image after first paint.
-      const PUBLIC_MARKER = "/storage/v1/object/public/avatars/";
-      const PATH_RE = /^[0-9a-fA-F-]{8,}\/.+$/;
       const presign = async (raw: string | null): Promise<string | null> => {
-        if (!raw || !raw.includes(PUBLIC_MARKER)) return raw;
-        const tail = raw.split(PUBLIC_MARKER)[1]?.split("?")[0] ?? "";
-        if (!PATH_RE.test(tail)) return raw;
-        const { data: s } = await sb.storage.from("avatars").createSignedUrl(tail, 3600);
-        return s?.signedUrl ?? raw;
+        if (!raw) return raw;
+        const path = avatarObjectPath(raw);
+        if (!path) return raw.includes("/avatars/") ? null : raw;
+        if (!allowedArtwork.has(path)) return null;
+        const { data: s } = await sb.storage.from("avatars").createSignedUrl(path, 3600);
+        return s?.signedUrl ?? null;
       };
 
       const rawPhoto = (p.avatar_url as string | null) ?? (q.photo_url as string | null) ?? null;
@@ -124,6 +124,12 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       // Show the artist's own songs from their profile library AND from
       // arena submissions, deduplicated so a song never appears twice.
       const trackList = artistTracks.slice(0, 8);
+      const artworkPaths = [rawPhoto, rawBanner, ...trackList.map((t) => t.cover_url)]
+        .flatMap((raw) => {
+          const path = typeof raw === "string" ? avatarObjectPath(raw) : null;
+          return path ? [path] : [];
+        });
+      const allowedArtwork = await publicArtworkPaths(sb, artworkPaths);
 
       const [photoSigned, bannerSigned, trackCovers] = await Promise.all([
         presign(rawPhoto),
