@@ -6,17 +6,17 @@ import { LandingPage } from "@/components/tunevio/LandingPage";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tunevio | Discover Independent Music, Live Events & Artist Battles" },
+      { title: "Tunevio | Independent Music Streaming & Live Artist Battles" },
       {
         name: "description",
         content:
-          "Discover independent artists, stream music, join interactive live sessions, and experience music battles on Tunevio.",
+          "Discover independent music, stream songs and music videos, connect with unsigned artists, join live music events, and compete in real-time artist battles on Tunevio.",
       },
-      { property: "og:title", content: "Tunevio | Discover Independent Music, Live Events & Artist Battles" },
+      { property: "og:title", content: "Tunevio | Independent Music Streaming & Live Artist Battles" },
       {
         property: "og:description",
         content:
-          "Discover independent artists, stream music, join interactive live sessions, and experience music battles on Tunevio.",
+          "Discover independent music, stream songs and music videos, connect with unsigned artists, join live music events, and compete in real-time artist battles on Tunevio.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://tunevio.com/" },
