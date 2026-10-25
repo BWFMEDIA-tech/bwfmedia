@@ -4,6 +4,7 @@ import { Crown, X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon, Music
 import { toast } from "sonner";
 import { submitPlayTrack } from "@/lib/play.functions";
 import { signPlayAudioUrl } from "@/lib/play-audio.functions";
+import { readAudioDurationSeconds } from "@/lib/audio-duration";
 import { supabase } from "@/integrations/supabase/client";
 import { SignedImg } from "@/components/ui/signed-img";
 
@@ -27,6 +28,7 @@ export function SubmitTrackDialog({
   const [title, setTitle] = useState("");
   const [artistName, setArtistName] = useState(defaultArtistName);
   const [audioUrl, setAudioUrl] = useState("");
+  const [durationSeconds, setDurationSeconds] = useState<number | null>(null);
   const [coverUrl, setCoverUrl] = useState("");
   const [useBoost, setUseBoost] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -99,6 +101,9 @@ export function SubmitTrackDialog({
     }
     setUploading(true);
     setProgress(5);
+    // Record the real duration so track rows show minutes instead of "--:--".
+    const measured = await readAudioDurationSeconds(file);
+    setDurationSeconds(measured);
     try {
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
