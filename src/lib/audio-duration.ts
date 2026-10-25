@@ -21,7 +21,7 @@ export async function readAudioDurationSeconds(file: File): Promise<number | nul
   } catch {
     return null;
   } finally {
-    audio.removeAttribute("src");
+    audio.removeAttribute?.("src");
     URL.revokeObjectURL(objectUrl);
   }
 }
