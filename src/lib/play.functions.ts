@@ -15,6 +15,7 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       audioUrl: z.string().url().max(2000).optional().or(z.literal("")).default(""),
       coverUrl: z.string().url().max(2000).optional().or(z.literal("")).default(""),
       useBoost: z.boolean().optional().default(false),
+      durationSeconds: z.number().int().min(0).max(60 * 60 * 12).optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -117,6 +118,7 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
         title: data.title,
         audio_url: data.audioUrl || null,
         cover_url: data.coverUrl || null,
+        duration_seconds: data.durationSeconds ?? null,
         boosted,
         position: nextPosition,
         battle_match_id: battleMatchId,

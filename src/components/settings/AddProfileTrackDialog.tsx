@@ -39,6 +39,9 @@ export function AddProfileTrackDialog({
   async function handleAudio(file: File) {
     if (file.size > MAX_BYTES) return toast.error("Max 50MB.");
     setUploading(true); setProgress(5);
+    // Record the real duration so track rows show minutes instead of "--:--".
+    const durationSeconds = await readAudioDurationSeconds(file);
+    setAudioDurationSeconds(durationSeconds);
     try {
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
@@ -105,6 +108,7 @@ export function AddProfileTrackDialog({
         title: title.trim(),
         audio_url: audioUrl,
         cover_url: coverUrl || null,
+        duration_seconds: audioDurationSeconds,
         status: "queued",
       } as any);
       if (insErr) throw insErr;
