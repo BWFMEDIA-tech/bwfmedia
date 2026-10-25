@@ -276,9 +276,10 @@ export function LandingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05 }}
-            className="welcome-wordmark mt-6 font-semibold leading-none"
+            className="welcome-wordmark mt-6 font-semibold"
+            style={{ fontSize: "clamp(30px, 5.2vw, 54px)", lineHeight: 1.15, letterSpacing: "-0.01em" }}
           >
-            Tunevio<span className="text-primary">.</span>
+            Discover Independent Artists, Stream Music &amp; Join Live Battles
           </motion.h1>
           <p className="welcome-tagline mt-6 text-2xl sm:text-3xl font-medium">Music is better when <span className="text-primary">you’re part of it.</span></p>
           <motion.p
