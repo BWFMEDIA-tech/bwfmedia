@@ -39,7 +39,7 @@ export function SubmitTrackDialog({
   const coverRef = useRef<HTMLInputElement>(null);
   const [coverUploading, setCoverUploading] = useState(false);
   const [coverProgress, setCoverProgress] = useState(0);
-  type ProfileTrack = { id: string; title: string; audio_url: string | null; cover_url: string | null };
+  type ProfileTrack = { id: string; title: string; audio_url: string | null; cover_url: string | null; duration_seconds: number | null };
   const [profileTracks, setProfileTracks] = useState<ProfileTrack[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [pickedProfileId, setPickedProfileId] = useState<string>("");
@@ -55,7 +55,7 @@ export function SubmitTrackDialog({
         if (!uid) return;
         const { data } = await supabase
           .from("play_tracks")
-          .select("id, title, audio_url, cover_url, created_at")
+          .select("id, title, audio_url, cover_url, duration_seconds, created_at")
           .eq("artist_user_id", uid)
           .neq("status", "removed")
           .order("created_at", { ascending: false })
@@ -69,7 +69,7 @@ export function SubmitTrackDialog({
           if (!key || !t.audio_url || seen.has(key) || seen.has(fileKey)) continue;
           seen.add(key);
           seen.add(fileKey);
-          unique.push({ id: t.id, title: t.title, audio_url: t.audio_url, cover_url: t.cover_url });
+          unique.push({ id: t.id, title: t.title, audio_url: t.audio_url, cover_url: t.cover_url, duration_seconds: t.duration_seconds ?? null });
         }
         setProfileTracks(unique);
       } finally {
@@ -87,6 +87,7 @@ export function SubmitTrackDialog({
     setTitle(t.title);
     if (t.audio_url) setAudioUrl(t.audio_url);
     if (t.cover_url) setCoverUrl(t.cover_url);
+    setDurationSeconds(t.duration_seconds ?? null);
     setUploadedName(t.title);
   }
 
@@ -213,7 +214,7 @@ export function SubmitTrackDialog({
           }
         }
       }
-      const res: any = await submitFn({ data: { streamId, title, artistName, audioUrl: finalAudio, coverUrl: finalCover, useBoost } });
+      const res: any = await submitFn({ data: { streamId, title, artistName, audioUrl: finalAudio, coverUrl: finalCover, useBoost, durationSeconds } });
       if (res?.routedToBattle) {
         toast.success(`Routed to Side ${String(res.battleSide).toUpperCase()} of the live battle`);
       } else {
