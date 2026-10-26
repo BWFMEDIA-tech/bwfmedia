@@ -4,8 +4,8 @@ import { LegalPage } from "@/components/site/LegalPage";
 export const Route = createFileRoute("/cookie-policy")({
   head: () => ({
     meta: [
-      { title: "Cookie Policy — BWF Media TV" },
-      { name: "description", content: "How BWF Media TV uses cookies and similar tracking technologies across the platform." },
+      { title: "Cookie Policy — Tunevio" },
+      { name: "description", content: "How Tunevio uses cookies and similar tracking technologies across the platform." },
     ],
   }),
   component: CookiePage,
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/cookie-policy")({
 function CookiePage() {
   return (
     <LegalPage title="Cookie Policy" effectiveDate="June 15, 2026">
-      <p>This Cookie Policy explains how BWF Media TV ("BWF") uses cookies and similar tracking technologies when you visit our Services.</p>
+      <p>This Cookie Policy explains how Tunevio uses cookies and similar tracking technologies when you visit our Services.</p>
 
       <h2>1. What Are Cookies?</h2>
       <p>Cookies are small text files stored on your device when you visit a website. They allow the site to recognize your device, remember preferences, and improve your experience.</p>
@@ -42,7 +42,7 @@ function CookiePage() {
       <p>We may update this Cookie Policy from time to time. Changes will be posted on this page with a revised Effective Date.</p>
 
       <h2>7. Contact</h2>
-      <p>Email: <a href="mailto:bookings@bwfmedia.company">bookings@bwfmedia.company</a></p>
+      <p>Email: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a></p>
     </LegalPage>
   );
 }

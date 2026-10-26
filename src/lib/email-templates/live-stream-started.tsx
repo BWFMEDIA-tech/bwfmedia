@@ -20,12 +20,12 @@ interface Props {
 
 const Email = ({
   hostName = 'A Tunevio host',
-  streamTitle = 'BWF Live',
-  streamUrl = 'https://bwfnetwork.com/live',
+  streamTitle = 'Tunevio Live',
+  streamUrl = 'https://tunevio.com/live',
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>{`${hostName} just went live on BWF Network`}</Preview>
+    <Preview>{`${hostName} just went live on Tunevio`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={header}>
@@ -42,7 +42,7 @@ const Email = ({
           </Button>
         </Section>
         <Text style={footer}>
-          You're receiving this because you opted in to live alerts on BWF Network. Manage notification
+          You're receiving this because you opted in to live alerts on Tunevio. Manage notification
           preferences in your account settings.
         </Text>
       </Container>
@@ -57,8 +57,8 @@ export const template = {
   displayName: 'Live stream started',
   previewData: {
     hostName: 'JXHNNY RICH',
-    streamTitle: 'BWF Live: Unsigned Artist Review',
-    streamUrl: 'https://bwfnetwork.com/live',
+    streamTitle: 'Tunevio Live: Unsigned Artist Review',
+    streamUrl: 'https://tunevio.com/live',
   },
 } satisfies TemplateEntry
 

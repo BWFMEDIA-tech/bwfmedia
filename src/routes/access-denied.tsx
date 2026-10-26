@@ -4,7 +4,7 @@ import { ShieldAlert } from "lucide-react";
 export const Route = createFileRoute("/access-denied")({
   head: () => ({
     meta: [
-      { title: "Access Denied — BWF Network" },
+      { title: "Access Denied — Tunevio" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -21,10 +21,10 @@ function AccessDenied() {
         <h1 className="text-2xl font-bold text-white">Access Denied</h1>
         <p className="mt-3 text-sm text-white/60">
           You don't have permission to view this area. Stream Studio is
-          restricted to BWF administrators.
+          restricted to Tunevio administrators.
         </p>
         <p className="mt-2 text-xs text-white/40">
-          If you believe this is a mistake, contact a BWF admin.
+          If you believe this is a mistake, contact a Tunevio admin.
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link

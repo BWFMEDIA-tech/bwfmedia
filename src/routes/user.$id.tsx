@@ -7,8 +7,8 @@ import { SignedImg } from "@/components/ui/signed-img";
 export const Route = createFileRoute("/user/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `User Profile — BWF Network` },
-      { name: "description", content: "BWF Network user profile." },
+      { title: `User Profile — Tunevio` },
+      { name: "description", content: "Tunevio user profile." },
     ],
   }),
   component: PublicProfilePage,

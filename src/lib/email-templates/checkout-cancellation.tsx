@@ -3,7 +3,7 @@ import {
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
-const SITE_NAME = 'BWF Media'
+const SITE_NAME = 'Tunevio'
 const GOLD = '#D4A24C'
 const BLOOD = '#A41E22'
 
@@ -20,7 +20,7 @@ const CheckoutCancellation = ({
   totalFormatted,
   returnUrl,
 }: CheckoutCancellationProps) => {
-  const url = returnUrl || 'https://bwfnetwork.com'
+  const url = returnUrl || 'https://tunevio.com'
   return (
     <Html lang="en" dir="ltr">
       <Head />
@@ -29,8 +29,8 @@ const CheckoutCancellation = ({
         <Container style={container}>
           <Section style={brandBar}>
             <Text style={brandText}>
-              <span style={{ color: '#000' }}>BWF</span>
-              <span style={{ color: GOLD }}>MEDIA</span>
+              <span style={{ color: '#000' }}>Tunevio</span>
+
             </Text>
             <Text style={tagline}>// Checkout // Paused</Text>
           </Section>
@@ -96,13 +96,13 @@ const CheckoutCancellation = ({
 
 export const template = {
   component: CheckoutCancellation,
-  subject: 'Your BWF Media cart is saved — finish when you’re ready',
+  subject: 'Your Tunevio cart is saved — finish when you’re ready',
   displayName: 'Checkout cancellation',
   previewData: {
     name: 'Alex',
     itemCount: 2,
     totalFormatted: '$700',
-    returnUrl: 'https://bwfnetwork.com',
+    returnUrl: 'https://tunevio.com',
   },
 } satisfies TemplateEntry
 

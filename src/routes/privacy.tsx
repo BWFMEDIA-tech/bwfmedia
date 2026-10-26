@@ -4,10 +4,10 @@ import { LegalPage } from "@/components/site/LegalPage";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — BWF Media TV" },
-      { name: "description", content: "How BWF Media TV collects, uses, and protects information across our artist platform, media network, and booking services." },
-      { property: "og:title", content: "Privacy Policy — BWF Media TV" },
-      { property: "og:description", content: "Our privacy practices for the BWF Network platform and services." },
+      { title: "Privacy Policy — Tunevio" },
+      { name: "description", content: "How Tunevio collects, uses, and protects information across our artist platform, media network, and booking services." },
+      { property: "og:title", content: "Privacy Policy — Tunevio" },
+      { property: "og:description", content: "Our privacy practices for the Tunevio platform and services." },
     ],
   }),
   component: PrivacyPage,
@@ -17,7 +17,7 @@ function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" effectiveDate="June 15, 2026">
       <p>
-        Welcome to BWF Media TV ("BWF," "we," "our," or "us"). This Privacy Policy explains how we collect, use,
+        Welcome to Tunevio (https://tunevio.com) ("Tunevio," "we," "our," or "us"). This Privacy Policy explains how we collect, use,
         disclose, and protect information when you visit or use our website, services, artist platform, media network,
         booking services, and related applications (collectively, the "Services").
       </p>
@@ -71,7 +71,7 @@ function PrivacyPage() {
       <h3>Legal Requirements</h3>
       <p>To comply with laws, respond to lawful requests, protect rights and safety, or investigate fraud or abuse.</p>
       <h3>Business Transfers</h3>
-      <p>If BWF Media TV is involved in a merger, acquisition, financing, or sale of assets, information may be transferred as part of that transaction.</p>
+      <p>If Tunevio is involved in a merger, acquisition, financing, or sale of assets, information may be transferred as part of that transaction.</p>
 
       <h2>7. Data Retention</h2>
       <p>We retain information for as long as reasonably necessary to provide Services, maintain business records, resolve disputes, enforce agreements, and comply with legal obligations.</p>
@@ -100,7 +100,7 @@ function PrivacyPage() {
       </ul>
 
       <h2>14. Contact Us</h2>
-      <p>BWF Media TV<br />Email: <a href="mailto:bookings@bwfmedia.company">bookings@bwfmedia.company</a><br />Website: bwfnetwork.com</p>
+      <p>Tunevio<br />Email: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a><br />Website: https://tunevio.com</p>
 
       <h2>15. Changes to This Privacy Policy</h2>
       <p>We may update this Privacy Policy periodically. Changes will be posted with an updated Effective Date. Continued use of the Services constitutes acceptance of the revised Privacy Policy.</p>

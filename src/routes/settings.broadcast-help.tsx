@@ -4,7 +4,7 @@ import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 
 export const Route = createFileRoute("/settings/broadcast-help")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Broadcast Help — BWF Network" }] }),
+  head: () => ({ meta: [{ title: "Broadcast Help — Tunevio" }] }),
   component: BroadcastHelpPage,
 });
 

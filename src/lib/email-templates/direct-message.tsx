@@ -20,8 +20,8 @@ interface Props {
 
 const Email = ({
   senderName = 'Someone',
-  preview = 'You have a new message on BWF Network',
-  inboxUrl = 'https://bwfnetwork.com/messages',
+  preview = 'You have a new message on Tunevio',
+  inboxUrl = 'https://tunevio.com/messages',
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -39,7 +39,7 @@ const Email = ({
           </Button>
         </Section>
         <Text style={footer}>
-          You're receiving this because someone messaged you on BWF Network while you were offline.
+          You're receiving this because someone messaged you on Tunevio while you were offline.
           Manage your notifications in account settings.
         </Text>
       </Container>
@@ -50,12 +50,12 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (d: Record<string, any>) =>
-    `${d?.senderName ?? 'Someone'} sent you a message on BWF Network`,
+    `${d?.senderName ?? 'Someone'} sent you a message on Tunevio`,
   displayName: 'New direct message',
   previewData: {
     senderName: 'JXHNNY RICH',
     preview: 'Hey — loved your last set. Want to collab?',
-    inboxUrl: 'https://bwfnetwork.com/messages',
+    inboxUrl: 'https://tunevio.com/messages',
   },
 } satisfies TemplateEntry
 

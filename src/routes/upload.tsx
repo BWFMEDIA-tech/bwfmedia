@@ -4,9 +4,9 @@ import { ChevronRight, Clapperboard, Mic, Music2, Package, Radio, Swords } from 
 export const Route = createFileRoute("/upload")({
   head: () => ({
     meta: [
-      { title: "Upload — BWF Network" },
-      { name: "description", content: "Submit a track to Play Arena, add music to your profile, or go live on BWF Network." },
-      { property: "og:title", content: "Upload — BWF Network" },
+      { title: "Upload — Tunevio" },
+      { name: "description", content: "Submit a track to Play Arena, add music to your profile, or go live on Tunevio." },
+      { property: "og:title", content: "Upload — Tunevio" },
       { property: "og:description", content: "Submit tracks, add music, or go live." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

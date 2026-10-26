@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Radio, DollarSign, Users, Shield, Ban, X, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — BWF Network" }] }),
+  head: () => ({ meta: [{ title: "Admin Dashboard — Tunevio" }] }),
   component: AdminDashboard,
 });
 

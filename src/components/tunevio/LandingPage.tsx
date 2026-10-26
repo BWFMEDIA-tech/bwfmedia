@@ -270,7 +270,7 @@ export function LandingPage() {
             className="welcome-eyebrow inline-flex items-center gap-2 text-xs text-muted-foreground"
           >
             <Music2 className="h-3.5 w-3.5 text-primary" />
-            Tunevio, brought to you by BWFMEDIA
+            Tunevio
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
@@ -581,7 +581,7 @@ export function LandingPage() {
           <div className="flex items-center gap-3">
             <img src={tunevioLogo.url} alt="Tunevio" className="h-8 w-auto" />
             <span className="text-xs text-foreground/50">
-              Tunevio, brought to you by BWFMEDIA
+              Tunevio
             </span>
           </div>
           <nav

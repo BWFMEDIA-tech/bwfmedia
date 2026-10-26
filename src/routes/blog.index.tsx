@@ -8,23 +8,23 @@ import { NewBlogPostDialog } from "@/components/blog/NewBlogPostDialog";
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "Blog — BWF Media TV" },
-      { name: "description", content: "Read the latest from BWF Media TV, interviews, behind-the-scenes stories, viral content breakdowns, and culture commentary from the heart of hip-hop." },
-      { property: "og:title", content: "BWF Media TV Blog, Where Culture Speaks" },
-      { property: "og:description", content: "Interviews, BTS, and culture commentary from BWF Media TV." },
+      { title: "Blog — Tunevio" },
+      { name: "description", content: "Read the latest from Tunevio, interviews, behind-the-scenes stories, viral content breakdowns, and culture commentary from the heart of hip-hop." },
+      { property: "og:title", content: "Tunevio Blog, Where Culture Speaks" },
+      { property: "og:description", content: "Interviews, BTS, and culture commentary from Tunevio." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfnetwork.com/blog" },
+      { property: "og:url", content: "https://tunevio.com/blog" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/blog" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/blog" }],
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "Blog",
-        name: "BWF Media TV Blog",
-        url: "https://bwfnetwork.com/blog",
-        description: "Interviews, BTS, and culture commentary from BWF Media TV.",
-        publisher: { "@type": "Organization", name: "BWF Media TV", url: "https://bwfnetwork.com" },
+        name: "Tunevio Blog",
+        url: "https://tunevio.com/blog",
+        description: "Interviews, BTS, and culture commentary from Tunevio.",
+        publisher: { "@type": "Organization", name: "Tunevio", url: "https://tunevio.com" },
       }),
     }],
   }),
@@ -38,7 +38,7 @@ const featured = {
     "We break down the editing rhythm, hook framing, and platform timing behind one of our most viral interview drops of the year.",
   date: "Apr 28, 2026",
   readTime: "6 min read",
-  author: "BWF Editorial",
+  author: "Tunevio Editorial",
   Icon: Flame,
 };
 
@@ -98,8 +98,8 @@ const posts: Array<{
   {
     category: "Behind The Scenes",
     Icon: Camera,
-    title: "Inside the Studio: A Day Shooting With BWF Media",
-    excerpt: "From load-in to wrap, what really happens during a BWF interview shoot.",
+    title: "Inside the Studio: A Day Shooting With Tunevio",
+    excerpt: "From load-in to wrap, what really happens during a Tunevio interview shoot.",
     date: "Apr 15, 2026",
     readTime: "4 min read",
   },
@@ -137,7 +137,7 @@ function BlogPage() {
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
           <Link to="/" className="font-display text-xl tracking-tight text-bone hover:opacity-80">
-            BWF<span style={{ color: "var(--blood)" }}>™</span>
+            Tunevio<span style={{ color: "var(--blood)" }}>™</span>
           </Link>
           <nav className="flex items-center gap-6 font-cond font-bold tracking-[0.25em] text-[11px] uppercase">
             <Link to="/" className="text-bone/70 hover:text-bone transition-colors">Home</Link>
@@ -156,7 +156,7 @@ function BlogPage() {
           <div className="flex items-center gap-3 mb-6">
             <span className="block h-px w-10" style={{ backgroundColor: "var(--blood)" }} />
             <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-              The BWF Journal
+              Tunevio
             </span>
           </div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] text-bone heavy-shadow max-w-4xl">
@@ -164,7 +164,7 @@ function BlogPage() {
             <span style={{ color: "var(--blood)" }}>CULTURE</span> COMMENTARY.
           </h1>
           <p className="mt-6 text-bone/70 max-w-2xl text-base md:text-lg">
-            Long-form perspectives from the BWF Media TV editorial team, viral breakdowns,
+            Long-form perspectives from the Tunevio editorial team, viral breakdowns,
             artist conversations, and the strategy behind the content that moves culture.
           </p>
         </div>

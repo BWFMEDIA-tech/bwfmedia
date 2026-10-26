@@ -23,16 +23,16 @@ import { PlatformCapabilities } from "@/components/site/PlatformCapabilities";
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "Discover — BWF Network" },
+      { title: "Discover — Tunevio" },
       {
         name: "description",
         content:
-          "Browse, sign, get featured, and collaborate across the BWF Network. Everything you need to build your music career in one place.",
+          "Browse, sign, get featured, and collaborate across Tunevio. Everything you need to build your music career in one place.",
       },
-      { property: "og:title", content: "Discover — BWF Network" },
+      { property: "og:title", content: "Discover — Tunevio" },
       {
         property: "og:description",
-        content: "The next starts here. Browse, sign, get featured, and collab across the BWF Network.",
+        content: "The next starts here. Browse, sign, get featured, and collab across Tunevio.",
       },
     ],
   }),
@@ -149,7 +149,7 @@ function NetworkTile({
       />
       <div className="relative flex items-start justify-between">
         <div>
-          <div className="font-display text-[10px] tracking-[0.3em] text-bone/40 uppercase">BWF</div>
+          <div className="font-display text-[10px] tracking-[0.3em] text-bone/40 uppercase">Tunevio</div>
           <div className="font-display text-lg uppercase text-bone leading-tight">{label}</div>
         </div>
         <Icon size={20} className="text-blood" />
@@ -215,7 +215,7 @@ function DiscoverPage() {
               Browse. Sign. Get Featured. Collab.
             </p>
             <p className="mt-2 text-bone/60 text-sm max-w-md">
-              Everything you need to build your career across the BWF Network.
+              Everything you need to build your career across Tunevio.
             </p>
             <div className="mt-8 grid grid-cols-4 gap-4 max-w-md">
               <ActionPill icon={Search} label="Browse" sub="Find new talent" />
@@ -262,7 +262,7 @@ function DiscoverPage() {
           {/* Right: profile release CTA */}
           <aside className="rounded-2xl border border-white/10 bg-[#0d0d18]/85 backdrop-blur p-6 lg:mt-6">
             <div className="font-display text-xl uppercase text-bone leading-tight">
-              BWF Profile
+              Tunevio Profile
               <br />
               Release
             </div>
@@ -317,7 +317,7 @@ function DiscoverPage() {
 
           <PathCard
             title="Sign"
-            blurb="Join the BWF Network and start your journey."
+            blurb="Join Tunevio and start your journey."
             to="/pricing"
             cta="Sign Up Now"
             tone="blood"
@@ -375,7 +375,7 @@ function DiscoverPage() {
       <section className="max-w-7xl mx-auto px-6 md:px-12 py-12">
         <div className="flex items-end justify-between mb-6">
           <h2 className="font-cond font-bold tracking-[0.3em] text-sm md:text-base uppercase text-bone">
-            Across The BWF Network
+            Across Tunevio
           </h2>
           <RouterLink
             to="/"
@@ -451,7 +451,7 @@ function DiscoverPage() {
                 <div className="p-3">
                   <div className="font-semibold text-bone text-sm truncate">{v.title}</div>
                   <div className="text-[10px] text-bone/50 truncate uppercase tracking-widest font-cond">
-                    {v.artist || "BWF Artist"}
+                    {v.artist || "Tunevio Artist"}
                   </div>
                 </div>
               </RouterLink>

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/settings/payouts")({
   }),
   head: () => ({
     meta: [
-      { title: "Payouts — Artist Settings — BWF Network" },
+      { title: "Payouts — Artist Settings — Tunevio" },
       {
         name: "description",
         content:

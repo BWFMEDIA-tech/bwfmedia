@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Rebrand visible copy, metadata and public URLs to Tunevio; replace the specified contact email, preserve protected systems/accounts, and provide unpublished review reports.
 - [x] Add rejected-session recovery before Home authenticated requests; six recovery tests pass, signed-in Home loads without token/runtime errors and build OK. Original reported error not reproduced; not published.
 - [ ] Fix queued artist-profile artwork signing and local unsaved cover previews; test upload, save and refresh while preserving private-file restrictions.
 - [x] Add authenticated muted 15-second host-camera previews with thumbnail fallback, isolated receive-only identities and no inflated visitor counts; 28 tests and build pass. Signed-in Live card renders without errors; the available broadcast supplied no camera video, so real video playback/cutoff remains unverified.

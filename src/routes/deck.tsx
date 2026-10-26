@@ -15,10 +15,10 @@ import { getDeckContent } from "@/lib/deck-gate.functions";
 export const Route = createFileRoute("/deck")({
   head: () => ({
     meta: [
-      { title: "BWFMEDIA, Investor Pitch Deck" },
-      { name: "description", content: "BWFMEDIA Inc. investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
-      { property: "og:title", content: "BWFMEDIA, Investor Pitch Deck" },
-      { property: "og:description", content: "Real Content. Real People. Real Reach. Private investor presentation from BWFMEDIA Inc." },
+      { title: "Tunevio, Investor Pitch Deck" },
+      { name: "description", content: "Tunevio investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
+      { property: "og:title", content: "Tunevio, Investor Pitch Deck" },
+      { property: "og:description", content: "Real Content. Real People. Real Reach. Private investor presentation from Tunevio" },
     ],
   }),
   component: DeckPage,
@@ -60,7 +60,7 @@ function Slide({
             {number}, {label}
           </span>
           <span className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 hidden md:block">
-            BWFMEDIA · PITCH DECK
+            Tunevio · PITCH DECK
           </span>
         </div>
         <motion.div
@@ -110,9 +110,9 @@ function DeckNav() {
     <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur bg-black/70 border-b border-border">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
-          <img src={bwfLogo.url} alt="BWF Media" className="w-8 h-8 object-contain" />
+          <img src={bwfLogo.url} alt="Tunevio" className="w-8 h-8 object-contain" />
           <span className="font-display text-lg md:text-xl tracking-tight text-bone">
-            BWF MEDIA <span style={{ color: "var(--blood)" }}>TV</span>
+            Tunevio
           </span>
         </Link>
         <span className="hidden md:block font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-bone/60">
@@ -181,7 +181,7 @@ function Cover({ c }: { c: DeckData["cover"] }) {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
           <span className="font-cond font-bold tracking-[0.5em] text-xs uppercase text-bone/60">{c.eyebrow}</span>
           <h1 className="mt-8 font-display text-7xl md:text-[9rem] leading-[0.9] text-bone">
-            BWF<span style={{ color: "var(--blood)" }}>MEDIA</span>
+            Tunevio
             <br />INC.
             <span className="sr-only"> Investor Pitch Deck</span>
           </h1>
@@ -630,7 +630,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
         <div className="flex items-center justify-between mb-4 font-mono text-[10px] tracking-[0.35em] uppercase" style={{ color: HUD_GOLD }}>
           <div className="flex items-center gap-2">
             <Radio className="w-3 h-3" />
-            <span>BWF MEDIA TV</span>
+            <span>Tunevio</span>
           </div>
           <div className="flex items-center gap-2 text-bone/50">
             <span className="hidden sm:inline">Private &amp; Confidential</span>
@@ -644,7 +644,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
                 className="relative p-3"
                 style={{ border: `1px solid ${HUD_GOLD}66`, boxShadow: `0 0 30px ${HUD_GOLD}55` }}
               >
-                <img src={bwfLogo.url} alt="BWF Media" className="w-10 h-10 object-contain" />
+                <img src={bwfLogo.url} alt="Tunevio" className="w-10 h-10 object-contain" />
               </div>
             </div>
 
@@ -793,7 +793,7 @@ function DeckLeadForm({ onSubmitted }: { onSubmitted: () => void }) {
         </HudFrame>
 
         <p className="mt-6 text-center font-mono text-[10px] tracking-[0.4em] uppercase text-bone/35">
-          BWFMEDIA · Private &amp; Confidential · Do Not Distribute
+          Tunevio · Private &amp; Confidential · Do Not Distribute
         </p>
       </motion.div>
     </main>
@@ -849,7 +849,7 @@ function DeckGate({ onUnlock }: { onUnlock: (d: DeckData) => void }) {
                 className="relative p-3"
                 style={{ border: `1px solid ${HUD_GOLD}66`, boxShadow: `0 0 30px ${HUD_GOLD}55` }}
               >
-                <img src={bwfLogo.url} alt="BWF Media" className="w-10 h-10 object-contain" />
+                <img src={bwfLogo.url} alt="Tunevio" className="w-10 h-10 object-contain" />
               </div>
             </div>
 
@@ -922,7 +922,7 @@ function DeckGate({ onUnlock }: { onUnlock: (d: DeckData) => void }) {
         </HudFrame>
 
         <p className="mt-6 text-center font-mono text-[10px] tracking-[0.4em] uppercase text-bone/35">
-          BWFMEDIA · Private &amp; Confidential
+          Tunevio · Private &amp; Confidential
         </p>
       </motion.div>
     </main>

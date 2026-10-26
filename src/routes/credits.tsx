@@ -10,7 +10,7 @@ import { getBoostWallet, createBoostPackCheckout } from "@/lib/boost-economy.fun
 export const Route = createFileRoute("/credits")({
   head: () => ({
     meta: [
-      { title: "Boost Credits — BWF Network" },
+      { title: "Boost Credits — Tunevio" },
       { name: "description", content: "Buy boost credits to push your favorite tracks up the Play Arena leaderboard." },
     ],
   }),

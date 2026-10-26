@@ -97,7 +97,7 @@ export class MediaEngine {
     bitrateKbps: 0,
     resolution: "—",
     fps: 0,
-    platform: "BWF Network",
+    platform: "Tunevio",
     errors: [],
     stagePublishing: false,
     broadcastPublishing: false,

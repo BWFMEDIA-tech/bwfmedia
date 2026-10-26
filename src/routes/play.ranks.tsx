@@ -34,11 +34,11 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/play/ranks")({
   head: () => ({
     meta: [
-      { title: "Rank Progression — BWF Play Arena" },
+      { title: "Rank Progression — Tunevio Play Arena" },
       {
         name: "description",
         content:
-          "Climb the ranks. Activate power-ups. Earn XP by performing, engaging and winning battles in the BWF Play Arena.",
+          "Climb the ranks. Activate power-ups. Earn XP by performing, engaging and winning battles in the Tunevio Play Arena.",
       },
     ],
   }),
@@ -52,7 +52,7 @@ const RANKS = [
   { icon: Diamond, label: "DIAMOND STAR", floor: 10000, cap: 25000, range: "10,000 – 24,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#0000FF]/20", note: "Elite status. Consistent performance and strong fan support." },
   { icon: Crown, label: "PLATINUM ICON", floor: 25000, cap: 50000, range: "25,000 – 49,999 XP", color: "text-[#0000FF]", bg: "from-[#0000FF]/30 to-[#00E6FF]/20", note: "Recognized across the platform. A true standout artist." },
   { icon: Star, label: "SUPERSTAR", floor: 50000, cap: 100000, range: "50,000 – 99,999 XP", color: "text-[#00E6FF]", bg: "from-[#00E6FF]/30 to-[#0000FF]/20", note: "Massive reach. Dominating battles, streams, and engagement." },
-  { icon: Sparkles, label: "LEGEND", floor: 100000, cap: null as number | null, range: "100,000+ XP", color: "text-[#0000FF]", bg: "from-[#0000FF]/40 to-[#00E6FF]/20", note: "Invite Only · Top 1% of BWF NETWORK performers." },
+  { icon: Sparkles, label: "LEGEND", floor: 100000, cap: null as number | null, range: "100,000+ XP", color: "text-[#0000FF]", bg: "from-[#0000FF]/40 to-[#00E6FF]/20", note: "Invite Only · Top 1% of Tunevio performers." },
 ];
 
 const XP_RULES = [

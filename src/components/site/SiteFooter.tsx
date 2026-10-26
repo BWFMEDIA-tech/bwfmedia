@@ -31,7 +31,7 @@ const menuGroups: Array<{
     title: "Company",
     links: [
       { label: "Home", to: "/" },
-      { label: "Why BWF", href: "/#why" },
+      { label: "Why Tunevio", href: "/#why" },
       { label: "Audience", href: "/#audience" },
       { label: "Contact", to: "/contact" },
       { label: "Blog", to: "/blog" },
@@ -89,11 +89,11 @@ export function SiteFooter({ fullWidth = false }: { fullWidth?: boolean }) {
           </p>
           <div className="mt-6 space-y-3">
             <a
-              href="mailto:bookings@bwfmedia.company"
+              href="mailto:tunevioapp@gmail.com"
               className="flex items-center gap-2 text-sm text-bone/60 hover:text-blood transition-colors"
             >
               <Mail size={14} className="text-blood" />
-              bookings@bwfmedia.company
+              tunevioapp@gmail.com
             </a>
             <div className="flex items-start gap-2 text-sm text-bone/60">
               <MapPin size={14} className="text-blood mt-0.5" />
@@ -161,7 +161,7 @@ export function SiteFooter({ fullWidth = false }: { fullWidth?: boolean }) {
             ))}
           </div>
           <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-bone/40 text-center sm:text-right">
-            © {new Date().getFullYear()} BWF Media TV — All rights reserved
+            © {new Date().getFullYear()} Tunevio — All rights reserved
           </div>
         </div>
       </div>

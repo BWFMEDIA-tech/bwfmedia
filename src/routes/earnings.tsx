@@ -18,7 +18,7 @@ import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
 export const Route = createFileRoute("/earnings")({
   head: () => ({
     meta: [
-      { title: "Revenue Dashboard — BWF Network" },
+      { title: "Revenue Dashboard — Tunevio" },
       {
         name: "description",
         content:

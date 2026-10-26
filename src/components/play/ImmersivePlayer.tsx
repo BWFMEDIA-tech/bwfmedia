@@ -29,7 +29,7 @@ import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { usePlayer } from "@/lib/player-context";
 
 /* ============================================================
-   Brand palette (BWF):
+   Brand palette (Tunevio):
    purple #0000FF · magenta #00E6FF · cyan #00E6FF · blue #0000FF
 ============================================================ */
 

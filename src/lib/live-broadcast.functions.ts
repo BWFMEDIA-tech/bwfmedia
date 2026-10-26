@@ -39,7 +39,7 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     const hostName =
       hostProfile?.stage_name || hostProfile?.display_name || "A Tunevio host";
     const link = `/stream/${stream.room_name}`;
-    const streamUrl = `https://bwfnetwork.com${link}`;
+    const streamUrl = `https://tunevio.com${link}`;
 
     // 2. Build recipient list: every profile except the host.
     const { data: profiles } = await supabaseAdmin

@@ -63,7 +63,7 @@ function AnalyticsPage() {
         <h1 className="mt-4 text-3xl font-bold flex items-center gap-3">
           <BarChart3 className="h-7 w-7 text-violet-400" /> Global Analytics
         </h1>
-        <p className="mt-1 text-white/55">Network-wide performance across BWFMedia, BWFPLAY, and Triesent.</p>
+        <p className="mt-1 text-white/55">Network-wide performance across Tunevio, BWFPLAY, and Triesent.</p>
 
         {loading || !data ? (
           <p className="mt-12 text-white/50">Loading metrics…</p>

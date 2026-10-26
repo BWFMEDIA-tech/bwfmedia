@@ -26,7 +26,7 @@ function Dashboard() {
     <>
       <PageHeader
         title="Dashboard"
-        subtitle={`Welcome back, ${auth.displayName || "Admin"}! Here's what's happening on BWF Network.`}
+        subtitle={`Welcome back, ${auth.displayName || "Admin"}! Here's what's happening on Tunevio.`}
       />
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

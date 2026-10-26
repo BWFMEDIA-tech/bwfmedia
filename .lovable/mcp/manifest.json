@@ -13,13 +13,13 @@
     "server": {
       "name": "tunevio-mcp",
       "version": "0.1.0",
-      "title": "Tunevio / BWF Network"
+      "title": "Tunevio"
     },
     "tools": [
       {
         "name": "about_tunevio",
-        "title": "About Tunevio / BWF Network",
-        "description": "Return a short description of Tunevio (BWF Network) — the music, media, and creator platform this MCP server exposes.",
+        "title": "About Tunevio",
+        "description": "Return a short description of Tunevio — the music, media, and creator platform this MCP server exposes.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,

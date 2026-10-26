@@ -17,27 +17,27 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 export const Route = createFileRoute("/network")({
   head: () => ({
     meta: [
-      { title: "BWF Network | Music Streaming, Live Artist Battles & Monetization Platform" },
+      { title: "Tunevio | Music Streaming, Live Artist Battles & Monetization Platform" },
       {
         name: "description",
         content:
-          "BWF Network is a next-generation music streaming platform for independent artists featuring live streaming, real-time rankings, fan engagement, and artist monetization tools.",
+          "Tunevio is a next-generation music streaming platform for independent artists featuring live streaming, real-time rankings, fan engagement, and artist monetization tools.",
       },
       {
         name: "keywords",
         content:
           "music streaming platform, independent music platform, live music streaming, artist monetization platform, music discovery platform, creator economy platform, live artist battles, earn money from music",
       },
-      { property: "og:title", content: "BWF Network | Music Streaming, Live Artist Battles & Monetization Platform" },
+      { property: "og:title", content: "Tunevio | Music Streaming, Live Artist Battles & Monetization Platform" },
       {
         property: "og:description",
         content:
           "Discover, stream, and support independent artists through live music streaming, real-time rankings, and creator monetization tools.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfnetwork.com/network" },
+      { property: "og:url", content: "https://tunevio.com/network" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/network" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/network" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/network")({
           mainEntity: [
             {
               "@type": "Question",
-              name: "What is BWF Network?",
+              name: "What is Tunevio?",
               acceptedAnswer: {
                 "@type": "Answer",
                 text: "A live music streaming and monetization platform for independent artists.",
@@ -128,7 +128,7 @@ const features = [
 ];
 
 const faqs = [
-  { q: "What is BWF Network?", a: "A live music streaming and monetization platform for independent artists." },
+  { q: "What is Tunevio?", a: "A live music streaming and monetization platform for independent artists." },
   { q: "How do artists earn money?", a: "Through tips, boosts, subscriptions, and merch sales — tracked and paid in real time." },
   { q: "Is it free for listeners?", a: "Yes, with optional premium features for deeper access and perks." },
   { q: "What is live ranking?", a: "A real-time system that ranks artists based on audience engagement and boost activity." },
@@ -158,7 +158,7 @@ function NetworkPage() {
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-6">
               <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
               <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
-                BWF Network
+                Tunevio
               </span>
             </div>
             <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9] uppercase text-bone">
@@ -206,10 +206,10 @@ function NetworkPage() {
             <div className="max-w-3xl">
               <Kicker>About</Kicker>
               <h2 className="font-display text-3xl md:text-5xl uppercase text-bone leading-[0.95]">
-                What is BWF Network?
+                What is Tunevio?
               </h2>
               <p className="mt-5 text-bone/70 text-base md:text-lg leading-relaxed">
-                BWF Network is a music streaming and creator economy platform designed for
+                Tunevio is a music streaming and creator economy platform designed for
                 independent artists to grow, perform live, and monetize their audience through
                 tips, boosts, subscriptions, and merch.
               </p>
@@ -319,7 +319,7 @@ function NetworkPage() {
                 Music Platform.
               </h2>
               <p className="mt-5 text-bone/70 text-base md:text-lg leading-relaxed">
-                Built as a hybrid of Spotify and Twitch, BWF Network is redefining how artists
+                Built as a hybrid of Spotify and Twitch, Tunevio is redefining how artists
                 are discovered, ranked, and monetized in the creator economy.
               </p>
             </div>
@@ -357,7 +357,7 @@ function NetworkPage() {
               <div>
                 <Kicker>Get On Stage</Kicker>
                 <h3 className="font-display text-2xl md:text-3xl uppercase text-bone leading-tight">
-                  Ready to go live on BWF Network?
+                  Ready to go live on Tunevio?
                 </h3>
               </div>
               <RouterLink
