@@ -30,7 +30,7 @@ const CheckoutCancellation = ({
           <Section style={brandBar}>
             <Text style={brandText}>
               <span style={{ color: '#000' }}>Tunevio</span>
-              
+
             </Text>
             <Text style={tagline}>// Checkout // Paused</Text>
           </Section>

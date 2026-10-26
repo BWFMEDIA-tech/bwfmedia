@@ -172,7 +172,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
           <div className="text-xl font-black tracking-tight">
             <span className="text-white">Tunevio</span>
-            
+
           </div>
         </div>
         <div className="shrink-0 px-4 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">

@@ -16,9 +16,9 @@ export const Route = createFileRoute("/deck")({
   head: () => ({
     meta: [
       { title: "Tunevio, Investor Pitch Deck" },
-      { name: "description", content: "Tunevio Inc. investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
+      { name: "description", content: "Tunevio investor pitch deck. 687M+ views, 325K+ subscribers. Real Content. Real People. Real Reach." },
       { property: "og:title", content: "Tunevio, Investor Pitch Deck" },
-      { property: "og:description", content: "Real Content. Real People. Real Reach. Private investor presentation from Tunevio Inc." },
+      { property: "og:description", content: "Real Content. Real People. Real Reach. Private investor presentation from Tunevio" },
     ],
   }),
   component: DeckPage,

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/dmca")({
 function DmcaPage() {
   return (
     <LegalPage title="DMCA Policy" effectiveDate="June 15, 2026">
-      <p>Tunevio ("Tunevio") respects the intellectual property rights of others and expects the same of its users. This DMCA Policy explains how to notify us of alleged copyright infringement on the Services in accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512).</p>
+      <p>Tunevio respects the intellectual property rights of others and expects the same of its users. This DMCA Policy explains how to notify us of alleged copyright infringement on the Services in accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512).</p>
 
       <h2>1. Filing a DMCA Takedown Notice</h2>
       <p>If you believe that content on the Platform infringes your copyright, send a written notice to our Designated Copyright Agent that includes:</p>

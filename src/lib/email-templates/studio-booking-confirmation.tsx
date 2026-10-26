@@ -33,7 +33,7 @@ const StudioBookingConfirmation = ({
         <Section style={brandBar}>
           <Text style={brandText}>
             <span style={{ color: '#000' }}>Tunevio</span>
-            
+
           </Text>
           <Text style={tagline}>Studio Booking · Request Received</Text>
         </Section>

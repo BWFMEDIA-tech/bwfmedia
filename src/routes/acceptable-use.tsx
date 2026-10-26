@@ -20,7 +20,7 @@ function AcceptableUsePage() {
     <LegalPage title="Acceptable Use Policy & Terms of Service" effectiveDate="October 20, 2026">
       <p>
         Tunevio is a music streaming, artist-discovery, live-streaming and creator-engagement platform that connects
-        independent artists, music creators, listeners and fans. Tunevio is operated by BWFMEDIA.
+        independent artists, music creators, listeners and fans.
       </p>
       <p>
         This Acceptable Use Policy and Terms of Service ("Policy") explains the rules that apply when accessing or

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/cookie-policy")({
 function CookiePage() {
   return (
     <LegalPage title="Cookie Policy" effectiveDate="June 15, 2026">
-      <p>This Cookie Policy explains how Tunevio ("Tunevio") uses cookies and similar tracking technologies when you visit our Services.</p>
+      <p>This Cookie Policy explains how Tunevio uses cookies and similar tracking technologies when you visit our Services.</p>
 
       <h2>1. What Are Cookies?</h2>
       <p>Cookies are small text files stored on your device when you visit a website. They allow the site to recognize your device, remember preferences, and improve your experience.</p>

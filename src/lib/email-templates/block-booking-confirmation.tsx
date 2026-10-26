@@ -31,7 +31,7 @@ const BlockBookingConfirmation = ({
         <Section style={brandBar}>
           <Text style={brandText}>
             <span style={{ color: '#000' }}>Tunevio</span>
-            
+
           </Text>
           <Text style={tagline}>Off The Block · Request Received</Text>
         </Section>

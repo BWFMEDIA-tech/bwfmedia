@@ -170,9 +170,9 @@ function VideosPage() {
   const rows = [
     { title: "Trending Music Videos", items: music },
     { title: "New Releases", items: music },
-    { title: "Tunevio Originals", items: filtered.filter(v => matches(v, /(?:tunevio|Tunevio)\s+original/i)) },
+    { title: "Tunevio Originals", items: filtered.filter(v => matches(v, /(?:tunevio|bwf)\s+original/i)) },
     { title: "Live Performances", items: music.filter(v => matches(v, /\blive\b|performance|concert|session/i)) },
-    { title: "Underground Spotlight", items: music.filter(v => !matches(v, /(?:tunevio|Tunevio)\s+original|\blive\b|concert/i)) },
+    { title: "Underground Spotlight", items: music.filter(v => !matches(v, /(?:tunevio|bwf)\s+original|\blive\b|concert/i)) },
     { title: "Sponsored & Partners", items: filtered.filter(v => v.category === "sponsored") },
   ];
   return <div className="video-cinema min-h-screen bg-background text-foreground font-body">

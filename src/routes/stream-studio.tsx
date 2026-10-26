@@ -201,7 +201,6 @@ function Sidebar() {
         <div className="text-2xl font-black tracking-tight">
           <span className="text-white">Tunevio</span>
         </div>
-        <span className="text-[10px] tracking-[0.3em] text-white/50">NETWORK</span>
       </Link>
 
       <button

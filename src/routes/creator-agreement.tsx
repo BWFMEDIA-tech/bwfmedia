@@ -14,7 +14,7 @@ export const Route = createFileRoute("/creator-agreement")({
 function CreatorAgreementPage() {
   return (
     <LegalPage title="Creator Agreement" effectiveDate="June 15, 2026">
-      <p>This Creator Agreement ("Agreement") is entered into between Tunevio ("Tunevio") and any individual or entity ("Creator") who creates a profile, uploads content, monetizes work, or otherwise participates in the Tunevio platform.</p>
+      <p>This Creator Agreement ("Agreement") is entered into between Tunevio and any individual or entity ("Creator") who creates a profile, uploads content, monetizes work, or otherwise participates in the Tunevio platform.</p>
 
       <h2>1. Eligibility</h2>
       <p>Creators must be at least 18 years of age and legally able to enter into binding contracts in their jurisdiction.</p>

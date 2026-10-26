@@ -27,12 +27,12 @@ export const Route = createFileRoute("/discover")({
       {
         name: "description",
         content:
-          "Browse, sign, get featured, and collaborate across the Tunevio. Everything you need to build your music career in one place.",
+          "Browse, sign, get featured, and collaborate across Tunevio. Everything you need to build your music career in one place.",
       },
       { property: "og:title", content: "Discover — Tunevio" },
       {
         property: "og:description",
-        content: "The next starts here. Browse, sign, get featured, and collab across the Tunevio.",
+        content: "The next starts here. Browse, sign, get featured, and collab across Tunevio.",
       },
     ],
   }),
@@ -215,7 +215,7 @@ function DiscoverPage() {
               Browse. Sign. Get Featured. Collab.
             </p>
             <p className="mt-2 text-bone/60 text-sm max-w-md">
-              Everything you need to build your career across the Tunevio.
+              Everything you need to build your career across Tunevio.
             </p>
             <div className="mt-8 grid grid-cols-4 gap-4 max-w-md">
               <ActionPill icon={Search} label="Browse" sub="Find new talent" />
@@ -317,7 +317,7 @@ function DiscoverPage() {
 
           <PathCard
             title="Sign"
-            blurb="Join the Tunevio and start your journey."
+            blurb="Join Tunevio and start your journey."
             to="/pricing"
             cta="Sign Up Now"
             tone="blood"
@@ -375,7 +375,7 @@ function DiscoverPage() {
       <section className="max-w-7xl mx-auto px-6 md:px-12 py-12">
         <div className="flex items-end justify-between mb-6">
           <h2 className="font-cond font-bold tracking-[0.3em] text-sm md:text-base uppercase text-bone">
-            Across The Tunevio
+            Across Tunevio
           </h2>
           <RouterLink
             to="/"

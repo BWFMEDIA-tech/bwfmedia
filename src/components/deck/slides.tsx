@@ -702,7 +702,7 @@ export function Slide13() {
           ))}
         </div>
         <motion.div {...fade(0.65)} className="mt-10 max-w-4xl text-bone/60 text-xl leading-relaxed">
-          Tunevio's existing audience gives Tunevio a built-in foundation of creators, viewers and engaged fans.
+          Tunevio's existing audience provides a built-in foundation of creators, viewers and engaged fans.
         </motion.div>
       </div>
     </SlideShell>

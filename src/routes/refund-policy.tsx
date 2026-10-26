@@ -14,7 +14,7 @@ export const Route = createFileRoute("/refund-policy")({
 function RefundPage() {
   return (
     <LegalPage title="Refund & Cancellation Policy" effectiveDate="June 15, 2026">
-      <p>This Refund Policy applies to bookings, memberships, and paid services purchased through Tunevio ("Tunevio").</p>
+      <p>This Refund Policy applies to bookings, memberships, and paid services purchased through Tunevio.</p>
 
       <h2>1. Studio Bookings</h2>
       <ul>

@@ -98,7 +98,7 @@ function NetworkStreamsPage() {
         <h1 className="mt-4 text-3xl font-bold flex items-center gap-3">
           <Radio className="h-7 w-7 text-violet-400" /> Network Streams
         </h1>
-        <p className="mt-1 text-white/55">Manage every live and archived broadcast across BWFNetwork.</p>
+        <p className="mt-1 text-white/55">Manage every live and archived broadcast across Tunevio.</p>
 
         <div className="mt-6 flex flex-wrap items-center gap-2">
           {(["live", "ended", "all"] as const).map((t) => (

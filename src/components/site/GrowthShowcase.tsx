@@ -78,7 +78,7 @@ const MILESTONES = [
   "Off The Block hits #1 in cultural commentary",
   "Tunevio Red Mic ranked top podcast on iHeart",
   "2.3M new views in the last 7 days",
-  "787K comments across the Tunevio",
+  "787K comments across Tunevio",
 ];
 
 const PARTNERS = [

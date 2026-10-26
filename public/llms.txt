@@ -13,4 +13,4 @@
 
 ## Optional
 
-- [Investor Deck](/deck): Tunevio Inc. investor pitch deck (passphrase protected).
+- [Investor Deck](/deck): Tunevio investor pitch deck (passphrase protected).

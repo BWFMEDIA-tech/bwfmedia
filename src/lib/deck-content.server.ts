@@ -56,7 +56,7 @@ export const DECK_CONTENT = {
       "Original Shows & Interviews",
       "Music Video Distribution",
       "Advertising & Marketing Services",
-      "Tunevio Network",
+      "Tunevio",
     ],
   },
   market: {

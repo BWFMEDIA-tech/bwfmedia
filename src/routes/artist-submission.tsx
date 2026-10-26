@@ -14,7 +14,7 @@ export const Route = createFileRoute("/artist-submission")({
 function ArtistSubmissionPage() {
   return (
     <LegalPage title="Artist Submission Terms" effectiveDate="June 15, 2026">
-      <p>By submitting music, videos, images, promotional materials, or other content ("Submission") to Tunevio ("Tunevio") for consideration, review, placement, interview, or promotion, you agree to these Artist Submission Terms.</p>
+      <p>By submitting music, videos, images, promotional materials, or other content ("Submission") to Tunevio for consideration, review, placement, interview, or promotion, you agree to these Artist Submission Terms.</p>
 
       <h2>1. Ownership and Rights</h2>
       <p>You represent that you own or control all rights necessary to submit the material, including master recording, composition, sync, performance, and likeness rights. You retain ownership of your Submission.</p>

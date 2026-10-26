@@ -100,7 +100,7 @@ function PrivacyPage() {
       </ul>
 
       <h2>14. Contact Us</h2>
-      <p>Tunevio<br />Email: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a><br />Website: bwfnetwork.com</p>
+      <p>Tunevio<br />Email: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a><br />Website: https://tunevio.com</p>
 
       <h2>15. Changes to This Privacy Policy</h2>
       <p>We may update this Privacy Policy periodically. Changes will be posted with an updated Effective Date. Continued use of the Services constitutes acceptance of the revised Privacy Policy.</p>

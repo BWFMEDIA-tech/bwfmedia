@@ -156,7 +156,7 @@ function BlogPage() {
           <div className="flex items-center gap-3 mb-6">
             <span className="block h-px w-10" style={{ backgroundColor: "var(--blood)" }} />
             <span className="font-cond font-bold tracking-[0.4em] text-xs uppercase" style={{ color: "var(--blood)" }}>
-              The Tunevio
+              Tunevio
             </span>
           </div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] text-bone heavy-shadow max-w-4xl">
