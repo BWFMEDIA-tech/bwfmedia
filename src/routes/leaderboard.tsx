@@ -16,10 +16,10 @@ const leaderboardQuery = queryOptions({
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
-      { title: "Artist Leaderboard — BWF Network" },
-      { name: "description", content: "The top artists on BWF Network ranked by XP, battle wins, and audience votes. Climb the ranks." },
-      { property: "og:title", content: "Artist Leaderboard — BWF Network" },
-      { property: "og:description", content: "The top artists on BWF Network ranked by XP, battle wins, and audience votes." },
+      { title: "Artist Leaderboard — Tunevio" },
+      { name: "description", content: "The top artists on Tunevio ranked by XP, battle wins, and audience votes. Climb the ranks." },
+      { property: "og:title", content: "Artist Leaderboard — Tunevio" },
+      { property: "og:description", content: "The top artists on Tunevio ranked by XP, battle wins, and audience votes." },
     ],
   }),
   errorComponent: ({ error }) => (

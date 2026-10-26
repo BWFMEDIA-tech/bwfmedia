@@ -10,7 +10,7 @@ import { getAdminProfile, updateAdminProfile, getAdminOverview } from "@/lib/adm
 import { SignedImg } from "@/components/ui/signed-img";
 
 export const Route = createFileRoute("/admin/profile")({
-  head: () => ({ meta: [{ title: "Admin Profile — BWF Network" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin Profile — Tunevio" }, { name: "robots", content: "noindex" }] }),
   component: AdminProfilePage,
 });
 

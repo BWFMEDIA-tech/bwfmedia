@@ -50,7 +50,7 @@ function ReturnPage() {
         {status === 'paid' && (<>
           <CheckCircle2 className="w-14 h-14 mx-auto mb-4 text-emerald-500" />
           <h1 className="text-3xl font-semibold mb-2">Booking confirmed{name ? `, ${name.split(' ')[0]}` : ''}!</h1>
-          <p className="text-muted-foreground mb-6">We've received your payment. The BWF team will reach out to confirm the schedule.</p>
+          <p className="text-muted-foreground mb-6">We've received your payment. The Tunevio team will reach out to confirm the schedule.</p>
           <Button asChild><Link to="/">Back to home</Link></Button>
         </>)}
         {status === 'pending' && (<>

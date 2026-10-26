@@ -518,15 +518,15 @@ function ProfileSettingsPage() {
 }
 
 const SAMPLE_EVENTS = [
-  { month: "JUN", day: "21", title: "BWF Live Concert", location: "Atlanta, GA", time: "8:00 PM" },
+  { month: "JUN", day: "21", title: "Tunevio Live Concert", location: "Atlanta, GA", time: "8:00 PM" },
   { month: "JUL", day: "13", title: "Summer Jam 2024", location: "Miami, FL", time: "7:00 PM" },
   { month: "AUG", day: "03", title: "Indie Artist Showcase", location: "Nashville, TN", time: "9:00 PM" },
 ];
 const SAMPLE_MERCH = [
-  { name: "BWF Hoodie", price: "$49.99" },
-  { name: "BWF Tee", price: "$29.99" },
-  { name: "BWF Hat", price: "$24.99" },
-  { name: "BWF Chain", price: "$79.99" },
+  { name: "Tunevio Hoodie", price: "$49.99" },
+  { name: "Tunevio Tee", price: "$29.99" },
+  { name: "Tunevio Hat", price: "$24.99" },
+  { name: "Tunevio Chain", price: "$79.99" },
 ];
 
 function DateBlock({ month, day }: { month: string; day: string }) {

@@ -502,7 +502,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         />
         <p className="-mt-1 mb-3 text-[10px] leading-snug text-white/40">
           Moderators monitor live rooms, remove inappropriate users, handle reports, stop harassment,
-          monitor cheating, enforce community rules, and assist hosts. Moderators are assigned by BWF admins.
+          monitor cheating, enforce community rules, and assist hosts. Moderators are assigned by Tunevio admins.
         </p>
         <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
           {allModerators.slice(0, MAX_MODS).map((m) => {

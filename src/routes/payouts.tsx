@@ -23,7 +23,7 @@ import {
 export const Route = createFileRoute("/payouts")({
   head: () => ({
     meta: [
-      { title: "Payouts — BWF Network" },
+      { title: "Payouts — Tunevio" },
       {
         name: "description",
         content:

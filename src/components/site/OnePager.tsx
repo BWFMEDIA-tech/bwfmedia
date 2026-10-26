@@ -194,7 +194,7 @@ function VideosRow({ videos }: { videos: any[] }) {
                 <div className="p-3">
                   <div className="font-semibold text-bone text-sm truncate">{v.title}</div>
                   <div className="text-[11px] text-bone/50 truncate uppercase tracking-widest font-cond">
-                    {v.artist || "BWF Artist"}
+                    {v.artist || "Tunevio Artist"}
                   </div>
                 </div>
               </RouterLink>
@@ -258,7 +258,7 @@ function BookShoot() {
             <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between">
               <div>
                 <div className="font-cond tracking-[0.3em] text-[10px] uppercase text-blood">By Appointment</div>
-                <div className="font-display text-2xl uppercase text-bone">BWF Studio</div>
+                <div className="font-display text-2xl uppercase text-bone">Tunevio Studio</div>
               </div>
               <RouterLink
                 to="/studio"
@@ -289,7 +289,7 @@ function FollowStrip() {
     <section className="border-t border-blood/20 bg-gradient-to-b from-black to-[#0a0405]">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-14 grid md:grid-cols-[1fr_auto] items-center gap-6">
         <div>
-          <div className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood mb-2">Follow BWF</div>
+          <div className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood mb-2">Follow Tunevio</div>
           <h3 className="font-display text-3xl md:text-4xl uppercase text-bone leading-tight">
             715M+ Views. 332K+ Subscribers. The culture is here.
           </h3>

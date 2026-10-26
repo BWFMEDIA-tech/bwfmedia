@@ -30,7 +30,7 @@ export const DECK_CONTENT = {
     cards: [
       { t: "Viral Media Platform", d: "Short-form, music, culture, virality." },
       { t: "Interview + Promo Engine", d: "Direct artist exposure & promotion." },
-      { t: "BWFMEDIA TV", d: "Streaming network for culture content." },
+      { t: "Tunevio", d: "Streaming network for culture content." },
     ],
     quote: "Think: an **independent Netflix + Tubi** for culture-driven content.",
   },
@@ -49,14 +49,14 @@ export const DECK_CONTENT = {
   },
   ecosystem: {
     kicker: "One brand, many surfaces",
-    title: "The full BWFMEDIA\nplatform.",
+    title: "The full Tunevio\nplatform.",
     items: [
       "YouTube + Social Channels",
       "Roku Streaming Channel",
       "Original Shows & Interviews",
       "Music Video Distribution",
       "Advertising & Marketing Services",
-      "BWFMEDIA TV Network",
+      "Tunevio Network",
     ],
   },
   market: {
@@ -66,7 +66,7 @@ export const DECK_CONTENT = {
       { big: "$100B+", label: "Creator Economy" },
       { big: "$500B+", label: "Streaming Industry" },
     ],
-    note: "Independent creators are **shifting away from labels** and toward direct monetization. BWFMEDIA sits at the intersection of both waves.",
+    note: "Independent creators are **shifting away from labels** and toward direct monetization. Tunevio sits at the intersection of both waves.",
   },
   business: {
     kicker: "Multiple revenue streams",
@@ -88,7 +88,7 @@ export const DECK_CONTENT = {
       { t: "Netflix", d: "Content" },
       { t: "Tubi", d: "Free Streaming" },
     ],
-    quote: "BWFMEDIA = **all three** + a [[culture niche]] + a proven **viral engine**.",
+    quote: "Tunevio = **all three** + a [[culture niche]] + a proven **viral engine**.",
   },
   growth: {
     kicker: "How we scale from here",
@@ -96,7 +96,7 @@ export const DECK_CONTENT = {
     bullets: [
       "Scale viral content production across all platforms",
       "Expand artist partnerships and exclusive interviews",
-      "Launch the full BWFMEDIA TV streaming platform",
+      "Launch the full Tunevio streaming platform",
       "Paid ad amplification on top-performing content",
       "Influencer collaborations to expand reach",
     ],
@@ -116,7 +116,7 @@ export const DECK_CONTENT = {
     title: "Raising\n[[$500K – $1M.]]",
     uses: [
       "Content production & studio infrastructure",
-      "Platform development (BWFMEDIA TV)",
+      "Platform development (Tunevio)",
       "Marketing & paid ad amplification",
       "Team expansion (editors, producers, sales)",
     ],

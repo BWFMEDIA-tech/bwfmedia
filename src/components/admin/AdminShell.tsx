@@ -171,8 +171,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-5">
 
           <div className="text-xl font-black tracking-tight">
-            <span className="text-white">BWF</span>
-            <span className="ml-1 text-[10px] font-bold tracking-[0.3em] text-violet-400">NETWORK</span>
+            <span className="text-white">Tunevio</span>
+            
           </div>
         </div>
         <div className="shrink-0 px-4 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400">
@@ -289,7 +289,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="mx-3 mt-2 mb-3 shrink-0 rounded-xl border border-blue-500/30 bg-gradient-to-br from-blue-600/15 to-violet-600/10 p-4">
 
           <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-blue-300">
-            <Crown className="h-3 w-3" /> BWF PRO ADMIN
+            <Crown className="h-3 w-3" /> Tunevio PRO ADMIN
           </div>
           <div className="mt-1 text-xs text-white/70">Manage your network like a pro.</div>
           <Link to="/admin/settings" className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-bold hover:bg-blue-500">

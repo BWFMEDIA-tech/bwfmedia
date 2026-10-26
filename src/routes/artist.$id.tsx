@@ -67,7 +67,7 @@ export const Route = createFileRoute("/artist/$id")({
     const name = loaderData?.name?.trim() || "Artist Profile";
     const title = `${name} — TUNEVIO`;
     const desc = `Stream ${name}'s music, watch live sessions, support with tips, and join the community on TUNEVIO — the creator-powered entertainment platform.`;
-    const url = `https://bwfnetwork.com/artist/${params.id}`;
+    const url = `https://tunevio.com/artist/${params.id}`;
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },

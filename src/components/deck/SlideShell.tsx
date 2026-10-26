@@ -78,7 +78,7 @@ export function SlideShell({
         <div className="flex items-center gap-3">
           <img src={logo.url} alt="Tunevio" className="w-28 h-auto object-contain" />
           <span className="font-cond font-bold tracking-[0.3em] text-xs uppercase text-bone/80">
-            BWF Media TV
+            Tunevio
           </span>
         </div>
         {label && (

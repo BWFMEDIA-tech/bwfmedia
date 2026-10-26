@@ -66,7 +66,7 @@ function UnsubscribePage() {
             <>
               <h1 className="font-display text-4xl uppercase">Unsubscribe?</h1>
               <p className="mt-4 text-bone/75">
-                Confirm to stop receiving emails from <span style={{ color: GOLD }}>BWF Media</span>.
+                Confirm to stop receiving emails from <span style={{ color: GOLD }}>Tunevio</span>.
               </p>
               <button
                 onClick={handleConfirm}

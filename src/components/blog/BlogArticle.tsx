@@ -17,7 +17,7 @@ export function BlogArticle({ category, title, date, readTime, intro, children }
       <header className="border-b border-border">
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
           <Link to="/" className="font-display text-xl tracking-tight text-bone hover:opacity-80">
-            BWF<span style={{ color: "var(--blood)" }}>™</span>
+            Tunevio<span style={{ color: "var(--blood)" }}>™</span>
           </Link>
           <nav className="flex items-center gap-6 font-cond font-bold tracking-[0.25em] text-[11px] uppercase">
             <Link to="/" className="text-bone/70 hover:text-bone transition-colors">Home</Link>

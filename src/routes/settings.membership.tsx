@@ -24,7 +24,7 @@ function MembershipPage() {
   if (loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-white/60" /></div>;
 
   return (
-    <SettingsShell title="Membership" blurb="Your BWF plan and perks.">
+    <SettingsShell title="Membership" blurb="Your Tunevio plan and perks.">
       <Card>
         <div className="flex items-center gap-4">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-red-600 to-purple-600"><Crown className="h-6 w-6 text-white" /></div>

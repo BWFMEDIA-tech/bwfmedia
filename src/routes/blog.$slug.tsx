@@ -8,10 +8,10 @@ import { useAuth } from "@/lib/auth-context";
 export const Route = createFileRoute("/blog/$slug")({
   head: () => ({
     meta: [
-      { title: "Blog Post — BWF Media TV" },
-      { name: "description", content: "Read the latest story from the BWF Media TV blog." },
-      { property: "og:title", content: "BWF Media TV Blog Post" },
-      { property: "og:description", content: "Interviews, guides, and culture commentary from BWF Media TV." },
+      { title: "Blog Post — Tunevio" },
+      { name: "description", content: "Read the latest story from the Tunevio blog." },
+      { property: "og:title", content: "Tunevio Blog Post" },
+      { property: "og:description", content: "Interviews, guides, and culture commentary from Tunevio." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -30,7 +30,7 @@ function BlogPostPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (post) document.title = `${post.title} — BWF Media TV`;
+    if (post) document.title = `${post.title} — Tunevio`;
   }, [post]);
 
   if (post === undefined) return <div className="min-h-screen bg-background p-12 text-bone/60">Loading…</div>;

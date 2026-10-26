@@ -26,7 +26,7 @@ function SettingsAdmin() {
         <Card>
           <Crown className="h-5 w-5 text-amber-400" />
           <div className="mt-3 font-bold">Plan & Billing</div>
-          <div className="mt-1 text-xs text-white/50">BWF PRO Admin — manage subscription.</div>
+          <div className="mt-1 text-xs text-white/50">Tunevio PRO Admin — manage subscription.</div>
           <Link to="/settings/billing" className="mt-4 inline-flex rounded-md border border-white/10 px-3 py-1.5 text-xs hover:bg-white/5">Open</Link>
         </Card>
       </div>

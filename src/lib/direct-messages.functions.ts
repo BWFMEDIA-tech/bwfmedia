@@ -72,7 +72,7 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
         const recipientEmail = recipientAuth?.user?.email
         if (recipientEmail) {
           const senderName =
-            senderProfile?.display_name || 'Someone on BWF Network'
+            senderProfile?.display_name || 'Someone on Tunevio'
           const preview =
             data.body.length > 200 ? data.body.slice(0, 197) + '…' : data.body
           const { sendAndLog } = await import('@/lib/email-send-log')
@@ -82,7 +82,7 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
             templateData: {
               senderName,
               preview,
-              inboxUrl: 'https://bwfnetwork.com/messages',
+              inboxUrl: 'https://tunevio.com/messages',
             },
             idempotencyKey: `dm-${inserted.id}`,
           })

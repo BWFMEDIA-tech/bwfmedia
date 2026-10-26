@@ -21,12 +21,12 @@ import { Toaster } from "@/components/ui/sonner";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact BWF Media — Bookings & Partnerships" },
+      { title: "Contact Tunevio — Bookings & Partnerships" },
       {
         name: "description",
-        content: "Get in touch with BWF Media TV. Studio bookings, partnerships, press, and brand collaborations.",
+        content: "Get in touch with Tunevio. Studio bookings, partnerships, press, and brand collaborations.",
       },
-      { property: "og:title", content: "Contact BWF Media — Bookings & Partnerships" },
+      { property: "og:title", content: "Contact Tunevio — Bookings & Partnerships" },
       { property: "og:description", content: "Studio bookings, partnerships, press, and brand collaborations." },
     ],
   }),
@@ -62,7 +62,7 @@ function ContactPage() {
     }
     setSubmitting(true);
     try {
-      const mail = `mailto:bookings@bwfmedia.company?subject=${encodeURIComponent(parsed.data.subject)}&body=${encodeURIComponent(
+      const mail = `mailto:tunevioapp@gmail.com?subject=${encodeURIComponent(parsed.data.subject)}&body=${encodeURIComponent(
         `${parsed.data.message}\n\n— ${parsed.data.name}\n${parsed.data.email}`,
       )}`;
       window.location.href = mail;
@@ -110,10 +110,10 @@ function ContactPage() {
           <div>
             <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-bone/40 mb-3">Email</div>
             <a
-              href="mailto:bookings@bwfmedia.company"
+              href="mailto:tunevioapp@gmail.com"
               className="inline-flex items-center gap-3 text-bone hover:text-blood transition-colors"
             >
-              <Mail size={18} /> bookings@bwfmedia.company
+              <Mail size={18} /> tunevioapp@gmail.com
             </a>
           </div>
           <div>

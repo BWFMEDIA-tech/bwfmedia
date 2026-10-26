@@ -17,14 +17,14 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/studio")({
   head: () => ({
     meta: [
-      { title: "BWF Media Studio - Studio Bookings Only" },
-      { name: "description", content: "Premium media production hub for artists & creators. Book studio time at BWF Media for interviews, music video content, podcast recording, and press sessions." },
-      { property: "og:title", content: "BWF Media Studio - Where Culture, Content & Creators Meet" },
+      { title: "Tunevio Studio - Studio Bookings Only" },
+      { name: "description", content: "Premium media production hub for artists & creators. Book studio time at Tunevio for interviews, music video content, podcast recording, and press sessions." },
+      { property: "og:title", content: "Tunevio Studio - Where Culture, Content & Creators Meet" },
       { property: "og:description", content: "Premium studio bookings for artists & creators. Professional sound, lighting, and brand-ready delivery." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfnetwork.com/studio" },
+      { property: "og:url", content: "https://tunevio.com/studio" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/studio" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/studio" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -34,14 +34,14 @@ export const Route = createFileRoute("/studio")({
           serviceType: "Media Production & Studio Bookings",
           provider: {
             "@type": "Organization",
-            name: "BWF Media TV",
-            url: "https://bwfnetwork.com",
+            name: "Tunevio",
+            url: "https://tunevio.com",
           },
           areaServed: "US",
-          name: "BWF Media Studio Bookings",
+          name: "Tunevio Studio Bookings",
           description:
             "Premium studio sessions for artist interviews, music video content, podcast recording, press, and social content packs.",
-          url: "https://bwfnetwork.com/studio",
+          url: "https://tunevio.com/studio",
         }),
       },
     ],
@@ -93,7 +93,7 @@ function StudioPage() {
         </motion.div>
         <div className="max-w-6xl mx-auto px-6 md:px-12">
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
-            BWF Media TV <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
+            Tunevio <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
           </div>
 
           <motion.h1
@@ -143,7 +143,7 @@ function StudioPage() {
               </div>
               <div className="flex-1">
                 <h2 className="font-cond font-bold tracking-[0.2em] text-base md:text-lg uppercase" style={{ color: GOLD }}>
-                  All Sessions Recorded At BWFMedia Studio
+                  All Sessions Recorded At Tunevio Studio
                 </h2>
                 <p className="mt-2 text-bone/75">We do not operate as a mobile setup for standard bookings.</p>
                 <div className="my-6 h-px" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)` }} />
@@ -167,11 +167,11 @@ function StudioPage() {
           <div className="mt-10">
             <VideoPlayer
               videos={[
-                { id: "TwEQ8rszojQ", title: "Jay Murkk: 12 Years Inside Angola Prison (New Orleans Story You Need to Hear) Part1", subtitle: "BWF Media Studio" },
-                { id: "2yIdA5Jp7vU", title: "The Return of Freeway Rick Ross: From Kingpin to Redemption", subtitle: "BWF Media Studio" },
-                { id: "LeMMMetmTT0", title: "PTSD: Blurring the Line Between Sane and Insane – KAHREE 003's Powerful Story", subtitle: "BWF Media Studio" },
-                { id: "xXBDvU2S9Es", title: "The Dark Rise of ProblemChild9: Musical Young Thugs' Untold Story", subtitle: "BWF Media Studio" },
-                { id: "41dClYGOS0s", title: "Surviving the 9th Ward: Speedy's Harrowing Tale of Blood and Resilience", subtitle: "BWF Media Studio" },
+                { id: "TwEQ8rszojQ", title: "Jay Murkk: 12 Years Inside Angola Prison (New Orleans Story You Need to Hear) Part1", subtitle: "Tunevio Studio" },
+                { id: "2yIdA5Jp7vU", title: "The Return of Freeway Rick Ross: From Kingpin to Redemption", subtitle: "Tunevio Studio" },
+                { id: "LeMMMetmTT0", title: "PTSD: Blurring the Line Between Sane and Insane – KAHREE 003's Powerful Story", subtitle: "Tunevio Studio" },
+                { id: "xXBDvU2S9Es", title: "The Dark Rise of ProblemChild9: Musical Young Thugs' Untold Story", subtitle: "Tunevio Studio" },
+                { id: "41dClYGOS0s", title: "Surviving the 9th Ward: Speedy's Harrowing Tale of Blood and Resilience", subtitle: "Tunevio Studio" },
               ]}
             />
           </div>
@@ -305,7 +305,7 @@ function StudioPage() {
         <section className="pt-10 grid md:grid-cols-2 gap-8">
           <HUDFrame className="p-7">
             <div className="font-display text-5xl md:text-6xl">
-              <span className="text-bone">BWF MEDIA </span><span style={{ color: GOLD }}>TV</span>
+              <span className="text-bone">Tunevio</span>
             </div>
             <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
               Where Culture Goes Viral

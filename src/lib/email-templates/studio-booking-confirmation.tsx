@@ -3,7 +3,7 @@ import {
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
-const SITE_NAME = 'BWF Media'
+const SITE_NAME = 'Tunevio'
 const GOLD = '#D4A24C'
 
 interface StudioBookingProps {
@@ -32,8 +32,8 @@ const StudioBookingConfirmation = ({
       <Container style={container}>
         <Section style={brandBar}>
           <Text style={brandText}>
-            <span style={{ color: '#000' }}>BWF MEDIA </span>
-            <span style={{ color: GOLD }}>TV</span>
+            <span style={{ color: '#000' }}>Tunevio</span>
+            
           </Text>
           <Text style={tagline}>Studio Booking · Request Received</Text>
         </Section>
@@ -85,7 +85,7 @@ const StudioBookingConfirmation = ({
           </Section>
         )}
         <Text style={text}>
-          <strong style={{ color: GOLD }}>1. Confirmation —</strong> A BWF team
+          <strong style={{ color: GOLD }}>1. Confirmation —</strong> A Tunevio team
           member will email you within 24 hours to confirm the slot or propose
           alternatives if needed.
         </Text>
@@ -117,7 +117,7 @@ const StudioBookingConfirmation = ({
 
 export const template = {
   component: StudioBookingConfirmation,
-  subject: 'Your BWF Studio session request — confirmation incoming',
+  subject: 'Your Tunevio Studio session request — confirmation incoming',
   displayName: 'Studio Booking Confirmation',
   previewData: {
     name: 'Jordan',
@@ -126,7 +126,7 @@ export const template = {
     time: '2:00 PM',
     duration: '2 Hours',
     crewSize: 'Duo (2 Operators)',
-    payUrl: 'https://bwfnetwork.com/pay/example-id?table=studio_bookings',
+    payUrl: 'https://tunevio.com/pay/example-id?table=studio_bookings',
   },
 } satisfies TemplateEntry
 

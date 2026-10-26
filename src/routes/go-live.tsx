@@ -25,9 +25,9 @@ import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 export const Route = createFileRoute("/go-live")({
   head: () => ({
     meta: [
-      { title: "Go Live from Your Profile — BWF Network" },
+      { title: "Go Live from Your Profile — Tunevio" },
       { name: "description", content: "Start a live video stream straight from your artist profile. Pick a title and category, hit Go Live, and your fans can watch and chat instantly." },
-      { property: "og:title", content: "Go Live from Your Profile — BWF Network" },
+      { property: "og:title", content: "Go Live from Your Profile — Tunevio" },
       { property: "og:description", content: "Start a live video stream straight from your artist profile and chat with fans in real time." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

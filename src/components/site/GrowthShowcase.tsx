@@ -76,9 +76,9 @@ const MILESTONES = [
   "332K+ subscribers and climbing daily",
   "Featured on global hip-hop trending charts",
   "Off The Block hits #1 in cultural commentary",
-  "BWF Red Mic ranked top podcast on iHeart",
+  "Tunevio Red Mic ranked top podcast on iHeart",
   "2.3M new views in the last 7 days",
-  "787K comments across the BWF network",
+  "787K comments across the Tunevio",
 ];
 
 const PARTNERS = [
@@ -143,7 +143,7 @@ export function GrowthShowcase() {
             transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6 font-display text-4xl md:text-6xl lg:text-7xl uppercase text-bone leading-[0.95]"
           >
-            BWFMedia Continues{" "}
+            Tunevio Continues{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{ backgroundImage: "var(--gradient-blood)" }}
@@ -280,7 +280,7 @@ export function GrowthShowcase() {
           <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="max-w-xl">
               <span className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood">
-                Work With BWFMedia
+                Work With Tunevio
               </span>
               <h3 className="mt-4 font-display text-3xl md:text-5xl uppercase text-bone leading-[0.95]">
                 Plug into the engine moving culture.
@@ -290,7 +290,7 @@ export function GrowthShowcase() {
               to="/contact"
               className="group inline-flex items-center gap-3 px-8 py-5 bg-blood text-white font-cond font-bold tracking-[0.25em] text-xs uppercase hover:bg-blood-glow transition-colors shadow-[0_20px_60px_-20px_rgba(0,0,255,0.7)]"
             >
-              Work With BWFMedia
+              Work With Tunevio
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </RouterLink>
           </div>

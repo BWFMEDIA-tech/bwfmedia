@@ -679,7 +679,7 @@ export function Slide13() {
       <div className="flex-1 flex flex-col items-center justify-center px-20 py-16 text-center">
         <Kicker>All time</Kicker>
         <motion.div {...fade(0.1)} className="font-display text-7xl tracking-tight text-bone mb-4">
-          BWF<sup className="text-3xl align-super">™</sup>
+          Tunevio<sup className="text-3xl align-super">™</sup>
         </motion.div>
         <motion.p {...fade(0.2)} className="font-cond tracking-[0.25em] text-xl uppercase text-bone/60 mb-12">
           Network Analytics
@@ -702,7 +702,7 @@ export function Slide13() {
           ))}
         </div>
         <motion.div {...fade(0.65)} className="mt-10 max-w-4xl text-bone/60 text-xl leading-relaxed">
-          BWF Network's existing audience gives Tunevio a built-in foundation of creators, viewers and engaged fans.
+          Tunevio's existing audience gives Tunevio a built-in foundation of creators, viewers and engaged fans.
         </motion.div>
       </div>
     </SlideShell>

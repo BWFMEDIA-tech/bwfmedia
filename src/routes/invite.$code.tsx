@@ -17,10 +17,10 @@ import { useStagePresence } from "@/lib/use-stage-presence";
 export const Route = createFileRoute("/invite/$code")({
   head: ({ params }) => ({
     meta: [
-      { title: `Join BWF Network Live — ${params.code}` },
-      { name: "description", content: "Join a live BWF Network room as host, speaker, or listener." },
-      { property: "og:title", content: "Join BWF Network Live" },
-      { property: "og:description", content: "You've been invited to a BWF Network live room." },
+      { title: `Join Tunevio Live — ${params.code}` },
+      { name: "description", content: "Join a live Tunevio room as host, speaker, or listener." },
+      { property: "og:title", content: "Join Tunevio Live" },
+      { property: "og:description", content: "You've been invited to a Tunevio live room." },
     ],
   }),
   component: InvitePage,
@@ -144,7 +144,7 @@ function InvitePage() {
   return (
     <Shell>
       <div className="mb-2 text-[10px] uppercase tracking-[0.3em] text-white/40">
-        BWF Network · Live Invite
+        Tunevio · Live Invite
       </div>
       <h1 className="text-2xl font-bold mb-1">{resolved.stream.title}</h1>
       <div className="mb-5 flex items-center gap-2 text-xs">
@@ -268,7 +268,7 @@ function NotFound({ reason, code }: { reason: string; code: string }) {
         <p className="text-sm text-white/60 mb-4">{message}</p>
         <p className="text-[11px] text-white/40 mb-4">Code: <code className="text-white/60">{code}</code></p>
         <Link to="/" className="inline-block rounded-lg border border-white/15 px-4 py-2 text-xs font-semibold text-white hover:bg-white/5">
-          Back to BWF
+          Back to Tunevio
         </Link>
       </div>
     </Shell>

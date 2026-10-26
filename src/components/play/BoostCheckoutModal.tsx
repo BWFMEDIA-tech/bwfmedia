@@ -42,7 +42,7 @@ export function BoostCheckoutModal({
               </div>
               <div className="leading-tight">
                 <div className="text-[10px] font-bold tracking-[0.18em] text-white/50 uppercase">
-                  BWF Network
+                  Tunevio
                 </div>
                 <div className="text-sm font-semibold text-white">
                   {kind === "boost" ? "Boost Checkout" : "Artist Membership"}
@@ -68,7 +68,7 @@ export function BoostCheckoutModal({
           {/* Branded footer */}
           <div className="px-5 py-3 border-t border-white/5 bg-[#08080F] text-center">
             <p className="text-[11px] text-white/40">
-              Secure checkout · Powered by <span className="text-white/60 font-medium">BWF Network</span>
+              Secure checkout · Powered by <span className="text-white/60 font-medium">Tunevio</span>
             </p>
           </div>
         </div>

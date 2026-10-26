@@ -199,7 +199,7 @@ function Sidebar() {
     <aside className="hidden lg:flex w-[240px] shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] p-4">
       <Link to="/" className="flex items-center gap-2 px-2 py-3">
         <div className="text-2xl font-black tracking-tight">
-          <span className="text-white">BWF</span>
+          <span className="text-white">Tunevio</span>
         </div>
         <span className="text-[10px] tracking-[0.3em] text-white/50">NETWORK</span>
       </Link>
@@ -250,7 +250,7 @@ function Sidebar() {
       <div className="mt-auto rounded-xl border border-white/5 bg-white/[0.02] p-4">
         <div className="mb-2 flex items-center gap-2">
           <Crown className="h-4 w-4" style={{ color: PURPLE }} />
-          <span className="text-sm font-bold text-white">BWF PRO</span>
+          <span className="text-sm font-bold text-white">Tunevio PRO</span>
         </div>
         <p className="mb-3 text-xs text-white/50">Upgrade to unlock more tools and features.</p>
         <button
@@ -262,7 +262,7 @@ function Sidebar() {
       </div>
 
       <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-white/30">
-        Powered by <span className="font-bold text-white/70">BWFNETWORK</span>
+        Powered by <span className="font-bold text-white/70">Tunevio</span>
       </div>
     </aside>
   );
@@ -445,7 +445,7 @@ function InviteGuest({ streamId }: { streamId?: string | null }) {
     toast.success("Invite link copied");
     setTimeout(() => setCopied(false), 2000);
   };
-  const shareText = "Join me live on BWF Network";
+  const shareText = "Join me live on Tunevio";
   const encodedLink = encodeURIComponent(link);
   const encodedText = encodeURIComponent(shareText);
   const openShare = (url: string) => {
@@ -486,7 +486,7 @@ function InviteGuest({ streamId }: { streamId?: string | null }) {
       onClick: async () => {
         if (typeof navigator !== "undefined" && (navigator as any).share) {
           try {
-            await (navigator as any).share({ title: "BWF Network", text: shareText, url: link });
+            await (navigator as any).share({ title: "Tunevio", text: shareText, url: link });
             return;
           } catch (e: any) {
             if (e?.name === "AbortError") return;
@@ -566,7 +566,7 @@ const CHAT_SEED = [
   { name: "Nina Strings", msg: "Love the vibe! JXHNNY coming with that real talk 💯", time: "now", likes: 0 },
   { name: "ProdByTee", verified: true, msg: "The beat selection is crazy!", time: "now", likes: 7 },
   { name: "Lyrik_Lee", msg: "He needs to drop this one ASAP!!! 🚀", time: "now", likes: 0 },
-  { name: "QueenVee", tip: 20, msg: "Keep shining king! BWF showing real love! 💜", time: "now", isTip: true },
+  { name: "QueenVee", tip: 20, msg: "Keep shining king! Tunevio showing real love! 💜", time: "now", isTip: true },
   { name: "JXHNNY RICH", artist: true, msg: "Appreciate y'all! Means everything 🙏💯", time: "now", likes: 15 },
 ];
 
@@ -703,7 +703,7 @@ function OnAirBar() {
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> ON AIR
       </span>
       <div>
-        <div className="font-bold text-white">BWF Live: LIVE ARENA</div>
+        <div className="font-bold text-white">Tunevio Live: LIVE ARENA</div>
         <div className="text-[10px] text-white/50">Music Review Podcast</div>
       </div>
       <div className="hidden items-center gap-2 sm:flex">
@@ -783,7 +783,7 @@ function StreamStudio() {
   const [streamMode, setStreamMode] = useState<"broadcast" | "stage" | "play">("broadcast");
   const [stageLocked, setStageLocked] = useState(false);
   const [streamCategory, setStreamCategory] = useState<string>(LIVE_CATEGORIES[0].id);
-  const [streamTitle, setStreamTitle] = useState("BWF Live: LIVE ARENA");
+  const [streamTitle, setStreamTitle] = useState("Tunevio Live: LIVE ARENA");
   const [streamDescription, setStreamDescription] = useState("");
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
   const { participants, hands, queue } = useStageState(stream?.id ?? null);
@@ -916,7 +916,7 @@ function StreamStudio() {
     if (going) return;
     setGoing(true);
     try {
-      const s = await startFn({ data: { title: streamTitle.trim() || "BWF Live: LIVE ARENA", category: streamCategory, description: streamDescription.trim() || undefined } });
+      const s = await startFn({ data: { title: streamTitle.trim() || "Tunevio Live: LIVE ARENA", category: streamCategory, description: streamDescription.trim() || undefined } });
       const t = await tokenFn({ data: { roomName: s.room_name } });
       setStream(s);
       setLk({ token: t.token, wsUrl: t.wsUrl });
@@ -995,7 +995,7 @@ function StreamStudio() {
                     </span>
                   </div>
                   <div className="flex min-w-0 items-center gap-1.5 text-sm font-bold text-white">
-                    <span className="min-w-0 break-words">{stream?.title || "BWF Live: LIVE ARENA"}</span>
+                    <span className="min-w-0 break-words">{stream?.title || "Tunevio Live: LIVE ARENA"}</span>
                     <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "#00E6FF" }} />
                   </div>
                   <div className="grid w-full grid-cols-2 gap-1.5 sm:flex sm:w-auto">
@@ -1051,7 +1051,7 @@ function StreamStudio() {
                         onChange={(e) => setStreamTitle(e.target.value)}
                         maxLength={120}
                         disabled={!!lk}
-                        placeholder="BWF Live: LIVE ARENA"
+                        placeholder="Tunevio Live: LIVE ARENA"
                         title={lk ? "Title is set when you go live" : "Shown everywhere your live appears"}
                         className="w-full rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-[#00E6FF]/50 focus:outline-none disabled:opacity-60"
                       />

@@ -6,7 +6,7 @@ import { ShoppingCart, ArrowLeft, Mail, HelpCircle } from "lucide-react";
 export const Route = createFileRoute("/checkout/cancel")({
   head: () => ({
     meta: [
-      { title: "Checkout Cancelled - BWF Media" },
+      { title: "Checkout Cancelled - Tunevio" },
       { name: "description", content: "Your checkout was cancelled. Your cart is still saved." },
       { name: "robots", content: "noindex" },
     ],

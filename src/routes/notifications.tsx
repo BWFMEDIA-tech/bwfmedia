@@ -20,8 +20,8 @@ type Notif = {
 export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — BWF Network" },
-      { name: "description", content: "Live alerts, mentions, and activity across BWF Network." },
+      { title: "Notifications — Tunevio" },
+      { name: "description", content: "Live alerts, mentions, and activity across Tunevio." },
     ],
   }),
   component: NotificationsPage,

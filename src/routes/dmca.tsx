@@ -4,8 +4,8 @@ import { LegalPage } from "@/components/site/LegalPage";
 export const Route = createFileRoute("/dmca")({
   head: () => ({
     meta: [
-      { title: "DMCA Policy — BWF Media TV" },
-      { name: "description", content: "How to submit copyright infringement notices and counter-notices to BWF Media TV under the DMCA." },
+      { title: "DMCA Policy — Tunevio" },
+      { name: "description", content: "How to submit copyright infringement notices and counter-notices to Tunevio under the DMCA." },
     ],
   }),
   component: DmcaPage,
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/dmca")({
 function DmcaPage() {
   return (
     <LegalPage title="DMCA Policy" effectiveDate="June 15, 2026">
-      <p>BWF Media TV ("BWF") respects the intellectual property rights of others and expects the same of its users. This DMCA Policy explains how to notify us of alleged copyright infringement on the Services in accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512).</p>
+      <p>Tunevio ("Tunevio") respects the intellectual property rights of others and expects the same of its users. This DMCA Policy explains how to notify us of alleged copyright infringement on the Services in accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512).</p>
 
       <h2>1. Filing a DMCA Takedown Notice</h2>
       <p>If you believe that content on the Platform infringes your copyright, send a written notice to our Designated Copyright Agent that includes:</p>
@@ -31,13 +31,13 @@ function DmcaPage() {
       <p>If you believe content was removed in error, you may submit a counter-notification containing your signature, identification of the removed material and its location, a statement under penalty of perjury that the removal was a mistake or misidentification, and your consent to the jurisdiction of the federal court in Alabama.</p>
 
       <h2>3. Repeat Infringers</h2>
-      <p>BWF will terminate the accounts of users determined, in our sole discretion, to be repeat infringers.</p>
+      <p>Tunevio will terminate the accounts of users determined, in our sole discretion, to be repeat infringers.</p>
 
       <h2>4. False Claims</h2>
       <p>Under Section 512(f) of the DMCA, any person who knowingly materially misrepresents that material is infringing — or was removed by mistake — may be liable for damages.</p>
 
       <h2>5. Designated Copyright Agent</h2>
-      <p>Copyright Agent<br />BWF Media TV<br />Email: <a href="mailto:bookings@bwfmedia.company">bookings@bwfmedia.company</a></p>
+      <p>Copyright Agent<br />Tunevio<br />Email: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a></p>
     </LegalPage>
   );
 }

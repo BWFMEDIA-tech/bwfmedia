@@ -10,16 +10,16 @@ export const Route = createFileRoute("/mic-drop")({
   component: MicDropArena,
   head: () => ({
     meta: [
-      { title: "Mic Drop Arena — Live Battles | BWF Network" },
+      { title: "Mic Drop Arena — Live Battles | Tunevio" },
       {
         name: "description",
         content:
-          "Live open mic battles, real-time audience voting and champion rankings, synced with the Play Arena on BWF Network.",
+          "Live open mic battles, real-time audience voting and champion rankings, synced with the Play Arena on Tunevio.",
       },
       { property: "og:title", content: "Mic Drop Arena — Live Battles" },
       {
         property: "og:description",
-        content: "Watch live battles, real-time votes and the current champions on BWF Network.",
+        content: "Watch live battles, real-time votes and the current champions on Tunevio.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

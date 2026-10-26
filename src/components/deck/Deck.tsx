@@ -88,7 +88,7 @@ export function Deck() {
       <div className="relative z-30 flex items-center justify-between px-6 py-3 border-b border-border bg-black/80 backdrop-blur">
         <div className="flex items-center gap-3">
           <div className="w-2 h-7" style={{ backgroundColor: "var(--blood)" }} />
-          <span className="font-display text-xl tracking-tight text-bone">BWF MEDIA <span style={{color:"var(--blood)"}}>TV</span></span>
+          <span className="font-display text-xl tracking-tight text-bone">Tunevio</span>
           <span className="font-cond text-bone/50 tracking-widest text-[10px] uppercase ml-2">Pitch Deck</span>
         </div>
         <div className="flex items-center gap-2">

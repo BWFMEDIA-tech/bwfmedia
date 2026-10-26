@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { sendAndLog } from '@/lib/email-send-log'
-const SITE_URL = 'https://bwfnetwork.com'
+const SITE_URL = 'https://tunevio.com'
 
 const Schema = z.object({
   full_name: z.string().min(1).max(120),

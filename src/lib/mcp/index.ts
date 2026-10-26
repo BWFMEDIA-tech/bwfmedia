@@ -7,10 +7,10 @@ const projectRef =
 
 export default defineMcp({
   name: "tunevio-mcp",
-  title: "Tunevio / BWF Network",
+  title: "Tunevio",
   version: "0.1.0",
   instructions:
-    "Authenticated tools for the Tunevio (BWF Network) platform. Sign in as a Tunevio user to use `about_tunevio` and `list_artists`.",
+    "Authenticated tools for the Tunevio platform. Sign in as a Tunevio user to use `about_tunevio` and `list_artists`.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",

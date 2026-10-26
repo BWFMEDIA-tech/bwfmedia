@@ -34,21 +34,21 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/off-the-block")({
   head: () => ({
     meta: [
-      { title: "BWF Off The Block - Street Interviews & Real Conversations" },
+      { title: "Tunevio Off The Block - Street Interviews & Real Conversations" },
       {
         name: "description",
         content:
-          "BWF Off The Block: on-location street interviews where culture, community, and real voices meet. Book a pull-up shoot with BWF Media.",
+          "Tunevio Off The Block: on-location street interviews where culture, community, and real voices meet. Book a pull-up shoot with Tunevio.",
       },
-      { property: "og:title", content: "BWF Off The Block - The Streets. The People. The Real." },
+      { property: "og:title", content: "Tunevio Off The Block - The Streets. The People. The Real." },
       {
         property: "og:description",
-        content: "Raw, on-location interviews from the block to the world. Tap in with BWF Media.",
+        content: "Raw, on-location interviews from the block to the world. Tap in with Tunevio.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://bwfnetwork.com/off-the-block" },
+      { property: "og:url", content: "https://tunevio.com/off-the-block" },
     ],
-    links: [{ rel: "canonical", href: "https://bwfnetwork.com/off-the-block" }],
+    links: [{ rel: "canonical", href: "https://tunevio.com/off-the-block" }],
   }),
   component: OffTheBlockPage,
 });
@@ -90,7 +90,7 @@ function OffTheBlockPage() {
 
         <div className="max-w-6xl mx-auto px-6 md:px-12">
           <div className="font-cond tracking-[0.5em] text-[10px] uppercase text-bone/60">
-            BWF Media TV <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
+            Tunevio <span style={{ color: GOLD }}>· Where Culture Goes Viral</span>
           </div>
 
           <motion.h1
@@ -247,7 +247,7 @@ function OffTheBlockPage() {
           <SectionTag>Mission // Why It Matters</SectionTag>
           <h2 className="sr-only">Our Mission</h2>
           <p className="mx-auto mt-8 max-w-2xl text-bone/85 text-base md:text-lg">
-            We amplify real stories, real people, real situations. BWF Off The Block gives a voice to the culture and
+            We amplify real stories, real people, real situations. Tunevio Off The Block gives a voice to the culture and
             keeps it authentic - frame by frame.
           </p>
 
@@ -319,8 +319,8 @@ function OffTheBlockPage() {
           <HUDFrame className="p-7 text-center">
             <div className="font-cond tracking-[0.4em] text-[10px] uppercase text-bone/60">Powered By</div>
             <div className="mt-2 font-display text-5xl md:text-6xl">
-              <span className="text-bone">BWF MEDIA </span>
-              <span style={{ color: GOLD }}>TV</span>
+              <span className="text-bone">Tunevio</span>
+              
             </div>
             <div className="mt-1 font-cond tracking-[0.35em] text-[10px] uppercase text-bone/60">
               Where Culture Goes Viral
@@ -330,7 +330,7 @@ function OffTheBlockPage() {
           <div className="space-y-3 font-cond tracking-[0.18em] text-sm uppercase self-center">
             {[
               { Icon: Instagram, label: "@bwfmediatv", href: "https://instagram.com/bwfmediatv" },
-              { Icon: Youtube, label: "BWF Media TV", href: "https://youtube.com/@bwfmediat" },
+              { Icon: Youtube, label: "Tunevio", href: "https://youtube.com/@bwfmediat" },
               { Icon: Mail, label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
             ].map(({ Icon, label, href }) => (
               <a

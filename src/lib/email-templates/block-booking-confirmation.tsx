@@ -3,7 +3,7 @@ import {
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
-const SITE_NAME = 'BWF Media'
+const SITE_NAME = 'Tunevio'
 const GOLD = '#D4A24C'
 
 interface BlockBookingProps {
@@ -30,8 +30,8 @@ const BlockBookingConfirmation = ({
       <Container style={container}>
         <Section style={brandBar}>
           <Text style={brandText}>
-            <span style={{ color: '#000' }}>BWF MEDIA </span>
-            <span style={{ color: GOLD }}>TV</span>
+            <span style={{ color: '#000' }}>Tunevio</span>
+            
           </Text>
           <Text style={tagline}>Off The Block · Request Received</Text>
         </Section>
@@ -78,7 +78,7 @@ const BlockBookingConfirmation = ({
           </Section>
         )}
         <Text style={text}>
-          <strong style={{ color: GOLD }}>1. Confirmation —</strong> A BWF crew
+          <strong style={{ color: GOLD }}>1. Confirmation —</strong> A Tunevio crew
           member will email you within 24 hours to confirm the pull-up or
           propose alternatives if needed.
         </Text>
@@ -111,7 +111,7 @@ const BlockBookingConfirmation = ({
 
 export const template = {
   component: BlockBookingConfirmation,
-  subject: 'Your BWF Off The Block pull-up — confirmation incoming',
+  subject: 'Your Tunevio Off The Block pull-up — confirmation incoming',
   displayName: 'Off The Block Booking Confirmation',
   previewData: {
     name: 'Jordan',
@@ -119,7 +119,7 @@ export const template = {
     location: 'Brooklyn, NY',
     date: 'Jun 10, 2026',
     time: '2:00 PM',
-    payUrl: 'https://bwfnetwork.com/pay/example-id?table=block_bookings',
+    payUrl: 'https://tunevio.com/pay/example-id?table=block_bookings',
   },
 } satisfies TemplateEntry
 

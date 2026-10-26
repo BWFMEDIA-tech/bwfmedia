@@ -121,7 +121,7 @@ function AcceptableUsePage() {
       </ul>
       <p>
         Reports should be submitted through Tunevio's available in-platform reporting functionality or by emailing{" "}
-        <a href="mailto:bookings@bwfmedia.company">bookings@bwfmedia.company</a>.
+        <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a>.
       </p>
       <p>
         Users must provide truthful information. Knowingly submitting false or misleading reports may result in
@@ -163,7 +163,7 @@ function AcceptableUsePage() {
         a valid counter-notification or other relevant evidence.
       </p>
       <p>
-        Copyright contact: <a href="mailto:bookings@bwfmedia.company">bookings@bwfmedia.company</a>
+        Copyright contact: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a>
       </p>
 
       <h2>6. Repeat Violations and Account Enforcement</h2>
@@ -263,9 +263,9 @@ function AcceptableUsePage() {
         <br />
         Website: <a href="https://tunevio.com">https://tunevio.com</a>
         <br />
-        Operator: BWFMEDIA
+        Operator: Tunevio
         <br />
-        Support contact: <a href="mailto:bookings@bwfmedia.company">bookings@bwfmedia.company</a>
+        Support contact: <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a>
       </p>
 
       <p>

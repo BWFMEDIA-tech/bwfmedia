@@ -10,8 +10,8 @@ import { useEffect, useState } from 'react';
 export const Route = createFileRoute('/recordings')({
   head: () => ({
     meta: [
-      { title: 'My Recordings — BWF Live' },
-      { name: 'description', content: 'Watch and manage your saved BWF Live broadcasts.' },
+      { title: 'My Recordings — Tunevio Live' },
+      { name: 'description', content: 'Watch and manage your saved Tunevio Live broadcasts.' },
     ],
   }),
   component: RecordingsPage,

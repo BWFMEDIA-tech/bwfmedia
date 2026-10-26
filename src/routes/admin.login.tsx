@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
     meta: [
-      { title: "Admin Login - BWF Media" },
+      { title: "Admin Login - Tunevio" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

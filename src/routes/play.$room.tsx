@@ -196,8 +196,8 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
                 </div>
                 <p className="text-xs text-white/60 mt-1">
                   {status?.membershipActive
-                    ? "You're a BWF Artist — drop a song into the queue."
-                    : "Become a BWF Artist ($6.99/mo) to submit songs."}
+                    ? "You're a Tunevio Artist — drop a song into the queue."
+                    : "Become a Tunevio Artist ($6.99/mo) to submit songs."}
                 </p>
               </button>
               <button
