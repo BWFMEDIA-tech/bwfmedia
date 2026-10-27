@@ -246,6 +246,13 @@
       "when": 1792732751465,
       "tag": "0034_invite_use_marker_and_battle_result_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793067753563,
+      "tag": "0035_blog_automation",
+      "breakpoints": true
     }
   ]
 }

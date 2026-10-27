@@ -69,3 +69,12 @@
 - [x] Replace the phone menu's Go Live button with an Arena button that opens the Arena page; kept the supplied logo as the button mark, renamed the page's browser title to TUNEVIO. Phone-sized browser verified signed-in: labels read Home/Inbox/Arena/Live Stage/My Account, tapping Arena lands on /play with the tab active, no page errors, build OK; not published.
 - [x] Rename the phone menu's fourth button from "Live Stage" to "Live Arena"; signed-in phone check shows Home/Inbox/Arena/Live Arena/Profile, tapping it opens the live room with no page errors, build OK; not published.
 - [x] Make the phone menu's Arena button open the live stream/stage while Tunevio is actually live and the Arena page otherwise; verified signed-in at 393x852 that a live-status tap lands on /stream/bwf-live-live-arena-6ddbb158 and, with nothing live, the same tap lands on /play, no page errors, build OK; not published.
+
+## Daily Blog Automation (plan: .lovable/plan/daily-blog-automation-plan-2026-10-27.md)
+- [x] Database: blog_posts SEO/automation columns, settings (disabled, drafts-only), runs (unique per Chicago date), topic calendar, server-only cron token
+- [x] Scheduling gate (DST-aware), QA checks, duplicate detection, cost estimate + tests
+- [ ] Server generation + AI review pass (blog-automation.server.ts)
+- [ ] /api/public/hooks/blog-daily hook + hourly cron job
+- [ ] Admin page /admin/blog-automation + NAV link
+- [ ] /blog/$slug server-rendered per-article metadata + sitemap entries
+- [ ] Optional: Firecrawl (news sources), Google Search Console (reporting)
