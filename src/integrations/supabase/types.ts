@@ -1111,48 +1111,231 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_automation_runs: {
+        Row: {
+          attempts: number
+          created_by: string | null
+          error: string | null
+          estimated_credits: number
+          finished_at: string | null
+          id: string
+          input_tokens: number
+          lease_until: string | null
+          output_tokens: number
+          post_id: string | null
+          retryable: boolean
+          run_date: string | null
+          started_at: string
+          status: string
+          topic_id: string | null
+          trigger: string
+        }
+        Insert: {
+          attempts?: number
+          created_by?: string | null
+          error?: string | null
+          estimated_credits?: number
+          finished_at?: string | null
+          id?: string
+          input_tokens?: number
+          lease_until?: string | null
+          output_tokens?: number
+          post_id?: string | null
+          retryable?: boolean
+          run_date?: string | null
+          started_at?: string
+          status?: string
+          topic_id?: string | null
+          trigger?: string
+        }
+        Update: {
+          attempts?: number
+          created_by?: string | null
+          error?: string | null
+          estimated_credits?: number
+          finished_at?: string | null
+          id?: string
+          input_tokens?: number
+          lease_until?: string | null
+          output_tokens?: number
+          post_id?: string | null
+          retryable?: boolean
+          run_date?: string | null
+          started_at?: string
+          status?: string
+          topic_id?: string | null
+          trigger?: string
+        }
+        Relationships: []
+      }
+      blog_automation_secrets: {
+        Row: {
+          cron_token: string
+          id: boolean
+        }
+        Insert: {
+          cron_token?: string
+          id?: boolean
+        }
+        Update: {
+          cron_token?: string
+          id?: boolean
+        }
+        Relationships: []
+      }
+      blog_automation_settings: {
+        Row: {
+          auto_publish: boolean
+          categories: string[]
+          enabled: boolean
+          id: boolean
+          monthly_budget_credits: number
+          paused_reason: string | null
+          publish_hour: number
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          auto_publish?: boolean
+          categories?: string[]
+          enabled?: boolean
+          id?: boolean
+          monthly_budget_credits?: number
+          paused_reason?: string | null
+          publish_hour?: number
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          auto_publish?: boolean
+          categories?: string[]
+          enabled?: boolean
+          id?: boolean
+          monthly_budget_credits?: number
+          paused_reason?: string | null
+          publish_hour?: number
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
+          automation_run_id: string | null
           body: string
           category: string
+          content_hash: string | null
           cover_url: string | null
           created_at: string
           excerpt: string
           id: string
+          keywords: string[]
+          meta_description: string | null
+          meta_title: string | null
           published: boolean
+          published_at: string | null
+          qa_report: Json | null
           read_minutes: number
+          review_flag: string | null
+          review_status: string
           slug: string
+          source: string
+          sources: Json
+          tags: string[]
           title: string
           updated_at: string
         }
         Insert: {
           author_id?: string | null
+          automation_run_id?: string | null
           body?: string
           category?: string
+          content_hash?: string | null
           cover_url?: string | null
           created_at?: string
           excerpt?: string
           id?: string
+          keywords?: string[]
+          meta_description?: string | null
+          meta_title?: string | null
           published?: boolean
+          published_at?: string | null
+          qa_report?: Json | null
           read_minutes?: number
+          review_flag?: string | null
+          review_status?: string
           slug: string
+          source?: string
+          sources?: Json
+          tags?: string[]
           title: string
           updated_at?: string
         }
         Update: {
           author_id?: string | null
+          automation_run_id?: string | null
           body?: string
           category?: string
+          content_hash?: string | null
           cover_url?: string | null
           created_at?: string
           excerpt?: string
           id?: string
+          keywords?: string[]
+          meta_description?: string | null
+          meta_title?: string | null
           published?: boolean
+          published_at?: string | null
+          qa_report?: Json | null
           read_minutes?: number
+          review_flag?: string | null
+          review_status?: string
           slug?: string
+          source?: string
+          sources?: Json
+          tags?: string[]
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_topic_calendar: {
+        Row: {
+          created_at: string
+          id: string
+          pillar: string
+          planned_for: string | null
+          post_id: string | null
+          status: string
+          target_keyword: string | null
+          topic: string
+          topic_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pillar: string
+          planned_for?: string | null
+          post_id?: string | null
+          status?: string
+          target_keyword?: string | null
+          topic: string
+          topic_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pillar?: string
+          planned_for?: string | null
+          post_id?: string | null
+          status?: string
+          target_keyword?: string | null
+          topic?: string
+          topic_key?: string
         }
         Relationships: []
       }
