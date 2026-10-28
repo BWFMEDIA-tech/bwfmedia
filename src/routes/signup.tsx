@@ -4,6 +4,7 @@ import { readHostReferral, saveHostReferral } from "@/lib/host-referral";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import { accountErrorMessage } from "@/lib/account-access";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [
@@ -39,17 +40,17 @@ function SignupPage() {
   const [genre, setGenre] = useState("");
   const [interests, setInterests] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmationPending, setConfirmationPending] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) return;
+    if (!role || loading) return;
     // Strong password: 8+ chars, upper, lower, number
     const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!strong.test(password)) {
       return toast.error("Password must be 8+ chars with upper, lower, and a number.");
     }
     setLoading(true);
-    const redirectTo = "/pricing";
     const meta: Record<string, unknown> = {
       display_name: displayName,
       role,
@@ -66,22 +67,16 @@ function SignupPage() {
       meta.referral_source = ref.source;
       if (ref.streamId) meta.referral_stream_id = ref.streamId;
     }
-    const { error } = await supabase.auth.signUp({
-      email, password,
+    try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(), password,
       options: {
-        emailRedirectTo: window.location.origin + redirectTo,
+        emailRedirectTo: window.location.origin + "/login",
         data: meta,
       },
     });
-    setLoading(false);
     if (error) {
-      const msg = error.message?.toLowerCase() ?? "";
-      if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
-        toast.error("This email is already registered. Please sign in instead.");
-        nav({ to: "/login" });
-        return;
-      }
-      return toast.error(error.message);
+      return toast.error(accountErrorMessage(error, "signup"));
     }
     // The account now exists on this device — future visits to the public
     // welcome page should go to sign-in, not back to the landing page.
@@ -90,8 +85,17 @@ function SignupPage() {
     } catch {
       // Storage unavailable — skip the remember step.
     }
-    toast.success("Check your email to confirm your account");
-    nav({ to: "/login" });
+    if (data.session) {
+      await nav({ to: "/home", replace: true });
+    } else {
+      setConfirmationPending(true);
+      toast.success("Check your email to confirm your account");
+    }
+    } catch {
+      toast.error(accountErrorMessage({}, "signup"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -129,7 +133,13 @@ function SignupPage() {
         </h1>
         <p className="mt-3 mb-6 text-sm text-bone/60">Your music. Your stage. Your audience.</p>
 
-        {step === "role" && (
+        {confirmationPending && (
+          <div role="status" className="mt-4 text-sm text-bone">
+            <p>Check your email to confirm your account.</p>
+            <p className="mt-2 text-bone/60">Open the confirmation link in your inbox or spam folder, then sign in. If you already have an account, sign in or reset your password.</p>
+          </div>
+        )}
+        {!confirmationPending && step === "role" && (
           <>
             <p className="font-cond tracking-[0.3em] text-[10px] uppercase text-blood font-bold mb-3">I'm joining as a…</p>
             <div className="grid grid-cols-1 gap-3 mb-5">
@@ -169,7 +179,7 @@ function SignupPage() {
           </>
         )}
 
-        {step === "details" && (
+        {!confirmationPending && step === "details" && (
           <>
             <button
               type="button"
