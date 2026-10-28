@@ -49,7 +49,7 @@ const menuGroups: Array<{
     title: "Account",
     links: [
       { label: "Sign In", to: "/login" },
-      { label: "Sign Up", to: "/pricing" },
+      { label: "Sign Up", to: "/signup" },
       { label: "Profile", to: "/profile" },
     ],
   },

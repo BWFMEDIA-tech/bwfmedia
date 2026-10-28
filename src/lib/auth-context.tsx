@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { hydrateAccountSession } from "@/lib/account-access";
 
 export type AppRole = "admin" | "manager" | "host" | "artist" | "moderator" | "member";
 
@@ -24,20 +25,22 @@ export function useAuth(): AuthState {
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+    const apply = (s: Session | null) => {
       setSession(s);
+      setLoading(false);
       if (!s) {
         setRoles([]);
         setProfile(null);
         setRolesLoading(false);
       }
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-      if (!data.session) setRolesLoading(false);
-    });
-    return () => subscription.unsubscribe();
+    };
+    const hydration = hydrateAccountSession(async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return data.session;
+    }, apply, () => apply(null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => hydration.onEvent(s));
+    return () => { hydration.dispose(); subscription.unsubscribe(); };
   }, []);
 
   useEffect(() => {

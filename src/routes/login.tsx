@@ -4,17 +4,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import { accountErrorMessage, safeAccountDestination } from "@/lib/account-access";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Sign in — Tunevio" }] }),
+  head: () => ({ meta: [
+    { title: "Sign in — Tunevio" },
+    { name: "description", content: "Sign in to your Tunevio account to discover music and connect with artists." },
+    { property: "og:title", content: "Sign in — Tunevio" },
+    { property: "og:description", content: "Sign in to your Tunevio account to discover music and connect with artists." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (s: Record<string, unknown>): { next?: string } => {
     const raw =
       (typeof s.next === "string" && s.next) ||
       (typeof s.redirect === "string" && s.redirect) ||
       "";
     // Same-origin relative paths only — never an absolute/off-site URL.
-    const next = raw.startsWith("/") && !raw.startsWith("//") ? raw : undefined;
+    const next = safeAccountDestination(raw);
     return next ? { next } : {};
   },
   component: LoginPage,
@@ -27,7 +35,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
 
   // If a session already exists (e.g. returning from Google OAuth), move on.
   // Do not call another auth method from onAuthStateChange: doing so can block
@@ -36,16 +44,19 @@ function LoginPage() {
     let cancelled = false;
     const go = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
-        if (cancelled || !data.session) return;
-        const saved = sessionStorage.getItem("bwf:post-login");
-        sessionStorage.removeItem("bwf:post-login");
+        const { data, error } = await supabase.auth.getUser();
+        if (cancelled || error || !data.user) return;
+        let saved: string | undefined;
+        try {
+          saved = safeAccountDestination(sessionStorage.getItem("bwf:post-login"));
+          sessionStorage.removeItem("bwf:post-login");
+        } catch { /* Browser storage must not block sign-in. */ }
         const destination = next ?? saved;
         if (destination) {
-          window.location.assign(destination);
+          await nav({ to: destination, replace: true });
           return;
         }
-        nav({ to: "/" });
+        nav({ to: "/home", replace: true });
       } catch {
         // Keep the sign-in form available when a stale browser session cannot
         // be restored; submitting the form will establish a fresh session.
@@ -58,10 +69,10 @@ function LoginPage() {
   }, [next, nav]);
 
   const onGoogle = async () => {
-    setFailed(false);
+    setFailed(null);
     setGoogleLoading(true);
     try {
-      if (next) sessionStorage.setItem("bwf:post-login", next);
+      try { if (next) sessionStorage.setItem("bwf:post-login", next); } catch { /* Optional storage. */ }
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/login",
       });
@@ -78,27 +89,29 @@ function LoginPage() {
         // Storage unavailable — skip the remember step.
       }
       if (result.redirected) return;
-      const saved = sessionStorage.getItem("bwf:post-login");
-      sessionStorage.removeItem("bwf:post-login");
-      if (saved) window.location.assign(saved);
-      else nav({ to: "/" });
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) throw new Error("Sign-in did not complete");
+      await nav({ to: next ?? "/home", replace: true });
     } catch {
       setGoogleLoading(false);
       toast.error("Unable to connect to Google. Please try again.");
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || googleLoading) return;
     setLoading(true);
-    setFailed(false);
+    setFailed(null);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (error) {
         setLoading(false);
-        // Generic message — never reveal whether the email exists
-        setFailed(true);
-        return toast.error("Incorrect email or password.");
+        const message = accountErrorMessage(error, "signin");
+        setFailed(message);
+        return toast.error(message);
       }
       // Remember on this device that an account exists, so future visits to
       // the public welcome page go straight to sign-in.
@@ -108,12 +121,8 @@ function LoginPage() {
         // Storage unavailable — skip the remember step.
       }
       toast.success("Signed in");
-      if (next) {
-        window.location.assign(next);
-        return;
-      }
       const uid = data.user?.id;
-      let dest: "/stream-studio" | "/home" | "/artist-dashboard" = "/stream-studio";
+      let dest: "/stream-studio" | "/home" | "/artist-dashboard" = "/home";
       if (uid) {
         const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
         const list = (roles ?? []).map((r: { role: string }) => r.role);
@@ -130,13 +139,16 @@ function LoginPage() {
         // do. Send artist-only accounts to their dashboard, from which they
         // can join existing stages as guests.
         const isPrivileged = list.includes("manager") || list.includes("host");
+        if (isPrivileged) dest = "/stream-studio";
         if (list.includes("artist") && !isPrivileged) dest = "/artist-dashboard";
       }
-      nav({ to: dest });
+      await nav({ to: next ?? dest, replace: true });
     } catch {
+      const message = accountErrorMessage({}, "signin");
+      setFailed(message);
+      toast.error(message);
+    } finally {
       setLoading(false);
-      setFailed(true);
-      toast.error("Unable to reach sign-in. Please check your connection and try again.");
     }
   };
 
@@ -208,7 +220,7 @@ function LoginPage() {
 
         {failed && (
           <div className="mt-4 rounded-md border border-blood/40 bg-blood/10 p-3 text-center">
-            <p className="text-xs text-bone/80 mb-2">Incorrect email or password.</p>
+            <p role="alert" className="text-xs text-bone/80 mb-2">{failed}</p>
             <Link to="/forgot-password" className="font-cond tracking-[0.2em] text-xs uppercase text-blood hover:text-blood-glow transition-colors">
               Forgot password?
             </Link>
@@ -216,7 +228,7 @@ function LoginPage() {
         )}
         <div className="flex justify-between mt-5 text-xs text-bone/60">
           <Link to="/forgot-password" className="hover:text-blood transition-colors">Forgot password?</Link>
-          <Link to="/pricing" className="hover:text-blood transition-colors">Create account</Link>
+          <Link to="/signup" className="hover:text-blood transition-colors">Create account</Link>
         </div>
       </div>
     </div>
