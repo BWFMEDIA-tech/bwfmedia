@@ -72,7 +72,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
     }
   });
 
-/** $6.99/mo subscription for BWF Artist Membership. */
+/** $9.99/mo subscription for BWF Artist Membership. */
 export const createMembershipCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => BoostSchema.parse(input))
