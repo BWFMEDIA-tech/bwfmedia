@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Play, Square, Vote, Lock, CheckCircle2, SkipForward, X, StopCircle } from "lucide-react";
@@ -9,6 +9,7 @@ import {
 } from "@/lib/battle-engine.functions";
 import { cn } from "@/lib/utils";
 import { SignedImg } from "@/components/ui/signed-img";
+import { createInteractionGate } from "@/lib/battle-interactions";
 
 /**
  * Pure control surface for the battle host. Renders buttons only and emits
@@ -43,6 +44,7 @@ export function BattleHostControls({
   const [queues, setQueues] = useState<{ a: any[]; b: any[] }>({ a: [], b: [] });
   const [busy, setBusy] = useState<BattleEventType | null>(null);
   const [picker, setPicker] = useState<"a" | "b" | null>(null);
+  const interactionGate = useRef(createInteractionGate());
 
   useEffect(() => {
     let cancelled = false;
@@ -53,6 +55,7 @@ export function BattleHostControls({
   }, [matchId, votingStatus, activeSide, currentRound]);
 
   async function emit(type: BattleEventType, payload?: { trackId?: string }) {
+    if (!interactionGate.current.enter()) return;
     setBusy(type);
     try {
       await dispatchFn({ data: { matchId, type, payload } });
@@ -60,6 +63,7 @@ export function BattleHostControls({
       const msg = String(e?.message ?? "");
       toast.error(msg.replace(/^INVALID_TRANSITION:\s*/, "Cannot: "));
     } finally {
+      interactionGate.current.leave();
       setBusy(null);
       // Always resync — recovers from stale state (e.g. match was cancelled
       // by another client) so the UI flips back to the correct controls.
