@@ -252,6 +252,20 @@ function SettingsPayoutsPage() {
             )}
             {acct ? (ready ? "Manage on Stripe" : "Finish setup") : "Connect bank account"}
           </button>
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 text-xs text-white/70 space-y-1.5">
+            <div className="font-semibold text-white/90">Use Chime or Cash App</div>
+            <p>
+              <span className="font-medium text-white/90">Chime:</span> open the Chime app → Settings → Account
+              details to copy your routing and account number.
+            </p>
+            <p>
+              <span className="font-medium text-white/90">Cash App:</span> tap the Money tab → Account &amp; routing
+              number (enable it if asked).
+            </p>
+            <p className="text-white/50">
+              Enter those numbers when you connect your bank account above, and payouts land straight in Chime or Cash App.
+            </p>
+          </div>
           {acct?.country && (
             <div className="text-[11px] text-white/40">
               {acct.country.toUpperCase()} · {(acct.default_currency ?? "usd").toUpperCase()}
