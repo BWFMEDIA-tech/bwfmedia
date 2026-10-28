@@ -1082,6 +1082,15 @@ function StreamStudio() {
                       <Radio className="h-3.5 w-3.5" /> {going ? "Starting…" : "Go Live"}
                     </Button>
                   )}
+                  {lk && (
+                    <Button
+                      variant="outline"
+                      onClick={stop}
+                      className="studio-button studio-button-danger col-span-2 gap-1.5 px-3 sm:col-span-1"
+                    >
+                      <PhoneOff className="h-3.5 w-3.5" /> End Stream
+                    </Button>
+                  )}
                   <Button variant="outline" onClick={copyInvite} className="studio-button px-3">
                     Share
                   </Button>
