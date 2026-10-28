@@ -197,7 +197,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
                 <p className="text-xs text-white/60 mt-1">
                   {status?.membershipActive
                     ? "You're a Tunevio Artist — drop a song into the queue."
-                    : "Become a Tunevio Artist ($6.99/mo) to submit songs."}
+                    : "Become a Tunevio Artist ($9.99/mo) to submit songs."}
                 </p>
               </button>
               <button
@@ -322,7 +322,7 @@ function ArtistMembershipCard({ active, onUpgrade }: { active: boolean; onUpgrad
     <div className="rounded-2xl border border-violet-500/40 bg-gradient-to-br from-violet-700/20 to-blue-700/10 p-4">
       <div className="text-[10px] font-bold tracking-widest text-violet-300">ARTIST MEMBERSHIP</div>
       <div className="mt-1 flex items-baseline gap-1">
-        <span className="text-3xl font-black">$6.99</span>
+        <span className="text-3xl font-black">$9.99</span>
         <span className="text-xs text-white/60">/month</span>
       </div>
       <ul className="mt-3 space-y-1 text-xs text-white/80">

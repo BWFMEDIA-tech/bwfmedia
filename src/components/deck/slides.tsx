@@ -374,7 +374,7 @@ export function Slide6() {
 export function Slide7() {
   const engines = [
     { n: "1", title: "Listener Subscriptions", text: "Premium · Family · Student · Lite" },
-    { n: "2", title: "Artist Membership — $6.99/mo", text: "Enhanced platform capabilities and monetization opportunities." },
+    { n: "2", title: "Artist Membership — $9.99/mo", text: "Enhanced platform capabilities and monetization opportunities." },
     { n: "3", title: "Skip the Line — $25", text: "Priority access within the Play Arena ecosystem." },
     { n: "4", title: "Voting / Boost Credits", text: "Paid engagement mechanics inside the competitive ecosystem." },
     { n: "5", title: "Music Distribution", text: "Artists pay for distribution and related services." },
