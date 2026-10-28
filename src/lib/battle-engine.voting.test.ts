@@ -24,7 +24,7 @@ describe("Voting never changes track assignments or audio", () => {
         return chain;
       },
     };
-    for (let i = 0; i < 10; i++) await runBattleEvent(sb, "host", { matchId: "match", type: "OPEN_VOTING" });
+    for (let i = 0; i < 10; i++) await runBattleEvent(sb, "host", { matchId: "match", type: "OPEN_VOTING" }, sb);
     expect(writes).toHaveLength(10);
     expect(writes.every(w => w.table === "battle_rounds" && JSON.stringify(w.values) === '{"voting_status":"open"}')).toBe(true);
     expect(round.a_playing_track_id).toBe("track-a");

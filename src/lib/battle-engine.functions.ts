@@ -68,14 +68,20 @@ async function loadRoundVoteTotals(sb: any, roundId: string): Promise<VoteTotals
 /** Pure handler so wrappers in battles.functions.ts can call into the engine
  *  without going back through the server-fn RPC boundary. */
 export async function runBattleEvent(
-  supabase: any,
+  userSupabase: any,
   userId: string,
   data: { matchId: string; type: BattleEventType; payload?: { trackId?: string } },
+  writer?: any,
 ) {
-    const m = await assertHost(supabase, userId, data.matchId);
+    // Authorize as the caller first; results (wins, winner, completion) are
+    // protected from direct user writes by a DB trigger, so the engine
+    // performs its state transitions with the server client after the check.
+    const m = await assertHost(userSupabase, userId, data.matchId);
     if (m.status === "completed" || m.status === "cancelled") {
       invalid(`match is ${m.status}`);
     }
+    const supabase =
+      writer ?? (await import("@/integrations/supabase/client.server")).supabaseAdmin;
 
     const loadCurrentRound = async () => {
       if (!m.current_round_id) return null;
