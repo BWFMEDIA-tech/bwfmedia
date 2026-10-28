@@ -1,4 +1,5 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { GeneralSettingsShell } from "@/components/settings/GeneralSettingsShell";
 import { supabase } from "@/integrations/supabase/client";
 
