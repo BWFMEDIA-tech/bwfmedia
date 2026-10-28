@@ -6944,6 +6944,10 @@ export type Database = {
         Args: { p_duration_played_seconds: number; p_event_id: string }
         Returns: boolean
       }
+      verify_cron_secret: {
+        Args: { p_name: string; p_token: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role:
