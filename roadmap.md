@@ -1,5 +1,5 @@
 # Live artist profile
-- [ ] Fix Play Arena Voting/Hype side switching with stable track assignments and duplicate guards; verify rapid actions, realtime and refresh without redesigning or publishing.
+- [ ] Fix Play Arena Voting/Hype side switching: code fixed and 27 regression tests pass; live multi-user, reconnect and refresh checks blocked because the database was temporarily unreachable.
 - [ ] Rebrand visible copy, metadata and public URLs to Tunevio; replace the specified contact email, preserve protected systems/accounts, and provide unpublished review reports.
 - [x] Add rejected-session recovery before Home authenticated requests; six recovery tests pass, signed-in Home loads without token/runtime errors and build OK. Original reported error not reproduced; not published.
 - [ ] Fix queued artist-profile artwork signing and local unsaved cover previews; test upload, save and refresh while preserving private-file restrictions.
