@@ -139,6 +139,7 @@ function LoginPage() {
         // do. Send artist-only accounts to their dashboard, from which they
         // can join existing stages as guests.
         const isPrivileged = list.includes("manager") || list.includes("host");
+        if (isPrivileged) dest = "/stream-studio";
         if (list.includes("artist") && !isPrivileged) dest = "/artist-dashboard";
       }
       await nav({ to: next ?? dest, replace: true });
