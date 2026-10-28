@@ -274,6 +274,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [description, setDescription] = useState("");
   const [externalUrl, setExternalUrl] = useState("");
   const [category, setCategory] = useState<"music" | "sponsored">("music");
+  const [genre, setGenre] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -345,7 +346,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     const ins = await supabase.from("videos").insert({
       user_id: userId, title, artist: artist || null, description: description || null,
       category, storage_path: path, external_url: externalUrl || null,
-      thumbnail_path,
+      thumbnail_path, genre: genre || null,
     });
     setBusy(false);
     if (ins.error) { setErr(ins.error.message); return; }
@@ -374,6 +375,19 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
               {c === "music" ? "Music Video" : "Sponsored"}
             </Button>
           ))}
+        </div>
+        <div>
+          <p className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-foreground/70">Genre</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {GENRES.filter(g => g !== "All genres").map(g => (
+              <Button key={g} type="button" onClick={() => setGenre(genre === g ? "" : g)} aria-pressed={genre === g}
+                className={`px-3 py-1.5 font-cond font-bold tracking-widest text-[11px] uppercase border ${
+                  genre === g ? "text-foreground bg-primary/30 border-primary/40" : "text-foreground/60 border-border/20"
+                }`}>
+                {g}
+              </Button>
+            ))}
+          </div>
         </div>
         <input ref={fileRef} type="file" accept="video/*" required aria-label="Video file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
