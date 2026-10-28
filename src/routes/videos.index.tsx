@@ -382,7 +382,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
             {GENRES.filter(g => g !== "All genres").map(g => (
               <Button key={g} type="button" onClick={() => setGenre(genre === g ? "" : g)} aria-pressed={genre === g}
                 className={`px-3 py-1.5 font-cond font-bold tracking-widest text-[11px] uppercase border ${
-                  genre === g ? "text-foreground bg-primary/30 border-primary/40" : "text-foreground/60 border-border/20"
+                  genre === g ? "text-foreground bg-primary/30 border-primary/40" : "text-foreground/60 border-border/20 bg-card hover:bg-muted"
                 }`}>
                 {g}
               </Button>
