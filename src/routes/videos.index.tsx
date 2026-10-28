@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedVideoUrl } from "@/lib/video-urls";
+import { videoMatchesGenre } from "@/lib/video-genre";
 import { useServerFn } from "@tanstack/react-start";
 import { getSavedVideos, setVideoSaved } from "@/lib/video-engagement.functions";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/videos/")({
     { name: "twitter:card", content: "summary_large_image" },
   ], links: [{ rel: "canonical", href: "https://tunevio.com/videos" }] }),
 });
-type VideoRow = { id: string; user_id: string; title: string; artist: string | null; description: string | null; category: "music" | "sponsored"; storage_path: string; external_url: string | null; thumbnail_path: string | null; created_at: string; };
+type VideoRow = { id: string; user_id: string; title: string; artist: string | null; description: string | null; genre: string | null; category: "music" | "sponsored"; storage_path: string; external_url: string | null; thumbnail_path: string | null; created_at: string; };
 function VideoThumb({ v, className = "h-full w-full object-cover", eager = false }: { v: VideoRow; className?: string; eager?: boolean }) {
   const thumb = useSignedVideoUrl(v.thumbnail_path);
   const fallback = useSignedVideoUrl(v.thumbnail_path ? null : v.storage_path);
@@ -161,11 +162,9 @@ function VideosPage() {
     const url = `${window.location.origin}/videos/${hero.id}`;
     try { if (navigator.share) await navigator.share({ title: hero.title, url }); else { await navigator.clipboard.writeText(url); setError("Video link copied."); } } catch { /* share dismissed */ }
   };
-  const filtered = videos.filter(v => {
-    const text = `${v.title} ${v.artist ?? ""} ${v.description ?? ""}`.toLowerCase();
-    const genreMatch = genre === "All genres" || (genre === "Hip Hop" ? /hip[ -]?hop|rap/.test(text) : genre === "R&B" ? /r&b|rnb|rhythm and blues/.test(text) : text.includes(genre.toLowerCase()));
-    return text.includes(search.trim().toLowerCase()) && genreMatch && (tab !== "My List" || savedIds.includes(v.id)) && (tab !== "My Videos" || v.user_id === userId);
-  });
+  const filtered = videos.filter(v => videoMatchesGenre(v, genre)
+    && `${v.title} ${v.artist ?? ""} ${v.description ?? ""}`.toLowerCase().includes(search.trim().toLowerCase())
+    && (tab !== "My List" || savedIds.includes(v.id)) && (tab !== "My Videos" || v.user_id === userId));
   const music = filtered.filter(v => v.category === "music");
   const rows = [
     { title: "Trending Music Videos", items: music },
@@ -270,6 +269,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [description, setDescription] = useState("");
   const [externalUrl, setExternalUrl] = useState("");
   const [category, setCategory] = useState<"music" | "sponsored">("music");
+  const [genre, setGenre] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -341,7 +341,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
     const ins = await supabase.from("videos").insert({
       user_id: userId, title, artist: artist || null, description: description || null,
       category, storage_path: path, external_url: externalUrl || null,
-      thumbnail_path,
+      thumbnail_path, genre: genre || null,
     });
     setBusy(false);
     if (ins.error) { setErr(ins.error.message); return; }
@@ -370,6 +370,19 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
               {c === "music" ? "Music Video" : "Sponsored"}
             </Button>
           ))}
+        </div>
+        <div>
+          <p className="font-cond font-bold tracking-[0.25em] text-[10px] uppercase text-foreground/70">Genre</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {GENRES.filter(g => g !== "All genres").map(g => (
+              <Button key={g} type="button" onClick={() => setGenre(genre === g ? "" : g)} aria-pressed={genre === g}
+                className={`px-3 py-1.5 font-cond font-bold tracking-widest text-[11px] uppercase border ${
+                  genre === g ? "text-foreground bg-primary/30 border-primary/40" : "text-foreground/60 border-border/20 bg-card hover:bg-muted"
+                }`}>
+                {g}
+              </Button>
+            ))}
+          </div>
         </div>
         <input ref={fileRef} type="file" accept="video/*" required aria-label="Video file"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
