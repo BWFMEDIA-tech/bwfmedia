@@ -107,10 +107,10 @@ export async function runBattleEvent(
           if (cur && (cur.status !== "closed" || cur.voting_status !== "finalized")) {
             // Final round closed but never finalized: END_ROUND finalizes it
             // and completes the match in one transition.
-            return runBattleEvent(supabase, userId, {
+            return runBattleEvent(userSupabase, userId, {
               matchId: data.matchId,
               type: "END_ROUND",
-            });
+            }, supabase);
           }
           const aWins = m.a_wins as number;
           const bWins = m.b_wins as number;
