@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedVideoUrl } from "@/lib/video-urls";
+import { videoMatchesGenre } from "@/lib/video-genre";
 import { useServerFn } from "@tanstack/react-start";
 import { getSavedVideos, setVideoSaved } from "@/lib/video-engagement.functions";
 import { Button } from "@/components/ui/button";
@@ -161,15 +162,9 @@ function VideosPage() {
     const url = `${window.location.origin}/videos/${hero.id}`;
     try { if (navigator.share) await navigator.share({ title: hero.title, url }); else { await navigator.clipboard.writeText(url); setError("Video link copied."); } } catch { /* share dismissed */ }
   };
-  const filtered = videos.filter(v => {
-    const text = `${v.title} ${v.artist ?? ""} ${v.description ?? ""}`.toLowerCase();
-    const picked = (v.genre ?? "").toLowerCase();
-    // Prefer the stored genre; older uploads without one keep the text-based match.
-    const genreMatch = genre === "All genres" || (picked
-      ? picked === genre.toLowerCase()
-      : (genre === "Hip Hop" ? /hip[ -]?hop|rap/.test(text) : genre === "R&B" ? /r&b|rnb|rhythm and blues/.test(text) : text.includes(genre.toLowerCase())));
-    return text.includes(search.trim().toLowerCase()) && genreMatch && (tab !== "My List" || savedIds.includes(v.id)) && (tab !== "My Videos" || v.user_id === userId);
-  });
+  const filtered = videos.filter(v => videoMatchesGenre(v, genre)
+    && `${v.title} ${v.artist ?? ""} ${v.description ?? ""}`.toLowerCase().includes(search.trim().toLowerCase())
+    && (tab !== "My List" || savedIds.includes(v.id)) && (tab !== "My Videos" || v.user_id === userId));
   const music = filtered.filter(v => v.category === "music");
   const rows = [
     { title: "Trending Music Videos", items: music },
