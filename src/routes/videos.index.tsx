@@ -21,7 +21,7 @@ export const Route = createFileRoute("/videos/")({
     { name: "twitter:card", content: "summary_large_image" },
   ], links: [{ rel: "canonical", href: "https://tunevio.com/videos" }] }),
 });
-type VideoRow = { id: string; user_id: string; title: string; artist: string | null; description: string | null; category: "music" | "sponsored"; storage_path: string; external_url: string | null; thumbnail_path: string | null; created_at: string; };
+type VideoRow = { id: string; user_id: string; title: string; artist: string | null; description: string | null; genre: string | null; category: "music" | "sponsored"; storage_path: string; external_url: string | null; thumbnail_path: string | null; created_at: string; };
 function VideoThumb({ v, className = "h-full w-full object-cover", eager = false }: { v: VideoRow; className?: string; eager?: boolean }) {
   const thumb = useSignedVideoUrl(v.thumbnail_path);
   const fallback = useSignedVideoUrl(v.thumbnail_path ? null : v.storage_path);
@@ -163,7 +163,11 @@ function VideosPage() {
   };
   const filtered = videos.filter(v => {
     const text = `${v.title} ${v.artist ?? ""} ${v.description ?? ""}`.toLowerCase();
-    const genreMatch = genre === "All genres" || (genre === "Hip Hop" ? /hip[ -]?hop|rap/.test(text) : genre === "R&B" ? /r&b|rnb|rhythm and blues/.test(text) : text.includes(genre.toLowerCase()));
+    const picked = (v.genre ?? "").toLowerCase();
+    // Prefer the stored genre; older uploads without one keep the text-based match.
+    const genreMatch = genre === "All genres" || (picked
+      ? picked === genre.toLowerCase()
+      : (genre === "Hip Hop" ? /hip[ -]?hop|rap/.test(text) : genre === "R&B" ? /r&b|rnb|rhythm and blues/.test(text) : text.includes(genre.toLowerCase())));
     return text.includes(search.trim().toLowerCase()) && genreMatch && (tab !== "My List" || savedIds.includes(v.id)) && (tab !== "My Videos" || v.user_id === userId);
   });
   const music = filtered.filter(v => v.category === "music");
