@@ -1,10 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { assignedArtistIds, createInteractionGate, createSnapshotGate } from "./battle-interactions";
+import { assignedArtistIds, assignedBattleTrack, createInteractionGate, createSnapshotGate } from "./battle-interactions";
 import { mergeScoreUpdate, rankArtists, type BattleScoreMap } from "./battle-scores";
 
 const artists = Object.freeze([Object.freeze({ id: "side-a" }), Object.freeze({ id: "side-b" })]);
 
 describe("battle assignments", () => {
+  it("keeps the host-selected Side B song over a newer unrelated upload", () => {
+    const tracks = [
+      { id: "new-upload", artist_user_id: "artist-b", battle_match_id: null, battle_side: null },
+      { id: "chosen-b", artist_user_id: "artist-b", battle_match_id: "match", battle_side: "b" },
+      { id: "chosen-a", artist_user_id: "artist-a", battle_match_id: "match", battle_side: "a" },
+    ];
+    expect(assignedBattleTrack(tracks, "match", "b", "artist-b")?.id).toBe("chosen-b");
+    expect(assignedBattleTrack(tracks, "match", "a", "artist-a")?.id).toBe("chosen-a");
+  });
   it("keeps Side A first when Side B leads Hype", () => {
     const scores = mergeScoreUpdate({}, { artist_id: "side-b", hype_score: 9, pass_score: 0 });
     expect(rankArtists(scores, assignedArtistIds(artists))[0]).toBe("side-b");

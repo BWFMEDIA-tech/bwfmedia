@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assignedBattleTrack } from "@/lib/battle-interactions";
 import {
   buildVoteTotals,
   emptyVoteTotals,
@@ -639,13 +640,13 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       const artistIds = needFallback.map((n) => n.artistId!).filter(Boolean);
       const { data: subs } = await trackSb
         .from("play_tracks")
-        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at, updated_at")
+        .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at, updated_at, battle_match_id, battle_side")
         .eq("stream_id", data.streamId)
         .in("artist_user_id", artistIds)
         .in("status", ["queued", "playing"])
         .order("created_at", { ascending: false });
       for (const n of needFallback) {
-        const t = (subs ?? []).find((row: any) => row.artist_user_id === n.artistId) ?? null;
+        const t = n.artistId ? assignedBattleTrack(subs ?? [], match.id, n.side, n.artistId) : null;
         if (t) {
           if (n.side === "a") aTrack = t;
           else bTrack = t;
