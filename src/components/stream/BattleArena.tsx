@@ -17,6 +17,7 @@ import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDial
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { Volume2 } from "lucide-react";
 import { BattleReplays } from "./BattleReplays";
+import { createSnapshotGate } from "@/lib/battle-interactions";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -61,7 +62,9 @@ function BattleArenaLive({
   // on battle_matches / battle_rounds simply trigger a re-fetch; we never
   // compute battle state in the UI.
   const cancelledRef = useRef(false);
+  const snapshotGate = useRef(createSnapshotGate());
   const refresh = useCallback(async () => {
+    const request = snapshotGate.current.begin();
     try {
       let s = await stateFn({ data: { streamId } });
       // Broadcast gate: never render totals that fail the consistency check.
@@ -73,7 +76,7 @@ function BattleArenaLive({
         s = await stateFn({ data: { streamId } });
         if ((s as any)?.voteTotals && !validateVoteTotals((s as any).voteTotals)) return;
       }
-      if (!cancelledRef.current) setRoomState(s as RoomState);
+      if (!cancelledRef.current && snapshotGate.current.isCurrent(request)) setRoomState(s as RoomState);
     } catch { /* ignore */ }
   }, [streamId, stateFn]);
 
@@ -95,8 +98,10 @@ function BattleArenaLive({
       .on("postgres_changes",
         { event: "*", schema: "public", table: "play_tracks", filter: `stream_id=eq.${streamId}` },
         refresh)
-      .subscribe();
-    return () => { cancelledRef.current = true; supabase.removeChannel(ch); };
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") void refresh();
+      });
+    return () => { cancelledRef.current = true; snapshotGate.current.invalidate(); supabase.removeChannel(ch); };
   }, [streamId, refresh]);
 
   const match = roomState?.match ?? null;
@@ -180,6 +185,7 @@ function BattleArenaLive({
     <>
       {audioEl}
       <BattleView
+        key={match.id}
         roomState={roomState}
         myVote={myVote}
         isHost={isHost}
@@ -310,7 +316,7 @@ function BattleView({
   const canVote = votingStatus === "open" && !myVote;
 
   const vote = async (choice: "a" | "b", useBoost = false) => {
-    if (!currentRound || voteInFlightRef.current) return;
+    if (!currentRound || !canVote || voteInFlightRef.current) return;
     voteInFlightRef.current = true;
     // Pop a floating "+N" over the chosen side for instant tactile feedback.
     // Feedback only — the bars move when the server broadcasts new totals.
@@ -475,6 +481,7 @@ function BattleView({
       </div>
 
       <HypePassPanel
+        key={match.id as string}
         battleId={match.id as string}
         artists={[
           { id: match.artist_a_id as string, name: (match.artist_a_name as string) ?? "Artist A" },

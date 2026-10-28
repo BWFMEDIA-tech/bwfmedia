@@ -511,10 +511,12 @@ export function ImmersivePlayer({
   // from the player, without leaving for the BattleArena UI.
   const battleVote = useTrackBattleVote(track, userId);
   const [battleVoting, setBattleVoting] = useState<"a" | "b" | null>(null);
+  const battleVoteInFlight = useRef(false);
   const castBattleSide = async (choice: "a" | "b") => {
-    if (!battleVote?.roundId) return;
+    if (!battleVote?.roundId || battleVoteInFlight.current || battleVote.myChoice) return;
     if (!userId) { toast.error("Sign in to vote"); return; }
     if (!battleVote.canVote) { toast.message("Voting is closed for this round"); return; }
+    battleVoteInFlight.current = true;
     setBattleVoting(choice);
     try {
       await battleVoteFn({ data: { roundId: battleVote.roundId, choice, useBoost: false } });
@@ -522,6 +524,7 @@ export function ImmersivePlayer({
     } catch (e: any) {
       toast.error(e?.message ?? "Vote failed");
     } finally {
+      battleVoteInFlight.current = false;
       setBattleVoting(null);
     }
   };

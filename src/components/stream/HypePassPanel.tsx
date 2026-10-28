@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { reactToBattle } from "@/lib/battle-reactions.functions";
 import { useBattleScores } from "@/lib/useBattleScores";
 import { rankArtists, type BattleReactionAction } from "@/lib/battle-scores";
+import { assignedArtistIds, createInteractionGate } from "@/lib/battle-interactions";
 
 const COOLDOWN_MS = 8_000;
 
@@ -24,7 +25,7 @@ type Pending = {
  * Hype & Pass engagement panel for a live battle. One reaction per user per
  * artist (DB-enforced); optimistic bump on click, reverted on failure; 8s
  * panel-wide cooldown after every attempt. Scores stream in over the
- * battle:{battleId} realtime channel and reorder the leaderboard live.
+ * battle:{battleId} realtime channel; side assignments never follow rank.
  */
 export function HypePassPanel({
   battleId,
@@ -43,6 +44,7 @@ export function HypePassPanel({
   const [pending, setPending] = useState<Pending | null>(null);
   const [cooldownLeft, setCooldownLeft] = useState(0);
   const cooldownUntilRef = useRef(0);
+  const interactionGate = useRef(createInteractionGate());
 
   // Who am I + which artists did I already react to (persists across reloads).
   useEffect(() => {
@@ -86,11 +88,12 @@ export function HypePassPanel({
   };
 
   const react = async (artist: Artist, action: BattleReactionAction) => {
-    if (!live || pending || cooldownLeft > 0 || myReactions[artist.id]) return;
+    if (!live || pending || Date.now() < cooldownUntilRef.current || myReactions[artist.id]) return;
     if (!userId) {
       toast.error("Sign in to react");
       return;
     }
+    if (!interactionGate.current.enter()) return;
     const snap = scores[artist.id];
     // Optimistic bump — display shows snapshot+1 until the server confirms.
     setPending({
@@ -116,6 +119,7 @@ export function HypePassPanel({
     } finally {
       setPending(null);
       startCooldown();
+      interactionGate.current.leave();
     }
   };
 
@@ -127,6 +131,7 @@ export function HypePassPanel({
     () => Object.fromEntries(artists.map((a) => [a.id, a])),
     [artists],
   );
+  const sideIds = assignedArtistIds(artists);
   const leaderId =
     ranked.length > 1 &&
     (scores[ranked[0]]?.battle_score ?? 0) > (scores[ranked[1]]?.battle_score ?? 0)
@@ -147,7 +152,7 @@ export function HypePassPanel({
       </div>
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {ranked.map((artistId) => {
+        {sideIds.map((artistId) => {
           const artist = byId[artistId];
           if (!artist) return null;
           const score = scores[artistId];
@@ -161,7 +166,7 @@ export function HypePassPanel({
           const mine = myReactions[artistId];
           const isPending = pending?.artistId === artistId;
           const disabled = !live || !!pending || cooldownLeft > 0 || !!mine;
-          const pulseKey = `${score?.rev ?? 0}:${isPending ? pending!.action : ""}`;
+          const pulseKey = `${score?.rev ?? 0}:${isPending ? pending?.action : ""}`;
 
           return (
             <motion.div
@@ -221,7 +226,7 @@ export function HypePassPanel({
                       "bg-emerald-600/80 hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40",
                     )}
                   >
-                    {isPending && pending!.action === "hype" ? (
+                    {isPending && pending?.action === "hype" ? (
                       <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
                       <Flame className="h-3 w-3" />
@@ -236,7 +241,7 @@ export function HypePassPanel({
                       "bg-red-600/70 hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-40",
                     )}
                   >
-                    {isPending && pending!.action === "pass" ? (
+                    {isPending && pending?.action === "pass" ? (
                       <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
                       <ThumbsDown className="h-3 w-3" />
