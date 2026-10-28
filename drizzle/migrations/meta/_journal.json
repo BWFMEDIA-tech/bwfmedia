@@ -253,6 +253,13 @@
       "when": 1793067753563,
       "tag": "0035_blog_automation",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1793218501936,
+      "tag": "0036_videos_add_genre",
+      "breakpoints": true
     }
   ]
 }
