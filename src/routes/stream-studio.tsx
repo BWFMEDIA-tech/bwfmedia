@@ -61,7 +61,6 @@ import {
 
 /* ---------- Admin-only layout customization (presentation only) ---------- */
 const STUDIO_BLOCKS: StudioBlockDef[] = [
-  { id: "console", label: "Console Header" },
   { id: "production", label: "Live Production Dashboard" },
   { id: "promotion", label: "Promotion Mode" },
   { id: "liveroom", label: "Live Room / Stage" },
@@ -978,9 +977,8 @@ function StreamStudio() {
           <StudioLayoutProvider isAdmin={auth.roles.includes("admin")} defs={STUDIO_BLOCKS}>
           <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto p-3 sm:p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px]">
             {/* Center column */}
-            <StudioColumn className="flex min-w-0 flex-col gap-3">
-              {/* Console header */}
-              <StudioBlock id="console" label="Console Header">
+            <div className="flex min-w-0 flex-col gap-3">
+              {/* Essential setup controls stay visible above customizable blocks. */}
               <div className="flex min-w-0 flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-3 py-3 backdrop-blur sm:px-5 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
 
                 <div className="flex min-w-0 flex-wrap items-center gap-3">
@@ -1116,8 +1114,8 @@ function StreamStudio() {
                   </Button>
                 </div>
               </div>
-              </StudioBlock>
 
+              <StudioColumn className="flex min-w-0 flex-col gap-3">
               {/* Unified Live Production Dashboard — single MediaEngine.
                   Stage and Broadcast are independent source toggles. */}
               <StudioBlock id="production" label="Live Production Dashboard">
@@ -1261,6 +1259,7 @@ function StreamStudio() {
               <InviteGuest streamId={stream?.id} />
               </StudioBlock>
             </StudioColumn>
+            </div>
 
             {/* Right rail — sticky console */}
             <StudioColumn className="flex flex-col gap-3 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)]">
