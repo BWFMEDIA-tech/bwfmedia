@@ -6219,6 +6219,24 @@ export type Database = {
           },
         ]
       }
+      video_upload_usage: {
+        Row: {
+          month_start: string
+          upload_count: number
+          user_id: string
+        }
+        Insert: {
+          month_start: string
+          upload_count?: number
+          user_id: string
+        }
+        Update: {
+          month_start?: string
+          upload_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           artist: string | null
@@ -6763,6 +6781,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_video_upload_allowance: { Args: never; Returns: Json }
       get_waitlist_count: { Args: never; Returns: number }
       grant_boost_credits_purchase: {
         Args: {

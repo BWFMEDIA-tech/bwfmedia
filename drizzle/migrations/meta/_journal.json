@@ -260,6 +260,13 @@
       "when": 1793218501936,
       "tag": "0036_videos_add_genre",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1793237673554,
+      "tag": "0037_artist_monthly_video_allowance",
+      "breakpoints": true
     }
   ]
 }
