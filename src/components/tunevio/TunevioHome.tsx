@@ -5,23 +5,18 @@ import {
   Bell,
   Clapperboard,
   Clock,
-  Compass,
   Flame,
   Heart,
-  Home,
   ListMusic,
   Mic2,
   Pause,
   Play,
-  Radio,
   Volume2,
   VolumeX,
   Rocket,
   Search,
   Sparkles,
-  Star,
   TrendingUp,
-  Trophy,
   Users,
 } from "lucide-react";
 import { getHomeFeed } from "@/lib/home-feed.functions";
@@ -42,22 +37,6 @@ import {
   TrackCard,
   toPlayerTrack,
 } from "@/components/tunevio/cards";
-
-const SIDEBAR = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/search", label: "Search", icon: Search },
-  { to: "/library", label: "Library", icon: ListMusic },
-  { to: "/settings", label: "Account", icon: Users },
-  { to: "/messages", label: "Inbox", icon: Bell },
-  { to: "/events", label: "Events", icon: Clock },
-  { to: "/store", label: "Store", icon: Heart },
-  { to: "/charts", label: "Charts", icon: Trophy },
-  { to: "/discover", label: "Discover", icon: Compass },
-  { to: "/live", label: "Live", icon: Radio },
-  { to: "/mic-drop", label: "Arena", icon: Mic2 },
-  { to: "/artists", label: "Artists", icon: Users },
-  { to: "/leaderboard", label: "Leaderboard", icon: Star },
-] as const;
 
 type HomeChip = "all" | "music" | "videos" | "live" | "artists" | "arena";
 const HOME_CHIPS: { id: HomeChip; label: string }[] = [
@@ -124,37 +103,6 @@ export function TunevioHome() {
   return (
     <div className="swara-home min-h-screen bg-background text-foreground">
       <div className="flex w-full gap-6 px-4 pb-40 pt-4 sm:px-6 lg:px-8">
-        {/* Desktop sidebar */}
-        <aside className="sticky top-24 hidden h-[calc(100vh-8rem)] w-[220px] shrink-0 flex-col rounded-2xl border border-tv-line bg-tv-surface p-4 lg:flex">
-          <p className="px-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/35">Browse</p>
-          <nav className="mt-3 flex flex-col gap-1">
-            {SIDEBAR.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.label}
-                  to={item.to as never}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-white/65 transition hover:bg-white/10 hover:text-white"
-                  activeProps={{ className: "bg-white/10 text-white" }}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="mt-auto rounded-xl bg-gradient-to-br from-tv-violet/30 to-tv-cyan/20 p-4">
-            <p className="text-sm font-black">Are you an artist?</p>
-            <p className="mt-1 text-xs text-white/60">Upload music, go live and get discovered.</p>
-            <Link
-              to="/artist-submission"
-              className="mt-3 inline-block rounded-full bg-white px-3 py-1.5 text-xs font-black text-black"
-            >
-              Get started
-            </Link>
-          </div>
-        </aside>
-
         <main className="min-w-0 flex-1 space-y-10">
           {/* Dashboard bar */}
           <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-tv-line bg-tv-surface/80 p-3 backdrop-blur sm:flex sm:justify-between">
