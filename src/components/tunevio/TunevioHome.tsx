@@ -172,6 +172,28 @@ export function TunevioHome() {
             ))}
           </div>
 
+          {/* Charts */}
+          {show("music") && (
+          <ContentRail
+            id="charts"
+            title="Tunevio Charts"
+            eyebrow="Top of the platform"
+            showAllTo="/charts"
+            items={(feed?.charts ?? []).map((t, i) => (
+              <AlbumCard
+                key={t.id}
+                track={t}
+                queue={feed?.charts}
+                badge={
+                  <span className="rounded-full bg-black/75 px-2 py-0.5 text-[10px] font-black text-tv-cyan">
+                    #{i + 1}
+                  </span>
+                }
+              />
+            ))}
+          />
+          )}
+
           {/* Discover playlists */}
           {show("music") && (
           <ContentRail
@@ -362,28 +384,6 @@ export function TunevioHome() {
             eyebrow="Personalized"
             signedIn={auth.isAuthenticated}
             tracks={feed?.discover ?? []}
-          />
-          )}
-
-          {/* Charts */}
-          {show("music") && (
-          <ContentRail
-            id="charts"
-            title="Tunevio Charts"
-            eyebrow="Top of the platform"
-            showAllTo="/charts"
-            items={(feed?.charts ?? []).map((t, i) => (
-              <AlbumCard
-                key={t.id}
-                track={t}
-                queue={feed?.charts}
-                badge={
-                  <span className="rounded-full bg-black/75 px-2 py-0.5 text-[10px] font-black text-tv-cyan">
-                    #{i + 1}
-                  </span>
-                }
-              />
-            ))}
           />
           )}
 
