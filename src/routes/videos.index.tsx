@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedVideoUrl } from "@/lib/video-urls";
 import { videoMatchesGenre } from "@/lib/video-genre";
+import { parseVideoUploadAllowance, type VideoUploadAllowance } from "@/lib/video-upload-allowance";
 import { useServerFn } from "@tanstack/react-start";
 import { getSavedVideos, setVideoSaved } from "@/lib/video-engagement.functions";
 import { Button } from "@/components/ui/button";
@@ -272,6 +273,9 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [genre, setGenre] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const submitting = useRef(false);
+  const [allowance, setAllowance] = useState<VideoUploadAllowance | null>(null);
+  const [checkingAllowance, setCheckingAllowance] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -281,6 +285,26 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
   const [thumbBlob, setThumbBlob] = useState<Blob | null>(null);
   const [thumbPreview, setThumbPreview] = useState<string | null>(null);
   const [capturing, setCapturing] = useState(false);
+
+  const checkAllowance = async () => {
+    const { data, error } = await supabase.rpc("get_video_upload_allowance");
+    if (error) throw new Error("Could not check your video allowance. Please try again.");
+    const next = parseVideoUploadAllowance(data);
+    setAllowance(next);
+    return next;
+  };
+  useEffect(() => {
+    let active = true;
+    supabase.rpc("get_video_upload_allowance").then(({ data, error }) => {
+      if (!active) return;
+      try {
+        if (error) throw new Error("Could not check your video allowance. Please reopen the upload form.");
+        setAllowance(parseVideoUploadAllowance(data));
+      } catch (error) { setErr(error instanceof Error ? error.message : "Could not check your video allowance."); }
+      setCheckingAllowance(false);
+    });
+    return () => { active = false; };
+  }, [userId]);
 
   useEffect(() => {
     if (!file) { setVideoUrl(null); return; }
@@ -319,13 +343,21 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting.current) return;
     if (!file) { setErr("Pick a video file"); return; }
+    submitting.current = true;
     setBusy(true); setErr(null);
+    const uploadedPaths: string[] = [];
+    let published = false;
+    try {
+    const currentAllowance = await checkAllowance();
+    if (currentAllowance.remaining === 0) throw new Error("You've used your 2 video uploads this month. Your allowance resets on the first of next month (Chicago time).");
     const ext = file.name.split(".").pop() || "mp4";
     const stamp = Date.now();
     const path = `${userId}/${stamp}.${ext}`;
     const up = await supabase.storage.from("videos").upload(path, file, { contentType: file.type });
-    if (up.error) { setErr(up.error.message); setBusy(false); return; }
+    if (up.error) throw new Error(up.error.message);
+    uploadedPaths.push(path);
 
     // Use user-picked thumbnail if available; otherwise fall back to an auto-grab.
     let thumbnail_path: string | null = null;
@@ -334,7 +366,7 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
       if (blob) {
         const tPath = `${userId}/${stamp}-thumb.jpg`;
         const tUp = await supabase.storage.from("videos").upload(tPath, blob, { contentType: "image/jpeg" });
-        if (!tUp.error) thumbnail_path = tPath;
+        if (!tUp.error) { thumbnail_path = tPath; uploadedPaths.push(tPath); }
       }
     } catch { /* non-fatal */ }
 
@@ -343,14 +375,25 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
       category, storage_path: path, external_url: externalUrl || null,
       thumbnail_path, genre: genre || null,
     });
-    setBusy(false);
-    if (ins.error) { setErr(ins.error.message); return; }
+    if (ins.error) throw new Error(ins.error.message);
+    published = true;
     onUploaded();
+    } catch (error) {
+      if (!published && uploadedPaths.length) await supabase.storage.from("videos").remove(uploadedPaths);
+      setErr(error instanceof Error ? error.message : "Your video could not be uploaded. Please try again.");
+      await checkAllowance().catch(() => setAllowance(null));
+    } finally { submitting.current = false; setBusy(false); }
   };
 
   return (
     <Modal onClose={onClose} title="Upload Video">
       <form onSubmit={submit} className="space-y-4">
+        <div role="status" className="text-sm text-muted-foreground">
+          {checkingAllowance ? "Checking upload allowance…" : allowance ? <>
+            <p>{allowance.remaining} of 2 video uploads remaining this month · Free and paid artists</p>
+            <p className="mt-1">Resets {new Date(allowance.resetsAt).toLocaleDateString("en-US", { timeZone: "America/Chicago", month: "long", day: "numeric" })} (Chicago time)</p>
+          </> : "Video allowance unavailable."}
+        </div>
         <input required aria-label="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
           className="w-full bg-card border border-border/20 px-4 py-3 text-foreground focus:border-primary outline-none" />
         <input aria-label="Artist or sponsor" value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artist / Sponsor"
@@ -427,9 +470,9 @@ function UploadModal({ userId, onClose, onUploaded }: { userId: string; onClose:
           </div>
         )}
         {err && <p className="text-primary text-sm">{err}</p>}
-        <Button disabled={busy} className="w-full py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-foreground disabled:opacity-50"
+        <Button disabled={busy || checkingAllowance || !allowance || allowance.remaining === 0} className="w-full py-3 font-cond font-bold tracking-[0.25em] text-[11px] uppercase text-foreground disabled:opacity-50"
           >
-          {busy ? "Uploading…" : "Publish"}
+          {busy ? "Uploading…" : allowance?.remaining === 0 ? "Monthly limit reached" : "Publish"}
         </Button>
       </form>
     </Modal>
