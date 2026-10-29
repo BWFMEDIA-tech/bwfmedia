@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Allow every artist, including free accounts, two video uploads per calendar month with enforced limits and upload allowance display.
 - [x] Repair sign-up links, confirmation handling, safe redirects, truthful errors and session hydration; 13 tests pass, confirmation/error UI verified with mocked auth responses, real existing session validates and reaches /home. Email/password enabled and hosted signup/confirmation settings checked; real new-account email delivery and password submission remain unverified without a test inbox/credentials. Profiles and security settings preserved; not published.
 - [ ] Fix Play Arena Voting/Hype side switching: code fixed and 27 regression tests pass; live multi-user, reconnect and refresh checks blocked because the database was temporarily unreachable.
 - [ ] Rebrand visible copy, metadata and public URLs to Tunevio; replace the specified contact email, preserve protected systems/accounts, and provide unpublished review reports.
