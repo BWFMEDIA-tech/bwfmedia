@@ -1574,6 +1574,72 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_imports: {
+        Row: {
+          artists_detected: number
+          completed_at: string | null
+          created_at: string
+          distributor: string
+          duplicates_skipped: number
+          error_count: number
+          errors: Json
+          file_name: string
+          file_size: number
+          id: string
+          idempotency_key: string
+          import_name: string
+          isrcs_found: number
+          releases_detected: number
+          releases_imported: number
+          status: string
+          tracks_detected: number
+          tracks_imported: number
+          user_id: string
+        }
+        Insert: {
+          artists_detected?: number
+          completed_at?: string | null
+          created_at?: string
+          distributor: string
+          duplicates_skipped?: number
+          error_count?: number
+          errors?: Json
+          file_name: string
+          file_size?: number
+          id?: string
+          idempotency_key: string
+          import_name: string
+          isrcs_found?: number
+          releases_detected?: number
+          releases_imported?: number
+          status?: string
+          tracks_detected?: number
+          tracks_imported?: number
+          user_id: string
+        }
+        Update: {
+          artists_detected?: number
+          completed_at?: string | null
+          created_at?: string
+          distributor?: string
+          duplicates_skipped?: number
+          error_count?: number
+          errors?: Json
+          file_name?: string
+          file_size?: number
+          id?: string
+          idempotency_key?: string
+          import_name?: string
+          isrcs_found?: number
+          releases_detected?: number
+          releases_imported?: number
+          status?: string
+          tracks_detected?: number
+          tracks_imported?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_timeouts: {
         Row: {
           created_at: string
