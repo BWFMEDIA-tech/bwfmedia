@@ -16,6 +16,7 @@ const GROUPS = [
     { to: "/settings/music-media", label: "Tracks, Releases & Artwork" },
     { to: "/distribution", label: "Release Status & Distribution" },
     { to: "/rights", label: "Music Rights & Royalties" },
+    { to: "/import-catalog", label: "Import Catalog" },
   ] },
   { key: "live", label: "Live & Arena", icon: Radio, children: [
     { to: "/go-live", label: "Go Live" },
