@@ -24,7 +24,7 @@ function client() {
       if (table === "streams") return { data: { id: filters.some((f) => f[1] === "title") ? "library" : "live", status: "live" } };
       if (table === "user_roles") return { data: [{ role: "artist" }] };
       if (table === "battle_matches") return { data: null };
-      return { data: filters.some((f) => f[1] === "id") ? state.source : state.queued ? [{ id: "existing" }] : [] };
+      return { data: filters.some((f) => f[0] === "eq" && f[1] === "id") ? state.source : state.queued ? [{ id: "existing" }] : [] };
     };
     const builder: Record<string, unknown> = {};
     for (const method of ["select", "eq", "neq", "in", "order", "limit", "maybeSingle"]) {
