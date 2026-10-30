@@ -34,6 +34,7 @@ import { Route as GoLiveRouteImport } from './routes/go-live'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as HostEarningsRouteImport } from './routes/host-earnings'
+import { Route as ImportCatalogRouteImport } from './routes/import-catalog'
 import { Route as InstallRouteImport } from './routes/install'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as LibraryRouteImport } from './routes/library'
@@ -288,6 +289,11 @@ const HomeRoute = HomeRouteImport.update({
 const HostEarningsRoute = HostEarningsRouteImport.update({
   id: '/host-earnings',
   path: '/host-earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportCatalogRoute = ImportCatalogRouteImport.update({
+  id: '/import-catalog',
+  path: '/import-catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InstallRoute = InstallRouteImport.update({
@@ -980,6 +986,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/home': typeof HomeRoute
   '/host-earnings': typeof HostEarningsRoute
+  '/import-catalog': typeof ImportCatalogRoute
   '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
   '/library': typeof LibraryRoute
@@ -1135,6 +1142,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/home': typeof HomeRoute
   '/host-earnings': typeof HostEarningsRoute
+  '/import-catalog': typeof ImportCatalogRoute
   '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
   '/library': typeof LibraryRoute
@@ -1292,6 +1300,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/home': typeof HomeRoute
   '/host-earnings': typeof HostEarningsRoute
+  '/import-catalog': typeof ImportCatalogRoute
   '/install': typeof InstallRoute
   '/leaderboard': typeof LeaderboardRoute
   '/library': typeof LibraryRoute
@@ -1451,6 +1460,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/home'
     | '/host-earnings'
+    | '/import-catalog'
     | '/install'
     | '/leaderboard'
     | '/library'
@@ -1606,6 +1616,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/home'
     | '/host-earnings'
+    | '/import-catalog'
     | '/install'
     | '/leaderboard'
     | '/library'
@@ -1762,6 +1773,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/home'
     | '/host-earnings'
+    | '/import-catalog'
     | '/install'
     | '/leaderboard'
     | '/library'
@@ -1920,6 +1932,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   HomeRoute: typeof HomeRoute
   HostEarningsRoute: typeof HostEarningsRoute
+  ImportCatalogRoute: typeof ImportCatalogRoute
   InstallRoute: typeof InstallRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LibraryRoute: typeof LibraryRoute
@@ -2173,6 +2186,13 @@ declare module '@tanstack/react-router' {
       path: '/host-earnings'
       fullPath: '/host-earnings'
       preLoaderRoute: typeof HostEarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/import-catalog': {
+      id: '/import-catalog'
+      path: '/import-catalog'
+      fullPath: '/import-catalog'
+      preLoaderRoute: typeof ImportCatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/install': {
@@ -3259,6 +3279,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   HomeRoute: HomeRoute,
   HostEarningsRoute: HostEarningsRoute,
+  ImportCatalogRoute: ImportCatalogRoute,
   InstallRoute: InstallRoute,
   LeaderboardRoute: LeaderboardRoute,
   LibraryRoute: LibraryRoute,
