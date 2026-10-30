@@ -2,6 +2,22 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+/** Read only the caller's existing artist-profile library, never queue mirrors. */
+export const getSubmissionProfileTracks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: library, error: libraryError } = await context.supabase.from("streams")
+      .select("id").eq("host_id", context.userId).eq("title", "__profile_library__").maybeSingle();
+    if (libraryError) throw new Error("Unable to load profile library");
+    if (!library) return [];
+    const { data: tracks, error } = await context.supabase.from("play_tracks")
+      .select("id, title, cover_url").eq("artist_user_id", context.userId)
+      .eq("stream_id", library.id).neq("status", "removed").not("audio_url", "is", null)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error("Unable to load profile songs");
+    return tracks ?? [];
+  });
+
 /** Submit a track to a stream's BWFPLAY queue. Requires active membership.
  *  If the user has boost credits, one is consumed and the track is marked
  *  boosted (jumps to top of the queue). */
@@ -10,28 +26,32 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({
       streamId: z.string().uuid(),
-      title: z.string().min(1).max(120),
-      artistName: z.string().min(1).max(120),
-      audioUrl: z.string().url().max(2000).optional().or(z.literal("")).default(""),
-      coverUrl: z.string().url().max(2000).optional().or(z.literal("")).default(""),
+      profileTrackId: z.string().uuid(),
       useBoost: z.boolean().optional().default(false),
-      durationSeconds: z.number().int().min(0).max(60 * 60 * 12).optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Enforce that audio_url, when supplied, points to this artist's own
-    // play/<userId>/ prefix in the artist-audio bucket. The bucket's storage
-    // SELECT policy is scoped to that prefix; rejecting other shapes prevents
-    // stream participants from being handed a path that could resolve to
-    // another artist's audio file.
-    if (data.audioUrl) {
-      const required = `/artist-audio/play/${userId}/`;
-      if (!data.audioUrl.includes(required)) {
-        throw new Error("audio_url must reference this artist's play/<uid>/ storage path");
-      }
+    const { data: library, error: libraryError } = await supabase.from("streams")
+      .select("id").eq("host_id", userId).eq("title", "__profile_library__").maybeSingle();
+    if (libraryError) throw new Error("Unable to verify profile library");
+    if (!library || library.id === data.streamId) throw new Error("Choose a song already on your artist profile");
+    const { data: source, error: sourceError } = await supabase.from("play_tracks")
+      .select("id, title, artist_name, audio_url, cover_url, duration_seconds")
+      .eq("id", data.profileTrackId).eq("artist_user_id", userId).eq("stream_id", library.id)
+      .neq("status", "removed").maybeSingle();
+    if (sourceError) throw new Error("Unable to verify profile song");
+    if (!source?.audio_url || !source.title) throw new Error("Choose a song already on your artist profile");
+    // Keep the existing owned-storage restriction on submitted audio.
+    if (!source.audio_url.includes(`/artist-audio/play/${userId}/`)) {
+      throw new Error("This profile song needs audio uploaded to your artist profile before submitting");
     }
+    const { data: queued, error: queueError } = await supabase.from("play_tracks")
+      .select("id").eq("artist_user_id", userId).eq("stream_id", data.streamId)
+      .in("status", ["queued", "playing"]).eq("audio_url", source.audio_url).limit(1);
+    if (queueError) throw new Error("Unable to check live queue");
+    if (queued?.length) throw new Error("This track is already in the live queue");
 
     // Stream must exist + accept submissions.
     const { data: stream } = await supabase
@@ -114,11 +134,11 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       .insert({
         stream_id: data.streamId,
         artist_user_id: userId,
-        artist_name: data.artistName,
-        title: data.title,
-        audio_url: data.audioUrl || null,
-        cover_url: data.coverUrl || null,
-        duration_seconds: data.durationSeconds ?? null,
+        artist_name: source.artist_name,
+        title: source.title,
+        audio_url: source.audio_url,
+        cover_url: source.cover_url,
+        duration_seconds: source.duration_seconds ?? null,
         boosted,
         position: nextPosition,
         battle_match_id: battleMatchId,
