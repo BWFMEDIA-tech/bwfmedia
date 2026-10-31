@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { signVideoPaths } from "@/lib/video-sign.functions";
+import { signPublicVideoPaths, signVideoPaths } from "@/lib/video-sign.functions";
 
 const cache = new Map<string, { url: string; expiresAt: number }>();
 const inflight = new Map<string, Promise<string | null>>();

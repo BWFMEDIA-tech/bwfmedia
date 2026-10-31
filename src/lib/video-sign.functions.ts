@@ -36,3 +36,32 @@ export const signVideoPaths = createServerFn({ method: "POST" })
     for (const s of signed ?? []) if (s.path) results[s.path] = s.signedUrl ?? null;
     return { results };
   });
+
+/**
+ * Public variant for signed-out visitors: signs only paths that belong to a
+ * published video row, so arbitrary bucket files are never exposed.
+ */
+export const signPublicVideoPaths = createServerFn({ method: "POST" })
+  .inputValidator((d) =>
+    z.object({ paths: z.array(z.string().min(1).max(500)).min(1).max(50) }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const paths = Array.from(new Set(data.paths));
+    const results: Record<string, string | null> = {};
+    for (const p of paths) results[p] = null;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("videos")
+      .select("storage_path, thumbnail_path")
+      .or(`storage_path.in.(${paths.map((p) => `"${p.replace(/"/g, "")}"`).join(",")}),thumbnail_path.in.(${paths.map((p) => `"${p.replace(/"/g, "")}"`).join(",")})`);
+    const allowed = new Set<string>();
+    for (const r of (rows ?? []) as Array<{ storage_path: string | null; thumbnail_path: string | null }>) {
+      if (r.storage_path) allowed.add(r.storage_path);
+      if (r.thumbnail_path) allowed.add(r.thumbnail_path);
+    }
+    const toSign = paths.filter((p) => allowed.has(p));
+    if (!toSign.length) return { results };
+    const { data: signed } = await supabaseAdmin.storage.from("videos").createSignedUrls(toSign, 3600);
+    for (const s of signed ?? []) if (s.path) results[s.path] = s.signedUrl ?? null;
+    return { results };
+  });
