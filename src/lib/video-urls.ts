@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { signVideoPaths } from "@/lib/video-sign.functions";
+import { signPublicVideoPaths, signVideoPaths } from "@/lib/video-sign.functions";
 
 const cache = new Map<string, { url: string; expiresAt: number }>();
 const inflight = new Map<string, Promise<string | null>>();
@@ -16,10 +16,10 @@ export async function signVideoPath(path: string | null | undefined): Promise<st
     let signedUrl: string | null = null;
     try {
       const { data: s } = await supabase.auth.getSession();
-      if (s.session) {
-        const res = await signVideoPaths({ data: { paths: [path] } });
-        signedUrl = res.results[path] ?? null;
-      }
+      const res = s.session
+        ? await signVideoPaths({ data: { paths: [path] } })
+        : await signPublicVideoPaths({ data: { paths: [path] } });
+      signedUrl = res.results[path] ?? null;
     } catch {
       signedUrl = null;
     }
