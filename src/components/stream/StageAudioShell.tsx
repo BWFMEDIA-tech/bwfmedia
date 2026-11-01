@@ -16,7 +16,6 @@ import {
   type RemoteParticipant,
   type RemoteTrackPublication,
 } from "livekit-client";
-import type { LocalAudioTrack } from "livekit-client";
 import { Mic, MicOff, Radio, PhoneOff, Activity, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -30,6 +29,7 @@ import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { StageNavigationConnection } from "./StageNavigationConnection";
 import { setStageNavigationConnection } from "@/lib/stage-navigation-connection";
+import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -48,6 +48,7 @@ export function StageAudioShell({
   onLeave,
   showHostTools = true,
   autoConnect = false,
+  arenaAudio = false,
 }: {
   token: string;
   serverUrl: string;
@@ -60,7 +61,9 @@ export function StageAudioShell({
   showHostTools?: boolean;
   /** Connect immediately after a Join Live/Invite click instead of showing a second join prompt. */
   autoConnect?: boolean;
+  arenaAudio?: boolean;
 }) {
+  const audioOptions = useMemo(() => arenaAudio ? getArenaRoomAudioOptions() : undefined, [arenaAudio]);
   const [connect, setConnect] = useState(autoConnect);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
@@ -169,6 +172,7 @@ export function StageAudioShell({
       connect
       audio
       video={false}
+      options={audioOptions}
       onError={(e) => {
         const kind = classifyLiveKitError(e);
         if (kind) {
@@ -767,47 +771,13 @@ function MicLevelMeter() {
       setLevel(0);
       return;
     }
-    const pub = Array.from(localParticipant.trackPublications.values()).find(
-      (p) => p.kind === Track.Kind.Audio,
-    );
-    const track = pub?.track as LocalAudioTrack | undefined;
-    const mediaStreamTrack = track?.mediaStreamTrack;
-    if (!mediaStreamTrack) return;
-
-    let raf = 0;
-    let ctx: AudioContext | null = null;
-    let analyser: AnalyserNode | null = null;
-    let source: MediaStreamAudioSourceNode | null = null;
-    try {
-      ctx = new AudioContext();
-      const stream = new MediaStream([mediaStreamTrack]);
-      source = ctx.createMediaStreamSource(stream);
-      analyser = ctx.createAnalyser();
-      analyser.fftSize = 512;
-      source.connect(analyser);
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      const tick = () => {
-        if (!analyser) return;
-        analyser.getByteTimeDomainData(data);
-        let sum = 0;
-        for (let i = 0; i < data.length; i++) {
-          const v = (data[i] - 128) / 128;
-          sum += v * v;
-        }
-        const rms = Math.sqrt(sum / data.length);
-        setLevel(Math.min(1, rms * 2.5));
-        raf = requestAnimationFrame(tick);
-      };
-      tick();
-    } catch (e) {
-      console.warn("[stage-audio] Mic meter init failed", e);
-    }
-    return () => {
-      cancelAnimationFrame(raf);
-      try { source?.disconnect(); } catch {}
-      try { analyser?.disconnect(); } catch {}
-      try { ctx?.close(); } catch {}
-    };
+    // LiveKit already measures the microphone. A second capture graph/context
+    // here used to be created and closed on every mute/unmute (especially costly
+    // during iOS audio-route changes). Read the existing meter at 10 Hz instead.
+    const sample = () => setLevel(Math.min(1, localParticipant.audioLevel * 2.5));
+    sample();
+    const timer = setInterval(sample, 100);
+    return () => clearInterval(timer);
   }, [localParticipant, isMicrophoneEnabled]);
 
   const bars = 12;

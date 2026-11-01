@@ -33,8 +33,8 @@ export function getSharedAudioContext(): AudioContext | null {
 
 /** Resume the shared context — must be called from a user gesture. */
 export function resumeAudioContext(): void {
-  if (sharedCtx && sharedCtx.state === "suspended") {
-    void sharedCtx.resume();
+  if (sharedCtx && (sharedCtx.state as string) !== "running" && sharedCtx.state !== "closed") {
+    void sharedCtx.resume().catch(() => { /* A new user gesture may still be required. */ });
   }
 }
 
