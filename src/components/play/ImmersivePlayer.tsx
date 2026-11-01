@@ -189,7 +189,35 @@ function LiveVisualizerImpl({
         data = new Uint8Array(new ArrayBuffer(128));
       }
 
-      if (mode === "ring") {
+      if (mode === "waves") {
+        // Horizontal sound waves extending left and right from the artwork,
+        // driven by the live frequency data. Frozen flat when paused.
+        const perSide = 36;
+        const artR = Math.min(w, h) * 0.3; // start just outside the artwork
+        const maxLen = (w / 2 - artR) * 0.92;
+        const step = data.length / perSide;
+        for (const side of [-1, 1]) {
+          for (let i = 0; i < perSide; i++) {
+            const v = data[Math.floor(i * step)] / 255;
+            const bh = (2 + v * Math.min(w, h) * 0.22) * dpr;
+            const x = cx + side * (artR + (i / perSide) * maxLen);
+            const fade = 1 - (i / perSide) * 0.75;
+            const grad = ctx2d.createLinearGradient(0, cy - bh, 0, cy + bh);
+            grad.addColorStop(0, `rgba(0,230,255,${0.9 * fade})`);
+            grad.addColorStop(0.5, `rgba(0,75,255,${0.95 * fade})`);
+            grad.addColorStop(1, `rgba(192,192,200,${0.55 * fade})`);
+            ctx2d.strokeStyle = grad;
+            ctx2d.lineWidth = 3 * dpr;
+            ctx2d.lineCap = "round";
+            ctx2d.shadowColor = `rgba(0,230,255,${0.8 * fade})`;
+            ctx2d.shadowBlur = 10 * dpr;
+            ctx2d.beginPath();
+            ctx2d.moveTo(x, cy - bh / 2);
+            ctx2d.lineTo(x, cy + bh / 2);
+            ctx2d.stroke();
+          }
+        }
+      } else if (mode === "ring") {
         const bars = 96;
         const radius = Math.min(w, h) * 0.34;
         const step = data.length / bars;
@@ -201,10 +229,10 @@ function LiveVisualizerImpl({
           const y1 = cy + Math.sin(a) * radius;
           const x2 = cx + Math.cos(a) * (radius + len);
           const y2 = cy + Math.sin(a) * (radius + len);
-          const hue = 270 + v * 80;
+          const hue = 195 + v * 45;
           const grad = ctx2d.createLinearGradient(x1, y1, x2, y2);
           grad.addColorStop(0, `hsla(${hue},100%,60%,0.95)`);
-          grad.addColorStop(1, `hsla(${hue + 40},100%,55%,0.1)`);
+          grad.addColorStop(1, `hsla(${hue + 15},100%,55%,0.1)`);
           ctx2d.strokeStyle = grad;
           ctx2d.lineWidth = 3 * dpr;
           ctx2d.lineCap = "round";
@@ -246,7 +274,7 @@ function LiveVisualizerImpl({
           const x = cx + Math.cos(a) * r;
           const y = cy + Math.sin(a) * r;
           const size = (1.6 + energy * 5) * dpr;
-          const hue = 220 + (i / count) * 140;
+          const hue = 185 + (i / count) * 55;
           ctx2d.fillStyle = `hsla(${hue},100%,65%,${0.6 + energy * 0.4})`;
           ctx2d.shadowColor = `hsla(${hue},100%,60%,1)`;
           ctx2d.shadowBlur = 18 * dpr;
