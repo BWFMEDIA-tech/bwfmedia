@@ -59,7 +59,7 @@ function useAudioGraph(audioRef: React.RefObject<HTMLAudioElement | null>) {
   analyserRef.current = graph?.analyser ?? null;
   gainRef.current = graph?.gain ?? null;
   ctxRef.current = graph?.ctx ?? null;
-  const resume = () => resumeSharedAudio();
+  const resume = resumeSharedAudio;
   return { analyserRef, gainRef, ctxRef, resume };
 }
 

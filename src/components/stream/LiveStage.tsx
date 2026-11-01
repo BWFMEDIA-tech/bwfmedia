@@ -10,7 +10,7 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Track, ConnectionQuality, ConnectionState, RoomEvent, type Participant } from "livekit-client";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Mic, MicOff, Camera, CameraOff, MonitorUp, UserPlus, Settings, PhoneOff, Wifi, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
 import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { StageMuteEnforcement } from "./StageMuteEnforcement";
+import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -51,9 +52,11 @@ interface LiveStageProps {
   profileHost?: { id: string; name: string; photo: string | null };
   /** Podcast mode: keep the mic live but turn the camera off. */
   audioOnly?: boolean;
+  arenaAudio?: boolean;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost, audioOnly = false }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost, audioOnly = false, arenaAudio = false }: LiveStageProps) {
+  const audioOptions = useMemo(() => arenaAudio ? getArenaRoomAudioOptions() : undefined, [arenaAudio]);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
 
   // Publish health to the global store; reset on unmount so other surfaces
@@ -92,6 +95,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       connect={!fatal}
       video={false}
       audio={false}
+      options={audioOptions}
       onError={(e) => {
         const kind = classifyLiveKitError(e);
         if (kind) {

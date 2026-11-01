@@ -221,6 +221,7 @@ function GuestPage() {
               onLeave={() => setLk(null)}
               showHostTools={isHostLike}
               autoConnect
+              arenaAudio
             >
               <StageRoom
                 streamId={streamId}
@@ -246,7 +247,7 @@ function GuestPage() {
             </StageAudioShell>
           ) : (
             <>
-              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} />
+              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} arenaAudio />
               {streamId && (
                 <StageRoom
                   streamId={streamId}
