@@ -40,7 +40,7 @@ function fmt(sec: number): string {
   return `${m}:${s}`;
 }
 
-type VisMode = "ring" | "bars" | "particles";
+type VisMode = "waves" | "ring" | "bars" | "particles";
 
 /* ---------- Web Audio: analyser + normalizer gain ----------
    Signal chain: <audio> → MediaElementSource → AnalyserNode → GainNode → destination
@@ -174,18 +174,19 @@ function LiveVisualizerImpl({
       tRef.current += isPlaying ? 0.015 : 0.005;
 
       let data: Uint8Array<ArrayBuffer>;
-      if (analyser) {
+      if (analyser && isPlaying) {
         data = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
         analyser.getByteFrequencyData(data);
-      } else {
-        // idle pulse
+      } else if (isPlaying) {
+        // fallback pulse only while actually playing (no analyser available)
         const n = 128;
         data = new Uint8Array(new ArrayBuffer(n));
         for (let i = 0; i < n; i++) {
-          data[i] = isPlaying
-            ? 60 + Math.sin(tRef.current * 2 + i * 0.18) * 40 + Math.random() * 20
-            : 20 + Math.sin(tRef.current + i * 0.12) * 15;
+          data[i] = 60 + Math.sin(tRef.current * 2 + i * 0.18) * 40 + Math.random() * 20;
         }
+      } else {
+        // paused/stopped: flat data so the waves freeze instead of looping
+        data = new Uint8Array(new ArrayBuffer(128));
       }
 
       if (mode === "ring") {
