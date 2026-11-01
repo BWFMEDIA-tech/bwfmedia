@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { usePlaybackPlaying } from "@/lib/playback-store";
+import { usePlaybackPlaying, setPlaybackPlaying } from "@/lib/playback-store";
 import { SignedImg } from "@/components/ui/signed-img";
 import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
