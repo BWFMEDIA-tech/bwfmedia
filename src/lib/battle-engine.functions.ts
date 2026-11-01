@@ -649,7 +649,10 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
         .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at, updated_at, battle_match_id, battle_side")
         .eq("stream_id", data.streamId)
         .in("artist_user_id", artistIds)
-        .in("status", ["queued", "playing"])
+        // Include "completed" so a side whose battle track already played
+        // (or a pending match whose artists submitted earlier) still shows
+        // its real artwork instead of the blank placeholder disc.
+        .in("status", ["queued", "playing", "completed"])
         .order("created_at", { ascending: false });
       for (const n of needFallback) {
         const t = n.artistId ? assignedBattleTrack(subs ?? [], match.id, n.side, n.artistId) : null;
