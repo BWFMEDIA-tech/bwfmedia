@@ -1446,6 +1446,26 @@ function BattleTrackAudio({ audioUrl, title, startedAt }: { audioUrl: string | n
     return a.play();
   };
 
+  // Report this element's real playback state to the shared store so the
+  // vinyl spin follows the battle audio itself — not the global music
+  // player, which is a separate element and usually paused on Arena pages.
+  useEffect(() => {
+    const a = ref.current;
+    if (!a) return;
+    const onPlay = () => setPlaybackPlaying(true);
+    const onStop = () => setPlaybackPlaying(false);
+    a.addEventListener("playing", onPlay);
+    a.addEventListener("pause", onStop);
+    a.addEventListener("ended", onStop);
+    if (a.paused) setPlaybackPlaying(false);
+    return () => {
+      a.removeEventListener("playing", onPlay);
+      a.removeEventListener("pause", onStop);
+      a.removeEventListener("ended", onStop);
+      setPlaybackPlaying(false);
+    };
+  }, [src]);
+
   useEffect(() => {
     const a = ref.current;
     if (!a) return;
