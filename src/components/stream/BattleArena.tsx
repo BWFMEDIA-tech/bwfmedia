@@ -750,6 +750,33 @@ function ArtistSide({
           </div>
         ) : (
           <>
+            {isPlaying && (["left", "right"] as const).map((dir) => (
+              <div
+                key={dir}
+                aria-hidden
+                className={cn(
+                  "pointer-events-none absolute top-1/2 flex h-12 -translate-y-1/2 items-center gap-[3px] sm:gap-1",
+                  dir === "left" ? "right-full mr-1.5 flex-row-reverse" : "left-full ml-1.5",
+                )}
+              >
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    className="arena-wave-bar w-[3px] rounded-full"
+                    style={{
+                      height: `${100 - i * 13}%`,
+                      opacity: 1 - i * 0.13,
+                      background:
+                        i % 3 === 0 ? "#00E6FF" : i % 3 === 1 ? "#004BFF" : "#C0C7D1",
+                      boxShadow: i % 3 === 2 ? undefined : "0 0 6px rgba(0,230,255,0.6)",
+                      animationDelay: `${(i * 0.11 + (dir === "right" ? 0.05 : 0)).toFixed(2)}s`,
+                      animationDuration: `${0.7 + (i % 3) * 0.18}s`,
+                      animationPlayState: audioPlaying ? "running" : "paused",
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
             {isPlaying && (
               <>
                 <span

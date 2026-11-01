@@ -1343,3 +1343,21 @@ body { font-family: var(--font-body); letter-spacing: 0; }
     font-size: max(16px, 1em) !important;
   }
 }
+
+/* Arena sound waves: transform-only so they stay cheap on phones and never
+   touch the audio graph; play state follows the real battle <audio>. */
+@keyframes arena-wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.arena-wave-bar {
+  transform-origin: center;
+  transform: scaleY(0.25);
+  animation-name: arena-wave;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .arena-wave-bar { animation: none; }
+}
