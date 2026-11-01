@@ -40,3 +40,4 @@
 - Keep text fields at 16px or larger on touch screens (global rule in styles.css), because iOS Safari/PWA/Capacitor zoom the page when a focused field's text is smaller.
 - Live directory previews use isolated, authenticated read-only LiveKit identities and camera-only subscriptions; exclude preview identities from visitor totals and release connections after the timed preview, because browsing must not publish, interrupt hosts or inflate fan counts.
 - Store track lengths in play_tracks.duration_seconds (uploads measure the local file via src/lib/audio-duration.ts before insert); duration displays fall back to "--:--" only for rows without a measured length, because historical rows lack durations.
+- Arena shares one clock, isolates mic/music graphs, stops muted capture and reuses LiveKit levels and stable callbacks to avoid audio churn.
