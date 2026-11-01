@@ -519,7 +519,7 @@ export function ImmersivePlayer({
   const [volume, setVolume] = useState(0.85);
   const [muted, setMuted] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [visMode, setVisMode] = useState<VisMode>("ring");
+  const [visMode, setVisMode] = useState<VisMode>("waves");
   const [showQueue, setShowQueue] = useState(true);
   const [sleepMin, setSleepMin] = useState<number | null>(null);
   const sleepRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -831,7 +831,7 @@ export function ImmersivePlayer({
             </span>
           </div>
           <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/40 p-0.5">
-            {(["ring","bars","particles"] as VisMode[]).map((m) => (
+            {(["waves","ring","bars","particles"] as VisMode[]).map((m) => (
               <button key={m}
                 onClick={() => setVisMode(m)}
                 className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition ${
@@ -848,22 +848,30 @@ export function ImmersivePlayer({
         <div className="relative z-10 mx-auto flex w-full max-w-[420px] items-center justify-center">
           <div className="relative aspect-square w-full">
             <LiveVisualizer analyserRef={analyserRef} mode={visMode} isPlaying={isPlaying} />
-            <div className={`absolute inset-[18%] overflow-hidden rounded-3xl border-2 border-white/15 shadow-[0_0_80px_-10px_rgba(0,0,255,0.7)] transition-transform duration-500 ${
-              isPlaying ? "scale-100" : "scale-95"
-            }`}>
-              {track?.cover_url ? (
-                <SignedImg src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
-              ) : (
-                <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#0000FF] to-[#0000FF]">
-                  <Sparkles className="h-16 w-16 text-white/60" />
-                </div>
-              )}
+            {/* Vinyl: spins only while the track is actually playing.
+                animationPlayState freezes the rotation in place on pause and
+                resumes from the same angle, so the disc never jumps. */}
+            <div
+              className="absolute inset-[18%] animate-[spin_6s_linear_infinite]"
+              style={{ animationPlayState: isPlaying ? "running" : "paused" }}
+            >
+              <div className="h-full w-full overflow-hidden rounded-full border-2 border-white/20 shadow-[0_0_80px_-10px_rgba(0,0,255,0.7),inset_0_0_0_6px_rgba(0,0,0,0.85)]">
+                {track?.cover_url ? (
+                  <SignedImg src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#0000FF] to-[#004BFF]">
+                    <Sparkles className="h-16 w-16 text-white/60" />
+                  </div>
+                )}
+              </div>
+              {/* vinyl center label */}
+              <div aria-hidden className="absolute left-1/2 top-1/2 h-[16%] w-[16%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/25 bg-black/90 shadow-[0_0_12px_rgba(0,230,255,0.35)]" />
             </div>
             {needsUnlock && track && (
               <button
                 type="button"
                 onClick={unlockAndPlay}
-                className="absolute inset-0 z-20 grid place-items-center rounded-3xl bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 z-20 grid place-items-center rounded-full bg-black/60 backdrop-blur-sm"
                 aria-label="Tap to start listening"
               >
                 <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#0000FF] via-[#00E6FF] to-[#0000FF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(0,0,255,0.9)]">
