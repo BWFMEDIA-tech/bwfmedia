@@ -703,7 +703,8 @@ function ArtistSide({
   // (animation-play-state: paused) when the shared audio element is paused,
   // so it resumes from the same angle when playback continues.
   const spinning = isPlaying;
-  const spinPaused = isPlaying && !audioPlaying;
+  // Spin follows the shared "playing" track state so every viewer (host, stage, listeners) sees it turn, even when audio plays through the live room instead of a local element.
+  const spinPaused = !isPlaying && !audioPlaying;
   const statusMeta =
     status === "playing"
       ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#00E6FF] to-[#00e6ff] text-black animate-pulse" }
@@ -771,7 +772,7 @@ function ArtistSide({
                       boxShadow: i % 3 === 2 ? undefined : "0 0 6px rgba(0,230,255,0.6)",
                       animationDelay: `${(i * 0.11 + (dir === "right" ? 0.05 : 0)).toFixed(2)}s`,
                       animationDuration: `${0.7 + (i % 3) * 0.18}s`,
-                      animationPlayState: audioPlaying ? "running" : "paused",
+                      animationPlayState: isPlaying || audioPlaying ? "running" : "paused",
                     }}
                   />
                 ))}
