@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Hand, LogOut, X as XIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { raiseHand, leaveStage, cancelHand } from "@/lib/stage.functions";
+import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
 
@@ -160,14 +161,19 @@ export function RaiseHandButton({ streamId, auth, label: idleLabel }: { streamId
   };
 
   if (onStage) {
+    // Mute and "Leave stage" travel together so phone users reach both from the
+    // same spot instead of scrolling to a separate mic row.
     return (
-      <Button variant="outline" size="sm"
-        onClick={onLeave}
-        disabled={busy}
-        className="text-destructive"
-      >
-        <LogOut className="h-4 w-4" /> Leave stage
-      </Button>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <SelfMicrophoneButton />
+        <Button variant="outline" size="sm"
+          onClick={onLeave}
+          disabled={busy}
+          className="text-destructive"
+        >
+          <LogOut className="h-4 w-4" /> Leave stage
+        </Button>
+      </div>
     );
   }
 

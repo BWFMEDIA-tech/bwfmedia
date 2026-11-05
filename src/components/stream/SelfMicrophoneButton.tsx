@@ -1,11 +1,20 @@
 import { useState } from "react";
-import { useLocalParticipant } from "@livekit/components-react";
+import { useLocalParticipant, useMaybeRoomContext } from "@livekit/components-react";
 import { Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 /** Local track control only; never grants stage access or changes host moderation. */
 export function SelfMicrophoneButton() {
+  // This button is also rendered from page-level rows (next to "Leave stage"),
+  // which can sit outside any LiveKit room. Only mount the participant hook when
+  // a room context actually exists — useLocalParticipant throws without one.
+  const room = useMaybeRoomContext();
+  if (!room) return null;
+  return <SelfMicrophoneButtonControl />;
+}
+
+function SelfMicrophoneButtonControl() {
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
   const [busy, setBusy] = useState(false);
   const allowed = localParticipant.permissions?.canPublish === true;

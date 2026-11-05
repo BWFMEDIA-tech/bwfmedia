@@ -49,6 +49,7 @@ export function StageAudioShell({
   showHostTools = true,
   autoConnect = false,
   arenaAudio = false,
+  hideSelfMicRow = false,
 }: {
   token: string;
   serverUrl: string;
@@ -62,6 +63,8 @@ export function StageAudioShell({
   /** Connect immediately after a Join Live/Invite click instead of showing a second join prompt. */
   autoConnect?: boolean;
   arenaAudio?: boolean;
+  /** Set when the page already shows the mic control beside "Leave stage". */
+  hideSelfMicRow?: boolean;
 }) {
   const audioOptions = useMemo(() => arenaAudio ? getArenaRoomAudioOptions() : undefined, [arenaAudio]);
   const [connect, setConnect] = useState(autoConnect);
@@ -195,7 +198,7 @@ export function StageAudioShell({
         <StageReconnectBanner />
         {children}
         {showHostTools && <StageDiagnostics />}
-        {showHostTools ? <StageMicBar onLeave={onLeave} /> : <div className="flex justify-center py-3"><SelfMicrophoneButton /></div>}
+        {showHostTools ? <StageMicBar onLeave={onLeave} /> : !hideSelfMicRow && <div className="flex justify-center py-3"><SelfMicrophoneButton /></div>}
       </StageConnectionProvider>
     </LiveKitRoom>
   );
