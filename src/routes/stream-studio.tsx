@@ -1220,6 +1220,12 @@ function StreamStudio() {
                       <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
                     )}
 
+                    {/* Battle sits above the stage roster so the matchup is
+                        the first thing the host sees. */}
+                    {streamMode !== "play" && (
+                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
+                    )}
+
                     <StudioStageRoom
                       streamId={stream.id}
                       participants={participants}
@@ -1229,9 +1235,6 @@ function StreamStudio() {
                       spotlight={spotlight}
                       selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
                     />
-                    {streamMode !== "play" && (
-                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
-                    )}
                     {streamMode === "stage" && <StudioAudienceRow participants={participants} />}
                   </StageAudioShell>
                 )}
