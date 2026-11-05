@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, X, CheckCircle2, Image as ImageIcon, Music2 } from "lucide-react";
+import { Crown, X, CheckCircle2, Image as ImageIcon, Music2, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { submitPlayTrack, getSubmissionProfileTracks } from "@/lib/play.functions";
 import { SignedImg } from "@/components/ui/signed-img";
+import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { Button } from "@/components/ui/button";
 
-export function SubmitTrackDialog({ streamId, boostCredits, onClose, onSubmitted }: {
+export function SubmitTrackDialog({ streamId, defaultArtistName, boostCredits, onClose, onSubmitted }: {
   streamId: string;
   defaultArtistName: string;
   boostCredits: number;
@@ -22,6 +23,7 @@ export function SubmitTrackDialog({ streamId, boostCredits, onClose, onSubmitted
   const [useBoost, setUseBoost] = useState(false);
   const [busy, setBusy] = useState(false);
   const submitting = useRef(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,6 +54,19 @@ export function SubmitTrackDialog({ streamId, boostCredits, onClose, onSubmitted
     }
   };
 
+  if (uploadOpen) return (
+    <AddProfileTrackDialog
+      defaultArtistName={defaultArtistName}
+      onClose={() => setUploadOpen(false)}
+      onAdded={(track) => {
+        setProfileTracks((tracks) => [track, ...tracks.filter((t) => t.id !== track.id)]);
+        setPickedProfileId(track.id);
+        setProfileError("");
+        setLoadingProfile(false);
+      }}
+    />
+  );
+
   return (
     <div className="fixed inset-0 z-[100] bg-background/80 flex items-center justify-center p-4">
       <div className="relative w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-lg border border-border bg-card p-6">
@@ -60,12 +75,13 @@ export function SubmitTrackDialog({ streamId, boostCredits, onClose, onSubmitted
         </Button>
         <h2 className="text-xl font-bold mb-4">Submit a track</h2>
         <div className="space-y-3">
+          <Button variant="outline" className="w-full" disabled={busy} onClick={() => setUploadOpen(true)}><UploadCloud className="h-4 w-4" /> Upload new track</Button>
           {loadingProfile && profileTracks.length === 0 && (
             <div className="text-xs text-muted-foreground">Loading your profile tracks…</div>
           )}
           {!loadingProfile && !profileError && profileTracks.length === 0 && (
             <div className="rounded-lg border border-border bg-muted p-4 text-center text-sm text-muted-foreground">
-              No songs on your profile yet. Upload music to your artist profile first, then come back to submit.
+              No songs on your profile yet.
             </div>
           )}
           {profileError && <div role="alert" className="text-sm text-destructive">{profileError}</div>}
