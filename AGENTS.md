@@ -10,7 +10,7 @@
 - Suppress the host's navigation glow using its local LiveKit connection while mounted; remote availability still follows backend status, and transport loss must not end or mutate a stream.
 - Share local microphone controls across audio and video stages without granting stage access; treat muted microphone publications as intentional during media recovery so reconnect logic never unmutes a participant.
 - Resolve stage photo self-microphone controls from the local room identity as well as profile props, including pending host roster placeholders; only the local track is toggled and host moderation stays authoritative.
-- Render live artist profiles through ArtistLiveRoom with existing LiveKit/chat/stage tools and a public-safe host-filtered lookup; poll status to restore the profile without exposing private stream fields.
+- Profiles use the shared confirmed live feed without role filters: streams reuse ArtistLiveRoom; stages/broadcasts use existing join routes, keeping directory status and permissions consistent.
 - Authorize stream controls by the authenticated stream owner rather than platform roles, and keep stream ownership immutable, because each profile's live room is independent.
 - Keep `/profile` redirecting to artist profiles, not a duplicate editor, to preserve old links.
 - Resolve artist public IDs and legacy account IDs to the profile account ID before loading related data or checking ownership, because directory links and old shared links use different identifiers.
