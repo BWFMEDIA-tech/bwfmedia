@@ -85,7 +85,7 @@ export function BattleHostControls({
           <ControlButton
             label={
               currentRound === 0
-                ? "Start Battle"
+                ? "Start Battle & Open Voting"
                 : isFinalRound
                   ? "Complete Match"
                   : `Start Round ${currentRound + 1}`
