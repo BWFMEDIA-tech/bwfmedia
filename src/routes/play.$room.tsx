@@ -12,6 +12,7 @@ import { BoostCheckoutModal } from "@/components/play/BoostCheckoutModal";
 import { SubmitTrackDialog } from "@/components/play/SubmitTrackDialog";
 import { LiveChat } from "@/components/stream/LiveChat";
 import { BattleArena } from "@/components/stream/BattleArena";
+import { SkipLinePopup } from "@/components/play/SkipLinePopup";
 import { ImmersivePlayer } from "@/components/play/ImmersivePlayer";
 import { useStageState } from "@/lib/useStageState";
 import { useListeningSession } from "@/lib/useListeningSession";
@@ -265,6 +266,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
         </div>
       </div>
 
+      <SkipLinePopup queued={queued} />
       <MembershipPromoPopup
         userId={auth.user?.id ?? null}
         eligible={!!auth.user && auth.roles.includes("artist") && status !== null && !status.membershipActive}
