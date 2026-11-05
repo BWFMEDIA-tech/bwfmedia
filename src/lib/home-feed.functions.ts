@@ -123,10 +123,11 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
   const artistIds = new Set(
     ((artistRoleRes.data ?? []) as any[]).map((r) => r.user_id as string),
   );
-  const { onlyArtistTracks } = await import("@/lib/home-feed-artists");
+  const { onlyArtistTracks: onlyArtistRaw, onlyWithArtwork, onePerRelease } = await import("@/lib/home-feed-artists");
+  const onlyArtistTracks = (rows: any, ids: Set<string>) => onlyWithArtwork(onlyArtistRaw(rows, ids) as any[]);
 
   const trending = onlyArtistTracks(trendingRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
-  const newReleases = onlyArtistTracks(newRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
+  const newReleases = onePerRelease(onlyArtistTracks(newRes.data, artistIds)).slice(0, LIMIT).map(mapTrack);
   const popularWeek = onlyArtistTracks(weekRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
   const popularAll = onlyArtistTracks(popularRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
   const popular = popularWeek.length ? popularWeek : popularAll;
@@ -171,7 +172,8 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
   const newArtistIds = new Set(
     (newReleases as FeedTrack[]).map((t) => t.artistUserId).filter(Boolean) as string[],
   );
-  const rising = artists.filter((a) => newArtistIds.has(a.id)).slice(0, LIMIT);
+  const withPhoto = (a: FeedArtist) => !!a.avatarUrl && a.avatarUrl.trim() !== "";
+  const rising = artists.filter((a) => withPhoto(a) && newArtistIds.has(a.id)).slice(0, LIMIT);
 
   const streamRows = (streamRes.data ?? []) as any[];
   const viewersByStream = new Map<string, number>(
@@ -207,7 +209,7 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
     boosted,
     featured,
     artists: sortedArtists.slice(0, LIMIT),
-    rising: rising.length ? rising : sortedArtists.slice(0, LIMIT),
+    rising: rising.length ? rising : sortedArtists.filter(withPhoto).slice(0, LIMIT),
     battles,
     liveStreams,
   };
