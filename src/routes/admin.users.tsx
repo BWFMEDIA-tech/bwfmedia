@@ -139,8 +139,8 @@ function AdminUsersPage() {
           </button>
         </form>
 
-        <div className="mt-6 overflow-hidden rounded-xl border border-white/10">
-          <table className="w-full text-sm">
+        <div className="mt-6 overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] rounded-xl border border-white/10">
+          <table className="w-full min-w-[720px] text-sm">
             <thead className="bg-white/5 text-left text-xs uppercase tracking-wider text-white/50">
               <tr>
                 <th className="px-4 py-3">User</th>
