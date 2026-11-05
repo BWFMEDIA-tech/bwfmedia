@@ -156,6 +156,7 @@ import { Route as ApiPublicCheckoutCancellationEmailRouteImport } from './routes
 import { Route as ApiPublicStudioBookingRouteImport } from './routes/api/public/studio-booking'
 import { Route as ArtistStorePagesIndexRouteImport } from './routes/artist-store.pages.index'
 import { Route as ArtistStorePagesPageIdRouteImport } from './routes/artist-store.pages.$pageId'
+import { Route as ArtistIdConnectionsRouteImport } from './routes/artist_.$id.connections'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
@@ -909,6 +910,11 @@ const ArtistStorePagesPageIdRoute = ArtistStorePagesPageIdRouteImport.update({
   path: '/pages/$pageId',
   getParentRoute: () => ArtistStoreRoute,
 } as any)
+const ArtistIdConnectionsRoute = ArtistIdConnectionsRouteImport.update({
+  id: '/artist_/$id/connections',
+  path: '/artist/$id/connections',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BroadcastBroadcastIdManageRoute =
   BroadcastBroadcastIdManageRouteImport.update({
     id: '/manage',
@@ -1107,6 +1113,7 @@ export interface FileRoutesByFullPath {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
+  '/artist/$id/connections': typeof ArtistIdConnectionsRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
@@ -1262,6 +1269,7 @@ export interface FileRoutesByTo {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
+  '/artist/$id/connections': typeof ArtistIdConnectionsRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
@@ -1421,6 +1429,7 @@ export interface FileRoutesById {
   '/api/public/checkout-cancellation-email': typeof ApiPublicCheckoutCancellationEmailRoute
   '/api/public/studio-booking': typeof ApiPublicStudioBookingRoute
   '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
+  '/artist_/$id/connections': typeof ArtistIdConnectionsRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
@@ -1581,6 +1590,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/artist-store/pages/$pageId'
+    | '/artist/$id/connections'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/events'
     | '/play/audience/$room'
@@ -1736,6 +1746,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/artist-store/pages/$pageId'
+    | '/artist/$id/connections'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/events'
     | '/play/audience/$room'
@@ -1894,6 +1905,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout-cancellation-email'
     | '/api/public/studio-booking'
     | '/artist-store/pages/$pageId'
+    | '/artist_/$id/connections'
     | '/broadcast/$broadcastId/manage'
     | '/lovable/email/events'
     | '/play/audience/$room'
@@ -2001,6 +2013,7 @@ export interface RootRouteChildren {
   ApiPublicBlockBookingRoute: typeof ApiPublicBlockBookingRoute
   ApiPublicCheckoutCancellationEmailRoute: typeof ApiPublicCheckoutCancellationEmailRoute
   ApiPublicStudioBookingRoute: typeof ApiPublicStudioBookingRoute
+  ArtistIdConnectionsRoute: typeof ArtistIdConnectionsRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
   ApiOauthPlatformCallbackRoute: typeof ApiOauthPlatformCallbackRoute
@@ -3042,6 +3055,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistStorePagesPageIdRouteImport
       parentRoute: typeof ArtistStoreRoute
     }
+    '/artist_/$id/connections': {
+      id: '/artist_/$id/connections'
+      path: '/artist/$id/connections'
+      fullPath: '/artist/$id/connections'
+      preLoaderRoute: typeof ArtistIdConnectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/broadcast/$broadcastId/manage': {
       id: '/broadcast/$broadcastId/manage'
       path: '/manage'
@@ -3352,6 +3372,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCheckoutCancellationEmailRoute:
     ApiPublicCheckoutCancellationEmailRoute,
   ApiPublicStudioBookingRoute: ApiPublicStudioBookingRoute,
+  ArtistIdConnectionsRoute: ArtistIdConnectionsRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
   ApiOauthPlatformCallbackRoute: ApiOauthPlatformCallbackRoute,

@@ -1068,8 +1068,8 @@ function FollowCounts({ artistId }: { artistId: string }) {
   const d = q.data as { count?: number; followingCount?: number } | undefined;
   return (
     <div className="mt-2 flex gap-5 text-sm">
-      <span><b className="font-bold text-white tabular-nums">{fmtNum(d?.count ?? 0)}</b> <span className="text-white/60">followers</span></span>
-      <span><b className="font-bold text-white tabular-nums">{fmtNum(d?.followingCount ?? 0)}</b> <span className="text-white/60">following</span></span>
+      <Link to="/artist/$id/connections" params={{ id: artistId }} search={{ tab: "followers" }} className="hover:underline"><b className="font-bold text-white tabular-nums">{fmtNum(d?.count ?? 0)}</b> <span className="text-white/60">followers</span></Link>
+      <Link to="/artist/$id/connections" params={{ id: artistId }} search={{ tab: "following" }} className="hover:underline"><b className="font-bold text-white tabular-nums">{fmtNum(d?.followingCount ?? 0)}</b> <span className="text-white/60">following</span></Link>
     </div>
   );
 }
