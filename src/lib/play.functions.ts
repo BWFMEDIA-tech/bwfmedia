@@ -280,7 +280,27 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
         .upsert({ stream_id: data.streamId, current_track_id: null }, { onConflict: "stream_id" });
       return { ok: true, next: null };
     }
-    await supabase.from("play_tracks").update({ status: "playing" }).eq("id", next.id);
+    await supabase.from("play_tracks")
+      .update({ status: "playing", updated_at: new Date().toISOString() } as any)
+      .eq("id", next.id);
+    // When the queue hands a battle over to the other side, record it on the
+    // match right away so every screen spins the correct record instantly.
+    const { data: nextRow } = await supabase.from("play_tracks")
+      .select("battle_match_id, battle_side").eq("id", next.id).maybeSingle();
+    if (nextRow?.battle_match_id && (nextRow.battle_side === "a" || nextRow.battle_side === "b")) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: m } = await supabaseAdmin.from("battle_matches")
+        .select("id, stream_id, current_round_id").eq("id", nextRow.battle_match_id).maybeSingle();
+      if (m && m.stream_id === data.streamId) {
+        if (m.current_round_id) {
+          await supabaseAdmin.from("battle_rounds")
+            .update({ [`${nextRow.battle_side}_playing_track_id`]: next.id } as any)
+            .eq("id", m.current_round_id);
+        }
+        await supabaseAdmin.from("battle_matches")
+          .update({ active_side: nextRow.battle_side } as any).eq("id", m.id);
+      }
+    }
     await supabase.from("play_sessions")
       .upsert({ stream_id: data.streamId, current_track_id: next.id, status: "open" },
         { onConflict: "stream_id" });
