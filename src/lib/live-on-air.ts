@@ -47,7 +47,19 @@ export async function filterOnAirStreams<T>(
     await Promise.all(names.slice(offset, offset + 10).map(async name => {
       if ((peopleByRoom.get(name) ?? 0) <= 0) return;
       try { partsByRoom.set(name, await client.listParticipants(name)); }
-      catch { /* A room can disappear between the two presence reads. */ }
+      catch {
+        // Retry transient reads without removing a genuinely connected host.
+        try { partsByRoom.set(name, await client.listParticipants(name)); }
+        catch {
+          // A vanished room is offline; a failed read of an existing room is unknown.
+          let remaining: Array<{ name: string; numParticipants?: number }>;
+          try { remaining = await client.listRooms([name]); }
+          catch { throw new Error("Live presence temporarily unavailable"); }
+          if (remaining.some(room => room.name === name && (room.numParticipants ?? 0) > 0)) {
+            throw new Error("Live presence temporarily unavailable");
+          }
+        }
+      }
     }));
   }
   const onAir = candidates.map(candidate => candidate.room && partsByRoom.get(candidate.room)?.some(

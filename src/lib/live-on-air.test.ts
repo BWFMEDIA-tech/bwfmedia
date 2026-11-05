@@ -102,8 +102,8 @@ describe("filterOnAirStreams", () => {
     await expect(filterOnAirStreams([candidate("a", "room-a")], null)).rejects.toThrow("Live presence temporarily unavailable");
   });
 
-  it("drops only the row whose participant lookup fails", async () => {
-    const rows = await filterOnAirStreams(
+  it("reports unknown presence rather than removing an existing room after lookup failures", async () => {
+    await expect(filterOnAirStreams(
       [candidate("broken", "room-broken"), candidate("real", "room-live")],
       client(
         [
@@ -112,8 +112,26 @@ describe("filterOnAirStreams", () => {
         ],
         { "room-live": [{ identity: "host-1", permission: { canPublish: true } }] },
       ),
-    );
-    expect(ids(rows)).toEqual(["real"]);
+    )).rejects.toThrow("Live presence temporarily unavailable");
+  });
+  it("retains a connected host when a transient participant lookup succeeds on retry", async () => {
+    let attempts = 0;
+    const recovering: OnAirRoomClient = {
+      listRooms: async () => [{ name: "recovering", numParticipants: 1 }],
+      listParticipants: async () => {
+        if (++attempts === 1) throw new Error("transient failure");
+        return [{ identity: "host-1", permission: { canPublish: true } }];
+      },
+    };
+    expect(ids(await filterOnAirStreams([candidate("active", "recovering")], recovering))).toEqual(["active"]);
+  });
+  it("removes a room that vanishes between participant reads", async () => {
+    let reads = 0;
+    const vanished: OnAirRoomClient = {
+      listRooms: async () => ++reads === 1 ? [{ name: "gone", numParticipants: 1 }] : [],
+      listParticipants: async () => { throw new Error("gone"); },
+    };
+    expect(await filterOnAirStreams([candidate("ended", "gone")], vanished)).toEqual([]);
   });
 
   it("drops a row that has no room to check", async () => {

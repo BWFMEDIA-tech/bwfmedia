@@ -80,7 +80,8 @@ function LivePage() {
           ))}
         </div>
 
-        {feed.isError ? (
+        {feed.isError && streams.length > 0 && <p role="status" className="mb-4 text-sm text-muted-foreground">Reconnecting — live status and visitor counts are temporarily unconfirmed.</p>}
+        {feed.isError && streams.length === 0 ? (
           <div className="py-12 text-center"><p className="mb-4 text-muted-foreground">Live broadcasts are temporarily unavailable.</p><Button onClick={feed.retry}>Retry</Button></div>
         ) : loading ? (
           <p className="text-muted-foreground">Loading live streams…</p>
