@@ -58,7 +58,20 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
         : 0
       const isOffline = !lastSeen || now - lastSeen > OFFLINE_THRESHOLD_MS
 
+      // Cap offline email notifications per sender so messaging can't be used
+      // to spam inboxes: 10 emails/hour per sender, 3/hour per sender→recipient.
+      let emailAllowed = false
       if (isOffline) {
+        const [perSender, perPair] = await Promise.all([
+          supabaseAdmin.rpc('check_rate_limit', { _bucket_key: `dm-email:${userId}`, _action: 'dm_email', _max_hits: 10, _window_secs: 3600 }),
+          supabaseAdmin.rpc('check_rate_limit', { _bucket_key: `dm-email:${userId}:${data.recipientId}`, _action: 'dm_email_pair', _max_hits: 3, _window_secs: 3600 }),
+        ])
+        const ok = (r: { data: unknown; error: unknown }) =>
+          !r.error && Array.isArray(r.data) && (r.data[0] as { allowed?: boolean } | undefined)?.allowed === true
+        emailAllowed = ok(perSender) && ok(perPair)
+      }
+
+      if (isOffline && emailAllowed) {
         // Look up sender display name and recipient email
         const [{ data: senderProfile }, { data: recipientAuth }] = await Promise.all([
           supabaseAdmin
