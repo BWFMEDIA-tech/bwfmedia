@@ -158,15 +158,21 @@ function AdminUsersPage() {
                 <tr key={u.id} className="border-t border-white/5 align-top">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {u.avatar_url ? (
-                        <SignedImg src={u.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-white/10" />
-                      )}
-                      <div>
-                        <div className="font-medium">{u.display_name || u.email || u.id.slice(0, 8)}</div>
-                        <div className="text-xs text-white/40">{u.email}</div>
-                      </div>
+                      <Link
+                        to="/artist/$id"
+                        params={{ id: u.id }}
+                        className="flex min-w-0 items-center gap-3 group"
+                      >
+                        {u.avatar_url ? (
+                          <SignedImg src={u.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover transition group-hover:ring-2 group-hover:ring-white/30" />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-white/10 transition group-hover:ring-2 group-hover:ring-white/30" />
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-medium group-hover:underline group-hover:text-white">{u.display_name || u.email || u.id.slice(0, 8)}</div>
+                          <div className="text-xs text-white/40">{u.email}</div>
+                        </div>
+                      </Link>
                     </div>
                   </td>
                   <td className="px-4 py-3">
