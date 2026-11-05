@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
+import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
+import type { UploadedProfileTrack } from "@/lib/profile-track-upload";
+import { Button } from "@/components/ui/button";
 import {
   Mic2,
   Swords,
@@ -45,6 +50,10 @@ export const Route = createFileRoute("/play/")({
   head: () => ({
     meta: [
       { title: "Play Arena — TUNEVIO" },
+      { property: "og:title", content: "Play Arena — TUNEVIO" },
+      { property: "og:description", content: "Upload music, join queues and compete in Tunevio's Play Arena." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         name: "description",
         content:
@@ -59,6 +68,8 @@ function PlayArenaDashboard() {
   const fn = useServerFn(getArenaDashboard);
   const userFn = useServerFn(getArenaUserStats);
   const { isAuthenticated } = useAuth();
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadedSong, setUploadedSong] = useState<UploadedProfileTrack | null>(null);
   const { data } = useQuery({
     queryKey: ["arena-dashboard"],
     queryFn: () => fn(),
@@ -77,6 +88,11 @@ function PlayArenaDashboard() {
     <div className="min-h-screen bg-[#06060d] text-white pt-20 pb-16">
       <div className="w-full px-4 sm:px-6 lg:px-8 space-y-6">
         <ProfileHero totals={data.totals} user={userStats ?? null} />
+        {isAuthenticated ? (
+          <div className="flex justify-end">
+            <Button onClick={() => setUploadOpen(true)}><Music2 className="h-4 w-4" /> Upload new track</Button>
+          </div>
+        ) : null}
         <ChoosePath data={data} user={userStats ?? null} />
         <LiveArenaStatus data={data} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -86,6 +102,8 @@ function PlayArenaDashboard() {
         </div>
         <ArenaPass />
       </div>
+      {uploadOpen && <AddProfileTrackDialog defaultArtistName={userStats?.displayName ?? ""} onClose={() => setUploadOpen(false)} onAdded={setUploadedSong} />}
+      {!uploadOpen && uploadedSong && <SubmitToArenaModal song={uploadedSong} onClose={() => setUploadedSong(null)} />}
     </div>
   );
 }

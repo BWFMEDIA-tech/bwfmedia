@@ -20,8 +20,12 @@ import type { PlayerTrack } from "@/lib/player-context";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
-    { title: "BWFPLAY Live Arena — Vote · Boost · Win" },
+    { title: "Tunevio Live Arena — Vote · Boost · Win" },
     { name: "description", content: "Live music arena: vote on tracks, boost your submission, and crown the weekly champion." },
+    { property: "og:title", content: "Tunevio Live Arena — Vote · Boost · Win" },
+    { property: "og:description", content: "Submit your music and vote on tracks in the Tunevio live music arena." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: PlayArena,
 });
