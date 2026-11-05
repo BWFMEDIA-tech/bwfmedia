@@ -813,15 +813,15 @@ export function ImmersivePlayer({
   );
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+    <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       {/* ───────── HERO PLAYER ───────── */}
-      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(120%_120%_at_20%_0%,rgba(0,0,255,0.18),transparent_60%),radial-gradient(120%_120%_at_80%_100%,rgba(0,230,255,0.14),transparent_55%),#06060f] p-5 sm:p-8 backdrop-blur-xl shadow-[0_0_120px_-40px_rgba(0,0,255,0.55)]">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(120%_120%_at_20%_0%,rgba(0,0,255,0.18),transparent_60%),radial-gradient(120%_120%_at_80%_100%,rgba(0,230,255,0.14),transparent_55%),#06060f] p-4 sm:p-5 backdrop-blur-xl shadow-[0_0_80px_-40px_rgba(0,0,255,0.55)]">
         {/* glow corners */}
-        <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-[#0000FF]/30 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-[#00E6FF]/25 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -left-16 -top-16 h-44 w-44 rounded-full bg-[#0000FF]/30 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -right-16 -bottom-16 h-44 w-44 rounded-full bg-[#00E6FF]/25 blur-3xl" />
 
         {/* Top bar — LIVE + listener count + vis mode */}
-        <div className="relative z-10 flex items-center justify-between mb-4">
+        <div className="relative z-10 flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#00E6FF] to-[#0000FF] px-2.5 py-1 text-[10px] font-black tracking-[0.18em]">
               <Radio className="h-3 w-3" /> LIVE
@@ -845,7 +845,7 @@ export function ImmersivePlayer({
         </div>
 
         {/* Artwork + visualizer */}
-        <div className="relative z-10 mx-auto flex w-full max-w-[420px] items-center justify-center">
+        <div className="relative z-10 mx-auto flex w-full max-w-[240px] sm:max-w-[280px] items-center justify-center">
           <div className="relative aspect-square w-full">
             <LiveVisualizer analyserRef={analyserRef} mode={visMode} isPlaying={isPlaying} />
             {/* Vinyl: spins only while the track is actually playing.
@@ -874,8 +874,8 @@ export function ImmersivePlayer({
                 className="absolute inset-0 z-20 grid place-items-center rounded-full bg-black/60 backdrop-blur-sm"
                 aria-label="Tap to start listening"
               >
-                <span className="flex flex-col items-center gap-2 rounded-full bg-gradient-to-br from-[#0000FF] via-[#00E6FF] to-[#0000FF] px-6 py-4 text-sm font-black tracking-wide text-white shadow-[0_0_60px_-5px_rgba(0,0,255,0.9)]">
-                  <Play className="h-8 w-8" />
+                <span className="flex flex-col items-center gap-1.5 rounded-full bg-gradient-to-br from-[#0000FF] via-[#00E6FF] to-[#0000FF] px-4 py-2.5 text-xs font-black tracking-wide text-white shadow-[0_0_40px_-5px_rgba(0,0,255,0.9)]">
+                  <Play className="h-5 w-5" />
                   TAP TO LISTEN
                 </span>
               </button>
@@ -884,22 +884,22 @@ export function ImmersivePlayer({
         </div>
 
         {/* Track info + verified + like/share/playlist */}
-        <div className="relative z-10 mt-5 flex flex-col items-center text-center">
+        <div className="relative z-10 mt-3 flex flex-col items-center text-center">
           {track ? (
             <>
-              <h2 className="flex items-center gap-2 text-2xl sm:text-3xl font-black tracking-tight">
+              <h2 className="flex items-center gap-2 text-lg sm:text-xl font-black tracking-tight">
                 <span className="truncate max-w-[80vw] sm:max-w-md">{track.title}</span>
               </h2>
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-white/70">
+              <p className="mt-0.5 flex items-center gap-1.5 text-xs text-white/70">
                 <span className="truncate">{track.artist_name}</span>
                 <BadgeCheck className="h-4 w-4 text-[#00E6FF]" />
                 <RankBadge userId={track.artist_user_id} size="md" />
               </p>
 
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-2 flex items-center gap-1.5">
                 <button
                   onClick={toggleLike}
-                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                  className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
                     liked
                       ? "border-[#00E6FF] bg-[#00E6FF]/15 text-[#00E6FF] shadow-[0_0_20px_-5px_rgba(0,0,255,0.7)]"
                       : "border-white/15 text-white/80 hover:border-white/40"
@@ -909,11 +909,11 @@ export function ImmersivePlayer({
                 </button>
                 <button
                   onClick={share}
-                  className="flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-bold text-white/80 hover:border-white/40 transition"
+                  className="flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-bold text-white/80 hover:border-white/40 transition"
                 >
-                  <Share2 className="h-3.5 w-3.5" /> Share
+                  <Share2 className="h-3 w-3" /> Share
                 </button>
-                <div className="hidden sm:flex items-center gap-1 rounded-full border border-white/15 px-2.5 py-1.5 text-xs font-bold text-white/80">
+                <div className="hidden sm:flex items-center gap-1 rounded-full border border-white/15 px-2 py-1 text-[11px] font-bold text-white/80">
                   <span className="text-[#00E6FF]">{track.score}</span>
                   <span className="text-white/40">score</span>
                 </div>
@@ -921,8 +921,8 @@ export function ImmersivePlayer({
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-black text-white/70">Waiting for next drop…</h2>
-              <p className="mt-1 text-sm text-white/40">{isHost ? "Pick a track from the queue to start." : "The host will play the next track soon."}</p>
+              <h2 className="text-lg font-black text-white/70">Waiting for next drop…</h2>
+              <p className="mt-0.5 text-xs text-white/40">{isHost ? "Pick a track from the queue to start." : "The host will play the next track soon."}</p>
             </>
           )}
         </div>
@@ -961,7 +961,7 @@ export function ImmersivePlayer({
         )}
 
         {/* Progress + transport */}
-        <div className="relative z-10 mt-6 w-full">
+        <div className="relative z-10 mt-3 w-full">
           {/* Progress */}
           <div className="flex items-center gap-3 text-[11px] tabular-nums text-white/60">
             <span className="w-10 text-right">{fmt(progress)}</span>
