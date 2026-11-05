@@ -281,6 +281,13 @@
       "when": 1793417757904,
       "tag": "0039_videos_public_read",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1793860673642,
+      "tag": "0040_get_host_rate_self_only",
+      "breakpoints": true
     }
   ]
 }
