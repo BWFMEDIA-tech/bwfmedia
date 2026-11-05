@@ -233,7 +233,7 @@ export function LiveChat({
         "flex flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(0,0,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]",
         popOut
           ? "fixed bottom-[84px] right-4 md:bottom-[92px] md:right-6 z-[95] h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))]"
-          : "relative w-full lg:w-[340px]",
+          : "hidden",
       )}
       style={{
         background:
