@@ -99,14 +99,8 @@ export function LiveProductionDashboard({
       <SourceTogglePanel />
 
       {/* Main two-panel layout */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <StagePanel
-          participants={participants}
-          onInvite={onInvite}
-          onPromoteParticipant={onPromoteParticipant}
-          onRemoveParticipant={onRemoveParticipant}
-          onMessageParticipant={onMessageParticipant}
-        />
+      {/* Stage (Audio) panel lives on the Admin Dashboard. */}
+      <div className="grid gap-4">
         <BroadcastPanel />
       </div>
 
@@ -358,7 +352,7 @@ function StatusPill({ on, partial, accent }: { on: boolean; partial?: boolean; a
 
 /* ---------------- Stage panel (continued) ---------------- */
 
-function StagePanel({
+export function StagePanel({
   participants, onInvite, onPromoteParticipant, onRemoveParticipant, onMessageParticipant,
 }: {
   participants: Array<{ id: string; name: string; avatar?: string | null }>;
