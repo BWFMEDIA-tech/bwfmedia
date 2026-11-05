@@ -156,3 +156,49 @@ export const listFollowedArtistIds = createServerFn({ method: "POST" })
     if (error) throw error;
     return { followedIds: (rows ?? []).map((r) => r.artist_id as string) };
   });
+/** Public followers/following list for the profile connections page. */
+export const listFollowConnections = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        userId: z.string().uuid(),
+        kind: z.enum(["followers", "following"]),
+        limit: z.number().int().min(1).max(200).default(200),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase;
+    const matchCol = data.kind === "followers" ? "artist_id" : "follower_id";
+    const otherCol = data.kind === "followers" ? "follower_id" : "artist_id";
+    const { data: rows, error } = await sb
+      .from("artist_follows")
+      .select("artist_id, follower_id, created_at")
+      .eq(matchCol, data.userId)
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (error) throw error;
+    const ids = (rows ?? []).map((r) => (r as Record<string, string>)[otherCol]);
+    const profs = new Map<string, { display_name: string | null; username: string | null; avatar_url: string | null; stage_name: string | null; genre: string | null }>();
+    if (ids.length) {
+      const { data: p } = await sb
+        .from("public_profiles")
+        .select("id, display_name, username, avatar_url, stage_name, genre")
+        .in("id", ids);
+      for (const r of p ?? []) if (r.id) profs.set(r.id, r);
+    }
+    return {
+      people: ids.map((id, i) => {
+        const p = profs.get(id);
+        return {
+          id,
+          followedAt: (rows ?? [])[i].created_at as string,
+          name: p?.stage_name || p?.display_name || "Tunevio member",
+          username: p?.username ?? null,
+          avatarUrl: p?.avatar_url ?? null,
+          subtitle: p?.genre ?? null,
+        };
+      }),
+    };
+  });
