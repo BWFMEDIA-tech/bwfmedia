@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Complete all-active Live directory brief: display existing account roles, preserve public discovery during local reconnects, handle presence lookup failures truthfully, and verify existing session types without changing streaming or schema.
 - [x] Remove Arena playback callback churn and extra mic-meter context; opt Arena room consumers into shared-clock independent graphs and clean muted capture. 24 regression tests pass and preview compiles. Live mic/music acceptance test remains blocked by unavailable active room/session; actual iPhone/Android and multi-listener audio remain unverified.
 - [x] Restrict live song submissions to the submitting artist's existing profile library; verify ownership and source metadata server-side, test restrictions and song picker.
 - [x] Allow all artists, including free accounts, two videos per Chicago calendar month; atomic database enforcement retains usage after deletion. Existing usage backfilled, allowance shown in real signed-in upload form, eight tests and build pass. No test video published or real allowance consumed; full upload/concurrency testing remains unverified.
