@@ -6,7 +6,13 @@ export type DirectoryRow = {
   description: string | null; thumbnail_url: string | null; viewer_count: number;
   started_at: string | null; mode: string | null;
   preview_room_name?: string;
+  account_roles?: string[];
 };
+const PUBLIC_LIVE_ROLES = ["artist", "host", "listener", "admin", "moderator", "manager", "member", "user"];
+/** Display labels only; never use these to grant room permissions. */
+export function liveAccountRoles(roles: string[]): string[] {
+  return PUBLIC_LIVE_ROLES.filter(role => roles.includes(role));
+}
 type Stage = { id: string; title: string; host_id: string; status: string; livekit_room: string; audience_count: number; started_at: string | null; description: string | null };
 type Broadcast = { id: string; host_id: string; stream_title: string; stream_status: string; description: string | null; viewer_count: number; started_at: string | null; playback_source: unknown };
 

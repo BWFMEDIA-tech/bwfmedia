@@ -80,7 +80,8 @@ function LivePage() {
           ))}
         </div>
 
-        {feed.isError ? (
+        {feed.isError && streams.length > 0 && <p role="status" className="mb-4 text-sm text-muted-foreground">Reconnecting — live status and visitor counts are temporarily unconfirmed.</p>}
+        {feed.isError && streams.length === 0 ? (
           <div className="py-12 text-center"><p className="mb-4 text-muted-foreground">Live broadcasts are temporarily unavailable.</p><Button onClick={feed.retry}>Retry</Button></div>
         ) : loading ? (
           <p className="text-muted-foreground">Loading live streams…</p>
@@ -138,6 +139,7 @@ function LivePage() {
                       {s.host?.stage_name || s.host?.display_name || "Tunevio host"}
                     </span>
                   </div>
+                  {(s.account_roles?.length ?? 0) > 0 && <p className="mt-1 text-xs text-muted-foreground capitalize">{s.account_roles?.map(role => role === "admin" ? "Administrator" : role).join(" · ")}</p>}
                   {s.category && (
                     <span className="mt-3 inline-block rounded-md bg-secondary border border-border px-2 py-1 text-[10px] font-semibold text-primary">
                       {liveCategoryLabel(s.category)}
