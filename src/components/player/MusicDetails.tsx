@@ -62,8 +62,8 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
       <DialogContent className="swara-music-detail music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
         {track.coverUrl && <SignedImg src={track.coverUrl} alt="" aria-hidden className="music-detail-backdrop" />}
         <div className="music-detail-shade" aria-hidden />
-        <div className="music-detail-content relative mx-auto max-w-2xl px-5 pb-8 pt-5 sm:px-10">
-          <header className="mb-6 grid grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
+        <div className="music-detail-content relative mx-auto max-w-2xl px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-10 sm:pb-8">
+          <header className="mb-3 grid sm:mb-6 grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
             <Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Back to music" onClick={onClose}>{nowPlaying ? <ChevronDown /> : <ArrowLeft />}</Button>
             <div className="min-w-0 text-center text-xs text-brand-silver">{nowPlaying ? <span className="block truncate text-sm font-semibold text-foreground">{track.title}</span> : "TUNEVIO MUSIC"}</div>
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Music options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
@@ -71,24 +71,24 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
           <div className="music-detail-art mx-auto aspect-square overflow-hidden rounded-lg bg-secondary">
             {track.coverUrl && failedCover !== track.coverUrl ? <SignedImg src={track.coverUrl} alt={`${track.title} artwork`} onError={() => setFailedCover(track.coverUrl ?? null)} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}
           </div>
-          <div className={nowPlaying ? "mt-10 flex items-center justify-between gap-4" : "mt-7 text-center"}>
+          <div className={nowPlaying ? "mt-4 flex items-center justify-between gap-3 sm:mt-10" : "mt-7 text-center"}>
             <div className="min-w-0">
-              <DialogTitle className="break-words text-2xl font-bold leading-tight sm:text-3xl">{track.title}</DialogTitle>
-              <DialogDescription className={nowPlaying ? "mt-1 text-lg font-semibold text-brand-silver" : "mt-2 text-base text-brand-silver"}>{track.artistId ? <Link to="/artist/$id" params={{ id: track.artistId }} onClick={onClose}>{track.artist}</Link> : track.artist}</DialogDescription>
+              <DialogTitle className="truncate text-xl font-bold leading-tight sm:text-3xl">{track.title}</DialogTitle>
+              <DialogDescription className={nowPlaying ? "mt-0.5 truncate text-base font-semibold text-brand-silver sm:text-lg" : "mt-2 text-base text-brand-silver"}>{track.artistId ? <Link to="/artist/$id" params={{ id: track.artistId }} onClick={onClose}>{track.artist}</Link> : track.artist}</DialogDescription>
               {track.preview && <p className="mt-2 text-xs text-muted-foreground">30-second preview</p>}
             </div>
             {nowPlaying && <Button variant="ghost" size="icon" aria-label={liked ? "Remove from saved" : "Save track"} aria-pressed={liked} disabled={saving} onClick={() => void like(track)} className={`h-12 w-12 shrink-0 rounded-full [&_svg]:size-8 ${liked ? "text-primary" : "text-foreground"}`}>{liked ? <CheckCircle2 /> : <PlusCircle />}</Button>}
           </div>
           {nowPlaying ? <>
-            <div className="mt-7"><input type="range" aria-label="Seek music" min={0} max={p.duration || 1} step={0.1} value={Math.min(p.progress, p.duration || 1)} disabled={!p.duration} onChange={(e) => p.seek(Number(e.target.value))} style={{ background: `linear-gradient(to right, var(--primary) ${p.duration ? Math.min(p.progress / p.duration, 1) * 100 : 0}%, var(--music-progress-track) 0)` }} className="music-expanded-progress w-full" /><div className="mt-3 flex justify-between text-xs tabular-nums text-brand-silver"><span>{formatPlayerTime(p.progress)}</span><span>-{formatPlayerTime(Math.max((p.duration || 0) - p.progress, 0))}</span></div></div>
-            <div className="my-7 flex items-center justify-between gap-2">
+            <div className="mt-3 sm:mt-7"><input type="range" aria-label="Seek music" min={0} max={p.duration || 1} step={0.1} value={Math.min(p.progress, p.duration || 1)} disabled={!p.duration} onChange={(e) => p.seek(Number(e.target.value))} style={{ background: `linear-gradient(to right, var(--primary) ${p.duration ? Math.min(p.progress / p.duration, 1) * 100 : 0}%, var(--music-progress-track) 0)` }} className="music-expanded-progress w-full" /><div className="mt-1.5 flex justify-between text-xs tabular-nums text-brand-silver"><span>{formatPlayerTime(p.progress)}</span><span>-{formatPlayerTime(Math.max((p.duration || 0) - p.progress, 0))}</span></div></div>
+            <div className="my-3 flex items-center sm:my-7 justify-between gap-2">
               <Button variant="ghost" size="icon" aria-label="Shuffle music" aria-pressed={p.shuffle} onClick={p.toggleShuffle} className={`h-12 w-12 [&_svg]:size-7 ${p.shuffle ? "text-primary" : "text-foreground"}`}><Shuffle /></Button>
               <Button variant="ghost" size="icon" aria-label="Previous track" onClick={p.prev} className="h-14 w-14 [&_svg]:size-9"><SkipBack fill="currentColor" /></Button>
-              <Button size="icon" aria-label={p.isPlaying ? "Pause music" : "Play music"} onClick={p.toggle} className="h-20 w-20 rounded-full bg-foreground text-background hover:bg-foreground/90 [&_svg]:size-9">{p.isPlaying ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}</Button>
+              <Button size="icon" aria-label={p.isPlaying ? "Pause music" : "Play music"} onClick={p.toggle} className="h-16 w-16 rounded-full bg-foreground sm:h-20 sm:w-20 text-background hover:bg-foreground/90 [&_svg]:size-9">{p.isPlaying ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}</Button>
               <Button variant="ghost" size="icon" aria-label="Next track" onClick={p.next} className="h-14 w-14 [&_svg]:size-9"><SkipForward fill="currentColor" /></Button>
               <Button variant="ghost" size="icon" aria-label={`Repeat ${p.repeat}`} onClick={p.cycleRepeat} className={`h-12 w-12 [&_svg]:size-7 ${p.repeat !== "off" ? "text-primary" : "text-foreground"}`}>{p.repeat === "one" ? <Repeat1 /> : <Repeat />}</Button>
             </div>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between sm:mb-6">
               <Button variant="ghost" size="icon" aria-label="Track credits" onClick={() => setCredits((v) => !v)} className="h-11 w-11 [&_svg]:size-6"><Info /></Button>
               <div className="flex items-center gap-4">
                 <Button variant="ghost" size="icon" aria-label="Share music" onClick={() => void shareMusic(track)} className="h-11 w-11 [&_svg]:size-6"><Share /></Button>
