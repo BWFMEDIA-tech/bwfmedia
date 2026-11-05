@@ -770,6 +770,7 @@ function StreamStudio() {
   const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
   const setDestinationsFn = useServerFn(setStreamDestinations);
+  const [audienceTab, setAudienceTab] = useState<"audience" | "hands" | "backstage" | "green">("audience");
   const [selectedDestinations, setSelectedDestinations] = useState<StreamPlatformKey[]>([]);
   useEffect(() => { setSelectedDestinations(readSavedDestinations()); }, []);
   const platformsSectionRef = useRef<HTMLDivElement | null>(null);
@@ -1234,12 +1235,6 @@ function StreamStudio() {
                     {streamMode === "stage" && <StudioAudienceRow participants={participants} />}
                   </StageAudioShell>
                 )}
-                {/* Guest tools sit at the bottom of the stage. */}
-                <div className="mt-3 grid gap-3 lg:grid-cols-3">
-                  <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />
-                  <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />
-                  <GreenRoom streamId={stream?.id ?? null} participants={participants} />
-                </div>
               </>
               </StudioBlock>
 
@@ -1261,10 +1256,16 @@ function StreamStudio() {
               </StudioBlock>
               <StudioBlock id="audience" label="Audience">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
-                <h3 className="mb-3 text-sm tracking-[0.2em] text-white" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                  AUDIENCE
-                </h3>
-                <StudioAudienceRow participants={participants} />
+                <div className="mb-3 flex flex-wrap gap-1" role="tablist">
+                  {([["audience","Audience"],["hands",`Raise Hand${hands.length ? ` (${hands.length})` : ""}`],["backstage","Backstage"],["green","Green Room"]] as const).map(([k,l]) => (
+                    <button key={k} type="button" role="tab" aria-selected={audienceTab===k} onClick={() => setAudienceTab(k)}
+                      className={`rounded-full px-3 py-1 text-xs font-semibold transition ${audienceTab===k ? "bg-cyan-400 text-black" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"}`}>{l}</button>
+                  ))}
+                </div>
+                {audienceTab === "audience" && <StudioAudienceRow participants={participants} />}
+                {audienceTab === "hands" && <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />}
+                {audienceTab === "backstage" && <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />}
+                {audienceTab === "green" && <GreenRoom streamId={stream?.id ?? null} participants={participants} />}
               </div>
               </StudioBlock>
             </StudioColumn>
