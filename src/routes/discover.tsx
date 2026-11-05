@@ -176,7 +176,7 @@ function DiscoverPage() {
   const artists = data?.featuredArtists ?? [];
   const videos = data?.videos ?? [];
 
-  const browseArtists = artists.slice(0, 3);
+  const browseArtists = data?.recentArtists?.length ? data.recentArtists : artists.slice(0, 3);
   const featured = artists.slice(0, 3);
   const latestArtist = data?.latestArtist ?? null;
 

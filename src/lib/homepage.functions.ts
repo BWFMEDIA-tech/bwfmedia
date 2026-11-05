@@ -109,5 +109,22 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
     host: pmap.get(s.host_id) ?? null,
   }));
 
-  return { liveStreams, videos, featuredArtists, latestArtist };
+  // Newest artist sign-ups with a profile photo, for the Discover "Browse" card.
+  let recentArtists: any[] = [];
+  const recentRes = await sb.from("profiles")
+    .select("id, display_name, stage_name, avatar_url, bio, created_at")
+    .not("avatar_url", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(60);
+  const recentIds = (recentRes.data ?? []).map((p: any) => p.id);
+  if (recentIds.length) {
+    const roleRes = await sb.from("user_roles").select("user_id").eq("role", "artist").in("user_id", recentIds);
+    const artistSet = new Set((roleRes.data ?? []).map((r: any) => r.user_id));
+    recentArtists = (recentRes.data ?? [])
+      .filter((p: any) => artistSet.has(p.id))
+      .slice(0, 3)
+      .map((p: any) => ({ ...p, avatar_url: pmap.get(p.id)?.avatar_url ?? p.avatar_url }));
+  }
+
+  return { liveStreams, videos, featuredArtists, latestArtist, recentArtists };
 });
