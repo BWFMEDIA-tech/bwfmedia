@@ -41,6 +41,7 @@ import { canToggleStageMicrophone } from "@/lib/stage-microphone";
 import { useConnectedIdentities, useSpeakingIdentities } from "@/lib/stage-connection-context";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
+import { FriendPlusButton } from "@/components/artist/FriendPlusButton";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
@@ -943,6 +944,7 @@ function SpeakerBubble({
           )}
           <ArtistStatusBeacon userId={p.user_id} className="top-1 right-1 bottom-auto" />
         </Link>
+        <FriendPlusButton userId={p.user_id} displayName={p.display_name} />
         <Button
           variant={micOff ? "destructive" : "default"}
           size="icon"
