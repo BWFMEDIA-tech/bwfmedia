@@ -94,6 +94,9 @@ export function LiveChat({
   const [tipsTotalCents, setTipsTotalCents] = useState(0);
   const [tipsCount, setTipsCount] = useState(0);
   const [showTip, setShowTip] = useState(false);
+  // Floating pop-out: the same chat panel lifts off the page into a bubble
+  // window so anyone can open and read messages from anywhere on screen.
+  const [popOut, setPopOut] = useState(false);
   const [durationLabel, setDurationLabel] = useState("00:00");
   const profileCache = useRef<Record<string, { display_name: string; avatar_url: string | null }>>({});
   const listRef = useRef<HTMLDivElement>(null);
@@ -215,8 +218,23 @@ export function LiveChat({
   </aside>;
 
   return (
+    <>
+    <button
+      type="button"
+      onClick={() => setPopOut((v) => !v)}
+      aria-label={popOut ? "Close live chat window" : "Open live chat window"}
+      aria-expanded={popOut}
+      className="fixed bottom-24 left-4 z-[95] flex h-14 w-14 items-center justify-center rounded-full border border-[#00E6FF]/50 bg-[#07070f] text-[#00E6FF] shadow-[0_0_24px_rgba(0,230,255,0.45)] transition hover:scale-105"
+    >
+      {popOut ? <span className="text-xl font-bold leading-none">×</span> : <MessageCircle className="h-6 w-6" />}
+    </button>
     <aside
-      className="relative flex w-full flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(0,0,255,0.55)] lg:w-[340px] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]"
+      className={cn(
+        "flex flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(0,0,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]",
+        popOut
+          ? "fixed bottom-40 left-4 z-[95] h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))]"
+          : "relative w-full lg:w-[340px]",
+      )}
       style={{
         background:
           "radial-gradient(80% 50% at 0% 0%, rgba(0,0,255,0.18), transparent 60%), radial-gradient(80% 50% at 100% 100%, rgba(0,0,255,0.18), transparent 60%), #07070f",
@@ -542,6 +560,7 @@ export function LiveChat({
         <TipModal streamId={streamId} auth={auth} onClose={() => setShowTip(false)} />
       )}
     </aside>
+    </>
   );
 }
 
