@@ -30,7 +30,6 @@ import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as EarningsRouteImport } from './routes/earnings'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as FriendPlusPreviewRouteImport } from './routes/friend-plus-preview'
 import { Route as GoLiveRouteImport } from './routes/go-live'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HomeRouteImport } from './routes/home'
@@ -272,11 +271,6 @@ const EventsRoute = EventsRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FriendPlusPreviewRoute = FriendPlusPreviewRouteImport.update({
-  id: '/friend-plus-preview',
-  path: '/friend-plus-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoLiveRoute = GoLiveRouteImport.update({
@@ -1000,7 +994,6 @@ export interface FileRoutesByFullPath {
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/friend-plus-preview': typeof FriendPlusPreviewRoute
   '/go-live': typeof GoLiveRoute
   '/help': typeof HelpRoute
   '/home': typeof HomeRoute
@@ -1159,7 +1152,6 @@ export interface FileRoutesByTo {
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/friend-plus-preview': typeof FriendPlusPreviewRoute
   '/go-live': typeof GoLiveRoute
   '/help': typeof HelpRoute
   '/home': typeof HomeRoute
@@ -1320,7 +1312,6 @@ export interface FileRoutesById {
   '/earnings': typeof EarningsRoute
   '/events': typeof EventsRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/friend-plus-preview': typeof FriendPlusPreviewRoute
   '/go-live': typeof GoLiveRoute
   '/help': typeof HelpRoute
   '/home': typeof HomeRoute
@@ -1483,7 +1474,6 @@ export interface FileRouteTypes {
     | '/earnings'
     | '/events'
     | '/forgot-password'
-    | '/friend-plus-preview'
     | '/go-live'
     | '/help'
     | '/home'
@@ -1642,7 +1632,6 @@ export interface FileRouteTypes {
     | '/earnings'
     | '/events'
     | '/forgot-password'
-    | '/friend-plus-preview'
     | '/go-live'
     | '/help'
     | '/home'
@@ -1802,7 +1791,6 @@ export interface FileRouteTypes {
     | '/earnings'
     | '/events'
     | '/forgot-password'
-    | '/friend-plus-preview'
     | '/go-live'
     | '/help'
     | '/home'
@@ -1964,7 +1952,6 @@ export interface RootRouteChildren {
   EarningsRoute: typeof EarningsRoute
   EventsRoute: typeof EventsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
-  FriendPlusPreviewRoute: typeof FriendPlusPreviewRoute
   GoLiveRoute: typeof GoLiveRoute
   HelpRoute: typeof HelpRoute
   HomeRoute: typeof HomeRoute
@@ -2197,13 +2184,6 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/friend-plus-preview': {
-      id: '/friend-plus-preview'
-      path: '/friend-plus-preview'
-      fullPath: '/friend-plus-preview'
-      preLoaderRoute: typeof FriendPlusPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/go-live': {
@@ -3335,7 +3315,6 @@ const rootRouteChildren: RootRouteChildren = {
   EarningsRoute: EarningsRoute,
   EventsRoute: EventsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
-  FriendPlusPreviewRoute: FriendPlusPreviewRoute,
   GoLiveRoute: GoLiveRoute,
   HelpRoute: HelpRoute,
   HomeRoute: HomeRoute,
