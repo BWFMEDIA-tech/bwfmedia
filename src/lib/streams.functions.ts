@@ -137,13 +137,9 @@ export const deleteStreamsBulk = createServerFn({ method: "POST" })
 export const getArtistLiveStream = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ artistId: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: stream, error } = await supabaseAdmin.from("streams")
-      .select("id, title, room_name, host_id, mode, started_at, viewer_count")
-      .eq("host_id", data.artistId).eq("status", "live")
-      .order("started_at", { ascending: false }).limit(1).maybeSingle();
-    if (error) throw new Error(error.message);
-    return stream;
+    const { readLiveDirectory } = await import("./live-directory.server");
+    const rows = await readLiveDirectory();
+    return rows.find(row => row.host_id === data.artistId && row.kind === "stream") ?? null;
   });
 
 export const getStreamByRoom = createServerFn({ method: "POST" })

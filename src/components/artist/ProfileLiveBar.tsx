@@ -1,70 +1,33 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { Radio } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-
-type LiveRow = { room_name: string; title: string | null };
+import { Button } from "@/components/ui/button";
+import type { DirectoryRow } from "@/lib/live-directory";
+import { stageDestination } from "@/lib/live-stage-navigation";
 
 /**
  * Instagram/TikTok-style live strip on an artist profile.
  * Shows a LIVE pill + watch link while the artist is broadcasting,
  * and a Go Live shortcut for the profile owner when they are not.
  */
-export function ProfileLiveBar({ artistId, isOwner }: { artistId: string; isOwner: boolean }) {
-  const [live, setLive] = useState<LiveRow | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      const { data } = await supabase
-        .from("streams")
-        .select("room_name, title")
-        .eq("host_id", artistId)
-        .eq("status", "live")
-        .order("started_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (!cancelled) setLive((data as LiveRow | null) ?? null);
-    };
-    void load();
-    const id = setInterval(load, 20000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, [artistId]);
+export function ProfileLiveBar({ live, isOwner }: { live: DirectoryRow | null; isOwner: boolean }) {
 
   if (live) {
     return (
-      <Link
-        to="/stream/$room"
-        params={{ room: live.room_name }}
-        className="flex items-center gap-3 rounded-2xl border border-[#00E6FF]/40 bg-[#00E6FF]/10 px-4 py-3 transition hover:bg-[#00E6FF]/20"
-      >
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00E6FF] px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-white">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> Live
-        </span>
-        <span className="min-w-0 flex-1 truncate text-sm text-white/85">{live.title || "Live now"}</span>
-        <span className="text-xs font-semibold text-[#00E6FF]">Watch</span>
-      </Link>
+      <Button asChild variant="outline" className="h-auto w-full justify-start gap-3 border-primary bg-primary/10 px-4 py-3 text-foreground hover:bg-primary/20">
+        <Link {...stageDestination(live)}>
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground"><Radio className="h-3.5 w-3.5" /> LIVE</span>
+          <span className="min-w-0 flex-1 truncate text-left text-sm">{live.title || "Live now"}</span>
+          <span className="shrink-0 text-xs font-semibold text-primary">Join live</span>
+        </Link>
+      </Button>
     );
   }
 
   if (!isOwner) return null;
 
   return (
-    <Link
-      to="/go-live"
-      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 transition hover:bg-white/[0.07]"
-    >
-      <span
-        className="grid h-9 w-9 place-items-center rounded-xl"
-        style={{ background: "linear-gradient(135deg, rgba(0,0,255,0.3), rgba(0,0,255,0.25))" }}
-      >
-        <Radio className="h-4 w-4 text-white" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-white">Go Live</span>
-        <span className="block text-xs text-white/55">Start a live stream on your profile.</span>
-      </span>
-      <span className="text-xs font-semibold text-[#00E6FF]">Start</span>
-    </Link>
+    <Button asChild variant="outline" className="h-auto w-full justify-start gap-3 px-4 py-3">
+      <Link to="/go-live"><Radio className="h-4 w-4 text-primary" /><span className="flex-1 text-left">Go Live</span><span className="text-xs text-primary">Start</span></Link>
+    </Button>
   );
 }

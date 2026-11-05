@@ -53,7 +53,8 @@ function ProfileVideoCard({ v }: { v: { id: string; title: string; thumbnail_pat
     </Link>
   );
 }
-import { getArtistLiveStream } from "@/lib/streams.functions";
+import { useLiveStageFeed } from "@/lib/use-live-stage-navigation";
+import { profileLiveSession } from "@/lib/profile-live";
 
 const artistMetaOptions = (id: string) =>
   queryOptions({
@@ -142,17 +143,11 @@ function ArtistProfilePage() {
   const isOwner = !!user && user.id === id;
   const ownerTools = isOwner && hasArtistTools(auth.roles);
   const queryClient = useQueryClient();
-  const fetchLive = useServerFn(getArtistLiveStream);
-  const liveQuery = useQuery({
-    queryKey: ["artist-live", id],
-    queryFn: () => fetchLive({ data: { artistId: id } }),
-    refetchInterval: 10_000,
-    refetchOnWindowFocus: true,
-  });
+  const liveFeed = useLiveStageFeed();
+  const live = profileLiveSession(liveFeed.entries, id);
   const onLiveEnded = useCallback(() => {
-    queryClient.setQueryData(["artist-live", id], null);
-    void queryClient.invalidateQueries({ queryKey: ["artist-live", id] });
-  }, [queryClient, id]);
+    void queryClient.invalidateQueries({ queryKey: ["live-stage-navigation"] });
+  }, [queryClient]);
 
   const profileComplete = !!(meta?.name && (meta?.bio || meta?.photo));
   const isBlank = !meta?.name && !meta?.photo && !meta?.bio
@@ -185,12 +180,12 @@ function ArtistProfilePage() {
     );
   }
 
-  if (liveQuery.data) {
+  if (live?.kind === "stream") {
     const topTrack = [...(meta?.tracks ?? [])].sort((a, b) => (b.play_count ?? 0) - (a.play_count ?? 0))[0];
     return (
       <ArtistLiveRoom
-        key={liveQuery.data.id}
-        stream={liveQuery.data}
+        key={live.id}
+        stream={live}
         artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null, tracks: (meta?.tracks ?? []).map((t) => ({ id: t.id, title: t.title, cover_url: t.cover_url })) }}
         followSlot={!isOwner ? <FollowButton artistId={id} /> : null}
         platformSlot={<ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />}
@@ -212,7 +207,8 @@ function ArtistProfilePage() {
             isOwner={isOwner}
             canUseTools={hasArtistTools(auth.roles)}
           />
-          <ProfileLiveBar artistId={id} isOwner={ownerTools} />
+          <ProfileLiveBar live={live} isOwner={ownerTools} />
+          {liveFeed.isError && <p role="status" className="text-sm text-muted-foreground">Live status is temporarily unconfirmed.</p>}
           <ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
