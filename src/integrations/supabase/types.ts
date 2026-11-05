@@ -6741,6 +6741,10 @@ export type Database = {
         Args: { _artist_id: string }
         Returns: number
       }
+      get_artist_following_count: {
+        Args: { _user_id: string }
+        Returns: number
+      }
       get_artists_directory: {
         Args: never
         Returns: {

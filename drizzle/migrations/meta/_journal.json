@@ -295,6 +295,13 @@
       "when": 1793885236975,
       "tag": "0041_signup_roles_require_verified_email",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1793887997797,
+      "tag": "0042_artist_following_count_fn",
+      "breakpoints": true
     }
   ]
 }

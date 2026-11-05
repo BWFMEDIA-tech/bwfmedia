@@ -28,7 +28,8 @@ export const getArtistFollowStats = createServerFn({ method: "GET" })
     const sb = publicClient();
     const { data: count, error } = await sb.rpc("get_artist_follower_count", { _artist_id: data.artistId });
     if (error) throw error;
-    return { count: count ?? 0 };
+    const { data: followingCount } = await sb.rpc("get_artist_following_count", { _user_id: data.artistId });
+    return { count: count ?? 0, followingCount: followingCount ?? 0 };
   });
 
 export const listArtistFollowers = createServerFn({ method: "GET" })
