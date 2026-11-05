@@ -4,6 +4,7 @@ import { ExternalLink, Loader2, Save, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
+import { ConnectedPlatformsSection } from "@/components/stream/ConnectedPlatformsSection";
 import { SettingsShell } from "@/components/settings/SettingsShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +91,7 @@ function ConnectedAppsPage() {
 
   if (loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
   return <SettingsShell title="Connected Platforms">
+    <div className="mb-6"><ConnectedPlatformsSection /></div>
     {!user ? <p className="text-muted-foreground">Sign in to manage your platform links.</p> : error ? <p role="alert" className="text-destructive">{error}</p> : <div className="space-y-0 divide-y divide-border">
       {PROFILE_PLATFORMS.map(p => {
         const saved = links.find(l => l.provider.toLowerCase() === p.key);
