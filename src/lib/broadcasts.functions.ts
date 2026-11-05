@@ -6,6 +6,7 @@ const PlaybackSource = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("stage"), stage_room_ids: z.array(z.string().uuid()).default([]) }),
   z.object({ kind: z.literal("upload"), asset_url: z.string().url() }),
   z.object({ kind: z.literal("prerecord"), recording_id: z.string().uuid() }),
+  z.object({ kind: z.literal("external"), url: z.string().url().refine(u => u.startsWith("https://")) }),
 ]);
 
 async function sbPublic() {
@@ -253,4 +254,68 @@ export const listLiveBroadcasts = createServerFn({ method: "GET" })
       .limit(50);
     if (error) throw new Error(error.message);
     return data ?? [];
+  });
+/** External stream links (YouTube, Twitch, etc.) must be plain https URLs. */
+export function safeStreamUrl(raw: string): string | null {
+  try {
+    const u = new URL(raw.trim());
+    return u.protocol === "https:" && u.hostname.includes(".") ? u.toString() : null;
+  } catch { return null; }
+}
+
+/** Artist starts a live session pointing at their own external stream URL. Ends any prior link session. */
+export const startLinkBroadcast = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({
+    stream_title: z.string().trim().min(1).max(200),
+    url: z.string().max(2000),
+  }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const url = safeStreamUrl(data.url);
+    if (!url) throw new Error("Enter a valid https:// stream link");
+    const { data: isArtist } = await supabase.rpc("has_role", { _user_id: userId, _role: "artist" });
+    if (!isArtist) throw new Error("Only artists can start a broadcast");
+    const now = new Date().toISOString();
+    await supabase.from("broadcasts").update({ stream_status: "ended", ended_at: now })
+      .eq("host_id", userId).eq("stream_status", "live").contains("playback_source", { kind: "external" });
+    const { data: row, error } = await supabase.from("broadcasts").insert({
+      host_id: userId, stream_title: data.stream_title, playback_source: { kind: "external", url },
+      stream_status: "live", started_at: now,
+    }).select("id").single();
+    if (error) throw new Error("Could not start broadcast");
+    return { id: row.id };
+  });
+
+/** Caller's current live link session, if any. */
+export const getMyLinkBroadcast = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.from("broadcasts")
+      .select("id, stream_title, playback_source, started_at")
+      .eq("host_id", context.userId).eq("stream_status", "live")
+      .contains("playback_source", { kind: "external" })
+      .order("started_at", { ascending: false }).limit(1).maybeSingle();
+    if (error) throw new Error("Broadcast temporarily unavailable");
+    return data ? { ...data, url: (data.playback_source as { url?: string })?.url ?? "" } : null;
+  });
+
+/** Public list of artists currently live via an external stream link. */
+export const listLinkBroadcasts = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await db.from("broadcasts")
+      .select("id, host_id, stream_title, playback_source, started_at")
+      .eq("stream_status", "live").contains("playback_source", { kind: "external" })
+      .order("started_at", { ascending: false }).limit(50);
+    if (error) throw new Error("Broadcasts temporarily unavailable");
+    const ids = [...new Set((data ?? []).map(r => r.host_id))];
+    const { data: profiles } = ids.length
+      ? await db.from("profiles").select("id, display_name, stage_name").in("id", ids)
+      : { data: [] as { id: string; display_name: string | null; stage_name: string | null }[] };
+    const names = new Map((profiles ?? []).map(p => [p.id, p.stage_name || p.display_name || "Artist"]));
+    return (data ?? []).flatMap(r => {
+      const url = safeStreamUrl((r.playback_source as { url?: string })?.url ?? "");
+      return url ? [{ id: r.id, host_id: r.host_id, title: r.stream_title, url, started_at: r.started_at, artist: names.get(r.host_id) ?? "Artist" }] : [];
+    });
   });
