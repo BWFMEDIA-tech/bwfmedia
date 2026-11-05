@@ -65,3 +65,26 @@ export function stageRoomAccess(room: { host_id: string; status: string }, userI
   const isHost = room.host_id === userId;
   return { canJoin: isHost || room.status === "live", canPublish: isHost, isHost };
 }
+/** Hours after which a link broadcast the artist forgot to stop stops being listed. */
+export const EXTERNAL_BROADCAST_MAX_HOURS = 12;
+
+/**
+ * Link broadcasts (artist-pasted YouTube/Twitch/etc. links) can't be checked
+ * against the live room service, so they are listed while marked live by the
+ * artist and started within the last EXTERNAL_BROADCAST_MAX_HOURS hours.
+ */
+export function externalBroadcastRows(broadcasts: Broadcast[], now = Date.now()): DirectoryRow[] {
+  const cutoff = now - EXTERNAL_BROADCAST_MAX_HOURS * 3600_000;
+  return broadcasts.flatMap((b) => {
+    const source = b.playback_source as { kind?: string; url?: string } | null;
+    if (b.stream_status !== "live" || source?.kind !== "external") return [];
+    if (typeof source.url !== "string" || !source.url.startsWith("https://")) return [];
+    const started = b.started_at ? Date.parse(b.started_at) : NaN;
+    if (!Number.isFinite(started) || started < cutoff) return [];
+    return [{
+      id: b.id, title: b.stream_title, room_name: b.id, host_id: b.host_id, status: "live", kind: "broadcast" as const,
+      category: null, description: b.description, thumbnail_url: null, viewer_count: b.viewer_count ?? 0,
+      started_at: b.started_at, mode: "external",
+    }];
+  });
+}

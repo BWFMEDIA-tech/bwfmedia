@@ -46,7 +46,8 @@ export const Route = createFileRoute("/broadcast/$broadcastId")({
 type PlaybackSource =
   | { kind: "stage"; stage_room_ids: string[] }
   | { kind: "upload"; asset_url: string }
-  | { kind: "prerecord"; recording_id: string };
+  | { kind: "prerecord"; recording_id: string }
+  | { kind: "external"; url: string };
 
 function BroadcastViewerPage() {
   const initial = Route.useLoaderData().broadcast;
@@ -86,6 +87,10 @@ function BroadcastViewerPage() {
         <div className="mb-4 aspect-video rounded-2xl border border-white/10 bg-gradient-to-br from-[#0d0d18] to-[#16162a] grid place-items-center">
           {source.kind === "upload" ? (
             <video src={source.asset_url} controls className="h-full w-full rounded-2xl" />
+          ) : source.kind === "external" && source.url?.startsWith("https://") ? (
+            <a href={source.url} target="_blank" rel="noopener noreferrer" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">
+              {isLive ? "Watch live stream" : "Open stream link"}
+            </a>
           ) : (
             <div className="text-center text-white/40">
               <Radio className="mx-auto mb-2 h-8 w-8" />

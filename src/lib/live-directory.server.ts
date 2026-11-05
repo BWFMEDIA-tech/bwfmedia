@@ -1,4 +1,4 @@
-import { directoryCandidates, directoryRows, liveAccountRoles, type DirectoryRow } from "./live-directory";
+import { directoryCandidates, directoryRows, externalBroadcastRows, liveAccountRoles, type DirectoryRow } from "./live-directory";
 import { filterOnAirStreams, type OnAirRoomClient } from "./live-on-air";
 
 async function roomClient(): Promise<OnAirRoomClient> {
@@ -32,7 +32,11 @@ export async function readLiveDirectory(limit?: number) {
     roomClient(),
   ]);
   const candidates = directoryCandidates(streams.map(s => ({ ...s, kind: "stream" })) as DirectoryRow[], stages, broadcasts, links);
-  const rows = directoryRows(await filterOnAirStreams(candidates, service), limit);
+  const connected = directoryRows(await filterOnAirStreams(candidates, service));
+  const seen = new Set(connected.map(r => `${r.kind}:${r.id}`));
+  const merged = [...connected, ...externalBroadcastRows(broadcasts).filter(r => !seen.has(`${r.kind}:${r.id}`))]
+    .sort((a, b) => String(b.started_at ?? "").localeCompare(String(a.started_at ?? "")) || a.id.localeCompare(b.id));
+  const rows = limit === undefined ? merged : merged.slice(0, limit);
   const hostIds = [...new Set(rows.map(r => r.host_id))];
   const profiles = new Map<string, { display_name: string | null; avatar_url: string | null; stage_name: string | null }>();
   const roles = new Map<string, string[]>();
