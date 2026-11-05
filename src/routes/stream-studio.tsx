@@ -2,6 +2,7 @@ import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { readSavedDestinations } from "@/components/stream/StreamDestinationSelector";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, LayoutDashboard, Video, Users, Compass, Calendar, MessageSquare,
@@ -47,7 +48,6 @@ import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { StreamThumbnailDialog } from "@/components/stream/StreamThumbnailDialog";
 import { ImageIcon } from "lucide-react";
-import { StreamDestinationSelector } from "@/components/stream/StreamDestinationSelector";
 import { setStreamDestinations } from "@/lib/stream-platforms.functions";
 import type { StreamPlatformKey } from "@/lib/stream-platforms/registry";
 import {
@@ -771,6 +771,7 @@ function StreamStudio() {
   const tokenFn = useServerFn(getLiveKitToken);
   const setDestinationsFn = useServerFn(setStreamDestinations);
   const [selectedDestinations, setSelectedDestinations] = useState<StreamPlatformKey[]>([]);
+  useEffect(() => { setSelectedDestinations(readSavedDestinations()); }, []);
   const platformsSectionRef = useRef<HTMLDivElement | null>(null);
   const [stream, setStream] = useState<{ id: string; room_name: string; title: string } | null>(null);
   const [lk, setLk] = useState<{ token: string; wsUrl: string } | null>(null);
@@ -1172,13 +1173,6 @@ function StreamStudio() {
                 {!lk && (
                   <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4">
                     <div className="flex flex-col gap-3">
-                      <StreamDestinationSelector
-                        selected={selectedDestinations}
-                        onChange={setSelectedDestinations}
-                        onWantsConnect={() =>
-                          nav({ to: "/settings/connected-apps" })
-                        }
-                      />
                       <div className="flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-black/40 p-3 text-xs text-zinc-400">
                         Ready when you are —
                         <Button

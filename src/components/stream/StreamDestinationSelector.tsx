@@ -87,3 +87,12 @@ export function StreamDestinationSelector({
     </div>
   );
 }
+const DEST_KEY = "tunevio:stream-destinations";
+export function readSavedDestinations(): StreamPlatformKey[] {
+  try { const v = JSON.parse(localStorage.getItem(DEST_KEY) ?? "[]"); return Array.isArray(v) ? v : []; } catch { return []; }
+}
+export function SavedStreamDestinations() {
+  const [selected, setSelected] = useState<StreamPlatformKey[]>([]);
+  useEffect(() => { setSelected(readSavedDestinations()); }, []);
+  return <StreamDestinationSelector selected={selected} onChange={(next) => { setSelected(next); try { localStorage.setItem(DEST_KEY, JSON.stringify(next)); } catch { /* ignore */ } }} />;
+}
