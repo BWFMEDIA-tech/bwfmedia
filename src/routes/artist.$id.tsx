@@ -1,3 +1,4 @@
+import defaultAvatar from "@/assets/default-artist-avatar.png.asset.json";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
@@ -269,7 +270,7 @@ function HeroBanner({
               {artist.photo ? (
                 <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="h-full w-full grid place-items-center bg-gradient-to-br from-[#00E6FF]/25 to-black text-3xl font-black">{initials}</div>
+                <img src={defaultAvatar.url} alt={artist.name} className="h-full w-full object-cover" />
               )}
             </div>
             <ArtistStatusBeacon userId={artist.id} className="bottom-2 right-2 h-4 w-4" />
