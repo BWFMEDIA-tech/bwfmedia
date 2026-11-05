@@ -111,12 +111,11 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
         .eq("status", "live")
         .order("started_at", { ascending: false })
         .limit(6),
-      sb
-        .from("streams")
-        .select("id, title, room_name, category, thumbnail_url, viewer_count, started_at")
-        .eq("status", "live")
-        .order("started_at", { ascending: false })
-        .limit(8),
+      // Only streams whose host is actually connected; stale "live" rows are excluded.
+      import("@/lib/live-directory.server")
+        .then(({ readLiveDirectory }) => readLiveDirectory())
+        .then((rows) => ({ data: rows.filter((r) => r.kind === "stream").slice(0, 8), error: null }))
+        .catch(() => ({ data: [] as any[], error: null })),
       sb.from("user_roles").select("user_id").eq("role", "artist"),
     ]);
 

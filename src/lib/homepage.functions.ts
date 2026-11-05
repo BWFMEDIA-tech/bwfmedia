@@ -11,12 +11,10 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
   const sb = supabaseAdmin as any;
 
   const [liveRes, videoRes, artistRolesRes] = await Promise.all([
-    sb
-      .from("streams")
-      .select("id, title, room_name, status, host_id, category, thumbnail_url, viewer_count, started_at")
-      .eq("status", "live")
-      .order("started_at", { ascending: false })
-      .limit(3),
+    import("@/lib/live-directory.server")
+      .then(({ readLiveDirectory }) => readLiveDirectory())
+      .then((rows) => ({ data: rows.filter((r) => r.kind === "stream").slice(0, 3) }))
+      .catch(() => ({ data: [] as any[] })),
     sb
       .from("videos")
       .select("id, title, artist, thumbnail_path, external_url, created_at")
