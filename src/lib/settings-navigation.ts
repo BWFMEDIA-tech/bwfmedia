@@ -21,7 +21,7 @@ export function settingsGroups(roles: readonly string[]): SettingsGroup[] {
     artist ? { key: "artist", label: "Artist Tools", items: [
       { to: "/settings/artist-info", label: "Artist Profile" },
       { to: "/settings/social-links", label: "Social & Platform Links" },
-      { to: "/settings/music-media", label: "Music Preferences" },
+      { to: "/upload", label: "Upload Music" },
       { to: "/settings/events", label: "Events & Showcases" },
       { to: "/settings/broadcast-help", label: "Live Settings" },
     ] } : null,
