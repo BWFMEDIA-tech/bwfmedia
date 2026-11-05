@@ -224,7 +224,7 @@ export function LiveChat({
       onClick={() => setPopOut((v) => !v)}
       aria-label={popOut ? "Close live chat window" : "Open live chat window"}
       aria-expanded={popOut}
-      className="fixed bottom-24 left-4 z-[95] flex h-14 w-14 items-center justify-center rounded-full border border-[#00E6FF]/50 bg-[#07070f] text-[#00E6FF] shadow-[0_0_24px_rgba(0,230,255,0.45)] transition hover:scale-105"
+      className="fixed bottom-4 right-[88px] md:bottom-6 md:right-[96px] z-[45] flex h-14 w-14 items-center justify-center rounded-full border border-[#00E6FF]/50 bg-[#07070f] text-[#00E6FF] shadow-[0_0_24px_rgba(0,230,255,0.45)] transition hover:scale-105"
     >
       {popOut ? <span className="text-xl font-bold leading-none">×</span> : <MessageCircle className="h-6 w-6" />}
     </button>
@@ -232,7 +232,7 @@ export function LiveChat({
       className={cn(
         "flex flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(0,0,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]",
         popOut
-          ? "fixed bottom-40 left-4 z-[95] h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))]"
+          ? "fixed bottom-[84px] right-4 md:bottom-[92px] md:right-6 z-[95] h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))]"
           : "relative w-full lg:w-[340px]",
       )}
       style={{
