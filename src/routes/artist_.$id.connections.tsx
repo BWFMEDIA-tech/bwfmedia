@@ -41,7 +41,7 @@ function ConnectionsPage() {
   const { id } = Route.useParams();
   const { tab } = Route.useSearch();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [newestFirst, setNewestFirst] = useState(true);
@@ -149,7 +149,7 @@ function ConnectionsPage() {
           </button>
         </div>
 
-        {!user ? (
+        {authLoading ? null : !user ? (
           <div className="mt-10 text-center">
             <p className="text-sm text-muted-foreground">Sign in to see followers and following.</p>
             <Link to="/login" className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground">Sign in</Link>
