@@ -296,6 +296,7 @@ function InviteRoom({
         isHost={role === "host"}
         onLeave={onLeave}
         autoConnect
+        hideSelfMicRow
       >
         <StageRoom
           streamId={stream.id}
