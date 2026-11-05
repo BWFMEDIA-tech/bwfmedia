@@ -441,7 +441,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
         onInvite={() => setInvite("host")}
         inviteLabel="Invite Host"
       />
-      <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
+      <div className="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-5 sm:gap-y-4">
         {hosts.map((p) => (
           <SpeakerBubble
             key={p.id}
@@ -504,7 +504,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           Moderators monitor live rooms, remove inappropriate users, handle reports, stop harassment,
           monitor cheating, enforce community rules, and assist hosts. Moderators are assigned by Tunevio admins.
         </p>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
+        <div className="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-5 sm:gap-y-4">
           {allModerators.slice(0, MAX_MODS).map((m) => {
             const p = participants.find(
               (x) => x.user_id === m.user_id && !AUDIENCE_ROLES.includes(x.stage_role ?? "listener") && x.stage_role !== "host" && x.stage_role !== "co_host",
@@ -553,7 +553,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
           inviteLabel="Invite Guest"
           muteAll={canManage ? { muted: guestsAllMuted, busy: groupBusy === "guests", disabled: guestSpeakers.length === 0, onToggle: () => toggleGroupMute("guests", guestsAllMuted) } : undefined}
         />
-        <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-5">
+        <div className="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-5 sm:gap-y-4">
           {guests.map((p) => (
             <SpeakerBubble
               key={p.id}
