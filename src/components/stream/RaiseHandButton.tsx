@@ -9,7 +9,7 @@ import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
 
-export function RaiseHandButton({ streamId, auth, label: idleLabel }: { streamId: string; auth: AuthState; label?: string }) {
+export function RaiseHandButton({ streamId, auth, label: idleLabel, hideSelfMic }: { streamId: string; auth: AuthState; label?: string; hideSelfMic?: boolean }) {
   const topicId = useId();
   const raise = useServerFn(raiseHand);
   const leave = useServerFn(leaveStage);
@@ -162,10 +162,11 @@ export function RaiseHandButton({ streamId, auth, label: idleLabel }: { streamId
 
   if (onStage) {
     // Mute and "Leave stage" travel together so phone users reach both from the
-    // same spot instead of scrolling to a separate mic row.
+    // same spot instead of scrolling to a separate mic row. When the row already
+    // carries its own mic control, `hideSelfMic` keeps this one leave-only.
     return (
       <div className="flex flex-wrap items-center justify-center gap-2">
-        <SelfMicrophoneButton />
+        {hideSelfMic ? null : <SelfMicrophoneButton />}
         <Button variant="outline" size="sm"
           onClick={onLeave}
           disabled={busy}

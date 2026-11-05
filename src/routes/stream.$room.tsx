@@ -248,7 +248,7 @@ function GuestPage() {
             </StageAudioShell>
           ) : (
             <>
-              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} arenaAudio />
+              <LiveStage token={lk.token} serverUrl={lk.wsUrl} onEnd={() => setLk(null)} onInvite={() => {}} publish={!inCrowd} streamId={streamId ?? undefined} showHostTools={isHostLike} arenaAudio raiseHandAuth={auth} />
               {streamId && (
                 <StageRoom
                   streamId={streamId}
@@ -259,7 +259,7 @@ function GuestPage() {
               {streamId && inCrowd && (
                 <InCrowdBanner streamId={streamId} auth={auth} mode="broadcast" />
               )}
-              {streamId && !inCrowd && (
+              {streamId && !inCrowd && isHostLike && (
                 <div className="flex justify-center">
                   <RaiseHandButton streamId={streamId} auth={auth} />
                 </div>
