@@ -143,7 +143,7 @@ export async function runBattleEvent(
               match_id: m.id,
               round_number: nextNumber,
               status: "live",
-              voting_status: "closed",
+              voting_status: "open",
               started_at: now.toISOString(),
               ends_at: endsAt.toISOString(),
             },
@@ -160,7 +160,7 @@ export async function runBattleEvent(
           });
           if (resetErr) throw new Error(resetErr.message);
         }
-        await supabase
+        const { error: startError } = await supabase
           .from("battle_matches")
           .update({
             status: "live",
@@ -170,6 +170,7 @@ export async function runBattleEvent(
             started_at: m.status === "pending" ? now.toISOString() : undefined,
           })
           .eq("id", m.id);
+        if (startError) throw new Error(startError.message);
 
         // Auto-play the host's pre-picked Side A track for round 1, if one
         // was attached at match creation. The existing battle-aware
@@ -344,20 +345,22 @@ export async function runBattleEvent(
         // Track assignments belong to creation / explicit PLAY_SIDE events.
         // Allow host to open voting even if one or both artists haven't
         // submitted a track yet. Votes will simply be tallied per side.
-        await supabase
+        const { error: votingError } = await supabase
           .from("battle_rounds")
           .update({ voting_status: "open" })
           .eq("id", round.id);
+        if (votingError) throw new Error(votingError.message);
         return { ok: true };
       }
 
       case "CLOSE_VOTING": {
         const round = await loadCurrentRound();
         if (!round) invalid("no current round");
-        await supabase
+        const { error: votingError } = await supabase
           .from("battle_rounds")
           .update({ voting_status: "closed" })
           .eq("id", round!.id);
+        if (votingError) throw new Error(votingError.message);
         return { ok: true };
       }
 
@@ -435,7 +438,7 @@ export async function runBattleEvent(
               match_id: m.id,
               round_number: nextNumber,
               status: "live",
-              voting_status: "closed",
+              voting_status: "open",
               started_at: now.toISOString(),
               ends_at: endsAt.toISOString(),
             },
@@ -451,7 +454,7 @@ export async function runBattleEvent(
           });
           if (resetErr) throw new Error(resetErr.message);
         }
-        await supabase
+        const { error: nextError } = await supabase
           .from("battle_matches")
           .update({
             current_round: nextNumber,
@@ -459,6 +462,7 @@ export async function runBattleEvent(
             active_side: null,
           })
           .eq("id", m.id);
+        if (nextError) throw new Error(nextError.message);
         return { ok: true, round: nextRound };
       }
 
