@@ -42,9 +42,9 @@ function convertHeic(url: string): Promise<string> {
   if (!p) {
     p = (async () => {
       const blob = await (await fetch(url)).blob();
-      const { default: heic2any } = await import("heic2any");
-      const out = await heic2any({ blob, toType: "image/jpeg", quality: 0.85 });
-      return URL.createObjectURL(Array.isArray(out) ? out[0] : out);
+      const { heicTo } = await import("heic-to");
+      const out = await heicTo({ blob, type: "image/jpeg", quality: 0.85 });
+      return URL.createObjectURL(out);
     })();
     p.catch(() => heicCache.delete(key));
     heicCache.set(key, p);
