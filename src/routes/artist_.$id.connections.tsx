@@ -53,7 +53,8 @@ function ConnectionsPage() {
 
   const stats = useQuery({ queryKey: ["artist-follow-stats", id], queryFn: () => statsFn({ data: { artistId: id } }) });
   const list = useQuery({
-    queryKey: ["follow-connections", id, tab],
+    queryKey: ["follow-connections", id, tab, user?.id],
+    enabled: !!user,
     queryFn: () => listFn({ data: { userId: id, kind: tab, limit: 200 } }),
   });
   const people: Person[] = list.data?.people ?? [];
@@ -148,7 +149,12 @@ function ConnectionsPage() {
           </button>
         </div>
 
-        {list.isLoading ? (
+        {!user ? (
+          <div className="mt-10 text-center">
+            <p className="text-sm text-muted-foreground">Sign in to see followers and following.</p>
+            <Link to="/login" className="mt-4 inline-flex h-10 items-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground">Sign in</Link>
+          </div>
+        ) : list.isLoading ? (
           <ul className="mt-3 space-y-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <li key={i} className="flex items-center gap-3">
@@ -158,7 +164,7 @@ function ConnectionsPage() {
             ))}
           </ul>
         ) : list.isError ? (
-          <p className="mt-10 text-center text-sm text-muted-foreground">Couldn't load this list. Pull to refresh and try again.</p>
+          <p className="mt-10 text-center text-sm text-muted-foreground">Couldn't load this list. Please try again.</p>
         ) : shown.length === 0 ? (
           <p className="mt-10 text-center text-sm text-muted-foreground">
             {q ? "No matches." : tab === "followers" ? "No followers yet." : "Not following anyone yet."}
