@@ -272,8 +272,13 @@ export const refundStoreOrder = createServerFn({ method: "POST" })
   .inputValidator((d: { orderId: string }) => z.object({ orderId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     // RLS: only the seller, their label managers or admins can read this order.
-    const { data: o } = await (context.supabase as any).from("store_orders").select("id, status, stripe_payment_intent_id, environment").eq("id", data.orderId).maybeSingle();
+    const { data: o } = await (context.supabase as any).from("store_orders").select("id, status, stripe_payment_intent_id, environment, seller_user_id").eq("id", data.orderId).maybeSingle();
     if (!o) return { error: "Order not found" };
+    // Buyers can read their own orders, so visibility alone is not permission to refund.
+    if (o.seller_user_id !== context.userId) {
+      const { data: isAdmin } = await (context.supabase as any).rpc("has_role", { _user_id: context.userId, _role: "admin" });
+      if (!isAdmin) return { error: "Only the seller or an admin can refund this order." };
+    }
     if (o.status !== "paid" || !o.stripe_payment_intent_id) return { error: "Only paid orders can be refunded." };
     const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
     try {
