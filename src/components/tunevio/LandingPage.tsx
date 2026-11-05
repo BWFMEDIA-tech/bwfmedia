@@ -346,15 +346,15 @@ export function LandingPage() {
           >
             One Platform. <span className="text-primary">Three Ways In.</span>
           </h2>
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="-mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0">
             {roles.map((role, i) => (
               <motion.div
                 key={role.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
+                initial={{ y: 20 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="welcome-role flex flex-col rounded-lg border border-border bg-card p-6 sm:p-8 hover:border-primary/50 transition-colors"
+                className="welcome-role flex w-[85%] shrink-0 snap-center flex-col md:w-auto rounded-lg border border-border bg-card p-6 sm:p-8 hover:border-primary/50 transition-colors"
               >
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
                   <role.icon className="h-6 w-6 text-primary" />
