@@ -89,4 +89,4 @@
 - [ ] /blog/$slug server-rendered per-article metadata + sitemap entries
 - [ ] Optional: Firecrawl (news sources), Google Search Console (reporting)
 - [x] Remove the featured artist portrait card from the Discover page hero; grid rebalanced to two columns, unused photo import and latest-artist variable dropped.
-- [ ] Make the Arena/live ImmersivePlayer panel smaller and compact (src/components/play/ImmersivePlayer.tsx).
+- [x] Make the Arena/live ImmersivePlayer panel smaller and compact: tighter padding, smaller artwork and transport controls, condensed vote/speed/stat rows; desktop and 393px checks show no overlap or clipped text, no page errors.
