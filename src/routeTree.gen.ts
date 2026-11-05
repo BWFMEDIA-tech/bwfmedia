@@ -58,7 +58,6 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SkipLinePreviewRouteImport } from './routes/skip-line-preview'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as StudioRouteImport } from './routes/studio'
@@ -412,11 +411,6 @@ const SignupRoute = SignupRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SkipLinePreviewRoute = SkipLinePreviewRouteImport.update({
-  id: '/skip-line-preview',
-  path: '/skip-line-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StoreRoute = StoreRouteImport.update({
@@ -1028,7 +1022,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/skip-line-preview': typeof SkipLinePreviewRoute
   '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -1186,7 +1179,6 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/skip-line-preview': typeof SkipLinePreviewRoute
   '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -1348,7 +1340,6 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/skip-line-preview': typeof SkipLinePreviewRoute
   '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
@@ -1511,7 +1502,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
-    | '/skip-line-preview'
     | '/store'
     | '/stream-studio'
     | '/studio'
@@ -1669,7 +1659,6 @@ export interface FileRouteTypes {
     | '/search'
     | '/signup'
     | '/sitemap.xml'
-    | '/skip-line-preview'
     | '/store'
     | '/stream-studio'
     | '/studio'
@@ -1830,7 +1819,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signup'
     | '/sitemap.xml'
-    | '/skip-line-preview'
     | '/store'
     | '/stream-studio'
     | '/studio'
@@ -1992,7 +1980,6 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SkipLinePreviewRoute: typeof SkipLinePreviewRoute
   StoreRoute: typeof StoreRoute
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
@@ -2393,13 +2380,6 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/skip-line-preview': {
-      id: '/skip-line-preview'
-      path: '/skip-line-preview'
-      fullPath: '/skip-line-preview'
-      preLoaderRoute: typeof SkipLinePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/store': {
@@ -3363,7 +3343,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SkipLinePreviewRoute: SkipLinePreviewRoute,
   StoreRoute: StoreRoute,
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
