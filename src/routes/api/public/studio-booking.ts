@@ -38,6 +38,18 @@ export const Route = createFileRoute('/api/public/studio-booking')({
         const data = parsed.data
         const supabase = createClient(supabaseUrl, serviceKey)
 
+        // Rate limit public submissions: 3/hour per IP and 2/day per email.
+        const ip = request.headers.get('cf-connecting-ip') ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+        const [rlIp, rlEmail] = await Promise.all([
+          supabase.rpc('check_rate_limit', { _bucket_key: `ip:${ip}`, _action: 'studio_booking', _max_hits: 3, _window_secs: 3600 }),
+          supabase.rpc('check_rate_limit', { _bucket_key: `email:${data.email.toLowerCase()}`, _action: 'studio_booking_email', _max_hits: 2, _window_secs: 86400 }),
+        ])
+        const allowed = (r: { data: unknown; error: unknown }) =>
+          !r.error && Array.isArray(r.data) && (r.data[0] as { allowed?: boolean } | undefined)?.allowed === true
+        if (!allowed(rlIp) || !allowed(rlEmail)) {
+          return Response.json({ error: 'Too many booking requests. Please try again later.' }, { status: 429 })
+        }
+
         // 1. Insert booking
         const { data: inserted, error: insertError } = await supabase
           .from('studio_bookings')

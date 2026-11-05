@@ -42,7 +42,11 @@ export const Route = createFileRoute("/api/assistant/chat")({
         if (!question || question.length > MAX_CHARS) return json(400, { error: `Questions must be 1–${MAX_CHARS} characters.` });
         // Only text parts from the browser are trusted as history.
         const clean = messages
-          .filter((m) => m.role === "user" || m.role === "assistant")
+          // Only the visitor's own questions are sent to the model; earlier
+          // "assistant" turns from the browser can't be verified, so they are
+          // dropped to stop fabricated replies from steering the answer.
+          .filter((m) => m.role === "user")
+          .slice(-10)
           .map((m) => ({ ...m, parts: (m.parts ?? []).filter((p: any) => p.type === "text").map((p: any) => ({ type: "text" as const, text: String(p.text).slice(0, 8000) })) }));
 
         // Optional sign-in
