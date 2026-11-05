@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { addBannedWord, removeBannedWord, endStreamAdmin, unbanUser } from "@/lib/moderation.functions";
 import { toast } from "sonner";
+import { StagePanel } from "@/components/studio/LiveProductionDashboard";
+import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 import { Radio, DollarSign, Users, Shield, Ban, X, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/dashboard")({
@@ -90,6 +92,10 @@ function AdminDashboard() {
           <Stat icon={Users} label="Tips received" value={String(tipCount)} color="#0000FF" />
           <Stat icon={Ban} label="Active bans" value={String(bans.length)} color="#ef4444" />
         </section>
+
+        <MediaEngineProvider>
+          <StagePanel participants={[]} />
+        </MediaEngineProvider>
 
         <section className="rounded-2xl border border-white/10 bg-[#0d0d18] p-4">
           <h2 className="mb-3 text-sm font-bold tracking-widest">LIVE STREAMS</h2>
