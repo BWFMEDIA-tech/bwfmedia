@@ -21,6 +21,16 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://tunevio.com/" },
       { name: "twitter:card", content: "summary_large_image" },
+      {
+        property: "og:image",
+        content:
+          "https://tunevio.com/__l5e/assets-v1/0a151f95-7057-4a3e-84a7-b48a9ac7e819/tunevio-social.jpg",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://tunevio.com/__l5e/assets-v1/0a151f95-7057-4a3e-84a7-b48a9ac7e819/tunevio-social.jpg",
+      },
     ],
     links: [{ rel: "canonical", href: "https://tunevio.com/" }],
   }),
