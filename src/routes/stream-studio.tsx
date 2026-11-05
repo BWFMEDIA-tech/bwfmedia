@@ -1176,7 +1176,7 @@ function StreamStudio() {
                         selected={selectedDestinations}
                         onChange={setSelectedDestinations}
                         onWantsConnect={() =>
-                          navigate({ to: "/settings/connected-apps" })
+                          nav({ to: "/settings/connected-apps" })
                         }
                       />
                       <div className="flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-black/40 p-3 text-xs text-zinc-400">
