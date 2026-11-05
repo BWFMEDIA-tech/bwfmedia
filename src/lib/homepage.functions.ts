@@ -123,7 +123,16 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
     recentArtists = (recentRes.data ?? [])
       .filter((p: any) => artistSet.has(p.id))
       .slice(0, 3)
-      .map((p: any) => ({ ...p, avatar_url: pmap.get(p.id)?.avatar_url ?? p.avatar_url }));
+    ;
+    recentArtists = await Promise.all(recentArtists.map(async (p: any) => {
+      if (pmap.has(p.id)) return pmap.get(p.id);
+      const raw: string = p.avatar_url ?? "";
+      if (!raw.includes(PUBLIC_MARKER)) return p;
+      const tail = raw.split(PUBLIC_MARKER)[1]?.split("?")[0] ?? "";
+      if (!PATH_RE.test(tail)) return p;
+      const { data: s } = await sb.storage.from("avatars").createSignedUrl(tail, 3600);
+      return s?.signedUrl ? { ...p, avatar_url: s.signedUrl } : p;
+    }));
   }
 
   return { liveStreams, videos, featuredArtists, latestArtist, recentArtists };
