@@ -18,11 +18,12 @@ export const signVideoPaths = createServerFn({ method: "POST" })
     const others = paths.filter((p) => !own.includes(p));
     const allowed = new Set<string>(own);
     if (others.length) {
-      const { data: rows } = await context.supabase
-        .from("videos")
-        .select("storage_path, thumbnail_path")
-        .or(`storage_path.in.(${others.map((p) => `"${p.replace(/"/g, "")}"`).join(",")}),thumbnail_path.in.(${others.map((p) => `"${p.replace(/"/g, "")}"`).join(",")})`);
-      for (const r of (rows ?? []) as Array<{ storage_path: string | null; thumbnail_path: string | null }>) {
+      const [a, b] = await Promise.all([
+        context.supabase.from("videos").select("storage_path, thumbnail_path").in("storage_path", others),
+        context.supabase.from("videos").select("storage_path, thumbnail_path").in("thumbnail_path", others),
+      ]);
+      const rows = [...(a.data ?? []), ...(b.data ?? [])];
+      for (const r of rows as Array<{ storage_path: string | null; thumbnail_path: string | null }>) {
         if (r.storage_path) allowed.add(r.storage_path);
         if (r.thumbnail_path) allowed.add(r.thumbnail_path);
       }
@@ -50,10 +51,12 @@ export const signPublicVideoPaths = createServerFn({ method: "POST" })
     const results: Record<string, string | null> = {};
     for (const p of paths) results[p] = null;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows } = await supabaseAdmin
-      .from("videos")
-      .select("storage_path, thumbnail_path")
-      .or(`storage_path.in.(${paths.map((p) => `"${p.replace(/"/g, "")}"`).join(",")}),thumbnail_path.in.(${paths.map((p) => `"${p.replace(/"/g, "")}"`).join(",")})`);
+    // Parameterised .in() filters: path strings can never inject filter syntax.
+    const [a, b] = await Promise.all([
+      supabaseAdmin.from("videos").select("storage_path, thumbnail_path").in("storage_path", paths),
+      supabaseAdmin.from("videos").select("storage_path, thumbnail_path").in("thumbnail_path", paths),
+    ]);
+    const rows = [...(a.data ?? []), ...(b.data ?? [])];
     const allowed = new Set<string>();
     for (const r of (rows ?? []) as Array<{ storage_path: string | null; thumbnail_path: string | null }>) {
       if (r.storage_path) allowed.add(r.storage_path);

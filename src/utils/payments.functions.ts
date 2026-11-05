@@ -22,6 +22,11 @@ export const createCartCheckoutSession = createServerFn({ method: "POST" })
       }
     }
     const safeReturnUrl = validateReturnUrl(data.returnUrl);
+    const totalQty = data.items.reduce((n, it) => n + it.quantity, 0);
+    if (totalQty > 20) throw new Error("Too many items");
+    if (new Set(data.items.map((i) => i.priceId)).size !== data.items.length) {
+      throw new Error("Duplicate items");
+    }
     return { ...data, returnUrl: safeReturnUrl };
   })
   .handler(async ({ data }) => {
@@ -37,7 +42,11 @@ export const createCartCheckoutSession = createServerFn({ method: "POST" })
 
     const lineItems = data.items.map((it) => {
       const price = priceMap.get(it.priceId);
-      if (!price) throw new Error(`Price not found: ${it.priceId}`);
+      // Only active one-time catalog prices may be bought through the cart;
+      // amounts always come from Stripe, never from the request.
+      if (!price || !price.active || price.type !== "one_time") {
+        throw new Error(`Price not available: ${it.priceId}`);
+      }
       return { price: price.id, quantity: it.quantity };
     });
 
