@@ -1,4 +1,8 @@
 export type StageEntry = { id: string; room_name: string; host_id: string; status: string; kind?: string };
+/** Local transport affects navigation glow only, never the public directory. */
+export function navigationStageEntries<T extends StageEntry>(entries: T[], connection: { streamId: string; connected: boolean } | null): T[] {
+  return entries.filter(entry => !connection || entry.id !== connection.streamId || connection.connected);
+}
 
 export type StageDestination =
   | { to: "/broadcast/$broadcastId"; params: { broadcastId: string } }

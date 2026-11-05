@@ -1,4 +1,4 @@
-import { directoryCandidates, directoryRows, type DirectoryRow } from "./live-directory";
+import { directoryCandidates, directoryRows, liveAccountRoles, type DirectoryRow } from "./live-directory";
 import { filterOnAirStreams, type OnAirRoomClient } from "./live-on-air";
 
 async function roomClient(): Promise<OnAirRoomClient> {
@@ -35,10 +35,16 @@ export async function readLiveDirectory(limit?: number) {
   const rows = directoryRows(await filterOnAirStreams(candidates, service), limit);
   const hostIds = [...new Set(rows.map(r => r.host_id))];
   const profiles = new Map<string, { display_name: string | null; avatar_url: string | null; stage_name: string | null }>();
+  const roles = new Map<string, string[]>();
   for (let offset = 0; offset < hostIds.length; offset += 200) {
-    const result = await db.from("profiles").select("id,display_name,avatar_url,stage_name").in("id", hostIds.slice(offset, offset + 200));
-    if (result.error) throw new Error("Live directory temporarily unavailable");
+    const ids = hostIds.slice(offset, offset + 200);
+    const [result, roleResult] = await Promise.all([
+      db.from("profiles").select("id,display_name,avatar_url,stage_name").in("id", ids),
+      db.from("user_roles").select("user_id,role").in("user_id", ids),
+    ]);
+    if (result.error || roleResult.error) throw new Error("Live directory temporarily unavailable");
     for (const p of result.data ?? []) profiles.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url, stage_name: p.stage_name });
+    for (const r of roleResult.data ?? []) roles.set(r.user_id, [...(roles.get(r.user_id) ?? []), r.role]);
   }
-  return rows.map(r => ({ ...r, host: profiles.get(r.host_id) ?? null }));
+  return rows.map(r => ({ ...r, host: profiles.get(r.host_id) ?? null, account_roles: liveAccountRoles(roles.get(r.host_id) ?? []) }));
 }

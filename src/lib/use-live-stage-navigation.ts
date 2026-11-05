@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { listLiveStreams } from "@/lib/live-broadcast.functions";
 import { liveRosterRows, type LiveRosterRow } from "./live-roster";
-import { liveStageDestination } from "./live-stage-navigation";
+import { liveStageDestination, navigationStageEntries } from "./live-stage-navigation";
 import { useStageNavigationConnection } from "./stage-navigation-connection";
 
 /**
@@ -14,7 +14,6 @@ import { useStageNavigationConnection } from "./stage-navigation-connection";
  * query instead of opening a second subscription to the same table.
  */
 export function useLiveStageFeed() {
-  const connection = useStageNavigationConnection();
   const id = useId();
   const fetchLive = useServerFn(listLiveStreams);
   const [online, setOnline] = useState(true);
@@ -44,8 +43,7 @@ export function useLiveStageFeed() {
       void supabase.removeChannel(channel);
     };
   }, [id, query.refetch]);
-  const entries = (query.isError ? [] : query.data?.streams ?? [])
-    .filter((entry) => !connection || entry.id !== connection.streamId || connection.connected);
+  const entries = query.data?.streams ?? [];
   return {
     entries,
     online,
@@ -58,8 +56,9 @@ export function useLiveStageFeed() {
 /** Where the live entries should go right now: the real broadcast when there is one. */
 export function useLiveStageNavigation() {
   const auth = useAuth();
+  const connection = useStageNavigationConnection();
   const { entries, online } = useLiveStageFeed();
-  return liveStageDestination(entries, auth.user?.id, online);
+  return liveStageDestination(navigationStageEntries(entries, connection), auth.user?.id, online);
 }
 
 /** The people currently live on Tunevio, own broadcast first. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { directoryCandidates, directoryRows, stageRoomAccess, type DirectoryRow } from "./live-directory";
+import { directoryCandidates, directoryRows, liveAccountRoles, stageRoomAccess, type DirectoryRow } from "./live-directory";
 import { filterOnAirStreams, type OnAirRoomClient } from "./live-on-air";
 
 const stream = (id: string, mode = "broadcast"): DirectoryRow => ({ id, room_name: id, host_id: id, status: "live", kind: "stream", title: id, description: null, thumbnail_url: null, category: null, viewer_count: 0, started_at: null, mode });
@@ -10,6 +10,16 @@ const service = (connected: Record<string, string>): OnAirRoomClient => ({
   listParticipants: async room => [{ identity: connected[room], permission: { canPublish: true } }],
 });
 describe("unified live directory", () => {
+  for (const role of ["artist", "host", "listener", "admin", "moderator"]) {
+    it(`includes a connected ${role} and its existing role label`, async () => {
+      const rows = directoryRows(await filterOnAirStreams(directoryCandidates([stream(role)], [], [], []), service({ [role]: role })));
+      expect(rows.map(r => r.id)).toEqual([role]);
+      expect(liveAccountRoles([role])).toEqual([role]);
+    });
+  }
+  it("deduplicates and allow-lists account role labels", () => {
+    expect(liveAccountRoles(["admin", "artist", "artist", "unknown"])).toEqual(["artist", "admin"]);
+  });
   it("counts two connected visitors, including a guest, but excludes the host and stale stored counts", async () => {
     const liveService: OnAirRoomClient = {
       listRooms: async () => [{ name: "artist", numParticipants: 3 }],

@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { liveStageDestination, type StageEntry } from "./live-stage-navigation";
+import { liveStageDestination, navigationStageEntries, type StageEntry } from "./live-stage-navigation";
 
 const stream: StageEntry = { id: "stream-1", room_name: "host-room", host_id: "host", status: "live", kind: "stream" };
 describe("live stage navigation", () => {
+  it("suppresses only local navigation glow during reconnect without mutating directory entries", () => {
+    const directory = [stream];
+    expect(navigationStageEntries(directory, { streamId: stream.id, connected: false })).toEqual([]);
+    expect(directory).toEqual([stream]);
+    expect(navigationStageEntries(directory, { streamId: stream.id, connected: true })).toEqual([stream]);
+  });
   it("routes hosts, members and listeners to the actual stream joining route", () => {
     for (const user of ["host", "member", "listener", undefined]) {
       expect(liveStageDestination([stream], user)).toEqual({ to: "/stream/$room", params: { room: "host-room" }, live: true });
