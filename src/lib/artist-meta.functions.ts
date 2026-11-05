@@ -123,7 +123,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
       const rawBanner = (p.banner_url as string | null) ?? null;
       // Show the artist's own songs from their profile library AND from
       // arena submissions, deduplicated so a song never appears twice.
-      const trackList = artistTracks.slice(0, 8);
+      // Show every song (no 8-song cap) so the full catalog is visible.
+      const trackList = artistTracks;
       const artworkPaths = [rawPhoto, rawBanner, ...trackList.map((t) => t.cover_url)]
         .flatMap((raw) => {
           const path = typeof raw === "string" ? avatarObjectPath(raw) : null;
