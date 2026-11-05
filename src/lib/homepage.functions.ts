@@ -109,5 +109,31 @@ export const getHomepageData = createServerFn({ method: "GET" }).handler(async (
     host: pmap.get(s.host_id) ?? null,
   }));
 
-  return { liveStreams, videos, featuredArtists, latestArtist };
+  // Newest artist sign-ups with a profile photo, for the Discover "Browse" card.
+  let recentArtists: any[] = [];
+  const recentRes = await sb.from("profiles")
+    .select("id, display_name, stage_name, avatar_url, bio, created_at")
+    .not("avatar_url", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(60);
+  const recentIds = (recentRes.data ?? []).map((p: any) => p.id);
+  if (recentIds.length) {
+    const roleRes = await sb.from("user_roles").select("user_id").eq("role", "artist").in("user_id", recentIds);
+    const artistSet = new Set((roleRes.data ?? []).map((r: any) => r.user_id));
+    recentArtists = (recentRes.data ?? [])
+      .filter((p: any) => artistSet.has(p.id))
+      .slice(0, 3)
+    ;
+    recentArtists = await Promise.all(recentArtists.map(async (p: any) => {
+      if (pmap.has(p.id)) return pmap.get(p.id);
+      const raw: string = p.avatar_url ?? "";
+      if (!raw.includes(PUBLIC_MARKER)) return p;
+      const tail = raw.split(PUBLIC_MARKER)[1]?.split("?")[0] ?? "";
+      if (!PATH_RE.test(tail)) return p;
+      const { data: s } = await sb.storage.from("avatars").createSignedUrl(tail, 3600);
+      return s?.signedUrl ? { ...p, avatar_url: s.signedUrl } : p;
+    }));
+  }
+
+  return { liveStreams, videos, featuredArtists, latestArtist, recentArtists };
 });
