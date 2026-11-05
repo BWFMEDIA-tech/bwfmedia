@@ -22,6 +22,10 @@ export const Route = createFileRoute("/notifications")({
     meta: [
       { title: "Notifications — Tunevio" },
       { name: "description", content: "Live alerts, mentions, and activity across Tunevio." },
+      { property: "og:title", content: "Notifications — Tunevio" },
+      { property: "og:description", content: "Live alerts, mentions, and activity across Tunevio." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NotificationsPage,
@@ -134,7 +138,7 @@ function NotificationsPage() {
                       {n.body && (
                         <p className={`text-sm text-white/70 mt-1 ${expanded[n.id] ? "" : "line-clamp-2"}`}>{n.body}</p>
                       )}
-                      {n.media_url && n.media_type === "image" && <img src={n.media_url} alt="" loading="lazy" className="mt-3 w-full max-h-80 rounded-lg object-cover" />}
+                      {n.media_url && n.media_type === "image" && <img src={n.media_url} alt={`Image attached to ${n.title}`} loading="lazy" className="mt-3 block h-auto w-full rounded-lg object-contain" />}
                       {n.media_url && n.media_type === "video" && <video src={n.media_url} controls playsInline preload="metadata" onClick={(e) => e.stopPropagation()} className="mt-3 w-full max-h-80 rounded-lg bg-black" />}
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         {!n.read_at && <span className="rounded-full bg-violet-500/20 text-violet-300 px-2 py-0.5 text-[10px] font-semibold">New</span>}
