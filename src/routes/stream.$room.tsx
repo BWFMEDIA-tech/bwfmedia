@@ -222,6 +222,7 @@ function GuestPage() {
               showHostTools={isHostLike}
               autoConnect
               arenaAudio
+              hideSelfMicRow
             >
               <StageRoom
                 streamId={streamId}
