@@ -27,3 +27,18 @@ describe("onlyArtistTracks", () => {
     expect(onlyArtistTracks(rows, new Set())).toEqual([]);
   });
 });
+
+import { onlyWithArtwork, onePerRelease } from "./home-feed-artists";
+describe("release rules", () => {
+  it("hides songs without artwork", () => {
+    expect(onlyWithArtwork([{ cover_url: "a" }, { cover_url: null }, { cover_url: " " }])).toHaveLength(1);
+  });
+  it("shows an album once and each single once", () => {
+    const rows = [
+      { id: 1, artist_user_id: "x", cover_url: "album" },
+      { id: 2, artist_user_id: "x", cover_url: "album" },
+      { id: 3, artist_user_id: "x", cover_url: "single" },
+    ];
+    expect(onePerRelease(rows).map((r) => r.id)).toEqual([1, 3]);
+  });
+});
