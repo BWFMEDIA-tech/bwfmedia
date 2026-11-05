@@ -163,6 +163,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
   // IDs of users currently on stage as performers. Used to lock the
   // Artist A / Artist B selectors once anyone in the matchup goes live.
+  const [view, setView] = useState<"player" | "battle">("player");
   const onStageIds = new Set(
     stageState.participants
       .filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room")
@@ -172,7 +173,20 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
   return (
     <>
       <div className="space-y-5">
-        {/* Immersive hero player + right rail (queue/battle/leaderboard) */}
+        <div role="tablist" aria-label="Live view" className="inline-flex rounded-full border border-white/10 bg-white/5 p-1">
+          {(["player", "battle"] as const).map((t) => (
+            <button key={t} role="tab" aria-selected={view === t} onClick={() => setView(t)}
+              className={`rounded-full px-5 py-1.5 text-xs font-bold tracking-widest uppercase transition ${view === t ? "bg-[#00E6FF] text-black shadow-[0_0_14px_#00E6FF80]" : "text-white/60 hover:text-white"}`}>
+              {t === "player" ? "Player" : "Battle"}
+            </button>
+          ))}
+        </div>
+        {view === "battle" && stream && (
+          <div className="animate-in fade-in duration-300">
+            <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} />
+          </div>
+        )}
+        <div className={view === "player" ? "animate-in fade-in duration-300" : "hidden"}>
         <ImmersivePlayer
           track={playing}
           upNext={queued}
@@ -181,6 +195,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
           streamId={stream?.id ?? null}
           isHost={isHost}
         />
+        </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
           {/* Main column */}
@@ -230,10 +245,6 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
               <HostControls streamId={stream.id} queued={queued} room={room} />
             )}
 
-            {/* Battle Arena — 1v1 head-to-head over the play queue */}
-            {stream && (
-              <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} />
-            )}
           </div>
 
           {/* Right column */}
