@@ -126,8 +126,10 @@ function BattleArenaLive({
     return () => { cancelled = true; };
   }, [currentRound?.id]);
 
+  const rs: any = roomState;
+  const onAirSide = rs?.bTrack?.status === "playing" ? "b" : rs?.aTrack?.status === "playing" ? "a" : roomState?.activeSide;
   const onAirTrack: any =
-    roomState?.activeSide === "b" ? (roomState as any)?.bTrack : roomState?.activeSide === "a" ? (roomState as any)?.aTrack : null;
+    onAirSide === "b" ? (roomState as any)?.bTrack : onAirSide === "a" ? (roomState as any)?.aTrack : null;
   const onAirUrl = playAudio && onAirTrack?.status === "playing" ? (onAirTrack.audio_url as string | null) : null;
   const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} startedAt={onAirTrack?.updated_at ?? null} /> : null;
 
@@ -246,8 +248,15 @@ function BattleView({
   onAfterHostEmit?: () => void;
 }) {
   const voteFn = useServerFn(castBattleVote);
-  const { match, rounds, currentRound, activeSide, votingStatus, aTrack, bTrack, voteTotals } =
+  const { match, rounds, currentRound, activeSide: storedSide, votingStatus, aTrack, bTrack, voteTotals } =
     roomState;
+  // The track that is actually playing decides which record spins, so the
+  // switch happens the moment the queue hands Side A over to Side B, even
+  // before the match's stored active side catches up.
+  const activeSide: "a" | "b" | null =
+    (bTrack as any)?.status === "playing" ? "b"
+      : (aTrack as any)?.status === "playing" ? "a"
+        : (storedSide as any) ?? null;
 
   // Transient "+N" flash shown over the side that was just voted for — pure
   // visual feedback. The bars ONLY render server-computed totals
