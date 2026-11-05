@@ -408,12 +408,12 @@ function FollowButton({ artistId }: { artistId: string }) {
     onMutate: async () => {
       await qc.cancelQueries({ queryKey: ["artist-follow-stats", artistId] });
       const previous = qc.getQueryData<{ count: number }>(["artist-follow-stats", artistId]);
-      qc.setQueryData(["artist-follow-stats", artistId], { count: Math.max(0, (previous?.count ?? 0) + (following ? -1 : 1)) });
+      qc.setQueryData(["artist-follow-stats", artistId], { ...(previous ?? {}), count: Math.max(0, (previous?.count ?? 0) + (following ? -1 : 1)) });
       qc.setQueryData(["artist-following", artistId], { following: !following });
       return { previous, following };
     },
     onSuccess: (res) => {
-      qc.setQueryData(["artist-follow-stats", artistId], { count: res.count });
+      qc.setQueryData(["artist-follow-stats", artistId], (old: any) => ({ ...(old ?? {}), count: res.count }));
       qc.setQueryData(["artist-following", artistId], { following: res.following });
       void qc.invalidateQueries({ queryKey: ["artist-follow-stats", artistId] });
     },
