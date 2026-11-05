@@ -47,7 +47,6 @@ import { IDENTITY_COLUMNS, effectiveIdentity } from "@/lib/host-identity";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { StreamThumbnailDialog } from "@/components/stream/StreamThumbnailDialog";
 import { ImageIcon } from "lucide-react";
-import { ConnectedPlatformsSection } from "@/components/stream/ConnectedPlatformsSection";
 import { StreamDestinationSelector } from "@/components/stream/StreamDestinationSelector";
 import { setStreamDestinations } from "@/lib/stream-platforms.functions";
 import type { StreamPlatformKey } from "@/lib/stream-platforms/registry";
@@ -1171,16 +1170,13 @@ function StreamStudio() {
               <>
 
                 {!lk && (
-                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 md:grid-cols-2">
-                    <div ref={platformsSectionRef}>
-                      <ConnectedPlatformsSection />
-                    </div>
+                  <div className="grid gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4">
                     <div className="flex flex-col gap-3">
                       <StreamDestinationSelector
                         selected={selectedDestinations}
                         onChange={setSelectedDestinations}
                         onWantsConnect={() =>
-                          platformsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+                          nav({ to: "/settings/connected-apps" })
                         }
                       />
                       <div className="flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-black/40 p-3 text-xs text-zinc-400">
