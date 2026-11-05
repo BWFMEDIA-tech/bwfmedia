@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import discoverHero from "@/assets/discover-hero.jpg";
 import { getHomepageData } from "@/lib/homepage.functions";
 import { SignedImg } from "@/components/ui/signed-img";
 import { PlatformCapabilities } from "@/components/site/PlatformCapabilities";
@@ -178,7 +177,6 @@ function DiscoverPage() {
 
   const browseArtists = data?.recentArtists?.length ? data.recentArtists : artists.slice(0, 3);
   const featured = artists.slice(0, 3);
-  const latestArtist = data?.latestArtist ?? null;
 
   return (
     <div
@@ -196,7 +194,7 @@ function DiscoverPage() {
         <div className="font-cond font-bold tracking-[0.4em] text-[11px] uppercase text-blood mb-4">
           Discover
         </div>
-        <div className="grid lg:grid-cols-[1.1fr_1fr_0.9fr] gap-8 items-start">
+        <div className="grid lg:grid-cols-[1.25fr_0.75fr] gap-8 items-start">
           {/* Left: headline + quick actions */}
           <div>
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl uppercase text-bone leading-[0.9]">
@@ -224,40 +222,6 @@ function DiscoverPage() {
               <ActionPill icon={Users} label="Collab" sub="Create together" />
             </div>
           </div>
-
-          {/* Center: latest artist to join */}
-          <RouterLink
-            to="/artist/$id"
-            params={{ id: latestArtist?.id ?? "browse" }}
-            className="group relative block rounded-2xl overflow-hidden border border-blood/30 aspect-[4/5] lg:aspect-auto lg:h-[460px]"
-          >
-            {latestArtist?.avatarUrl ? (
-              <SignedImg
-                src={latestArtist.avatarUrl}
-                alt={latestArtist.name}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <img
-                src={discoverHero}
-                alt={latestArtist?.name ?? "Featured artist"}
-                className="absolute inset-0 w-full h-full object-cover"
-                width={1280}
-                height={1280}
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-            {latestArtist && (
-              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-                <div className="font-cond font-bold tracking-[0.3em] text-[10px] uppercase text-blood">
-                  Latest to join
-                </div>
-                <div className="mt-1 font-display text-xl md:text-2xl uppercase text-bone leading-tight group-hover:text-white transition-colors">
-                  {latestArtist.name}
-                </div>
-              </div>
-            )}
-          </RouterLink>
 
           {/* Right: profile release CTA */}
           <aside className="rounded-2xl border border-white/10 bg-[#0d0d18]/85 backdrop-blur p-6 lg:mt-6">
