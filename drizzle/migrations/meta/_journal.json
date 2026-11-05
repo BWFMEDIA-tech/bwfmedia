@@ -288,6 +288,13 @@
       "when": 1793860673642,
       "tag": "0040_get_host_rate_self_only",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1793885236975,
+      "tag": "0041_signup_roles_require_verified_email",
+      "breakpoints": true
     }
   ]
 }

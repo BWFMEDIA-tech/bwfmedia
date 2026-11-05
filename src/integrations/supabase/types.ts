@@ -6862,6 +6862,10 @@ export type Database = {
         Args: { _credits: number; _user_id: string }
         Returns: number
       }
+      grant_requested_signup_role: {
+        Args: { _meta: Json; _user_id: string }
+        Returns: undefined
+      }
       has_active_artist_access: { Args: { _user_id: string }; Returns: boolean }
       has_active_tunevio_subscription: {
         Args: { _role?: string; _user_id: string }
