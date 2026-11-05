@@ -983,10 +983,10 @@ export function ImmersivePlayer({
           </div>
 
           {/* Vote ribbon (live score visible always) */}
-          <div className="mt-4 flex items-center justify-center gap-2">
+          <div className="mt-2 flex items-center justify-center gap-1.5">
             <button
               onClick={() => vote(1)}
-              className={`group flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+              className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
                 myVote === 1
                   ? "border-emerald-400 bg-emerald-400/15 text-emerald-300 shadow-[0_0_18px_-5px_rgba(52,211,153,0.7)]"
                   : "border-emerald-400/30 text-emerald-300/80 hover:border-emerald-400"
@@ -994,7 +994,7 @@ export function ImmersivePlayer({
             >▲ Hype</button>
             <button
               onClick={() => vote(-1)}
-              className={`group flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+              className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${
                 myVote === -1
                   ? "border-rose-400 bg-rose-400/15 text-rose-300 shadow-[0_0_18px_-5px_rgba(251,113,133,0.7)]"
                   : "border-rose-400/30 text-rose-300/80 hover:border-rose-400"
@@ -1006,7 +1006,7 @@ export function ImmersivePlayer({
               live battle round so any listener can pick a side without
               leaving the player. */}
           {battleVote && battleVote.roundId && (
-            <div className="mt-3 flex flex-col items-center gap-2">
+            <div className="mt-2 flex flex-col items-center gap-1.5">
               <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">
                 Battle Vote {battleVote.canVote ? "" : "(closed)"}
               </div>
@@ -1015,7 +1015,7 @@ export function ImmersivePlayer({
                   type="button"
                   disabled={!battleVote.canVote || battleVoting !== null}
                   onClick={() => castBattleSide("a")}
-                  className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
+                  className={`group relative flex-1 rounded-xl border px-2.5 py-1.5 text-[11px] font-bold transition disabled:opacity-60 ${
                     battleVote.myChoice === "a"
                       ? "border-[#00E6FF] bg-[#00E6FF]/15 text-[#00E6FF] shadow-[0_0_22px_-6px_rgba(0,230,255,0.8)]"
                       : "border-[#00E6FF]/30 text-[#00E6FF]/85 hover:border-[#00E6FF]"
@@ -1031,7 +1031,7 @@ export function ImmersivePlayer({
                   type="button"
                   disabled={!battleVote.canVote || battleVoting !== null}
                   onClick={() => castBattleSide("b")}
-                  className={`group relative flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition disabled:opacity-60 ${
+                  className={`group relative flex-1 rounded-xl border px-2.5 py-1.5 text-[11px] font-bold transition disabled:opacity-60 ${
                     battleVote.myChoice === "b"
                       ? "border-[#00E6FF] bg-[#00E6FF]/15 text-[#00E6FF] shadow-[0_0_22px_-6px_rgba(0,0,255,0.8)]"
                       : "border-[#00E6FF]/30 text-[#00E6FF]/85 hover:border-[#00E6FF]"
@@ -1048,17 +1048,17 @@ export function ImmersivePlayer({
           )}
 
           {/* Transport */}
-          <div className="mt-5 flex items-center justify-center gap-3 sm:gap-5">
+          <div className="mt-3 flex items-center justify-center gap-1.5 sm:gap-3">
             <button
               aria-label="Previous"
               onClick={hostPlayPrev}
-              className="grid h-10 w-10 place-items-center rounded-full text-white/70 hover:text-white transition disabled:opacity-30"
+              className="grid h-8 w-8 place-items-center rounded-full text-white/70 hover:text-white transition disabled:opacity-30"
               title="Restart / previous"
             ><SkipBack className="h-5 w-5" /></button>
 
             <button
               aria-label="Shuffle"
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition"
+              className="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition"
               onClick={() => toast.message("Shuffle is host-controlled in BWFPLAY")}
             ><Shuffle className="h-4 w-4" /></button>
 
@@ -1066,14 +1066,14 @@ export function ImmersivePlayer({
               aria-label={isPlaying ? "Pause" : "Play"}
               onClick={togglePlay}
               disabled={!track?.audio_url && !(isHost && upNext.length > 0)}
-              className="relative grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br from-[#0000FF] via-[#00E6FF] to-[#0000FF] text-white shadow-[0_0_60px_-5px_rgba(0,0,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
+              className="relative grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-full bg-gradient-to-br from-[#0000FF] via-[#00E6FF] to-[#0000FF] text-white shadow-[0_0_40px_-5px_rgba(0,0,255,0.85)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-40"
             >
-              {isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7 translate-x-0.5" />}
+              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-0.5" />}
             </button>
 
             <button
               aria-label="Repeat"
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition"
+              className="grid h-8 w-8 place-items-center rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition"
               onClick={() => toast.message("Loop is host-controlled in BWFPLAY")}
             ><Repeat className="h-4 w-4" /></button>
 
@@ -1081,25 +1081,25 @@ export function ImmersivePlayer({
               aria-label="Skip"
               onClick={hostSkip}
               disabled={!isHost}
-              className="grid h-10 w-10 place-items-center rounded-full text-white/70 hover:text-white transition disabled:opacity-30"
+              className="grid h-8 w-8 place-items-center rounded-full text-white/70 hover:text-white transition disabled:opacity-30"
               title={isHost ? "Skip to next" : "Host only"}
             ><SkipForward className="h-5 w-5" /></button>
           </div>
 
           {/* Secondary row: volume · speed · sleep */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-xs text-white/70">
-            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] text-white/70">
+            <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-2.5 py-1">
               <button onClick={() => setMuted(m => !m)} aria-label="Mute">
                 {muted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
               <input
                 type="range" min={0} max={1} step={0.01} value={muted ? 0 : volume}
                 onChange={(e) => { setMuted(false); setVolume(parseFloat(e.target.value)); }}
-                className="h-1 w-24 accent-[#0000FF]"
+                className="h-1 w-16 accent-[#0000FF]"
                 aria-label="Volume"
               />
             </div>
-            <label className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
+            <label className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2.5 py-1">
               <Gauge className="h-3.5 w-3.5" />
               <select
                 value={speed}
@@ -1112,7 +1112,7 @@ export function ImmersivePlayer({
                 ))}
               </select>
             </label>
-            <label className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1.5">
+            <label className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2.5 py-1">
               <Moon className="h-3.5 w-3.5" />
               <select
                 value={sleepMin ?? ""}
@@ -1130,7 +1130,7 @@ export function ImmersivePlayer({
               type="button"
               onClick={() => setNormalize(v => !v)}
               title="Auto-level: keeps loud and quiet tracks at a consistent volume"
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold transition ${
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold transition ${
                 normalize
                   ? "border-[#00E6FF]/60 bg-[#00E6FF]/10 text-[#00E6FF] shadow-[0_0_15px_-5px_rgba(0,230,255,0.7)]"
                   : "border-white/10 bg-black/30 text-white/60 hover:text-white"
@@ -1145,7 +1145,7 @@ export function ImmersivePlayer({
         </div>
 
         {/* COMMUNITY STRIP */}
-        <div className="relative z-10 mt-7 grid grid-cols-3 gap-3">
+        <div className="relative z-10 mt-4 grid grid-cols-3 gap-2">
           <Stat icon={<Users className="h-4 w-4 text-[#00E6FF]" />} label="Listeners" value={listeners.toLocaleString()} />
           <Stat icon={<Heart className="h-4 w-4 text-[#00E6FF]" />} label="Likes" value={totalLikes.toLocaleString()} />
           <Stat icon={<MessageCircle className="h-4 w-4 text-[#0000FF]" />} label="Votes" value={totalVotes.toLocaleString()} />
@@ -1258,25 +1258,25 @@ export function ImmersivePlayer({
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 backdrop-blur">
-      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/60">
+    <div className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-1.5 backdrop-blur">
+      <div className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-white/60">
         {icon} {label}
       </div>
-      <div className="mt-0.5 text-lg font-black tabular-nums">{value}</div>
+      <div className="mt-0.5 text-sm font-black tabular-nums">{value}</div>
     </div>
   );
 }
 
 function UpNextPreview({ next, secondsUntil }: { next: PlayTrack; secondsUntil: number }) {
   return (
-    <div className="relative z-10 mx-auto mt-5 flex w-full max-w-[460px] items-center gap-3 rounded-2xl border border-white/10 bg-black/40 p-2.5 pr-3 backdrop-blur transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+    <div className="relative z-10 mx-auto mt-3 flex w-full max-w-[360px] items-center gap-2 rounded-xl border border-white/10 bg-black/40 p-2 pr-2.5 backdrop-blur transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
       <div className="flex flex-col items-center gap-0.5 px-1">
         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#00E6FF]">Up Next</span>
         <span className="text-[10px] font-bold tabular-nums text-white/60">
           {secondsUntil > 0 ? `in ${fmt(secondsUntil)}` : "any moment"}
         </span>
       </div>
-      <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#0000FF] to-[#0000FF]">
+      <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#0000FF] to-[#0000FF]">
         {next.cover_url ? (
           <SignedImg src={next.cover_url} alt="" className="h-full w-full object-cover" />
         ) : (
