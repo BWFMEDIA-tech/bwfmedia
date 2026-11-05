@@ -39,7 +39,7 @@ export function SkipLinePopup({ queued }: { queued: PlayTrack[] }) {
   if (!shown) return null;
   const { track, avatar } = shown;
   return (
-    <div className="fixed inset-x-0 top-20 z-[100] flex justify-center px-4 animate-in fade-in slide-in-from-top-4" role="status" aria-live="polite">
+    <div className="fixed inset-x-0 top-56 z-[100] flex justify-center px-4 animate-in fade-in slide-in-from-top-4" role="status" aria-live="polite">
       <div className="relative flex w-full max-w-sm items-center gap-4 rounded-2xl border border-cyan-400/50 bg-black/90 p-4 shadow-[0_0_30px_rgba(0,230,255,0.35)]">
         <button onClick={() => setShown(null)} aria-label="Close" className="absolute right-2 top-2 rounded-full p-1 text-white/60 hover:bg-white/10 hover:text-white">
           <X className="h-4 w-4" />
