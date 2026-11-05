@@ -8,10 +8,49 @@ import { useSignedAvatarUrl } from "@/lib/useSignedAvatar";
 export const SignedImg = React.forwardRef<
   HTMLImageElement,
   React.ImgHTMLAttributes<HTMLImageElement>
->(({ src, ...props }, ref) => {
+>(({ src, onError, ...props }, ref) => {
   const resolved = useSignedAvatarUrl(typeof src === "string" ? src : undefined);
-  return <img ref={ref} src={typeof src === "string" ? resolved : src} {...props} />;
+  const [converted, setConverted] = React.useState<string | null>(null);
+  React.useEffect(() => setConverted(null), [resolved]);
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    // Most browsers (non-Safari) can't display iPhone HEIC photos; convert them on the fly.
+    if (!converted && resolved && isHeic(resolved)) {
+      convertHeic(resolved)
+        .then(setConverted)
+        .catch(() => onError?.(e));
+      return;
+    }
+    onError?.(e);
+  };
+  return (
+    <img
+      ref={ref}
+      src={typeof src === "string" ? (converted ?? resolved) : src}
+      onError={handleError}
+      {...props}
+    />
+  );
 });
+
+const heicCache = new Map<string, Promise<string>>();
+function isHeic(url: string) {
+  return /\.hei[cf](\?|$)/i.test(url);
+}
+function convertHeic(url: string): Promise<string> {
+  const key = url.split("?")[0];
+  let p = heicCache.get(key);
+  if (!p) {
+    p = (async () => {
+      const blob = await (await fetch(url)).blob();
+      const { heicTo } = await import("heic-to");
+      const out = await heicTo({ blob, type: "image/jpeg", quality: 0.85 });
+      return URL.createObjectURL(out);
+    })();
+    p.catch(() => heicCache.delete(key));
+    heicCache.set(key, p);
+  }
+  return p;
+}
 SignedImg.displayName = "SignedImg";
 
 type SignedBackgroundProps = React.HTMLAttributes<HTMLDivElement> & {
