@@ -237,8 +237,12 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
 
     // Battle-aware pick: if the finished track belonged to a battle, prefer
     // the opposite side's next queued track from the same match.
-    if (justPlayed?.battle_match_id && (justPlayed.battle_side === "a" || justPlayed.battle_side === "b")) {
-      const otherSide = justPlayed.battle_side === "a" ? "b" : "a";
+    // Side A hands off to Side B; once Side B finishes, the round is done and
+    // the flow continues with the next song in the regular queue instead of
+    // looping back to Side A.
+    const finishedSideB = !!justPlayed?.battle_match_id && justPlayed.battle_side === "b";
+    if (justPlayed?.battle_match_id && justPlayed.battle_side === "a") {
+      const otherSide = "b";
       const { data: opp } = await supabase.from("play_tracks")
         .select("id")
         .eq("stream_id", data.streamId).eq("status", "queued")
@@ -252,9 +256,13 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
 
     // Fallback: normal queue order (boosted first, then position).
     if (!next) {
-      const { data: fallback } = await supabase.from("play_tracks")
+      let q = supabase.from("play_tracks")
         .select("id")
-        .eq("stream_id", data.streamId).eq("status", "queued")
+        .eq("stream_id", data.streamId).eq("status", "queued");
+      if (finishedSideB) {
+        q = q.or(`battle_match_id.is.null,battle_match_id.neq.${justPlayed!.battle_match_id}`);
+      }
+      const { data: fallback } = await q
         .order("boosted", { ascending: false })
         .order("position", { ascending: true })
         .limit(1).maybeSingle();
