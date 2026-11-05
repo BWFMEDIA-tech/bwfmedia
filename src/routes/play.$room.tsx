@@ -261,11 +261,15 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
                 playbackState={session.snapshot?.playbackState ?? "stopped"}
               />
             )}
-            <ArtistMembershipCard active={!!status?.membershipActive} onUpgrade={() => setModal("membership")} />
           </div>
         </div>
       </div>
 
+      <MembershipPromoPopup
+        userId={auth.user?.id ?? null}
+        eligible={!!auth.user && auth.roles.includes("artist") && status !== null && !status.membershipActive}
+        onUpgrade={() => setModal("membership")}
+      />
       {modal === "boost" && <BoostCheckoutModal kind="boost" onClose={() => { setModal(null); refreshStatus(); }} />}
       {modal === "membership" && <BoostCheckoutModal kind="membership" onClose={() => { setModal(null); refreshStatus(); }} />}
       {modal === "submit" && stream && (
@@ -331,6 +335,33 @@ function Leaderboard({ items, isHost, streamId }: { items: PlayTrack[]; isHost: 
   );
 }
 
+
+function MembershipPromoPopup({ userId, eligible, onUpgrade }: { userId: string | null; eligible: boolean; onUpgrade: () => void }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!eligible || !userId) return;
+    const key = `tunevio:membership-promo-seen:${userId}`;
+    try { if (localStorage.getItem(key)) return; } catch { return; }
+    const t = window.setTimeout(() => {
+      try { localStorage.setItem(key, "1"); } catch { /* ignore */ }
+      setOpen(true);
+    }, 30_000);
+    return () => window.clearTimeout(t);
+  }, [eligible, userId]);
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-label="Artist membership">
+      <div className="relative w-full max-w-sm">
+        <button onClick={() => setOpen(false)} aria-label="Close"
+          className="absolute right-2 top-2 z-10 rounded-full p-1.5 text-white/70 hover:bg-white/10 hover:text-white">
+          <span aria-hidden className="text-lg leading-none">×</span>
+        </button>
+        <div className="mb-2 text-center text-sm font-semibold text-white">You're live in the Arena — unlock artist tools</div>
+        <ArtistMembershipCard active={false} onUpgrade={() => { setOpen(false); onUpgrade(); }} />
+      </div>
+    </div>
+  );
+}
 
 function ArtistMembershipCard({ active, onUpgrade }: { active: boolean; onUpgrade: () => void }) {
   return (
