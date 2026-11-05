@@ -955,7 +955,7 @@ function SpeakerBubble({
         </Button>
       </div>
       <div className="text-center">
-        <div className="flex items-center justify-center gap-1 text-xs font-bold text-white">
+        <div className="flex max-w-full items-center justify-center gap-1 truncate text-xs font-bold text-white">
           {kind === "host" && <Crown className="h-3 w-3" style={{ color: PURPLE }} />}
           {kind === "co_host" && <Star className="h-3 w-3" style={{ color: "#60a5fa" }} />}
           {p.display_name ?? "Guest"}
