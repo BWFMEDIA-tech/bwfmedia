@@ -233,6 +233,16 @@ function TrackPicker({
   onPick: (trackId: string) => void;
   onClose: () => void;
 }) {
+  // Show each song once: repeated submissions of the same title collapse to
+  // the most useful copy (playing > queued > anything else).
+  const rank = (st: string) => (st === "playing" ? 0 : st === "queued" ? 1 : 2);
+  const byTitle = new Map<string, any>();
+  for (const t of tracks) {
+    const key = String(t.title ?? t.id).trim().toLowerCase();
+    const prev = byTitle.get(key);
+    if (!prev || rank(t.status) < rank(prev.status)) byTitle.set(key, t);
+  }
+  tracks = Array.from(byTitle.values());
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 p-4" onClick={onClose}>
       <div
