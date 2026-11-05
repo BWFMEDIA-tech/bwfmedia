@@ -262,10 +262,10 @@ function HeroBanner({
         <div className="absolute inset-0 opacity-60" style={{ background: `radial-gradient(120% 80% at 70% 0%, ${RED}33, transparent 60%)` }} />
       )}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_120%,#000_0%,transparent_50%)]" />
-      <div className="relative p-5 md:p-8 grid grid-cols-[minmax(0,1fr)_auto] gap-6 sm:flex sm:flex-wrap sm:items-end">
-        <div className="flex min-w-0 items-end gap-5">
+      <div className="relative p-5 md:p-8 flex gap-6 sm:items-end">
+        <div className="flex min-w-0 flex-1 items-center gap-4 sm:items-end sm:gap-5">
           <div className="relative shrink-0">
-            <div className="h-28 w-28 md:h-36 md:w-36 rounded-full overflow-hidden ring-4" style={{ borderColor: RED, boxShadow: `0 0 40px ${RED}55`, borderWidth: 0, outline: `3px solid ${RED}` }}>
+            <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-36 md:w-36 rounded-full overflow-hidden ring-4" style={{ borderColor: RED, boxShadow: `0 0 40px ${RED}55`, borderWidth: 0, outline: `3px solid ${RED}` }}>
               {artist.photo ? (
                 <SignedImg src={artist.photo} alt={artist.name} className="h-full w-full object-cover" />
               ) : (
@@ -275,11 +275,12 @@ function HeroBanner({
             <ArtistStatusBeacon userId={artist.id} className="bottom-2 right-2 h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="font-anton text-4xl md:text-5xl uppercase tracking-tight truncate">{artist.name}</h1>
+            <div className="flex items-start gap-2">
+              <h1 className="font-anton text-2xl sm:text-4xl md:text-5xl uppercase tracking-tight leading-tight break-words line-clamp-2">{artist.name}</h1>
               <RankBadge userId={artist.id} size="xl" />
             </div>
-            {artist.handle && <div className="text-sm text-white/60 mt-1">{artist.handle}</div>}
+            {artist.handle && <div className="text-sm text-white/60 mt-1 truncate">{artist.handle}</div>}
+            <FollowCounts artistId={artist.id} />
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
               {location && (
                 <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" style={{ color: RED }} /> {location}</span>
@@ -295,12 +296,12 @@ function HeroBanner({
         </div>
       </div>
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
-        <div className="w-full sm:w-auto"><ProfileMessageButton artistId={artist.id} /></div>
+        <ProfileMessageButton artistId={artist.id} compact />
         {isOwner && !canUseTools ? (
           <Link
             to="/signup"
             search={{ as: "artist" } as any}
-            className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
             style={{
               borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
               background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
@@ -313,7 +314,7 @@ function HeroBanner({
           <>
             <Link
               to="/go-live"
-              className="inline-flex h-12 items-center gap-2 rounded-full px-7 text-sm font-black uppercase tracking-wide text-white transition hover:brightness-110"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-black uppercase tracking-wide text-white transition hover:brightness-110"
               style={{
                 background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-blue))",
                 boxShadow:
@@ -324,7 +325,7 @@ function HeroBanner({
             </Link>
             <Link
               to="/settings/profile"
-              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
               style={{
                 borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
                 background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
@@ -335,7 +336,7 @@ function HeroBanner({
             </Link>
             <Link
               to="/distribution"
-              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
               style={{
                 borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
                 background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
@@ -348,16 +349,17 @@ function HeroBanner({
         ) : (
           <>
             <FollowButton artistId={artist.id} />
-            <PillButton icon={Share2} label="Share" />
+            <PillButton icon={Share2} label="Share" onClick={() => shareProfile(artist.name)} />
             <button
-              className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+              aria-label="More"
+              className="inline-flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
               style={{
                 borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
                 background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
                 boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
               }}
             >
-              <MoreHorizontal className="h-4 w-4" /> More
+              <MoreHorizontal className="h-4 w-4" />
             </button>
           </>
         )}
@@ -366,10 +368,12 @@ function HeroBanner({
   );
 }
 
-function PillButton({ icon: Icon, label }: { icon: any; label: string }) {
+function PillButton({ icon: Icon, label, onClick }: { icon: any; label: string; onClick?: () => void }) {
   return (
     <button
-      className="inline-flex h-12 items-center gap-2 rounded-full border px-6 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
       style={{
         borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
         background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
@@ -434,7 +438,7 @@ function FollowButton({ artistId }: { artistId: string }) {
   return (
     <>
       <div
-        className={`inline-flex h-12 items-stretch rounded-full overflow-hidden border transition ${
+        className={`inline-flex h-9 items-stretch rounded-full overflow-hidden border transition ${
           following ? "artist-follow-on" : ""
         }`}
         style={
@@ -451,7 +455,7 @@ function FollowButton({ artistId }: { artistId: string }) {
           onClick={handleClick}
           disabled={mut.isPending}
           aria-pressed={following}
-          className={`artist-follow-main inline-flex items-center gap-2 px-6 text-sm font-semibold transition disabled:opacity-60 ${
+          className={`artist-follow-main inline-flex items-center gap-1.5 px-3.5 text-xs font-semibold transition disabled:opacity-60 ${
             following
               ? ""
               : "text-white hover:bg-white/[0.08]"
@@ -464,7 +468,7 @@ function FollowButton({ artistId }: { artistId: string }) {
           type="button"
           onClick={() => setFollowersOpen(true)}
           aria-label="View followers"
-          className={`artist-follow-count px-4 text-xs tabular-nums border-l transition ${
+          className={`artist-follow-count px-3 text-xs tabular-nums border-l transition ${
             following
               ? ""
               : "text-white/70 hover:bg-white/[0.08]"
@@ -1040,3 +1044,32 @@ function SupportArtist({
 }
 
 
+
+async function shareProfile(name: string) {
+  const url = typeof window !== "undefined" ? window.location.href : "";
+  const data = { title: `${name} on Tunevio`, text: `Check out ${name} on Tunevio`, url };
+  try {
+    if (navigator.share) { await navigator.share(data); return; }
+    await navigator.clipboard.writeText(url);
+    toast.success("Profile link copied");
+  } catch (e: any) {
+    if (e?.name === "AbortError") return;
+    try { await navigator.clipboard.writeText(url); toast.success("Profile link copied"); }
+    catch { toast.error("Could not share profile"); }
+  }
+}
+
+function FollowCounts({ artistId }: { artistId: string }) {
+  const fetchStats = useServerFn(getArtistFollowStats);
+  const q = useQuery({
+    queryKey: ["artist-follow-stats", artistId],
+    queryFn: () => fetchStats({ data: { artistId } }),
+  });
+  const d = q.data as { count?: number; followingCount?: number } | undefined;
+  return (
+    <div className="mt-2 flex gap-5 text-sm">
+      <span><b className="font-bold text-white tabular-nums">{fmtNum(d?.count ?? 0)}</b> <span className="text-white/60">followers</span></span>
+      <span><b className="font-bold text-white tabular-nums">{fmtNum(d?.followingCount ?? 0)}</b> <span className="text-white/60">following</span></span>
+    </div>
+  );
+}
