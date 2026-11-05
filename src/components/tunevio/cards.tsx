@@ -273,7 +273,11 @@ export function TrackCard({
       <Artwork src={track.coverUrl} alt={track.title} className="h-12 w-12 shrink-0" rounded="rounded-lg" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-white">{track.title}</p>
-        <p className="truncate text-xs text-white/50">{track.artistName}</p>
+        {track.artistUserId ? (
+          <Link to="/artist/$id" params={{ id: track.artistUserId }} className="block truncate text-xs text-white/50 hover:text-tv-cyan hover:underline">{track.artistName}</Link>
+        ) : (
+          <p className="truncate text-xs text-white/50">{track.artistName}</p>
+        )}
       </div>
       <span className="hidden shrink-0 text-xs tabular-nums text-white/40 sm:block">
         {formatDuration(track.durationSeconds)}
