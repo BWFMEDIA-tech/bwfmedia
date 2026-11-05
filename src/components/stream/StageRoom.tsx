@@ -632,7 +632,7 @@ function ModBubble({
   m: { user_id: string; display_name: string | null; avatar_url: string | null };
 }) {
   return (
-    <div className="group relative flex flex-col items-center gap-2 pt-3">
+    <div className="group relative flex min-w-0 flex-col items-center gap-1 pt-2">
       <div className="relative">
         <div
           className="absolute -inset-1 rounded-full opacity-70 blur-md"
@@ -891,7 +891,7 @@ function SpeakerBubble({
     } else if (onToggleMute) onToggleMute();
   };
   return (
-    <div className="relative flex flex-col items-center gap-2 pt-3">
+    <div className="relative flex min-w-0 flex-col items-center gap-1 pt-2">
       <div className="absolute -top-0.5 left-1/2 z-30 -translate-x-1/2">
         <span
           className="whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-bold tracking-widest text-white shadow-lg shadow-black/50 ring-1 ring-black/40"
@@ -927,10 +927,10 @@ function SpeakerBubble({
         )}
         <Link to="/artist/$id" params={{ id: p.user_id }} className="relative block">
           {p.avatar_url ? (
-            <SignedImg src={p.avatar_url} alt="" className="h-[96px] w-[96px] rounded-full border-2 border-[#0d0d18] object-cover" />
+            <SignedImg src={p.avatar_url} alt="" className="h-[76px] w-[76px] sm:h-[96px] sm:w-[96px] rounded-full border-2 border-[#0d0d18] object-cover" />
           ) : (
             <div
-              className="h-[96px] w-[96px] rounded-full border-2 border-[#0d0d18]"
+              className="h-[76px] w-[76px] sm:h-[96px] sm:w-[96px] rounded-full border-2 border-[#0d0d18]"
               style={{ background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})` }}
             />
           )}
@@ -946,7 +946,7 @@ function SpeakerBubble({
           aria-pressed={micOff}
           title={canTapMic ? (micOff ? "Unmute mic" : "Mute mic") : undefined}
           className={cn(
-            "absolute -bottom-1 -right-1 flex h-11 w-11 items-center justify-center rounded-full border-2 border-background transition-transform",
+            "absolute -bottom-1 -right-1 flex h-8 w-8 sm:h-11 sm:w-11 items-center justify-center rounded-full border-2 border-background transition-transform",
             canTapMic && "cursor-pointer hover:scale-110",
             isSpeaking && !micOff && "scale-125 animate-bounce",
           )}
@@ -1430,9 +1430,9 @@ export function AudienceRow({ participants }: { participants: StageParticipant[]
 
 function EmptySlot({ label = "Open slot", color = "#ffffff" }: { label?: string; color?: string }) {
   return (
-    <div className="group flex flex-col items-center gap-2">
+    <div className="group flex flex-col items-center gap-1">
       <div
-        className="relative grid h-[96px] w-[96px] place-items-center rounded-full border border-dashed transition group-hover:scale-105"
+        className="relative grid h-[76px] w-[76px] sm:h-[96px] sm:w-[96px] place-items-center rounded-full border border-dashed transition group-hover:scale-105"
         style={{
           borderColor: `${color}aa`,
           background: `radial-gradient(60% 60% at 50% 50%, ${color}22, transparent 70%)`,
@@ -1456,7 +1456,7 @@ function MoreOpenChip({ count, color }: { count: number; color: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       <div
-        className="grid h-[96px] w-[96px] place-items-center rounded-full border text-center"
+        className="grid h-[76px] w-[76px] sm:h-[96px] sm:w-[96px] place-items-center rounded-full border text-center"
         style={{
           borderColor: `${color}55`,
           background: `radial-gradient(60% 60% at 50% 50%, ${color}18, transparent 70%)`,
