@@ -1361,3 +1361,8 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
   .arena-wave-bar { animation: none; }
 }
+
+/* Compact now-playing on phones: artwork shrinks with screen height so controls fit without scrolling */
+@media (max-width: 639px) {
+  .swara-music-detail .music-detail-art { width: min(100%, calc(100dvh - 330px)); max-width: 440px; }
+}
