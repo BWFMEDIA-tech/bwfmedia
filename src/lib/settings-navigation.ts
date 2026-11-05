@@ -19,6 +19,7 @@ export function settingsGroups(roles: readonly string[]): SettingsGroup[] {
       { to: "/settings/notifications", label: "Notifications" },
     ] },
     artist ? { key: "artist", label: "Artist Tools", items: [
+      { to: "/profile", label: "My Profile" },
       { to: "/settings/artist-info", label: "Artist Profile" },
       { to: "/settings/social-links", label: "Social & Platform Links" },
       { to: "/upload", label: "Upload Music" },
