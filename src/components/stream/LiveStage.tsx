@@ -32,6 +32,8 @@ import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { SelfMicrophoneButton } from "./SelfMicrophoneButton";
 import { StageMuteEnforcement } from "./StageMuteEnforcement";
 import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
+import { RaiseHandButton } from "./RaiseHandButton";
+import type { AuthState } from "@/lib/auth-context";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -53,9 +55,14 @@ interface LiveStageProps {
   /** Podcast mode: keep the mic live but turn the camera off. */
   audioOnly?: boolean;
   arenaAudio?: boolean;
+  /**
+   * When passed, the mic row also carries this person's raise-hand / "Leave
+   * stage" control, so phone users reach mute and leave from one spot.
+   */
+  raiseHandAuth?: AuthState;
 }
 
-export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost, audioOnly = false, arenaAudio = false }: LiveStageProps) {
+export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish = true, showHostTools = true, profileHost, audioOnly = false, arenaAudio = false, raiseHandAuth }: LiveStageProps) {
   const audioOptions = useMemo(() => arenaAudio ? getArenaRoomAudioOptions() : undefined, [arenaAudio]);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
 
@@ -109,7 +116,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
     >
       <RoomAudioRenderer />
       <StageConnectionProvider>
-        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} audioOnly={audioOnly} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} />}
+        {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} audioOnly={audioOnly} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} raiseHandAuth={raiseHandAuth} />}
         <PublishSync publish={publish} camera={!audioOnly} />
         {audioOnly && <AudioOnlySync />}
         {streamId && <StageMuteEnforcement streamId={streamId} />}
@@ -381,7 +388,7 @@ function friendlyDeviceError(error: unknown) {
   return message || "Could not enable camera or microphone.";
 }
 
-export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean }) {
+export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onViewerCount, streamId, publish, showHostTools = true, raiseHandAuth }: { onEnd: () => void; onInvite: () => void; hostImage?: string; guestImage?: string; onViewerCount?: (n: number) => void; streamId?: string; publish?: boolean; showHostTools?: boolean; raiseHandAuth?: AuthState }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -551,7 +558,14 @@ export function LiveStageContent({ onEnd, onInvite, hostImage, guestImage, onVie
         </div>}
       </div>
       {showHostTools && <StreamControlBar onEnd={onEnd} onInvite={onInvite} streamId={streamId} />}
-      {!showHostTools && publish && <div className="flex justify-center py-3"><SelfMicrophoneButton /></div>}
+      {!showHostTools && publish && (
+        <div className="flex flex-wrap items-center justify-center gap-2 py-3">
+          <SelfMicrophoneButton />
+          {raiseHandAuth && streamId && (
+            <RaiseHandButton streamId={streamId} auth={raiseHandAuth} hideSelfMic />
+          )}
+        </div>
+      )}
     </>
   );
 }
