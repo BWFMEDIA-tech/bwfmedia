@@ -67,15 +67,20 @@ function ArtistsPage() {
   }
 
   const allGenres = useMemo(() => {
-    const s = new Set<string>();
-    for (const a of artists) for (const g of a.genres) s.add(g);
-    return Array.from(s).sort((a, b) => a.localeCompare(b));
+    const m = new Map<string, string>();
+    for (const a of artists) for (const g of a.genres) {
+      const k = genreKey(g);
+      if (!k || k === "all") continue;
+      const prev = m.get(k);
+      if (!prev || (g !== g.toLowerCase() && prev === prev.toLowerCase())) m.set(k, g.trim());
+    }
+    return Array.from(m, ([key, label]) => ({ key, label })).sort((a, b) => a.label.localeCompare(b.label));
   }, [artists]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return artists.filter((a) => {
-      if (genre && !a.genres.includes(genre)) return false;
+      if (genre && !a.genres.some((g) => genreKey(g) === genre)) return false;
       if (!needle) return true;
       return (
         a.name.toLowerCase().includes(needle) ||
@@ -117,33 +122,17 @@ function ArtistsPage() {
             />
           </div>
           {allGenres.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setGenre(null)}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
-                  genre === null
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                All genres
-              </button>
+            <select
+              value={genre ?? ""}
+              onChange={(e) => setGenre(e.target.value || null)}
+              aria-label="Filter by genre"
+              className="mt-3 h-10 w-full rounded-md border border-border bg-background px-3 text-base text-foreground sm:w-64 sm:text-sm"
+            >
+              <option value="">All genres</option>
               {allGenres.map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setGenre(genre === g ? null : g)}
-                  className={`rounded-full border px-3 py-1 text-xs transition ${
-                    genre === g
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {g}
-                </button>
+                <option key={g.key} value={g.key}>{g.label}</option>
               ))}
-            </div>
+            </select>
           )}
         </div>
 
@@ -253,4 +242,7 @@ function ArtistDirectoryCard({
       </Button>
     </div>
   );
+}
+function genreKey(g: string) {
+  return g.toLowerCase().replace(/[^a-z0-9&]/g, "");
 }
