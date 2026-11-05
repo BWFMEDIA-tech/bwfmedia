@@ -112,6 +112,7 @@ import { Route as BlogCanYouPlayMusicOnLiveStreamRouteImport } from './routes/bl
 import { Route as BlogHowArtistsGetPaidForStreamingMusicRouteImport } from './routes/blog.how-artists-get-paid-for-streaming-music'
 import { Route as BlogHowToLiveStreamMusicRouteImport } from './routes/blog.how-to-live-stream-music'
 import { Route as BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport } from './routes/blog.live-stream-music-twitch-youtube-facebook'
+import { Route as BroadcastIndexRouteImport } from './routes/broadcast.index'
 import { Route as BroadcastBroadcastIdRouteImport } from './routes/broadcast.$broadcastId'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -688,6 +689,11 @@ const BlogLiveStreamMusicTwitchYoutubeFacebookRoute =
     path: '/blog/live-stream-music-twitch-youtube-facebook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BroadcastIndexRoute = BroadcastIndexRouteImport.update({
+  id: '/broadcast/',
+  path: '/broadcast/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BroadcastBroadcastIdRoute = BroadcastBroadcastIdRouteImport.update({
   id: '/broadcast/$broadcastId',
   path: '/broadcast/$broadcastId',
@@ -1101,6 +1107,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/artist-store/': typeof ArtistStoreIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/broadcast/': typeof BroadcastIndexRoute
   '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
   '/settings/': typeof SettingsIndexRoute
@@ -1257,6 +1264,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/artist-store': typeof ArtistStoreIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/broadcast': typeof BroadcastIndexRoute
   '/labels': typeof LabelsIndexRoute
   '/play': typeof PlayIndexRoute
   '/settings': typeof SettingsIndexRoute
@@ -1417,6 +1425,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/artist-store/': typeof ArtistStoreIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/broadcast/': typeof BroadcastIndexRoute
   '/labels/': typeof LabelsIndexRoute
   '/play/': typeof PlayIndexRoute
   '/settings/': typeof SettingsIndexRoute
@@ -1578,6 +1587,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/artist-store/'
     | '/blog/'
+    | '/broadcast/'
     | '/labels/'
     | '/play/'
     | '/settings/'
@@ -1734,6 +1744,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/artist-store'
     | '/blog'
+    | '/broadcast'
     | '/labels'
     | '/play'
     | '/settings'
@@ -1893,6 +1904,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/artist-store/'
     | '/blog/'
+    | '/broadcast/'
     | '/labels/'
     | '/play/'
     | '/settings/'
@@ -2003,6 +2015,7 @@ export interface RootRouteChildren {
   UserIdRoute: typeof UserIdRoute
   VideosIdRoute: typeof VideosIdRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  BroadcastIndexRoute: typeof BroadcastIndexRoute
   LabelsIndexRoute: typeof LabelsIndexRoute
   PlayIndexRoute: typeof PlayIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
@@ -2747,6 +2760,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogLiveStreamMusicTwitchYoutubeFacebookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/broadcast/': {
+      id: '/broadcast/'
+      path: '/broadcast'
+      fullPath: '/broadcast/'
+      preLoaderRoute: typeof BroadcastIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/broadcast/$broadcastId': {
       id: '/broadcast/$broadcastId'
       path: '/broadcast/$broadcastId'
@@ -3361,6 +3381,7 @@ const rootRouteChildren: RootRouteChildren = {
   UserIdRoute: UserIdRoute,
   VideosIdRoute: VideosIdRoute,
   BlogIndexRoute: BlogIndexRoute,
+  BroadcastIndexRoute: BroadcastIndexRoute,
   LabelsIndexRoute: LabelsIndexRoute,
   PlayIndexRoute: PlayIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
