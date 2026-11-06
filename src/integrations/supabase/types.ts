@@ -6712,6 +6712,10 @@ export type Database = {
         }
         Returns: number
       }
+      battle_challenge_mark_agreed: {
+        Args: { _match_id: string }
+        Returns: undefined
+      }
       battle_vote_target_artist: {
         Args: { _choice: string; _match_id: string }
         Returns: string
