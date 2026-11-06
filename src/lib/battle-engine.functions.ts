@@ -241,7 +241,7 @@ export async function runBattleEvent(
         const { data: track } = await supabase
           .from("play_tracks")
           .select("id, stream_id, artist_user_id, status")
-          .eq("id", trackId!)
+          .eq("id", trackId)
           .maybeSingle();
         if (!track) invalid("track not found");
         const expectedArtist = side === "a" ? m.artist_a_id : m.artist_b_id;
@@ -255,7 +255,7 @@ export async function runBattleEvent(
           await supabase
             .from("play_tracks")
             .update({ stream_id: m.stream_id })
-            .eq("id", trackId!);
+            .eq("id", trackId);
         }
 
         // Switching songs is not proof that the previous song finished.
@@ -299,7 +299,7 @@ export async function runBattleEvent(
         await supabase
           .from("play_sessions")
           .upsert(
-            { stream_id: m.stream_id, current_track_id: trackId!, status: "open" },
+            { stream_id: m.stream_id, current_track_id: trackId, status: "open" },
             { onConflict: "stream_id" },
           );
         return { ok: true, side, trackId };
