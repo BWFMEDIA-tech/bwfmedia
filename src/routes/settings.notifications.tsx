@@ -11,6 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getPushPublicKey, sendPushTest } from "@/lib/push-settings.functions";
 import { subscribePush, unsubscribePush } from "@/lib/notifications.functions";
 import { sendAnnouncement } from "@/lib/announcements.functions";
+import type { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/settings/notifications")({
   head: () => ({ meta: [
@@ -60,7 +61,9 @@ function NotificationsPage() {
 
   async function update(key: keyof typeof p, value: boolean) {
     if (!user) return;
-    const { error } = await supabase.from("notification_preferences").upsert({ user_id: user.id, [key]: value }, { onConflict: "user_id" });
+    const changes: Database["public"]["Tables"]["notification_preferences"]["Insert"] = { user_id: user.id };
+    changes[key] = value;
+    const { error } = await supabase.from("notification_preferences").upsert(changes, { onConflict: "user_id" });
     if (error) { toast.error("Couldn't save notification preferences"); return false; }
     setP(current => ({ ...current, [key]: value }));
     return true;

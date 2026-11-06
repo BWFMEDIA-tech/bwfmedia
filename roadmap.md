@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Mobile push notifications
-- [ ] Reuse inbox, device subscription storage and PWA; secure VAPID delivery with opt-in settings
-- [ ] Integrate challenges, messages, followers, followed-artist uploads and authorized event announcements
-- [ ] Verify delivery security, preferences, duplicate prevention and mobile settings
+- [x] Reuse inbox/device storage, opt-in settings, dedicated cache-free messaging worker and server-only VAPID sender
+- [x] Existing challenge inbox events feed push; messages/follows/published profile music and authorized Saturday events enqueue push; host/admin announcement action added
+- [x] 22 tests: preferences, endpoint security, RFC8291/VAPID encryption and existing regressions; signed-in preference persistence/restoration, 390px layout and unauthenticated callback 401 verified
+- [ ] Verify device subscriptions, notification click-through and closed-app delivery; no devices subscribed, so real push remains unverified
 - [ ] Publish and verify closed-app delivery on real iPhone (iOS 16.4+) and Android devices — requires devices
 
 ## Artist 1v1 Challenge Queue & Host Battle Management (uploaded spec)
