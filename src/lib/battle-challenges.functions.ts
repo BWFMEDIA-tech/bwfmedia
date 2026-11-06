@@ -38,16 +38,8 @@ async function profileSummary(supabase: any, ids: string[]): Promise<Map<string,
 }
 
 async function notify(userIds: string[], n: { actorId: string; type: string; title: string; body?: string | null; link?: string | null }) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const rows = userIds.map((uid) => ({
-    user_id: uid,
-    actor_id: n.actorId,
-    type: n.type,
-    title: n.title,
-    body: n.body ?? null,
-    link: n.link ?? "/play",
-  }));
-  await (supabaseAdmin as any).from("notifications").insert(rows);
+  const { notifyBattleUsers } = await import("@/lib/battle-notifications.server");
+  await notifyBattleUsers(userIds, n);
 }
 
 function withProfiles(rows: any[], profiles: Map<string, ProfileInfo>) {
