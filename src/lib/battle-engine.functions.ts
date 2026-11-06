@@ -258,8 +258,7 @@ export async function runBattleEvent(
             .eq("id", trackId!);
         }
 
-        // Demote any currently playing track on the stream to completed and
-        // stamp the previously-playing side as finished.
+        // Switching songs is not proof that the previous song finished.
         const { data: nowPlaying } = await supabase
           .from("play_tracks")
           .select("id, artist_user_id")
@@ -282,8 +281,8 @@ export async function runBattleEvent(
         // when the host re-presses "Play <Artist>" to restart the track.
         const { error: upErr } = await supabase
           .from("play_tracks")
-          .update({ status: "playing", updated_at: new Date().toISOString() } as any)
-          .eq("id", trackId!);
+          .update({ status: "playing", updated_at: new Date().toISOString(), battle_match_id: m.id, battle_side: side } as any)
+          .eq("id", trackId);
         if (upErr) throw new Error(upErr.message);
         const trackCol = side === "a" ? "a_playing_track_id" : "b_playing_track_id";
         await supabase

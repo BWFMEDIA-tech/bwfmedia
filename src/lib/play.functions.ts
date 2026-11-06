@@ -222,8 +222,9 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ streamId: z.string().uuid(), finishedTrackId: z.string().uuid().optional() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    await assertHost(supabase, userId, data.streamId);
+    const { supabase: userSupabase, userId } = context;
+    await assertHost(userSupabase, userId, data.streamId);
+    const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
     // Capture the track that just finished so we can keep battle order
     // (A → B → A → B…) when a live battle is running on this stream.
     const { data: justPlayed } = await supabase.from("play_tracks")
@@ -232,14 +233,15 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
       .maybeSingle();
     // A late/duplicate audio-ended callback must not complete the next song.
     if (data.finishedTrackId && justPlayed?.id !== data.finishedTrackId) return { ok: true, next: null };
-    await supabase.from("play_tracks")
+    const { error: completionError } = await supabase.from("play_tracks")
       .update({ status: "completed" })
       .eq("stream_id", data.streamId).eq("status", "playing");
+    if (completionError) throw new Error(completionError.message);
 
     if (data.finishedTrackId && justPlayed?.battle_match_id) {
-      await runBattleEvent(supabase, userId, {
+      await runBattleEvent(userSupabase, userId, {
         matchId: justPlayed.battle_match_id, type: "FINISH_TRACK", payload: { trackId: justPlayed.id },
-      });
+      }, supabase);
     }
 
     let next: { id: string } | null = null;
@@ -255,6 +257,10 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
       const { data: match } = await supabase.from("battle_matches")
         .select("status").eq("id", justPlayed.battle_match_id).maybeSingle();
       battleActive = !!match && match.status !== "completed" && match.status !== "cancelled";
+    } else {
+      const { data: match } = await supabase.from("battle_matches").select("id")
+        .eq("stream_id", data.streamId).in("status", ["pending", "live"]).limit(1).maybeSingle();
+      battleActive = !!match;
     }
     if (justPlayed?.battle_match_id && justPlayed.battle_side === "a") {
       const otherSide = "b";
