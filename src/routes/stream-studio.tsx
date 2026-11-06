@@ -41,6 +41,7 @@ import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
+import { ArtistChallengesPanel } from "@/components/stream/ArtistChallengesPanel";
 import { useArtistSubscription } from "@/hooks/useArtistSubscription";
 import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
