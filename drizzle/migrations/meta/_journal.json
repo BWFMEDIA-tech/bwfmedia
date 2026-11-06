@@ -330,6 +330,13 @@
       "when": 1793940671595,
       "tag": "0046_battle_challenge_agreement_rpc",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1793941290378,
+      "tag": "0047_mobile_push_delivery",
+      "breakpoints": true
     }
   ]
 }

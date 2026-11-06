@@ -3283,30 +3283,113 @@ export type Database = {
       }
       notification_preferences: {
         Row: {
+          battle_alerts: boolean
           email: boolean
+          follower_alerts: boolean
           in_app: boolean
           live_alerts: boolean
+          message_alerts: boolean
+          music_alerts: boolean
           push: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
+          battle_alerts?: boolean
           email?: boolean
+          follower_alerts?: boolean
           in_app?: boolean
           live_alerts?: boolean
+          message_alerts?: boolean
+          music_alerts?: boolean
           push?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
+          battle_alerts?: boolean
           email?: boolean
+          follower_alerts?: boolean
           in_app?: boolean
           live_alerts?: boolean
+          message_alerts?: boolean
+          music_alerts?: boolean
           push?: boolean
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      notification_push_deliveries: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          notification_id: string
+          response_code: number | null
+          status: string
+          subscription_id: string
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          notification_id: string
+          response_code?: number | null
+          status?: string
+          subscription_id: string
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          notification_id?: string
+          response_code?: number | null
+          status?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_push_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_push_deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "web_push_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_push_jobs: {
+        Row: {
+          created_at: string
+          id: string
+          notification_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notification_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notification_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_push_jobs_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: true
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -3318,6 +3401,7 @@ export type Database = {
           media_type: string | null
           media_url: string | null
           read_at: string | null
+          source_event: string | null
           stream_id: string | null
           title: string
           type: string
@@ -3332,6 +3416,7 @@ export type Database = {
           media_type?: string | null
           media_url?: string | null
           read_at?: string | null
+          source_event?: string | null
           stream_id?: string | null
           title: string
           type: string
@@ -3346,6 +3431,7 @@ export type Database = {
           media_type?: string | null
           media_url?: string | null
           read_at?: string | null
+          source_event?: string | null
           stream_id?: string | null
           title?: string
           type?: string
@@ -6436,6 +6522,7 @@ export type Database = {
         Row: {
           auth: string
           created_at: string
+          enabled: boolean
           endpoint: string
           id: string
           p256dh: string
@@ -6445,6 +6532,7 @@ export type Database = {
         Insert: {
           auth: string
           created_at?: string
+          enabled?: boolean
           endpoint: string
           id?: string
           p256dh: string
@@ -6454,6 +6542,7 @@ export type Database = {
         Update: {
           auth?: string
           created_at?: string
+          enabled?: boolean
           endpoint?: string
           id?: string
           p256dh?: string
