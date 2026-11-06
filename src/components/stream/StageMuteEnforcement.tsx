@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { RoomEvent, Track } from "livekit-client";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { activeMutedUserIds } from "@/lib/stage-microphone";
+import { activeMutedUserIds, shouldSilenceStageMicrophone } from "@/lib/stage-microphone";
 
 /**
  * Enforces host moderation (stage_participants.muted_until) inside a video
@@ -19,17 +19,18 @@ import { activeMutedUserIds } from "@/lib/stage-microphone";
 export function StageMuteEnforcement({ streamId }: { streamId: string }) {
   const room = useRoomContext();
   const [muted, setMuted] = useState<Set<string>>(new Set());
+  const [roles, setRoles] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     let active = true;
     const load = async () => {
       const { data } = await supabase
         .from("stage_participants")
-        .select("user_id, muted_until")
-        .eq("stream_id", streamId)
-        .not("muted_until", "is", null);
-      if (!active) return;
+        .select("user_id, stage_role, muted_until")
+        .eq("stream_id", streamId);
+      if (!active || !data) return;
       setMuted(activeMutedUserIds(data ?? []));
+      setRoles(new Map(data.map((row) => [row.user_id, row.stage_role])));
     };
     load();
     const ch = supabase
@@ -49,7 +50,7 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
     if (!room) return;
     const apply = () => {
       room.remoteParticipants.forEach((p) => {
-        const silence = muted.has(p.identity);
+        const silence = shouldSilenceStageMicrophone(roles.get(p.identity), p.permissions?.canPublish, muted.has(p.identity));
         p.audioTrackPublications.forEach((pub) => {
           if (pub.source === Track.Source.Microphone) pub.setEnabled(!silence);
         });
@@ -59,12 +60,14 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
     room.on(RoomEvent.TrackPublished, apply);
     room.on(RoomEvent.TrackSubscribed, apply);
     room.on(RoomEvent.ParticipantConnected, apply);
+    room.on(RoomEvent.ParticipantPermissionsChanged, apply);
     return () => {
       room.off(RoomEvent.TrackPublished, apply);
       room.off(RoomEvent.TrackSubscribed, apply);
       room.off(RoomEvent.ParticipantConnected, apply);
+      room.off(RoomEvent.ParticipantPermissionsChanged, apply);
     };
-  }, [room, muted]);
+  }, [room, muted, roles]);
 
   // Switch off the local mic while host-muted, and keep it off if the
   // device or a self-unmute tap tries to re-enable it.
@@ -72,19 +75,21 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
     if (!room) return;
     const lp = room.localParticipant;
     const enforce = () => {
-      if (muted.has(lp.identity) && lp.isMicrophoneEnabled) {
+      if (shouldSilenceStageMicrophone(roles.get(lp.identity), lp.permissions?.canPublish, muted.has(lp.identity)) && lp.isMicrophoneEnabled) {
         lp.setMicrophoneEnabled(false).catch(() => {});
-        toast.info("The host has muted you");
+        if (muted.has(lp.identity)) toast.info("The host has muted you");
       }
     };
     enforce();
     room.on(RoomEvent.LocalTrackPublished, enforce);
     room.on(RoomEvent.TrackUnmuted, enforce);
+    room.on(RoomEvent.ParticipantPermissionsChanged, enforce);
     return () => {
       room.off(RoomEvent.LocalTrackPublished, enforce);
       room.off(RoomEvent.TrackUnmuted, enforce);
+      room.off(RoomEvent.ParticipantPermissionsChanged, enforce);
     };
-  }, [room, muted]);
+  }, [room, muted, roles]);
 
   return null;
 }

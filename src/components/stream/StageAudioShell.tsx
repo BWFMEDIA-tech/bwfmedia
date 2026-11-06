@@ -30,6 +30,7 @@ import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { StageNavigationConnection } from "./StageNavigationConnection";
 import { setStageNavigationConnection } from "@/lib/stage-navigation-connection";
 import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
+import { StageMuteEnforcement } from "./StageMuteEnforcement";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -66,7 +67,10 @@ export function StageAudioShell({
   /** Set when the page already shows the mic control beside "Leave stage". */
   hideSelfMicRow?: boolean;
 }) {
-  const audioOptions = useMemo(() => arenaAudio ? getArenaRoomAudioOptions() : undefined, [arenaAudio]);
+  const audioOptions = useMemo(() => arenaAudio ? getArenaRoomAudioOptions() : {
+    audioCaptureDefaults: { echoCancellation: true, noiseSuppression: true },
+    publishDefaults: { stopMicTrackOnMute: true },
+  }, [arenaAudio]);
   const [connect, setConnect] = useState(autoConnect);
   const [me, setMe] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [fatal, setFatal] = useState<{ kind: LiveKitFatalKind; detail: string } | null>(null);
@@ -173,7 +177,7 @@ export function StageAudioShell({
       token={token}
       serverUrl={serverUrl}
       connect
-      audio
+      audio={false}
       video={false}
       options={audioOptions}
       onError={(e) => {
@@ -190,7 +194,7 @@ export function StageAudioShell({
         {isHost && <StageNavigationConnection streamId={streamId} />}
         <RoomAudioRenderer />
         <StageMicSync streamId={streamId} userId={userId} />
-        <MutedSpeakerGuard streamId={streamId} />
+        <StageMuteEnforcement streamId={streamId} />
         <LocalSpeakingSignalPublisher />
         <AudioPlaybackUnblocker />
         <ParticipantAudioLogger />
@@ -202,63 +206,6 @@ export function StageAudioShell({
       </StageConnectionProvider>
     </LiveKitRoom>
   );
-}
-
-/**
- * Listener-side enforcement: anyone muted by the host is silenced for every
- * viewer, even if their own device tries to keep publishing.
- */
-function MutedSpeakerGuard({ streamId }: { streamId: string }) {
-  const room = useRoomContext();
-  const [muted, setMuted] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      const { data } = await supabase
-        .from("stage_participants")
-        .select("user_id, muted_until")
-        .eq("stream_id", streamId)
-        .not("muted_until", "is", null);
-      if (!active) return;
-      const now = Date.now();
-      setMuted(new Set((data ?? [])
-        .filter((r: any) => r.muted_until && new Date(r.muted_until).getTime() > now)
-        .map((r: any) => r.user_id as string)));
-    };
-    load();
-    const ch = supabase
-      .channel(`stage-mute-guard-${streamId}-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes",
-        { event: "*", schema: "public", table: "stage_participants", filter: `stream_id=eq.${streamId}` },
-        load)
-      .subscribe();
-    const t = setInterval(load, 30_000);
-    return () => { active = false; clearInterval(t); supabase.removeChannel(ch); };
-  }, [streamId]);
-
-  useEffect(() => {
-    if (!room) return;
-    const apply = () => {
-      room.remoteParticipants.forEach((p) => {
-        const silence = muted.has(p.identity);
-        p.audioTrackPublications.forEach((pub) => {
-          if (pub.source === Track.Source.Microphone) pub.setEnabled(!silence);
-        });
-      });
-    };
-    apply();
-    room.on(RoomEvent.TrackPublished, apply);
-    room.on(RoomEvent.TrackSubscribed, apply);
-    room.on(RoomEvent.ParticipantConnected, apply);
-    return () => {
-      room.off(RoomEvent.TrackPublished, apply);
-      room.off(RoomEvent.TrackSubscribed, apply);
-      room.off(RoomEvent.ParticipantConnected, apply);
-    };
-  }, [room, muted]);
-
-  return null;
 }
 
 function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
@@ -314,10 +261,8 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     if (!localParticipant) return;
     const isHostMuted = !!mutedUntil && new Date(mutedUntil).getTime() > Date.now();
     const hasStageRole = role === "host" || role === "co_host" || role === "speaker";
-    const canSpeak = hasStageRole && !isHostMuted;
-    // Auto-enable mic for stage roles. For listeners/guests we do NOT
-    // force-disable here — that would override their manual Unmute tap on
-    // iOS / iPad / desktop. The host can still mute them via `muted_until`.
+    const canSpeak = hasStageRole && !isHostMuted && localParticipant.permissions?.canPublish === true;
+    // Capture starts only after stage approval; audience devices never publish a mic.
     if (canSpeak && prevCanSpeak !== true) {
       if (localParticipant.permissions?.canPublish === false) return;
       localParticipant
@@ -329,7 +274,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
           console.error("[stage-audio] Audio device error", err);
           toast.error(err?.message || "Microphone unavailable");
         });
-    } else if (isHostMuted) {
+    } else if (!canSpeak) {
       localParticipant.setMicrophoneEnabled(false).catch(() => {});
     }
     if (prevCanSpeak === false && canSpeak) {
@@ -344,9 +289,10 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     if (!room || !localParticipant) return;
     const enforce = () => {
       const isHostMuted = !!mutedUntil && new Date(mutedUntil).getTime() > Date.now();
-      if (isHostMuted && localParticipant.isMicrophoneEnabled) {
+      const approved = ["host", "co_host", "speaker"].includes(role ?? "") && localParticipant.permissions?.canPublish === true;
+      if ((!approved || isHostMuted) && localParticipant.isMicrophoneEnabled) {
         localParticipant.setMicrophoneEnabled(false).catch(() => {});
-        toast.info("The host has muted you");
+        if (isHostMuted) toast.info("The host has muted you");
       }
     };
     room.on(RoomEvent.LocalTrackPublished, enforce);
@@ -355,7 +301,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
       room.off(RoomEvent.LocalTrackPublished, enforce);
       room.off(RoomEvent.TrackUnmuted, enforce);
     };
-  }, [room, localParticipant, mutedUntil]);
+  }, [room, localParticipant, role, mutedUntil, permissionTick]);
 
   return null;
 }
