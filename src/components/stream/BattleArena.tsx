@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { usePlaybackPlaying, setPlaybackPlaying } from "@/lib/playback-store";
 import { SignedImg } from "@/components/ui/signed-img";
-import { createBattleMatch, castBattleVote, updateBattleArtists } from "@/lib/battles.functions";
+import { createBattleMatch, castBattleVote, updateBattleArtists, agreeBattleGenre } from "@/lib/battles.functions";
+import { BATTLE_GENRES, type BattleGenre } from "@/lib/battle-genres";
 import { getBattleRoomState } from "@/lib/battle-engine.functions";
 import { validateVoteTotals } from "@/lib/vote-math";
 import { BattleHostControls } from "./BattleHostControls";
@@ -204,6 +205,7 @@ function BattleArenaLive({
           matchId={match.id as string}
           initialA={(match.artist_a_id as string | null) ?? ""}
           initialB={(match.artist_b_id as string | null) ?? ""}
+          initialGenre={((match as any).genre as string | null) ?? ""}
           onClose={() => setShowEdit(false)}
           onSaved={refresh}
           onOptimistic={(a, b) => {
@@ -422,6 +424,7 @@ function BattleView({
         </div>
       </div>
 
+      <GenreAgreementBar match={match} userId={userId} />
       {/* Unified live vote percentage tracker */}
       <VoteTracker
         aPct={aPct}
@@ -957,6 +960,7 @@ function CreateBattleDialog({
   matchId,
   initialA,
   initialB,
+  initialGenre,
   onSaved,
   onOptimistic,
   onReconcile,
@@ -968,6 +972,7 @@ function CreateBattleDialog({
   matchId?: string;
   initialA?: string;
   initialB?: string;
+  initialGenre?: string;
   onSaved?: () => void;
   onOptimistic?: (a: string, b: string) => void;
   onReconcile?: () => void;
@@ -976,6 +981,7 @@ function CreateBattleDialog({
   const updateFn = useServerFn(updateBattleArtists);
   const [a, setA] = useState<string>(initialA || participants[0]?.user_id || "");
   const [b, setB] = useState<string>(initialB || participants[1]?.user_id || "");
+  const [genre, setGenre] = useState<string>(initialGenre ?? "");
   const [rounds, setRounds] = useState(3);
   const [seconds, setSeconds] = useState(60);
   const [busy, setBusy] = useState(false);
@@ -1054,6 +1060,7 @@ function CreateBattleDialog({
 
   const submit = async () => {
     if (!a || !b || a === b) return toast.error("Pick two different artists");
+    if (!isEdit && !genre) return toast.error("Choose the battle genre");
     // Pre-stage window confirmation step before persisting an edit.
     if (isEdit && !confirming) {
       setConfirming(true);
@@ -1069,7 +1076,7 @@ function CreateBattleDialog({
         // an artist just hit the stage), revert and refresh from truth.
         onOptimistic?.(a, b);
         onClose();
-        await updateFn({ data: { matchId, artistAId: a, artistBId: b } });
+        await updateFn({ data: { matchId, artistAId: a, artistBId: b, genre: (genre || undefined) as BattleGenre | undefined } });
         toast.success("Matchup updated");
         onSaved?.();
         return;
@@ -1083,6 +1090,7 @@ function CreateBattleDialog({
             roundSeconds: seconds,
             trackAId: trackA || undefined,
             trackBId: trackB || undefined,
+            genre: genre as BattleGenre,
           },
         });
         toast.success("Battle ready — Start Battle to play Artist A's track");
@@ -1114,6 +1122,20 @@ function CreateBattleDialog({
           <Trophy className="h-4 w-4 text-[#0000FF]" /> {isEdit ? "Edit Matchup" : "Create 1v1 Battle"}
         </div>
         <div className="space-y-3">
+          <label className="block text-xs text-white/70">
+            Battle genre <span className="text-[#00E6FF]">*</span>
+            <select
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-2 text-base sm:text-sm text-white"
+            >
+              <option value="" disabled>Select a genre…</option>
+              {BATTLE_GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <span className="mt-1 block text-[10px] text-white/40">
+              Both artists must agree to this genre and submit music that fits it before voting opens.
+            </span>
+          </label>
           <ArtistSelect label="Artist A" value={a} onChange={setA} participants={participants} exclude={b} />
           <TrackSelect
             label="Artist A track"
@@ -1550,5 +1572,57 @@ function BattleTrackAudio({ audioUrl, title, startedAt }: { audioUrl: string | n
         </button>
       )}
     </>
+  );
+}
+
+function GenreAgreementBar({ match, userId }: { match: any; userId: string | null }) {
+  const agreeFn = useServerFn(agreeBattleGenre);
+  const [busy, setBusy] = useState(false);
+  const genre = match?.genre as string | null;
+  if (!genre) return null;
+  const a = !!match.genre_agreed_a;
+  const b = !!match.genre_agreed_b;
+  const pending = match.status === "pending";
+  const mySide = userId && userId === match.artist_a_id ? "a" : userId && userId === match.artist_b_id ? "b" : null;
+  const iAgreed = mySide === "a" ? a : mySide === "b" ? b : true;
+  const agree = async () => {
+    setBusy(true);
+    try {
+      await agreeFn({ data: { matchId: match.id } });
+      toast.success(`You're in — competing in ${genre}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not confirm genre");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-b border-white/10 bg-[#00E6FF]/5 px-4 py-2 text-[11px]">
+      <span className="rounded-full border border-[#00E6FF]/40 bg-[#00E6FF]/15 px-2.5 py-0.5 font-bold uppercase tracking-widest text-[#00E6FF]">
+        {genre}
+      </span>
+      {pending && (
+        <>
+          <span className={a ? "text-[#00E6FF]" : "text-white/50"}>
+            {a ? <Check className="mr-0.5 inline h-3 w-3" /> : null}{match.artist_a_name ?? "Artist A"} {a ? "agreed" : "pending"}
+          </span>
+          <span className={b ? "text-[#00E6FF]" : "text-white/50"}>
+            {b ? <Check className="mr-0.5 inline h-3 w-3" /> : null}{match.artist_b_name ?? "Artist B"} {b ? "agreed" : "pending"}
+          </span>
+          {mySide && !iAgreed && (
+            <button
+              onClick={agree}
+              disabled={busy}
+              className="ml-auto rounded-md bg-[#0000FF] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#0000CC] disabled:opacity-50"
+            >
+              {busy ? "Confirming…" : `I agree to compete in ${genre}`}
+            </button>
+          )}
+          {!(a && b) && !mySide && (
+            <span className="ml-auto text-white/40">Voting opens once both artists agree</span>
+          )}
+        </>
+      )}
+    </div>
   );
 }
