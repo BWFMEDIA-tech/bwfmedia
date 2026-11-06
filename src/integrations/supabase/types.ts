@@ -658,6 +658,60 @@ export type Database = {
         }
         Relationships: []
       }
+      battle_challenges: {
+        Row: {
+          challenged_id: string
+          challenger_id: string
+          created_at: string
+          genre: string
+          id: string
+          match_id: string | null
+          scheduled_at: string | null
+          status: string
+          stream_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          challenged_id: string
+          challenger_id: string
+          created_at?: string
+          genre: string
+          id?: string
+          match_id?: string | null
+          scheduled_at?: string | null
+          status?: string
+          stream_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          challenged_id?: string
+          challenger_id?: string
+          created_at?: string
+          genre?: string
+          id?: string
+          match_id?: string | null
+          scheduled_at?: string | null
+          status?: string
+          stream_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_challenges_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battle_challenges_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       battle_matches: {
         Row: {
           a_wins: number
@@ -6657,6 +6711,10 @@ export type Database = {
           _user_id: string
         }
         Returns: number
+      }
+      battle_challenge_mark_agreed: {
+        Args: { _match_id: string }
+        Returns: undefined
       }
       battle_vote_target_artist: {
         Args: { _choice: string; _match_id: string }

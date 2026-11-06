@@ -41,6 +41,7 @@ import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
+import { ArtistChallengesPanel } from "@/components/stream/ArtistChallengesPanel";
 import { useArtistSubscription } from "@/hooks/useArtistSubscription";
 import { MediaEngineProvider } from "@/lib/media-engine/MediaEngineContext";
 import { LiveProductionDashboard } from "@/components/studio/LiveProductionDashboard";
@@ -1256,6 +1257,11 @@ function StreamStudio() {
               </StudioBlock>
               <StudioBlock id="chat" label="Live Chat">
               <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
+              </StudioBlock>
+              <StudioBlock id="challenges" label="Artist Challenges">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
+                <ArtistChallengesPanel />
+              </div>
               </StudioBlock>
               <StudioBlock id="audience" label="Audience">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
