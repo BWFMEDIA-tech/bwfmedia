@@ -2,9 +2,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { BATTLE_GENRES } from "@/lib/battle-genres";
+import {
+  CHALLENGE_STATUSES,
+  canCancelChallenge,
+  canDeclineChallenge,
+  canRespondToChallenge,
+  canStartChallenge,
+} from "@/lib/battle-challenges";
 
 const genreSchema = z.enum(BATTLE_GENRES);
-const CHALLENGE_STATUSES = ["pending", "accepted", "declined", "scheduled", "live", "completed", "cancelled"] as const;
 
 type Ctx = { supabase: any; userId: string };
 
@@ -126,7 +132,7 @@ export const respondBattleChallenge = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!c) throw new Error("Challenge not found");
     if (c.challenged_id !== userId) throw new Error("Only the challenged artist can respond");
-    if (c.status !== "pending") throw new Error("This challenge was already answered");
+    if (!canRespondToChallenge(c.status)) throw new Error("This challenge was already answered");
 
     const next = data.accept ? "accepted" : "declined";
     const { error } = await supabase
@@ -162,7 +168,7 @@ export const cancelBattleChallenge = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!c) throw new Error("Challenge not found");
     if (c.challenger_id !== userId && c.challenged_id !== userId) throw new Error("Not your challenge");
-    if (!["pending", "accepted", "scheduled"].includes(c.status)) throw new Error("This challenge can no longer be cancelled");
+    if (!canCancelChallenge(c.status)) throw new Error("This challenge can no longer be cancelled");
 
     const { error } = await supabase.from("battle_challenges").update({ status: "cancelled" }).eq("id", c.id);
     if (error) throw new Error(error.message);
@@ -211,7 +217,7 @@ export const declineBattleChallenge = createServerFn({ method: "POST" })
       .eq("id", data.challengeId)
       .maybeSingle();
     if (!c) throw new Error("Challenge not found");
-    if (!["pending", "accepted", "scheduled"].includes(c.status)) throw new Error("This challenge can no longer be declined");
+    if (!canDeclineChallenge(c.status)) throw new Error("This challenge can no longer be declined");
     const { error } = await supabase.from("battle_challenges").update({ status: "declined" }).eq("id", c.id);
     if (error) throw new Error(error.message);
     await notify([c.challenger_id, c.challenged_id], {
@@ -238,7 +244,7 @@ export const scheduleBattleChallenge = createServerFn({ method: "POST" })
       .eq("id", data.challengeId)
       .maybeSingle();
     if (!c) throw new Error("Challenge not found");
-    if (!["pending", "accepted", "scheduled"].includes(c.status)) throw new Error("This challenge can no longer be scheduled");
+    if (!canDeclineChallenge(c.status)) throw new Error("This challenge can no longer be scheduled");
     const when = new Date(data.scheduledAt);
     if (when.getTime() < Date.now() - 60_000) throw new Error("Pick a time in the future");
     const { error } = await supabase
@@ -272,7 +278,7 @@ export const startBattleChallenge = createServerFn({ method: "POST" })
     if (!c) throw new Error("Challenge not found");
     // Both artists must have agreed: challenger agreed by submitting, the
     // challenged artist agrees by accepting (status moves past "pending").
-    if (!["accepted", "scheduled"].includes(c.status)) {
+    if (!canStartChallenge(c.status)) {
       throw new Error("Both artists must agree before the battle can start");
     }
 
