@@ -98,6 +98,18 @@ export function useAuth(): AuthState {
     avatarUrl: profile?.avatar_url ?? null,
     roles,
     isAuthenticated: !!user,
-    signOut: async () => { await supabase.auth.signOut(); },
+    signOut: async () => {
+      // Shared devices must stop receiving the previous account's private alerts.
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration("/push/");
+        const subscription = await registration?.pushManager.getSubscription();
+        if (subscription) {
+          const { error } = await supabase.from("web_push_subscriptions").delete().eq("endpoint", subscription.endpoint).eq("user_id", user?.id ?? "");
+          if (error) throw new Error("Couldn't disconnect notifications; please try signing out again");
+          await subscription.unsubscribe();
+        }
+      }
+      await supabase.auth.signOut();
+    },
   };
 }
