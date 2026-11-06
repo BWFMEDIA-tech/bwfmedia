@@ -7,6 +7,7 @@ import { findGenreMatch, leaveGenreMatch, listGenreBattles, challengeArtist, agr
 import { useState } from "react";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
+import { BattleChallenges } from "@/components/play/BattleChallenges";
 import type { UploadedProfileTrack } from "@/lib/profile-track-upload";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,7 +71,7 @@ export const Route = createFileRoute("/play/")({
 function PlayArenaDashboard() {
   const fn = useServerFn(getArenaDashboard);
   const userFn = useServerFn(getArenaUserStats);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadedSong, setUploadedSong] = useState<UploadedProfileTrack | null>(null);
   const { data } = useQuery({
@@ -98,6 +99,7 @@ function PlayArenaDashboard() {
         ) : null}
         <ChoosePath data={data} user={userStats ?? null} />
         <GenreBattleBoard isAuthenticated={isAuthenticated} />
+        {isAuthenticated && user?.id && <BattleChallenges userId={user.id} />}
         <LiveArenaStatus data={data} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <EarnXp />

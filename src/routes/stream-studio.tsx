@@ -1257,6 +1257,11 @@ function StreamStudio() {
               <StudioBlock id="chat" label="Live Chat">
               <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
               </StudioBlock>
+              <StudioBlock id="challenges" label="Artist Challenges">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
+                <ArtistChallengesPanel />
+              </div>
+              </StudioBlock>
               <StudioBlock id="audience" label="Audience">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
                 <div className="mb-3 flex flex-wrap gap-1" role="tablist">
