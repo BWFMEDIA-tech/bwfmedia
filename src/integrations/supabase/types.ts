@@ -671,6 +671,9 @@ export type Database = {
           current_round: number
           current_round_id: string | null
           ended_at: string | null
+          genre: string | null
+          genre_agreed_a: boolean
+          genre_agreed_b: boolean
           host_id: string
           id: string
           replay_a_votes: number
@@ -698,6 +701,9 @@ export type Database = {
           current_round?: number
           current_round_id?: string | null
           ended_at?: string | null
+          genre?: string | null
+          genre_agreed_a?: boolean
+          genre_agreed_b?: boolean
           host_id: string
           id?: string
           replay_a_votes?: number
@@ -725,6 +731,9 @@ export type Database = {
           current_round?: number
           current_round_id?: string | null
           ended_at?: string | null
+          genre?: string | null
+          genre_agreed_a?: boolean
+          genre_agreed_b?: boolean
           host_id?: string
           id?: string
           replay_a_votes?: number
@@ -2773,6 +2782,7 @@ export type Database = {
       matchmaking_pool: {
         Row: {
           enqueued_at: string
+          genre: string | null
           id: string
           matched_battle_id: string | null
           status: string
@@ -2783,6 +2793,7 @@ export type Database = {
         }
         Insert: {
           enqueued_at?: string
+          genre?: string | null
           id?: string
           matched_battle_id?: string | null
           status?: string
@@ -2793,6 +2804,7 @@ export type Database = {
         }
         Update: {
           enqueued_at?: string
+          genre?: string | null
           id?: string
           matched_battle_id?: string | null
           status?: string
@@ -6621,6 +6633,7 @@ export type Database = {
         Args: { _reason?: string; _release_id: string }
         Returns: Json
       }
+      agree_battle_genre: { Args: { _match_id: string }; Returns: boolean }
       approve_release_takedown: { Args: { _release_id: string }; Returns: Json }
       assign_host_tier: {
         Args: {
@@ -6727,7 +6740,10 @@ export type Database = {
       }
       deliver_release: { Args: { _release_id: string }; Returns: Json }
       dequeue_matchmaking: { Args: never; Returns: boolean }
-      enqueue_matchmaking: { Args: { _tier?: string }; Returns: string }
+      enqueue_matchmaking: {
+        Args: { _genre?: string; _tier?: string }
+        Returns: string
+      }
       ensure_host_referral_code: { Args: { _user_id: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
       finalize_battle_replays: { Args: never; Returns: number }
@@ -6902,6 +6918,7 @@ export type Database = {
         Args: { _stream_id: string; _user_id: string }
         Returns: boolean
       }
+      is_valid_battle_genre: { Args: { _g: string }; Returns: boolean }
       label_manages_artist: {
         Args: { _artist_id: string; _roles: string[]; _user_id: string }
         Returns: boolean
@@ -6909,6 +6926,16 @@ export type Database = {
       label_role_of: {
         Args: { _label_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["label_role"]
+      }
+      list_battle_challengers: {
+        Args: { _genre?: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          genre: string
+          tier: string
+          user_id: string
+        }[]
       }
       list_recent_battle_replays: {
         Args: { _stream_id: string }
