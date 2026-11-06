@@ -12,14 +12,16 @@ export const vapidFromSeed = createServerOnlyFn(async (seed: string) => {
   return { subject: "https://tunevio.com", publicKey: base64(p256.getPublicKey(key, false)), privateKey: base64(key) };
 });
 
-export const deliverInboxPush = createServerOnlyFn(async (notificationId: string, seed: string) => {
+export const deliverInboxPush = createServerOnlyFn(async (notificationId: string, seed: string, onlyEndpoint?: string) => {
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const { data: n, error } = await db.from("notifications").select("id,user_id,type,title,body,link").eq("id", notificationId).maybeSingle();
   if (error || !n) throw new Error("Notification unavailable");
   const { data: preferences, error: prefError } = await db.from("notification_preferences").select("push,live_alerts,battle_alerts,message_alerts,follower_alerts,music_alerts").eq("user_id", n.user_id).maybeSingle();
   if (prefError) throw new Error("Preferences unavailable");
   if (!pushAllowed(n.type, preferences)) return { accepted: 0, failed: 0 };
-  const { data: devices, error: deviceError } = await db.from("web_push_subscriptions").select("id,endpoint,p256dh,auth").eq("user_id", n.user_id).eq("enabled", true).limit(20);
+  let deviceQuery = db.from("web_push_subscriptions").select("id,endpoint,p256dh,auth").eq("user_id", n.user_id).eq("enabled", true);
+  if (onlyEndpoint) deviceQuery = deviceQuery.eq("endpoint", onlyEndpoint);
+  const { data: devices, error: deviceError } = await deviceQuery;
   if (deviceError) throw new Error("Devices unavailable");
   const vapid = await vapidFromSeed(seed);
   let accepted = 0, failed = 0;

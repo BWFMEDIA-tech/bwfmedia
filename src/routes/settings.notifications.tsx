@@ -25,7 +25,7 @@ export const Route = createFileRoute("/settings/notifications")({
 });
 
 function NotificationsPage() {
-  const { user, roles } = useAuth();
+  const { user, roles, loading: authLoading } = useAuth();
   const [p, setP] = useState({ in_app: true, email: true, push: false, live_alerts: true, battle_alerts: true, message_alerts: true, follower_alerts: true, music_alerts: true });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -48,19 +48,21 @@ function NotificationsPage() {
   }, []);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { setLoading(false); return; }
-    supabase.from("notification_preferences").select("*").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+    setLoading(true);
+    supabase.from("notification_preferences").select("*").eq("user_id", user.id).maybeSingle().then(({ data, error }) => {
+      if (error) toast.error("Couldn't load notification preferences");
       if (data) setP({ in_app: data.in_app, email: data.email, push: data.push, live_alerts: data.live_alerts, battle_alerts: data.battle_alerts, message_alerts: data.message_alerts, follower_alerts: data.follower_alerts, music_alerts: data.music_alerts });
       setLoading(false);
     });
-  }, [user]);
+  }, [user, authLoading]);
 
   async function update(key: keyof typeof p, value: boolean) {
     if (!user) return;
-    const next = { ...p, [key]: value };
-    const { error } = await supabase.from("notification_preferences").upsert({ user_id: user.id, ...next });
+    const { error } = await supabase.from("notification_preferences").upsert({ user_id: user.id, [key]: value }, { onConflict: "user_id" });
     if (error) { toast.error("Couldn't save notification preferences"); return false; }
-    setP(next);
+    setP(current => ({ ...current, [key]: value }));
     return true;
   }
 

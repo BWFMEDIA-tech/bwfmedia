@@ -20,5 +20,5 @@ export const sendPushTest = createServerFn({ method: "POST" }).middleware([requi
   const { data: notification, error } = await db.from("notifications").insert({ user_id: context.userId, type: "push_test", title: "TUNEVIO notification test", body: "Your device is connected to Tunevio notifications.", link: "/settings/notifications" }).select("id").single();
   if (error || !notification) throw new Error("Could not create test notification");
   const { deliverInboxPush } = await import("./web-push.server");
-  return deliverInboxPush(notification.id, seed);
+  return deliverInboxPush(notification.id, seed, data.endpoint);
 });
