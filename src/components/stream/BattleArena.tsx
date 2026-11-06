@@ -16,6 +16,8 @@ import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { Volume2 } from "lucide-react";
+import { BattleReplays } from "./BattleReplays";
+import { HypePassPanel } from "./HypePassPanel";
 import { createSnapshotGate } from "@/lib/battle-interactions";
 import { bothBattleSongsFinished } from "@/lib/battle-voting";
 import { advancePlayQueue } from "@/lib/play.functions";
@@ -31,7 +33,12 @@ type Participant = {
 };
 
 export function BattleArena(props: Parameters<typeof BattleArenaLive>[0]) {
-  return <BattleArenaLive {...props} />;
+  return (
+    <>
+      <BattleArenaLive {...props} />
+      {props.showEngagementPanels && <BattleReplays streamId={props.streamId} />}
+    </>
+  );
 }
 
 function BattleArenaLive({
@@ -40,6 +47,7 @@ function BattleArenaLive({
   participants,
   onStageIds,
   playAudio = false,
+  showEngagementPanels = false,
 }: {
   streamId: string;
   isHost: boolean;
@@ -47,6 +55,8 @@ function BattleArenaLive({
   onStageIds?: Set<string>;
   /** Render the battle's on-air track audio (pages without the arena player). */
   playAudio?: boolean;
+  /** Show the Hype Meter and post-battle Replay panels (Live Arena battle view). */
+  showEngagementPanels?: boolean;
 }) {
   const stateFn = useServerFn(getBattleRoomState);
   const [roomState, setRoomState] = useState<RoomState | null>(null);
@@ -197,6 +207,7 @@ function BattleArenaLive({
         onEditMatchup={() => setShowEdit(true)}
         onVoteCast={(c) => setMyVote(c)}
         onAfterHostEmit={refresh}
+        showEngagementPanels={showEngagementPanels}
       />
       {showEdit && isHost && (
         <CreateBattleDialog
@@ -241,6 +252,7 @@ function BattleView({
   onEditMatchup,
   onVoteCast,
   onAfterHostEmit,
+  showEngagementPanels = false,
 }: {
   roomState: RoomState;
   myVote: "a" | "b" | null;
@@ -249,6 +261,7 @@ function BattleView({
   onEditMatchup?: () => void;
   onVoteCast: (c: "a" | "b") => void;
   onAfterHostEmit?: () => void;
+  showEngagementPanels?: boolean;
 }) {
   const voteFn = useServerFn(castBattleVote);
   const { match, rounds, currentRound, activeSide: storedSide, votingStatus, aTrack, bTrack, voteTotals } =
@@ -492,6 +505,18 @@ function BattleView({
           flash={flash && flash.side === "b" ? flash : null}
         />
       </div>
+
+      {showEngagementPanels && (
+        <HypePassPanel
+          key={match.id as string}
+          battleId={match.id as string}
+          artists={[
+            { id: match.artist_a_id as string, name: (match.artist_a_name as string) ?? "Artist A" },
+            { id: match.artist_b_id as string, name: (match.artist_b_name as string) ?? "Artist B" },
+          ]}
+          live={match.status === "live"}
+        />
+      )}
 
       {lastClosed && lastClosed.id !== currentRound?.id && (
         <div className="border-t border-white/10 bg-black/30 px-4 py-2 text-[11px] text-white/60">

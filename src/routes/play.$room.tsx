@@ -50,13 +50,13 @@ function PlayArena() {
           </div>
           <Link to="/live" className="text-sm text-white/60 hover:text-white">← All live</Link>
         </div>
-        <PlayArenaView stream={stream} room={room} />
+        <PlayArenaView stream={stream} room={room} showBattlePanels />
       </div>
     </div>
   );
 }
 
-export function PlayArenaView({ stream, showChat = true, room }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean; room?: string }) {
+export function PlayArenaView({ stream, showChat = true, room, showBattlePanels = false }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean; room?: string; showBattlePanels?: boolean }) {
   const statusFn = useServerFn(getMyPlayStatus);
   const auth = useAuth();
   const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
@@ -183,7 +183,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
         </div>
         {view === "battle" && stream && (
           <div className="animate-in fade-in duration-300">
-            <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} />
+            <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} showEngagementPanels={showBattlePanels} />
           </div>
         )}
         <div className={view === "player" ? "animate-in fade-in duration-300" : "hidden"}>
