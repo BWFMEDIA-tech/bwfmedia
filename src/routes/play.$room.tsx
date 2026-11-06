@@ -16,7 +16,6 @@ import { SkipLinePopup } from "@/components/play/SkipLinePopup";
 import { ImmersivePlayer } from "@/components/play/ImmersivePlayer";
 import { useStageState } from "@/lib/useStageState";
 import { useListeningSession } from "@/lib/useListeningSession";
-import { ListeningSessionPanel } from "@/components/player/ListeningSessionPanel";
 import type { PlayerTrack } from "@/lib/player-context";
 
 export const Route = createFileRoute("/play/$room")({
@@ -84,7 +83,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
       coverUrl: t.cover_url,
     };
   };
-  const session = useListeningSession({
+  useListeningSession({
     streamId: stream?.id ?? null,
     hostUserId: stream?.host_id ?? null,
     me: auth.user
@@ -198,7 +197,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
         />
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+        <div className="space-y-5">
           {/* Main column */}
           <div className="space-y-5">
             {/* Submit / Boost CTAs */}
@@ -248,21 +247,7 @@ export function PlayArenaView({ stream, showChat = true, room }: { stream: { id:
 
           </div>
 
-          {/* Right column */}
-          <div className="space-y-5">
-            {showChat && <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />}
-            {stream && (
-              <ListeningSessionPanel
-                isHost={session.isHost}
-                hostPresent={session.hostPresent}
-                listenerCount={session.listenerCount}
-                participants={session.participants}
-                currentTrackTitle={playing?.title ?? null}
-                currentArtist={playing?.artist_name ?? null}
-                playbackState={session.snapshot?.playbackState ?? "stopped"}
-              />
-            )}
-          </div>
+          {showChat && <LiveChat streamId={stream?.id ?? null} auth={auth} hostId={stream?.host_id ?? null} />}
         </div>
       </div>
 
