@@ -504,5 +504,15 @@ export const challengeArtist = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    const { notifyBattleUsers } = await import("@/lib/battle-notifications.server");
+    await notifyBattleUsers([data.opponentId], {
+      actorId: context.userId,
+      type: "battle_challenge",
+      title: `${me?.stage_name ?? me?.display_name ?? "An artist"} wants to battle you`,
+      body: `Genre: ${data.genre}. Open the Battle Arena to accept the 1v1 challenge.`,
+      link: "/play",
+      streamId,
+      sourceEvent: `battle-invitation:${match.id}`,
+    });
     return { ok: true, matchId: match.id };
   });

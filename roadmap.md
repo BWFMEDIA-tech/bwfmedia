@@ -1,5 +1,9 @@
 # Roadmap
 
+## 1v1 challenge notifications
+- [ ] Connect direct genre challenges to the existing notification inbox and check notification write failures
+- [ ] Run notification regressions and verify the signed-in inbox
+
 ## Mobile push notifications
 - [x] Reuse inbox/device storage, opt-in settings, dedicated cache-free messaging worker and server-only VAPID sender
 - [x] Existing challenge inbox events feed push; messages/follows/published profile music and authorized Saturday events enqueue push; host/admin announcement action added
