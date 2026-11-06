@@ -609,7 +609,8 @@ export function ImmersivePlayer({
       setIsPlaying(false);
       setPlaybackPlaying(false);
       if (isHost && streamId) {
-        try { await advanceFn({ data: { streamId } }); } catch { /* ignore */ }
+        try { await advanceFn({ data: { streamId, finishedTrackId: track?.id } }); }
+        catch (error: any) { toast.error(error?.message ?? "Unable to advance battle playback"); }
       }
     };
     a.addEventListener("timeupdate", onTime);

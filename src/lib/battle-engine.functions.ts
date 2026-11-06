@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assignedBattleTrack } from "@/lib/battle-interactions";
+import { bothBattleSongsFinished } from "@/lib/battle-voting";
 import {
   buildVoteTotals,
   emptyVoteTotals,
@@ -25,6 +26,7 @@ const EVENT_TYPES = [
   "PLAY_SIDE_A_TRACK",
   "PLAY_SIDE_B_TRACK",
   "STOP_TRACK",
+  "FINISH_TRACK",
   "OPEN_VOTING",
   "CLOSE_VOTING",
   "FINALIZE_ROUND",
@@ -138,7 +140,6 @@ export async function runBattleEvent(
         if (cur && cur.status === "live") invalid("a round is already live");
         const nextNumber = m.current_round + 1;
         const now = new Date();
-        const endsAt = new Date(now.getTime() + (m.round_seconds ?? 60) * 1000);
         const { data: round, error } = await supabase
           .from("battle_rounds")
           .upsert(
@@ -146,9 +147,11 @@ export async function runBattleEvent(
               match_id: m.id,
               round_number: nextNumber,
               status: "live",
-              voting_status: "open",
+              voting_status: "closed",
+              a_track_finished_at: null,
+              b_track_finished_at: null,
               started_at: now.toISOString(),
-              ends_at: endsAt.toISOString(),
+              ends_at: null,
             },
             { onConflict: "match_id,round_number" },
           )
@@ -272,14 +275,6 @@ export async function runBattleEvent(
             .update({ status: "completed" })
             .in("id", toDemote.map((t: any) => t.id));
         }
-        if (m.active_side && m.active_side !== side) {
-          const stampCol =
-            m.active_side === "a" ? "a_track_finished_at" : "b_track_finished_at";
-          await supabase
-            .from("battle_rounds")
-            .update({ [stampCol]: new Date().toISOString() } as any)
-            .eq("id", round.id);
-        }
 
         // Unconditionally mark this track playing. This is idempotent and
         // also forces a row UPDATE event over realtime even when the row
@@ -293,7 +288,7 @@ export async function runBattleEvent(
         const trackCol = side === "a" ? "a_playing_track_id" : "b_playing_track_id";
         await supabase
           .from("battle_rounds")
-          .update({ [trackCol]: trackId } as any)
+          .update({ [trackCol]: trackId, [`${side}_track_finished_at`]: null, voting_status: "closed", ends_at: null } as any)
           .eq("id", round.id);
         await supabase
           .from("battle_matches")
@@ -325,19 +320,37 @@ export async function runBattleEvent(
             .update({ status: "completed" })
             .in("id", nowPlaying.map((t: any) => t.id));
         }
-        if (m.active_side) {
-          const stampCol =
-            m.active_side === "a" ? "a_track_finished_at" : "b_track_finished_at";
-          await supabase
-            .from("battle_rounds")
-            .update({ [stampCol]: new Date().toISOString() } as any)
-            .eq("id", round!.id);
-        }
         await supabase
           .from("battle_matches")
           .update({ active_side: null })
           .eq("id", m.id);
         return { ok: true };
+      }
+
+      case "FINISH_TRACK": {
+        const round = await loadCurrentRound();
+        if (!round || round.status !== "live") invalid("no live round");
+        const trackId = data.payload?.trackId;
+        const side = trackId && round.a_playing_track_id === trackId ? "a"
+          : trackId && round.b_playing_track_id === trackId ? "b" : null;
+        if (!side) invalid("track is not assigned to this round");
+        const { data: track, error: trackError } = await supabase.from("play_tracks")
+          .select("id, status, stream_id").eq("id", trackId).maybeSingle();
+        if (trackError) throw new Error(trackError.message);
+        if (!track || track.stream_id !== m.stream_id || track.status !== "completed") invalid("track has not finished");
+        const stampCol = `${side}_track_finished_at`;
+        if (round[stampCol]) return { ok: true, already: true };
+        const finishedRound = { ...round, [stampCol]: new Date().toISOString() };
+        const bothFinished = bothBattleSongsFinished(finishedRound);
+        const { error } = await supabase.from("battle_rounds").update({
+          [stampCol]: finishedRound[stampCol],
+          ...(bothFinished ? { voting_status: "open", ends_at: new Date(Date.now() + (m.round_seconds ?? 60) * 1000).toISOString() } : {}),
+        }).eq("id", round.id);
+        if (error) throw new Error(error.message);
+        const { error: sideError } = await supabase.from("battle_matches")
+          .update({ active_side: null }).eq("id", m.id);
+        if (sideError) throw new Error(sideError.message);
+        return { ok: true, votingOpened: bothFinished };
       }
 
       case "OPEN_VOTING": {
@@ -346,11 +359,11 @@ export async function runBattleEvent(
         // Voting changes voting only. Selecting/promoting tracks here used to
         // create two playing rows and silently replace the host-picked song.
         // Track assignments belong to creation / explicit PLAY_SIDE events.
-        // Allow host to open voting even if one or both artists haven't
-        // submitted a track yet. Votes will simply be tallied per side.
+        if (!bothBattleSongsFinished(round)) invalid("both songs must finish before voting opens");
+        if (round.voting_status === "open") return { ok: true, already: true };
         const { error: votingError } = await supabase
           .from("battle_rounds")
-          .update({ voting_status: "open" })
+          .update({ voting_status: "open", ends_at: new Date(Date.now() + (m.round_seconds ?? 60) * 1000).toISOString() })
           .eq("id", round.id);
         if (votingError) throw new Error(votingError.message);
         return { ok: true };
@@ -433,7 +446,6 @@ export async function runBattleEvent(
         // Otherwise open the next round, same as START_ROUND.
         const nextNumber = m.current_round + 1;
         const now = new Date();
-        const endsAt = new Date(now.getTime() + (m.round_seconds ?? 60) * 1000);
         const { data: nextRound, error } = await supabase
           .from("battle_rounds")
           .upsert(
@@ -441,9 +453,11 @@ export async function runBattleEvent(
               match_id: m.id,
               round_number: nextNumber,
               status: "live",
-              voting_status: "open",
+              voting_status: "closed",
+              a_track_finished_at: null,
+              b_track_finished_at: null,
               started_at: now.toISOString(),
-              ends_at: endsAt.toISOString(),
+              ends_at: null,
             },
             { onConflict: "match_id,round_number" },
           )

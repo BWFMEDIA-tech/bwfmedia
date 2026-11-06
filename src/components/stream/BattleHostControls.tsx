@@ -24,6 +24,7 @@ export function BattleHostControls({
   matchStatus,
   currentRound,
   totalRounds,
+  songsFinished,
   artistAName,
   artistBName,
   onAfterEmit,
@@ -35,6 +36,7 @@ export function BattleHostControls({
   matchStatus: string;
   currentRound: number;
   totalRounds: number;
+  songsFinished: boolean;
   artistAName: string;
   artistBName: string;
   onAfterEmit?: () => void;
@@ -85,7 +87,7 @@ export function BattleHostControls({
           <ControlButton
             label={
               currentRound === 0
-                ? "Start Battle & Open Voting"
+                ? "Start Battle"
                 : isFinalRound
                   ? "Complete Match"
                   : `Start Round ${currentRound + 1}`
@@ -131,6 +133,7 @@ export function BattleHostControls({
                 icon={<Vote className="h-3 w-3" />}
                 loading={busy === "OPEN_VOTING"}
                 onClick={() => emit("OPEN_VOTING")}
+                disabled={!songsFinished}
               />
             )}
             {votingStatus === "open" && (

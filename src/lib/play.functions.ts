@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { runBattleEvent } from "@/lib/battle-engine.functions";
 
 /** Read only the caller's existing artist-profile library, never queue mirrors. */
 export const getSubmissionProfileTracks = createServerFn({ method: "GET" })
@@ -219,7 +220,7 @@ export const playTrackNow = createServerFn({ method: "POST" })
 /** Host: advance to next queued track (boosted first, then by position). */
 export const advancePlayQueue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
+  .inputValidator((input) => z.object({ streamId: z.string().uuid(), finishedTrackId: z.string().uuid().optional() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertHost(supabase, userId, data.streamId);
@@ -229,9 +230,17 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
       .select("id, battle_match_id, battle_side")
       .eq("stream_id", data.streamId).eq("status", "playing")
       .maybeSingle();
+    // A late/duplicate audio-ended callback must not complete the next song.
+    if (data.finishedTrackId && justPlayed?.id !== data.finishedTrackId) return { ok: true, next: null };
     await supabase.from("play_tracks")
       .update({ status: "completed" })
       .eq("stream_id", data.streamId).eq("status", "playing");
+
+    if (data.finishedTrackId && justPlayed?.battle_match_id) {
+      await runBattleEvent(supabase, userId, {
+        matchId: justPlayed.battle_match_id, type: "FINISH_TRACK", payload: { trackId: justPlayed.id },
+      });
+    }
 
     let next: { id: string } | null = null;
 
@@ -267,7 +276,7 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
         .select("id")
         .eq("stream_id", data.streamId).eq("status", "queued");
       if (finishedSideB) {
-        q = q.or(`battle_match_id.is.null,battle_match_id.neq.${justPlayed!.battle_match_id}`);
+        q = q.or(`battle_match_id.is.null,battle_match_id.neq.${justPlayed?.battle_match_id}`);
       }
       const { data: fallback } = await q
         .order("boosted", { ascending: false })
