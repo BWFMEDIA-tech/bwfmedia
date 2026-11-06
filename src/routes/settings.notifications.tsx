@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { getPushPublicKey, sendPushTest } from "@/lib/push-settings.functions";
 import { subscribePush, unsubscribePush } from "@/lib/notifications.functions";
+import { sendAnnouncement } from "@/lib/announcements.functions";
 
 export const Route = createFileRoute("/settings/notifications")({
   head: () => ({ meta: [
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/settings/notifications")({
 });
 
 function NotificationsPage() {
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
   const [p, setP] = useState({ in_app: true, email: true, push: false, live_alerts: true, battle_alerts: true, message_alerts: true, follower_alerts: true, music_alerts: true });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -34,6 +35,8 @@ function NotificationsPage() {
   const subscribeFn = useServerFn(subscribePush);
   const unsubscribeFn = useServerFn(unsubscribePush);
   const testFn = useServerFn(sendPushTest);
+  const announceFn = useServerFn(sendAnnouncement);
+  const [eventTitle, setEventTitle] = useState("");
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) { setDeviceHint("Push notifications aren't supported in this browser."); return; }
@@ -122,7 +125,7 @@ function NotificationsPage() {
         <Row label="In-app notifications"><Switch aria-label="In-app notifications" checked={p.in_app} onCheckedChange={(v) => update("in_app", v)} /></Row>
         <Row label="Email"><Switch aria-label="Email notifications" checked={p.email} onCheckedChange={(v) => update("email", v)} /></Row>
         <Row label="Notifications on this device" hint={deviceHint || (deviceEnabled ? "Connected" : "Not enabled")}><Switch aria-label="Enable notifications on this device" disabled={busy || !user} checked={deviceEnabled} onCheckedChange={toggleDevice} /></Row>
-        <Row label="Push notifications on all devices"><Switch aria-label="Push notifications" disabled={busy || !user || !deviceEnabled} checked={p.push} onCheckedChange={(v) => update("push", v)} /></Row>
+        <Row label="Push notifications on all devices"><Switch aria-label="Push notifications" disabled={busy || !user} checked={p.push} onCheckedChange={(v) => v && !deviceEnabled ? toggleDevice(true) : update("push", v)} /></Row>
         <Row label="Live show alerts"><Switch aria-label="Live show alerts" checked={p.live_alerts} onCheckedChange={(v) => update("live_alerts", v)} /></Row>
         <Row label="Battle challenges and updates"><Switch aria-label="Battle alerts" checked={p.battle_alerts} onCheckedChange={(v) => update("battle_alerts", v)} /></Row>
         <Row label="New messages"><Switch aria-label="Message alerts" checked={p.message_alerts} onCheckedChange={(v) => update("message_alerts", v)} /></Row>
@@ -130,6 +133,16 @@ function NotificationsPage() {
         <Row label="Music from followed artists"><Switch aria-label="Music alerts" checked={p.music_alerts} onCheckedChange={(v) => update("music_alerts", v)} /></Row>
         <Button variant="outline" className="mt-4" disabled={!deviceEnabled || !p.push || busy} onClick={testDevice}>Send test notification</Button>
       </Card>
+      {(roles.includes("host") || roles.includes("admin")) && <Card title="Live event announcement">
+        <input aria-label="Event announcement" className="w-full rounded border border-border bg-background px-3 py-2 text-foreground" maxLength={120} value={eventTitle} onChange={event => setEventTitle(event.target.value)} placeholder="Event title" />
+        <Button className="mt-3" disabled={busy || !eventTitle.trim()} onClick={async () => {
+          if (!confirm("Send this live event announcement to Tunevio members?")) return;
+          setBusy(true);
+          try { await announceFn({ data: { kind: "event", title: eventTitle.trim(), link: "/live", audiences: ["everyone"], email: false } }); setEventTitle(""); toast.success("Event announcement sent"); }
+          catch (error) { toast.error(error instanceof Error ? error.message : "Couldn't announce event"); }
+          finally { setBusy(false); }
+        }}>Announce live event</Button>
+      </Card>}
     </SettingsShell></div>
   );
 }

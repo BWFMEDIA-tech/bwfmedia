@@ -16,8 +16,16 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
   .inputValidator((i) => Schema.parse(i))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    if (!isAdmin) {
+      const { data: isHost } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "host" });
+      if (!isHost || data.kind !== "event" || data.email || data.mediaPath) throw new Error("Forbidden");
+      const { readLiveDirectory } = await import("./live-directory.server");
+      const live = await readLiveDirectory();
+      if (!live.some(room => room.host_id === context.userId)) throw new Error("Go live before announcing your event");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rate, error: rateError } = await supabaseAdmin.rpc("check_rate_limit", { _bucket_key: context.userId, _action: "event_announcement", _max_hits: 3, _window_secs: 3600 });
+    if (rateError || !rate?.[0]?.allowed) throw new Error("Please wait before sending another announcement");
 
     let mediaUrl: string | null = null;
     if (data.mediaPath && data.mediaType) {
@@ -48,7 +56,7 @@ export const sendAnnouncement = createServerFn({ method: "POST" })
     const off = new Set<string>();
     for (let i = 0; i < all.length; i += 500) {
       const { data: prefs } = await supabaseAdmin.from("notification_preferences")
-        .select("user_id").eq("in_app", false).in("user_id", all.slice(i, i + 500));
+        .select("user_id").eq("in_app", false).eq("push", false).in("user_id", all.slice(i, i + 500));
       prefs?.forEach((p: any) => off.add(p.user_id));
     }
     const recipients = all.filter((id) => !off.has(id));
