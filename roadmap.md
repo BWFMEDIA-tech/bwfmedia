@@ -1,5 +1,5 @@
 # Live artist profile
-- [ ] Remove the Hype Meter panel while preserving battle playback and voting.
+- [x] Remove the Hype Meter panel while preserving battle playback and voting; preview build OK and 11 voting/completion regression tests pass.
 - [x] Open 1v1 voting automatically after both assigned songs finish; reject early opens, start the voting clock afterward, guard stale song-end callbacks and hold the regular queue; 39 regression tests and preview build pass.
 - [ ] Verify two-song completion and a listener's accepted vote in a real battle; blocked by no isolated two-artist test battle, and existing live shows must not be interrupted.
 - [x] Repair Arena voting: host-started rounds now open voting, failed writes surface errors; 17 regression tests and preview build pass. Signed-in room checked; pictured matchup was cancelled during verification, so no real round started or competition vote cast.
