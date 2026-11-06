@@ -16,7 +16,6 @@ import { RankBadge } from "@/components/rank/RankBadge";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { Volume2 } from "lucide-react";
-import { BattleReplays } from "./BattleReplays";
 import { createSnapshotGate } from "@/lib/battle-interactions";
 import { bothBattleSongsFinished } from "@/lib/battle-voting";
 import { advancePlayQueue } from "@/lib/play.functions";
@@ -32,12 +31,7 @@ type Participant = {
 };
 
 export function BattleArena(props: Parameters<typeof BattleArenaLive>[0]) {
-  return (
-    <>
-      <BattleArenaLive {...props} />
-      <BattleReplays streamId={props.streamId} />
-    </>
-  );
+  return <BattleArenaLive {...props} />;
 }
 
 function BattleArenaLive({
