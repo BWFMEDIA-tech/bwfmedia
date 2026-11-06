@@ -15,6 +15,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^4.0.92",
     "@ai-sdk/react": "^4.0.141",
+    "@block65/webcrypto-web-push": "2.0.0",
     "@capacitor/android": "^8.4.1",
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",
@@ -33,6 +34,7 @@
     "@lovable.dev/email-js": "0.1.0",
     "@lovable.dev/mcp-js": "^0.20.0",
     "@lovable.dev/webhooks-js": "^0.0.1",
+    "@noble/curves": "1.9.7",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
