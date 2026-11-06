@@ -1,8 +1,8 @@
 # Roadmap
 
 ## 1v1 challenge notifications
-- [ ] Connect direct genre challenges to the existing notification inbox and check notification write failures
-- [ ] Run notification regressions and verify the signed-in inbox
+- [x] Connect direct genre challenges to the existing notification inbox and check notification write failures; restore five missing pending invitations
+- [x] Twelve notification/challenge regressions passed; signed-in challenge text and Battle Arena click-through verified
 
 ## Mobile push notifications
 - [x] Reuse inbox/device storage, opt-in settings, dedicated cache-free messaging worker and server-only VAPID sender
