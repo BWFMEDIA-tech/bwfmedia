@@ -219,20 +219,22 @@ export function LiveChat({
 
   return (
     <>
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="icon"
       onClick={() => setPopOut((v) => !v)}
       aria-label={popOut ? "Close live chat window" : "Open live chat window"}
       aria-expanded={popOut}
-      className="fixed bottom-4 right-[88px] md:bottom-6 md:right-[96px] z-[45] flex h-14 w-14 items-center justify-center rounded-full border border-[#00E6FF]/50 bg-[#07070f] text-[#00E6FF] shadow-[0_0_24px_rgba(0,230,255,0.45)] transition hover:scale-105"
+      className="tunevio-floating-launcher fixed right-[88px] md:right-[96px] z-[45] flex h-14 w-14 items-center justify-center rounded-full border border-primary/50 bg-background text-primary shadow-lg transition hover:scale-105"
     >
       {popOut ? <span className="text-xl font-bold leading-none">×</span> : <MessageCircle className="h-6 w-6" />}
-    </button>
+    </Button>
     <aside
       className={cn(
         "flex flex-col overflow-hidden rounded-3xl border border-white/10 shadow-[0_0_60px_-25px_rgba(0,0,255,0.55)] [font-family:'Space_Grotesk',ui-sans-serif,system-ui]",
         popOut
-          ? "fixed bottom-[84px] right-4 md:bottom-[92px] md:right-6 z-[95] h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))]"
+          ? "tunevio-chat-window fixed right-4 md:right-6 z-[95] h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))]"
           : "hidden",
       )}
       style={{
