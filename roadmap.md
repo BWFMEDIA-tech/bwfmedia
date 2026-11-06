@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Open 1v1 voting automatically after both battle songs finish; keep submissions closed beforehand and preserve battle/queue flow.
 - [x] Repair Arena voting: host-started rounds now open voting, failed writes surface errors; 17 regression tests and preview build pass. Signed-in room checked; pictured matchup was cancelled during verification, so no real round started or competition vote cast.
 - [x] Add Arena new-track uploads using the existing profile uploader; save to the artist's profile first, then select the saved song for owner-validated submission. Eleven tests pass; signed-in desktop/phone form and close verified without overflow or runtime errors. Full upload/queue verification awaits a real artist audio file; no fake music added.
 - [x] Profiles now select the member's confirmed live session from the shared directory without role filters; streams retain inline tools, stages/broadcasts show Join live using existing routes. 50 regression tests pass; desktop/phone offline profile verified without errors or overflow, build OK. Real live joining remains blocked by no active broadcast (see existing verification task below).
