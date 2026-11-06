@@ -1,4 +1,5 @@
 # Live artist profile
+- [x] Show the Hype Meter and Battle Replay on the Live Arena battle page (/play/$room Battle tab) while keeping Stream Studio free of both; 14 battle tests pass, build OK, both surfaces verified in the preview.
 - [x] Remove the Battle Replay section without changing live battles or stored replays; preview build OK and 11 voting/completion tests pass.
 - [x] Remove the Hype Meter panel while preserving battle playback and voting; preview build OK and 11 voting/completion regression tests pass.
 - [x] Open 1v1 voting automatically after both assigned songs finish; reject early opens, start the voting clock afterward, guard stale song-end callbacks and hold the regular queue; 39 regression tests and preview build pass.
