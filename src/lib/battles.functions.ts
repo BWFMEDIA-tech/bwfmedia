@@ -448,10 +448,61 @@ export const listGenreBattles = createServerFn({ method: "POST" })
       const { data: streams } = await sb.from("streams").select("id, room_name").in("id", streamIds);
       rooms = Object.fromEntries((streams ?? []).map((s: any) => [s.id, s.room_name]));
     }
+    const { data: incoming } = await sb
+      .from("battle_matches")
+      .select("id, artist_a_name, genre, created_at")
+      .eq("artist_b_id", context.userId)
+      .eq("status", "pending")
+      .eq("genre_agreed_b", false)
+      .not("genre", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(10);
     return {
+      incoming: incoming ?? [],
       battles: (battles ?? []).map((b: any) => ({ ...b, room_name: rooms[b.stream_id] ?? null })),
       challengers: ((challengers ?? []) as any[]).filter((c) => c.user_id !== context.userId),
       myGenre: (mine?.genre as string | null) ?? null,
       userId: context.userId,
     };
+  });
+
+/** Challenge an artist who is waiting in the same genre. Creates a pending
+ *  battle on the challenger's own live room; the opponent accepts via
+ *  agreeBattleGenre before voting can begin. */
+export const challengeArtist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ opponentId: z.string().uuid(), genre: genreSchema }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    if (data.opponentId === context.userId) throw new Error("You can't battle yourself");
+    const { data: waiting } = await sb.rpc("list_battle_challengers", { _genre: data.genre });
+    const opp = ((waiting ?? []) as any[]).find((c) => c.user_id === data.opponentId);
+    if (!opp) throw new Error(`That artist is no longer looking for a ${data.genre} battle`);
+    const { data: streamId, error: sErr } = await sb.rpc("get_or_create_profile_stream");
+    if (sErr || !streamId) throw new Error(sErr?.message ?? "Could not open your battle room");
+    const { data: live } = await sb
+      .from("battle_matches").select("id").eq("stream_id", streamId).eq("status", "live").maybeSingle();
+    if (live) throw new Error("You already have a live battle — finish it first");
+    const { data: me } = await sb
+      .from("public_profiles").select("display_name, stage_name").eq("id", context.userId).maybeSingle();
+    const { data: match, error } = await sb
+      .from("battle_matches")
+      .insert({
+        stream_id: streamId,
+        host_id: context.userId,
+        artist_a_id: context.userId,
+        artist_b_id: data.opponentId,
+        artist_a_name: me?.stage_name ?? me?.display_name ?? "Artist",
+        artist_b_name: opp.display_name ?? "Artist",
+        total_rounds: 3,
+        round_seconds: 60,
+        genre: data.genre,
+        status: "pending",
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ok: true, matchId: match.id };
   });

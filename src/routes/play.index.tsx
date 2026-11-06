@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { BATTLE_GENRES, type BattleGenre } from "@/lib/battle-genres";
-import { findGenreMatch, leaveGenreMatch, listGenreBattles } from "@/lib/battles.functions";
+import { findGenreMatch, leaveGenreMatch, listGenreBattles, challengeArtist, agreeBattleGenre } from "@/lib/battles.functions";
 import { useState } from "react";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
@@ -706,6 +706,33 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
   const listFn = useServerFn(listGenreBattles);
   const findFn = useServerFn(findGenreMatch);
   const leaveFn = useServerFn(leaveGenreMatch);
+  const challengeFn = useServerFn(challengeArtist);
+  const acceptFn = useServerFn(agreeBattleGenre);
+  const [actingId, setActingId] = useState<string | null>(null);
+  const challenge = async (opponentId: string, genre: BattleGenre, name: string) => {
+    setActingId(opponentId);
+    try {
+      await challengeFn({ data: { opponentId, genre } });
+      toast.success(`Challenge sent to ${name}`, { description: `They need to accept the ${genre} battle.` });
+      qc.invalidateQueries({ queryKey: ["genre-battles"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not send challenge");
+    } finally {
+      setActingId(null);
+    }
+  };
+  const accept = async (matchId: string, genre: string) => {
+    setActingId(matchId);
+    try {
+      await acceptFn({ data: { matchId } });
+      toast.success(`Challenge accepted — ${genre} battle is ready`);
+      qc.invalidateQueries({ queryKey: ["genre-battles"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not accept challenge");
+    } finally {
+      setActingId(null);
+    }
+  };
   const qc = useQueryClient();
   const [filter, setFilter] = useState<BattleGenre | null>(null);
   const [pick, setPick] = useState<BattleGenre | "">("");
@@ -791,6 +818,29 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
             ))}
           </div>
 
+          {(data?.incoming ?? []).length > 0 && (
+            <div className="mt-4 rounded-xl border border-[#00E6FF]/40 bg-[#00E6FF]/5 p-4">
+              <p className="text-sm font-bold">Challenges for you</p>
+              <ul className="mt-3 space-y-2">
+                {data!.incoming.map((m: any) => (
+                  <li key={m.id} className="flex flex-wrap items-center gap-2">
+                    <span className="min-w-0 flex-1 truncate text-sm">
+                      <span className="font-semibold">{m.artist_a_name ?? "An artist"}</span> wants to battle you
+                    </span>
+                    <GenreBadge genre={m.genre} />
+                    <button
+                      onClick={() => accept(m.id, m.genre)}
+                      disabled={actingId === m.id}
+                      className="rounded-md bg-[#0000FF] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#0000CC] disabled:opacity-50"
+                    >
+                      {actingId === m.id ? "Accepting…" : "Accept"}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {isError ? (
             <p className="mt-4 text-sm text-red-300">Couldn't load battles. Try again shortly.</p>
           ) : isLoading ? (
@@ -814,13 +864,13 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
                         )}
                         <span className="min-w-0 flex-1 truncate text-sm">{c.display_name}</span>
                         <GenreBadge genre={c.genre} />
-                        <Link
-                          to="/artist/$id"
-                          params={{ id: c.user_id }}
-                          className="rounded-md border border-[#00E6FF]/40 px-2.5 py-1 text-[11px] font-bold text-[#00E6FF] hover:bg-[#00E6FF]/10"
+                        <button
+                          onClick={() => challenge(c.user_id, c.genre, c.display_name)}
+                          disabled={actingId === c.user_id}
+                          className="rounded-md border border-[#00E6FF]/40 px-2.5 py-1 text-[11px] font-bold text-[#00E6FF] hover:bg-[#00E6FF]/10 disabled:opacity-50"
                         >
-                          Challenge
-                        </Link>
+                          {actingId === c.user_id ? "Sending…" : "Challenge"}
+                        </button>
                       </li>
                     ))}
                   </ul>
