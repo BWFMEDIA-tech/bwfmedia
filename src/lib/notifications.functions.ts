@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { validPushEndpoint } from "./web-push";
 
 export const listNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -92,9 +93,9 @@ export const subscribePush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i) =>
     z.object({
-      endpoint: z.string().url().max(2000),
-      p256dh: z.string().min(1).max(500),
-      auth: z.string().min(1).max(500),
+      endpoint: z.string().url().max(2000).refine(validPushEndpoint, "Unsupported push service"),
+      p256dh: z.string().regex(/^[A-Za-z0-9_-]{87}$/),
+      auth: z.string().regex(/^[A-Za-z0-9_-]{22}$/),
       user_agent: z.string().max(500).optional(),
     }).parse(i),
   )
@@ -103,7 +104,7 @@ export const subscribePush = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("web_push_subscriptions")
       .upsert(
-        { user_id: userId, endpoint: data.endpoint, p256dh: data.p256dh, auth: data.auth, user_agent: data.user_agent ?? null },
+        { user_id: userId, endpoint: data.endpoint, p256dh: data.p256dh, auth: data.auth, user_agent: data.user_agent ?? null, enabled: true },
         { onConflict: "endpoint" },
       );
     if (error) throw new Error(error.message);
@@ -115,10 +116,11 @@ export const unsubscribePush = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ endpoint: z.string().url() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await supabase
+    const { error } = await supabase
       .from("web_push_subscriptions")
       .delete()
       .eq("endpoint", data.endpoint)
       .eq("user_id", userId);
+    if (error) throw new Error("Couldn't disable device notifications");
     return { ok: true };
   });

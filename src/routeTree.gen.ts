@@ -163,6 +163,7 @@ import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/e
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
 import { Route as ApiPublicHooksProcessPayoutsRouteImport } from './routes/api/public/hooks/process-payouts'
+import { Route as ApiPublicHooksPushNotificationRouteImport } from './routes/api/public/hooks/push-notification'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -949,6 +950,12 @@ const ApiPublicHooksProcessPayoutsRoute =
     path: '/api/public/hooks/process-payouts',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPushNotificationRoute =
+  ApiPublicHooksPushNotificationRouteImport.update({
+    id: '/api/public/hooks/push-notification',
+    path: '/api/public/hooks/push-notification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -1127,6 +1134,7 @@ export interface FileRoutesByFullPath {
   '/artist-store/pages/': typeof ArtistStorePagesIndexRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
+  '/api/public/hooks/push-notification': typeof ApiPublicHooksPushNotificationRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1284,6 +1292,7 @@ export interface FileRoutesByTo {
   '/artist-store/pages': typeof ArtistStorePagesIndexRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
+  '/api/public/hooks/push-notification': typeof ApiPublicHooksPushNotificationRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1445,6 +1454,7 @@ export interface FileRoutesById {
   '/artist-store/pages/': typeof ArtistStorePagesIndexRoute
   '/api/oauth/$platform/callback': typeof ApiOauthPlatformCallbackRoute
   '/api/public/hooks/process-payouts': typeof ApiPublicHooksProcessPayoutsRoute
+  '/api/public/hooks/push-notification': typeof ApiPublicHooksPushNotificationRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1607,6 +1617,7 @@ export interface FileRouteTypes {
     | '/artist-store/pages/'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
+    | '/api/public/hooks/push-notification'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1764,6 +1775,7 @@ export interface FileRouteTypes {
     | '/artist-store/pages'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
+    | '/api/public/hooks/push-notification'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1924,6 +1936,7 @@ export interface FileRouteTypes {
     | '/artist-store/pages/'
     | '/api/oauth/$platform/callback'
     | '/api/public/hooks/process-payouts'
+    | '/api/public/hooks/push-notification'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -2031,6 +2044,7 @@ export interface RootRouteChildren {
   PlayAudienceRoomRoute: typeof PlayAudienceRoomRoute
   ApiOauthPlatformCallbackRoute: typeof ApiOauthPlatformCallbackRoute
   ApiPublicHooksProcessPayoutsRoute: typeof ApiPublicHooksProcessPayoutsRoute
+  ApiPublicHooksPushNotificationRoute: typeof ApiPublicHooksPushNotificationRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -3117,6 +3131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksProcessPayoutsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/push-notification': {
+      id: '/api/public/hooks/push-notification'
+      path: '/api/public/hooks/push-notification'
+      fullPath: '/api/public/hooks/push-notification'
+      preLoaderRoute: typeof ApiPublicHooksPushNotificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -3398,6 +3419,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlayAudienceRoomRoute: PlayAudienceRoomRoute,
   ApiOauthPlatformCallbackRoute: ApiOauthPlatformCallbackRoute,
   ApiPublicHooksProcessPayoutsRoute: ApiPublicHooksProcessPayoutsRoute,
+  ApiPublicHooksPushNotificationRoute: ApiPublicHooksPushNotificationRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
