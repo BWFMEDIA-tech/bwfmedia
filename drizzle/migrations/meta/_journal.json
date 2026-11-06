@@ -316,6 +316,13 @@
       "when": 1793932083242,
       "tag": "0044_battle_genres",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1793940588310,
+      "tag": "0045_battle_challenges",
+      "breakpoints": true
     }
   ]
 }
