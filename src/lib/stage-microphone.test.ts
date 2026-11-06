@@ -1,7 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { activeMutedUserIds, canToggleStageMicrophone, shouldRestoreStageMicrophone } from "./stage-microphone";
+import { activeMutedUserIds, canToggleStageMicrophone, shouldRestoreStageMicrophone, shouldSilenceStageMicrophone } from "./stage-microphone";
 
 describe("stage self mute", () => {
+  it("silences audience microphones even when publishing grants are stale", () => {
+    expect(shouldSilenceStageMicrophone("listener", true, false)).toBe(true);
+    expect(shouldSilenceStageMicrophone("green_room", true, false)).toBe(true);
+  });
+  it("silences revoked publishing and host-muted speakers", () => {
+    expect(shouldSilenceStageMicrophone("speaker", false, false)).toBe(true);
+    expect(shouldSilenceStageMicrophone("speaker", true, true)).toBe(true);
+  });
+  it("keeps approved host and speaker microphones available", () => {
+    for (const role of ["host", "co_host", "speaker"]) {
+      expect(shouldSilenceStageMicrophone(role, true, false)).toBe(false);
+    }
+    expect(shouldSilenceStageMicrophone(null, false, false)).toBe(true);
+  });
   it("lets every publishing stage participant mute and unmute their own mic", () => {
     expect(canToggleStageMicrophone(true, true, false)).toBe(true);
     expect(canToggleStageMicrophone(false, true, false)).toBe(true);

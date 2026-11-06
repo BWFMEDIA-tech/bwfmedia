@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Stop audience microphone capture and silence audience publications across audio/video stages; verify tests and preview. Real multi-device echo verification requires a separate test room.
 - [x] Show the Hype Meter and Battle Replay on the Live Arena battle page (/play/$room Battle tab) while keeping Stream Studio free of both; 14 battle tests pass, build OK, both surfaces verified in the preview.
 - [x] Remove the Battle Replay section without changing live battles or stored replays; preview build OK and 11 voting/completion tests pass.
 - [x] Remove the Hype Meter panel while preserving battle playback and voting; preview build OK and 11 voting/completion regression tests pass.

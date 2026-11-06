@@ -3,6 +3,11 @@ export function canToggleStageMicrophone(microphoneEnabled: boolean, canPublish:
   return microphoneEnabled || (canPublish && !hostMuted);
 }
 
+/** Audience seats never carry microphone audio, even with stale publishing grants. */
+export function shouldSilenceStageMicrophone(role: string | null | undefined, canPublish: boolean | undefined, hostMuted: boolean) {
+  return hostMuted || canPublish === false || role === "listener" || role === "green_room";
+}
+
 /** User IDs whose host mute is still in effect (muted_until in the future). */
 export function activeMutedUserIds(rows: Iterable<{ user_id: string; muted_until: string | null }>, now = Date.now()) {
   const ids = new Set<string>();
