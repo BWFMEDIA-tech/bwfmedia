@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { BATTLE_GENRES } from "@/lib/battle-genres";
+const genreSchema = z.enum(BATTLE_GENRES);
 const adminRpc = async () => (await import("@/integrations/supabase/client.server")).supabaseAdmin as any;
 
 /**
@@ -58,6 +60,7 @@ export const createBattleMatch = createServerFn({ method: "POST" })
         roundSeconds: z.number().int().min(15).max(600).default(60),
         trackAId: z.string().uuid().optional(),
         trackBId: z.string().uuid().optional(),
+        genre: genreSchema,
       })
       .refine((d) => d.artistAId !== d.artistBId, { message: "Artists must differ" })
       .parse(input),
@@ -107,6 +110,7 @@ export const createBattleMatch = createServerFn({ method: "POST" })
         artist_b_name: nameFor(data.artistBId),
         total_rounds: data.totalRounds,
         round_seconds: data.roundSeconds,
+        genre: data.genre,
         status: "pending",
       })
       .select("*")
@@ -154,6 +158,7 @@ export const updateBattleArtists = createServerFn({ method: "POST" })
         matchId: z.string().uuid(),
         artistAId: z.string().uuid(),
         artistBId: z.string().uuid(),
+        genre: genreSchema.optional(),
       })
       .refine((d) => d.artistAId !== d.artistBId, { message: "Artists must differ" })
       .parse(input),
@@ -202,6 +207,7 @@ export const updateBattleArtists = createServerFn({ method: "POST" })
         artist_b_id: data.artistBId,
         artist_a_name: nameFor(data.artistAId),
         artist_b_name: nameFor(data.artistBId),
+        ...(data.genre ? { genre: data.genre } : {}),
       })
       .eq("id", data.matchId)
       .select("*")
@@ -388,4 +394,64 @@ export const getActiveBattle = createServerFn({ method: "GET" })
       .eq("match_id", match.id)
       .order("round_number", { ascending: true });
     return { match, rounds: rounds ?? [] };
+  });
+/** Battling artist confirms they agree to compete in the match's genre. */
+export const agreeBattleGenre = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ matchId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase.rpc as any)("agree_battle_genre", { _match_id: data.matchId });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Join the 1v1 matchmaking pool for a chosen genre. */
+export const findGenreMatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ genre: genreSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase.rpc as any)("enqueue_matchmaking", { _genre: data.genre });
+    if (error) throw new Error(error.message);
+    return { ok: true, genre: data.genre };
+  });
+
+export const leaveGenreMatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { error } = await (context.supabase.rpc as any)("dequeue_matchmaking");
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Battles + waiting challengers, optionally filtered by genre. */
+export const listGenreBattles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ genre: genreSchema.nullable() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    let q = sb
+      .from("battle_matches")
+      .select("id, stream_id, artist_a_id, artist_b_id, artist_a_name, artist_b_name, genre, status, genre_agreed_a, genre_agreed_b, created_at, winner_id")
+      .not("genre", "is", null)
+      .in("status", ["pending", "live", "completed"])
+      .order("created_at", { ascending: false })
+      .limit(30);
+    if (data.genre) q = q.eq("genre", data.genre);
+    const [{ data: battles }, { data: challengers }, { data: mine }] = await Promise.all([
+      q,
+      sb.rpc("list_battle_challengers", { _genre: data.genre }),
+      sb.from("matchmaking_pool").select("genre").eq("user_id", context.userId).eq("status", "waiting").maybeSingle(),
+    ]);
+    const streamIds = Array.from(new Set((battles ?? []).map((b: any) => b.stream_id)));
+    let rooms: Record<string, string> = {};
+    if (streamIds.length) {
+      const { data: streams } = await sb.from("streams").select("id, room_name").in("id", streamIds);
+      rooms = Object.fromEntries((streams ?? []).map((s: any) => [s.id, s.room_name]));
+    }
+    return {
+      battles: (battles ?? []).map((b: any) => ({ ...b, room_name: rooms[b.stream_id] ?? null })),
+      challengers: ((challengers ?? []) as any[]).filter((c) => c.user_id !== context.userId),
+      myGenre: (mine?.genre as string | null) ?? null,
+      userId: context.userId,
+    };
   });

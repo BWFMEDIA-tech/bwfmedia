@@ -38,7 +38,7 @@ async function assertHost(supabase: any, userId: string, matchId: string) {
   const { data: m } = await supabase
     .from("battle_matches")
     .select(
-      "id, stream_id, host_id, status, current_round, total_rounds, a_wins, b_wins, artist_a_id, artist_b_id, active_side, current_round_id, round_seconds",
+      "id, stream_id, host_id, status, current_round, total_rounds, a_wins, b_wins, artist_a_id, artist_b_id, active_side, current_round_id, round_seconds, genre, genre_agreed_a, genre_agreed_b",
     )
     .eq("id", matchId)
     .maybeSingle();
@@ -130,6 +130,9 @@ export async function runBattleEvent(
             })
             .eq("id", m.id);
           return { ok: true, completed: true, winnerUserId: overallWinner };
+        }
+        if ((m.current_round as number) === 0 && m.genre && !(m.genre_agreed_a && m.genre_agreed_b)) {
+          invalid(`both artists must agree to compete in ${m.genre} before voting begins`);
         }
         const cur = await loadCurrentRound();
         if (cur && cur.status === "live") invalid("a round is already live");
