@@ -306,11 +306,10 @@ export const startBattleChallenge = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Both artists already agreed through the challenge flow — pre-set the
-    // genre agreement flags so the host can open round 1 immediately.
-    await supabase
-      .from("battle_matches")
-      .update({ genre_agreed_a: true, genre_agreed_b: true })
-      .eq("id", match.id);
+    // genre agreement flags so the host can open round 1 immediately. The
+    // genre guard trigger only allows this through the host-only RPC.
+    const { error: aErr } = await supabase.rpc("battle_challenge_mark_agreed", { _match_id: match.id });
+    if (aErr) throw new Error(aErr.message);
 
     const { error: uErr } = await supabase
       .from("battle_challenges")
