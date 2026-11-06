@@ -19,6 +19,8 @@ import { useSignedAudioUrl } from "@/lib/useSignedAudio";
 import { Volume2 } from "lucide-react";
 import { BattleReplays } from "./BattleReplays";
 import { createSnapshotGate } from "@/lib/battle-interactions";
+import { bothBattleSongsFinished } from "@/lib/battle-voting";
+import { advancePlayQueue } from "@/lib/play.functions";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -132,7 +134,13 @@ function BattleArenaLive({
   const onAirTrack: any =
     onAirSide === "b" ? (roomState as any)?.bTrack : onAirSide === "a" ? (roomState as any)?.aTrack : null;
   const onAirUrl = playAudio && onAirTrack?.status === "playing" ? (onAirTrack.audio_url as string | null) : null;
-  const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} startedAt={onAirTrack?.updated_at ?? null} /> : null;
+  const advanceFn = useServerFn(advancePlayQueue);
+  const onBattleTrackEnded = useCallback(async () => {
+    if (!isHost || !onAirTrack?.id) return;
+    try { await advanceFn({ data: { streamId, finishedTrackId: onAirTrack.id } }); }
+    catch (error: any) { toast.error(error?.message ?? "Unable to advance battle playback"); }
+  }, [isHost, streamId, onAirTrack?.id, advanceFn]);
+  const audioEl = playAudio ? <BattleTrackAudio audioUrl={onAirUrl} title={onAirTrack?.title ?? null} startedAt={onAirTrack?.updated_at ?? null} onEnded={onBattleTrackEnded} /> : null;
 
   // Visible to everyone (artists, hosts, listeners) even before a battle starts.
   if (!match && !isHost) {
@@ -324,7 +332,7 @@ function BattleView({
   const bCount = voteTotals.bVotes;
 
   const lastClosed = [...rounds].reverse().find((r: any) => r.status === "closed");
-  const canVote = votingStatus === "open" && !myVote;
+  const canVote = votingStatus === "open" && bothBattleSongsFinished(currentRound) && !myVote;
 
   const vote = async (choice: "a" | "b", useBoost = false) => {
     if (!currentRound || !canVote || voteInFlightRef.current) return;
@@ -526,6 +534,7 @@ function BattleView({
           matchStatus={match.status as string}
           currentRound={match.current_round as number}
           totalRounds={match.total_rounds as number}
+          songsFinished={bothBattleSongsFinished(currentRound)}
           artistAName={match.artist_a_name ?? "Side A"}
           artistBName={match.artist_b_name ?? "Side B"}
           onAfterEmit={onAfterHostEmit}
@@ -1474,7 +1483,7 @@ function TrackSelect({
  * player. Mobile browsers (iOS Safari, Android Chrome) block sound until a tap,
  * so a "Tap to listen" button appears and any tap on the page also unlocks it.
  */
-function BattleTrackAudio({ audioUrl, title, startedAt }: { audioUrl: string | null; title: string | null; startedAt?: string | null }) {
+function BattleTrackAudio({ audioUrl, title, startedAt, onEnded }: { audioUrl: string | null; title: string | null; startedAt?: string | null; onEnded?: () => void }) {
   const src = useSignedAudioUrl(audioUrl);
   const ref = useRef<HTMLAudioElement | null>(null);
   const [blocked, setBlocked] = useState(false);
@@ -1513,17 +1522,18 @@ function BattleTrackAudio({ audioUrl, title, startedAt }: { audioUrl: string | n
     if (!a) return;
     const onPlay = () => setPlaybackPlaying(true);
     const onStop = () => setPlaybackPlaying(false);
+    const onEnd = () => { onStop(); onEnded?.(); };
     a.addEventListener("playing", onPlay);
     a.addEventListener("pause", onStop);
-    a.addEventListener("ended", onStop);
+    a.addEventListener("ended", onEnd);
     if (a.paused) setPlaybackPlaying(false);
     return () => {
       a.removeEventListener("playing", onPlay);
       a.removeEventListener("pause", onStop);
-      a.removeEventListener("ended", onStop);
+      a.removeEventListener("ended", onEnd);
       setPlaybackPlaying(false);
     };
-  }, [src]);
+  }, [src, onEnded]);
 
   useEffect(() => {
     const a = ref.current;
