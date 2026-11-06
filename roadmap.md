@@ -1,4 +1,5 @@
 # Live artist profile
+- [ ] Remove the Battle Replay section without changing live battles or stored replays.
 - [x] Remove the Hype Meter panel while preserving battle playback and voting; preview build OK and 11 voting/completion regression tests pass.
 - [x] Open 1v1 voting automatically after both assigned songs finish; reject early opens, start the voting clock afterward, guard stale song-end callbacks and hold the regular queue; 39 regression tests and preview build pass.
 - [ ] Verify two-song completion and a listener's accepted vote in a real battle; blocked by no isolated two-artist test battle, and existing live shows must not be interrupted.
