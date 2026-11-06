@@ -19,18 +19,22 @@ async function isHostOrAdmin(supabase: any, userId: string): Promise<boolean> {
   return (roles ?? []).some((r: any) => r.role === "host" || r.role === "admin");
 }
 
-async function profileSummary(supabase: any, ids: string[]) {
-  if (!ids.length) return new Map<string, { name: string; avatar: string | null }>();
+type ProfileInfo = { name: string; avatar: string | null };
+
+async function profileSummary(supabase: any, ids: string[]): Promise<Map<string, ProfileInfo>> {
+  const map = new Map<string, ProfileInfo>();
+  if (!ids.length) return map;
   const { data } = await supabase
     .from("public_profiles")
     .select("id, display_name, stage_name, avatar_url")
     .in("id", ids);
-  return new Map(
-    (data ?? []).map((p: any) => [
-      p.id,
-      { name: (p.stage_name as string | null) ?? (p.display_name as string | null) ?? "Artist", avatar: (p.avatar_url as string | null) ?? null },
-    ]),
-  );
+  for (const p of (data ?? []) as any[]) {
+    map.set(p.id as string, {
+      name: (p.stage_name as string | null) ?? (p.display_name as string | null) ?? "Artist",
+      avatar: (p.avatar_url as string | null) ?? null,
+    });
+  }
+  return map;
 }
 
 async function notify(userIds: string[], n: { actorId: string; type: string; title: string; body?: string | null; link?: string | null }) {
@@ -46,7 +50,7 @@ async function notify(userIds: string[], n: { actorId: string; type: string; tit
   await (supabaseAdmin as any).from("notifications").insert(rows);
 }
 
-function withProfiles(rows: any[], profiles: Map<string, { name: string; avatar: string | null }>) {
+function withProfiles(rows: any[], profiles: Map<string, ProfileInfo>) {
   return rows.map((c) => ({
     ...c,
     challenger_name: profiles.get(c.challenger_id)?.name ?? "Artist",
@@ -112,7 +116,7 @@ export const listMyBattleChallenges = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(error.message);
-    const ids = Array.from(new Set((data ?? []).flatMap((c: any) => [c.challenger_id, c.challenged_id])));
+    const ids = Array.from(new Set((data ?? []).flatMap((c: any) => [c.challenger_id, c.challenged_id]))) as string[];
     const profiles = await profileSummary(supabase, ids);
     return { challenges: withProfiles(data ?? [], profiles), userId };
   });
@@ -199,7 +203,7 @@ export const listHostBattleChallenges = createServerFn({ method: "POST" })
     if (data.status) q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    const ids = Array.from(new Set((rows ?? []).flatMap((c: any) => [c.challenger_id, c.challenged_id])));
+    const ids = Array.from(new Set((rows ?? []).flatMap((c: any) => [c.challenger_id, c.challenged_id]))) as string[];
     const profiles = await profileSummary(supabase, ids);
     return { challenges: withProfiles(rows ?? [], profiles) };
   });
