@@ -2,3 +2,4 @@
 - Keep freestyle votes/lifecycle separate from song battles; reuse stream ownership, approved camera roles, existing LiveKit rooms and inbox, with RPC-only immutable votes and bounded deadline checks, because freestyle timing must not alter song voting or capture twice.
 - Enforce freestyle challenge occupancy and slot assignment under a single database advisory lock and link accepted A/B identities to live battles via triggers; use existing inbox and media grants, because concurrent invitations or direct RPC launches must not bypass the separate freestyle queue.
 - Validate challenge participants with the existing has_role RPC, not other users' private role rows, because self-only RLS hides valid opponents without removing their artist role.
+- Read profile battle status through one server-only reader over both battle queues, exposing only names, avatars and status, because a decorative profile card must never leak private battle rows or take the profile page down.
