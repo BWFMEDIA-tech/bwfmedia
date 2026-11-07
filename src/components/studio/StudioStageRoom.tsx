@@ -168,7 +168,11 @@ export function StudioStageRoom({
         const p = participants.find((x) => x.user_id === id);
         return { user_id: id, display_name: p?.display_name ?? null, avatar_url: p?.avatar_url ?? null };
       }),
-  ];
+  ].filter((m) => {
+    // Anyone currently in the audience must not show as a mod.
+    const p = participants.find((x) => x.user_id === m.user_id);
+    return !p || !AUDIENCE_ROLES.includes(p.stage_role ?? "listener");
+  });
   const [confirm, setConfirm] = useState<null | {
     title: string;
     description: string;
@@ -302,6 +306,11 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
       confirmLabel: "Demote to Audience",
       run: async () => {
         await demoteSrv({ data: { streamId, targetUserId: uid } });
+        // A mod moved to the audience is no longer a mod for this stream.
+        if (streamModIds.includes(uid)) {
+          await supabase.from("stream_moderators").delete().eq("stream_id", streamId).eq("user_id", uid);
+          setStreamModIds((prev) => prev.filter((x) => x !== uid));
+        }
         toast.success("Moved to audience");
       },
     });
