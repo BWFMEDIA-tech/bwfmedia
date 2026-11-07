@@ -178,7 +178,8 @@ function RootComponent() {
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />
         <InstallPromptPopup />
-        <FreestyleChallengePopup />
+         <FreestyleChallengePopup />
+         <BattleChallengePopup />
         <IntroSplash />
         </ArtistStatusProvider>
         </PlayerProvider>
