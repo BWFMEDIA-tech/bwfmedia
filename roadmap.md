@@ -1,5 +1,10 @@
 # Roadmap
 
+## Play Freestyle cleanup
+- [ ] Simplify Play overview to confirmed Freestyle matchups and confirmed live performances; hide empty sections
+- [ ] Keep invitations, challenge creation and controls accessible on dedicated challenge page; preserve host controls
+- [ ] Verify signed-in overview and challenge navigation on mobile and desktop with existing data
+
 ## Smooth horizontal card scrolling
 - [x] Inspect shared rails and apply native momentum/proximity scrolling with mouse-only drag enhancement
 - [x] Verified desktop rail moves on mouse drag without opening cards, mobile proximity snapping and no page overflow; preview build OK; physical-device inertia remains unverified
