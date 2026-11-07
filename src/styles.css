@@ -1199,18 +1199,20 @@ body { font-family: var(--font-body); letter-spacing: 0; }
 .swara-home #discover .group { border: 0; background: transparent; padding: 0; }
 .swara-home #discover .group > div:first-child { aspect-ratio: 1; }
 .swara-home .group button[aria-label="Play"], .swara-home .group button[aria-label="Pause"] { box-shadow: none; border-color: transparent; background: var(--reference-action); color: var(--reference-action-foreground); }
-.tv-play-image { display: none; }
 :root { --artwork-play-backdrop: oklch(0 0 0 / 65%); }
+.tv-play-fab .tv-play-standard { display: none; }
+.tv-play-fab .tv-play-image { display: block; width: 72%; height: 72%; }
+.tv-play-fab[data-play-icon="true"],
+.swara-home .group button.tv-play-fab[data-play-icon="true"] {
+  background: var(--artwork-play-backdrop);
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+@media (hover: none), (pointer: coarse) {
+  .tv-play-fab { opacity: 1; }
+}
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
-  .tv-play-fab .tv-play-standard { display: none; }
-  .tv-play-fab .tv-play-image { display: block; width: 72%; height: 72%; }
-  .tv-play-fab[data-play-icon="true"],
-  .swara-home .group button.tv-play-fab[data-play-icon="true"] {
-    background: var(--artwork-play-backdrop);
-    border-color: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-  }
   .tv-artwork-controls .tv-play-fab {
     opacity: 0;
     transform: translateY(10px) scale(0.85);
