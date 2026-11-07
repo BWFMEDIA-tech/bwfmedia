@@ -34,6 +34,7 @@ import { StageMuteEnforcement } from "./StageMuteEnforcement";
 import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
 import { RaiseHandButton } from "./RaiseHandButton";
 import type { AuthState } from "@/lib/auth-context";
+import { AudioPlaybackUnblocker } from "./AudioPlaybackUnblocker";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -115,6 +116,7 @@ export function LiveStage({ token, serverUrl, onEnd, onInvite, hostImage, guestI
       className="contents"
     >
       <RoomAudioRenderer />
+      <AudioPlaybackUnblocker />
       <StageConnectionProvider>
         {profileHost ? <ProfileStage host={profileHost} streamId={streamId} showHostTools={showHostTools} publish={publish} onEnd={onEnd} onInvite={onInvite} onViewerCount={onViewerCount} audioOnly={audioOnly} /> : <StageInner onEnd={onEnd} onInvite={onInvite} hostImage={hostImage} guestImage={guestImage} onViewerCount={onViewerCount} streamId={streamId} publish={publish} showHostTools={showHostTools} raiseHandAuth={raiseHandAuth} />}
         <PublishSync publish={publish} camera={!audioOnly} />

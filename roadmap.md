@@ -1,5 +1,9 @@
 # Roadmap
 
+## Audience cannot hear
+- [x] Add the missing browser audio-unlock control to profile and Studio video stages; reuse it in audio stages without enabling audience microphones
+- [ ] Verify regression tests and audience playback; actual phone listening needs a connected host and audience devices
+
 ## 1v1 challenge notifications
 - [x] Connect direct genre challenges to the existing notification inbox and check notification write failures; restore five missing pending invitations
 - [x] Twelve notification/challenge regressions passed; signed-in challenge text and Battle Arena click-through verified
