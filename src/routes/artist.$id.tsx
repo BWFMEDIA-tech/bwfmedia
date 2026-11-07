@@ -266,7 +266,7 @@ function HeroBanner({
       )}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_120%,#000_0%,transparent_50%)]" />
       {isOwner && (
-        <Button asChild variant="outline" size="icon" className="absolute right-3 top-3 z-10" >
+        <Button asChild variant="ghost" size="icon" className="absolute right-3 top-3 z-10 bg-transparent hover:bg-transparent text-foreground hover:text-primary" >
           <Link to="/settings" aria-label="Profile settings" title="Settings">
             <Settings />
           </Link>
