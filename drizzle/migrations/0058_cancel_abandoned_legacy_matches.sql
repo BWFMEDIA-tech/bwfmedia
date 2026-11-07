@@ -1,0 +1,1 @@
+UPDATE public.battle_matches SET status='cancelled', ended_at=now() WHERE status='pending' AND started_at IS NULL AND tournament_id IS NULL;
