@@ -1,5 +1,11 @@
 # Roadmap
 
+## Final physical-device Freestyle integration test
+- [ ] Confirm A challenges B, B accepts, A receives acceptance notification, and both profiles occupy the same next available numbered slot (1–10), A as challenger and B as opponent
+- [ ] Confirm host sees accepted matchup and selects it before either artist is brought into the main video boxes; acceptance must not start the battle
+- [ ] Confirm two physical artist devices connect to assigned Side A/B with simultaneous cameras and microphones, host start/end, both live notifications, and completion releases the slot
+- [ ] Check denied camera/microphone permissions, connection failure/reconnection, and mobile Safari; await device observations before marking verified
+
 ## Pending battle queue regression
 - [x] Confirm and fix pending invitations/prepared matches blocking regular queue advancement; keep live battle playback/voting protected
 - [x] Verify six new regression cases and existing battle tests; 31 tests passed and preview build OK
