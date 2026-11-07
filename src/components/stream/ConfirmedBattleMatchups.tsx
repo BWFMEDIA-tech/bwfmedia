@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { SignedImg } from "@/components/ui/signed-img";
 import { supabase } from "@/integrations/supabase/client";
 import { listHostBattleChallenges, scheduleBattleChallenge } from "@/lib/battle-challenges.functions";
-import { DEFAULT_AVATAR_URL } from "@/lib/default-avatar";
 
 export type ConfirmedMatchup = {
   id: string; challenger_id: string; challenged_id: string; genre: string;
@@ -55,7 +54,7 @@ export function ConfirmedBattleMatchups({ selectedId, onSelect }: {
             { id: c.challenger_id, name: c.challenger_name, avatar: c.challenger_avatar, side: "A" },
             { id: c.challenged_id, name: c.challenged_name, avatar: c.challenged_avatar, side: "B" },
           ].map(p => <div key={p.id} className="flex min-w-0 items-center gap-2">
-            <SignedImg src={p.avatar || DEFAULT_AVATAR_URL} alt={p.name} className="h-9 w-9 shrink-0 rounded-md object-cover" />
+            <SignedImg src={p.avatar || "/icon-192.png"} alt={p.name} className="h-9 w-9 shrink-0 rounded-md object-cover" />
             <div className="min-w-0"><span className="text-[10px] text-muted-foreground">Side {p.side}</span><p className="break-words text-xs font-semibold">{p.name}</p><p className="text-[10px] text-primary">{c.genre}</p></div>
           </div>)}
           {c.scheduled_at && <p className="col-span-2 text-[10px] text-muted-foreground">Scheduled · {new Date(c.scheduled_at).toLocaleString()}</p>}

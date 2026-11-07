@@ -153,7 +153,7 @@ export function ArtistChallengesPanel() {
                     <Play className="mr-1 h-3.5 w-3.5" /> Start battle
                   </Button>
                 )}
-                <Button
+                {c.status !== "pending" && <Button
                   size="sm"
                   variant="outline"
                   disabled={busyId === c.id}
@@ -163,7 +163,7 @@ export function ArtistChallengesPanel() {
                   }}
                 >
                   <Calendar className="mr-1 h-3.5 w-3.5" /> Schedule
-                </Button>
+                </Button>}
                 <Button
                   size="sm"
                   variant="ghost"
