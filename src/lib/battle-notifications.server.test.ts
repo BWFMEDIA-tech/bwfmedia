@@ -29,4 +29,16 @@ describe("1v1 inbox delivery", () => {
       actorId: "challenger", type: "battle_challenge", title: "Challenge",
     })).rejects.toThrow("notification could not be delivered");
   });
+  it("notifies both artists for scheduled and started battles", async () => {
+    for (const event of ["scheduled", "started"]) {
+      await notifyBattleUsers(["artist-1", "artist-2"], {
+        actorId: "host", type: "battle_challenge", title: `Battle ${event}`,
+        sourceEvent: `battle-${event}:match`, link: "/play/arena",
+      });
+      expect(insert).toHaveBeenLastCalledWith([
+        expect.objectContaining({ user_id: "artist-1", source_event: `battle-${event}:match`, link: "/play/arena" }),
+        expect.objectContaining({ user_id: "artist-2", source_event: `battle-${event}:match`, link: "/play/arena" }),
+      ]);
+    }
+  });
 });

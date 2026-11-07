@@ -7093,6 +7093,17 @@ export type Database = {
         Returns: string
       }
       month_bucket: { Args: { _ts: string }; Returns: string }
+      prepare_confirmed_battle: {
+        Args: {
+          _challenge_id: string
+          _rounds?: number
+          _seconds?: number
+          _stream_id: string
+          _track_a?: string
+          _track_b?: string
+        }
+        Returns: string
+      }
       react_to_battle: {
         Args: {
           _action: string

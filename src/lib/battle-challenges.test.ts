@@ -5,9 +5,18 @@ import {
   canStartChallenge,
   canCancelChallenge,
   canDeclineChallenge,
+  confirmedMatchups,
 } from "@/lib/battle-challenges";
 
 describe("battle challenge lifecycle", () => {
+  const matchup = { challenger_id: "artist-1", challenged_id: "artist-2", genre: "R&B" };
+  it("automatically includes accepted and scheduled matchups only", () => {
+    expect(confirmedMatchups(CHALLENGE_STATUSES.map(status => ({ ...matchup, genre: status, status }))).map(c => c.status)).toEqual(["accepted", "scheduled"]);
+  });
+  it("shows one confirmed matchup even if its artist order is reversed", () => {
+    const accepted = { ...matchup, status: "accepted" };
+    expect(confirmedMatchups([accepted, { ...accepted, challenger_id: "artist-2", challenged_id: "artist-1" }])).toEqual([accepted]);
+  });
   it("covers every documented status", () => {
     expect(CHALLENGE_STATUSES).toEqual([
       "pending",

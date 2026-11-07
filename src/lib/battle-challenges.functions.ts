@@ -8,6 +8,7 @@ import {
   canDeclineChallenge,
   canRespondToChallenge,
   canStartChallenge,
+  confirmedMatchups,
 } from "@/lib/battle-challenges";
 
 const genreSchema = z.enum(BATTLE_GENRES);
@@ -37,7 +38,7 @@ async function profileSummary(supabase: any, ids: string[]): Promise<Map<string,
   return map;
 }
 
-async function notify(userIds: string[], n: { actorId: string; type: string; title: string; body?: string | null; link?: string | null }) {
+async function notify(userIds: string[], n: { actorId: string; type: string; title: string; body?: string | null; link?: string | null; sourceEvent?: string; streamId?: string }) {
   const { notifyBattleUsers } = await import("@/lib/battle-notifications.server");
   await notifyBattleUsers(userIds, n);
 }
@@ -182,7 +183,7 @@ export const cancelBattleChallenge = createServerFn({ method: "POST" })
 export const listHostBattleChallenges = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({ status: z.enum(CHALLENGE_STATUSES).nullable().default(null) }).parse(input ?? {}),
+    z.object({ status: z.enum(CHALLENGE_STATUSES).nullable().default(null), confirmedOnly: z.boolean().default(false) }).parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as Ctx;
@@ -193,11 +194,12 @@ export const listHostBattleChallenges = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(100);
     if (data.status) q = q.eq("status", data.status);
+    if (data.confirmedOnly) q = q.in("status", ["accepted", "scheduled"]);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     const ids = Array.from(new Set((rows ?? []).flatMap((c: any) => [c.challenger_id, c.challenged_id]))) as string[];
     const profiles = await profileSummary(supabase, ids);
-    return { challenges: withProfiles(rows ?? [], profiles) };
+    return { challenges: withProfiles(data.confirmedOnly ? confirmedMatchups(rows ?? []) : rows ?? [], profiles) };
   });
 
 /** Host/admin declines a proposed matchup. */
@@ -240,13 +242,15 @@ export const scheduleBattleChallenge = createServerFn({ method: "POST" })
       .eq("id", data.challengeId)
       .maybeSingle();
     if (!c) throw new Error("Challenge not found");
-    if (!canDeclineChallenge(c.status)) throw new Error("This challenge can no longer be scheduled");
+    if (!canStartChallenge(c.status)) throw new Error("Both artists must accept before scheduling");
     const when = new Date(data.scheduledAt);
     if (when.getTime() < Date.now() - 60_000) throw new Error("Pick a time in the future");
     const { error } = await supabase
       .from("battle_challenges")
       .update({ status: "scheduled", scheduled_at: when.toISOString() })
-      .eq("id", c.id);
+      .eq("id", c.id)
+      .in("status", ["accepted", "scheduled"])
+      .select("id").single();
     if (error) throw new Error(error.message);
     const whenText = when.toLocaleString("en-US", { dateStyle: "full", timeStyle: "short", timeZone: "America/Chicago" });
     await notify([c.challenger_id, c.challenged_id], {
@@ -254,6 +258,7 @@ export const scheduleBattleChallenge = createServerFn({ method: "POST" })
       type: "battle_challenge",
       title: "Battle scheduled",
       body: `Your ${c.genre} battle is scheduled for ${whenText} CT.`,
+      sourceEvent: `battle-scheduled:${c.id}:${when.toISOString()}`,
     });
     return { ok: true };
   });
@@ -262,7 +267,14 @@ export const scheduleBattleChallenge = createServerFn({ method: "POST" })
  *  on the host's own live room so it appears in the Battle Arena. */
 export const startBattleChallenge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ challengeId: z.string().uuid() }).parse(input))
+  .inputValidator((input) => z.object({
+    challengeId: z.string().uuid(),
+    streamId: z.string().uuid().optional(),
+    totalRounds: z.number().int().min(1).max(9).default(3),
+    roundSeconds: z.number().int().min(15).max(600).default(60),
+    trackAId: z.string().uuid().optional(),
+    trackBId: z.string().uuid().optional(),
+  }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as Ctx;
     if (!(await isHostOrAdmin(supabase, userId))) throw new Error("Only hosts and admins can start battles");
@@ -278,54 +290,30 @@ export const startBattleChallenge = createServerFn({ method: "POST" })
       throw new Error("Both artists must agree before the battle can start");
     }
 
-    const { data: streamId, error: sErr } = await supabase.rpc("get_or_create_profile_stream");
-    if (sErr || !streamId) throw new Error(sErr?.message ?? "Could not open your battle room");
-    const { data: live } = await supabase
-      .from("battle_matches")
-      .select("id")
-      .eq("stream_id", streamId)
-      .eq("status", "live")
-      .maybeSingle();
-    if (live) throw new Error("A battle is already live on your stream — finish it first");
-
-    const profiles = await profileSummary(supabase, [c.challenger_id, c.challenged_id]);
-    const { data: match, error } = await supabase
-      .from("battle_matches")
-      .insert({
-        stream_id: streamId,
-        host_id: userId,
-        artist_a_id: c.challenger_id,
-        artist_b_id: c.challenged_id,
-        artist_a_name: profiles.get(c.challenger_id)?.name ?? "Artist",
-        artist_b_name: profiles.get(c.challenged_id)?.name ?? "Artist",
-        total_rounds: 3,
-        round_seconds: 60,
-        genre: c.genre,
-        status: "pending",
-      })
-      .select("id")
-      .single();
+    let streamId = data.streamId;
+    if (!streamId) {
+      const { data: ownStream, error: sErr } = await supabase.rpc("get_or_create_profile_stream");
+      if (sErr || !ownStream) throw new Error(sErr?.message ?? "Could not open your battle room");
+      streamId = ownStream as string;
+    }
+    const { data: matchId, error } = await supabase.rpc("prepare_confirmed_battle", {
+      _challenge_id: c.id, _stream_id: streamId,
+      _rounds: data.totalRounds, _seconds: data.roundSeconds,
+      _track_a: data.trackAId ?? null, _track_b: data.trackBId ?? null,
+    });
     if (error) throw new Error(error.message);
-
-    // Both artists already agreed through the challenge flow — pre-set the
-    // genre agreement flags so the host can open round 1 immediately. The
-    // genre guard trigger only allows this through the host-only RPC.
-    const { error: aErr } = await supabase.rpc("battle_challenge_mark_agreed", { _match_id: match.id });
-    if (aErr) throw new Error(aErr.message);
-
-    const { error: uErr } = await supabase
-      .from("battle_challenges")
-      .update({ status: "live", match_id: match.id, stream_id: streamId })
-      .eq("id", c.id);
-    if (uErr) throw new Error(uErr.message);
-
+    if (!matchId) throw new Error("Could not prepare the confirmed matchup");
+    const { runBattleEvent } = await import("@/lib/battle-engine.functions");
+    await runBattleEvent(supabase, userId, { matchId, type: "START_ROUND" });
+    const { data: stream } = await supabase.from("streams").select("room_name").eq("id", streamId).maybeSingle();
     await notify([c.challenger_id, c.challenged_id], {
       actorId: userId,
       type: "battle_challenge",
       title: "Your battle is starting",
       body: `The host started your ${c.genre} battle. Head to the Battle Arena now.`,
+      link: stream?.room_name ? `/play/${encodeURIComponent(stream.room_name)}` : "/play",
+      streamId,
+      sourceEvent: `battle-started:${matchId}`,
     });
-
-    const { data: stream } = await supabase.from("streams").select("room_name").eq("id", streamId).maybeSingle();
-    return { ok: true, matchId: match.id, roomName: (stream?.room_name as string | null) ?? null };
+    return { ok: true, matchId, roomName: (stream?.room_name as string | null) ?? null };
   });

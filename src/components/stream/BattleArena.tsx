@@ -21,6 +21,9 @@ import { HypePassPanel } from "./HypePassPanel";
 import { createSnapshotGate } from "@/lib/battle-interactions";
 import { bothBattleSongsFinished } from "@/lib/battle-voting";
 import { advancePlayQueue } from "@/lib/play.functions";
+import { startBattleChallenge } from "@/lib/battle-challenges.functions";
+import { ConfirmedBattleMatchups, type ConfirmedMatchup } from "./ConfirmedBattleMatchups";
+import { Button } from "@/components/ui/button";
 
 type RoomState = Awaited<ReturnType<typeof getBattleRoomState>>;
 
@@ -969,7 +972,7 @@ function ArtistSide({
   );
 }
 
-function CreateBattleDialog({
+export function CreateBattleDialog({
   streamId,
   participants,
   onClose,
@@ -978,6 +981,7 @@ function CreateBattleDialog({
   initialA,
   initialB,
   initialGenre,
+  initialChallenge,
   onSaved,
   onOptimistic,
   onReconcile,
@@ -990,15 +994,18 @@ function CreateBattleDialog({
   initialA?: string;
   initialB?: string;
   initialGenre?: string;
+  initialChallenge?: ConfirmedMatchup;
   onSaved?: () => void;
   onOptimistic?: (a: string, b: string) => void;
   onReconcile?: () => void;
 }) {
   const createFn = useServerFn(createBattleMatch);
   const updateFn = useServerFn(updateBattleArtists);
-  const [a, setA] = useState<string>(initialA || participants[0]?.user_id || "");
-  const [b, setB] = useState<string>(initialB || participants[1]?.user_id || "");
-  const [genre, setGenre] = useState<string>(initialGenre ?? "");
+  const startChallengeFn = useServerFn(startBattleChallenge);
+  const [confirmed, setConfirmed] = useState<ConfirmedMatchup | null>(initialChallenge ?? null);
+  const [a, setA] = useState<string>(initialChallenge?.challenger_id || initialA || participants[0]?.user_id || "");
+  const [b, setB] = useState<string>(initialChallenge?.challenged_id || initialB || participants[1]?.user_id || "");
+  const [genre, setGenre] = useState<string>(initialChallenge?.genre ?? initialGenre ?? "");
   const [rounds, setRounds] = useState(3);
   const [seconds, setSeconds] = useState(60);
   const [busy, setBusy] = useState(false);
@@ -1097,6 +1104,13 @@ function CreateBattleDialog({
         toast.success("Matchup updated");
         onSaved?.();
         return;
+      } else if (confirmed) {
+        await startChallengeFn({ data: {
+          challengeId: confirmed.id, streamId, totalRounds: rounds, roundSeconds: seconds,
+          trackAId: trackA || undefined, trackBId: trackB || undefined,
+        } });
+        toast.success("Battle started — both artists notified");
+        onSaved?.();
       } else {
         await createFn({
           data: {
@@ -1132,17 +1146,24 @@ function CreateBattleDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
       <div
-        className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d0d18] p-5"
+        className="max-h-[85dvh] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-popover p-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white">
           <Trophy className="h-4 w-4 text-[#0000FF]" /> {isEdit ? "Edit Matchup" : "Create 1v1 Battle"}
         </div>
         <div className="space-y-3">
+          {!isEdit && <ConfirmedBattleMatchups selectedId={confirmed?.id ?? null} onSelect={(c) => {
+            setConfirmed(c);
+            setTrackA(""); setTrackB("");
+            if (c) { setA(c.challenger_id); setB(c.challenged_id); setGenre(c.genre); }
+          }} />}
+          {confirmed && <Button size="sm" variant="ghost" onClick={() => setConfirmed(null)}>Manual matchup</Button>}
           <label className="block text-xs text-white/70">
             Battle genre <span className="text-[#00E6FF]">*</span>
             <select
               value={genre}
+              disabled={!!confirmed}
               onChange={(e) => setGenre(e.target.value)}
               className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-2 py-2 text-base sm:text-sm text-white"
             >
@@ -1153,7 +1174,7 @@ function CreateBattleDialog({
               Both artists must agree to this genre and submit music that fits it before voting opens.
             </span>
           </label>
-          <ArtistSelect label="Artist A" value={a} onChange={setA} participants={participants} exclude={b} />
+          {!confirmed && <ArtistSelect label="Artist A" value={a} onChange={setA} participants={participants} exclude={b} />}
           <TrackSelect
             label="Artist A track"
             value={trackA}
@@ -1162,7 +1183,7 @@ function CreateBattleDialog({
             loading={loadingA}
             artistSelected={!!a}
           />
-          <ArtistSelect label="Artist B" value={b} onChange={setB} participants={participants} exclude={a} />
+          {!confirmed && <ArtistSelect label="Artist B" value={b} onChange={setB} participants={participants} exclude={a} />}
           <TrackSelect
             label="Artist B track"
             value={trackB}
@@ -1215,13 +1236,12 @@ function CreateBattleDialog({
           >
             {confirming ? "Back" : "Cancel"}
           </button>
-          <button
+          <Button
             onClick={submit} disabled={busy}
-            className="rounded-md px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg, #0000FF, #00E6FF)" }}
+            size="sm"
           >
-            {busy ? "Saving…" : isEdit ? (confirming ? "Confirm save" : "Save matchup") : "Create battle"}
-          </button>
+            {busy ? "Saving…" : isEdit ? (confirming ? "Confirm save" : "Save matchup") : confirmed ? "Start confirmed battle" : "Create battle"}
+          </Button>
         </div>
       </div>
       {uploadOpen && (

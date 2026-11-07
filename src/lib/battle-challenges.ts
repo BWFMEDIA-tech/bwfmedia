@@ -23,6 +23,17 @@ export function canStartChallenge(status: string): boolean {
   return status === "accepted" || status === "scheduled";
 }
 
+export function confirmedMatchups<T extends { challenger_id: string; challenged_id: string; genre: string; status: string }>(rows: T[]): T[] {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    if (!canStartChallenge(row.status)) return false;
+    const key = [...[row.challenger_id, row.challenged_id].sort(), row.genre].join(":");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 /** Either artist can cancel before the battle goes live. */
 export function canCancelChallenge(status: string): boolean {
   return status === "pending" || status === "accepted" || status === "scheduled";

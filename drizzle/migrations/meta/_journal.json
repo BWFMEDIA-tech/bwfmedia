@@ -344,6 +344,20 @@
       "when": 1793941475881,
       "tag": "0048_push_music_visibility_and_event_authority",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1794020057473,
+      "tag": "0049_confirmed_challenge_battle_workflow",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794020287791,
+      "tag": "0050_challenge_confirmation_integrity",
+      "breakpoints": true
     }
   ]
 }
