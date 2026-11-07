@@ -106,14 +106,20 @@ export function useAuth(): AuthState {
     isAuthenticated: !!user,
     signOut: async () => {
       // Shared devices must stop receiving the previous account's private alerts.
-      if ("serviceWorker" in navigator) {
-        const registration = await navigator.serviceWorker.getRegistration("/push/");
-        const subscription = await registration?.pushManager.getSubscription();
-        if (subscription) {
-          const { error } = await supabase.from("web_push_subscriptions").delete().eq("endpoint", subscription.endpoint).eq("user_id", user?.id ?? "");
-          if (error) throw new Error("Couldn't disconnect notifications; please try signing out again");
-          await subscription.unsubscribe();
+      try {
+        if ("serviceWorker" in navigator) {
+          const registration = await Promise.race([
+            navigator.serviceWorker.getRegistration("/push/"),
+            new Promise<undefined>((r) => setTimeout(() => r(undefined), 2000)),
+          ]);
+          const subscription = await registration?.pushManager.getSubscription();
+          if (subscription) {
+            await supabase.from("web_push_subscriptions").delete().eq("endpoint", subscription.endpoint).eq("user_id", user?.id ?? "");
+            await subscription.unsubscribe();
+          }
         }
+      } catch (e) {
+        console.warn("Push cleanup failed during sign-out", e);
       }
       await supabase.auth.signOut();
     },

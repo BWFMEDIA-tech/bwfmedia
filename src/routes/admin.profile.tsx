@@ -171,7 +171,7 @@ function AdminProfilePage() {
               <div>Last sign in: {data?.lastSignInAt ? new Date(data.lastSignInAt).toLocaleString() : "—"}</div>
             </div>
             <button
-              onClick={() => auth.signOut()}
+              onClick={async () => { try { await auth.signOut(); } finally { window.location.replace("/admin/login"); } }}
               className="mt-4 w-full rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 hover:bg-red-500/20"
             >
               Sign out

@@ -354,7 +354,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   <Settings className="h-4 w-4" /> System Settings
                 </Link>
                 <button
-                  onClick={() => { auth.signOut(); navigate({ to: "/" }); }}
+                  onClick={async () => { try { await auth.signOut(); } finally { navigate({ to: "/admin/login", replace: true }); } }}
                   className="flex w-full items-center gap-2 border-t border-white/5 px-3 py-2.5 text-sm text-red-300 hover:bg-red-500/10"
                 >
                   <LogOut className="h-4 w-4" /> Sign out
