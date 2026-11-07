@@ -45,6 +45,14 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
     finally { setBusy(false); }
   };
   const profile = (id: string) => state.data?.profiles.find(p => p.id === id);
+  const slotArtist = (id: string, side: 'a' | 'b') => {
+    const p = profile(id);
+    const name = p?.stage_name || p?.display_name || 'Artist';
+    return <Link to="/artist/$id" params={{ id }} className="fsq-artist" data-side={side}>
+      <span className="fsq-ring" data-side={side}><SignedImg src={p?.avatar_url ?? undefined} alt={name} /></span>
+      <span className="min-w-0"><span className="fsq-name">{name}</span><span className="fsq-genre">{p?.genre || '—'}</span></span>
+    </Link>;
+  };
   const artist = (id: string) => {
     const p = profile(id);
     const name = p?.stage_name || p?.display_name || 'Artist';
