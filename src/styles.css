@@ -396,6 +396,27 @@
   html { scroll-behavior: smooth; }
 }
 
+/* Native rails keep browser momentum and axis locking; proximity avoids forced stops. */
+:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll) {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y pinch-zoom;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+}
+:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll) > * {
+  scroll-snap-stop: normal;
+}
+:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll)[data-card-dragging] {
+  cursor: grabbing;
+  user-select: none;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html, :is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll) { scroll-behavior: auto; }
+}
+
 @layer utilities {
   .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
   .font-brush { font-family: var(--font-brush); letter-spacing: 0.02em; }
