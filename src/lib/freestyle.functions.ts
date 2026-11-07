@@ -29,7 +29,9 @@ export const startFreestyle = createServerFn({ method: 'POST' })
   .inputValidator(input => streamInput.extend({ artistA: z.string().uuid(), artistB: z.string().uuid(), duration: z.number().int().min(30).max(900) }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: stream, error: streamError } = await context.supabase.from('streams').select('host_id,room_name,status').eq('id', data.streamId).single();
-    if (streamError || !stream || stream.host_id !== context.userId || stream.status !== 'live') throw new Error('Only the live stream owner can start freestyle battles');
+    const { data: admin } = await context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'admin' });
+    const { data: host } = await context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'host' });
+    if (streamError || !stream || stream.status !== 'live' || !(admin || (host && stream.host_id === context.userId))) throw new Error('Only the authorized host or admin can start freestyle battles');
     const key = process.env['LIVEKIT_API_KEY'];
     const secret = process.env['LIVEKIT_API_SECRET'];
     const url = process.env['LIVEKIT_URL'];
@@ -44,6 +46,47 @@ export const startFreestyle = createServerFn({ method: 'POST' })
     const { data: id, error } = await context.supabase.rpc('start_freestyle_battle', { _stream_id: data.streamId, _artist_a: data.artistA, _artist_b: data.artistB, _duration: data.duration });
     if (error) throw new Error(error.message);
     return id;
+  });
+
+export const getFreestyleQueue = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: challenges, error } = await context.supabase.from('freestyle_challenges').select('*').in('status', ['pending', 'accepted', 'scheduled', 'live']).order('created_at');
+    if (error) throw new Error('Could not load freestyle queue');
+    const ids = [...new Set((challenges ?? []).flatMap(c => [c.artist_a_id, c.artist_b_id]))];
+    const { data: profiles, error: profileError } = ids.length ? await context.supabase.from('public_profiles').select('id,display_name,stage_name,avatar_url,genre').in('id', ids) : { data: [], error: null };
+    if (profileError) throw new Error('Could not load artist profiles');
+    const [artist, host, admin] = await Promise.all(['artist', 'host', 'admin'].map(role => context.supabase.rpc('has_role', { _user_id: context.userId, _role: role as 'artist' | 'host' | 'admin' })));
+    return { challenges: challenges ?? [], profiles: profiles ?? [], isArtist: artist.data === true, isHost: host.data === true, isAdmin: admin.data === true };
+  });
+
+export const submitFreestyleChallenge = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator(input => z.object({ opponent: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc('submit_freestyle_challenge', { _opponent: data.opponent });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+export const respondFreestyleChallenge = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator(input => z.object({ id: z.string().uuid(), accept: z.boolean() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc('respond_freestyle_challenge', { _id: data.id, _accept: data.accept });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+export const controlFreestyleChallenge = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator(input => z.object({ id: z.string().uuid(), action: z.enum(['schedule', 'cancel']), streamId: z.string().uuid().optional(), scheduledAt: z.string().datetime().optional() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc('control_freestyle_challenge', { _id: data.id, _action: data.action, _stream_id: data.streamId, _scheduled_at: data.scheduledAt });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+export const endFreestyle = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator(input => z.object({ battleId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc('end_freestyle_battle', { _id: data.battleId });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const voteFreestyle = createServerFn({ method: 'POST' })

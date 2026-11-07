@@ -393,6 +393,20 @@
       "when": 1794032920573,
       "tag": "0055_freestyle_bounded_deadline_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1794034509067,
+      "tag": "0056_freestyle_ten_slot_challenge_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1794034558182,
+      "tag": "0057_freestyle_authorized_queue_launch",
+      "breakpoints": true
     }
   ]
 }

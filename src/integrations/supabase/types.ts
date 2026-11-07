@@ -2346,6 +2346,60 @@ export type Database = {
           },
         ]
       }
+      freestyle_challenges: {
+        Row: {
+          artist_a_id: string
+          artist_b_id: string
+          battle_id: string | null
+          created_at: string
+          id: string
+          scheduled_at: string | null
+          slot_number: number | null
+          status: string
+          stream_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          artist_a_id: string
+          artist_b_id: string
+          battle_id?: string | null
+          created_at?: string
+          id?: string
+          scheduled_at?: string | null
+          slot_number?: number | null
+          status?: string
+          stream_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          artist_a_id?: string
+          artist_b_id?: string
+          battle_id?: string | null
+          created_at?: string
+          id?: string
+          scheduled_at?: string | null
+          slot_number?: number | null
+          status?: string
+          stream_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freestyle_challenges_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "freestyle_battles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "freestyle_challenges_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       freestyle_votes: {
         Row: {
           battle_id: string
@@ -7039,6 +7093,15 @@ export type Database = {
           retry_after_secs: number
         }[]
       }
+      control_freestyle_challenge: {
+        Args: {
+          _action: string
+          _id: string
+          _scheduled_at?: string
+          _stream_id?: string
+        }
+        Returns: undefined
+      }
       create_label: {
         Args: {
           _bio?: string
@@ -7055,6 +7118,7 @@ export type Database = {
       }
       deliver_release: { Args: { _release_id: string }; Returns: Json }
       dequeue_matchmaking: { Args: never; Returns: boolean }
+      end_freestyle_battle: { Args: { _id: string }; Returns: undefined }
       enqueue_matchmaking: {
         Args: { _genre?: string; _tier?: string }
         Returns: string
@@ -7351,6 +7415,10 @@ export type Database = {
         Returns: undefined
       }
       reset_round_votes: { Args: { _round_id: string }; Returns: undefined }
+      respond_freestyle_challenge: {
+        Args: { _accept: boolean; _id: string }
+        Returns: undefined
+      }
       reverse_host_earning: {
         Args: { _earning_id: string; _reason: string }
         Returns: undefined
@@ -7402,6 +7470,10 @@ export type Database = {
           _session_id: string
           _shipping: Json
         }
+        Returns: string
+      }
+      submit_freestyle_challenge: {
+        Args: { _opponent: string }
         Returns: string
       }
       update_stream_playback_progress: {
