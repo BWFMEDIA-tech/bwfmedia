@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { FreestyleQueue } from "@/components/play/FreestyleQueue";
+import { PlayProfileHero } from "@/components/play/PlayProfileHero";
 import { useLiveStageFeed } from "@/lib/use-live-stage-navigation";
 import { stageDestination } from "@/lib/live-stage-navigation";
 
@@ -28,6 +29,7 @@ function PlayArenaDashboard() {
         <div><p className="mb-2 text-sm font-semibold text-primary">TUNEVIO</p><h1 className="text-3xl font-bold sm:text-4xl">Play Arena</h1></div>
         <Button asChild><Link to="/play/challenges"><Swords />Challenge an artist</Link></Button>
       </header>
+      <PlayProfileHero />
       <FreestyleQueue overview />
       {feed.isError && <div role="alert" className="flex items-center gap-3 text-sm text-muted-foreground">Live performances are temporarily unavailable.<Button variant="link" onClick={feed.retry}>Retry</Button></div>}
       {live.length > 0 && <section aria-label="Active live performances" className="space-y-6">
