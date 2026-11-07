@@ -7,7 +7,7 @@ export function AssistantLauncher({ raised }: { raised: boolean }) {
   return (
     <>
       {open && (
-        <div className="fixed inset-x-2 bottom-2 top-20 z-50 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl md:inset-x-auto md:right-6 md:top-auto md:bottom-6 md:h-[640px] md:w-[400px]">
+        <div className="tunevio-chat-window fixed right-4 z-[95] flex h-[min(70vh,620px)] w-[min(360px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-border bg-background shadow-2xl md:right-6">
           <AssistantChat compact onNavigate={() => setOpen(false)} onClose={() => setOpen(false)} />
         </div>
       )}
