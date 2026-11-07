@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
-  ArrowLeft,
   User,
   LogOut,
   Settings,
@@ -104,7 +103,6 @@ export function SiteHeader() {
   const auth = useAuth();
   const stage = useLiveStageNavigation();
   const navigate = useNavigate();
-  const router = useRouter();
   const pathname = useActivePath();
   const isAdmin = auth.roles.includes("admin");
   const isManager = auth.roles.includes("manager");
