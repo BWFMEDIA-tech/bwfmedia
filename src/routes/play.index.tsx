@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 import { StreamThumbnailImage } from "@/components/stream/StreamThumbnailImage";
 import { FreestyleQueue } from "@/components/play/FreestyleQueue";
+import { PlayProfileHero } from "@/components/play/PlayProfileHero";
 import { useLiveStageFeed } from "@/lib/use-live-stage-navigation";
 import { stageDestination } from "@/lib/live-stage-navigation";
 
