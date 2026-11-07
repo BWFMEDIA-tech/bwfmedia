@@ -63,15 +63,16 @@ export const submitBattleChallenge = createServerFn({ method: "POST" })
     const { supabase, userId } = context as Ctx;
     if (data.challengedId === userId) throw new Error("You can't challenge yourself");
 
-    // Both participants must be artists.
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("user_id, role")
-      .in("user_id", [userId, data.challengedId])
-      .eq("role", "artist");
-    const artistIds = new Set((roles ?? []).map((r: any) => r.user_id));
-    if (!artistIds.has(userId)) throw new Error("Only artist accounts can send battle challenges");
-    if (!artistIds.has(data.challengedId)) throw new Error("That account is not an artist");
+    // Role rows are self/admin-only. Use the existing server-authoritative
+    // boolean check rather than interpreting a hidden opponent row as absent.
+    const [sender, opponent] = await Promise.all(
+      [userId, data.challengedId].map(id =>
+        supabase.rpc("has_role", { _user_id: id, _role: "artist" }),
+      ),
+    );
+    if (sender.error || opponent.error) throw new Error("Unable to verify artist eligibility. Please try again.");
+    if (sender.data !== true) throw new Error("Only artist accounts can send battle challenges");
+    if (opponent.data !== true) throw new Error("That account is not an artist");
 
     const { data: challenge, error } = await supabase
       .from("battle_challenges")
