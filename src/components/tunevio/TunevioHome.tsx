@@ -2,7 +2,6 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
-  Bell,
   Clapperboard,
   Clock,
   Flame,
@@ -123,13 +122,6 @@ export function TunevioHome() {
               />
             </form>
             <div className="flex shrink-0 items-center gap-2">
-              <Link
-                to="/notifications"
-                aria-label="Notifications"
-                className="grid h-10 w-10 place-items-center rounded-full border border-tv-line text-white/70 transition hover:bg-white/10 hover:text-white"
-              >
-                <Bell className="h-4 w-4" />
-              </Link>
               {auth.isAuthenticated ? (
                 <Link to="/settings" aria-label="Your profile" className="block">
                   {auth.avatarUrl ? (
