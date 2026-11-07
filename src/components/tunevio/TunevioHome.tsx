@@ -122,8 +122,8 @@ export function TunevioHome() {
               />
             </form>
             <div className="flex shrink-0 items-center gap-2">
-              {auth.isAuthenticated ? (
-                <Link to="/profile" aria-label="Your profile" className="block">
+              {auth.isAuthenticated && auth.user ? (
+                <Link to="/artist/$id" params={{ id: auth.user.id }} aria-label="Your profile" className="block">
                   {auth.avatarUrl ? (
                     <SignedImg
                       src={auth.avatarUrl}
