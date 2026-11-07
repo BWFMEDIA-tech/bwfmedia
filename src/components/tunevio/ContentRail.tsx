@@ -3,13 +3,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export type RailSize = "sm" | "md" | "lg" | "wide";
+export type RailSize = "sm" | "md" | "lg" | "wide" | "xl";
 
 const WIDTHS: Record<RailSize, string> = {
   sm: "w-[130px] sm:w-[150px]",
   md: "w-[150px] sm:w-[172px] lg:w-[186px]",
   lg: "w-[200px] sm:w-[230px]",
   wide: "w-[260px] sm:w-[320px]",
+  xl: "w-[220px] sm:w-[280px] lg:w-[360px]",
 };
 
 export function ContentRail({
