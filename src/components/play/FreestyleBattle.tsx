@@ -49,6 +49,8 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
   const state = useQuery({ queryKey: key, queryFn: () => read({ data: { streamId } }), enabled: !!auth.user, refetchInterval: 5000 });
   const battle = state.data?.battle;
   const [now, setNow] = useState(0);
+  const [clockOffset, setClockOffset] = useState(0);
+  useEffect(() => { if (state.data) setClockOffset(state.data.serverTime - Date.now()); }, [state.data]);
   const [artistA, setArtistA] = useState('');
   const [artistB, setArtistB] = useState('');
   const [duration, setDuration] = useState(180);
@@ -63,7 +65,7 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
     const channel = supabase.channel(`freestyle-${streamId}-${crypto.randomUUID()}`).on('postgres_changes', { event: '*', schema: 'public', table: 'freestyle_battles', filter: `stream_id=eq.${streamId}` }, () => { void queryClient.invalidateQueries({ queryKey: ['freestyle', streamId] }); }).subscribe();
     return () => { void supabase.removeChannel(channel); };
   }, [streamId, auth.user?.id, queryClient]);
-  const remaining = battle ? Math.max(0, Math.ceil((Date.parse(battle.ends_at) - now) / 1000)) : duration;
+  const remaining = battle ? Math.max(0, Math.ceil((Date.parse(battle.ends_at) - now - clockOffset) / 1000)) : duration;
   useEffect(() => {
     if (battle?.status === 'live' && remaining === 0) void queryClient.invalidateQueries({ queryKey: ['freestyle', streamId] });
   }, [battle?.id, battle?.status, remaining === 0, streamId, queryClient]);
@@ -120,10 +122,10 @@ function ArtistCamera({ artistId, name, photo, hostId, artistA, artistB }: { art
   const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: false }], { onlySubscribed: false });
   const participants = useParticipants();
   const track = tracks.find(t => t.participant.identity === artistId);
-  const live = !!artistId && participants.some(p => p.identity === artistId);
+  const live = !!artistId && participants.some(p => p.identity === artistId) && !!track?.publication && !track.publication.isMuted;
   const viewers = new Set(participants.filter(p => ![hostId, artistA, artistB].includes(p.identity) && !p.identity.startsWith('preview_')).map(p => p.identity)).size;
   return <div className="freestyle-camera relative bg-muted">
-    {track && 'publication' in track && !track.publication?.isMuted ? <VideoTrack trackRef={track} className="h-full w-full object-cover" /> : photo ? <SignedImg src={photo} alt={name} className="h-full w-full object-contain" /> : <div className="grid h-full place-items-center"><CameraOff className="h-10 w-10 text-muted-foreground" /></div>}
+    {track && track.publication && !track.publication.isMuted ? <VideoTrack trackRef={{ participant: track.participant, publication: track.publication, source: Track.Source.Camera }} className="h-full w-full object-cover" /> : photo ? <SignedImg src={photo} alt={name} className="h-full w-full object-contain" /> : <div className="grid h-full place-items-center"><CameraOff className="h-10 w-10 text-muted-foreground" /></div>}
     <div className="absolute bottom-2 left-2 flex items-center gap-3 rounded-sm bg-background/90 px-2 py-1 text-xs"><span className="flex items-center gap-1"><Radio className="h-3 w-3" />{live ? 'LIVE' : artistId ? 'Offline' : 'Waiting'}</span><span className="flex items-center gap-1"><Eye className="h-3 w-3" />{viewers} viewers</span></div>
   </div>;
 }

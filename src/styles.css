@@ -126,8 +126,10 @@
 .freestyle-count { border: 1px solid var(--freestyle-side); border-radius: 6px; background: var(--background); }
 .freestyle-vs { position: absolute; left: 50%; top: 32%; transform: translate(-50%,-50%); display: grid; place-items: center; width: 56px; height: 56px; border: 1px solid var(--border); border-radius: 50%; background: var(--background); font-weight: 900; font-size: 23px; color: var(--foreground); }
 @media (max-width: 639px) {
-  .freestyle-grid { grid-template-columns: minmax(0,1fr); gap: 3rem; }
-  .freestyle-vs { top: 50%; width: 36px; height: 36px; font-size: 17px; }
+  .freestyle-grid { grid-template-columns: minmax(0,1fr); gap: 1rem; }
+  .freestyle-side[data-side="a"] { order: 1; }
+  .freestyle-side[data-side="b"] { order: 3; }
+  .freestyle-vs { order: 2; position: static; transform: none; justify-self: center; width: 36px; height: 36px; font-size: 17px; }
 }
 
 .artist-status-beacon { position: absolute; right: 0; bottom: 0; z-index: 2; width: 11px; height: 11px; border: 2px solid var(--background); border-radius: 50%; background: var(--status-offline); pointer-events: auto; }
