@@ -66,3 +66,44 @@ it("manual skipping does not certify a song finished", async () => {
   expect(rows.battle_rounds[0].a_track_finished_at).toBeNull();
   expect(rows.battle_rounds[0].voting_status).toBe("closed");
 });
+
+it.each(["pending invitation", "accepted pending matchup"])("advances regular songs during a %s", async (kind) => {
+  rows.battle_matches[0].status = "pending";
+  rows.battle_matches[0].current_round_id = null;
+  rows.battle_matches[0].genre_agreed_b = kind === "accepted pending matchup";
+  rows.play_tracks = [
+    { id: "current", stream_id: "stream", status: "playing", battle_match_id: null },
+    { id: "next", stream_id: "stream", status: "queued", battle_match_id: null },
+  ];
+  expect(await finish("current")).toMatchObject({ next: "next" });
+  expect(rows.play_tracks[0].status).toBe("completed");
+  expect(rows.play_tracks[1].status).toBe("playing");
+  expect(rows.play_sessions[0].current_track_id).toBe("next");
+  expect(rows.battle_matches[0].status).toBe("pending");
+});
+
+it("allows host Next from an idle queue with a pending challenge", async () => {
+  rows.battle_matches[0].status = "pending";
+  rows.play_tracks = [{ id: "regular", stream_id: "stream", status: "queued", battle_match_id: null }];
+  expect(await finish()).toMatchObject({ next: "regular" });
+  expect(rows.play_sessions[0].current_track_id).toBe("regular");
+});
+
+it("holds regular songs when a battle is live even if the current song is not a battle track", async () => {
+  rows.play_tracks = [
+    { id: "current", stream_id: "stream", status: "playing", battle_match_id: null },
+    { id: "regular", stream_id: "stream", status: "queued", battle_match_id: null },
+  ];
+  expect(await finish("current")).toMatchObject({ next: null });
+  expect(rows.play_tracks[1].status).toBe("queued");
+  expect(rows.play_sessions[0].current_track_id).toBeNull();
+});
+
+it.each(["completed", "cancelled"])("resumes the held queue on manual Next after the battle is %s", async (status) => {
+  await finish("a");
+  await finish("b");
+  rows.battle_matches[0].status = status;
+  expect(rows.play_tracks[2].status).toBe("queued");
+  expect(await finish()).toMatchObject({ next: "regular" });
+  expect(rows.play_tracks[2].status).toBe("playing");
+});
