@@ -1,7 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { SettingsShell, Card } from "@/components/settings/SettingsShell";
-export const Route = createFileRoute("/settings/artist-info")({ component: () => (
-  <SettingsShell title="Artist Info" blurb="Press bio, label, hometown.">
-    <Card><div className="py-6 text-center text-sm text-white/50">Coming soon. Manage stage name and bio from the <a className="text-red-400" href="/settings/profile">Profile tab</a> for now.</div></Card>
-  </SettingsShell>
-)});
+import { createFileRoute, redirect } from "@tanstack/react-router";
+export const Route = createFileRoute("/settings/artist-info")({
+  head: () => ({ meta: [
+    { title: "Artist Information | Tunevio" },
+    { name: "description", content: "Update your existing Tunevio artist information." },
+    { property: "og:title", content: "Artist Information | Tunevio" },
+    { property: "og:description", content: "Update your existing Tunevio artist information." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  beforeLoad: () => { throw redirect({ to: "/settings/profile" }); },
+});

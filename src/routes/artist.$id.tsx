@@ -35,6 +35,7 @@ import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
 import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { useSignedVideoUrl } from "@/lib/video-urls";
 
@@ -299,18 +300,9 @@ function HeroBanner({
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
         <ProfileMessageButton artistId={artist.id} compact />
         {isOwner && !canUseTools ? (
-          <Link
-            to="/signup"
-            search={{ as: "artist" } as any}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
-            style={{
-              borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
-              background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
-              boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
-            }}
-          >
+          <ActivateArtistButton>
             Become an artist to go live
-          </Link>
+          </ActivateArtistButton>
         ) : isOwner ? (
           <>
             <Link

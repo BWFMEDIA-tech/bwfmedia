@@ -1,5 +1,11 @@
 # Roadmap
 
+## Existing artist profile activation
+- [x] Reuse the signed-in account for Become an Artist and Go Live activation through a confirmed-email, self-only idempotent role grant; no schema or auth configuration changes
+- [x] Prefill profile editors including stage name and primary genre; update only changed fields without new registration or duplicate profiles
+- [x] Fifteen activation/preservation/navigation regressions passed; signed-in 390px editor saves unchanged data with zero writes and Artist Info reopens the same saved fields; preview build OK
+- [ ] Verify actual role activation on a non-artist device; available test session is admin-only, so its roles were not modified
+
 ## Final physical-device Freestyle integration test
 - [x] Corrected private-role-row challenge rejection using existing authoritative has_role RPC; no roles/policies changed, 35 regression tests passed; actual device retry still pending
 - [x] User confirmed B accepted, both artists appear in the same numbered slot, A received the acceptance notification, and the host sees the accepted matchup; exact next-available numbering and A/B assignment still need observation

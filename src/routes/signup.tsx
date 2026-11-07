@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { accountErrorMessage } from "@/lib/account-access";
+import { useAuth } from "@/lib/auth-context";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [
@@ -19,6 +21,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
+  const auth = useAuth();
   const nav = useNavigate();
   const [step, setStep] = useState<"role" | "details">("role");
   const [role, setRole] = useState<"artist" | "listener" | "host" | null>(null);
@@ -44,6 +47,7 @@ function SignupPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (auth.user) return;
     if (!role || loading) return;
     // Strong password: 8+ chars, upper, lower, number
     const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -97,6 +101,13 @@ function SignupPage() {
       setLoading(false);
     }
   };
+
+  if (auth.loading) return <div className="grid min-h-96 place-items-center text-muted-foreground">Loading…</div>;
+  if (auth.user) return <div className="mx-auto max-w-md space-y-5 px-4 py-12 text-center">
+    <h1 className="text-2xl font-semibold">Your artist profile</h1>
+    <ActivateArtistButton>Continue to my artist profile</ActivateArtistButton>
+    <Link to="/settings/profile" className="block text-sm text-primary">Edit existing profile</Link>
+  </div>;
 
   return (
     <div className="relative min-h-screen bg-black text-bone flex items-center justify-center p-6 overflow-x-hidden">
