@@ -153,8 +153,8 @@ function RootComponent() {
   return (
         <QueryClientProvider client={queryClient}>
       <CartProvider>
-          <MediaSessionSync />
         <PlayerProvider>
+          <MediaSessionSync />
         <ArtistStatusProvider>
         <RealtimeHealthBanner />
         {isChrome && <SiteHeader />}
