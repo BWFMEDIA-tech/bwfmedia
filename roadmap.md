@@ -2,7 +2,8 @@
 
 ## Audience cannot hear
 - [x] Add the missing browser audio-unlock control to profile and Studio video stages; reuse it in audio stages without enabling audience microphones
-- [ ] Verify regression tests and audience playback; actual phone listening needs a connected host and audience devices
+- [x] Seventeen sound-unlock and microphone/audio regression tests passed; preview build OK and live listing loaded without runtime errors
+- [ ] Confirm actual audience listening on phones; requires a separate audience account/device without interrupting the live host
 
 ## 1v1 challenge notifications
 - [x] Connect direct genre challenges to the existing notification inbox and check notification write failures; restore five missing pending invitations
