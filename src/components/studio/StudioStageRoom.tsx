@@ -536,7 +536,9 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
               />
             );
           })}
-
+          {Array.from({ length: Math.max(0, MAX_MODS - Math.min(allModerators.length, MAX_MODS)) }).map((_, i) => (
+            <EmptySlot key={`m-${i}`} label="Mod slot" color="#C0C8D8" />
+          ))}
         </div>
       </div>
 
