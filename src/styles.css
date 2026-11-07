@@ -998,8 +998,8 @@
 html[data-music-player] body { padding-bottom: 96px; }
 :root { --tunevio-launcher-bottom: calc(env(safe-area-inset-bottom) + 76px); }
 .tunevio-floating-launcher { bottom: var(--tunevio-launcher-bottom); }
-.tunevio-chat-launcher { bottom: calc(var(--tunevio-launcher-bottom) + 68px); }
-.tunevio-chat-window { bottom: calc(var(--tunevio-launcher-bottom) + 136px); }
+.tunevio-chat-launcher { bottom: calc(var(--tunevio-launcher-bottom) + 60px); }
+.tunevio-chat-window { bottom: calc(var(--tunevio-launcher-bottom) + 120px); }
 html[data-music-player] { --tunevio-launcher-bottom: calc(var(--bwf-mobile-nav-h, env(safe-area-inset-bottom)) + 104px); }
 @media (min-width: 768px) {
   :root { --tunevio-launcher-bottom: 24px; }
