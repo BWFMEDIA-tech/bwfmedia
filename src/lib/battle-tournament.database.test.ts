@@ -34,6 +34,11 @@ describe.sequential("actual PostgreSQL tournament triggers", () => {
     await expect(challenge(3,3,2,"pending")).rejects.toThrow("pending or active opponent");
     await db.exec(`UPDATE battle_challenges SET status='cancelled' WHERE id='${artist(1001)}'`);
   });
+  it("does not start an unaccepted direct matchup", async () => {
+    await db.exec(`INSERT INTO battle_matches(id,host_id,artist_a_id,artist_b_id,genre) VALUES('${artist(2005)}','${artist(999)}','${artist(10)}','${artist(11)}','R&B')`);
+    await expect(db.exec(`UPDATE battle_matches SET status='live' WHERE id='${artist(2005)}'`)).rejects.toThrow("Both artists must accept");
+    await db.exec(`UPDATE battle_matches SET status='cancelled' WHERE id='${artist(2005)}'`);
+  });
   it("fills 20 slots, rejects the 21st, and reopens after cancellation", async () => {
     for(let n=10;n<30;n++) await challenge(n);
     await expect(challenge(30)).rejects.toThrow("20 battle slots");
@@ -68,6 +73,9 @@ describe.sequential("actual PostgreSQL tournament triggers", () => {
     await expect(db.query("SELECT start_new_battle_tournament()")).rejects.toThrow("Only hosts");
     await db.exec(`SELECT set_config('test.uid','${artist(999)}',false); SELECT start_new_battle_tournament();`);
     await challenge(43,81,84);
+  });
+  it("does not reset a tournament with an outstanding matchup", async () => {
+    await expect(db.query("SELECT start_new_battle_tournament()")).rejects.toThrow("Finish or cancel");
   });
   it("counts direct agreed matches once and blocks cross-path selections", async () => {
     await db.exec(`INSERT INTO battle_matches(id,host_id,artist_a_id,artist_b_id,genre) VALUES('${artist(2050)}','${artist(999)}','${artist(100)}','${artist(101)}','R&B');
