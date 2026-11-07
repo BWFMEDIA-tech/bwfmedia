@@ -226,9 +226,9 @@ export function LiveChat({
       onClick={() => setPopOut((v) => !v)}
       aria-label={popOut ? "Close live chat window" : "Open live chat window"}
       aria-expanded={popOut}
-      className="tunevio-chat-launcher fixed right-4 md:right-6 z-[45] flex h-14 w-14 items-center justify-center rounded-full border border-primary/50 bg-background text-primary shadow-lg transition hover:scale-105"
+      className="tunevio-chat-launcher fixed right-4 md:right-6 z-[45] flex h-12 w-12 items-center justify-center rounded-full border border-primary/50 bg-background text-primary shadow-lg transition hover:scale-105"
     >
-      {popOut ? <span className="text-xl font-bold leading-none">×</span> : <MessageCircle className="h-6 w-6" />}
+      {popOut ? <span className="text-lg font-bold leading-none">×</span> : <MessageCircle className="h-5 w-5" />}
     </Button>
     <aside
       className={cn(

@@ -16,9 +16,9 @@ export function AssistantLauncher({ raised }: { raised: boolean }) {
           type="button"
           aria-label="Open Tunevio AI Assistant"
           onClick={() => setOpen(true)}
-          className={`music-assistant-launcher fixed right-4 z-40 grid h-14 w-14 place-items-center rounded-full border border-primary/60 bg-background shadow-[0_0_24px_rgba(0,230,255,0.35)] transition-transform hover:scale-105 md:right-6 ${raised ? "tunevio-floating-launcher" : "bottom-4 md:bottom-6"}`}
+          className={`music-assistant-launcher fixed right-4 z-40 grid h-12 w-12 place-items-center rounded-full border border-primary/60 bg-background shadow-[0_0_24px_rgba(0,230,255,0.35)] transition-transform hover:scale-105 md:right-6 ${raised ? "tunevio-floating-launcher" : "bottom-4 md:bottom-6"}`}
         >
-          <AssistantRobot className="h-11 w-11" />
+          <AssistantRobot className="h-9 w-9" />
         </button>
       )}
     </>
