@@ -1,9 +1,9 @@
 # Roadmap
 
 ## 10-slot Freestyle challenge system
-- [ ] Enforce separate 10-slot capacity, one outstanding matchup, acceptance and authorized queue controls in the database
-- [ ] Add artist opponent selection and ten-slot board on Arena; host queue integrates with existing live freestyle video
-- [ ] Test lifecycle, capacity, permissions and mobile/desktop views; preserve song battles
+- [x] Enforce separate 10-slot capacity, one outstanding matchup, acceptance and authorized queue controls in the database
+- [x] Add artist opponent selection and ten-slot board on Arena; host queue integrates with existing live freestyle video
+- [x] Test lifecycle, capacity, permissions and mobile/desktop views; 23 Freestyle tests passed and ten slots render in the signed-in preview; preserve song battles
 - [ ] Verify two real connected artist devices and full inbox result flow without interrupting existing streams
 
 ## 1v1 Freestyle Battle
