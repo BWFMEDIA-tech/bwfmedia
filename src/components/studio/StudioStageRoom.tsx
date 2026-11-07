@@ -48,6 +48,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 const MAX_HOSTS = 5;
 const MAX_GUESTS = 20;
 const MAX_MODS = 5;
+const AUDIENCE_ROLES = ["listener", "green_room"];
 
 // BWF cinema palette — "Immersive Stage Cinema"
 const PURPLE = "#0000FF"; // brand magenta (primary, host)
@@ -180,7 +181,6 @@ export function StudioStageRoom({
     run: () => Promise<void>;
   }>(null);
 
-const AUDIENCE_ROLES = ["listener", "green_room"];
   // The primary host is always pinned to the first (left) slot; any other
   // hosts or co-hosts are added to the right in the order they joined.
   const hosts = participants
