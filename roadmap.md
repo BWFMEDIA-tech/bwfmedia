@@ -1,5 +1,10 @@
 # Roadmap
 
+## Existing artist profile activation
+- [ ] Reuse the signed-in account for Become an Artist and Go Live activation; preserve existing roles and profile data
+- [ ] Prefill profile editors and update only changed fields without new registration or duplicate profiles
+- [ ] Run preservation/activation regressions and verify the signed-in mobile profile flow
+
 ## Final physical-device Freestyle integration test
 - [x] Corrected private-role-row challenge rejection using existing authoritative has_role RPC; no roles/policies changed, 35 regression tests passed; actual device retry still pending
 - [x] User confirmed B accepted, both artists appear in the same numbered slot, A received the acceptance notification, and the host sees the accepted matchup; exact next-available numbering and A/B assignment still need observation
