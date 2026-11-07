@@ -7065,6 +7065,7 @@ export type Database = {
       finalize_expired_freestyle_battles: { Args: never; Returns: number }
       finalize_freestyle_battle: { Args: { _id: string }; Returns: undefined }
       finalize_room_earnings: { Args: { _stream_id: string }; Returns: Json }
+      freestyle_deadline_tick: { Args: never; Returns: undefined }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
       get_artist_earnings_summary: {
         Args: { _artist_id: string }
