@@ -219,7 +219,10 @@ function ProfileSettingsPage() {
     };
     const diff = changedFields(baseline.current, draft);
     if (Object.keys(diff).length) {
-      const patch = Object.fromEntries(Object.entries(diff).map(([key, value]) => [key, typeof value === "string" ? value.trim() || null : value]));
+      const patch: Partial<{ [K in keyof ProfileDraft]: ProfileDraft[K] | null }> = {
+        ...diff,
+        ...Object.fromEntries(Object.entries(diff).filter(([, value]) => typeof value === "string").map(([key, value]) => [key, String(value).trim() || null])),
+      };
       const { data: saved, error } = await supabase.from("profiles").update(patch).eq("id", user.id).select("id").single();
       if (error || !saved) throw error ?? new Error("Couldn't save your profile");
       baseline.current = { ...draft };
