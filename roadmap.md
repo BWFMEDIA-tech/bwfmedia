@@ -1,5 +1,11 @@
 # Roadmap
 
+## 20-slot 1v1 tournament rules
+- [ ] Enforce one outstanding opponent, atomic 20-slot capacity, and tournament-scoped loser elimination across challenge and direct Arena paths
+- [ ] Add real filled/available counters, selection locks, and host/admin new-tournament control
+- [ ] Preserve accepted-matchup launch and transactional acceptance/schedule/result inbox notifications
+- [ ] Run rule tests and verify signed-in tournament controls without disrupting current live sessions
+
 ## Accepted challenges → Create 1v1 Battle
 - [x] Show confirmed matchups with both profiles and genre in the existing Create Battle section; three already-accepted direct matchups linked
 - [x] Reuse host scheduling/start, automatically assign sides, and notify both artists
