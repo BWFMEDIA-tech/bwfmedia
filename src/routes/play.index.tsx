@@ -98,8 +98,8 @@ function PlayArenaDashboard() {
           </div>
         ) : null}
         <ChoosePath data={data} user={userStats ?? null} />
-        <GenreBattleBoard isAuthenticated={isAuthenticated} />
         {isAuthenticated && user?.id && <BattleChallenges userId={user.id} />}
+        <GenreBattleBoard isAuthenticated={isAuthenticated} />
         <LiveArenaStatus data={data} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <EarnXp />
