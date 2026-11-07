@@ -441,6 +441,11 @@ function BattleView({
         </div>
       </div>
 
+      {(match as any).genre && (
+        <div className="flex justify-center pt-2.5">
+          <span className="arena-neon-tag">{(match as any).genre}</span>
+        </div>
+      )}
       <GenreAgreementBar match={match} userId={userId} />
       {/* Unified live vote percentage tracker */}
       <VoteTracker
@@ -454,7 +459,10 @@ function BattleView({
         myVote={myVote}
         votingStatus={votingStatus}
       />
-      <div className="grid grid-cols-2 gap-0">
+      <div className="relative grid grid-cols-2 gap-0">
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 items-center">
+          <span className="arena-vs-bolt">VS</span>
+        </div>
         <ArtistSide
           side="a"
           artistId={match.artist_a_id as string | null}
@@ -600,9 +608,10 @@ function VoteTracker({
         </div>
 
         {/* Center VOTE hexagon */}
-        <div className="relative flex shrink-0 items-center justify-center">
+        <div className="relative flex shrink-0 flex-col items-center justify-center">
+          <Crown className="mb-0.5 h-4 w-4 text-[#7ef4ff] drop-shadow-[0_0_6px_rgba(0,230,255,0.9)]" />
           <div
-            className="flex h-12 w-20 items-center justify-center text-[11px] font-black tracking-widest text-white shadow-lg sm:h-14 sm:w-24 sm:text-sm"
+            className="arena-hex-glow flex h-12 w-20 items-center justify-center text-[11px] font-black tracking-widest text-white sm:h-14 sm:w-24 sm:text-sm"
             style={{
               clipPath:
                 "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
@@ -619,7 +628,7 @@ function VoteTracker({
             <span
               className="font-mono text-3xl font-black tabular-nums sm:text-4xl"
               style={{
-                background: "linear-gradient(135deg,#00E6FF,#ef4444)",
+                background: "linear-gradient(135deg,#e9d5ff,#a855f7)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -648,8 +657,8 @@ function VoteTracker({
           className="absolute inset-y-0 right-0 transition-[width] duration-700 ease-out"
           style={{
             width: `${bPct}%`,
-            background: "linear-gradient(90deg,#00E6FF,#ef4444)",
-            boxShadow: "0 0 18px rgba(239,68,68,0.6)",
+            background: "linear-gradient(90deg,#7c3aed,#c084fc)",
+            boxShadow: "0 0 18px rgba(168,85,247,0.6)",
           }}
         />
         <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/40" />
