@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Final physical-device Freestyle integration test
-- [ ] Diagnose and fix screenshot's "That account is not an artist" challenge rejection without changing roles or weakening authorization; screenshot shows the separate 20-slot song challenge flow
+- [x] Corrected private-role-row challenge rejection using existing authoritative has_role RPC; no roles/policies changed, 35 regression tests passed; actual device retry still pending
 - [x] User confirmed B accepted, both artists appear in the same numbered slot, A received the acceptance notification, and the host sees the accepted matchup; exact next-available numbering and A/B assignment still need observation
 - [ ] Confirm host sees accepted matchup and selects it before either artist is brought into the main video boxes; acceptance must not start the battle
 - [x] User reported host selection and correct Side A/B feeds with simultaneous cameras/microphones on two physical artist devices, both using mobile Safari; not independently observed
