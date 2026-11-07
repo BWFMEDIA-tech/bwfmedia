@@ -21,7 +21,7 @@ describe("challenge artist authorization with private role rows", () => {
   let roles: Map<string, boolean>;
   let rpc: ReturnType<typeof vi.fn>;
   let from: ReturnType<typeof vi.fn>;
-  let inserts: ReturnType<typeof vi.fn>;
+  let inserts: ReturnType<typeof vi.fn<(row: unknown) => void>>;
   beforeEach(() => {
     roles = new Map([[senderId, true], [opponentId, true]]);
     rpc = vi.fn(async (_name, args) => ({ data: roles.get(args._user_id) ?? false, error: null }));
