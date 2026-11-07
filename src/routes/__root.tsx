@@ -17,6 +17,7 @@ import { InstallPromptPopup } from "@/components/pwa/InstallPromptPopup";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
 import { GlobalPlayer } from "@/components/player/GlobalPlayer";
+import { MediaSessionSync } from "@/components/player/MediaSessionSync";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -152,6 +153,7 @@ function RootComponent() {
   return (
         <QueryClientProvider client={queryClient}>
       <CartProvider>
+          <MediaSessionSync />
         <PlayerProvider>
         <ArtistStatusProvider>
         <RealtimeHealthBanner />
