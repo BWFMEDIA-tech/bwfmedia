@@ -1,6 +1,36 @@
 // @auth-exempt: returns short-lived signed URLs for public-readable avatar paths only.
 import { createServerFn } from "@tanstack/react-start";
-import { avatarObjectPath, publicArtworkPaths } from "./public-artwork";
+import { avatarObjectPath, publicArtworkPaths, queuedArtworkPaths } from "./public-artwork";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+// Legacy queued covers may no longer have a profile-library row. Keep them
+// private: authorize through the caller's existing queue RLS, not the public signer.
+export const signQueuedArtworkUrls = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { urls: string[] }) => data)
+  .handler(async ({ data, context }) => {
+    const urls = data.urls.filter((url) => typeof url === "string").slice(0, 100);
+    const paths = urls.map(avatarObjectPath).filter((path): path is string => path !== null);
+    const results: Record<string, string | null> = {};
+    if (!paths.length) return { results, expiresIn: 600 };
+    const owners = [...new Set(paths.map((path) => path.split("/")[0]))];
+    const { data: tracks, error } = await context.supabase.from("play_tracks")
+      .select("cover_url, artist_user_id")
+      .eq("status", "queued")
+      .in("artist_user_id", owners);
+    if (error) throw new Error("Unable to load queue artwork");
+    const allowed = queuedArtworkPaths(tracks ?? [], paths);
+    if (!allowed.size) return { results, expiresIn: 600 };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed, error: signError } = await supabaseAdmin.storage.from("avatars")
+      .createSignedUrls([...allowed], 600);
+    if (signError) throw new Error("Unable to load queue artwork");
+    for (const url of urls) {
+      const path = avatarObjectPath(url);
+      results[url] = signed?.find((item) => item.path === path)?.signedUrl ?? null;
+    }
+    return { results, expiresIn: 600 };
+  });
 
 /**
  * Mint a short-lived signed URL for a private `avatars/` storage object.

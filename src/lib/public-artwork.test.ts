@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { avatarObjectPath, publicArtworkPaths } from "./public-artwork";
+import { avatarObjectPath, publicArtworkPaths, queuedArtworkPaths } from "./public-artwork";
 
 const owner = "85a8f0da-bb21-4b1c-a727-2b6ed507d9ce";
 const path = `${owner}/cover.jpg`;
@@ -22,6 +22,13 @@ function database(profiles: object[], tracks: { cover_url: string; status: strin
 }
 
 describe("public artwork signing boundary", () => {
+  it("allows only the exact artist-owned cover from an authorized queue read", () => {
+    expect([...queuedArtworkPaths([{ cover_url: url(path), artist_user_id: owner }], [path, `${owner}/private.jpg`])]).toEqual([path]);
+  });
+  it("rejects queued references to another artist's private uploads", () => {
+    expect(queuedArtworkPaths([{ cover_url: url(path), artist_user_id: "another-user" }], [path]).size).toBe(0);
+    expect(queuedArtworkPaths([], [path]).size).toBe(0);
+  });
   it("allows a published song cover without granting access to other uploads", async () => {
     const db = database([], [{ cover_url: url(path), status: "completed" }]);
     expect([...await publicArtworkPaths(db, [path, `${owner}/private.jpg`])]).toEqual([path]);
