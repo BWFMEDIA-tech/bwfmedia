@@ -61,6 +61,7 @@
   --freestyle-blue: #1469e8;
   --freestyle-red: #db2439;
   --freestyle-button-text: #ffffff;
+  --fsq-violet: #C53DFF;
   --radius: 0.25rem;
 
   /* Tunevio premium dark theme */
@@ -130,6 +131,27 @@
   .freestyle-side[data-side="a"] { order: 1; }
   .freestyle-side[data-side="b"] { order: 3; }
   .freestyle-vs { order: 2; position: static; transform: none; justify-self: center; width: 36px; height: 36px; font-size: 17px; }
+}
+
+/* Freestyle queue slot cards: neon VS matchup design. */
+.fsq-slot { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent); background: linear-gradient(105deg, color-mix(in srgb, var(--freestyle-blue) 20%, var(--background)), var(--background) 48%, color-mix(in srgb, var(--fsq-violet) 22%, var(--background))); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fsq-violet) 18%, transparent), 0 12px 32px -16px color-mix(in srgb, var(--fsq-violet) 55%, transparent); }
+.fsq-slot[data-state="open"] { border-style: dashed; border-color: var(--border); background: var(--card); box-shadow: none; }
+.fsq-slot-label { font-size: 15px; font-weight: 800; letter-spacing: .02em; }
+.fsq-status { border-radius: 999px; border: 1px solid color-mix(in srgb, var(--primary) 55%, transparent); padding: 3px 12px; font-size: 12px; font-weight: 700; color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, transparent); }
+.fsq-status[data-status="live"] { color: #fff; border-color: var(--fsq-violet); background: color-mix(in srgb, var(--fsq-violet) 30%, transparent); box-shadow: 0 0 12px color-mix(in srgb, var(--fsq-violet) 45%, transparent); }
+.fsq-status[data-status="open"] { color: var(--muted-foreground); border-color: var(--border); background: transparent; }
+.fsq-artist { display: flex; flex: 1 1 0; align-items: center; gap: 10px; min-width: 0; }
+.fsq-artist[data-side="b"] { flex-direction: row-reverse; text-align: right; }
+.fsq-ring { --fsq-ring: var(--primary); flex-shrink: 0; border-radius: 50%; padding: 2.5px; background: var(--fsq-ring); box-shadow: 0 0 10px color-mix(in srgb, var(--fsq-ring) 70%, transparent), 0 0 24px color-mix(in srgb, var(--fsq-ring) 35%, transparent); }
+.fsq-ring[data-side="b"] { --fsq-ring: var(--fsq-violet); }
+.fsq-ring img { display: block; width: 56px; height: 56px; border: 2px solid var(--background); border-radius: 50%; object-fit: cover; }
+.fsq-name { display: block; font-size: 15px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
+.fsq-genre { display: block; font-size: 12px; color: var(--muted-foreground); }
+.fsq-vs { flex-shrink: 0; font-size: 30px; font-style: italic; font-weight: 900; line-height: 1; background: linear-gradient(100deg, var(--primary), #fff 50%, var(--fsq-violet)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 55%, transparent)) drop-shadow(0 0 14px color-mix(in srgb, var(--fsq-violet) 40%, transparent)); }
+@media (max-width: 480px) {
+  .fsq-ring img { width: 44px; height: 44px; }
+  .fsq-vs { font-size: 24px; }
+  .fsq-name { font-size: 14px; }
 }
 
 .artist-status-beacon { position: absolute; right: 0; bottom: 0; z-index: 2; width: 11px; height: 11px; border: 2px solid var(--background); border-radius: 50%; background: var(--status-offline); pointer-events: auto; }
