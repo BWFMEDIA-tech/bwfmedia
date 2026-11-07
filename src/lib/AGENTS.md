@@ -1,0 +1,1 @@
+- Enforce tournament occupancy and capacity on challenge and direct-match writes under a shared database lock; scope elimination to the host-reset tournament and write inbox outcomes transactionally, because client checks cannot prevent concurrent bypasses.

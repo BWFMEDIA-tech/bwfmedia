@@ -23,6 +23,7 @@ beforeAll(async () => {
     CREATE FUNCTION is_valid_battle_genre(text) RETURNS boolean LANGUAGE sql AS $$ SELECT true $$;`);
   await db.exec(migration("0051_arena_tournament_rules"));
   await db.exec(migration("0052_tournament_guard_integrity"));
+  await db.exec(migration("0053_tournament_notification_lifecycle"));
   await db.exec("CREATE TRIGGER sync_test AFTER UPDATE OF status ON battle_matches FOR EACH ROW EXECUTE FUNCTION battle_challenges_sync_match()");
 }, 30000);
 afterAll(async () => { await db.close(); });
@@ -67,5 +68,21 @@ describe.sequential("actual PostgreSQL tournament triggers", () => {
     await expect(db.query("SELECT start_new_battle_tournament()")).rejects.toThrow("Only hosts");
     await db.exec(`SELECT set_config('test.uid','${artist(999)}',false); SELECT start_new_battle_tournament();`);
     await challenge(43,81,84);
+  });
+  it("counts direct agreed matches once and blocks cross-path selections", async () => {
+    await db.exec(`INSERT INTO battle_matches(id,host_id,artist_a_id,artist_b_id,genre) VALUES('${artist(2050)}','${artist(999)}','${artist(100)}','${artist(101)}','R&B');
+      UPDATE battle_matches SET genre_agreed_a=true,genre_agreed_b=true WHERE id='${artist(2050)}';`);
+    await expect(challenge(51,100,102)).rejects.toThrow("pending or active opponent");
+    const filled=await db.query<{count:number}>("SELECT battle_tournament_filled((SELECT id FROM battle_tournaments WHERE status='open')) AS count");
+    expect(filled.rows[0].count).toBe(2);
+    await db.exec(`UPDATE battle_matches SET status='cancelled' WHERE id='${artist(2050)}'`);
+  });
+  it("cancellation frees a linked direct match and neither artist loses eligibility", async () => {
+    await db.exec(`INSERT INTO battle_matches(id,host_id,artist_a_id,artist_b_id,genre) VALUES('${artist(2060)}','${artist(999)}','${artist(120)}','${artist(121)}','R&B');
+      INSERT INTO battle_challenges(id,challenger_id,challenged_id,genre,status,match_id) VALUES('${artist(1060)}','${artist(120)}','${artist(121)}','R&B','accepted','${artist(2060)}');
+      UPDATE battle_challenges SET status='cancelled' WHERE id='${artist(1060)}';`);
+    const match=await db.query<{status:string}>("SELECT status FROM battle_matches WHERE id=$1",[artist(2060)]);
+    expect(match.rows[0].status).toBe("cancelled");
+    await challenge(61,120,122);
   });
 });
