@@ -7,7 +7,7 @@ export function AssistantLauncher({ raised }: { raised: boolean }) {
   return (
     <>
       {open && (
-        <div className="fixed inset-x-0 bottom-0 top-0 z-[95] flex flex-col overflow-hidden border-0 bg-background pt-[env(safe-area-inset-top)] shadow-2xl md:inset-x-auto md:bottom-6 md:left-auto md:top-auto md:h-[min(70vh,620px)] md:w-[400px] md:rounded-3xl md:border md:border-border md:pt-0">
+        <div className="fixed inset-x-0 bottom-0 top-0 z-[95] flex flex-col overflow-hidden border-0 bg-background pt-[env(safe-area-inset-top)] shadow-2xl md:inset-x-auto md:bottom-6 md:left-auto md:right-6 md:top-auto md:h-[min(70vh,620px)] md:w-[400px] md:rounded-3xl md:border md:border-border md:pt-0">
           <AssistantChat compact onNavigate={() => setOpen(false)} onClose={() => setOpen(false)} />
         </div>
       )}
