@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { IDENTITY_COLUMNS, effectiveIdentity } from "./host-identity";
+import { stableParticipantOrder } from "./stage-roster";
 
 export type StageParticipant = {
   id: string;
@@ -59,16 +60,18 @@ export function useStageState(streamId: string | null) {
       return;
     }
     let cancelled = false;
+    let participantRefresh = 0;
 
     const refreshParticipants = async () => {
+      const refresh = ++participantRefresh;
       const { data } = await supabase.from("stage_participants").select("*").eq("stream_id", streamId);
-      if (cancelled || !data) return;
+      if (cancelled || refresh !== participantRefresh || !data) return;
       const next = (await hydrateProfiles(data as any)) as StageParticipant[];
-      if (cancelled) return;
+      if (cancelled || refresh !== participantRefresh) return;
       // PATCH-style merge: preserve object identity for rows whose payload
       // hasn't materially changed so consumers that depend on participants
       // by reference don't trigger reconnect/remount on heartbeat ticks.
-      setParticipants((prev) => mergeById(prev, next));
+      setParticipants((prev) => mergeById(prev, stableParticipantOrder(prev, next)));
     };
     const refreshHands = async () => {
       const { data } = await supabase.from("raise_hand_requests")
