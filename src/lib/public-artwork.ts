@@ -10,6 +10,17 @@ export function avatarObjectPath(input: string): string | null {
   return path;
 }
 
+/** Authenticated queue reads may reveal only the submitted artist's exact cover. */
+export function queuedArtworkPaths(rows: { cover_url: string | null; artist_user_id: string | null }[], paths: string[]): Set<string> {
+  const candidates = new Set(paths);
+  const allowed = new Set<string>();
+  for (const row of rows) {
+    const path = row.cover_url ? avatarObjectPath(row.cover_url) : null;
+    if (path && row.artist_user_id === path.split("/")[0] && candidates.has(path)) allowed.add(path);
+  }
+  return allowed;
+}
+
 /** Signing is restricted to exact current public references, never folder access. */
 export async function publicArtworkPaths(admin: any, paths: string[]): Promise<Set<string>> {
   const candidates = [...new Set(paths)].filter((p) => avatarObjectPath(p) === p).slice(0, 500);

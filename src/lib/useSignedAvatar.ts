@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { signAvatarUrls } from "@/lib/signed-avatar.functions";
+import { signAvatarUrls, signQueuedArtworkUrls } from "@/lib/signed-avatar.functions";
 import { avatarObjectPath } from "@/lib/public-artwork";
 
 type CacheEntry = { url: string; expiresAt: number };
@@ -25,13 +25,18 @@ function flushBatch() {
   batchResolvers.clear();
   if (urls.length === 0) return;
   signAvatarUrls({ data: { urls, expiresIn: TTL_SECONDS } })
-    .then((res) => {
+    .then(async (res) => {
+      const missing = urls.filter((url) => !res?.results?.[url]);
+      const queued = missing.length
+        ? await signQueuedArtworkUrls({ data: { urls: missing } }).catch(() => null)
+        : null;
       const now = Date.now();
       const expiresIn = res?.expiresIn ?? TTL_SECONDS;
       for (const [url, fns] of resolvers.entries()) {
-        const signed = res?.results?.[url] ?? null;
+        const publicSigned = res?.results?.[url];
+        const signed = publicSigned ?? queued?.results?.[url] ?? null;
         if (signed) {
-          cache.set(cacheKey(url), { url: signed, expiresAt: now + expiresIn * 1000 });
+          cache.set(cacheKey(url), { url: signed, expiresAt: now + (publicSigned ? expiresIn : 600) * 1000 });
         }
         for (const fn of fns) fn(signed);
       }
