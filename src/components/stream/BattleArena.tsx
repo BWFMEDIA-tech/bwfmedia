@@ -987,20 +987,6 @@ function ArtistSide({
             <Zap className="h-3 w-3" />
             <span className="ml-1">5x</span>
           </button>
-          <button
-            disabled={!canVote}
-            onClick={onSuperVote}
-            title="Spend 1 boost credit for a 5x vote"
-            className={cn(
-              "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition-transform duration-150 active:scale-95",
-              canVote
-                ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
-                : "cursor-not-allowed border-white/10 text-white/30",
-            )}
-          >
-            <Zap className="h-3 w-3" />
-            <span className="ml-1">5x</span>
-          </button>
         </div>
       )}
     </div>
