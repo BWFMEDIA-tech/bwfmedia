@@ -45,6 +45,14 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
     finally { setBusy(false); }
   };
   const profile = (id: string) => state.data?.profiles.find(p => p.id === id);
+  const slotArtist = (id: string, side: 'a' | 'b') => {
+    const p = profile(id);
+    const name = p?.stage_name || p?.display_name || 'Artist';
+    return <Link to="/artist/$id" params={{ id }} className="fsq-artist" data-side={side}>
+      <span className="fsq-ring" data-side={side}><SignedImg src={p?.avatar_url ?? undefined} alt={name} /></span>
+      <span className="min-w-0"><span className="fsq-name">{name}</span><span className="fsq-genre">{p?.genre || '—'}</span></span>
+    </Link>;
+  };
   const artist = (id: string) => {
     const p = profile(id);
     const name = p?.stage_name || p?.display_name || 'Artist';
@@ -56,19 +64,20 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
   return <section aria-label="Freestyle Battle Queue" className="space-y-4 border-y border-border py-5 text-foreground">
     <header className="flex flex-wrap items-center justify-between gap-2"><h2 className="flex items-center gap-2 text-xl font-bold"><Swords className="text-primary" />{streamId ? 'Freestyle Battle Queue' : '1v1 Freestyle Battle Challenge'}</h2><p className="text-sm font-semibold">{state.data ? `${slots.length}/10 · ${10 - slots.length} available` : '—/10'}</p></header>
     {!auth.user ? <Link to="/login" className="text-primary">Sign in to view slots and challenge an artist</Link> : state.isPending ? <p className="text-muted-foreground">Loading matchups…</p> : state.isError ? <p role="alert">Could not load matchups. <Button variant="link" onClick={() => void state.refetch()}>Retry</Button></p> : <>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         {Array.from({ length: 10 }, (_, i) => {
           const c = slots.find(c => c.slot_number === i + 1);
-          return <article key={i} className="min-w-0 rounded-md border border-border bg-card p-3">
-            <div className="mb-3 flex justify-between gap-2 text-xs"><span className="font-bold">Slot {i + 1}</span><span className={c ? 'text-primary' : 'text-muted-foreground'}>{c?.status === 'live' ? 'Live' : c?.status === 'scheduled' ? 'Scheduled' : c ? 'Accepted' : 'Open'}</span></div>
-            {c ? <div className="space-y-2">{artist(c.artist_a_id)}<p className="text-center text-xs font-bold text-muted-foreground">VS</p>{artist(c.artist_b_id)}
-              {c.scheduled_at && <p className="text-xs text-muted-foreground">{new Date(c.scheduled_at).toLocaleString()}</p>}
-              {streamId && canHost && c.status !== 'live' && (!c.stream_id || c.stream_id === streamId) && <div className="flex flex-wrap gap-1 pt-2">
+          return <article key={i} className="fsq-slot" data-state={c ? 'filled' : 'open'}>
+            <div className="flex items-center justify-between gap-2 px-4 pt-3"><span className="fsq-slot-label">Slot {i + 1}</span><span className="fsq-status" data-status={c?.status === 'live' ? 'live' : c ? 'filled' : 'open'}>{c?.status === 'live' ? 'Live' : c?.status === 'scheduled' ? 'Scheduled' : c ? 'Accepted' : 'Open'}</span></div>
+            {c ? <div className="px-4 pb-4 pt-3">
+              <div className="flex items-center gap-2 sm:gap-3">{slotArtist(c.artist_a_id, 'a')}<span className="fsq-vs" aria-hidden="true">VS</span>{slotArtist(c.artist_b_id, 'b')}</div>
+              {c.scheduled_at && <p className="pt-2 text-center text-xs text-muted-foreground">{new Date(c.scheduled_at).toLocaleString()}</p>}
+              {streamId && canHost && c.status !== 'live' && (!c.stream_id || c.stream_id === streamId) && <div className="flex flex-wrap justify-center gap-1 pt-3">
                 {onSelect && <Button size="sm" disabled={busy} onClick={() => onSelect(c)}><Play className="h-3 w-3" />Select</Button>}
                 <Button size="sm" variant="outline" aria-label={`Schedule slot ${i + 1}`} title="Schedule battle" onClick={() => { setScheduleId(c.id); setScheduleTime(''); }}><Calendar className="h-3 w-3" /></Button>
                 <Button size="sm" variant="ghost" aria-label={`Cancel slot ${i + 1}`} title="Cancel matchup" disabled={busy} onClick={() => { if (window.confirm('Cancel this matchup?')) void act(() => control({ data: { id: c.id, action: 'cancel', streamId } })); }}><X className="h-3 w-3" /></Button>
               </div>}
-            </div> : <div className="flex min-h-24 items-center justify-center text-sm text-muted-foreground">Open</div>}
+            </div> : <div className="flex min-h-24 items-center justify-center text-sm text-muted-foreground">Open slot</div>}
           </article>;
         })}
       </div>
