@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { SignedImg } from '@/components/ui/signed-img';
 import { StageAudioShell } from '@/components/stream/StageAudioShell';
+import { SelfMicrophoneButton } from '@/components/stream/SelfMicrophoneButton';
 import { useAuth } from '@/lib/auth-context';
 import { getLiveKitToken } from '@/lib/livekit.functions';
 import { getFreestyleState, startFreestyle, voteFreestyle, cancelFreestyle } from '@/lib/freestyle.functions';
@@ -133,5 +134,5 @@ function ArtistCamera({ artistId, name, photo, hostId, artistA, artistB }: { art
 function LocalCameraControl({ artistIds }: { artistIds: (string | undefined)[] }) {
   const { localParticipant, isCameraEnabled } = useLocalParticipant();
   if (!artistIds.includes(localParticipant.identity)) return null;
-  return <div className="mt-4 flex justify-center"><Button variant="outline" onClick={async () => { try { await localParticipant.setCameraEnabled(!isCameraEnabled); } catch { toast.error('Allow camera access and confirm your host-approved camera permission.'); } }}>{isCameraEnabled ? <CameraOff /> : <Camera />}{isCameraEnabled ? 'Camera off' : 'Camera on'}</Button></div>;
+  return <div className="mt-4 flex flex-wrap justify-center gap-2"><SelfMicrophoneButton /><Button variant="outline" onClick={async () => { try { await localParticipant.setCameraEnabled(!isCameraEnabled); } catch { toast.error('Allow camera access and confirm your host-approved camera permission.'); } }}>{isCameraEnabled ? <CameraOff /> : <Camera />}{isCameraEnabled ? 'Camera off' : 'Camera on'}</Button></div>;
 }

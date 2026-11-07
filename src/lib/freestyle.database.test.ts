@@ -19,6 +19,10 @@ beforeAll(async () => {
     INSERT INTO streams VALUES('${uid(100)}','${uid(1)}','live','test-freestyle');
     INSERT INTO stage_participants VALUES('${uid(100)}','${uid(2)}','speaker',true),('${uid(100)}','${uid(3)}','speaker',true);`);
   await db.exec(readFileSync('drizzle/migrations/0054_freestyle_live_battles.sql', 'utf8'));
+  await db.exec(`CREATE SCHEMA cron; CREATE TABLE cron.job(jobid integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,jobname text UNIQUE,schedule text,command text);
+    CREATE FUNCTION cron.schedule(text,text,text) RETURNS bigint LANGUAGE plpgsql AS $$ DECLARE jid integer; BEGIN INSERT INTO cron.job(jobname,schedule,command) VALUES($1,$2,$3) RETURNING jobid INTO jid; RETURN jid; END $$;
+    CREATE FUNCTION cron.unschedule(integer) RETURNS boolean LANGUAGE plpgsql AS $$ BEGIN DELETE FROM cron.job WHERE jobid=$1; RETURN true; END $$;`);
+  await db.exec(readFileSync('drizzle/migrations/0055_freestyle_bounded_deadline_checks.sql','utf8'));
 }, 30000);
 afterAll(() => db.close());
 describe.sequential('freestyle database rules', () => {
@@ -76,5 +80,10 @@ describe.sequential('freestyle database rules', () => {
     await db.exec('SET ROLE authenticated');
     await expect(db.query("INSERT INTO public.freestyle_votes(battle_id,user_id,choice) VALUES($1,$2,'b')",[battleId,uid(6)])).rejects.toThrow('permission denied');
     await db.exec('RESET ROLE');
+  });
+  it('deadline checks stop after the last battle completes', async () => {
+    await db.exec('SELECT freestyle_deadline_tick()');
+    const r=await db.query<{n:number}>('SELECT count(*)::int n FROM cron.job');
+    expect(r.rows[0].n).toBe(0);
   });
 });
