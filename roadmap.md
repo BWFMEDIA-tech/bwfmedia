@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Accepted challenges → Create 1v1 Battle
-- [ ] Show confirmed matchups with both profiles and genre in the existing Create Battle section
-- [ ] Reuse host scheduling/start, automatically assign sides, and notify both artists
-- [ ] Guard acceptance, duplicate starts, and remove finished/cancelled entries; run regression and signed-in checks
+- [x] Show confirmed matchups with both profiles and genre in the existing Create Battle section; three already-accepted direct matchups linked
+- [x] Reuse host scheduling/start, automatically assign sides, and notify both artists
+- [x] Guard acceptance, duplicate starts, and remove finished/cancelled entries; 21 regressions passed, preview build OK, real accepted matchup selection verified on desktop/390px mobile
+- [ ] Verify a full start/finish and inbox readback with both artists; requires an isolated matchup so existing live sessions are not interrupted
 
 ## Audience cannot hear
 - [x] Add the missing browser audio-unlock control to profile and Studio video stages; reuse it in audio stages without enabling audience microphones
