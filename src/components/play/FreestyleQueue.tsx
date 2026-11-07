@@ -26,6 +26,7 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
   const [busy, setBusy] = useState(false);
   const [scheduleId, setScheduleId] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
+  const [selected, setSelected] = useState('');
   const state = useQuery({ queryKey: ['freestyle-queue', auth.user?.id], queryFn: () => read(), enabled: !!auth.user });
   const directory = useQuery({ queryKey: ['artists-directory'], queryFn: () => getArtistsDirectory(), enabled: state.data?.isArtist === true, staleTime: 60000 });
   useEffect(() => {
@@ -78,9 +79,14 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
         {c.status === 'pending' && c.artist_b_id === auth.user?.id && <><Button size="sm" disabled={busy || slots.length >= 10} onClick={() => void act(() => respond({ data: { id: c.id, accept: true } }))}><Check />Accept</Button><Button size="sm" variant="outline" disabled={busy} onClick={() => void act(() => respond({ data: { id: c.id, accept: false } }))}><X />Decline</Button></>}
         {c.status !== 'live' && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void act(() => control({ data: { id: c.id, action: 'cancel' } }))}>Cancel challenge</Button>}
       </div>)}</div>}
-      {state.data?.isArtist && !streamId && <div className="space-y-3 border-t border-border pt-4"><h3 className="font-bold">Select Your Freestyle Opponent</h3>
+      {state.data?.isArtist && !streamId && <div className="space-y-3 border-t border-border pt-4"><h3 className="font-bold">Select an Artist to Battle</h3>
         {mine.length > 0 ? <p className="text-sm text-muted-foreground">Your current matchup is pending or active.</p> : slots.length >= 10 ? <p className="text-sm text-muted-foreground">All 10 slots are filled.</p> : <><Input aria-label="Search freestyle artists" placeholder="Search artists" value={search} onChange={e => setSearch(e.target.value)} />
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{(directory.data ?? []).filter(p => p.id !== auth.user?.id && p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 12).map(p => <div key={p.id} className="flex min-w-0 items-center gap-2 border-b border-border py-2"><SignedImg src={p.avatarUrl ?? undefined} alt={p.name} className="h-10 w-10 shrink-0 rounded-full object-cover" /><div className="min-w-0 flex-1"><p className="break-words text-sm font-bold">{p.name}</p><p className="text-xs text-muted-foreground">{p.genres.join(' · ')}</p></div><Button size="sm" disabled={busy || rows.some(c => [c.artist_a_id, c.artist_b_id].includes(p.id))} onClick={() => void act(() => submit({ data: { opponent: p.id } }))}>Challenge</Button></div>)}</div>
+          <div role="listbox" aria-label="Select an Artist to Battle" className="max-h-72 overflow-y-auto rounded-md border border-border">{(directory.data ?? []).filter(p => p.id !== auth.user?.id && p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 12).map(p => {
+            const taken = rows.some(c => [c.artist_a_id, c.artist_b_id].includes(p.id));
+            const chosen = selected === p.id;
+            return <button key={p.id} type="button" role="option" aria-selected={chosen} disabled={taken} onClick={() => setSelected(chosen ? '' : p.id)} className={`flex w-full min-w-0 items-center gap-2 border-b border-border px-3 py-2 text-left last:border-b-0 ${chosen ? 'bg-primary/10' : ''} ${taken ? 'opacity-50' : ''}`}><SignedImg src={p.avatarUrl ?? undefined} alt={p.name} className="h-10 w-10 shrink-0 rounded-full object-cover" /><span className="min-w-0 flex-1"><span className="block break-words text-sm font-bold">{p.name}</span><span className="block text-xs text-muted-foreground">{p.genres.join(' · ')}</span></span>{taken ? <span className="text-xs text-muted-foreground">In a matchup</span> : chosen ? <Check className="h-4 w-4 shrink-0 text-primary" /> : null}</button>;
+          })}</div>
+          <Button disabled={busy || !selected} onClick={() => void act(async () => { await submit({ data: { opponent: selected } }); setSelected(''); setSearch(''); })}><Swords />Send Battle Challenge</Button>
           {directory.isError && <p role="alert">Could not load artists.</p>}
         </>}
       </div>}
