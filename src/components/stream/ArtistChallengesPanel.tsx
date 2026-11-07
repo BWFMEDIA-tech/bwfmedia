@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { ConfirmedBattleMatchups, type ConfirmedMatchup } from "./ConfirmedBattleMatchups";
 import { CreateBattleDialog } from "./BattleArena";
+import { BattleTournamentStatus } from "@/components/play/BattleTournamentStatus";
 
 type HostChallenge = {
   id: string;
@@ -106,6 +107,7 @@ export function ArtistChallengesPanel({ streamId }: { streamId?: string }) {
 
   return (
     <div className="space-y-3">
+      <BattleTournamentStatus hostControls />
       {streamId && <section className="space-y-3 border-b border-border pb-3">
         <h3 className="text-sm font-bold">Create 1v1 Battle</h3>
         <ConfirmedBattleMatchups selectedId={selected?.id ?? null} onSelect={setSelected} />

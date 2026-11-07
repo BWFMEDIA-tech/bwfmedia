@@ -136,12 +136,13 @@ export const respondBattleChallenge = createServerFn({ method: "POST" })
       .from("battle_challenges")
       .update({ status: next })
       .eq("id", c.id)
-      .eq("status", "pending");
+      .eq("status", "pending")
+      .select("id").single();
     if (error) throw new Error(error.message);
 
     const profiles = await profileSummary(supabase, [c.challenger_id, c.challenged_id]);
     const me = profiles.get(userId)?.name ?? "The artist";
-    await notify([c.challenger_id, c.challenged_id], {
+    if (!data.accept) await notify([c.challenger_id, c.challenged_id], {
       actorId: userId,
       type: "battle_challenge",
       title: data.accept ? "Battle challenge accepted" : "Battle challenge declined",
@@ -252,14 +253,7 @@ export const scheduleBattleChallenge = createServerFn({ method: "POST" })
       .in("status", ["accepted", "scheduled"])
       .select("id").single();
     if (error) throw new Error(error.message);
-    const whenText = when.toLocaleString("en-US", { dateStyle: "full", timeStyle: "short", timeZone: "America/Chicago" });
-    await notify([c.challenger_id, c.challenged_id], {
-      actorId: userId,
-      type: "battle_challenge",
-      title: "Battle scheduled",
-      body: `Your ${c.genre} battle is scheduled for ${whenText} CT.`,
-      sourceEvent: `battle-scheduled:${c.id}:${when.toISOString()}`,
-    });
+    // Scheduling notifications are written transactionally by the database.
     return { ok: true };
   });
 

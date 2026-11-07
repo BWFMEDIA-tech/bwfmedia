@@ -15,6 +15,9 @@ import {
   cancelBattleChallenge,
 } from "@/lib/battle-challenges.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { getBattleTournamentState } from "@/lib/battle-tournament.functions";
+import { tournamentSubmissionBlock } from "@/lib/battle-tournament";
+import { BattleTournamentStatus } from "./BattleTournamentStatus";
 
 type Challenge = {
   id: string;
@@ -68,6 +71,9 @@ export function BattleChallenges({ userId }: { userId: string }) {
   const submit = useServerFn(submitBattleChallenge);
   const respond = useServerFn(respondBattleChallenge);
   const cancel = useServerFn(cancelBattleChallenge);
+  const tournamentRead = useServerFn(getBattleTournamentState);
+  const { data: tournament } = useQuery({ queryKey: ["battle-tournament"], queryFn: () => tournamentRead(), refetchInterval: 5000 });
+  const block = tournament ? tournamentSubmissionBlock(tournament) : "Loading tournament…";
 
   const [search, setSearch] = useState("");
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
@@ -91,6 +97,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
       .channel(`battle-challenges-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "battle_challenges" }, () => {
         refetch();
+        queryClient.invalidateQueries({ queryKey: ["battle-tournament"] });
         queryClient.invalidateQueries({ queryKey: ["host-battle-challenges"] });
       })
       .subscribe();
@@ -112,7 +119,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
   const sent = challenges.filter((c) => c.challenger_id === userId);
 
   const onSubmit = async () => {
-    if (!selectedArtist || !genre) return;
+    if (!selectedArtist || !genre || block) return;
     setBusy(true);
     try {
       await submit({ data: { challengedId: selectedArtist, genre: genre as (typeof BATTLE_GENRES)[number] } });
@@ -121,6 +128,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
       setGenre("");
       setSearch("");
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["battle-tournament"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not send challenge");
     } finally {
@@ -133,6 +141,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
       await respond({ data: { challengeId: id, accept } });
       toast.success(accept ? "Challenge accepted" : "Challenge declined");
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["battle-tournament"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not respond");
     }
@@ -143,6 +152,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
       await cancel({ data: { challengeId: id } });
       toast.success("Challenge cancelled");
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["battle-tournament"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not cancel");
     }
@@ -150,6 +160,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-4">
+      <BattleTournamentStatus />
       {/* Challenge composer */}
       <div className="rounded-xl border border-border bg-card/60 p-4">
         <div className="mb-3 flex items-center gap-2">
@@ -157,12 +168,13 @@ export function BattleChallenges({ userId }: { userId: string }) {
           <h3 className="text-sm font-bold">Challenge an artist</h3>
         </div>
         <Input
+          disabled={Boolean(block) || busy}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search artists…"
           className="mb-2"
         />
-        {search.trim() && (
+        {search.trim() && !block && (
           <div className="mb-3 max-h-48 space-y-1 overflow-y-auto">
             {matches.length === 0 && <p className="px-1 py-2 text-xs text-muted-foreground">No artists found.</p>}
             {matches.map((a) => (
@@ -185,6 +197,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
         )}
         <div className="flex flex-col gap-2 sm:flex-row">
           <select
+            disabled={Boolean(block) || busy}
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
             className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm"
@@ -196,12 +209,12 @@ export function BattleChallenges({ userId }: { userId: string }) {
               </option>
             ))}
           </select>
-          <Button onClick={onSubmit} disabled={busy || !selectedArtist || !genre} className="sm:w-auto">
+          <Button onClick={onSubmit} disabled={Boolean(block) || busy || !selectedArtist || !genre} className="sm:w-auto">
             <Swords className="mr-2 h-4 w-4" /> Send challenge
           </Button>
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">
-          The challenge goes to the host queue. Both artists must agree before the host can start the battle.
+          {block ?? "Both artists must accept before the host can start the battle."}
         </p>
       </div>
 
@@ -217,7 +230,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
                   <p className="truncate text-sm font-semibold">{c.challenger_name}</p>
                   <p className="text-xs text-muted-foreground">{c.genre}</p>
                 </div>
-                <Button size="sm" onClick={() => onRespond(c.id, true)}>
+                <Button size="sm" disabled={!tournament || tournament.eliminated || tournament.filled >= 20} onClick={() => onRespond(c.id, true)}>
                   <Check className="mr-1 h-3.5 w-3.5" /> Accept
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => onRespond(c.id, false)}>
