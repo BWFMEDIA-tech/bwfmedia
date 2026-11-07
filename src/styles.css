@@ -1222,7 +1222,7 @@ body { font-family: var(--font-body); letter-spacing: 0; }
     transform: translateY(0) scale(1);
     pointer-events: auto;
   }
-  .swara-home .group .tv-artwork-controls button.tv-play-fab {
+  .swara-home .group .tv-artwork-controls button.tv-play-fab:not([data-play-icon="true"]) {
     background: var(--brand-cyan);
     color: var(--background);
     border-color: var(--brand-cyan);
