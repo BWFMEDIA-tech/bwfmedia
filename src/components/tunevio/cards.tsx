@@ -122,7 +122,7 @@ export function PlayFab({
       aria-label={playing ? "Pause" : "Play"}
       onClick={onClick}
       className={cn(
-        "grid place-items-center rounded-full border border-tv-cyan/70 bg-black/60 text-white shadow-lg shadow-tv-cyan/25 backdrop-blur-sm transition",
+        "tv-play-fab grid place-items-center rounded-full border border-tv-cyan/70 bg-black/60 text-white shadow-lg shadow-tv-cyan/25 backdrop-blur-sm transition",
         "hover:scale-105 hover:border-tv-cyan active:scale-95",
         dims,
         className,
@@ -164,7 +164,7 @@ export function MediaCard({
 }: MediaCardProps) {
   const body = (
     <CardShell className="border-tv-cyan/25 p-3 hover:border-tv-cyan/50">
-      <div className="relative">
+      <div className="tv-artwork-controls relative">
         <Artwork
           src={imageUrl}
           alt={title}
