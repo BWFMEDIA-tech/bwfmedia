@@ -28,6 +28,19 @@ export const startFreestyle = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator(input => streamInput.extend({ artistA: z.string().uuid(), artistB: z.string().uuid(), duration: z.number().int().min(30).max(900) }).parse(input))
   .handler(async ({ data, context }) => {
+    const { data: stream, error: streamError } = await context.supabase.from('streams').select('host_id,room_name,status').eq('id', data.streamId).single();
+    if (streamError || !stream || stream.host_id !== context.userId || stream.status !== 'live') throw new Error('Only the live stream owner can start freestyle battles');
+    const key = process.env['LIVEKIT_API_KEY'];
+    const secret = process.env['LIVEKIT_API_SECRET'];
+    const url = process.env['LIVEKIT_URL'];
+    if (!key || !secret || !url) throw new Error('Live video is unavailable');
+    const { RoomServiceClient } = await import('livekit-server-sdk');
+    const service = new RoomServiceClient(url.replace(/^wss:/, 'https:').replace(/^ws:/, 'http:'), key, secret);
+    const connected = await service.listParticipants(stream.room_name);
+    for (const id of [data.artistA, data.artistB]) {
+      const artist = connected.find(p => p.identity === id);
+      if (!artist || !artist.permission?.canPublish || !artist.tracks.some(t => t.source === 1 && !t.muted)) throw new Error('Both artists must be connected with live cameras before starting');
+    }
     const { data: id, error } = await context.supabase.rpc('start_freestyle_battle', { _stream_id: data.streamId, _artist_a: data.artistA, _artist_b: data.artistB, _duration: data.duration });
     if (error) throw new Error(error.message);
     return id;
