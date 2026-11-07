@@ -36,8 +36,6 @@ import { StageAudioShell } from "@/components/stream/StageAudioShell";
 
 
 import { RaiseHandPanel } from "@/components/stream/RaiseHandPanel";
-import { BackstageQueue } from "@/components/stream/BackstageQueue";
-import { GreenRoom } from "@/components/stream/GreenRoom";
 import { supabase } from "@/integrations/supabase/client";
 import { useStagePresence } from "@/lib/use-stage-presence";
 import { PlayArenaView } from "@/routes/play.$room";
@@ -771,7 +769,7 @@ function StreamStudio() {
   const broadcastFn = useServerFn(broadcastStreamStarted);
   const tokenFn = useServerFn(getLiveKitToken);
   const setDestinationsFn = useServerFn(setStreamDestinations);
-  const [audienceTab, setAudienceTab] = useState<"audience" | "hands" | "backstage" | "green">("audience");
+  const [audienceTab, setAudienceTab] = useState<"audience" | "hands">("audience");
   const [selectedDestinations, setSelectedDestinations] = useState<StreamPlatformKey[]>([]);
   useEffect(() => { setSelectedDestinations(readSavedDestinations()); }, []);
   const platformsSectionRef = useRef<HTMLDivElement | null>(null);
@@ -786,7 +784,7 @@ function StreamStudio() {
   const [streamTitle, setStreamTitle] = useState("Tunevio Live: LIVE ARENA");
   const [streamDescription, setStreamDescription] = useState("");
   const [hostTransferMode, setHostTransferMode] = useState<"co_host" | "transfer">("co_host");
-  const { participants, hands, queue } = useStageState(stream?.id ?? null);
+  const { participants, hands } = useStageState(stream?.id ?? null);
   const spotlight = useStudioStreamSpotlight(stream?.id ?? undefined);
   const [thumbOpen, setThumbOpen] = useState(false);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
@@ -1218,13 +1216,13 @@ function StreamStudio() {
                     )}
 
                     {streamMode === "play" && (
-                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
+                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} showLeaderboard={false} />
                     )}
 
                     {/* Battle sits above the stage roster so the matchup is
                         the first thing the host sees. */}
                     {streamMode !== "play" && (
-                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} />
+                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} showLeaderboard={false} />
                     )}
 
                     <StudioStageRoom
@@ -1266,15 +1264,13 @@ function StreamStudio() {
               <StudioBlock id="audience" label="Audience">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
                 <div className="mb-3 flex flex-wrap gap-1" role="tablist">
-                  {([["audience","Audience"],["hands",`Raise Hand${hands.length ? ` (${hands.length})` : ""}`],["backstage","Backstage"],["green","Green Room"]] as const).map(([k,l]) => (
+                  {([["audience","Audience"],["hands",`Raise Hand${hands.length ? ` (${hands.length})` : ""}`]] as const).map(([k,l]) => (
                     <button key={k} type="button" role="tab" aria-selected={audienceTab===k} onClick={() => setAudienceTab(k)}
                       className={`rounded-full px-3 py-1 text-xs font-semibold transition ${audienceTab===k ? "bg-cyan-400 text-black" : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"}`}>{l}</button>
                   ))}
                 </div>
                 {audienceTab === "audience" && <StudioAudienceRow participants={participants} />}
                 {audienceTab === "hands" && <RaiseHandPanel hands={hands} streamId={stream?.id ?? null} />}
-                {audienceTab === "backstage" && <BackstageQueue streamId={stream?.id ?? null} queue={queue} canManage />}
-                {audienceTab === "green" && <GreenRoom streamId={stream?.id ?? null} participants={participants} />}
               </div>
               </StudioBlock>
             </StudioColumn>
