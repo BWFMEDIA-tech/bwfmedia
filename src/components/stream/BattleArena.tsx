@@ -441,11 +441,6 @@ function BattleView({
         </div>
       </div>
 
-      {(match as any).genre && (
-        <div className="flex justify-center pt-2.5">
-          <span className="arena-neon-tag">{(match as any).genre}</span>
-        </div>
-      )}
       <GenreAgreementBar match={match} userId={userId} />
       {/* Unified live vote percentage tracker */}
       <VoteTracker
@@ -852,7 +847,7 @@ function ArtistSide({
                     ? isPlaying ? "arena-ring-playing-a" : "arena-ring-a"
                     : isPlaying ? "arena-ring-playing-b" : "arena-ring-b",
                 )}
-              style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
+              style={{ borderColor: waveColor }}
             >
               {/* Vinyl record — spins slowly when idle, faster when playing.
                   Visible to every viewer; driven by shared server state. */}
@@ -1656,8 +1651,8 @@ function GenreAgreementBar({ match, userId }: { match: any; userId: string | nul
     }
   };
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-white/10 bg-[#00E6FF]/5 px-4 py-2 text-[11px]">
-      <span className="rounded-full border border-[#00E6FF]/40 bg-[#00E6FF]/15 px-2.5 py-0.5 font-bold uppercase tracking-widest text-[#00E6FF]">
+    <div className="flex flex-wrap items-center justify-center gap-2 border-b border-white/10 bg-black/30 px-4 py-2.5 text-[11px]">
+      <span className="arena-neon-tag">
         {genre}
       </span>
       {pending && (
