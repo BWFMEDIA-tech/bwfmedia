@@ -1439,7 +1439,7 @@ export function StudioAudienceRow({ participants }: { participants: StagePartici
       <div className="mb-3 text-[11px] font-bold tracking-widest text-white/60">AUDIENCE · {audience.length}</div>
       <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8">
         {audience.map((p) => (
-          <ListenerBubble key={p.id} p={p} />
+          <ListenerBubble key={p.user_id} p={p} />
         ))}
       </div>
     </div>
