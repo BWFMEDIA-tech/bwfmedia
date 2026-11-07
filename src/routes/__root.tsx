@@ -1,4 +1,5 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouter, useRouterState } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { registerTunevioPwa } from "@/lib/pwa";
@@ -137,6 +138,24 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Floating back arrow pinned below the header on every page except Home. */
+function BackButton() {
+  const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname === "/") return null;
+  return (
+    <button
+      type="button"
+      aria-label="Go back"
+      onClick={() => router.history.back()}
+      className="fixed left-4 z-40 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-background/90 text-foreground shadow-lg backdrop-blur transition hover:bg-white/10 md:left-6"
+      style={{ top: "calc(var(--bwf-banner-h, 0px) + env(safe-area-inset-top) + 84px)" }}
+    >
+      <ArrowLeft size={20} />
+    </button>
+  );
+}
+
 function RootComponent() {
   useEffect(() => { void registerTunevioPwa().catch(() => { /* Installation must never interrupt the website. */ }); }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -153,6 +172,7 @@ function RootComponent() {
         <ArtistStatusProvider>
         <RealtimeHealthBanner />
         {isChrome && <SiteHeader />}
+        {isChrome && <BackButton />}
         <div
           className={
             "pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+80px)]" +
