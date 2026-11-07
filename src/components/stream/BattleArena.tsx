@@ -455,7 +455,7 @@ function BattleView({
         votingStatus={votingStatus}
       />
       <div className="relative grid grid-cols-2 gap-0">
-        <div className="pointer-events-none absolute left-1/2 top-[95px] z-10 -translate-x-1/2 -translate-y-1/2">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
           <span className="arena-vs-bolt">VS</span>
         </div>
         <ArtistSide
