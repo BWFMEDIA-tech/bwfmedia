@@ -13,7 +13,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { usePlayer, type PlayerTrack } from "@/lib/player-context";
 import type { FeedArtist, FeedBattle, FeedStream, FeedTrack } from "@/lib/home-feed.functions";
-import playIconAsset from "@/assets/tunevio-play-icon.png.asset.json";
+import playIconAsset from "@/assets/tunevio-play-icon-small.png.asset.json";
 
 /* ── shared helpers ─────────────────────────────────────────────── */
 
@@ -134,7 +134,7 @@ export function PlayFab({
     >
       {playing ? <Pause className={cn(icon, "fill-current")} /> : <>
         <Play className={cn(icon, "tv-play-standard fill-current ml-0.5")} />
-        <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} className="tv-play-image h-full w-full object-contain" />
+        <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} decoding="async" width={40} height={40} className="tv-play-image h-full w-full object-contain" />
       </>}
     </Button>
   );
@@ -565,7 +565,7 @@ export function FeaturedCard({
                 <>
                   <span className="tv-play-fab grid h-7 w-7 shrink-0 place-items-center rounded-full" data-play-icon="true">
                     <Play className="tv-play-standard h-5 w-5 fill-current" />
-                    <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} className="tv-play-image h-full w-full object-contain" />
+                    <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} decoding="async" width={40} height={40} className="tv-play-image h-full w-full object-contain" />
                   </span> Play
                 </>
               )}
