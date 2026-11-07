@@ -24,7 +24,7 @@ import { usePlayer } from "@/lib/player-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedVideoUrl } from "@/lib/video-urls";
 import { SignedImg } from "@/components/ui/signed-img";
-import { ContentRail, ListSection } from "@/components/tunevio/ContentRail";
+import { ContentRail } from "@/components/tunevio/ContentRail";
 import {
   AlbumCard,
   ArtistCard,
@@ -33,7 +33,6 @@ import {
   LiveStreamCard,
   PlaylistCard,
   QuickAccessCard,
-  TrackCard,
   toPlayerTrack,
 } from "@/components/tunevio/cards";
 
@@ -245,16 +244,24 @@ export function TunevioHome() {
 
           {/* Popular this week */}
           {show("music") && (
-          <ListSection
+          <ContentRail
             id="popular"
             title="Top Songs"
             eyebrow="Most played"
             showAllTo="/charts"
-          >
-            {(feed?.popular ?? []).slice(0, 10).map((t, i) => (
-              <TrackCard key={t.id} track={t} index={i + 1} queue={feed?.popular} />
+            items={(feed?.popular ?? []).slice(0, 10).map((t, i) => (
+              <AlbumCard
+                key={t.id}
+                track={t}
+                queue={feed?.popular}
+                badge={
+                  <span className="rounded-full bg-black/75 px-2 py-0.5 text-[10px] font-black text-tv-cyan">
+                    #{i + 1}
+                  </span>
+                }
+              />
             ))}
-          </ListSection>
+          />
           )}
 
           {/* Quick access bento grid */}
