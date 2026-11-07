@@ -123,7 +123,7 @@ export function TunevioHome() {
             </form>
             <div className="flex shrink-0 items-center gap-2">
               {auth.isAuthenticated ? (
-                <Link to="/settings" aria-label="Your profile" className="block">
+                <Link to="/profile" aria-label="Your profile" className="block">
                   {auth.avatarUrl ? (
                     <SignedImg
                       src={auth.avatarUrl}
