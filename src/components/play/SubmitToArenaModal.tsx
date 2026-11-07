@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { getBoostWallet } from "@/lib/boost-economy.functions";
 import { listLiveArenas, submitSongToArena } from "@/lib/play-arena-submissions.functions";
 import { SignedImg } from "@/components/ui/signed-img";
+import { arenaSubmissionChoices } from "@/lib/arena-picker";
 
 type Priority = "standard" | "boosted" | "featured";
 
@@ -32,8 +33,9 @@ export function SubmitToArenaModal({
     (async () => {
       try {
         const rows = await listArenas();
-        setArenas(rows as any[]);
-        if ((rows as any[]).length > 0) setArenaId((rows as any[])[0].id);
+        const choices = arenaSubmissionChoices(rows as Array<{ id: string; title: string; status: string }>);
+        setArenas(choices);
+        setArenaId(choices[0]?.id ?? "");
       } catch (e: any) {
         toast.error(e?.message ?? "Couldn't load arenas");
       } finally {
@@ -72,20 +74,20 @@ export function SubmitToArenaModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900 to-black p-5 shadow-2xl">
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-background/80 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-gradient-to-b from-card to-background p-5 shadow-2xl">
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 overflow-hidden rounded-lg bg-white/5">
+            <div className="h-12 w-12 overflow-hidden rounded-lg bg-muted">
               {song.cover_url && <SignedImg src={song.cover_url} alt="" className="h-full w-full object-cover" />}
             </div>
             <div className="min-w-0">
-              <div className="text-xs uppercase tracking-wider text-fuchsia-400">Submit to Play Arena</div>
-              <div className="truncate text-base font-bold text-white">{song.title}</div>
-              <div className="flex items-center gap-2 truncate text-xs text-white/50">
+              <div className="text-xs uppercase tracking-wider text-primary">Submit to Play Arena</div>
+              <div className="truncate text-base font-bold text-foreground">{song.title}</div>
+              <div className="flex items-center gap-2 truncate text-xs text-muted-foreground">
                 {song.artist_name && <span className="truncate">{song.artist_name}</span>}
                 <span
-                  className="inline-flex items-center gap-1 text-white/40"
+                  className="inline-flex items-center gap-1 text-muted-foreground"
                   title={`${(song.play_count ?? 0).toLocaleString()} plays`}
                 >
                   <Headphones className="h-3 w-3" />
@@ -94,25 +96,26 @@ export function SubmitToArenaModal({
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-md p-1 text-white/60 hover:bg-white/5 hover:text-white"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-white/60">Arena</label>
+            <label htmlFor="arena-destination" className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Choose an Arena</label>
             {loading ? (
-              <div className="flex items-center gap-2 text-sm text-white/50"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading arenas…</div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading arenas…</div>
             ) : arenas.length === 0 ? (
-              <div className="rounded-md border border-white/10 bg-white/5 p-3 text-sm text-white/60">No arenas available right now.</div>
+              <div className="rounded-md border border-border bg-muted p-3 text-sm text-muted-foreground">No arenas available right now.</div>
             ) : (
               <select
+                id="arena-destination"
                 value={arenaId}
                 onChange={(e) => setArenaId(e.target.value)}
-                className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-fuchsia-500"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
               >
                 {arenas.map((a) => (
                   <option key={a.id} value={a.id}>
-                    {a.title} {a.status === "live" ? "• LIVE" : "• Upcoming"}
+                    {a.title?.trim() || "Untitled Arena"} {a.status === "live" ? "• Live now" : "• Accepting songs"}
                   </option>
                 ))}
               </select>
@@ -120,19 +123,19 @@ export function SubmitToArenaModal({
           </div>
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-white/60">Message (optional)</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Message (optional)</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value.slice(0, 280))}
               rows={2}
               placeholder="A note for the host…"
-              className="w-full resize-none rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 outline-none focus:border-fuchsia-500"
+              className="w-full resize-none rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary"
             />
-            <div className="mt-1 text-right text-[10px] text-white/40">{message.length}/280</div>
+            <div className="mt-1 text-right text-[10px] text-muted-foreground">{message.length}/280</div>
           </div>
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-white/60">Priority</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Priority</label>
             <div className="grid grid-cols-3 gap-2">
               {(
                 [
@@ -146,8 +149,8 @@ export function SubmitToArenaModal({
                   onClick={() => setPriority(p.v)}
                   className={`flex flex-col items-center gap-1 rounded-md border px-2 py-2 text-[11px] font-semibold uppercase tracking-wider transition ${
                     priority === p.v
-                      ? "border-fuchsia-500 bg-fuchsia-500/15 text-fuchsia-200"
-                      : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
+                      ? "border-primary bg-primary/15 text-primary"
+                      : "border-border bg-muted text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   {p.icon}
@@ -156,10 +159,10 @@ export function SubmitToArenaModal({
               ))}
             </div>
             {priority !== "standard" && (
-              <div className="mt-2 text-[10px] text-white/50">
+              <div className="mt-2 text-[10px] text-muted-foreground">
                 Priority placement costs {boostCost} boost credit{boostCost === 1 ? "" : "s"} —
                 {balance === null ? " checking your balance…" : ` you have ${balance}.`}{" "}
-                <a href="/credits" className="underline hover:text-fuchsia-300">Get credits</a>
+                <a href="/credits" className="underline hover:text-primary">Get credits</a>
               </div>
             )}
           </div>
@@ -167,7 +170,7 @@ export function SubmitToArenaModal({
           <button
             disabled={submitting || loading || !arenaId || (boostCost > 0 && balance !== null && balance < boostCost)}
             onClick={handleSubmit}
-            className="w-full rounded-md bg-gradient-to-r from-fuchsia-600 to-pink-600 px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-fuchsia-500/30 transition hover:from-fuchsia-500 hover:to-pink-500 disabled:opacity-50"
+            className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-foreground shadow-lg shadow-primary/30 transition hover:bg-primary/90 disabled:opacity-50"
           >
             {submitting ? "Submitting…" : "Submit to Arena"}
           </button>
