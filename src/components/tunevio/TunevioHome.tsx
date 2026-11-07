@@ -249,6 +249,7 @@ export function TunevioHome() {
             title="Top Songs"
             eyebrow="Most played"
             showAllTo="/charts"
+            size="xl"
             items={(feed?.popular ?? []).slice(0, 10).map((t, i) => (
               <AlbumCard
                 key={t.id}
