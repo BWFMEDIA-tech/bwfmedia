@@ -148,6 +148,17 @@
 .fsq-name { display: block; font-size: 15px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
 .fsq-genre { display: block; font-size: 12px; color: var(--muted-foreground); }
 .fsq-vs { flex-shrink: 0; font-size: 30px; font-style: italic; font-weight: 900; line-height: 1; background: linear-gradient(100deg, var(--primary), #fff 50%, var(--fsq-violet)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 55%, transparent)) drop-shadow(0 0 14px color-mix(in srgb, var(--fsq-violet) 40%, transparent)); }
+.play-confirmed-battles .fsq-slot { border-radius: 8px; background: var(--card); box-shadow: none; border-color: var(--border); }
+.play-confirmed-battles .fsq-artist { flex-direction: column; text-align: center; gap: 14px; }
+.play-confirmed-battles .fsq-ring { --fsq-ring: var(--brand-cyan); box-shadow: none; }
+.play-confirmed-battles .fsq-ring[data-side="b"] { --fsq-ring: var(--brand-blue); }
+.play-confirmed-battles .fsq-ring img { width: 104px; height: 104px; }
+.play-confirmed-battles .fsq-name { font-size: 17px; line-height: 1.4; }
+.play-confirmed-battles .fsq-vs { background: none; color: var(--brand-silver); filter: none; font-size: 24px; }
+.play-confirmed-battles .fsq-status[data-status="live"] { color: var(--primary); border-color: var(--primary); background: var(--background); box-shadow: none; }
+@media (max-width: 480px) {
+  .play-confirmed-battles .fsq-ring img { width: 80px; height: 80px; }
+}
 @media (max-width: 480px) {
   .fsq-ring img { width: 44px; height: 44px; }
   .fsq-vs { font-size: 24px; }

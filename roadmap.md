@@ -1,5 +1,10 @@
 # Roadmap
 
+## Play Freestyle cleanup
+- [x] Simplify Play overview to confirmed Freestyle matchups and confirmed live performances; hide empty sections
+- [x] Keep invitations, challenge creation and song upload/matchmaking accessible on /play/challenges; retain existing Stream Studio host controls and data connections
+- [x] Verify signed-in desktop/430px overview, challenge navigation and song upload entry; no page overflow or runtime errors, preview build OK; no confirmed matchups/current performances available for populated-card verification
+
 ## Smooth horizontal card scrolling
 - [x] Inspect shared rails and apply native momentum/proximity scrolling with mouse-only drag enhancement
 - [x] Verified desktop rail moves on mouse drag without opening cards, mobile proximity snapping and no page overflow; preview build OK; physical-device inertia remains unverified

@@ -128,6 +128,7 @@ import { Route as PayBookingIdRouteImport } from './routes/pay.$bookingId'
 import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as PlayRoomRouteImport } from './routes/play.$room'
+import { Route as PlayChallengesRouteImport } from './routes/play.challenges'
 import { Route as PlayRanksRouteImport } from './routes/play.ranks'
 import { Route as SettingsIndexRouteImport } from './routes/settings.index'
 import { Route as SettingsAppearanceRouteImport } from './routes/settings.appearance'
@@ -770,6 +771,11 @@ const PlayRoomRoute = PlayRoomRouteImport.update({
   path: '/play/$room',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayChallengesRoute = PlayChallengesRouteImport.update({
+  id: '/play/challenges',
+  path: '/play/challenges',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlayRanksRoute = PlayRanksRouteImport.update({
   id: '/play/ranks',
   path: '/play/ranks',
@@ -1093,6 +1099,7 @@ export interface FileRoutesByFullPath {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/play/challenges': typeof PlayChallengesRoute
   '/play/ranks': typeof PlayRanksRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
@@ -1251,6 +1258,7 @@ export interface FileRoutesByTo {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/play/challenges': typeof PlayChallengesRoute
   '/play/ranks': typeof PlayRanksRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
@@ -1413,6 +1421,7 @@ export interface FileRoutesById {
   '/pay/$bookingId': typeof PayBookingIdRoute
   '/pay/return': typeof PayReturnRoute
   '/play/$room': typeof PlayRoomRoute
+  '/play/challenges': typeof PlayChallengesRoute
   '/play/ranks': typeof PlayRanksRoute
   '/settings/appearance': typeof SettingsAppearanceRoute
   '/settings/artist-info': typeof SettingsArtistInfoRoute
@@ -1576,6 +1585,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/play/challenges'
     | '/play/ranks'
     | '/settings/appearance'
     | '/settings/artist-info'
@@ -1734,6 +1744,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/play/challenges'
     | '/play/ranks'
     | '/settings/appearance'
     | '/settings/artist-info'
@@ -1895,6 +1906,7 @@ export interface FileRouteTypes {
     | '/pay/$bookingId'
     | '/pay/return'
     | '/play/$room'
+    | '/play/challenges'
     | '/play/ranks'
     | '/settings/appearance'
     | '/settings/artist-info'
@@ -2022,6 +2034,7 @@ export interface RootRouteChildren {
   PayBookingIdRoute: typeof PayBookingIdRoute
   PayReturnRoute: typeof PayReturnRoute
   PlayRoomRoute: typeof PlayRoomRoute
+  PlayChallengesRoute: typeof PlayChallengesRoute
   PlayRanksRoute: typeof PlayRanksRoute
   StageRoomIdRoute: typeof StageRoomIdRoute
   StreamRoomRoute: typeof StreamRoomRoute
@@ -2886,6 +2899,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayRoomRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/play/challenges': {
+      id: '/play/challenges'
+      path: '/play/challenges'
+      fullPath: '/play/challenges'
+      preLoaderRoute: typeof PlayChallengesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/play/ranks': {
       id: '/play/ranks'
       path: '/play/ranks'
@@ -3396,6 +3416,7 @@ const rootRouteChildren: RootRouteChildren = {
   PayBookingIdRoute: PayBookingIdRoute,
   PayReturnRoute: PayReturnRoute,
   PlayRoomRoute: PlayRoomRoute,
+  PlayChallengesRoute: PlayChallengesRoute,
   PlayRanksRoute: PlayRanksRoute,
   StageRoomIdRoute: StageRoomIdRoute,
   StreamRoomRoute: StreamRoomRoute,
