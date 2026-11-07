@@ -259,7 +259,7 @@ function ChoosePath({
             className: "bg-[#0000FF] hover:bg-[#0000CC]",
             onClick: () => document.getElementById("genre-battles")?.scrollIntoView({ behavior: "smooth", block: "start" }),
           }}
-          footer={<>Battles Today: <span className="font-bold text-white">{battlesToday}/10</span></>}
+          footer={<>Battles Today: <span className="font-bold text-white">{battlesToday}/20</span></>}
         />
         <PathCard
           accent="from-amber-500/25 to-transparent"
