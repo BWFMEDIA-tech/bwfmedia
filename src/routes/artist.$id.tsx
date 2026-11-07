@@ -7,7 +7,7 @@ import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   BadgeCheck, MapPin, Music2, Play, Pause, Heart, Share2, MoreHorizontal,
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
-  ListMusic, ThumbsUp, Headphones,
+  ListMusic, ThumbsUp, Headphones, Settings,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
   DollarSign as Dollar, Trophy, Flame, Crown, Disc3,
 } from "lucide-react";
@@ -38,6 +38,7 @@ import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { useSignedVideoUrl } from "@/lib/video-urls";
+import { Button } from "@/components/ui/button";
 
 function ProfileVideoCard({ v }: { v: { id: string; title: string; thumbnail_path: string | null; created_at: string } }) {
   const thumb = useSignedVideoUrl(v.thumbnail_path && !/^https?:/.test(v.thumbnail_path) ? v.thumbnail_path : null);
@@ -264,7 +265,14 @@ function HeroBanner({
         <div className="absolute inset-0 opacity-60" style={{ background: `radial-gradient(120% 80% at 70% 0%, ${RED}33, transparent 60%)` }} />
       )}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_120%,#000_0%,transparent_50%)]" />
-      <div className="relative p-5 md:p-8 flex gap-6 sm:items-end">
+      {isOwner && (
+        <Button asChild variant="outline" size="icon" className="absolute right-3 top-3 z-10" >
+          <Link to="/settings" aria-label="Profile settings" title="Settings">
+            <Settings />
+          </Link>
+        </Button>
+      )}
+      <div className={`relative p-5 md:p-8 flex gap-6 sm:items-end${isOwner ? " pr-16 md:pr-20" : ""}`}>
         <div className="flex min-w-0 flex-1 items-center gap-4 sm:items-end sm:gap-5">
           <div className="relative shrink-0">
             <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-36 md:w-36 rounded-full overflow-hidden ring-4" style={{ borderColor: RED, boxShadow: `0 0 40px ${RED}55`, borderWidth: 0, outline: `3px solid ${RED}` }}>
