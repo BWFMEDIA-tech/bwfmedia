@@ -180,7 +180,6 @@ export function StudioStageRoom({
     run: () => Promise<void>;
   }>(null);
 
-const AUDIENCE_ROLES = ["listener", "green_room"];
   // The primary host is always pinned to the first (left) slot; any other
   // hosts or co-hosts are added to the right in the order they joined.
   const hosts = participants
