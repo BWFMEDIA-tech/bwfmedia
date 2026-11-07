@@ -14,6 +14,7 @@ import { MobileBottomNav } from "@/components/site/MobileBottomNav";
 import { IntroSplash } from "@/components/site/IntroSplash";
 import { AssistantLauncher } from "@/components/assistant/AssistantLauncher";
 import { InstallPromptPopup } from "@/components/pwa/InstallPromptPopup";
+import { FreestyleChallengePopup } from "@/components/play/FreestyleChallengePopup";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
 import { GlobalPlayer } from "@/components/player/GlobalPlayer";
@@ -176,6 +177,7 @@ function RootComponent() {
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />
         <InstallPromptPopup />
+        <FreestyleChallengePopup />
         <IntroSplash />
         </ArtistStatusProvider>
         </PlayerProvider>
