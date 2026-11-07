@@ -396,16 +396,29 @@
   html { scroll-behavior: smooth; }
 }
 
-/* Native rails keep browser momentum and axis locking; proximity avoids forced stops. */
+/* Native rails keep browser momentum and axis locking. Card rails free-scroll like Spotify (no snap
+   settle after release); only stage pagers keep gentle snapping. Rails get their own compositor layer. */
 :is(.flex, .grid, .tv-scroll):is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   touch-action: pan-x pan-y pinch-zoom;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+  will-change: scroll-position;
+}
+.tv-scroll-pager:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) {
   scroll-snap-type: x proximity;
 }
 :is(.flex, .grid, .tv-scroll):is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) > * {
   scroll-snap-stop: normal;
+}
+@media (hover: none), (pointer: coarse) {
+  /* Touch: drop per-card hover transitions/shadows that repaint while swiping. */
+  :is(.flex, .grid, .tv-scroll):is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) .tv-play-fab {
+    transition: none;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
 }
 :is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll)[data-card-dragging] {
   cursor: grabbing;
