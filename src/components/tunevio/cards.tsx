@@ -13,6 +13,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { usePlayer, type PlayerTrack } from "@/lib/player-context";
 import type { FeedArtist, FeedBattle, FeedStream, FeedTrack } from "@/lib/home-feed.functions";
+import playIconAsset from "@/assets/tunevio-play-icon.png.asset.json";
 
 /* ── shared helpers ─────────────────────────────────────────────── */
 
@@ -117,19 +118,25 @@ export function PlayFab({
   const dims = size === "lg" ? "h-14 w-14" : size === "sm" ? "h-9 w-9" : "h-10 w-10";
   const icon = size === "lg" ? "h-6 w-6" : size === "sm" ? "h-4 w-4" : "h-4 w-4";
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       type="button"
       aria-label={playing ? "Pause" : "Play"}
+      data-play-icon={!playing ? "true" : undefined}
       onClick={onClick}
       className={cn(
-        "tv-play-fab grid place-items-center rounded-full border border-tv-cyan/70 bg-black/60 text-white shadow-lg shadow-tv-cyan/25 backdrop-blur-sm transition",
+        "tv-play-fab grid place-items-center rounded-full border border-tv-cyan/70 bg-background/60 p-0 text-foreground shadow-lg backdrop-blur-sm transition",
         "hover:scale-105 hover:border-tv-cyan active:scale-95",
         dims,
         className,
       )}
     >
-      {playing ? <Pause className={cn(icon, "fill-current")} /> : <Play className={cn(icon, "fill-current ml-0.5")} />}
-    </button>
+      {playing ? <Pause className={cn(icon, "fill-current")} /> : <>
+        <Play className={cn(icon, "tv-play-standard fill-current ml-0.5")} />
+        <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} className="tv-play-image h-full w-full object-contain" />
+      </>}
+    </Button>
   );
 }
 
