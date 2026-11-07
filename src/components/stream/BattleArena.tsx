@@ -151,7 +151,7 @@ function BattleArenaLive({
   // Visible to everyone (artists, hosts, listeners) even before a battle starts.
   if (!match && !isHost) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0a1a2e] to-[#0d0d18] p-4">
+      <div className="battle-arena-neon rounded-2xl border border-white/15 p-4">
         <div className="flex items-center gap-2 text-sm font-bold text-white">
           <Swords className="h-4 w-4 text-[#00E6FF]" /> Battle Arena
         </div>
@@ -164,7 +164,7 @@ function BattleArenaLive({
 
   if (!match && isHost) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18] p-4">
+      <div className="battle-arena-neon rounded-2xl border border-white/15 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-bold text-white">
             <Swords className="h-4 w-4 text-[#00E6FF]" /> Battle Arena
@@ -386,8 +386,8 @@ function BattleView({
   if (!match) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18]">
-      <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-2">
+    <div className="battle-arena-neon overflow-hidden rounded-2xl border border-white/15">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-2">
         <div className="flex items-center gap-2 text-xs font-bold text-white">
           <Swords className="h-3.5 w-3.5 text-[#00E6FF]" />
           BATTLE · Round {Math.max(1, match.current_round as number)} / {match.total_rounds as number}
