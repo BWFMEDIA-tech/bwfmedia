@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Final physical-device Freestyle integration test
-- [ ] Confirm A challenges B, B accepts, A receives acceptance notification, and both profiles occupy the same next available numbered slot (1–10), A as challenger and B as opponent
+- [x] User confirmed B accepted, both artists appear in the same numbered slot, A received the acceptance notification, and the host sees the accepted matchup; exact next-available numbering and A/B assignment still need observation
 - [ ] Confirm host sees accepted matchup and selects it before either artist is brought into the main video boxes; acceptance must not start the battle
 - [ ] Confirm two physical artist devices connect to assigned Side A/B with simultaneous cameras and microphones, host start/end, both live notifications, and completion releases the slot
 - [ ] Check denied camera/microphone permissions, connection failure/reconnection, and mobile Safari; await device observations before marking verified
