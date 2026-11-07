@@ -232,11 +232,6 @@ function ChoosePath({
   data: ArenaDashboard;
   user: ArenaUserStats | null;
 }) {
-  const nextSlot =
-    data.nextSlotSeconds != null
-      ? formatMMSS(data.nextSlotSeconds)
-      : "--:--";
-  const queuePos = user?.queuePosition != null ? `#${user.queuePosition}` : "—";
   const battlesToday = user?.battlesToday ?? 0;
   const nextEvent = data.nextEventAt ? formatEventDate(data.nextEventAt) : "TBA";
   return (
@@ -248,20 +243,7 @@ function ChoosePath({
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <PathCard
-          accent="from-[#0000FF]/30 to-transparent"
-          ring="ring-[#0000FF]/40"
-          icon={<Mic2 className="h-6 w-6" />}
-          iconColor="text-[#0000FF]"
-          title="OPEN STAGE QUEUE"
-          desc={<>Join the queue for a chance to perform.<br />First come. First served.</>}
-          metricLabel="Next Slot In"
-          metricValue={nextSlot}
-          metricColor="text-[#0000FF]"
-          button={{ label: "JOIN QUEUE", className: "bg-[#0000FF] hover:bg-[#0000CC]" }}
-          footer={<>Your Position: <span className="font-bold text-white">{queuePos}</span></>}
-        />
+      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
         <PathCard
           accent="from-[#00E6FF]/25 via-[#00E6FF]/20 to-transparent"
           ring="ring-[#00E6FF]/40"
