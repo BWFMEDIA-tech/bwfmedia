@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Link as RouterLink, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link as RouterLink, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
+  ArrowLeft,
   User,
   LogOut,
   Settings,
@@ -103,6 +104,7 @@ export function SiteHeader() {
   const auth = useAuth();
   const stage = useLiveStageNavigation();
   const navigate = useNavigate();
+  const router = useRouter();
   const pathname = useActivePath();
   const isAdmin = auth.roles.includes("admin");
   const isManager = auth.roles.includes("manager");
@@ -208,6 +210,18 @@ export function SiteHeader() {
         >
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
+
+        {/* Back arrow (every page except Home) */}
+        {pathname !== "/" && (
+          <button
+            type="button"
+            aria-label="Go back"
+            onClick={() => router.history.back()}
+            className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 text-bone shrink-0"
+          >
+            <ArrowLeft size={20} />
+          </button>
+        )}
 
         {/* Logo */}
         <RouterLink to="/" className="flex min-w-0 items-center shrink-0 mr-2">
