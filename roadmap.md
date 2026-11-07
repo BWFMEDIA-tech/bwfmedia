@@ -1,5 +1,9 @@
 # Roadmap
 
+## Pending battle queue regression
+- [x] Confirm and fix pending invitations/prepared matches blocking regular queue advancement; keep live battle playback/voting protected
+- [x] Verify six new regression cases and existing battle tests; 31 tests passed and preview build OK
+
 ## 10-slot Freestyle challenge system
 - [x] Enforce separate 10-slot capacity, one outstanding matchup, acceptance and authorized queue controls in the database
 - [x] Add artist opponent selection and ten-slot board on Arena; host queue integrates with existing live freestyle video

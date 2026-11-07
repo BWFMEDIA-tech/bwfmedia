@@ -258,8 +258,11 @@ export const advancePlayQueue = createServerFn({ method: "POST" })
         .select("status").eq("id", justPlayed.battle_match_id).maybeSingle();
       battleActive = !!match && match.status !== "completed" && match.status !== "cancelled";
     } else {
+      // Invitations and prepared matches must not pause the listening queue.
+      // START_ROUND marks a triggered battle live; keep that battle protected
+      // even between songs while voting/results are still in progress.
       const { data: match } = await supabase.from("battle_matches").select("id")
-        .eq("stream_id", data.streamId).in("status", ["pending", "live"]).limit(1).maybeSingle();
+        .eq("stream_id", data.streamId).eq("status", "live").limit(1).maybeSingle();
       battleActive = !!match;
     }
     if (justPlayed?.battle_match_id && justPlayed.battle_side === "a") {
