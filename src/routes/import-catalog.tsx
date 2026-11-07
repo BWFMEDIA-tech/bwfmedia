@@ -8,6 +8,7 @@ import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { hasArtistTools } from "@/lib/artist-navigation";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { validateCatalog, catalogStats, MAX_CATALOG_FILE_BYTES, REQUIRED_COLUMNS, OPTIONAL_COLUMNS, type ParsedCatalog } from "@/lib/catalog-import";
 import { listCatalogImports, runCatalogImport } from "@/lib/catalog-import.functions";
 
@@ -87,7 +88,7 @@ function ImportCatalogPage() {
   };
   const canNext = [!!distributor, !!parsed && !parsed.missingColumns.length && parsed.rows.length > 0, true, false][step];
 
-  if (auth.user && !isArtist) return <div className="mx-auto max-w-lg rounded-xl border border-border bg-card p-8 text-center"><h1 className="text-2xl font-bold">Import Catalog is for artists</h1><p className="mt-2 text-muted-foreground">Upgrade to an artist account to import your music.</p><Button asChild className="mt-4"><Link to="/signup">Become an artist</Link></Button></div>;
+  if (auth.user && !isArtist) return <div className="mx-auto max-w-lg rounded-xl border border-border bg-card p-8 text-center"><h1 className="text-2xl font-bold">Import Catalog is for artists</h1><ActivateArtistButton className="mt-4" /></div>;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">

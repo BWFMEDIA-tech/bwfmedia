@@ -12,6 +12,7 @@ import { ArtworkUploader, ArtworkThumb, AudioUploader } from "@/components/distr
 import { formatDuration } from "@/lib/distribution-upload";
 import { useAuth } from "@/lib/auth-context";
 import { hasArtistTools } from "@/lib/artist-navigation";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import {
   listMyReleases, createRelease, updateRelease, deleteRelease,
   submitReleaseForReview, addReleaseTrack, updateReleaseTrack, deleteReleaseTrack,
@@ -26,6 +27,10 @@ export const Route = createFileRoute("/distribution")({
     meta: [
       { title: "Distribution — Tunevio" },
       { name: "description", content: "Submit your music for distribution review on Tunevio." },
+      { property: "og:title", content: "Distribution — Tunevio" },
+      { property: "og:description", content: "Submit your music for distribution review on Tunevio." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -112,8 +117,7 @@ function DistributionPage() {
         <div>
           <Disc3 className="mx-auto mb-4 h-10 w-10 text-[#00E6FF]" />
           <h1 className="text-xl font-bold">Distribution is for artists</h1>
-          <p className="mt-2 text-sm text-white/50">Register as an artist to release your music.</p>
-          <button onClick={() => navigate({ to: "/signup", search: { as: "artist" } as any })} className="mt-4 rounded-full bg-[#00E6FF] px-6 py-2 text-sm font-bold text-black">Become an artist</button>
+          <ActivateArtistButton className="mt-4" />
         </div>
       </div>
     );

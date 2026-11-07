@@ -23,6 +23,12 @@ export function useAuth(): AuthState {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [rolesLoading, setRolesLoading] = useState(true);
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+  const [profileVersion, setProfileVersion] = useState(0);
+  useEffect(() => {
+    const refresh = () => setProfileVersion((v) => v + 1);
+    window.addEventListener("tunevio:profile-updated", refresh);
+    return () => window.removeEventListener("tunevio:profile-updated", refresh);
+  }, []);
 
   useEffect(() => {
     const apply = (s: Session | null) => {
@@ -86,7 +92,7 @@ export function useAuth(): AuthState {
     return () => {
       cancelled = true;
     };
-  }, [session?.user?.id]);
+  }, [session?.user?.id, profileVersion]);
 
   const user = session?.user ?? null;
   return {

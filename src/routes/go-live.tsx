@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Radio, Copy, Check, Users, Headphones, Music2, Twitch, Youtube, Facebook, Link2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { canGoLive } from "@/lib/artist-navigation";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { platformLabel, safePlatformUrl, type ProfilePlatformLink } from "@/lib/profile-platforms";
 import { supabase } from "@/integrations/supabase/client";
 import { startOrResumeStream, endStream, getMyActiveStream } from "@/lib/streams.functions";
@@ -203,8 +204,8 @@ function GoLivePage() {
       <div className="mx-auto max-w-md px-4 pb-28 pt-16 text-center text-white">
         <Radio className="mx-auto mb-4 h-10 w-10 text-[#00E6FF]" />
         <h1 className="text-2xl font-black">Going live is for artists</h1>
-        <p className="mt-2 text-sm text-white/60">Listener accounts can watch and chat. Register as an artist to start your own live.</p>
-        <Link to="/signup" search={{ as: "artist" } as any} className="mt-5 inline-block rounded-full bg-[#00E6FF] px-6 py-2.5 text-sm font-bold text-black">Become an artist</Link>
+        <p className="mt-2 text-sm text-muted-foreground">Activate your existing profile as an artist.</p>
+        <ActivateArtistButton className="mt-5" />
       </div>
     );
   }
