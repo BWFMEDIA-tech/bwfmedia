@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ArrowDownUp, Search, Send } from "lucide-react";
+import { ArrowDownUp, Search, Send } from "lucide-react";
 import { toast } from "sonner";
 import {
   getArtistFollowStats,
@@ -97,19 +97,10 @@ function ConnectionsPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-2xl bg-background pb-24 text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur">
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
-          <button
-            type="button"
-            aria-label="Back"
-            onClick={() => (window.history.length > 1 ? router.history.back() : router.navigate({ to: "/artist/$id", params: { id } }))}
-            className="grid h-10 w-10 place-items-center rounded-full border border-border hover:bg-muted"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
+        <div className="flex justify-center items-center gap-3 px-4 py-3">
           <Link to="/artist/$id" params={{ id }} className="truncate text-center text-base font-bold">
             Profile
           </Link>
-          <span className="h-10 w-10" />
         </div>
         <nav className="grid grid-cols-2">
           {tabs.map((t) => (

@@ -185,7 +185,6 @@ function VideosPage() {
           <Button asChild variant="ghost" className="text-muted-foreground"><Link to="/recordings">Recordings</Link></Button>
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" title="Return to Tunevio"><Link to="/"><ArrowLeft /><span className="sr-only">Return to Tunevio</span></Link></Button>
           {canUpload ? <Button onClick={() => setShowUpload(true)} className="px-3"><Upload /><span className="hidden sm:inline">Upload video</span><span className="sr-only sm:hidden">Upload video</span></Button> : !userId ? <Button asChild variant="secondary"><Link to="/login">Sign in</Link></Button> : null}
         </div>
       </div>
