@@ -122,7 +122,7 @@ export async function runBattleEvent(
               : aWins > bWins
                 ? (m.artist_a_id as string)
                 : (m.artist_b_id as string);
-          await supabase
+          const { error: completionError } = await supabase
             .from("battle_matches")
             .update({
               status: "completed",
@@ -131,6 +131,7 @@ export async function runBattleEvent(
               active_side: null,
             })
             .eq("id", m.id);
+          if (completionError) throw new Error(completionError.message);
           return { ok: true, completed: true, winnerUserId: overallWinner };
         }
         if ((m.current_round as number) === 0 && m.genre && !(m.genre_agreed_a && m.genre_agreed_b)) {
@@ -431,7 +432,7 @@ export async function runBattleEvent(
               : aWins > bWins
                 ? (m.artist_a_id as string)
                 : (m.artist_b_id as string);
-          await supabase
+          const { error: completionError } = await supabase
             .from("battle_matches")
             .update({
               status: "completed",
@@ -440,6 +441,7 @@ export async function runBattleEvent(
               active_side: null,
             })
             .eq("id", m.id);
+          if (completionError) throw new Error(completionError.message);
           return { ok: true, completed: true, winnerUserId: overallWinner };
         }
         // Otherwise open the next round, same as START_ROUND.
@@ -497,7 +499,7 @@ export async function runBattleEvent(
             const bW = m.b_wins as number;
             const overallWinner =
               aW === bW ? null : aW > bW ? (m.artist_a_id as string) : (m.artist_b_id as string);
-            await supabase
+            const { error: completionError } = await supabase
               .from("battle_matches")
               .update({
                 status: "completed",
@@ -506,12 +508,13 @@ export async function runBattleEvent(
                 active_side: null,
               })
               .eq("id", m.id);
+            if (completionError) throw new Error(completionError.message);
             return { ok: true, already: true, completed: true };
           }
           return { ok: true, already: true };
         }
         // Winner from live accepted votes, not the denormalized columns.
-        const totals = await loadRoundVoteTotals(supabase, round!.id);
+        const totals = await loadRoundVoteTotals(supabase, round.id);
         const aScore = totals.aWeight;
         const bScore = totals.bWeight;
         const winner: "a" | "b" | "tie" =
@@ -523,7 +526,7 @@ export async function runBattleEvent(
             voting_status: "finalized",
             winner_choice: winner,
           })
-          .eq("id", round!.id);
+          .eq("id", round.id);
         const aWins = (m.a_wins as number) + (winner === "a" ? 1 : 0);
         const bWins = (m.b_wins as number) + (winner === "b" ? 1 : 0);
         const isLast = (m.current_round as number) >= (m.total_rounds as number);
@@ -534,7 +537,7 @@ export async function runBattleEvent(
               : aWins > bWins
                 ? (m.artist_a_id as string)
                 : (m.artist_b_id as string);
-          await supabase
+          const { error: completionError } = await supabase
             .from("battle_matches")
             .update({
               a_wins: aWins,
@@ -545,6 +548,7 @@ export async function runBattleEvent(
               active_side: null,
             })
             .eq("id", m.id);
+          if (completionError) throw new Error(completionError.message);
         } else {
           await supabase
             .from("battle_matches")
@@ -560,7 +564,7 @@ export async function runBattleEvent(
           .update({ status: "closed", voting_status: "closed" })
           .eq("match_id", m.id)
           .eq("status", "live");
-        await supabase
+        const { error: cancellationError } = await supabase
           .from("battle_matches")
           .update({
             status: "cancelled",
@@ -568,6 +572,7 @@ export async function runBattleEvent(
             active_side: null,
           })
           .eq("id", m.id);
+        if (cancellationError) throw new Error(cancellationError.message);
         return { ok: true };
       }
 
