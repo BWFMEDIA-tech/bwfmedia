@@ -151,7 +151,7 @@ function BattleArenaLive({
   // Visible to everyone (artists, hosts, listeners) even before a battle starts.
   if (!match && !isHost) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0a1a2e] to-[#0d0d18] p-4">
+      <div className="battle-arena-neon rounded-2xl border border-white/15 p-4">
         <div className="flex items-center gap-2 text-sm font-bold text-white">
           <Swords className="h-4 w-4 text-[#00E6FF]" /> Battle Arena
         </div>
@@ -164,7 +164,7 @@ function BattleArenaLive({
 
   if (!match && isHost) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18] p-4">
+      <div className="battle-arena-neon rounded-2xl border border-white/15 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-bold text-white">
             <Swords className="h-4 w-4 text-[#00E6FF]" /> Battle Arena
@@ -386,8 +386,8 @@ function BattleView({
   if (!match) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a2e] to-[#0d0d18]">
-      <div className="flex items-center justify-between border-b border-white/10 bg-black/30 px-4 py-2">
+    <div className="battle-arena-neon overflow-hidden rounded-2xl border border-white/15">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-2">
         <div className="flex items-center gap-2 text-xs font-bold text-white">
           <Swords className="h-3.5 w-3.5 text-[#00E6FF]" />
           BATTLE · Round {Math.max(1, match.current_round as number)} / {match.total_rounds as number}
@@ -454,7 +454,10 @@ function BattleView({
         myVote={myVote}
         votingStatus={votingStatus}
       />
-      <div className="grid grid-cols-2 gap-0">
+      <div className="relative grid grid-cols-2 gap-0">
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 items-center">
+          <span className="arena-vs-bolt">VS</span>
+        </div>
         <ArtistSide
           side="a"
           artistId={match.artist_a_id as string | null}
@@ -600,9 +603,10 @@ function VoteTracker({
         </div>
 
         {/* Center VOTE hexagon */}
-        <div className="relative flex shrink-0 items-center justify-center">
+        <div className="relative flex shrink-0 flex-col items-center justify-center">
+          <Crown className="mb-0.5 h-4 w-4 text-[#7ef4ff] drop-shadow-[0_0_6px_rgba(0,230,255,0.9)]" />
           <div
-            className="flex h-12 w-20 items-center justify-center text-[11px] font-black tracking-widest text-white shadow-lg sm:h-14 sm:w-24 sm:text-sm"
+            className="arena-hex-glow flex h-12 w-20 items-center justify-center text-[11px] font-black tracking-widest text-white sm:h-14 sm:w-24 sm:text-sm"
             style={{
               clipPath:
                 "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
@@ -619,7 +623,7 @@ function VoteTracker({
             <span
               className="font-mono text-3xl font-black tabular-nums sm:text-4xl"
               style={{
-                background: "linear-gradient(135deg,#00E6FF,#ef4444)",
+                background: "linear-gradient(135deg,#e9d5ff,#a855f7)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -648,8 +652,8 @@ function VoteTracker({
           className="absolute inset-y-0 right-0 transition-[width] duration-700 ease-out"
           style={{
             width: `${bPct}%`,
-            background: "linear-gradient(90deg,#00E6FF,#ef4444)",
-            boxShadow: "0 0 18px rgba(239,68,68,0.6)",
+            background: "linear-gradient(90deg,#7c3aed,#c084fc)",
+            boxShadow: "0 0 18px rgba(168,85,247,0.6)",
           }}
         />
         <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-white/40" />
@@ -725,9 +729,10 @@ function ArtistSide({
   flash?: { side: "a" | "b"; n: number; key: number } | null;
 }) {
   const grad = side === "a"
-    ? "linear-gradient(135deg, #0000FF, #0000ff)"
-    : "linear-gradient(135deg, #00E6FF, #00e6ff)";
-  const waveColor = side === "a" ? "#0000FF" : "#00E6FF";
+    ? "linear-gradient(135deg, #004BFF, #00E6FF)"
+    : "linear-gradient(135deg, #7c3aed, #c084fc)";
+  const waveColor = side === "a" ? "#00E6FF" : "#a855f7";
+  const wavePalette = side === "a" ? ["#00E6FF", "#004BFF", "#C0C7D1"] : ["#c084fc", "#7c3aed", "#C0C7D1"];
   const isEmpty = !artistId;
   const dim = !isEmpty && status !== "playing";
   const audioPlaying = usePlaybackPlaying();
@@ -739,9 +744,19 @@ function ArtistSide({
   const spinPaused = !isPlaying && !audioPlaying;
   const statusMeta =
     status === "playing"
-      ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#00E6FF] to-[#00e6ff] text-black animate-pulse" }
+      ? {
+          label: "Now Playing",
+          cls: side === "a"
+            ? "bg-gradient-to-r from-[#00E6FF] to-[#004BFF] text-black animate-pulse shadow-[0_0_14px_rgba(0,230,255,0.6)]"
+            : "bg-gradient-to-r from-[#c084fc] to-[#7c3aed] text-black animate-pulse shadow-[0_0_14px_rgba(168,85,247,0.6)]",
+        }
       : status === "next"
-        ? { label: "Up Next", cls: "bg-white/10 text-white/80" }
+        ? {
+            label: "Up Next",
+            cls: side === "a"
+              ? "border border-[#00E6FF]/30 bg-[#00E6FF]/10 text-[#7ef4ff]"
+              : "border border-[#a855f7]/30 bg-[#a855f7]/10 text-[#d8b4fe]",
+          }
         : status === "finished"
           ? { label: "Finished", cls: "bg-emerald-500/20 text-emerald-300" }
           : { label: "Ready", cls: "bg-white/5 text-white/50" };
@@ -756,8 +771,8 @@ function ArtistSide({
           key={flash.key}
           className="pointer-events-none absolute left-1/2 top-6 z-20 -translate-x-1/2 font-mono text-2xl font-black animate-[voteFloat_0.9s_ease-out_forwards]"
           style={{
-            color: side === "a" ? "#a78bfa" : "#ff6ab1",
-            textShadow: `0 0 12px ${side === "a" ? "rgba(0,0,255,0.9)" : "rgba(0,0,255,0.9)"}`,
+            color: side === "a" ? "#7ef4ff" : "#c084fc",
+            textShadow: `0 0 12px ${side === "a" ? "rgba(0,230,255,0.9)" : "rgba(168,85,247,0.9)"}`,
           }}
         >
           +{flash.n}
@@ -799,9 +814,8 @@ function ArtistSide({
                     style={{
                       height: `${100 - i * 13}%`,
                       opacity: 1 - i * 0.13,
-                      background:
-                        i % 3 === 0 ? "#00E6FF" : i % 3 === 1 ? "#004BFF" : "#C0C7D1",
-                      boxShadow: i % 3 === 2 ? undefined : "0 0 6px rgba(0,230,255,0.6)",
+                      background: wavePalette[i % 3],
+                      boxShadow: i % 3 === 2 ? undefined : `0 0 6px ${side === "a" ? "rgba(0,230,255,0.6)" : "rgba(168,85,247,0.6)"}`,
                       animationDelay: `${(i * 0.11 + (dir === "right" ? 0.05 : 0)).toFixed(2)}s`,
                       animationDuration: `${0.7 + (i % 3) * 0.18}s`,
                       animationPlayState: isPlaying || audioPlaying ? "running" : "paused",
@@ -827,11 +841,13 @@ function ArtistSide({
               </>
             )}
             <div
-              className={cn(
-                "relative h-full w-full overflow-hidden rounded-full border-2",
-                isPlaying && "shadow-[0_0_30px_rgba(0,0,255,0.6)]",
-              )}
-              style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
+                className={cn(
+                  "relative h-full w-full overflow-hidden rounded-full border-2",
+                  side === "a"
+                    ? isPlaying ? "arena-ring-playing-a" : "arena-ring-a"
+                    : isPlaying ? "arena-ring-playing-b" : "arena-ring-b",
+                )}
+              style={{ borderColor: waveColor }}
             >
               {/* Vinyl record — spins slowly when idle, faster when playing.
                   Visible to every viewer; driven by shared server state. */}
@@ -945,7 +961,7 @@ function ArtistSide({
               voted
                 ? "bg-white/20 text-white"
                 : canVote
-                  ? "text-white hover:opacity-90"
+                  ? cn("text-white hover:opacity-90", side === "a" ? "arena-vote-btn-a" : "arena-vote-btn-b")
                   : "cursor-not-allowed bg-white/5 text-white/30",
             )}
             style={canVote && !voted ? { background: grad } : undefined}
@@ -1635,8 +1651,8 @@ function GenreAgreementBar({ match, userId }: { match: any; userId: string | nul
     }
   };
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-white/10 bg-[#00E6FF]/5 px-4 py-2 text-[11px]">
-      <span className="rounded-full border border-[#00E6FF]/40 bg-[#00E6FF]/15 px-2.5 py-0.5 font-bold uppercase tracking-widest text-[#00E6FF]">
+    <div className="flex flex-wrap items-center justify-center gap-2 border-b border-white/10 bg-black/30 px-4 py-2.5 text-[11px]">
+      <span className="arena-neon-tag">
         {genre}
       </span>
       {pending && (
