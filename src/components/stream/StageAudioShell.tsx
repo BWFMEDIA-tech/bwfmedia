@@ -646,23 +646,25 @@ function StageMicBar({ onLeave }: { onLeave?: () => void }) {
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+    <div className="flex flex-wrap items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-2 sm:p-3">
       <button
         onClick={toggleMic}
-        className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold text-white hover:bg-white/5"
+        className="flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-semibold text-white hover:bg-white/5 sm:gap-2 sm:px-4 sm:text-xs"
       >
         {isMicrophoneEnabled ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5 text-red-400" />}
         {isMicrophoneEnabled ? "Mute" : "Unmute"}
       </button>
       <MicLevelMeter />
-      <DeviceSelector compact />
+      <div className="order-first flex w-full min-w-0 justify-center sm:order-none sm:w-auto">
+        <DeviceSelector compact />
+      </div>
       {onLeave && (
         <button
           onClick={async () => {
             await room?.disconnect();
             onLeave();
           }}
-          className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-500"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-red-500 sm:gap-2 sm:px-4 sm:text-xs"
         >
           <PhoneOff className="h-3.5 w-3.5" /> Leave
         </button>
@@ -698,7 +700,7 @@ function MicLevelMeter() {
   const lit = Math.round(level * bars);
   return (
     <div
-      className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 px-2 py-2"
+      className="flex shrink-0 items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 px-2 py-2"
       title="Your mic input level — you won't hear yourself (would cause echo)"
     >
       {Array.from({ length: bars }).map((_, i) => {

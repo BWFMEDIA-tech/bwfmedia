@@ -48,8 +48,8 @@ function DeviceDropdown({
   }
 
   return (
-    <label className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5 text-[11px] text-white/80 hover:bg-white/5">
-      <span className="flex items-center gap-1 text-white/60">
+    <label className="flex min-w-0 items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5 text-[11px] text-white/80 hover:bg-white/5">
+      <span className="flex shrink-0 items-center gap-1 text-white/60">
         {icon}
         {!compact && <span>{label}</span>}
       </span>
@@ -63,7 +63,7 @@ function DeviceDropdown({
             toast.error(err?.message || `Couldn't switch ${label.toLowerCase()}`);
           }
         }}
-        className="max-w-[160px] truncate rounded bg-transparent text-[11px] text-white outline-none [&>option]:bg-[#0d0d18]"
+        className="max-w-[110px] truncate rounded bg-transparent text-[11px] text-white outline-none sm:max-w-[160px] [&>option]:bg-[#0d0d18]"
         aria-label={`Select ${label.toLowerCase()}`}
       >
         {devices.map((d) => (
