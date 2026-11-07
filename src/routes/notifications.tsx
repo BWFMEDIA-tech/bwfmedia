@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Bell, CheckCheck, Radio, Trash2 } from "lucide-react";
+import { CheckCheck, MessageSquare, Radio, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
@@ -102,7 +102,7 @@ function NotificationsPage() {
     <div className="min-h-screen bg-[#050509] text-white pt-24 pb-12 px-4">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold flex items-center gap-3"><Bell className="h-7 w-7" /> Notifications</h1>
+          <h1 className="text-3xl font-bold">Notifications</h1>
           <div className="flex items-center gap-2">
             <button onClick={markAllRead} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs hover:bg-white/10">
               <CheckCheck className="h-3.5 w-3.5" /> Mark all read
@@ -122,7 +122,7 @@ function NotificationsPage() {
           <p className="text-white/50">Loading…</p>
         ) : items.length === 0 ? (
           <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-12 text-center">
-            <Bell className="mx-auto h-10 w-10 text-white/30 mb-3" />
+            <CheckCheck className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
             <p className="text-white/60">{tab === "unread" ? "No unread notifications." : "You're all caught up."}</p>
           </div>
         ) : (
@@ -138,7 +138,7 @@ function NotificationsPage() {
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 h-9 w-9 shrink-0 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00E6FF,#0000FF)" }}>
-                      {n.type === "live_stream_started" ? <Radio className="h-4 w-4 text-white" /> : <Bell className="h-4 w-4 text-white" />}
+                      {n.type === "live_stream_started" ? <Radio className="h-4 w-4 text-white" /> : <MessageSquare className="h-4 w-4 text-foreground" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
