@@ -4,6 +4,7 @@
 - [x] Enforce separate 10-slot capacity, one outstanding matchup, acceptance and authorized queue controls in the database
 - [x] Add artist opponent selection and ten-slot board on Arena; host queue integrates with existing live freestyle video
 - [x] Test lifecycle, capacity, permissions and mobile/desktop views; 23 Freestyle tests passed and ten slots render in the signed-in preview; preserve song battles
+- [x] Spec alignment: "Select an Artist to Battle" searchable dropdown with photos plus "Send Battle Challenge" button, host Cancel battle control, and live-stage inbox notification; verified on 430px signed-in preview
 - [ ] Verify two real connected artist devices and full inbox result flow without interrupting existing streams
 
 ## 1v1 Freestyle Battle
