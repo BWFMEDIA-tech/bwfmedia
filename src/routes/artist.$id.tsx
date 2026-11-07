@@ -33,6 +33,7 @@ import { FollowersModal } from "@/components/artist/FollowersModal";
 import { SignedImg } from "@/components/ui/signed-img";
 import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
+import { ProfileBattleCard } from "@/components/artist/ProfileBattleCard";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
 import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
@@ -225,6 +226,7 @@ function ArtistProfilePage() {
           ) : (
             <>
               <StatsRow stats={meta?.stats ?? { songs: 0, videos: 0, likes: 0, tipsCents: 0, battleWins: 0, currentStreak: 0, bestStreak: 0 }} title={meta?.title ?? null} />
+              <ProfileBattleCard artistId={id} />
               <PopularTracks tracks={meta?.tracks ?? []} isOwner={isOwner} artistName={artist.name} isAuthenticated={isAuthenticated} />
               <MusicVideos videos={meta?.videos ?? []} isOwner={isOwner} />
               <ArtistMerchSection userId={id} />
