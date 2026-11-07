@@ -1,5 +1,9 @@
 # Roadmap
 
+## Smooth horizontal card scrolling
+- [x] Inspect shared rails and apply native momentum/proximity scrolling with mouse-only drag enhancement
+- [x] Verified desktop rail moves on mouse drag without opening cards, mobile proximity snapping and no page overflow; preview build OK; physical-device inertia remains unverified
+
 ## Existing artist profile activation
 - [x] Reuse the signed-in account for Become an Artist and Go Live activation through a confirmed-email, self-only idempotent role grant; no schema or auth configuration changes
 - [x] Prefill profile editors including stage name and primary genre; update only changed fields without new registration or duplicate profiles
