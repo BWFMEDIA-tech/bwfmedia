@@ -58,7 +58,7 @@ function PlayArena() {
   );
 }
 
-export function PlayArenaView({ stream, showChat = true, room, showBattlePanels = false }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean; room?: string; showBattlePanels?: boolean }) {
+export function PlayArenaView({ stream, showChat = true, room, showBattlePanels = false, showLeaderboard = true }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean; room?: string; showBattlePanels?: boolean; showLeaderboard?: boolean }) {
   const statusFn = useServerFn(getMyPlayStatus);
   const auth = useAuth();
   const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
@@ -194,6 +194,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
           track={playing}
           upNext={queued}
           leaderboard={leaderboard}
+          showLeaderboard={showLeaderboard}
           userId={auth.user?.id ?? null}
           streamId={stream?.id ?? null}
           isHost={isHost}
@@ -239,7 +240,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
             </div>
 
             {/* Host-only leaderboard with delete + How it works */}
-            {isHost && (
+            {isHost && showLeaderboard && (
               <Leaderboard items={leaderboard} isHost={isHost} streamId={stream?.id ?? null} />
             )}
 

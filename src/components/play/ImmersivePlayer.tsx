@@ -483,6 +483,7 @@ export function ImmersivePlayer({
   track,
   upNext,
   leaderboard,
+  showLeaderboard = true,
   userId,
   streamId,
   isHost,
@@ -490,6 +491,7 @@ export function ImmersivePlayer({
   track: PlayTrack | null;
   upNext: PlayTrack[];
   leaderboard: PlayTrack[];
+  showLeaderboard?: boolean;
   userId: string | null;
   streamId: string | null;
   isHost: boolean;
@@ -1226,7 +1228,7 @@ export function ImmersivePlayer({
         </div>
 
         {/* Leaderboard mini */}
-        <div className="rounded-2xl border border-white/10 bg-[#08081a]/80 p-4 backdrop-blur">
+        {showLeaderboard && <div className="rounded-2xl border border-white/10 bg-[#08081a]/80 p-4 backdrop-blur">
           <div className="mb-3 inline-flex items-center gap-2 text-xs font-black tracking-wider">
             <Trophy className="h-4 w-4 text-[#FFD24A]" /> LEADERBOARD
           </div>
@@ -1251,7 +1253,7 @@ export function ImmersivePlayer({
               ))}
             </ol>
           )}
-        </div>
+        </div>}
       </div>
     </div>
   );
