@@ -1,5 +1,10 @@
 # Roadmap
 
+## 1v1 Freestyle Battle
+- [ ] Add a separate adjacent Freestyle section with reference-matched mobile video/voting layout
+- [ ] Reuse existing room media, profiles and inbox; enforce single votes and timed validated results
+- [ ] Test deadline, permissions, duplicate voting, results and desktop/mobile navigation without changing existing battles
+
 ## 20-slot 1v1 tournament rules
 - [x] Enforce one outstanding opponent, atomic 20-slot capacity, and tournament-scoped loser elimination across challenge and direct Arena paths
 - [x] Add real filled/available counters, selection locks, and host/admin new-tournament control
