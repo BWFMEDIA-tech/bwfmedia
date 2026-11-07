@@ -15,6 +15,8 @@ import {
   startBattleChallenge,
 } from "@/lib/battle-challenges.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { ConfirmedBattleMatchups, type ConfirmedMatchup } from "./ConfirmedBattleMatchups";
+import { CreateBattleDialog } from "./BattleArena";
 
 type HostChallenge = {
   id: string;
@@ -47,7 +49,7 @@ function Avatar({ url, name }: { url: string | null; name: string }) {
 }
 
 /** Host battle management: review, schedule and start artist challenges. */
-export function ArtistChallengesPanel() {
+export function ArtistChallengesPanel({ streamId }: { streamId?: string }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const decline = useServerFn(declineBattleChallenge);
@@ -58,6 +60,8 @@ export function ArtistChallengesPanel() {
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
   const [scheduleAt, setScheduleAt] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ConfirmedMatchup | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data, refetch } = useQuery({
     queryKey: ["host-battle-challenges", tab],
@@ -102,6 +106,13 @@ export function ArtistChallengesPanel() {
 
   return (
     <div className="space-y-3">
+      {streamId && <section className="space-y-3 border-b border-border pb-3">
+        <h3 className="text-sm font-bold">Create 1v1 Battle</h3>
+        <ConfirmedBattleMatchups selectedId={selected?.id ?? null} onSelect={setSelected} />
+        <Button size="sm" disabled={!selected} onClick={() => setShowCreate(true)}><Swords className="mr-1 h-4 w-4" /> Select matchup</Button>
+        {showCreate && selected && <CreateBattleDialog streamId={streamId} participants={[]} initialChallenge={selected}
+          onClose={() => setShowCreate(false)} onSaved={() => { setSelected(null); void refetch(); }} />}
+      </section>}
       <div className="flex items-center gap-2">
         <Swords className="h-4 w-4 text-cyan-400" />
         <h3 className="text-sm font-bold">Artist Challenges</h3>

@@ -972,7 +972,7 @@ function ArtistSide({
   );
 }
 
-function CreateBattleDialog({
+export function CreateBattleDialog({
   streamId,
   participants,
   onClose,
@@ -981,6 +981,7 @@ function CreateBattleDialog({
   initialA,
   initialB,
   initialGenre,
+  initialChallenge,
   onSaved,
   onOptimistic,
   onReconcile,
@@ -993,6 +994,7 @@ function CreateBattleDialog({
   initialA?: string;
   initialB?: string;
   initialGenre?: string;
+  initialChallenge?: ConfirmedMatchup;
   onSaved?: () => void;
   onOptimistic?: (a: string, b: string) => void;
   onReconcile?: () => void;
@@ -1000,10 +1002,10 @@ function CreateBattleDialog({
   const createFn = useServerFn(createBattleMatch);
   const updateFn = useServerFn(updateBattleArtists);
   const startChallengeFn = useServerFn(startBattleChallenge);
-  const [confirmed, setConfirmed] = useState<ConfirmedMatchup | null>(null);
-  const [a, setA] = useState<string>(initialA || participants[0]?.user_id || "");
-  const [b, setB] = useState<string>(initialB || participants[1]?.user_id || "");
-  const [genre, setGenre] = useState<string>(initialGenre ?? "");
+  const [confirmed, setConfirmed] = useState<ConfirmedMatchup | null>(initialChallenge ?? null);
+  const [a, setA] = useState<string>(initialChallenge?.challenger_id || initialA || participants[0]?.user_id || "");
+  const [b, setB] = useState<string>(initialChallenge?.challenged_id || initialB || participants[1]?.user_id || "");
+  const [genre, setGenre] = useState<string>(initialChallenge?.genre ?? initialGenre ?? "");
   const [rounds, setRounds] = useState(3);
   const [seconds, setSeconds] = useState(60);
   const [busy, setBusy] = useState(false);
