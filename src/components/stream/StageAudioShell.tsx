@@ -700,7 +700,7 @@ function MicLevelMeter() {
   const lit = Math.round(level * bars);
   return (
     <div
-      className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 px-2 py-2"
+      className="flex shrink-0 items-center gap-0.5 rounded-lg border border-white/10 bg-black/30 px-2 py-2"
       title="Your mic input level — you won't hear yourself (would cause echo)"
     >
       {Array.from({ length: bars }).map((_, i) => {

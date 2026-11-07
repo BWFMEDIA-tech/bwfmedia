@@ -63,7 +63,7 @@ function DeviceDropdown({
             toast.error(err?.message || `Couldn't switch ${label.toLowerCase()}`);
           }
         }}
-        className="max-w-[160px] truncate rounded bg-transparent text-[11px] text-white outline-none [&>option]:bg-[#0d0d18]"
+        className="max-w-[110px] truncate rounded bg-transparent text-[11px] text-white outline-none sm:max-w-[160px] [&>option]:bg-[#0d0d18]"
         aria-label={`Select ${label.toLowerCase()}`}
       >
         {devices.map((d) => (
