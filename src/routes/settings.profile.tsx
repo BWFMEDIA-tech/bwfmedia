@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { SignedImg } from "@/components/ui/signed-img";
 import { useServerFn } from "@tanstack/react-start";
 import { listMyEvents, createMyEvent, updateMyEvent, deleteMyEvent, type EventRow } from "@/lib/events.functions";
+import { changedFields } from "@/lib/profile-edits";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/settings/profile")({
   head: () => ({ meta: [
@@ -34,13 +36,20 @@ const SOCIAL_PROVIDERS = [
 const GENRE_OPTIONS = ["Hip-Hop / R&B", "R&B", "Hip-Hop", "Pop", "Trap", "Soul", "Afrobeats", "EDM", "Rock", "Country", "Jazz", "Reggae", "Latin", "Gospel", "Lo-Fi"];
 
 interface SocialLink { id?: string; provider: string; handle: string; url: string; enabled: boolean; }
+type ProfileDraft = { display_name: string; stage_name: string; genre: string; avatar_url: string; bio: string; banner_url: string; username: string; genres: string[]; brand_name: string; brand_avatar_url: string };
 
 function ProfileSettingsPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const baseline = useRef<ProfileDraft | null>(null);
+  const locationBaseline = useRef("");
+  const socialBaseline = useRef<SocialLink[]>([]);
 
   const [displayName, setDisplayName] = useState("");
+  const [stageName, setStageName] = useState("");
+  const [genre, setGenre] = useState("");
   const [username, setUsername] = useState("");
   const [location, setLocation] = useState("");
   const [genres, setGenres] = useState<string[]>([]);
@@ -84,7 +93,7 @@ function ProfileSettingsPage() {
     setSavingEvent(true);
     try {
       const payload = {
-        title: editingEvent.title!,
+        title: editingEvent.title,
         starts_at: new Date(editingEvent.starts_at).toISOString(),
         location: editingEvent.location || null,
         event_type: editingEvent.event_type || "event",
@@ -124,19 +133,33 @@ function ProfileSettingsPage() {
     let cancelled = false;
     (async () => {
       const uid = user.id;
-      const [{ data: p }, { data: acct }, { data: ls }, msgRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, avatar_url, bio, banner_url, username, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
+      const [profileRes, accountRes, socialRes, msgRes] = await Promise.all([
+        supabase.from("profiles").select("display_name, stage_name, genre, avatar_url, bio, banner_url, username, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
         supabase.from("user_accounts").select("location").eq("user_id", uid).maybeSingle(),
         supabase.from("user_social_links").select("id, provider, handle, url, enabled").eq("user_id", uid),
         supabase.from("stream_messages").select("id", { count: "exact", head: true }).eq("user_id", uid),
       ]);
       if (cancelled) return;
-      setDisplayName(p?.display_name ?? user.email?.split("@")[0] ?? "");
+      const p = profileRes.data;
+      if (profileRes.error || !p || accountRes.error || socialRes.error) {
+        setLoadError(true); setLoading(false); return;
+      }
+      const acct = accountRes.data;
+      const ls = socialRes.data;
+      baseline.current = {
+        display_name: p.display_name ?? "", stage_name: p.stage_name ?? "", genre: p.genre ?? "",
+        avatar_url: p.avatar_url ?? "", bio: p.bio ?? "", banner_url: p.banner_url ?? "",
+        username: p.username ?? "", genres: p.genres ?? [], brand_name: p.brand_name ?? "", brand_avatar_url: p.brand_avatar_url ?? "",
+      };
+      setDisplayName(p.display_name ?? "");
+      setStageName(p.stage_name ?? "");
+      setGenre(p.genre ?? "");
       setAvatarUrl(p?.avatar_url ?? "");
       setBio(p?.bio ?? "");
       setBannerUrl((p as any)?.banner_url ?? "");
       setUsername((p as any)?.username ?? "");
       setLocation((acct as any)?.location ?? "");
+      locationBaseline.current = acct?.location ?? "";
       setGenres(((p as any)?.genres ?? []) as string[]);
       setMemberSince((p as any)?.member_since ?? "");
       setBrandName((p as any)?.brand_name ?? "");
@@ -144,6 +167,7 @@ function ProfileSettingsPage() {
       const existing = (ls ?? []) as SocialLink[];
       const filled = SOCIAL_PROVIDERS.map((sp) => existing.find((e) => e.provider === sp.key) ?? { provider: sp.key, handle: "", url: "", enabled: false });
       setSocials(filled);
+      socialBaseline.current = filled.map((s) => ({ ...s }));
       setStats({ followers: msgRes.count ?? 0, monthly: Math.floor((msgRes.count ?? 0) * 4.2), streams: (msgRes.count ?? 0) * 190 });
       setLoading(false);
     })();
@@ -155,8 +179,8 @@ function ProfileSettingsPage() {
   async function uploadImage(file: File, kind: "avatar" | "banner"): Promise<string | null> {
     if (!user) return null;
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const path = `${user.id}/${kind}.${ext}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+    const path = `${user.id}/${kind}-${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("avatars").upload(path, file, { contentType: file.type });
     if (error) { toast.error(error.message); return null; }
     return supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl + `?v=${Date.now()}`;
   }
@@ -173,45 +197,62 @@ function ProfileSettingsPage() {
   }
 
   async function save() {
-    if (!user) return;
+    if (!user || !baseline.current || saving) return;
     setSaving(true);
+    try {
     let finalAvatar = avatarUrl; let finalBanner = bannerUrl;
     if (avatarPreview && avatarInput.current?.files?.[0]) {
       const up = await uploadImage(avatarInput.current.files[0], "avatar");
-      if (up) { finalAvatar = up; setAvatarUrl(up); setAvatarPreview(null); }
+      if (!up) return;
+      finalAvatar = up; setAvatarUrl(up); setAvatarPreview(null);
     }
     if (bannerPreview && bannerInput.current?.files?.[0]) {
       const up = await uploadImage(bannerInput.current.files[0], "banner");
-      if (up) { finalBanner = up; setBannerUrl(up); setBannerPreview(null); }
+      if (!up) return;
+      finalBanner = up; setBannerUrl(up); setBannerPreview(null);
     }
-    const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
-      display_name: displayName.trim() || null,
-      avatar_url: finalAvatar || null,
-      bio: bio.trim() || null,
-      banner_url: finalBanner || null,
-      username: username.trim() || null,
+    const draft: ProfileDraft = {
+      display_name: displayName, stage_name: stageName, genre,
+      avatar_url: finalAvatar, bio, banner_url: finalBanner, username,
       genres,
-      brand_name: brandName.trim() || null,
-      brand_avatar_url: brandAvatarUrl.trim() || null,
-    } as any);
-    if (error) { setSaving(false); toast.error(error.message); return; }
-    await supabase.from("user_accounts").upsert({
-      user_id: user.id,
-      location: location.trim() || null,
-    } as any, { onConflict: "user_id" });
-    // upsert socials
-    for (const s of socials) {
-      if (s.id) {
-        await supabase.from("user_social_links").update({ handle: s.handle, url: s.url, enabled: s.enabled }).eq("id", s.id);
-      } else if (s.url || s.handle) {
-        await supabase.from("user_social_links").insert({ user_id: user.id, provider: s.provider, handle: s.handle, url: s.url, enabled: s.enabled });
-      }
+      brand_name: brandName, brand_avatar_url: brandAvatarUrl,
+    };
+    const diff = changedFields(baseline.current, draft);
+    if (Object.keys(diff).length) {
+      const patch = Object.fromEntries(Object.entries(diff).map(([key, value]) => [key, typeof value === "string" ? value.trim() || null : value]));
+      const { data: saved, error } = await supabase.from("profiles").update(patch).eq("id", user.id).select("id").single();
+      if (error || !saved) throw error ?? new Error("Couldn't save your profile");
+      baseline.current = { ...draft };
     }
-    setSaving(false);
+    if (location !== locationBaseline.current) {
+      const { error } = await supabase.from("user_accounts").upsert({ user_id: user.id, location: location.trim() || null }, { onConflict: "user_id" });
+      if (error) throw error;
+      locationBaseline.current = location;
+    }
+    for (const s of socials) {
+      const original = socialBaseline.current.find((v) => v.provider === s.provider);
+      const values = { handle: s.handle, url: s.url, enabled: s.enabled };
+      const diff = changedFields(original ? { handle: original.handle, url: original.url, enabled: original.enabled } : { handle: "", url: "", enabled: false }, values);
+      if (!Object.keys(diff).length) continue;
+      if (s.id) {
+        const { error } = await supabase.from("user_social_links").update(diff).eq("id", s.id).eq("user_id", user.id);
+        if (error) throw error;
+      } else if (s.url || s.handle) {
+        const { data: inserted, error } = await supabase.from("user_social_links").insert({ user_id: user.id, provider: s.provider, ...values }).select("id").single();
+        if (error || !inserted) throw error ?? new Error("Couldn't save your link");
+        s.id = inserted.id;
+        setSocials((cur) => cur.map((v) => v.provider === s.provider ? { ...v, id: inserted.id } : v));
+      }
+      socialBaseline.current = socialBaseline.current.filter((v) => v.provider !== s.provider).concat({ ...s });
+    }
+    window.dispatchEvent(new Event("tunevio:profile-updated"));
     toast.success("Profile saved");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save your changes. Please try again.");
+    } finally { setSaving(false); }
   }
 
+  if (loadError) return <div role="alert" className="py-12 text-center text-muted-foreground">Couldn't load your saved profile. <Button variant="outline" onClick={() => window.location.reload()}>Try again</Button></div>;
   if (loading) {
     return <div className="grid h-96 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-foreground/60" /></div>;
   }
@@ -250,6 +291,8 @@ function ProfileSettingsPage() {
         <Section title="Basic Information">
           <div className="grid gap-4 md:grid-cols-2">
             <Input label="Artist Name" value={displayName} onChange={setDisplayName} maxLength={80} />
+            <Input label="Stage Name" value={stageName} onChange={setStageName} maxLength={80} />
+            <Input label="Primary Genre" value={genre} onChange={setGenre} maxLength={80} />
             <Input label="Username" value={username} onChange={(v) => setUsername(v.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase())} maxLength={30} prefix="@" />
             <div className="md:col-span-2">
               <Input label="Location" value={location} onChange={setLocation} maxLength={100} icon={<MapPin className="h-4 w-4 text-foreground/40" />} />
@@ -310,7 +353,8 @@ function ProfileSettingsPage() {
         <Section title="Links & Socials" icon={<Share2 className="h-4 w-4 text-primary" />}>
           <div className="space-y-2">
             {socials.map((s, idx) => {
-              const meta = SOCIAL_PROVIDERS.find((p) => p.key === s.provider)!;
+              const meta = SOCIAL_PROVIDERS.find((p) => p.key === s.provider);
+              if (!meta) return null;
               return (
                 <div key={s.provider} className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto]">
                   <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-foreground text-xs font-bold ${meta.color}`} title={meta.label}>{meta.label[0]}</div>
@@ -428,9 +472,9 @@ function ProfileSettingsPage() {
 
         <div className="sticky bottom-24 z-10 flex justify-end gap-3 rounded-xl border border-white/10 bg-background/90 p-3 backdrop-blur">
           <button onClick={() => window.location.reload()} className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">Reset Changes</button>
-          <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-sm font-bold text-foreground hover:bg-accent disabled:opacity-50">
+          <Button onClick={save} disabled={saving}>
             {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save Changes
-          </button>
+          </Button>
         </div>
       </div>
 
