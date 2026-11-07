@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -28,6 +28,7 @@ export function InstallPromptPopup() {
   const [visible, setVisible] = useState(false);
   const [prompt, setPrompt] = useState<InstallEvent | null>(null);
   const [busy, setBusy] = useState(false);
+  const [installHelp, setInstallHelp] = useState("");
 
   useEffect(() => {
     if (isInstalled()) return;
@@ -70,14 +71,22 @@ export function InstallPromptPopup() {
   };
 
   const install = async () => {
-    if (!prompt) return;
+    if (!prompt) {
+      const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      setInstallHelp(isAppleMobile
+        ? "Apple requires confirmation: tap your browser’s Share menu, choose Add to Home Screen, then tap Add."
+        : "Your browser isn’t offering automatic installation right now. Open its menu and choose Install app or Add to Home Screen.");
+      return;
+    }
     setBusy(true);
+    setInstallHelp("");
     try {
       await prompt.prompt();
       const choice = await prompt.userChoice;
       if (choice.outcome === "accepted") dismiss();
     } catch {
-      /* Fall back to the instructions on the install page. */
+      setInstallHelp("Installation couldn’t open. Use your browser’s menu to choose Install app or Add to Home Screen.");
     } finally {
       setBusy(false);
       setPrompt(null);
@@ -106,23 +115,15 @@ export function InstallPromptPopup() {
             Add Tunevio to your home screen for music, live battles and artist stages — one tap away.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            {prompt ? (
-              <Button size="sm" className="min-h-10" onClick={install} disabled={busy}>
-                <Download size={16} />
-                {busy ? "Opening…" : "Install now"}
-              </Button>
-            ) : (
-              <Button size="sm" className="min-h-10" asChild>
-                <Link to="/install" onClick={dismiss}>
-                  <Download size={16} />
-                  How to install
-                </Link>
-              </Button>
-            )}
+            <Button size="sm" className="min-h-10" onClick={install} disabled={busy}>
+              <Download size={16} />
+              {busy ? "Opening…" : "Install now"}
+            </Button>
             <Button size="sm" variant="ghost" className="min-h-10" onClick={dismiss}>
               Not now
             </Button>
           </div>
+          {installHelp && <p role="status" className="mt-3 text-sm text-muted-foreground">{installHelp}</p>}
         </div>
       </div>
     </div>
