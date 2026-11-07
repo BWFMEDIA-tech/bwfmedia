@@ -528,7 +528,7 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
       <div
         className={cn(
           "gap-4",
-          "flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "tv-scroll-pager flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           "md:grid md:items-start md:overflow-visible md:pb-0",
           visibleSlots.length === 1 && "md:grid-cols-1",
           visibleSlots.length === 2 && "md:grid-cols-2",
