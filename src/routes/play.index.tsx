@@ -8,6 +8,7 @@ import { useState } from "react";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
 import { BattleChallenges } from "@/components/play/BattleChallenges";
+import { getBattleTournamentState } from "@/lib/battle-tournament.functions";
 import type { UploadedProfileTrack } from "@/lib/profile-track-upload";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,8 +72,10 @@ export const Route = createFileRoute("/play/")({
 function PlayArenaDashboard() {
   const fn = useServerFn(getArenaDashboard);
   const userFn = useServerFn(getArenaUserStats);
+  const tournamentFn = useServerFn(getBattleTournamentState);
   const { isAuthenticated, user } = useAuth();
   const [uploadOpen, setUploadOpen] = useState(false);
+  const { data: tournament } = useQuery({ queryKey: ["battle-tournament"], queryFn: () => tournamentFn(), enabled: isAuthenticated, refetchInterval: 5000 });
   const [uploadedSong, setUploadedSong] = useState<UploadedProfileTrack | null>(null);
   const { data } = useQuery({
     queryKey: ["arena-dashboard"],
@@ -97,7 +100,7 @@ function PlayArenaDashboard() {
             <Button onClick={() => setUploadOpen(true)}><Music2 className="h-4 w-4" /> Upload new track</Button>
           </div>
         ) : null}
-        <ChoosePath data={data} user={userStats ?? null} />
+        <ChoosePath data={data} filledSlots={tournament?.filled ?? null} />
         {isAuthenticated && user?.id && <BattleChallenges userId={user.id} />}
         <GenreBattleBoard isAuthenticated={isAuthenticated} />
         <LiveArenaStatus data={data} />
@@ -227,12 +230,11 @@ function ProfileHero({
 /* ---------- Choose Your Path ---------- */
 function ChoosePath({
   data,
-  user,
+  filledSlots,
 }: {
   data: ArenaDashboard;
-  user: ArenaUserStats | null;
+  filledSlots: number | null;
 }) {
-  const battlesToday = user?.battlesToday ?? 0;
   const nextEvent = data.nextEventAt ? formatEventDate(data.nextEventAt) : "TBA";
   return (
     <section className="rounded-2xl border border-white/10 bg-[#0a0a14] p-5 sm:p-6">
@@ -259,7 +261,7 @@ function ChoosePath({
             className: "bg-[#0000FF] hover:bg-[#0000CC]",
             onClick: () => document.getElementById("genre-battles")?.scrollIntoView({ behavior: "smooth", block: "start" }),
           }}
-          footer={<>Battles Today: <span className="font-bold text-white">{battlesToday}/20</span></>}
+          footer={<>Battle Slots: <span className="font-bold text-white">{filledSlots ?? "—"}/20</span></>}
         />
         <PathCard
           accent="from-amber-500/25 to-transparent"
@@ -687,6 +689,8 @@ function ArenaPass() {
 void Radio;
 /* ---------- Genre battle board ---------- */
 function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const tournamentFn = useServerFn(getBattleTournamentState);
+  const { data: tournament } = useQuery({ queryKey: ["battle-tournament"], queryFn: () => tournamentFn(), enabled: isAuthenticated, refetchInterval: 5000 });
   const listFn = useServerFn(listGenreBattles);
   const findFn = useServerFn(findGenreMatch);
   const leaveFn = useServerFn(leaveGenreMatch);
@@ -699,6 +703,7 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
       await challengeFn({ data: { opponentId, genre } });
       toast.success(`Challenge sent to ${name}`, { description: `They need to accept the ${genre} battle.` });
       qc.invalidateQueries({ queryKey: ["genre-battles"] });
+      qc.invalidateQueries({ queryKey: ["battle-tournament"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not send challenge");
     } finally {
@@ -711,6 +716,7 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
       await acceptFn({ data: { matchId } });
       toast.success(`Challenge accepted — ${genre} battle is ready`);
       qc.invalidateQueries({ queryKey: ["genre-battles"] });
+      qc.invalidateQueries({ queryKey: ["battle-tournament"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Could not accept challenge");
     } finally {
@@ -781,7 +787,7 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
             </select>
             <button
               onClick={join}
-              disabled={busy}
+              disabled={busy || !tournament?.canSubmit}
               className="rounded-lg bg-[#0000FF] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0000CC] disabled:opacity-50"
             >
               {data?.myGenre ? "SWITCH GENRE" : "FIND MATCH"}
@@ -814,7 +820,7 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
                     <GenreBadge genre={m.genre} />
                     <button
                       onClick={() => accept(m.id, m.genre)}
-                      disabled={actingId === m.id}
+                      disabled={actingId === m.id || !tournament || tournament.eliminated || tournament.filled >= 20}
                       className="rounded-md bg-[#0000FF] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#0000CC] disabled:opacity-50"
                     >
                       {actingId === m.id ? "Accepting…" : "Accept"}
@@ -850,7 +856,7 @@ function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean }) {
                         <GenreBadge genre={c.genre} />
                         <button
                           onClick={() => challenge(c.user_id, c.genre, c.display_name)}
-                          disabled={actingId === c.user_id}
+                          disabled={actingId === c.user_id || !tournament?.canSubmit}
                           className="rounded-md border border-[#00E6FF]/40 px-2.5 py-1 text-[11px] font-bold text-[#00E6FF] hover:bg-[#00E6FF]/10 disabled:opacity-50"
                         >
                           {actingId === c.user_id ? "Sending…" : "Challenge"}
