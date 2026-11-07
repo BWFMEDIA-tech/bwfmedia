@@ -64,7 +64,7 @@ export function ProfileBattleCard({ artistId }: { artistId: string }) {
                 <Link to="/artist/$id" params={{ id: b.opponent.id }} className="fsq-name truncate hover:text-primary">
                   {b.opponent.name}
                 </Link>
-                <span className="fsq-genre truncate">{detailLabel(b)}</span>
+                <span className="fsq-genre line-clamp-2">{detailLabel(b)}</span>
               </div>
               <span className="fsq-vs" aria-hidden>VS</span>
               <span className="fsq-status shrink-0" data-status={b.status === "live" ? "live" : undefined}>
