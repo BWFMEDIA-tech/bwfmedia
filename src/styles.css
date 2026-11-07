@@ -405,7 +405,6 @@
   scroll-behavior: auto;
   scroll-snap-type: none;
   will-change: scroll-position;
-  transform: translateZ(0);
 }
 .tv-scroll-pager:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) {
   scroll-snap-type: x proximity;
