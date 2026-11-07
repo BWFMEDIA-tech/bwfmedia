@@ -397,14 +397,14 @@
 }
 
 /* Native rails keep browser momentum and axis locking; proximity avoids forced stops. */
-:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll) {
+:is(.flex, .grid, .tv-scroll):is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   touch-action: pan-x pan-y pinch-zoom;
   scroll-behavior: smooth;
   scroll-snap-type: x proximity;
 }
-:is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll) > * {
+:is(.flex, .grid, .tv-scroll):is([class*="overflow-x-auto"], [class*="overflow-x-scroll"]) > * {
   scroll-snap-stop: normal;
 }
 :is([class*="overflow-x-auto"], [class*="overflow-x-scroll"], .tv-scroll)[data-card-dragging] {
