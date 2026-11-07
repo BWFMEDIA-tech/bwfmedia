@@ -4,6 +4,7 @@ import { Bell, CheckCheck, Radio, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Notif = {
   id: string;
@@ -37,6 +38,7 @@ function NotificationsPage() {
   const [items, setItems] = useState<Notif[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [tab, setTab] = useState("all");
 
   const toggleExpand = async (n: Notif) => {
     setExpanded((prev) => ({ ...prev, [n.id]: !prev[n.id] }));
@@ -55,10 +57,12 @@ function NotificationsPage() {
     const uid = auth.user.id;
     let cancelled = false;
     const refresh = async () => {
-      const { data } = await supabase
+      let query = supabase
         .from("notifications")
         .select("id, type, title, body, link, read_at, created_at, media_url, media_type")
-        .eq("user_id", uid)
+        .eq("user_id", uid);
+      if (tab === "unread") query = query.is("read_at", null);
+      const { data } = await query
         .order("created_at", { ascending: false })
         .limit(100);
       if (!cancelled) { setItems((data ?? []) as Notif[]); setLoading(false); }
@@ -69,7 +73,7 @@ function NotificationsPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${uid}` }, refresh)
       .subscribe();
     return () => { cancelled = true; supabase.removeChannel(ch); };
-  }, [auth.user?.id]);
+  }, [auth.user?.id, tab]);
 
   const markAllRead = async () => {
     if (!auth.user) return;
@@ -108,12 +112,18 @@ function NotificationsPage() {
             </button>
           </div>
         </div>
+        <Tabs value={tab} onValueChange={(value) => { setLoading(true); setTab(value); }}>
+          <TabsList aria-label="Notification filter" className="mb-4 w-full sm:w-auto">
+            <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
+            <TabsTrigger value="unread" className="flex-1">Unread</TabsTrigger>
+          </TabsList>
+          <TabsContent value={tab}>
         {loading ? (
           <p className="text-white/50">Loading…</p>
         ) : items.length === 0 ? (
           <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-12 text-center">
             <Bell className="mx-auto h-10 w-10 text-white/30 mb-3" />
-            <p className="text-white/60">You're all caught up.</p>
+            <p className="text-white/60">{tab === "unread" ? "No unread notifications." : "You're all caught up."}</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2">
@@ -161,6 +171,8 @@ function NotificationsPage() {
             ))}
           </ul>
         )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
