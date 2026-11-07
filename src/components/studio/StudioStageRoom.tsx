@@ -606,7 +606,7 @@ const AUDIENCE_ROLES = ["listener", "green_room"];
             return (
               <>
                 {Array.from({ length: visible }).map((_, i) => (
-                  <EmptySlot key={`g-${i}`} label="Guest slot" color={ACCENT} />
+                  <EmptySlot key={`g-${i}`} label="Artist slot" color={ACCENT} />
                 ))}
                 {overflow > 0 && <MoreOpenChip count={overflow} color={ACCENT} />}
               </>
