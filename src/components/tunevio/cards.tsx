@@ -563,7 +563,10 @@ export function FeaturedCard({
                 </>
               ) : (
                 <>
-                  <Play className="h-5 w-5 fill-current" /> Play
+                  <span className="tv-play-fab grid h-7 w-7 shrink-0 place-items-center rounded-full" data-play-icon="true">
+                    <Play className="tv-play-standard h-5 w-5 fill-current" />
+                    <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} className="tv-play-image h-full w-full object-contain" />
+                  </span> Play
                 </>
               )}
             </button>
