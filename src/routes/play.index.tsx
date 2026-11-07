@@ -8,6 +8,7 @@ import { useState } from "react";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
 import { BattleChallenges } from "@/components/play/BattleChallenges";
+import { FreestyleQueue } from "@/components/play/FreestyleQueue";
 import { getBattleTournamentState } from "@/lib/battle-tournament.functions";
 import type { UploadedProfileTrack } from "@/lib/profile-track-upload";
 import { Button } from "@/components/ui/button";
@@ -102,6 +103,7 @@ function PlayArenaDashboard() {
         ) : null}
         <ChoosePath data={data} filledSlots={tournament?.filled ?? null} />
         {isAuthenticated && user?.id && <BattleChallenges userId={user.id} />}
+        <FreestyleQueue />
         <GenreBattleBoard isAuthenticated={isAuthenticated} />
         <LiveArenaStatus data={data} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

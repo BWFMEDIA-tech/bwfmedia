@@ -11,7 +11,8 @@ import { StageAudioShell } from '@/components/stream/StageAudioShell';
 import { SelfMicrophoneButton } from '@/components/stream/SelfMicrophoneButton';
 import { useAuth } from '@/lib/auth-context';
 import { getLiveKitToken } from '@/lib/livekit.functions';
-import { getFreestyleState, startFreestyle, voteFreestyle, cancelFreestyle } from '@/lib/freestyle.functions';
+import { getFreestyleState, startFreestyle, voteFreestyle, endFreestyle, getFreestyleQueue } from '@/lib/freestyle.functions';
+import { FreestyleQueue } from './FreestyleQueue';
 import { supabase } from '@/integrations/supabase/client';
 
 type Props = { streamId: string; hostId: string; room?: string; participants: { user_id: string; display_name: string | null; stage_role?: string | null }[] };
@@ -45,7 +46,9 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
   const read = useServerFn(getFreestyleState);
   const start = useServerFn(startFreestyle);
   const vote = useServerFn(voteFreestyle);
-  const cancel = useServerFn(cancelFreestyle);
+  const end = useServerFn(endFreestyle);
+  const queueRead = useServerFn(getFreestyleQueue);
+  const queue = useQuery({ queryKey: ['freestyle-queue', auth.user?.id], queryFn: () => queueRead(), enabled: !!auth.user });
   const key = ['freestyle', streamId, auth.user?.id];
   const state = useQuery({ queryKey: key, queryFn: () => read({ data: { streamId } }), enabled: !!auth.user, refetchInterval: 5000 });
   const battle = state.data?.battle;
@@ -56,7 +59,7 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
   const [artistB, setArtistB] = useState('');
   const [duration, setDuration] = useState(180);
   const [busy, setBusy] = useState(false);
-  const isHost = auth.user?.id === hostId;
+  const isHost = queue.data?.isAdmin || (queue.data?.isHost && auth.user?.id === hostId);
   useEffect(() => {
     const tick = () => setNow(Date.now());
     tick(); const timer = setInterval(tick, 250); return () => clearInterval(timer);
@@ -109,9 +112,10 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
     </div>
     {room && <LocalCameraControl artistIds={open ? [battle?.artist_a_id, battle?.artist_b_id] : candidates.map(p => p.user_id)} />}
     {!auth.user && <p className="mt-3 text-center text-sm text-muted-foreground">Sign in to watch and vote.</p>}
+    <FreestyleQueue streamId={streamId} hostId={hostId} onSelect={isHost && !open ? c => { setArtistA(c.artist_a_id); setArtistB(c.artist_b_id); } : undefined} />
     {isHost && <div className="mt-5 border-t border-border pt-4">
-      {open ? <Button variant="outline" disabled={busy} onClick={() => { if (battle && window.confirm('Cancel this freestyle battle?')) void action(() => cancel({ data: { battleId: battle.id } })); }}>Cancel freestyle battle</Button> : <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
-        {(['a', 'b'] as const).map(side => <label key={side} className="min-w-0 text-xs text-muted-foreground">Artist {side.toUpperCase()}<select aria-label={`Freestyle Artist ${side.toUpperCase()}`} className="mt-1 h-10 w-full rounded-md border border-input bg-background px-2 text-foreground" value={side === 'a' ? artistA : artistB} onChange={e => side === 'a' ? setArtistA(e.target.value) : setArtistB(e.target.value)}><option value="">Select on-stage artist</option>{candidates.map(p => <option key={p.user_id} value={p.user_id}>{p.display_name || 'Artist'}</option>)}</select></label>)}
+      {open ? <Button variant="outline" disabled={busy} onClick={() => { if (battle && window.confirm('End this battle and finalize votes?')) void action(() => end({ data: { battleId: battle.id } })); }}>End battle & record result</Button> : <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
+        {(['a', 'b'] as const).map(side => <div key={side} className="min-w-0 text-sm"><p className="text-muted-foreground">Artist {side.toUpperCase()}</p><p className="break-words font-bold">{(() => { const p = queue.data?.profiles.find(p => p.id === (side === 'a' ? artistA : artistB)); return p?.stage_name || p?.display_name || 'Select an accepted matchup'; })()}</p></div>)}
         <label className="text-xs text-muted-foreground">Duration<select aria-label="Freestyle duration" className="mt-1 block h-10 rounded-md border border-input bg-background px-2 text-foreground" value={duration} onChange={e => setDuration(Number(e.target.value))}>{[60, 180, 300].map(s => <option key={s} value={s}>{s / 60} min</option>)}</select></label>
         <Button className="self-end" disabled={busy || !artistA || !artistB || artistA === artistB || !room} onClick={() => void action(() => start({ data: { streamId, artistA, artistB, duration } }))}>{busy ? 'Starting…' : 'Start freestyle'}</Button>
       </div>}
