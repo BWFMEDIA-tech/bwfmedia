@@ -358,6 +358,13 @@
       "when": 1794020287791,
       "tag": "0050_challenge_confirmation_integrity",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1794028743027,
+      "tag": "0051_arena_tournament_rules",
+      "breakpoints": true
     }
   ]
 }

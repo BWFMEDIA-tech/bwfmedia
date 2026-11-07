@@ -669,6 +669,7 @@ export type Database = {
           scheduled_at: string | null
           status: string
           stream_id: string | null
+          tournament_id: string | null
           updated_at: string
         }
         Insert: {
@@ -681,6 +682,7 @@ export type Database = {
           scheduled_at?: string | null
           status?: string
           stream_id?: string | null
+          tournament_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -693,6 +695,7 @@ export type Database = {
           scheduled_at?: string | null
           status?: string
           stream_id?: string | null
+          tournament_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -708,6 +711,13 @@ export type Database = {
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battle_challenges_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "battle_tournaments"
             referencedColumns: ["id"]
           },
         ]
@@ -740,6 +750,7 @@ export type Database = {
           status: string
           stream_id: string
           total_rounds: number
+          tournament_id: string | null
           updated_at: string
           winner_id: string | null
         }
@@ -770,6 +781,7 @@ export type Database = {
           status?: string
           stream_id: string
           total_rounds?: number
+          tournament_id?: string | null
           updated_at?: string
           winner_id?: string | null
         }
@@ -800,6 +812,7 @@ export type Database = {
           status?: string
           stream_id?: string
           total_rounds?: number
+          tournament_id?: string | null
           updated_at?: string
           winner_id?: string | null
         }
@@ -816,6 +829,13 @@ export type Database = {
             columns: ["stream_id"]
             isOneToOne: false
             referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battle_matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "battle_tournaments"
             referencedColumns: ["id"]
           },
         ]
@@ -1020,6 +1040,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      battle_tournament_eliminations: {
+        Row: {
+          artist_id: string
+          created_at: string
+          match_id: string
+          tournament_id: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          match_id: string
+          tournament_id: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          match_id?: string
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_tournament_eliminations_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "battle_tournament_eliminations_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "battle_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      battle_tournaments: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          status: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          status?: string
+        }
+        Relationships: []
       }
       battle_vote_attempts: {
         Row: {
@@ -6805,6 +6885,7 @@ export type Database = {
         Args: { _match_id: string }
         Returns: undefined
       }
+      battle_tournament_filled: { Args: { tid: string }; Returns: number }
       battle_vote_target_artist: {
         Args: { _choice: string; _match_id: string }
         Returns: string
@@ -6924,6 +7005,7 @@ export type Database = {
         }[]
       }
       get_battle_replay: { Args: { _match_id: string }; Returns: Json }
+      get_battle_tournament_state: { Args: never; Returns: Json }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
@@ -7088,6 +7170,7 @@ export type Database = {
         Args: { _stream_id: string }
         Returns: string[]
       }
+      lock_battle_tournament: { Args: never; Returns: string }
       log_battle_vote_blocked: {
         Args: { _match_id: string; _metadata?: Json; _reason: string }
         Returns: string
@@ -7210,6 +7293,7 @@ export type Database = {
           platform_pool_cents: number
         }[]
       }
+      start_new_battle_tournament: { Args: never; Returns: string }
       store_can_manage: { Args: { _artist: string }; Returns: boolean }
       store_mark_order_paid: {
         Args: {
