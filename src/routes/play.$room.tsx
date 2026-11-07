@@ -17,6 +17,8 @@ import { ImmersivePlayer } from "@/components/play/ImmersivePlayer";
 import { useStageState } from "@/lib/useStageState";
 import { useListeningSession } from "@/lib/useListeningSession";
 import type { PlayerTrack } from "@/lib/player-context";
+import { Button } from "@/components/ui/button";
+import { FreestyleBattle } from "@/components/play/FreestyleBattle";
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -163,7 +165,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
 
   // IDs of users currently on stage as performers. Used to lock the
   // Artist A / Artist B selectors once anyone in the matchup goes live.
-  const [view, setView] = useState<"player" | "battle">("player");
+  const [view, setView] = useState<"player" | "battle" | "freestyle">("player");
   const onStageIds = new Set(
     stageState.participants
       .filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room")
@@ -173,14 +175,15 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
   return (
     <>
       <div className="space-y-5">
-        <div role="tablist" aria-label="Live view" className="inline-flex rounded-full border border-white/10 bg-white/5 p-1">
-          {(["player", "battle"] as const).map((t) => (
-            <button key={t} role="tab" aria-selected={view === t} onClick={() => setView(t)}
-              className={`rounded-full px-5 py-1.5 text-xs font-bold tracking-widest uppercase transition ${view === t ? "bg-[#00E6FF] text-black shadow-[0_0_14px_#00E6FF80]" : "text-white/60 hover:text-white"}`}>
-              {t === "player" ? "Player" : "Battle"}
-            </button>
+        <div role="tablist" aria-label="Live view" className="flex w-fit max-w-full flex-wrap gap-1 rounded-md border border-border bg-muted p-1">
+          {(["player", "battle", "freestyle"] as const).map((t) => (
+            <Button key={t} role="tab" size="sm" variant={view === t ? "default" : "ghost"} aria-selected={view === t} onClick={() => setView(t)}
+              className="min-w-0 px-2 text-xs font-bold sm:px-4">
+              {t === "player" ? "Player" : t === "battle" ? "Battle" : "1v1 Freestyle Battle"}
+            </Button>
           ))}
         </div>
+        {view === "freestyle" && stream && <FreestyleBattle streamId={stream.id} hostId={stream.host_id} room={room} participants={battleParticipants} />}
         {view === "battle" && stream && (
           <div className="animate-in fade-in duration-300">
             <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} showEngagementPanels={showBattlePanels} />

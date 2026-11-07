@@ -2293,6 +2293,88 @@ export type Database = {
         }
         Relationships: []
       }
+      freestyle_battles: {
+        Row: {
+          artist_a_id: string
+          artist_b_id: string
+          ended_at: string | null
+          ends_at: string
+          host_id: string
+          id: string
+          started_at: string
+          status: string
+          stream_id: string
+          votes_a: number
+          votes_b: number
+          winner_id: string | null
+        }
+        Insert: {
+          artist_a_id: string
+          artist_b_id: string
+          ended_at?: string | null
+          ends_at: string
+          host_id: string
+          id?: string
+          started_at?: string
+          status?: string
+          stream_id: string
+          votes_a?: number
+          votes_b?: number
+          winner_id?: string | null
+        }
+        Update: {
+          artist_a_id?: string
+          artist_b_id?: string
+          ended_at?: string | null
+          ends_at?: string
+          host_id?: string
+          id?: string
+          started_at?: string
+          status?: string
+          stream_id?: string
+          votes_a?: number
+          votes_b?: number
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freestyle_battles_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      freestyle_votes: {
+        Row: {
+          battle_id: string
+          choice: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          battle_id: string
+          choice: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          battle_id?: string
+          choice?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freestyle_votes_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "freestyle_battles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hook_secrets: {
         Row: {
           created_at: string
@@ -6925,6 +7007,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancel_freestyle_battle: { Args: { _id: string }; Returns: undefined }
       cast_battle_vote: {
         Args: {
           _choice: string
@@ -6933,6 +7016,10 @@ export type Database = {
           _use_boost?: boolean
           _user_agent?: string
         }
+        Returns: Json
+      }
+      cast_freestyle_vote: {
+        Args: { _battle_id: string; _choice: string }
         Returns: Json
       }
       cast_replay_vote: {
@@ -6975,7 +7062,10 @@ export type Database = {
       ensure_host_referral_code: { Args: { _user_id: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
       finalize_battle_replays: { Args: never; Returns: number }
+      finalize_expired_freestyle_battles: { Args: never; Returns: number }
+      finalize_freestyle_battle: { Args: { _id: string }; Returns: undefined }
       finalize_room_earnings: { Args: { _stream_id: string }; Returns: Json }
+      freestyle_deadline_tick: { Args: never; Returns: undefined }
       get_admin_subscription_metrics: { Args: never; Returns: Json }
       get_artist_earnings_summary: {
         Args: { _artist_id: string }
@@ -7292,6 +7382,15 @@ export type Database = {
           incentive_pool_cents: number
           platform_pool_cents: number
         }[]
+      }
+      start_freestyle_battle: {
+        Args: {
+          _artist_a: string
+          _artist_b: string
+          _duration: number
+          _stream_id: string
+        }
+        Returns: string
       }
       start_new_battle_tournament: { Args: never; Returns: string }
       store_can_manage: { Args: { _artist: string }; Returns: boolean }

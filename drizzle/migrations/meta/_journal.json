@@ -379,6 +379,20 @@
       "when": 1794029267492,
       "tag": "0053_tournament_notification_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1794032871471,
+      "tag": "0054_freestyle_live_battles",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1794032920573,
+      "tag": "0055_freestyle_bounded_deadline_checks",
+      "breakpoints": true
     }
   ]
 }
