@@ -22,6 +22,20 @@ export function GlobalPlayer({ hidden = false }: { hidden?: boolean }) {
     document.documentElement.toggleAttribute("data-music-player", !!track && !hidden);
     return () => document.documentElement.removeAttribute("data-music-player");
   }, [!!track, hidden]);
+  // Tapping the album in the iPhone Dynamic Island / lock-screen player foregrounds
+  // the installed app — open Now Playing so the song is front and center.
+  useEffect(() => {
+    if (hidden) return;
+    const standalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      (navigator as { standalone?: boolean }).standalone === true;
+    if (!standalone) return;
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && p.track && !p.detailTrack) setExpanded(true);
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [hidden, p.track, p.detailTrack]);
   const toggleLike = async () => {
     if (!track || saving) return;
     if (!auth.user) { toast.error("Sign in to save music"); return; }
