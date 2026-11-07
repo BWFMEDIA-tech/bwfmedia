@@ -604,7 +604,6 @@ function VoteTracker({
 
         {/* Center VOTE hexagon */}
         <div className="relative flex shrink-0 flex-col items-center justify-center">
-          <Crown className="mb-0.5 h-4 w-4 text-[#7ef4ff] drop-shadow-[0_0_6px_rgba(0,230,255,0.9)]" />
           <div
             className="arena-hex-glow flex h-12 w-20 items-center justify-center text-[11px] font-black tracking-widest text-white sm:h-14 sm:w-24 sm:text-sm"
             style={{
