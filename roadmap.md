@@ -3,6 +3,7 @@
 ## Final physical-device Freestyle integration test
 - [x] User confirmed B accepted, both artists appear in the same numbered slot, A received the acceptance notification, and the host sees the accepted matchup; exact next-available numbering and A/B assignment still need observation
 - [ ] Confirm host sees accepted matchup and selects it before either artist is brought into the main video boxes; acceptance must not start the battle
+- [x] User reported host selection and correct Side A/B feeds with simultaneous cameras/microphones on two physical artist devices, both using mobile Safari; not independently observed
 - [ ] Confirm two physical artist devices connect to assigned Side A/B with simultaneous cameras and microphones, host start/end, both live notifications, and completion releases the slot
 - [ ] Check denied camera/microphone permissions, connection failure/reconnection, and mobile Safari; await device observations before marking verified
 
