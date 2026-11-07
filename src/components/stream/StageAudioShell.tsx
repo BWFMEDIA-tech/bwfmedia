@@ -31,6 +31,7 @@ import { StageNavigationConnection } from "./StageNavigationConnection";
 import { setStageNavigationConnection } from "@/lib/stage-navigation-connection";
 import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
 import { StageMuteEnforcement } from "./StageMuteEnforcement";
+import { AudioPlaybackUnblocker } from "./AudioPlaybackUnblocker";
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -304,42 +305,6 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
   }, [room, localParticipant, role, mutedUntil, permissionTick]);
 
   return null;
-}
-
-/**
- * Surfaces an "Enable audio" prompt when the browser blocks autoplay so the
- * user can satisfy the gesture requirement without refreshing.
- */
-function AudioPlaybackUnblocker() {
-  const room = useRoomContext();
-  const [blocked, setBlocked] = useState(false);
-
-  useEffect(() => {
-    if (!room) return;
-    const update = () => setBlocked(!room.canPlaybackAudio);
-    update();
-    room.on(RoomEvent.AudioPlaybackStatusChanged, update);
-    return () => {
-      room.off(RoomEvent.AudioPlaybackStatusChanged, update);
-    };
-  }, [room]);
-
-  if (!blocked) return null;
-  return (
-    <button
-      onClick={async () => {
-        try {
-          await room?.startAudio();
-          toast.success("Audio enabled");
-        } catch (e: any) {
-          toast.error(e?.message || "Couldn't start audio");
-        }
-      }}
-      className="flex w-full items-center justify-center gap-2 rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
-    >
-      <VolumeX className="h-3.5 w-3.5" /> Browser blocked audio — click to enable
-    </button>
-  );
 }
 
 /** Console-logs participant + track lifecycle so the audio pipeline is debuggable. */
