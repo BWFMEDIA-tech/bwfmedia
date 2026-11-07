@@ -48,7 +48,7 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
     const p = profile(id);
     const name = p?.stage_name || p?.display_name || 'Artist';
     return <Link to="/artist/$id" params={{ id }} className="flex min-w-0 items-center gap-2">
-      <SignedImg src={p?.avatar_url} alt={name} className="h-9 w-9 shrink-0 rounded-full object-cover" />
+      <SignedImg src={p?.avatar_url ?? undefined} alt={name} className="h-9 w-9 shrink-0 rounded-full object-cover" />
       <span className="min-w-0"><span className="block break-words text-sm font-semibold">{name}</span><span className="block text-xs text-muted-foreground">{p?.genre || '—'}</span></span>
     </Link>;
   };
@@ -62,7 +62,7 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
             <div className="mb-3 flex justify-between gap-2 text-xs"><span className="font-bold">Slot {i + 1}</span><span className={c ? 'text-primary' : 'text-muted-foreground'}>{c?.status === 'live' ? 'Live' : c?.status === 'scheduled' ? 'Scheduled' : c ? 'Accepted' : 'Open'}</span></div>
             {c ? <div className="space-y-2">{artist(c.artist_a_id)}<p className="text-center text-xs font-bold text-muted-foreground">VS</p>{artist(c.artist_b_id)}
               {c.scheduled_at && <p className="text-xs text-muted-foreground">{new Date(c.scheduled_at).toLocaleString()}</p>}
-              {canHost && c.status !== 'live' && (!c.stream_id || c.stream_id === streamId) && <div className="flex flex-wrap gap-1 pt-2">
+              {streamId && canHost && c.status !== 'live' && (!c.stream_id || c.stream_id === streamId) && <div className="flex flex-wrap gap-1 pt-2">
                 {onSelect && <Button size="sm" disabled={busy} onClick={() => onSelect(c)}><Play className="h-3 w-3" />Select</Button>}
                 <Button size="sm" variant="outline" aria-label={`Schedule slot ${i + 1}`} title="Schedule battle" onClick={() => { setScheduleId(c.id); setScheduleTime(''); }}><Calendar className="h-3 w-3" /></Button>
                 <Button size="sm" variant="ghost" aria-label={`Cancel slot ${i + 1}`} title="Cancel matchup" disabled={busy} onClick={() => { if (window.confirm('Cancel this matchup?')) void act(() => control({ data: { id: c.id, action: 'cancel', streamId } })); }}><X className="h-3 w-3" /></Button>
@@ -80,7 +80,7 @@ export function FreestyleQueue({ streamId, hostId, onSelect }: Props) {
       </div>)}</div>}
       {state.data?.isArtist && !streamId && <div className="space-y-3 border-t border-border pt-4"><h3 className="font-bold">Select Your Freestyle Opponent</h3>
         {mine.length > 0 ? <p className="text-sm text-muted-foreground">Your current matchup is pending or active.</p> : slots.length >= 10 ? <p className="text-sm text-muted-foreground">All 10 slots are filled.</p> : <><Input aria-label="Search freestyle artists" placeholder="Search artists" value={search} onChange={e => setSearch(e.target.value)} />
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{(directory.data ?? []).filter(p => p.id !== auth.user?.id && p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 12).map(p => <div key={p.id} className="flex min-w-0 items-center gap-2 border-b border-border py-2"><SignedImg src={p.avatarUrl} alt={p.name} className="h-10 w-10 shrink-0 rounded-full object-cover" /><div className="min-w-0 flex-1"><p className="break-words text-sm font-bold">{p.name}</p><p className="text-xs text-muted-foreground">{p.genres.join(' · ')}</p></div><Button size="sm" disabled={busy || rows.some(c => [c.artist_a_id, c.artist_b_id].includes(p.id))} onClick={() => void act(() => submit({ data: { opponent: p.id } }))}>Challenge</Button></div>)}</div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{(directory.data ?? []).filter(p => p.id !== auth.user?.id && p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 12).map(p => <div key={p.id} className="flex min-w-0 items-center gap-2 border-b border-border py-2"><SignedImg src={p.avatarUrl ?? undefined} alt={p.name} className="h-10 w-10 shrink-0 rounded-full object-cover" /><div className="min-w-0 flex-1"><p className="break-words text-sm font-bold">{p.name}</p><p className="text-xs text-muted-foreground">{p.genres.join(' · ')}</p></div><Button size="sm" disabled={busy || rows.some(c => [c.artist_a_id, c.artist_b_id].includes(p.id))} onClick={() => void act(() => submit({ data: { opponent: p.id } }))}>Challenge</Button></div>)}</div>
           {directory.isError && <p role="alert">Could not load artists.</p>}
         </>}
       </div>}
