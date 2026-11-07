@@ -289,21 +289,15 @@ export function TrackCard({
       <span className="hidden shrink-0 text-xs tabular-nums text-white/40 sm:block">
         {formatDuration(track.durationSeconds)}
       </span>
-      <button
-        type="button"
-        aria-label={isCurrent && player.isPlaying ? "Pause" : "Play"}
+      <PlayFab
+        size="sm"
+        playing={isCurrent && player.isPlaying}
         onClick={() => {
           if (isCurrent) return player.toggle();
           player.play(toPlayerTrack(track), (queue ?? [track]).map(toPlayerTrack));
         }}
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white transition hover:bg-tv-cyan hover:text-black"
-      >
-        {isCurrent && player.isPlaying ? (
-          <Pause className="h-4 w-4 fill-current" />
-        ) : (
-          <Play className="ml-0.5 h-4 w-4 fill-current" />
-        )}
-      </button>
+        className="shrink-0 border-0 bg-secondary shadow-none backdrop-blur-none"
+      />
       <Button
         variant="ghost"
         type="button"
@@ -569,7 +563,10 @@ export function FeaturedCard({
                 </>
               ) : (
                 <>
-                  <Play className="h-5 w-5 fill-current" /> Play
+                  <span className="tv-play-fab grid h-7 w-7 shrink-0 place-items-center rounded-full" data-play-icon="true">
+                    <Play className="tv-play-standard h-5 w-5 fill-current" />
+                    <img src={playIconAsset.url} alt="" aria-hidden="true" draggable={false} className="tv-play-image h-full w-full object-contain" />
+                  </span> Play
                 </>
               )}
             </button>
@@ -634,18 +631,15 @@ export function QuickAccessCard({
       </div>
       <span className="min-w-0 flex-1 text-xs font-bold leading-tight text-white sm:break-words sm:text-sm">{title}</span>
       {onPlay ? (
-        <button
-          type="button"
-          aria-label={`Play ${title}`}
+        <PlayFab
+          size="sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onPlay();
           }}
-          className="absolute right-2 top-2 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-tv-cyan text-black transition sm:static sm:h-9 sm:w-9 md:opacity-0 md:group-hover:opacity-100"
-        >
-          <Play className="ml-0.5 h-4 w-4 fill-current" />
-        </button>
+          className="absolute right-2 top-2 h-8 w-8 shrink-0 border-0 bg-tv-cyan text-background shadow-none backdrop-blur-none sm:static sm:h-9 sm:w-9 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+        />
       ) : null}
     </div>
   );
