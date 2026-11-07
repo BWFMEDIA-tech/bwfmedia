@@ -107,7 +107,7 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
       })}
       <div className="freestyle-vs" aria-hidden="true">VS</div>
     </div>
-    {room && <LocalCameraControl artistIds={[battle?.artist_a_id, battle?.artist_b_id]} />}
+    {room && <LocalCameraControl artistIds={open ? [battle?.artist_a_id, battle?.artist_b_id] : candidates.map(p => p.user_id)} />}
     {!auth.user && <p className="mt-3 text-center text-sm text-muted-foreground">Sign in to watch and vote.</p>}
     {isHost && <div className="mt-5 border-t border-border pt-4">
       {open ? <Button variant="outline" disabled={busy} onClick={() => { if (battle && window.confirm('Cancel this freestyle battle?')) void action(() => cancel({ data: { battleId: battle.id } })); }}>Cancel freestyle battle</Button> : <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
