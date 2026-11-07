@@ -734,9 +734,10 @@ function ArtistSide({
   flash?: { side: "a" | "b"; n: number; key: number } | null;
 }) {
   const grad = side === "a"
-    ? "linear-gradient(135deg, #0000FF, #0000ff)"
-    : "linear-gradient(135deg, #00E6FF, #00e6ff)";
-  const waveColor = side === "a" ? "#0000FF" : "#00E6FF";
+    ? "linear-gradient(135deg, #004BFF, #00E6FF)"
+    : "linear-gradient(135deg, #7c3aed, #c084fc)";
+  const waveColor = side === "a" ? "#00E6FF" : "#a855f7";
+  const wavePalette = side === "a" ? ["#00E6FF", "#004BFF", "#C0C7D1"] : ["#c084fc", "#7c3aed", "#C0C7D1"];
   const isEmpty = !artistId;
   const dim = !isEmpty && status !== "playing";
   const audioPlaying = usePlaybackPlaying();
@@ -748,9 +749,19 @@ function ArtistSide({
   const spinPaused = !isPlaying && !audioPlaying;
   const statusMeta =
     status === "playing"
-      ? { label: "Now Playing", cls: "bg-gradient-to-r from-[#00E6FF] to-[#00e6ff] text-black animate-pulse" }
+      ? {
+          label: "Now Playing",
+          cls: side === "a"
+            ? "bg-gradient-to-r from-[#00E6FF] to-[#004BFF] text-black animate-pulse shadow-[0_0_14px_rgba(0,230,255,0.6)]"
+            : "bg-gradient-to-r from-[#c084fc] to-[#7c3aed] text-black animate-pulse shadow-[0_0_14px_rgba(168,85,247,0.6)]",
+        }
       : status === "next"
-        ? { label: "Up Next", cls: "bg-white/10 text-white/80" }
+        ? {
+            label: "Up Next",
+            cls: side === "a"
+              ? "border border-[#00E6FF]/30 bg-[#00E6FF]/10 text-[#7ef4ff]"
+              : "border border-[#a855f7]/30 bg-[#a855f7]/10 text-[#d8b4fe]",
+          }
         : status === "finished"
           ? { label: "Finished", cls: "bg-emerald-500/20 text-emerald-300" }
           : { label: "Ready", cls: "bg-white/5 text-white/50" };
@@ -765,8 +776,8 @@ function ArtistSide({
           key={flash.key}
           className="pointer-events-none absolute left-1/2 top-6 z-20 -translate-x-1/2 font-mono text-2xl font-black animate-[voteFloat_0.9s_ease-out_forwards]"
           style={{
-            color: side === "a" ? "#a78bfa" : "#ff6ab1",
-            textShadow: `0 0 12px ${side === "a" ? "rgba(0,0,255,0.9)" : "rgba(0,0,255,0.9)"}`,
+            color: side === "a" ? "#7ef4ff" : "#c084fc",
+            textShadow: `0 0 12px ${side === "a" ? "rgba(0,230,255,0.9)" : "rgba(168,85,247,0.9)"}`,
           }}
         >
           +{flash.n}
@@ -808,9 +819,8 @@ function ArtistSide({
                     style={{
                       height: `${100 - i * 13}%`,
                       opacity: 1 - i * 0.13,
-                      background:
-                        i % 3 === 0 ? "#00E6FF" : i % 3 === 1 ? "#004BFF" : "#C0C7D1",
-                      boxShadow: i % 3 === 2 ? undefined : "0 0 6px rgba(0,230,255,0.6)",
+                      background: wavePalette[i % 3],
+                      boxShadow: i % 3 === 2 ? undefined : `0 0 6px ${side === "a" ? "rgba(0,230,255,0.6)" : "rgba(168,85,247,0.6)"}`,
                       animationDelay: `${(i * 0.11 + (dir === "right" ? 0.05 : 0)).toFixed(2)}s`,
                       animationDuration: `${0.7 + (i % 3) * 0.18}s`,
                       animationPlayState: isPlaying || audioPlaying ? "running" : "paused",
@@ -836,10 +846,12 @@ function ArtistSide({
               </>
             )}
             <div
-              className={cn(
-                "relative h-full w-full overflow-hidden rounded-full border-2",
-                isPlaying && "shadow-[0_0_30px_rgba(0,0,255,0.6)]",
-              )}
+                className={cn(
+                  "relative h-full w-full overflow-hidden rounded-full border-2",
+                  side === "a"
+                    ? isPlaying ? "arena-ring-playing-a" : "arena-ring-a"
+                    : isPlaying ? "arena-ring-playing-b" : "arena-ring-b",
+                )}
               style={{ borderImage: `${grad} 1`, borderColor: waveColor }}
             >
               {/* Vinyl record — spins slowly when idle, faster when playing.
@@ -960,6 +972,20 @@ function ArtistSide({
             style={canVote && !voted ? { background: grad } : undefined}
           >
             {voted ? "Voted" : "Vote"}
+          </button>
+          <button
+            disabled={!canVote}
+            onClick={onSuperVote}
+            title="Spend 1 boost credit for a 5x vote"
+            className={cn(
+              "flex items-center justify-center rounded-md border px-2 py-1.5 text-xs font-semibold transition-transform duration-150 active:scale-95",
+              canVote
+                ? "border-amber-400/50 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                : "cursor-not-allowed border-white/10 text-white/30",
+            )}
+          >
+            <Zap className="h-3 w-3" />
+            <span className="ml-1">5x</span>
           </button>
           <button
             disabled={!canVote}
