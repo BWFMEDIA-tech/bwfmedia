@@ -15,6 +15,7 @@ import { IntroSplash } from "@/components/site/IntroSplash";
 import { AssistantLauncher } from "@/components/assistant/AssistantLauncher";
 import { InstallPromptPopup } from "@/components/pwa/InstallPromptPopup";
 import { FreestyleChallengePopup } from "@/components/play/FreestyleChallengePopup";
+import { BattleChallengePopup } from "@/components/play/BattleChallengePopup";
 import { RealtimeHealthBanner } from "@/components/RealtimeHealthBanner";
 import { PlayerProvider } from "@/lib/player-context";
 import { GlobalPlayer } from "@/components/player/GlobalPlayer";
