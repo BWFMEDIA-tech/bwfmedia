@@ -966,7 +966,7 @@ function ArtistSide({
               voted
                 ? "bg-white/20 text-white"
                 : canVote
-                  ? "text-white hover:opacity-90"
+                  ? cn("text-white hover:opacity-90", side === "a" ? "arena-vote-btn-a" : "arena-vote-btn-b")
                   : "cursor-not-allowed bg-white/5 text-white/30",
             )}
             style={canVote && !voted ? { background: grad } : undefined}
