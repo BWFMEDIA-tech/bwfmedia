@@ -172,6 +172,7 @@ function RootComponent() {
         <ArtistStatusProvider>
         <RealtimeHealthBanner />
         {isChrome && <SiteHeader />}
+        {isChrome && <BackButton />}
         <div
           className={
             "pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+72px)] md:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+80px)] lg:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+80px)]" +
