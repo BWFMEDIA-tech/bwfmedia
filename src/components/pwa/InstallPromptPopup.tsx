@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 const DISMISSED_KEY = "tunevio-install-prompt-dismissed";
 
