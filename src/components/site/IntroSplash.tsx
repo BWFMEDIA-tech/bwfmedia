@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import introAsset from "@/assets/videos/tunevio-logo-intro.mp4.asset.json";
 import logoAsset from "@/assets/tunevio-icon.png.asset.json";
+import { enableIntroAudio, playIntroWithFallback } from "@/lib/intro-audio";
 
 /**
  * Site intro: plays the video with its uploaded soundtrack once per session,
  * attempting audible autoplay with no sound step.
- * Never traps the user: tap to skip, video end dismisses, and a fail-safe
+ * A tap enables blocked mobile sound without restarting; Skip, video end, and a fail-safe
  * timer removes the splash if playback stalls.
  */
 const SESSION_KEY = "tunevio:intro-played";
@@ -17,6 +18,8 @@ export function IntroSplash() {
   const [sessionChecked, setSessionChecked] = useState(false);
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const soundRequested = useRef(false);
+  const logoHoldRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     try {
@@ -40,20 +43,16 @@ export function IntroSplash() {
     // start the video. Try with sound first; if the browser blocks
     // unmuted autoplay, keep playing muted instead of trapping the user.
     const startVideo = () => {
-      video.muted = false;
-      video.play().catch(() => {
-        video.muted = true;
-        video.play().catch(() => {
-          // Autoplay fully blocked — dismiss so the site is never blocked.
-          setShow(false);
-        });
+      if (soundRequested.current) return;
+      void playIntroWithFallback(video, () => !soundRequested.current).then((started) => {
+        if (!started) setShow(false);
       });
     };
-    const logoHold = window.setTimeout(startVideo, 1400);
+    logoHoldRef.current = window.setTimeout(startVideo, 1400);
     // Fail-safe: never leave the splash up longer than the clip can be.
     const failSafe = window.setTimeout(() => setShow(false), 14000);
     return () => {
-      window.clearTimeout(logoHold);
+      window.clearTimeout(logoHoldRef.current);
       window.clearTimeout(failSafe);
     };
   }, [show, sessionChecked]);
@@ -61,12 +60,22 @@ export function IntroSplash() {
   if (!show) return null;
 
   const dismiss = () => setShow(false);
+  const unlockSound = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    soundRequested.current = true;
+    window.clearTimeout(logoHoldRef.current);
+    void enableIntroAudio(video).then((enabled) => {
+      if (!enabled) soundRequested.current = false;
+    });
+  };
 
   return (
     <div
       className="fixed inset-0 z-[100] bg-background"
       role="dialog"
       aria-label="Tunevio intro"
+      onClick={unlockSound}
     >
       {!playing && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -85,7 +94,7 @@ export function IntroSplash() {
       />
       <Button
         type="button"
-        onClick={dismiss}
+        onClick={(event) => { event.stopPropagation(); dismiss(); }}
         aria-label="Skip intro"
         variant="outline"
         size="sm"
