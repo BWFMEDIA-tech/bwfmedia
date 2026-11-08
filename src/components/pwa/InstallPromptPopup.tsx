@@ -75,9 +75,9 @@ export function InstallPromptPopup() {
       window.removeEventListener("appinstalled", onInstalled);
       window.clearTimeout(timer);
     };
-  }, []);
+  }, [signedIn]);
 
-  if (!visible || pathname === "/install") return null;
+  if (!signedIn || !visible || pathname === "/install") return null;
 
   const dismiss = () => {
     setVisible(false);
