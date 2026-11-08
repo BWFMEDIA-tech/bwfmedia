@@ -317,34 +317,19 @@ function HeroBanner({
           <>
             <Link
               to="/go-live"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-black uppercase tracking-wide text-white transition hover:brightness-110"
-              style={{
-                background: "linear-gradient(90deg, var(--brand-cyan), var(--brand-blue))",
-                boxShadow:
-                  "0 0 0 1px color-mix(in srgb, var(--brand-cyan) 45%, transparent), 0 8px 32px color-mix(in srgb, var(--brand-blue) 55%, transparent), 0 2px 10px color-mix(in srgb, var(--brand-cyan) 40%, transparent)",
-              }}
+              className="ap-btn ap-btn-live"
             >
-              <span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Go Live
+              <span className="h-2 w-2 animate-pulse rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)]" /> Go Live
             </Link>
             <Link
               to="/settings/profile"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
-              style={{
-                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
-                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
-                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
-              }}
+              className="ap-btn ap-btn-dark"
             >
               Edit Artist Profile
             </Link>
             <Link
               to="/distribution"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
-              style={{
-                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
-                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
-                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
-              }}
+              className="ap-btn ap-btn-dark"
             >
               <Disc3 className="h-4 w-4" /> Distribution
             </Link>
