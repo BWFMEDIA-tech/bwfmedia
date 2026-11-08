@@ -63,7 +63,7 @@ export function IntroSplash() {
     >
       {!playing && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <img src={logoAsset.url} alt="Tunevio" className="w-64 max-w-[70%] object-contain" fetchPriority="high" />
+          <img src={logoAsset.url} alt="Tunevio" className="h-44 w-auto max-w-[70%] object-contain" fetchPriority="high" />
         </div>
       )}
       <video
