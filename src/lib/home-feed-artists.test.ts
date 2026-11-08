@@ -41,4 +41,16 @@ describe("release rules", () => {
     ];
     expect(onePerRelease(rows).map((r) => r.id)).toEqual([1, 3]);
   });
+  it("shows only the newest release from each artist", () => {
+    const rows = [
+      { id: 1, artist_user_id: "x" },
+      { id: 2, artist_user_id: "x" },
+      { id: 3, artist_user_id: "y" },
+      { id: 4, artist_user_id: "x" },
+    ];
+    expect(onePerArtist(rows).map((r) => r.id)).toEqual([1, 3]);
+  });
+  it("drops rows with no artist id", () => {
+    expect(onePerArtist([{ id: 1, artist_user_id: null }, { id: 2, artist_user_id: "x" }])).toHaveLength(1);
+  });
 });
