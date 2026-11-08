@@ -197,7 +197,7 @@ export function SiteHeader() {
           : "backdrop-blur bg-background/95 border-b border-border"
       }`}
     >
-      <div className="w-full px-4 md:px-8 h-[72px] md:h-20 lg:h-20 flex items-center gap-4">
+      <div className="w-full px-4 md:px-8 h-[60px] md:h-16 lg:h-16 flex items-center gap-3">
         {/* Mobile hamburger (left) */}
         <button
           type="button"

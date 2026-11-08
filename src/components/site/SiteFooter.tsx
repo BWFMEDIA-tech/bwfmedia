@@ -78,7 +78,7 @@ export function SiteFooter({ fullWidth = false }: { fullWidth?: boolean }) {
   return (
     <footer className="bg-black border-t border-white/10">
       {/* Main footer grid */}
-      <div className={`${fullWidth ? "w-full" : "max-w-7xl mx-auto"} px-6 md:px-12 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10`}>
+      <div className={`${fullWidth ? "w-full" : "max-w-7xl mx-auto"} px-6 md:px-12 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6`}>
         {/* Brand column */}
         <div className="lg:col-span-2">
           <RouterLink to="/" className="inline-flex items-center gap-3">
@@ -87,7 +87,7 @@ export function SiteFooter({ fullWidth = false }: { fullWidth?: boolean }) {
           <p className="mt-4 text-sm text-bone/55 max-w-sm leading-relaxed">
             Where culture goes viral. A premium media network for artists, brands, and the moments that matter.
           </p>
-          <div className="mt-6 space-y-3">
+          <div className="mt-4 space-y-2">
             <a
               href="mailto:tunevioapp@gmail.com"
               className="flex items-center gap-2 text-sm text-bone/60 hover:text-blood transition-colors"
@@ -145,7 +145,7 @@ export function SiteFooter({ fullWidth = false }: { fullWidth?: boolean }) {
 
       {/* Social + bottom bar */}
       <div className="border-t border-white/10">
-        <div className={`${fullWidth ? "w-full" : "max-w-7xl mx-auto"} px-6 md:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4`}>
+        <div className={`${fullWidth ? "w-full" : "max-w-7xl mx-auto"} px-6 md:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-4`}>
           <div className="flex flex-wrap items-center gap-2">
             {socials.map(({ href, label, Icon }) => (
               <a
