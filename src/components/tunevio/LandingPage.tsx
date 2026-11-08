@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArtistMarquee } from "@/components/tunevio/ArtistMarquee";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
+import heroRapperPoster from "@/assets/hero-rapper-poster.jpg.asset.json";
 import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
 import welcomePoster from "@/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json";
 import battlePoster from "@/assets/welcome-IMG_1560.png.asset.json";
@@ -253,11 +254,12 @@ export function LandingPage() {
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
             src={heroRapperVideo.url}
+            poster={heroRapperPoster.url}
             autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             className="welcome-hero-video absolute inset-0 h-full w-full object-cover"
           />
           <div className="welcome-hero-shade absolute inset-0" />
