@@ -77,4 +77,4 @@
 - [x] Tests (5 lifecycle tests) + typecheck + build verified; signed-in render verified on /play and /stream-studio
 
 ## Logo video intro
-- [ ] Add a logo video intro (user request "Logo video intro" after hero black-screen fix)
+- [x] Added animated Tunevio logo reveal as the opening intro video; hero black screen fixed with poster frame
