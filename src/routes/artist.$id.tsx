@@ -9,7 +9,7 @@ import {
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp, Headphones, Settings,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
-  DollarSign as Dollar, Trophy, Flame, Crown, Disc3,
+  DollarSign as Dollar, Trophy, Flame, Crown,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
@@ -35,7 +35,6 @@ import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 import { ProfileBattleCard } from "@/components/artist/ProfileBattleCard";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
-import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { useSignedVideoUrl } from "@/lib/video-urls";
@@ -308,33 +307,11 @@ function HeroBanner({
         </div>
       </div>
       <div className="relative px-5 md:px-8 pb-5 md:pb-6 flex flex-wrap items-center gap-2">
-        <ProfileMessageButton artistId={artist.id} compact />
         {isOwner && !canUseTools ? (
           <ActivateArtistButton>
             Become an artist to go live
           </ActivateArtistButton>
-        ) : isOwner ? (
-          <>
-            <Link
-              to="/go-live"
-              className="ap-btn ap-btn-live"
-            >
-              <span className="h-2 w-2 animate-pulse rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9)]" /> Go Live
-            </Link>
-            <Link
-              to="/settings/profile"
-              className="ap-btn ap-btn-dark"
-            >
-              Edit Artist Profile
-            </Link>
-            <Link
-              to="/distribution"
-              className="ap-btn ap-btn-dark"
-            >
-              <Disc3 className="h-4 w-4" /> Distribution
-            </Link>
-          </>
-        ) : (
+        ) : isOwner ? null : (
           <>
             <FollowButton artistId={artist.id} />
             <PillButton icon={Share2} label="Share" onClick={() => shareProfile(artist.name)} />
