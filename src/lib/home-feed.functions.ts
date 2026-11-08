@@ -127,7 +127,7 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
   const onlyArtistTracks = (rows: any, ids: Set<string>) => onlyWithArtwork(onlyArtistRaw(rows, ids) as any[]);
 
   const trending = onlyArtistTracks(trendingRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
-  const newReleases = onePerRelease(onlyArtistTracks(newRes.data, artistIds)).slice(0, LIMIT).map(mapTrack);
+  const newReleases = onePerArtist(onePerRelease(onlyArtistTracks(newRes.data, artistIds))).slice(0, LIMIT).map(mapTrack);
   const popularWeek = onlyArtistTracks(weekRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
   const popularAll = onlyArtistTracks(popularRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
   const popular = popularWeek.length ? popularWeek : popularAll;

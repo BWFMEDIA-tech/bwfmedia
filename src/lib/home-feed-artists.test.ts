@@ -28,7 +28,7 @@ describe("onlyArtistTracks", () => {
   });
 });
 
-import { onlyWithArtwork, onePerRelease } from "./home-feed-artists";
+import { onlyWithArtwork, onePerRelease, onePerArtist } from "./home-feed-artists";
 describe("release rules", () => {
   it("hides songs without artwork", () => {
     expect(onlyWithArtwork([{ cover_url: "a" }, { cover_url: null }, { cover_url: " " }])).toHaveLength(1);
