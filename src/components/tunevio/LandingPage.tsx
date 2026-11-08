@@ -462,10 +462,10 @@ export function LandingPage() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-80px" }}
-            className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10"
+            className="tv-scroll mt-10 flex gap-6 overflow-x-auto pb-4 -mx-5 px-5 sm:-mx-10 sm:px-10 lg:mx-0 lg:px-1"
           >
             {welcomeScreens.map((screen) => (
-              <motion.figure key={screen.title} variants={screenVariants} className="welcome-screen min-w-0">
+              <motion.figure key={screen.title} variants={screenVariants} className="welcome-screen w-64 shrink-0 sm:w-72 lg:w-80">
                 <div className="welcome-screen-frame relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-lg bg-background border border-border">
                   <motion.img
                     variants={screenImageVariants}
