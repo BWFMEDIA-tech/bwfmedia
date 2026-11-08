@@ -26,7 +26,7 @@ import {
   LayoutDashboard,
   Download,
 } from "lucide-react";
-import bwfLogo from "@/assets/tunevio-header-logo.png.asset.json";
+import bwfLogo from "@/assets/tunevio-icon.png.asset.json";
 import { useAuth } from "@/lib/auth-context";
 import { NotificationBell } from "@/components/NotificationBell";
 import { MessageBell } from "@/components/MessageBell";
