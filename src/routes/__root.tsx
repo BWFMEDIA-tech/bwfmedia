@@ -127,6 +127,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <IntroSplash />
         <noscript>
           <img
             height="1"
@@ -182,7 +183,6 @@ function RootComponent() {
         <InstallPromptPopup />
          <FreestyleChallengePopup />
          <BattleChallengePopup />
-        <IntroSplash />
         </ArtistStatusProvider>
         </PlayerProvider>
       </CartProvider>
