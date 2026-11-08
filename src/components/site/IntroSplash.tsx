@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import introAsset from "@/assets/tunevio-intro-soundtrack.mp4.asset.json";
+import introAsset from "@/assets/videos/tunevio-logo-intro.mp4.asset.json";
 
 /**
  * Site intro: plays the video with its uploaded soundtrack once per session,
@@ -56,7 +56,7 @@ export function IntroSplash() {
       <video
         ref={videoRef}
         src={introAsset.url}
-        className="h-full w-full object-cover md:object-contain"
+        className="h-full w-full object-contain"
         playsInline
         onEnded={dismiss}
         onError={dismiss}
