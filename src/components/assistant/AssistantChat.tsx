@@ -46,6 +46,7 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
       const t = data.session?.access_token;
       return t ? { Authorization: `Bearer ${t}` } : ({} as Record<string, string>);
     },
+    prepareSendMessagesRequest: ({ body, ...rest }) => ({ ...rest, body: { ...body, page: window.location.pathname } }),
   }), []);
 
   const { messages, setMessages, sendMessage, status, stop, error, clearError } = useChat({
@@ -181,7 +182,12 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
           )}
           {error && !busy && (
             <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm">
-              The assistant couldn't answer. Try again, or <Link to="/contact" className="text-primary" onClick={onNavigate}>contact support</Link>.
+              <p>That didn't go through. Try rephrasing your question — for example "How do I go live?" or "Where are my earnings?" — or <Link to="/contact" className="text-primary" onClick={onNavigate}>contact support</Link>.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {SUGGESTED_QUESTIONS[audience].slice(0, 2).map((q) => (
+                  <button key={q} type="button" onClick={() => { clearError(); ask(q); }} className="rounded-md border border-border bg-card px-2 py-1 text-xs hover:border-primary">{q}</button>
+                ))}
+              </div>
             </div>
           )}
         </ConversationContent>
