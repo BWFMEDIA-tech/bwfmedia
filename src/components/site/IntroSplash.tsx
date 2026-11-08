@@ -51,8 +51,11 @@ export function IntroSplash() {
     };
     const logoHold = window.setTimeout(startVideo, 1400);
     // Fail-safe: never leave the splash up longer than the clip can be.
-    const failSafe = window.setTimeout(() => setShow(false), 12000);
-    return () => window.clearTimeout(failSafe);
+    const failSafe = window.setTimeout(() => setShow(false), 14000);
+    return () => {
+      window.clearTimeout(logoHold);
+      window.clearTimeout(failSafe);
+    };
   }, [show, sessionChecked]);
 
   if (!show) return null;
