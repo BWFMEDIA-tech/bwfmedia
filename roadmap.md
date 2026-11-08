@@ -75,3 +75,6 @@
 - [x] Artist UI: challenge picker (artist search + genre) + my challenges list on /play
 - [x] Host UI: "Artist Challenges" panel in Stream Studio with status tabs, schedule/start/decline, realtime sync
 - [x] Tests (5 lifecycle tests) + typecheck + build verified; signed-in render verified on /play and /stream-studio
+
+## Logo video intro
+- [ ] Add a logo video intro (user request "Logo video intro" after hero black-screen fix)
