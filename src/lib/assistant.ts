@@ -72,10 +72,10 @@ export function allowedAssistantPath(href: string | undefined | null): string | 
 }
 
 export const SUGGESTED_QUESTIONS: Record<AssistantAudience, string[]> = {
-  guest: ["How do I create an account?", "How do I become an artist?", "What can I do on Tunevio?"],
-  fan: ["How do I follow an artist?", "How do I join a live?", "How do battles and voting work?"],
-  artist: ["How do I upload a song?", "How do I go live?", "Where are my earnings and analytics?"],
-  host: ["How do I get host access?", "Where are my host earnings?", "How do I moderate a live room?"],
+  guest: ["How do I create an account?", "What can I do on Tunevio?", "How do battles and voting work?"],
+  fan: ["How do I follow an artist?", "How do I join a live?", "Why can't I vote in a battle?"],
+  artist: ["How do I upload a song or music video?", "How do I challenge an artist to a freestyle battle?", "How do I connect my payout?"],
+  host: ["How do I go live?", "My microphone isn't working on stage", "Where are my host earnings?"],
   moderator: ["How do I moderate a live room?", "How do raised hands work?", "How do I contact support?"],
-  admin: ["How do I edit help articles?", "How do I review music rights?", "How do I go live?"],
+  admin: ["How do I make an announcement?", "How do I delete an account?", "How do I edit help articles?"],
 };
