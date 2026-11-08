@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ArtistMarquee } from "@/components/tunevio/ArtistMarquee";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import heroRapperPoster from "@/assets/hero-rapper-poster.jpg.asset.json";
-import tunevioLogo from "@/assets/tunevio-logo.png.asset.json";
+import tunevioLogo from "@/assets/tunevio-header-logo.png.asset.json";
 import welcomePoster from "@/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json";
 import battlePoster from "@/assets/welcome-IMG_1560.png.asset.json";
 import appShowcase from "@/assets/welcome-apps.png.asset.json";
