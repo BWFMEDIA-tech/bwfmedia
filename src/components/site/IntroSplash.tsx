@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import introAsset from "@/assets/videos/tunevio-logo-intro.mp4.asset.json";
-import logoAsset from "@/assets/tunevio-logo.png.asset.json";
+import logoAsset from "@/assets/tunevio-icon.png.asset.json";
 
 /**
  * Site intro: plays the video with its uploaded soundtrack once per session,
