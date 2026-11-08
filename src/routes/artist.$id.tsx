@@ -323,23 +323,13 @@ function HeroBanner({
             </Link>
             <Link
               to="/settings/profile"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
-              style={{
-                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
-                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
-                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
-              }}
+              className="ap-btn ap-btn-dark"
             >
               Edit Artist Profile
             </Link>
             <Link
               to="/distribution"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
-              style={{
-                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
-                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
-                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
-              }}
+              className="ap-btn ap-btn-dark"
             >
               <Disc3 className="h-4 w-4" /> Distribution
             </Link>
