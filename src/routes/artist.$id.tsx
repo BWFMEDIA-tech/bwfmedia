@@ -9,7 +9,7 @@ import {
   UserPlus, Instagram, Youtube, Twitter, Facebook, Link2,
   ListMusic, ThumbsUp, Headphones, Settings,
   Upload, Image as ImageIcon, FileText, Music, Video as VideoIcon,
-  DollarSign as Dollar, Trophy, Flame, Crown, Disc3,
+  DollarSign as Dollar, Trophy, Flame, Crown,
 } from "lucide-react";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
@@ -35,7 +35,6 @@ import { TipModal } from "@/components/stream/TipModal";
 import { ProfileLiveBar } from "@/components/artist/ProfileLiveBar";
 import { ProfileBattleCard } from "@/components/artist/ProfileBattleCard";
 import { ArtistLiveRoom } from "@/components/artist/ArtistLiveRoom";
-import { ProfileMessageButton } from "@/components/artist/ProfileMessageButton";
 import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { useSignedVideoUrl } from "@/lib/video-urls";
