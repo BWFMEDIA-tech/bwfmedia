@@ -124,7 +124,17 @@ export const deleteStreamsBulk = createServerFn({ method: "POST" })
       .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
     if (!adm) throw new Error("Not authorized");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    let q = supabaseAdmin.from("streams").delete({ count: "exact" }).eq("host_id", userId);
+    // Admin cleanup applies to every host's sessions. Stale "live" sessions are
+    // ended (not deleted) so tips, tracks and earnings tied to them are kept.
+    if (!data.ids?.length && data.status === "live") {
+      const { error, count } = await supabaseAdmin
+        .from("streams")
+        .update({ status: "ended", ended_at: new Date().toISOString() }, { count: "exact" })
+        .eq("status", "live");
+      if (error) throw new Error(error.message);
+      return { ok: true, deleted: count ?? 0 };
+    }
+    let q = supabaseAdmin.from("streams").delete({ count: "exact" });
     if (data.ids && data.ids.length) q = q.in("id", data.ids);
     else if (data.status && data.status !== "all") q = q.eq("status", data.status);
     else q = q.not("id", "is", null);
