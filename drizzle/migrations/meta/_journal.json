@@ -428,6 +428,13 @@
       "when": 1794075086261,
       "tag": "0060_fix_freestyle_challenge_notify_conflict",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794155276388,
+      "tag": "0061_skip_host_earnings_without_tier",
+      "breakpoints": true
     }
   ]
 }
