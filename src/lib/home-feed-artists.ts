@@ -28,3 +28,15 @@ export function onePerRelease<T extends { artist_user_id?: string | null; cover_
     return true;
   });
 }
+
+// New Releases rule: one entry per artist. Rows arrive newest-first, so the
+// first track seen for each artist is their latest release.
+export function onePerArtist<T extends { artist_user_id?: string | null }>(rows: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return rows.filter((r) => {
+    const key = r.artist_user_id ?? "";
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
