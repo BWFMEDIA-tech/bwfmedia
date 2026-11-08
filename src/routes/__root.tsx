@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { registerTunevioPwa } from "@/lib/pwa";
 import { installHorizontalCardDragging } from "@/lib/horizontal-scroll";
+import { installZoomBlocker } from "@/lib/disable-zoom";
 import { ArtistStatusProvider } from "@/components/artist/ArtistStatusBeacon";
 
 import appCss from "../styles.css?url";
@@ -48,7 +49,7 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" },
       { name: "theme-color", content: "#000000" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
@@ -144,6 +145,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   useEffect(() => installHorizontalCardDragging(), []);
+  useEffect(() => installZoomBlocker(), []);
   useEffect(() => { void registerTunevioPwa().catch(() => { /* Installation must never interrupt the website. */ }); }, []);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isChrome = pathname !== "/" && !pathname.startsWith("/stream-studio") && !pathname.startsWith("/stream/") && !pathname.startsWith("/stage/") && !pathname.startsWith("/videos") && !pathname.startsWith("/tunevio");
