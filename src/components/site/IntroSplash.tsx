@@ -27,7 +27,6 @@ export function IntroSplash() {
       sessionStorage.setItem(SESSION_KEY, "1");
     } catch {
       // Storage unavailable (private mode) — still show the intro once.
-    }
     } finally {
       setSessionChecked(true);
     }
