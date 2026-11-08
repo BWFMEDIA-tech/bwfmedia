@@ -20,9 +20,9 @@ function isInstalled(): boolean {
 }
 
 /**
- * One-time "Install Tunevio" welcome popup shown to anyone landing on the
- * site (guests, new members, hosts, visitors). Dismissal is remembered per
- * device; it never shows inside the already-installed app or on /install.
+ * One-time "Install Tunevio" welcome popup shown only to signed-in members.
+ * Dismissal is remembered per device; it never shows inside the
+ * already-installed app or on /install.
  */
 export function InstallPromptPopup() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -30,8 +30,25 @@ export function InstallPromptPopup() {
   const [prompt, setPrompt] = useState<InstallEvent | null>(null);
   const [busy, setBusy] = useState(false);
   const [installHelp, setInstallHelp] = useState("");
+  const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (active) setSignedIn(Boolean(data.session));
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "INITIAL_SESSION") return;
+      setSignedIn(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!signedIn) return;
     if (isInstalled()) return;
     try {
       if (window.localStorage.getItem(DISMISSED_KEY)) return;
