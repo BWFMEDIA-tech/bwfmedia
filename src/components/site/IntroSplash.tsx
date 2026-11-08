@@ -36,16 +36,20 @@ export function IntroSplash() {
     if (!show || !sessionChecked) return;
     const video = videoRef.current;
     if (!video) return;
-    // Try with sound first; if the browser blocks unmuted autoplay, keep
-    // playing muted instead of trapping the user.
-    video.muted = false;
-    video.play().catch(() => {
-      video.muted = true;
+    // Hold the static logo first so it reads as a deliberate beat, then
+    // start the video. Try with sound first; if the browser blocks
+    // unmuted autoplay, keep playing muted instead of trapping the user.
+    const startVideo = () => {
+      video.muted = false;
       video.play().catch(() => {
-        // Autoplay fully blocked — dismiss so the site is never blocked.
-        setShow(false);
+        video.muted = true;
+        video.play().catch(() => {
+          // Autoplay fully blocked — dismiss so the site is never blocked.
+          setShow(false);
+        });
       });
-    });
+    };
+    const logoHold = window.setTimeout(startVideo, 1400);
     // Fail-safe: never leave the splash up longer than the clip can be.
     const failSafe = window.setTimeout(() => setShow(false), 12000);
     return () => window.clearTimeout(failSafe);
