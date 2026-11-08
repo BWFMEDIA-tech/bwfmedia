@@ -46,7 +46,7 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
       const t = data.session?.access_token;
       return t ? { Authorization: `Bearer ${t}` } : ({} as Record<string, string>);
     },
-    body: () => ({ page: window.location.pathname }),
+    prepareSendMessagesRequest: ({ body, ...rest }) => ({ ...rest, body: { ...body, page: window.location.pathname } }),
   }), []);
 
   const { messages, setMessages, sendMessage, status, stop, error, clearError } = useChat({
