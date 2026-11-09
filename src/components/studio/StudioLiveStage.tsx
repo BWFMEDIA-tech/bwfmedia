@@ -530,21 +530,18 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
           "gap-4",
           "tv-scroll-pager flex snap-x snap-mandatory overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           "md:grid md:items-start md:overflow-visible md:pb-0",
-          visibleSlots.length === 1 && "md:grid-cols-1",
-          visibleSlots.length === 2 && "md:grid-cols-2",
-          visibleSlots.length === 3 && "md:grid-cols-3",
-          visibleSlots.length === 4 && "md:grid-cols-4",
+          spotlight.guest ? "md:grid-cols-4" : "md:grid-cols-3",
         )}
       >
         <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("admin", "HOST", "Waiting for Host", hostImage)}
         </div>
-        {spotlight.artist && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("middle", "ARTIST", "Waiting for Artist", guestImage)}
-        </div>}
-        {spotlight.cohost && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
+        </div>
+        <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("host", "CO-HOST", "Waiting for Co-Host")}
-        </div>}
+        </div>
         {spotlight.guest && <div className="w-[88%] min-w-0 shrink-0 snap-center md:w-full">
           {renderPanel("guest", "GUEST", "Waiting for Guest")}
         </div>}
