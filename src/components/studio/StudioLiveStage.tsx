@@ -28,7 +28,6 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import { Crown, Music2, UserRound, AudioLines, Headphones } from "lucide-react";
-import { getVisibleLiveVideoSlots } from "@/lib/live-video-slots";
 import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { SelfMicrophoneButton } from "@/components/stream/SelfMicrophoneButton";
 import { StageMuteEnforcement } from "@/components/stream/StageMuteEnforcement";
