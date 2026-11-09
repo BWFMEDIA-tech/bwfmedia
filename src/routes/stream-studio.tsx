@@ -1258,7 +1258,7 @@ function StreamStudio() {
               </StudioBlock>
               <StudioBlock id="challenges" label="Artist Challenges">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
-                <ArtistChallengesPanel streamId={stream?.id} />
+                <ArtistChallengesPanel streamId={stream?.id} hostId={auth.user?.id} roomName={stream?.room_name} />
               </div>
               </StudioBlock>
               <StudioBlock id="audience" label="Audience">
