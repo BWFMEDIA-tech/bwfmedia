@@ -26,6 +26,49 @@ import artistProfiles from "@/assets/welcome-IMG_1683.png.asset.json";
 import leaderboard from "@/assets/welcome-IMG_1682.png.asset.json";
 import stageRoom from "@/assets/welcome-IMG_1681.png.asset.json";
 import liveChat from "@/assets/welcome-IMG_1680.png.asset.json";
+import landingLiveCrowd from "@/assets/landing-live-crowd.jpg.asset.json";
+import landingArenaBattle from "@/assets/landing-arena-battle.jpg.asset.json";
+import landingDjVote from "@/assets/landing-dj-vote.jpg.asset.json";
+import landingCommunity from "@/assets/landing-community.jpg.asset.json";
+import landingStudioArtist from "@/assets/landing-studio-artist.jpg.asset.json";
+
+const highlights = [
+  {
+    image: landingLiveCrowd,
+    alt: "Artist performing on stage surrounded by a crowd holding up phone lights",
+    kicker: "Live Experiences",
+    title: "EXPERIENCE MUSIC TOGETHER.",
+    desc: "Join live sessions, stage rooms and performances where artists and fans share the moment in real time.",
+  },
+  {
+    image: landingArenaBattle,
+    alt: "Two artists facing off in a head-to-head rap battle under blue stage lights",
+    kicker: "Battle Arena",
+    title: "STEP INTO THE ARENA.",
+    desc: "Challenge other artists, compete in 1v1 battles, and let the audience decide who brings the heat.",
+  },
+  {
+    image: landingDjVote,
+    alt: "DJ performing a live set at the decks in a packed club",
+    kicker: "Audience Power",
+    title: "YOUR VOTE. YOUR VOICE.",
+    desc: "Discover emerging talent, vote for your favorites, and help independent music get the recognition it deserves.",
+  },
+  {
+    image: landingStudioArtist,
+    alt: "Artist recording vocals into a studio microphone with headphones on",
+    kicker: "For Artists",
+    title: "SHARE YOUR SOUND.",
+    desc: "Upload your music, build your profile, and let the world hear what you've been working on.",
+  },
+  {
+    image: landingCommunity,
+    alt: "Four friends listening to music together on headphones and phones",
+    kicker: "Community",
+    title: "BUILD YOUR MUSIC COMMUNITY.",
+    desc: "Follow artists, connect with music lovers, discover new sounds, and find your place in the Tunevio community.",
+  },
+];
 
 const welcomeScreens = [
   { image: livePlayer, title: "Live Music", alt: "Tunevio live music player showing Whole Vibe, playback and audience reactions" },
