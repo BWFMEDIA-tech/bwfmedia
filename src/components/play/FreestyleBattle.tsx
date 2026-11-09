@@ -102,7 +102,7 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
       {(['a', 'b'] as const).map(side => {
         const id = placement && !open ? (side === 'a' ? artistA : artistB) : side === 'a' ? battle?.artist_a_id : battle?.artist_b_id;
         const artist = artists.find(p => p.id === id) ?? queue.data?.profiles.find(p => p.id === id);
-        const genres = artist && 'genres' in artist ? artist.genres : null;
+        const genres = artist && 'genres' in artist && Array.isArray(artist.genres) ? artist.genres : null;
         const name = artist?.stage_name || artist?.display_name || `Artist ${side.toUpperCase()}`;
         const total = side === 'a' ? battle?.votes_a ?? 0 : battle?.votes_b ?? 0;
         return <div key={side} className="freestyle-side min-w-0" data-side={side}>
