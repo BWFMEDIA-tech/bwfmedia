@@ -420,7 +420,6 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
   const spotlight = useStudioStreamSpotlight(streamId);
-  const visibleSlots = getVisibleLiveVideoSlots(spotlight);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host" | "guest";
