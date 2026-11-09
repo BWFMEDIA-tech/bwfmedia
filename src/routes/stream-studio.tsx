@@ -10,7 +10,7 @@ import {
   MonitorUp, UserPlus, Share2, MoreHorizontal, Eye, Circle, Send, Smile,
   Heart, Flame, Music2, PartyPopper, Sparkles, Crown, Copy, Check,
   CheckCircle2, X as XIcon, Instagram, Facebook, MessageCircle, Mail,
-  Headphones, Wifi, PhoneOff, ChevronRight, GripVertical,
+  Headphones, Wifi, PhoneOff, ChevronRight, GripVertical, PanelLeftClose, PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -162,6 +162,7 @@ function Sidebar() {
   const auth = useAuth();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const uid = auth.user?.id;
@@ -193,22 +194,33 @@ function Sidebar() {
     return undefined;
   };
   return (
-    <aside className="hidden lg:flex w-[240px] shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] p-4">
-      <Link to="/" className="flex items-center gap-2 px-2 py-3">
-        <div className="text-2xl font-black tracking-tight">
-          <span className="text-white">Tunevio</span>
-        </div>
-      </Link>
+    <aside className={cn("hidden lg:flex shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] transition-[width] duration-200", collapsed ? "w-[64px] items-center p-2" : "w-[240px] p-4")}>
+      <div className={cn("flex w-full items-center", collapsed ? "justify-center py-2" : "justify-between px-2 py-3")}>
+        {!collapsed && (
+          <Link to="/" className="text-2xl font-black tracking-tight text-white">Tunevio</Link>
+        )}
+        <button
+          type="button"
+          onClick={() => setCollapsed((c) => !c)}
+          aria-label={collapsed ? "Expand menu" : "Minimize menu"}
+          title={collapsed ? "Expand menu" : "Minimize menu"}
+          className="rounded-lg p-2 text-white/60 transition hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00E6FF]"
+        >
+          {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+        </button>
+      </div>
 
       <button
-        className="mt-2 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02] active:scale-95"
+        aria-label="Go Live"
+        className={cn("mt-2 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold", collapsed ? "h-10 w-10 p-0" : "px-4 py-3")}
+        data-cls=" text-white shadow-lg transition hover:scale-[1.02] active:scale-95"
         style={{
           background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})`,
           boxShadow: `0 8px 32px ${PURPLE_GLOW}`,
         }}
       >
         <Radio className="h-4 w-4 animate-pulse" />
-        Go Live
+        {!collapsed && "Go Live"}
       </button>
 
       <nav className="mt-4 flex flex-col gap-1">
@@ -219,8 +231,11 @@ function Sidebar() {
             <Link
               key={item.label}
               to={item.to}
+              title={collapsed ? item.label : undefined}
+              aria-label={collapsed ? item.label : undefined}
               className={cn(
-                "group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition",
+                "group relative flex items-center rounded-lg py-2.5 text-sm transition",
+                collapsed ? "justify-center px-2.5" : "justify-between px-3",
                 active
                   ? "bg-white/5 text-white"
                   : "text-white/60 hover:bg-white/5 hover:text-white"
@@ -228,9 +243,11 @@ function Sidebar() {
             >
               <span className="flex items-center gap-3">
                 <item.icon className="h-4 w-4" style={active ? { color: PURPLE } : undefined} />
-                {item.label}
+                {!collapsed && item.label}
               </span>
-              {badge ? (
+              {badge && collapsed ? (
+                <span className="absolute right-1 top-1 h-2 w-2 rounded-full" style={{ background: PURPLE }} />
+              ) : badge ? (
                 <span
                   className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
                   style={{ background: PURPLE }}
@@ -243,6 +260,7 @@ function Sidebar() {
         })}
       </nav>
 
+      {!collapsed && <>
       <div className="mt-auto rounded-xl border border-white/5 bg-white/[0.02] p-4">
         <div className="mb-2 flex items-center gap-2">
           <Crown className="h-4 w-4" style={{ color: PURPLE }} />
@@ -260,6 +278,7 @@ function Sidebar() {
       <div className="flex items-center gap-2 px-2 pt-2 text-[10px] text-white/30">
         Powered by <span className="font-bold text-white/70">Tunevio</span>
       </div>
+      </>}
     </aside>
   );
 }
@@ -977,7 +996,7 @@ function StreamStudio() {
           <StudioLayoutProvider isAdmin={auth.roles.includes("admin")} defs={STUDIO_BLOCKS}>
           <div className="studio-three-col grid min-w-0 flex-1 grid-cols-1 items-start gap-4 overflow-y-auto p-3 sm:p-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[270px_minmax(0,1fr)_310px] 2xl:grid-cols-[320px_minmax(0,1fr)_360px]">
             {/* Left column — setup console + host tools */}
-            <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+            <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[80px] lg:max-h-[calc(100vh-96px)] lg:overflow-y-auto">
               {/* Essential setup controls stay visible above customizable blocks. */}
               <div className="flex min-w-0 flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-3 py-3 backdrop-blur sm:px-4 shadow-[0_0_40px_-20px_rgba(0,230,255,0.45)]">
 
