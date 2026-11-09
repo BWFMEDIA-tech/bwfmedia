@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { ASSISTANT_ROUTES, SUGGESTED_QUESTIONS, UNANSWERED_MARKER, allowedAssistantPath, audienceFromRoles } from "@/lib/assistant";
+import { assistantRequestBody } from "@/lib/assistant-request";
 import { Conversation, ConversationContent, ConversationScrollButton } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { PromptInput, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from "@/components/ai-elements/prompt-input";
@@ -46,7 +47,7 @@ export function AssistantChat({ compact = false, onNavigate, onClose }: { compac
       const t = data.session?.access_token;
       return t ? { Authorization: `Bearer ${t}` } : ({} as Record<string, string>);
     },
-    prepareSendMessagesRequest: ({ body, ...rest }) => ({ ...rest, body: { ...body, page: window.location.pathname } }),
+    prepareSendMessagesRequest: (request) => ({ body: assistantRequestBody(request, window.location.pathname) }),
   }), []);
 
   const { messages, setMessages, sendMessage, status, stop, error, clearError } = useChat({
