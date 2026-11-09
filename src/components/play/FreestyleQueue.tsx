@@ -66,7 +66,7 @@ export function FreestyleQueue({ streamId, hostId, onSelect, overview = false }:
   return <section aria-label="Freestyle Battle Queue" className={`min-w-0 space-y-4 py-3 text-foreground ${overview ? 'play-confirmed-battles' : ''}`}>
     <header className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:justify-between"><h2 className="flex min-w-0 items-center gap-2 text-base font-bold sm:text-lg"><Swords className="h-4 w-4 shrink-0 text-primary" />{streamId ? 'Freestyle Battle Queue' : overview ? 'Confirmed Freestyle battles' : '1v1 Freestyle Battle Challenge'}</h2>{!overview && <p className="shrink-0 text-right text-xs text-muted-foreground">{state.data ? `${slots.length}/10 · ${10 - slots.length} available` : '—/10'}</p>}</header>
     {!auth.user ? <Link to="/login" className="text-primary">Sign in to view slots and challenge an artist</Link> : state.isPending ? <p className="text-muted-foreground">Loading matchups…</p> : state.isError ? <p role="alert">Could not load matchups. <Button variant="link" onClick={() => void state.refetch()}>Retry</Button></p> : <>
-      <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
+      <div className="grid w-full min-w-0 grid-cols-1 gap-3">
         {slots.map(c => {
           return <article key={c.id} className="fsq-slot min-w-0 w-full" data-state="filled">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 pt-3"><span className="fsq-slot-label">Slot {c.slot_number}</span><span className="fsq-status" data-status={c.status === 'live' ? 'live' : 'filled'}>{c.status === 'live' ? 'Live' : c.status === 'scheduled' ? 'Scheduled' : 'Accepted'}</span></div>
