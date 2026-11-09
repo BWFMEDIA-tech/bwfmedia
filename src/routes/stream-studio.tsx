@@ -993,7 +993,7 @@ function StreamStudio() {
         <Sidebar />
         <main className="flex min-w-0 flex-1 flex-col">
           <StudioLayoutProvider isAdmin={auth.roles.includes("admin")} defs={STUDIO_BLOCKS}>
-          <div className="studio-three-col grid min-w-0 flex-1 grid-cols-1 items-start gap-4 overflow-y-auto p-3 sm:p-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[270px_minmax(0,1fr)_310px] 2xl:grid-cols-[320px_minmax(0,1fr)_360px]">
+          <div className="studio-three-col grid min-w-0 flex-1 grid-cols-1 items-start gap-4 overflow-y-auto p-3 sm:p-4 lg:grid-cols-[280px_minmax(0,1fr)] 2xl:grid-cols-[320px_minmax(0,1fr)]">
             {/* Left column — setup console + host tools */}
             <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[80px] lg:max-h-[calc(100vh-96px)] lg:overflow-y-auto">
               {/* Essential setup controls stay visible above customizable blocks. */}
@@ -1278,7 +1278,7 @@ function StreamStudio() {
             </div>
 
             {/* Right rail — sticky console */}
-            <StudioColumn className="flex min-w-0 flex-col gap-3 lg:col-span-2 xl:col-span-1 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto">
+            <StudioColumn className="flex min-w-0 flex-col gap-3 lg:col-span-2">
               <StudioBlock id="earnings" label="Live Earnings">
               <>{stream?.id && <div className="space-y-3"><HostEarningsCard streamId={stream.id} /></div>}</>
               </StudioBlock>
