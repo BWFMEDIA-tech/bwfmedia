@@ -7,6 +7,8 @@ import { Camera, CameraOff, Eye, ThumbsUp, Trophy, Radio } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { SignedImg } from '@/components/ui/signed-img';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { freestylePlacement } from '@/lib/freestyle-placement';
 import { StageAudioShell } from '@/components/stream/StageAudioShell';
 import { SelfMicrophoneButton } from '@/components/stream/SelfMicrophoneButton';
 import { useAuth } from '@/lib/auth-context';
@@ -23,10 +25,12 @@ export function FreestyleBattle(props: Props) {
   const tokenFn = useServerFn(getLiveKitToken);
   const [connection, setConnection] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
-  if (existingRoom) return <FreestyleContent {...props} />;
-  if (connection && auth.user) return <StageAudioShell token={connection.token} serverUrl={connection.wsUrl} streamId={props.streamId} userId={auth.user.id} isHost={auth.user.id === props.hostId} showHostTools={false} autoConnect arenaAudio onLeave={() => setConnection(null)}><FreestyleContent {...props} /></StageAudioShell>;
+  const [placementId, setPlacementId] = useState('');
+  const contentProps = { ...props, placementId, onPlace: setPlacementId };
+  if (existingRoom) return <FreestyleContent {...contentProps} />;
+  if (connection && auth.user) return <StageAudioShell token={connection.token} serverUrl={connection.wsUrl} streamId={props.streamId} userId={auth.user.id} isHost={auth.user.id === props.hostId} showHostTools={false} autoConnect arenaAudio onLeave={() => setConnection(null)}><FreestyleContent {...contentProps} /></StageAudioShell>;
   return <>
-    <FreestyleContent {...props} />
+    <FreestyleContent {...contentProps} />
     <div className="mt-4 flex justify-center">
       <Button disabled={joining || !props.room || !auth.user} onClick={async () => {
         if (!props.room) return;
@@ -39,7 +43,9 @@ export function FreestyleBattle(props: Props) {
   </>;
 }
 
-function FreestyleContent({ streamId, hostId, participants }: Props) {
+interface FreestyleContentProps extends Props { placementId: string; onPlace: (id: string) => void }
+
+function FreestyleContent({ streamId, hostId, participants, placementId, onPlace }: FreestyleContentProps) {
   const auth = useAuth();
   const room = useMaybeRoomContext();
   const queryClient = useQueryClient();
@@ -56,8 +62,9 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
   const [now, setNow] = useState(0);
   const [clockOffset, setClockOffset] = useState(0);
   useEffect(() => { if (state.data) setClockOffset(state.data.serverTime - Date.now()); }, [state.data]);
-  const [artistA, setArtistA] = useState('');
-  const [artistB, setArtistB] = useState('');
+  const placement = freestylePlacement(queue.data?.challenges ?? [], placementId, streamId);
+  const artistA = placement?.artistA ?? '';
+  const artistB = placement?.artistB ?? '';
   const [duration, setDuration] = useState(180);
   const [busy, setBusy] = useState(false);
   const isHost = queue.data?.isAdmin || (queue.data?.isHost && auth.user?.id === hostId);
@@ -93,15 +100,20 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
     {battle?.status === 'completed' && <div className="mb-4 flex items-center justify-center gap-2 border-y border-border py-3 font-bold"><Trophy className="text-primary" />{battle.winner_id ? `${artists.find(p => p.id === battle.winner_id)?.stage_name || artists.find(p => p.id === battle.winner_id)?.display_name || 'Artist'} wins` : 'Draw'} · {battle.votes_a} – {battle.votes_b}</div>}
     <div className="freestyle-grid">
       {(['a', 'b'] as const).map(side => {
-        const id = side === 'a' ? battle?.artist_a_id : battle?.artist_b_id;
-        const artist = artists.find(p => p.id === id);
+        const id = placement && !open ? (side === 'a' ? artistA : artistB) : side === 'a' ? battle?.artist_a_id : battle?.artist_b_id;
+        const artist = artists.find(p => p.id === id) ?? queue.data?.profiles.find(p => p.id === id);
+        const genres = artist && 'genres' in artist && Array.isArray(artist.genres) ? artist.genres : null;
         const name = artist?.stage_name || artist?.display_name || `Artist ${side.toUpperCase()}`;
         const total = side === 'a' ? battle?.votes_a ?? 0 : battle?.votes_b ?? 0;
         return <div key={side} className="freestyle-side min-w-0" data-side={side}>
           <div className="freestyle-frame">
-            {room ? <ArtistCamera artistId={id} name={name} photo={artist?.avatar_url} hostId={hostId} artistA={battle?.artist_a_id} artistB={battle?.artist_b_id} /> : <div className="freestyle-camera grid place-items-center bg-muted">{artist?.avatar_url ? <SignedImg src={artist.avatar_url} alt={name} className="h-full w-full object-contain" /> : <CameraOff className="h-10 w-10 text-muted-foreground" />}</div>}
+            {room ? <ArtistCamera artistId={id} name={name} photo={artist?.avatar_url} hostId={hostId} artistA={placement && !open ? artistA : battle?.artist_a_id} artistB={placement && !open ? artistB : battle?.artist_b_id} /> : <div className="freestyle-camera grid place-items-center bg-muted">{artist?.avatar_url ? <SignedImg src={artist.avatar_url} alt={name} className="h-full w-full object-contain" /> : <CameraOff className="h-10 w-10 text-muted-foreground" />}</div>}
             <span className="freestyle-label">Artist {side.toUpperCase()}</span>
-            <div className="flex min-w-0 items-center gap-3 p-3">{artist?.avatar_url && <SignedImg src={artist.avatar_url} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />}<div className="min-w-0"><p className="break-words font-bold">{name}</p><p className="text-xs text-muted-foreground">{artist?.genres?.join(' · ') || artist?.genre || '—'}</p></div></div>
+            <div className="flex min-w-0 items-center gap-3 p-3">{artist?.avatar_url && <SignedImg src={artist.avatar_url} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />}<div className="min-w-0"><p className="break-words font-bold">{name}</p><p className="text-xs text-muted-foreground">{genres?.join(' · ') || artist?.genre || '—'}</p></div></div>
+            {isHost && !open && <div className="px-3 pb-3"><Select value={placement ? placementId : ''} onValueChange={onPlace} disabled={busy}><SelectTrigger aria-label={`Place artist in video box ${side.toUpperCase()}`}><SelectValue placeholder={`Place Artist ${side.toUpperCase()}`} /></SelectTrigger><SelectContent>{(queue.data?.challenges ?? []).filter(c => freestylePlacement([c], c.id, streamId)).map(c => {
+              const profile = queue.data?.profiles.find(p => p.id === (side === 'a' ? c.artist_a_id : c.artist_b_id));
+              return <SelectItem key={c.id} value={c.id}>Slot {c.slot_number} · {profile?.stage_name || profile?.display_name || 'Artist'}</SelectItem>;
+            })}</SelectContent></Select></div>}
           </div>
           <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-2">
             <Button className="freestyle-vote h-14 whitespace-normal text-sm font-bold" disabled={!open || !!selected || busy || !auth.user} onClick={() => { if (battle) void action(() => vote({ data: { battleId: battle.id, choice: side } })); }}><ThumbsUp />{selected === side ? 'Vote submitted' : selected ? 'Voting complete' : `Vote for Artist ${side.toUpperCase()}`}</Button>
@@ -113,7 +125,7 @@ function FreestyleContent({ streamId, hostId, participants }: Props) {
     </div>
     {room && <LocalCameraControl artistIds={open ? [battle?.artist_a_id, battle?.artist_b_id] : candidates.map(p => p.user_id)} />}
     {!auth.user && <p className="mt-3 text-center text-sm text-muted-foreground">Sign in to watch and vote.</p>}
-    <FreestyleQueue streamId={streamId} hostId={hostId} onSelect={isHost && !open ? c => { setArtistA(c.artist_a_id); setArtistB(c.artist_b_id); } : undefined} />
+    <FreestyleQueue streamId={streamId} hostId={hostId} onSelect={isHost && !open ? c => onPlace(c.id) : undefined} />
     {isHost && <div className="mt-5 border-t border-border pt-4">
       {open ? <div className="flex flex-wrap gap-2"><Button variant="outline" disabled={busy} onClick={() => { if (battle && window.confirm('End this battle and finalize votes?')) void action(() => end({ data: { battleId: battle.id } })); }}>End battle & record result</Button><Button variant="ghost" disabled={busy} onClick={() => { if (battle && window.confirm('Cancel this battle? The slot will be released.')) void action(() => cancel({ data: { battleId: battle.id } })); }}>Cancel battle</Button></div> : <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
         {(['a', 'b'] as const).map(side => <div key={side} className="min-w-0 text-sm"><p className="text-muted-foreground">Artist {side.toUpperCase()}</p><p className="break-words font-bold">{(() => { const p = queue.data?.profiles.find(p => p.id === (side === 'a' ? artistA : artistB)); return p?.stage_name || p?.display_name || 'Select an accepted matchup'; })()}</p></div>)}

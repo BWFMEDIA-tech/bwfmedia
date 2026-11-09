@@ -1,5 +1,9 @@
 # Roadmap
 
+## Freestyle video-box placement
+- [ ] Let the host place an accepted matchup into Artist A and Artist B before starting; preserve fixed sides and existing camera permissions
+- [ ] Verify both names/photos appear in the boxes and accepted selection stays intact when joining video; physical camera checks remain device-dependent
+
 ## Play Freestyle cleanup
 - [x] Simplify Play overview to confirmed Freestyle matchups and confirmed live performances; hide empty sections
 - [x] Keep invitations, challenge creation and song upload/matchmaking accessible on /play/challenges; retain existing Stream Studio host controls and data connections
