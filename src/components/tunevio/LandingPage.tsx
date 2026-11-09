@@ -26,6 +26,49 @@ import artistProfiles from "@/assets/welcome-IMG_1683.png.asset.json";
 import leaderboard from "@/assets/welcome-IMG_1682.png.asset.json";
 import stageRoom from "@/assets/welcome-IMG_1681.png.asset.json";
 import liveChat from "@/assets/welcome-IMG_1680.png.asset.json";
+import landingLiveCrowd from "@/assets/landing-live-crowd.jpg.asset.json";
+import landingArenaBattle from "@/assets/landing-arena-battle.jpg.asset.json";
+import landingDjVote from "@/assets/landing-dj-vote.jpg.asset.json";
+import landingCommunity from "@/assets/landing-community.jpg.asset.json";
+import landingStudioArtist from "@/assets/landing-studio-artist.jpg.asset.json";
+
+const highlights = [
+  {
+    image: landingLiveCrowd,
+    alt: "Artist performing on stage surrounded by a crowd holding up phone lights",
+    kicker: "Live Experiences",
+    title: "EXPERIENCE MUSIC TOGETHER.",
+    desc: "Join live sessions, stage rooms and performances where artists and fans share the moment in real time.",
+  },
+  {
+    image: landingArenaBattle,
+    alt: "Two artists facing off in a head-to-head rap battle under blue stage lights",
+    kicker: "Battle Arena",
+    title: "STEP INTO THE ARENA.",
+    desc: "Challenge other artists, compete in 1v1 battles, and let the audience decide who brings the heat.",
+  },
+  {
+    image: landingDjVote,
+    alt: "DJ performing a live set at the decks in a packed club",
+    kicker: "Audience Power",
+    title: "YOUR VOTE. YOUR VOICE.",
+    desc: "Discover emerging talent, vote for your favorites, and help independent music get the recognition it deserves.",
+  },
+  {
+    image: landingStudioArtist,
+    alt: "Artist recording vocals into a studio microphone with headphones on",
+    kicker: "For Artists",
+    title: "SHARE YOUR SOUND.",
+    desc: "Upload your music, build your profile, and let the world hear what you've been working on.",
+  },
+  {
+    image: landingCommunity,
+    alt: "Four friends listening to music together on headphones and phones",
+    kicker: "Community",
+    title: "BUILD YOUR MUSIC COMMUNITY.",
+    desc: "Follow artists, connect with music lovers, discover new sounds, and find your place in the Tunevio community.",
+  },
+];
 
 const welcomeScreens = [
   { image: livePlayer, title: "Live Music", alt: "Tunevio live music player showing Whole Vibe, playback and audience reactions" },
@@ -485,6 +528,56 @@ export function LandingPage() {
               </motion.figure>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* Story highlights — alternating image/text rows */}
+      <section className="relative px-5 sm:px-10 pb-24" aria-label="Why Tunevio">
+        <div className="mx-auto max-w-6xl space-y-16 sm:space-y-20">
+          {highlights.map((h, i) => (
+            <div
+              key={h.title}
+              className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6 }}
+                className={i % 2 === 1 ? "lg:order-2" : ""}
+              >
+                <div className="welcome-battle-frame relative overflow-hidden rounded-lg border border-border is-revealed">
+                  <motion.img
+                    src={h.image.url}
+                    alt={h.alt}
+                    loading="lazy"
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ duration: 0.6, ease: easeOutExpo }}
+                    className="welcome-battle-img aspect-[4/3] w-full object-cover"
+                  />
+                  <span className="welcome-shine" aria-hidden="true" />
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className={i % 2 === 1 ? "lg:order-1" : ""}
+              >
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-foreground/5 px-3 py-1 text-xs text-muted-foreground">
+                  <Music2 className="h-3.5 w-3.5 text-primary" />
+                  <span>{h.kicker}</span>
+                </div>
+                <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-normal">
+                  {h.title}
+                </h2>
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+                  {h.desc}
+                </p>
+              </motion.div>
+            </div>
+          ))}
         </div>
       </section>
 
