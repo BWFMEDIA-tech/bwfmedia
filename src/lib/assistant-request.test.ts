@@ -12,7 +12,7 @@ describe("assistant request delivery", () => {
       fetch: fetchRequest,
       prepareSendMessagesRequest: (request) => ({ body: assistantRequestBody(request, "/home") }),
     });
-    await transport.sendMessages({ chatId: "account-chat", messages, trigger: "submit-message", messageId: "question" });
+    await transport.sendMessages({ chatId: "account-chat", messages, trigger: "submit-message", messageId: "question", abortSignal: undefined });
     const call = fetchRequest.mock.calls[0];
     expect(call).toBeDefined();
     const body = JSON.parse(String(call?.[1]?.body));
