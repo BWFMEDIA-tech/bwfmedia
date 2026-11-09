@@ -194,7 +194,7 @@ function Sidebar() {
     return undefined;
   };
   return (
-    <aside className={cn("hidden lg:flex shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] transition-[width] duration-200", collapsed ? "w-[64px] items-center p-2" : "w-[240px] p-4")}>
+    <aside className={cn("relative z-20 hidden lg:flex shrink-0 flex-col gap-2 border-r border-white/5 bg-[#0a0a12] transition-[width] duration-200", collapsed ? "w-[64px] items-center p-2" : "w-[240px] p-4")}>
       <div className={cn("flex w-full items-center", collapsed ? "justify-center py-2" : "justify-between px-2 py-3")}>
         {!collapsed && (
           <Link to="/" className="text-2xl font-black tracking-tight text-white">Tunevio</Link>
@@ -204,7 +204,7 @@ function Sidebar() {
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? "Expand menu" : "Minimize menu"}
           title={collapsed ? "Expand menu" : "Minimize menu"}
-          className="rounded-lg p-2 text-white/60 transition hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00E6FF]"
+          className="absolute -right-4 top-6 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-[#00E6FF] bg-[#0a0a12] text-[#00E6FF] shadow-[0_0_16px_rgba(0,230,255,0.6)] transition hover:bg-[#00E6FF] hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00E6FF]"
         >
           {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </button>
