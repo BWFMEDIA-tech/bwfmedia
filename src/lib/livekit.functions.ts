@@ -97,6 +97,18 @@ export const getLiveKitToken = createServerFn({ method: "POST" })
           canPublish = true;
           allowCamera = !!sp?.allow_camera || role === "host" || role === "co_host";
         }
+        // Freestyle artists: the two artists of a live battle or an accepted
+        // matchup on this stream may publish camera + mic without a stage
+        // promotion, so they can join their A/B video box.
+        if (!canPublish) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const pair = `artist_a_id.eq.${userId},artist_b_id.eq.${userId}`;
+          const [{ data: fb }, { data: fc }] = await Promise.all([
+            supabaseAdmin.from("freestyle_battles").select("id").eq("stream_id", streamIdRow.id).eq("status", "live").or(pair).limit(1),
+            supabaseAdmin.from("freestyle_challenges").select("id").eq("stream_id", streamIdRow.id).in("status", ["accepted", "scheduled", "live"]).or(pair).limit(1),
+          ]);
+          if ((fb?.length ?? 0) > 0 || (fc?.length ?? 0) > 0) { canPublish = true; allowCamera = true; }
+        }
       }
     }
 

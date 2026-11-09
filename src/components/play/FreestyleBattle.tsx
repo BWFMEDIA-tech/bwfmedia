@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { useMaybeRoomContext, useTracks, useParticipants, VideoTrack, useLocalParticipant } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { Camera, CameraOff, Eye, ThumbsUp, Trophy, Radio } from 'lucide-react';
+import { Camera, CameraOff, MicOff, Eye, ThumbsUp, Trophy, Radio } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { SignedImg } from '@/components/ui/signed-img';
@@ -25,6 +25,7 @@ export function FreestyleBattle(props: Props) {
   const tokenFn = useServerFn(getLiveKitToken);
   const [connection, setConnection] = useState<{ token: string; wsUrl: string } | null>(null);
   const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState('');
   const [placementId, setPlacementId] = useState('');
   const contentProps = { ...props, placementId, onPlace: setPlacementId };
   if (existingRoom) return <FreestyleContent {...contentProps} />;
@@ -34,12 +35,19 @@ export function FreestyleBattle(props: Props) {
     <div className="mt-4 flex justify-center">
       <Button disabled={joining || !props.room || !auth.user} onClick={async () => {
         if (!props.room) return;
-        setJoining(true);
-        try { setConnection(await tokenFn({ data: { roomName: props.room } })); }
-        catch (error) { toast.error(error instanceof Error ? error.message : 'Could not join live video'); }
+        setJoining(true); setJoinError('');
+        try {
+          const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Connection timed out. Please try again.')), 15000));
+          setConnection(await Promise.race([tokenFn({ data: { roomName: props.room } }), timeout]));
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : 'Could not join live video';
+          setJoinError(msg === 'Stream is not live' ? 'The host has not started this live room yet. Try again once they go live.' : msg);
+        }
         finally { setJoining(false); }
-      }}><Radio />{joining ? 'Connecting…' : auth.user ? 'Join live video' : 'Sign in to watch and vote'}</Button>
+      }}><Radio />{joining ? 'Connecting…' : joinError ? 'Retry joining' : auth.user ? 'Join live video' : 'Sign in to watch and vote'}</Button>
     </div>
+    {!props.room && <p className="mt-2 text-center text-sm text-muted-foreground">The battle video room isn't open yet.</p>}
+    {joinError && <p role="alert" className="mt-2 text-center text-sm text-destructive">{joinError}</p>}
   </>;
 }
 
@@ -123,7 +131,7 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
       })}
       <div className="freestyle-vs" aria-hidden="true">VS</div>
     </div>
-    {room && <LocalCameraControl artistIds={open ? [battle?.artist_a_id, battle?.artist_b_id] : candidates.map(p => p.user_id)} />}
+    {room && <LocalCameraControl artistIds={open ? [battle?.artist_a_id, battle?.artist_b_id] : [artistA, artistB, ...candidates.map(p => p.user_id)]} />}
     {!auth.user && <p className="mt-3 text-center text-sm text-muted-foreground">Sign in to watch and vote.</p>}
     <FreestyleQueue streamId={streamId} hostId={hostId} onSelect={isHost && !open ? c => onPlace(c.id) : undefined} />
     {isHost && <div className="mt-5 border-t border-border pt-4">
@@ -141,10 +149,12 @@ function ArtistCamera({ artistId, name, photo, hostId, artistA, artistB }: { art
   const participants = useParticipants();
   const track = tracks.find(t => t.participant.identity === artistId);
   const live = !!artistId && participants.some(p => p.identity === artistId) && !!track?.publication && !track.publication.isMuted;
+  const micTrack = participants.find(p => p.identity === artistId);
+  const micMuted = !!micTrack && !micTrack.isMicrophoneEnabled;
   const viewers = new Set(participants.filter(p => ![hostId, artistA, artistB].includes(p.identity) && !p.identity.startsWith('preview_')).map(p => p.identity)).size;
   return <div className="freestyle-camera relative bg-muted">
     {track && track.publication && !track.publication.isMuted ? <VideoTrack trackRef={{ participant: track.participant, publication: track.publication, source: Track.Source.Camera }} className="h-full w-full object-cover" /> : photo ? <SignedImg src={photo} alt={name} className="h-full w-full object-contain" /> : <div className="grid h-full place-items-center"><CameraOff className="h-10 w-10 text-muted-foreground" /></div>}
-    <div className="absolute bottom-2 left-2 flex items-center gap-3 rounded-sm bg-background/90 px-2 py-1 text-xs"><span className="flex items-center gap-1"><Radio className="h-3 w-3" />{live ? 'LIVE' : artistId ? 'Offline' : 'Waiting'}</span><span className="flex items-center gap-1"><Eye className="h-3 w-3" />{viewers} viewers</span></div>
+    <div className="absolute bottom-2 left-2 flex items-center gap-3 rounded-sm bg-background/90 px-2 py-1 text-xs"><span className="flex items-center gap-1"><Radio className="h-3 w-3" />{live ? 'LIVE' : artistId && participants.some(p => p.identity === artistId) ? 'Camera off' : artistId ? 'Offline' : 'Waiting'}</span>{micMuted && <span className="flex items-center gap-1"><MicOff className="h-3 w-3" />Muted</span>}<span className="flex items-center gap-1"><Eye className="h-3 w-3" />{viewers} viewers</span></div>
   </div>;
 }
 
