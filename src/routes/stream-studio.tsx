@@ -975,11 +975,11 @@ function StreamStudio() {
         <Sidebar />
         <main className="flex min-w-0 flex-1 flex-col">
           <StudioLayoutProvider isAdmin={auth.roles.includes("admin")} defs={STUDIO_BLOCKS}>
-          <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto p-3 sm:p-4 xl:grid xl:grid-cols-[minmax(0,1fr)_360px]">
-            {/* Center column */}
-            <div className="flex min-w-0 flex-col gap-3">
+          <div className="studio-three-col grid min-w-0 flex-1 grid-cols-1 items-start gap-4 overflow-y-auto p-3 sm:p-4 lg:grid-cols-[300px_minmax(0,1fr)] 2xl:grid-cols-[320px_minmax(0,1fr)_360px]">
+            {/* Left column — setup console + host tools */}
+            <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
               {/* Essential setup controls stay visible above customizable blocks. */}
-              <div className="flex min-w-0 flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-3 py-3 backdrop-blur sm:px-5 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
+              <div className="flex min-w-0 flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/70 px-3 py-3 backdrop-blur sm:px-4 shadow-[0_0_40px_-20px_rgba(0,230,255,0.45)]">
 
                 <div className="flex min-w-0 flex-wrap items-center gap-3">
                   <div className={cn(
@@ -1116,29 +1116,6 @@ function StreamStudio() {
               </div>
 
               <StudioColumn className="flex min-w-0 flex-col gap-3">
-              {/* Unified Live Production Dashboard — single MediaEngine.
-                  Stage and Broadcast are independent source toggles. */}
-              <StudioBlock id="production" label="Live Production Dashboard">
-              <LiveProductionDashboard
-                participants={participants.map((p) => ({
-                  id: p.user_id,
-                  name: p.display_name ?? "Guest",
-                  avatar: p.avatar_url,
-                }))}
-                onInvite={copyInvite}
-                onEndBroadcast={stop}
-              />
-              </StudioBlock>
-
-
-              <StreamThumbnailDialog
-                open={thumbOpen}
-                onOpenChange={setThumbOpen}
-                streamId={stream?.id ?? null}
-                currentUrl={thumbUrl}
-                onSaved={(u) => setThumbUrl(u)}
-              />
-
               <StudioBlock id="promotion" label="Promotion Mode">
               {stream?.id && (
 
@@ -1162,6 +1139,44 @@ function StreamStudio() {
                 </div>
               )}
               </StudioBlock>
+              {/* Invite link */}
+              <StudioBlock id="invite" label="Invite Guest">
+              <InviteGuest streamId={stream?.id} />
+              </StudioBlock>
+              <StudioBlock id="challenges" label="Artist Challenges">
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
+                <ArtistChallengesPanel streamId={stream?.id} hostId={auth.user?.id} roomName={stream?.room_name} />
+              </div>
+              </StudioBlock>
+              </StudioColumn>
+            </div>
+
+            {/* Center column — production + stage */}
+            <div className="flex min-w-0 flex-col gap-3">
+              <StudioColumn className="flex min-w-0 flex-col gap-3">
+              {/* Unified Live Production Dashboard — single MediaEngine.
+                  Stage and Broadcast are independent source toggles. */}
+              <StudioBlock id="production" label="Live Production Dashboard">
+              <LiveProductionDashboard
+                participants={participants.map((p) => ({
+                  id: p.user_id,
+                  name: p.display_name ?? "Guest",
+                  avatar: p.avatar_url,
+                }))}
+                onInvite={copyInvite}
+                onEndBroadcast={stop}
+              />
+              </StudioBlock>
+
+
+              <StreamThumbnailDialog
+                open={thumbOpen}
+                onOpenChange={setThumbOpen}
+                streamId={stream?.id ?? null}
+                currentUrl={thumbUrl}
+                onSaved={(u) => setThumbUrl(u)}
+              />
+
 
               {/* SINGLE persistent LiveKit room. `streamMode` only swaps the
                   inner UI — the LiveKitRoom (mic publish + audio subscriptions)
@@ -1241,25 +1256,16 @@ function StreamStudio() {
               </StudioBlock>
 
 
-              {/* Invite link */}
-              <StudioBlock id="invite" label="Invite Guest">
-              <InviteGuest streamId={stream?.id} />
-              </StudioBlock>
             </StudioColumn>
             </div>
 
             {/* Right rail — sticky console */}
-            <StudioColumn className="flex flex-col gap-3 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)]">
+            <StudioColumn className="flex min-w-0 flex-col gap-3 lg:col-span-2 2xl:col-span-1 2xl:sticky 2xl:top-4 2xl:max-h-[calc(100vh-2rem)] 2xl:overflow-y-auto">
               <StudioBlock id="earnings" label="Live Earnings">
               <>{stream?.id && <div className="space-y-3"><HostEarningsCard streamId={stream.id} /></div>}</>
               </StudioBlock>
               <StudioBlock id="chat" label="Live Chat">
               <LiveChat streamId={stream?.id ?? null} auth={auth} viewerCount={viewerCount} startedAt={startedAt} hostId={auth.user?.id ?? null} status={stream && lk ? "live" : "ended"} />
-              </StudioBlock>
-              <StudioBlock id="challenges" label="Artist Challenges">
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
-                <ArtistChallengesPanel streamId={stream?.id} hostId={auth.user?.id} roomName={stream?.room_name} />
-              </div>
               </StudioBlock>
               <StudioBlock id="audience" label="Audience">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-4">
