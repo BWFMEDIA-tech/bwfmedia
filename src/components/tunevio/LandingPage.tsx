@@ -531,6 +531,56 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Story highlights — alternating image/text rows */}
+      <section className="relative px-5 sm:px-10 pb-24" aria-label="Why Tunevio">
+        <div className="mx-auto max-w-6xl space-y-16 sm:space-y-20">
+          {highlights.map((h, i) => (
+            <div
+              key={h.title}
+              className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6 }}
+                className={i % 2 === 1 ? "lg:order-2" : ""}
+              >
+                <div className="welcome-battle-frame relative overflow-hidden rounded-lg border border-border is-revealed">
+                  <motion.img
+                    src={h.image.url}
+                    alt={h.alt}
+                    loading="lazy"
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ duration: 0.6, ease: easeOutExpo }}
+                    className="welcome-battle-img aspect-[4/3] w-full object-cover"
+                  />
+                  <span className="welcome-shine" aria-hidden="true" />
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className={i % 2 === 1 ? "lg:order-1" : ""}
+              >
+                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-foreground/5 px-3 py-1 text-xs text-muted-foreground">
+                  <Music2 className="h-3.5 w-3.5 text-primary" />
+                  <span>{h.kicker}</span>
+                </div>
+                <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-normal">
+                  {h.title}
+                </h2>
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+                  {h.desc}
+                </p>
+              </motion.div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Feature showcase */}
       <section className="relative px-5 sm:px-10 pb-24" aria-labelledby="features-heading">
         <div className="mx-auto max-w-6xl">
