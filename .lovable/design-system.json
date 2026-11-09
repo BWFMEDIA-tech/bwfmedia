@@ -1,0 +1,4606 @@
+{
+  "meta": {
+    "name": "Tunevio",
+    "package": "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985",
+    "version": "1.0.0",
+    "framework": "react",
+    "css_framework": "tailwind",
+    "starter_template": "custom_design_system_tailwind",
+    "theme_files": [
+      "src/styles.css"
+    ],
+    "source_type": "local",
+    "source_manifest": {
+      "#enrichment": "3e6538f0a072a01209cf04c3351c48b2312edcabb55ffe8581d374211760ddbe",
+      ".gitignore": "6d9e901a692b46a83707c245fb03bc91",
+      ".lovable/mcp/manifest.json": "ff83019c8b61493a47ab1482c79d6860",
+      ".lovable/north-star/north-star.md": "04d72f1ddf0c2a8b2bc8fae5f30bf743",
+      ".lovable/plan/apply-the-imported-design-to-the-existing-tunevio-website-2026-10-22.md": "b7b1d79dfab25d92eae471d76dcf60ef",
+      ".lovable/plan/artist-store-merchandise-categories-pricing-and-revenue-shar-2026-10-13.md": "99c07686565d41f154905d9fcebfa207",
+      ".lovable/plan/artist-streaming-analytics-2026-10-10.md": "0e834239d1164aec0497f643aca7dc00",
+      ".lovable/plan/daily-blog-automation-plan-2026-10-27.md": "e3a9fafbfd63a749baa1677549003c14",
+      ".lovable/plan/music-rights-royalties-dashboard-2026-10-12.md": "e3083b651049bd49d23db80f5f17fac1",
+      ".lovable/plan/nfc-experience-pages-nfc-tag-ordering-2026-10-13.md": "cd806e2040ba2a31ea3f5f37d2285eea",
+      ".lovable/plan/swara-inspired-appearance-updates-for-the-existing-tunevio-w-2026-10-22.md": "011e393d97d94e80de48e86c2f39172b",
+      ".lovable/plan/tunevio-ai-assistant-2026-10-13.md": "85a0aa8066712897eb4034dcd138346d",
+      ".lovable/plan/tunevio-artist-store-artist-store-physical-music-nfc-2026-10-13.md": "ff12d3f20dfdd48a21ad74e1bc8da6cf",
+      ".lovable/plan/tunevio-monthly-music-streamshare-royalties-2026-10-22.md": "4a3aa3178383ecc71b1dc6e54cb5e71d",
+      ".prettierignore": "e21a12aa81a8850840f9d9dcc8fa9b7b",
+      ".prettierrc": "185ef0234746ab738ac1ab6cec5e2bd9",
+      "AGENTS.md": "bd9983e00203dadd0912fc8cc1213a61",
+      "bunfig.toml": "f8693c0a302bd41cbb5668cabfbac3b7",
+      "capacitor.config.ts": "affbb3c320d4829c544d3c6692bfe29e",
+      "components.json": "30d3d035361ce807021f5c54620962e9",
+      "drizzle.config.ts": "c2b6029fa56b49433380b7263b06e3f7",
+      "drizzle/migrations/0000_migration.sql": "8e17d43da7d0200a43e6e991b4d84bb5",
+      "drizzle/migrations/0001_migration.sql": "dc356192a6342e06928971107be3f8e1",
+      "drizzle/migrations/0002_videos_bucket_owner_only_read.sql": "14256234ddcfbaada4f5b650acd61c06",
+      "drizzle/migrations/0003_independent_profile_live_ownership.sql": "e97ce244df25b9d597a2bfa82c244fab",
+      "drizzle/migrations/0004_live_setlist.sql": "0aad020ecf2230049e51122f6acd8c61",
+      "drizzle/migrations/0005_stream_cohost_spotlight.sql": "1007d87a0d58b8540e75eaa0456615ba",
+      "drizzle/migrations/0006_stream_moderators.sql": "08cdd04747ff0b6229a3c16a9b7a4a24",
+      "drizzle/migrations/0007_host_tier_system.sql": "cabddd728f511213b7a8a3580c313b2c",
+      "drizzle/migrations/0008_host_referrals.sql": "cda2cfd15da0be16f50fc595dbe61f08",
+      "drizzle/migrations/0009_artist_referral_program.sql": "aefe9a50e219eb5e67cd9676049e46ea",
+      "drizzle/migrations/0010_lock_down_money_functions.sql": "b721b035d1ebdfd8d2b5a9c18cd11e6d",
+      "drizzle/migrations/0011_regrant_signed_in_functions.sql": "52d1ad9fccb9381e6ab062352a86c290",
+      "drizzle/migrations/0012_setlist_audio.sql": "ca411dd5f7558f41ba1ed6451ad19485",
+      "drizzle/migrations/0013_add_artist_streaming_analytics.sql": "80433d4729bdb6bf77cc27d9d35c2e96",
+      "drizzle/migrations/0014_make_pdub_artist.sql": "10cd7adb7144502daff68bff4251f2c9",
+      "drizzle/migrations/0015_video_engagement_and_threaded_comments.sql": "5de6e0a5e25e634eece927558a08d5d2",
+      "drizzle/migrations/0016_music_rights_royalties.sql": "af675ee4d565749e5f0186e67a6b818d",
+      "drizzle/migrations/0017_artist_follower_count_fn.sql": "c30d43a2b834cdd6705e011d05435e42",
+      "drizzle/migrations/0018_stream_spotlight_guest_slot.sql": "7c0e7e7939d760fef51f52c13263e136",
+      "drizzle/migrations/0019_artist_store.sql": "c218a48fbc06544e9145e6a2084292bc",
+      "drizzle/migrations/0020_store_images_owner_read.sql": "33f7d4a9b50385352b97586c55466245",
+      "drizzle/migrations/0021_store_images_published_read.sql": "0032ba1e55e75f6da2df36a25afed29b",
+      "drizzle/migrations/0022_nfc_pages_and_tag_orders.sql": "a056c235b3db0b51dcf4b9a38aca15ba",
+      "drizzle/migrations/0023_tunevio_ai_assistant.sql": "85ea12abac47aa72d9c90c8e6cd05668",
+      "drizzle/migrations/0024_store_images_drop_public_read.sql": "3cc7378271bdcc99467879f88ab60aab",
+      "drizzle/migrations/0025_nfc_tag_order_admin.sql": "bb7418fb388bf3400516d49f916f4cae",
+      "drizzle/migrations/0026_store_merch_pricing_split.sql": "edcbd05d80d211799093ce5ed236e69a",
+      "drizzle/migrations/0027_announcement_media.sql": "dca5dafb1ee23c04c123a628015213e3",
+      "drizzle/migrations/0028_drop_public_announcement_media_read.sql": "858797f7a92e3c797a4e738147228f6c",
+      "drizzle/migrations/0029_keep_on_stage_participants.sql": "7c7fe050551eb720e3ac68e9fad7badb",
+      "drizzle/migrations/0030_battle_replay_voting.sql": "d61669fbc8e575bd00649f1ddd332990",
+      "drizzle/migrations/0031_site_nav_items.sql": "e3e52e87a4a14af8d69f1c074b4390fb",
+      "drizzle/migrations/0032_stream_playback_progress.sql": "bd9ee83b7e5b7cd88dec28d4ed078bd2",
+      "drizzle/migrations/0033_site_nav_menu_groups.sql": "4d09f5dbe82a5c027f5d6c61a6bc7df5",
+      "drizzle/migrations/0034_invite_use_marker_and_battle_result_guard.sql": "867204e4a7905cd1d0f25f8efe617510",
+      "drizzle/migrations/0035_blog_automation.sql": "c04369234d4f3e24474a959fbdd7881c",
+      "drizzle/migrations/0036_videos_add_genre.sql": "58ce85bef52648ceb2d4dd9971f3f741",
+      "drizzle/migrations/0037_artist_monthly_video_allowance.sql": "cd9c9bf7679352eeedcad7ee0acce14f",
+      "drizzle/migrations/0038_catalog_imports.sql": "866b193b474202ec249c45d9c42c5127",
+      "drizzle/migrations/0039_videos_public_read.sql": "aa0032214003d49cfc366fb3521cd753",
+      "drizzle/migrations/0040_get_host_rate_self_only.sql": "d834d9b6e095c5c782c5df9610f51600",
+      "drizzle/migrations/0041_signup_roles_require_verified_email.sql": "de8502d0097808c8d492cc238e567af4",
+      "drizzle/migrations/0042_artist_following_count_fn.sql": "bd12aef0dad8e7761f2a40f8482ed6bf",
+      "drizzle/migrations/0043_migration.sql": "40d14f06967409dd650e38b9a1552e20",
+      "drizzle/migrations/0044_battle_genres.sql": "bb2bb62d9aeb7fa3a8c8c1afe7909ddd",
+      "drizzle/migrations/0045_battle_challenges.sql": "e52de3566b2a2b24819029ec9d83b403",
+      "drizzle/migrations/0046_battle_challenge_agreement_rpc.sql": "c44a3a60d34b0566d18a76848d8770f1",
+      "drizzle/migrations/0047_mobile_push_delivery.sql": "c12818f42f561cc84dad7700cc242ff9",
+      "drizzle/migrations/0048_push_music_visibility_and_event_authority.sql": "af392df40908c4da89ce64f9e04d0043",
+      "drizzle/migrations/0049_confirmed_challenge_battle_workflow.sql": "631c3e15f5c27972280558c7fbb39f81",
+      "drizzle/migrations/0050_challenge_confirmation_integrity.sql": "dae3a13d3cd24741362f2e98f96b0085",
+      "drizzle/migrations/0051_arena_tournament_rules.sql": "e7dfa124ce8e6b3050e7c4d66328c2cc",
+      "drizzle/migrations/0052_tournament_guard_integrity.sql": "e9099ab2cf9095ba3f4473c0134e1754",
+      "drizzle/migrations/0053_tournament_notification_lifecycle.sql": "eb0bc49d2a48d6380feaa521c525ce66",
+      "drizzle/migrations/0054_freestyle_live_battles.sql": "e67091ddc8a2812de3d0f8d2555c43b5",
+      "drizzle/migrations/0055_freestyle_bounded_deadline_checks.sql": "68d108034c41c9516b6ea17f2a6d9e28",
+      "drizzle/migrations/0056_freestyle_ten_slot_challenge_queue.sql": "459270c39320eaff70ef1ad2a7d71780",
+      "drizzle/migrations/0057_freestyle_authorized_queue_launch.sql": "00a4c7ec476dc077e401ad4a54c91f90",
+      "drizzle/migrations/0058_cancel_abandoned_legacy_matches.sql": "40526041dc873836086623ab5d7e4c74",
+      "drizzle/migrations/0059_freestyle_live_stage_notification.sql": "7f5410f67cbb8597b9aab33151233dac",
+      "drizzle/migrations/0060_fix_freestyle_challenge_notify_conflict.sql": "1a0040ea82d000810b1e160649df9710",
+      "drizzle/migrations/0061_skip_host_earnings_without_tier.sql": "16a8334f756385e8cd7f3aab4b3584c5",
+      "drizzle/migrations/0062_assistant_knowledge_expansion.sql": "9072e03e7759ac23e1049a21114112bd",
+      "drizzle/migrations/meta/0000_snapshot.json": "672665a839595e523a92ae6d0d4857d9",
+      "drizzle/migrations/meta/0001_snapshot.json": "a86d722cdee4a18938e89c3ec0f04ca8",
+      "drizzle/migrations/meta/0002_snapshot.json": "fe64c3cd9b8416eb3d95963a599809fd",
+      "drizzle/migrations/meta/0003_snapshot.json": "b3196c12b5035af3c332c17584ac31f0",
+      "drizzle/migrations/meta/0004_snapshot.json": "b11f79473781a574a77f315581a69588",
+      "drizzle/migrations/meta/0005_snapshot.json": "9348650f2481d874ffebfd0ad6ea8435",
+      "drizzle/migrations/meta/0006_snapshot.json": "1f1a55226486ea26a7367bd146c4baba",
+      "drizzle/migrations/meta/0007_snapshot.json": "9d0acbbc1c86395908ffd15814ebed86",
+      "drizzle/migrations/meta/0008_snapshot.json": "5048beddecfb7b2bfd35f53477a16a07",
+      "drizzle/migrations/meta/0009_snapshot.json": "270a18e4bf3081ab9f41f55d2251bf0c",
+      "drizzle/migrations/meta/0010_snapshot.json": "d8a21df7c3da34e3340d30601d74eaa5",
+      "drizzle/migrations/meta/0011_snapshot.json": "6cf95baf3da892af43264835ec1b6f35",
+      "drizzle/migrations/meta/0012_snapshot.json": "6cdc8c19f2fc8276da9ef1c553b0b43f",
+      "drizzle/migrations/meta/0013_snapshot.json": "9964e395f34b0592f5d6e19479056fa6",
+      "drizzle/migrations/meta/0014_snapshot.json": "ac306433350d9b4af2dfee930238e8ef",
+      "drizzle/migrations/meta/0015_snapshot.json": "7ebc278e89383e2a7050187e7694b9fd",
+      "drizzle/migrations/meta/0016_snapshot.json": "5f6cb5f3b2e84c8edf4c824f92976fd9",
+      "drizzle/migrations/meta/0017_snapshot.json": "c58494bb90699fbb600e173e5244b580",
+      "drizzle/migrations/meta/0018_snapshot.json": "caee4e196f36a0c8026693df2f8dbf3f",
+      "drizzle/migrations/meta/0019_snapshot.json": "aa0ceecbd50995cc73a4433f8918498d",
+      "drizzle/migrations/meta/0020_snapshot.json": "0d74c1fac1e6682c6f047501e5e9c368",
+      "drizzle/migrations/meta/0021_snapshot.json": "2747b240725182a33d397b8bde33a0ba",
+      "drizzle/migrations/meta/0022_snapshot.json": "4b9f0b05cc4774e1471eaab3b07f5e9f",
+      "drizzle/migrations/meta/0023_snapshot.json": "058476ea3aba17b25c786c5ba73889ae",
+      "drizzle/migrations/meta/0024_snapshot.json": "a91674181a84d505694b2199c1fe9ce3",
+      "drizzle/migrations/meta/0025_snapshot.json": "d944b95160c5fa382a25a7b42aff5e52",
+      "drizzle/migrations/meta/0026_snapshot.json": "751c7ac3cd88973f5ae23bcb1b6ddc54",
+      "drizzle/migrations/meta/0027_snapshot.json": "6e7a1631e3b7883aea1e33b353ff5bf3",
+      "drizzle/migrations/meta/0028_snapshot.json": "5a4f7883d7f39047ba5062bf3be23521",
+      "drizzle/migrations/meta/0029_snapshot.json": "c19b8488da097e1be4b6dfb305ab28a0",
+      "drizzle/migrations/meta/0030_snapshot.json": "e6cb47948119a6ac64dfaee2c65c0960",
+      "drizzle/migrations/meta/0031_snapshot.json": "0e3fd2fb3712a66791c4117e1b0635c6",
+      "drizzle/migrations/meta/0032_snapshot.json": "d04b9608dcb6f7137a698cd15e54bac7",
+      "drizzle/migrations/meta/0033_snapshot.json": "b5cd0e225d86ae0c8fc58da7fe7c46f1",
+      "drizzle/migrations/meta/0034_snapshot.json": "e6f6415bf08d6f4e21799ae5f4997f6d",
+      "drizzle/migrations/meta/0035_snapshot.json": "5690ae2f33c66df7a2c0ca2303b62fe8",
+      "drizzle/migrations/meta/0036_snapshot.json": "f862868e1e19842ca982802bd41f9c1c",
+      "drizzle/migrations/meta/0037_snapshot.json": "9c59c46bf09996dc3e07d220510faca1",
+      "drizzle/migrations/meta/0038_snapshot.json": "cea7a7ac8fb110c0fc9c77d0216c44bd",
+      "drizzle/migrations/meta/0039_snapshot.json": "ba991d5834a0b2a03a23a96babb5aaf6",
+      "drizzle/migrations/meta/0040_snapshot.json": "e1c948c684e7a2beebda257b2f4e8199",
+      "drizzle/migrations/meta/0041_snapshot.json": "cb665233672f87758455f14b6d6f50ba",
+      "drizzle/migrations/meta/0042_snapshot.json": "a63d11ccdf8f37b89f2b7da00b74b84e",
+      "drizzle/migrations/meta/0043_snapshot.json": "996f6cca115fa6100bc8f251e330637b",
+      "drizzle/migrations/meta/0044_snapshot.json": "af198a3d725ac3fa2ca2322ada59e95c",
+      "drizzle/migrations/meta/0045_snapshot.json": "7c20d5eec18bbfbae624bec06c7424ea",
+      "drizzle/migrations/meta/0046_snapshot.json": "c9779f2352e3f478b41edb81427bd279",
+      "drizzle/migrations/meta/0047_snapshot.json": "94afce12c79f075aa9415cf62c2aeb46",
+      "drizzle/migrations/meta/0048_snapshot.json": "4236780c61ebe441dfef73122b5d3667",
+      "drizzle/migrations/meta/0049_snapshot.json": "80d470cbe93bac3d115eb97bf707d950",
+      "drizzle/migrations/meta/0050_snapshot.json": "c3842a4443a9940736e5ad2d22fc74ca",
+      "drizzle/migrations/meta/0051_snapshot.json": "53efb47d227af987b8f2d7b4979b0bfb",
+      "drizzle/migrations/meta/0052_snapshot.json": "a3ba83b5cf318790a727834fab03827e",
+      "drizzle/migrations/meta/0053_snapshot.json": "bb68939cce4775a2648e5555f388f765",
+      "drizzle/migrations/meta/0054_snapshot.json": "8d414cbe5d20afbd1bf281aaf011bc44",
+      "drizzle/migrations/meta/0055_snapshot.json": "5df1799dc8c2b43d4c149f18c4dc5da8",
+      "drizzle/migrations/meta/0056_snapshot.json": "96a5ea6e98060829ae0f24cf46097d8a",
+      "drizzle/migrations/meta/0057_snapshot.json": "0e260948b862386a26ac3bbba5e3544a",
+      "drizzle/migrations/meta/0058_snapshot.json": "d6a20e7be7fb34477f627c2eebf65528",
+      "drizzle/migrations/meta/0059_snapshot.json": "2732d7ecd00ab056da329c7a31f55c9b",
+      "drizzle/migrations/meta/0060_snapshot.json": "34a6cab87ede6fc06042f1384ec766bd",
+      "drizzle/migrations/meta/0061_snapshot.json": "d0586754ffb5bae99e2e34bc61b09f93",
+      "drizzle/migrations/meta/0062_snapshot.json": "bc3ede879b5995f571f40055e1ee6afc",
+      "drizzle/migrations/meta/_journal.json": "95f7a8a7271da170f3105739abe9e133",
+      "drizzle/schema.ts": "a60267d05d7dd11572f02686241f37c6",
+      "eslint.config.js": "add3680c1a1da90e68d105f0ae90f285",
+      "package.json": "66f9597e90bf7c254de23ded02366adf",
+      "public/apple-touch-icon.png": "a959992850c7c63144ec3170018751a7",
+      "public/favicon.png": "5133695fa30ee70bd4d6254703833582",
+      "public/icon-192.png": "492313750adbd8261164445c6c1cc5f7",
+      "public/icon-512.png": "66f1a58094ac446c2cbd3cc542d1862e",
+      "public/icon-maskable-512.png": "a99b15e39c55b040d4be91ef0379bcb9",
+      "public/llms.txt": "6c29e19adfa485c5b744ff7c419883a8",
+      "public/manifest.webmanifest": "7d19a5e6aabdd47e063b4af0feb9b026",
+      "public/offline.html": "dabd78c97d9b51d4433152124dc43fb8",
+      "public/og-image.png": "516a17a774570948ece478b4696b7fd6",
+      "public/push/worker.js": "26a17b90824dcd2a8c6bac9fe3610ae0",
+      "public/robots.txt": "5ef9f07359d65dfcb3a5acebcc94b822",
+      "roadmap.md": "a8440a29f5cd4493d1e4cb78cf50a8a9",
+      "scripts/check-auth-guard.ts": "74fd0ee932bdae9eabe56b01f32cc987",
+      "src/assets/artist-store-hero.jpg": "798462dc5cbbd67270d845419c73930a",
+      "src/assets/audience.jpg": "355a2fdd8e8e6d68ed42d8b2445f073b",
+      "src/assets/audience.jpg.asset.json": "72a507a8e4e0c9a732f59952e44afae3",
+      "src/assets/badge-battle-champion.png": "b37fbf62421fbf08fa348861a2d5da70",
+      "src/assets/badge-bronze-performer.png": "72e8976c21e481dae3e6b6481258f493",
+      "src/assets/badge-bwf-founder.png": "af51c54e886b47fc612f85149ee5b30b",
+      "src/assets/badge-diamond-star.png": "e5c3e1285db70d9acf1edf613ec7e098",
+      "src/assets/badge-featured-artist.png": "18ea64c4a52303ae7330b990182c42df",
+      "src/assets/badge-gold-creator.png": "3f2eb892aa3908a9e29f97bf5e07d985",
+      "src/assets/badge-hall-of-fame.png": "01e24ff3486355c85040152081e0aa30",
+      "src/assets/badge-legend-elite.png": "e72a3cf6e5168e582a93181b378b7379",
+      "src/assets/badge-platinum-icon.png": "4f7dbaa944229dd658eedb4f1a3bc7b0",
+      "src/assets/badge-silver-artist.png": "90203670e2848e58ac4bc7f63af80a28",
+      "src/assets/badge-superstar.png": "96f5ecf09a5e8ad44dd1620f39a57204",
+      "src/assets/badge-top-streamer.png": "e17d8207ee5d622f3f6ad755b57c1c0d",
+      "src/assets/badge-trending-artist.png": "df4b38d037f4be1fbd5c0c4d82263e0d",
+      "src/assets/badge-verified-artist.png": "6060380003f3b1c3a5a639b800b1f655",
+      "src/assets/bwf-intro.mp4.asset.json": "b04a35f8167df996d01d3b4b71eefd02",
+      "src/assets/bwf-join-bg.jpeg.asset.json": "2b2ddd037760ce6b4ad473a469d30d89",
+      "src/assets/bwf-logo-source.png": "6b488a0bb648503dca1075abcf943015",
+      "src/assets/bwf-logo.jpg": "e7a7da87e3f55a262514a36ac81ba8eb",
+      "src/assets/bwf-logo.png": "e2cbd7bdf4df7792b148c3616bae621d",
+      "src/assets/camera.png": "3d0c9c0b37179bc928686fad8857c297",
+      "src/assets/default-artist-avatar.png.asset.json": "bb5a29b5df20ebcaf0f7cd5f32069695",
+      "src/assets/discover-hero.jpg.asset.json": "00e2d08203fe6a583b03a6aacc0a5d18",
+      "src/assets/flyer-off-the-block.png": "1eef6a54658e60c2a55d453b4b8b94eb",
+      "src/assets/flyer-studio.png": "a989030d084c49f536f7d09e5667bce5",
+      "src/assets/go-live-logo.png.asset.json": "7f020c4eecf778c5467810c8fd7553bb",
+      "src/assets/grunge-bg.jpg": "2d682ea38ac465a300dfc214e6733c80",
+      "src/assets/grunge-bg.jpg.asset.json": "41d06720e5d6c8d7e7bbc92286d034be",
+      "src/assets/hero-rapper-poster.jpg.asset.json": "fe1e5502164ed15551b1c0f73aba7b87",
+      "src/assets/hero-rapper.mp4.asset.json": "876937d4b6e616aa2c04825768901b66",
+      "src/assets/landing-arena-battle.jpg.asset.json": "f2ddf6864063f55abb1468f36a861ff7",
+      "src/assets/landing-community.jpg.asset.json": "07a646c2141e4d19f5570ca10b4b1519",
+      "src/assets/landing-dj-vote.jpg.asset.json": "906ad31f8b973eb2e4ed7ad2b06cff49",
+      "src/assets/landing-live-crowd.jpg.asset.json": "cc692bff45f348edbee145a303a29154",
+      "src/assets/landing-studio-artist.jpg.asset.json": "e1b64f28fee49b887a5eb0db92f8b002",
+      "src/assets/music-video.jpg": "3f4def00f14fcb879ecb615d8039127f",
+      "src/assets/music-video.jpg.asset.json": "da98e34d42674b53b22c43c22d859acd",
+      "src/assets/off-the-block-hero.mp4.asset.json": "57e75d8e2c8788254e565069ee3aa578",
+      "src/assets/play-arena-1v1-battle.png.asset.json": "0266f3be8d23d41f06e785ef93bf8f32",
+      "src/assets/rights-shield.jpg": "949184155d2e5d4fbd5a821096abbd5f",
+      "src/assets/store-collection.jpg": "ea8e4e4c942375711c1be0573e781d38",
+      "src/assets/stream-guest.jpg": "da26b4b4e94064944e7678660888de4e",
+      "src/assets/stream-host.jpg": "685d91fdb1645c1db9de7ad2f52c747a",
+      "src/assets/stream-host.jpg.asset.json": "84690604e15e635eea3c4fc00ec006df",
+      "src/assets/studio-hero.mp4.asset.json": "e70a84f25600f943a7d3584428fe9ddc",
+      "src/assets/tunevio-assistant.png": "15a3c053f8785c1a23f252086291e535",
+      "src/assets/tunevio-blog-intro.png.asset.json": "3bdf24498587a2928c2446cd4ede7cbb",
+      "src/assets/tunevio-header-logo.png.asset.json": "903aae5974b785907307f62f74e6e8b2",
+      "src/assets/tunevio-icon.png.asset.json": "0810b7e3c1d3a515f0394d7caed4b78b",
+      "src/assets/tunevio-intro-soundtrack.mp4.asset.json": "f818a17d8516e38b6ed768f77cca4285",
+      "src/assets/tunevio-intro.mp4.asset.json": "439a36f6dcdba20e2281c2def64915bc",
+      "src/assets/tunevio-logo.png.asset.json": "86f5fabe14b1a9fc505c0659344125d7",
+      "src/assets/tunevio-mic-walkup-black.mp4.asset.json": "6968de84c9ded1f9cf7b1bd87903e8bc",
+      "src/assets/tunevio-mic-walkup.mp4.asset.json": "2fff0df858f2f08becb2306bbc0cedad",
+      "src/assets/tunevio-play-icon-small.png.asset.json": "f900fd02c50bec94f4fa6c83a4a9b9fe",
+      "src/assets/tunevio-play-icon.png.asset.json": "03395274269a9943c06f92b2461a89d1",
+      "src/assets/tunevio-social.jpg.asset.json": "56c8ed10febb1fc4beaed2f86012c555",
+      "src/assets/videos/tunevio-logo-intro.mp4.asset.json": "654676c9fc670c0cbe41d5bb72f64ade",
+      "src/assets/viral-thumbs.jpg": "60e515c47b8831795052b50a7e0b0d34",
+      "src/assets/viral-thumbs.jpg.asset.json": "d7996132d6e660341862b171cf64d301",
+      "src/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json": "5c647d471a6a5af3a9eaea26ee2283d0",
+      "src/assets/welcome-IMG_1560.png.asset.json": "3f639fc30d8ebdadaa04d34ce621d2cc",
+      "src/assets/welcome-IMG_1680.png.asset.json": "f1a8bc2e4eb1614917d147e6e9d79128",
+      "src/assets/welcome-IMG_1681.png.asset.json": "d7cd0dec5f81304d7cee6f1881b1eb9f",
+      "src/assets/welcome-IMG_1682.png.asset.json": "9dbf9488c7c8a94e12410cd8ca762b77",
+      "src/assets/welcome-IMG_1683.png.asset.json": "e66f160c80e3f3666cd4b92de237ccdb",
+      "src/assets/welcome-IMG_1684.png.asset.json": "66d96530109a9ae8363b58f235ba4be7",
+      "src/assets/welcome-IMG_1685.png.asset.json": "a4a79668ad27bd7233c5c9b9470590bf",
+      "src/assets/welcome-apps.png.asset.json": "9aff101248ae8c78dab27470ec8729ff",
+      "src/components/CartDrawer.tsx": "29420ff107cf83e0dd8be51d8b0db8ff",
+      "src/components/FuturisticCalendar.tsx": "a111137e67e8281ddc259e0fd3f12c49",
+      "src/components/MessageBell.tsx": "e8f2714911f976387124944947b57318",
+      "src/components/NotificationBell.tsx": "d7abc13d07979de4a0c6786e24c2b575",
+      "src/components/PaymentTestModeBanner.tsx": "e0dec342b07461563760eda6bbcd2376",
+      "src/components/PodcastMode.tsx": "f6115f6238983cee44a0a14ecc25eebf",
+      "src/components/RealtimeHealthBanner.tsx": "c16dbacea432ab5aa1d51edc1bb3fb03",
+      "src/components/StripeEmbeddedCheckout.tsx": "873c49c68d5b7fc7c8b708c3353b5c5b",
+      "src/components/UnreadBadge.test.ts": "e68e2d0732293e76c018971691818ef6",
+      "src/components/UnreadBadge.tsx": "edbff59d526123662ce743048acef2b8",
+      "src/components/admin/AdminShell.tsx": "c7f25687a95a006eb44a9098f66cc173",
+      "src/components/admin/BookingsView.tsx": "860f2a26e483aed4f7042171a8990df2",
+      "src/components/admin/DistributionReviewQueue.tsx": "42df88063132e3860e46667543cf74fa",
+      "src/components/admin/SectionPage.tsx": "c00ad1a7f688b723f73dc31def2eeeea",
+      "src/components/ai-elements/conversation.tsx": "51f053cb2c206062ef0c61a819281b0f",
+      "src/components/ai-elements/message.tsx": "a20101ba099e9edc2094d4b46a04f8ee",
+      "src/components/ai-elements/prompt-input.tsx": "a8390101b2dc9e551b9da8d71e1652b4",
+      "src/components/artist/ActivateArtistButton.tsx": "033704f117845411070e7827fc52773a",
+      "src/components/artist/ArtistDashboardShell.tsx": "e5abceefe00224fdee83959e1278e191",
+      "src/components/artist/ArtistLiveRoom.tsx": "87e836dab1a05a5fe812962edf2bda95",
+      "src/components/artist/ArtistStatusBeacon.tsx": "f5052d7eda467e3888b10ad46e415973",
+      "src/components/artist/FollowersModal.tsx": "aa995e793775febe7ac6cfc56acb478b",
+      "src/components/artist/FriendPlusButton.tsx": "6bebd6bc883943fa215171deefd851ed",
+      "src/components/artist/LiveSetlist.tsx": "83f7e738d76eab5dfdca6ee4c9d63d8d",
+      "src/components/artist/ProfileBattleCard.tsx": "ad2679dda94c6de8e858c2716aa4b7ff",
+      "src/components/artist/ProfileLiveBar.tsx": "a3f6271240590cd6e51af287799ef80e",
+      "src/components/artist/ProfileMessageButton.tsx": "a2529fdb3faa2b6d29bf2d179fcb9685",
+      "src/components/artist/ProfilePlatformLinks.tsx": "4455316aec347743f57cf86cc31e0f41",
+      "src/components/artist/StreamingWorldMap.tsx": "1fa8aaed6446ff51b4faf437de81b9ce",
+      "src/components/artist/TrialBanner.tsx": "0b2d984d9e6a4c66987430cdcee600a8",
+      "src/components/assistant/AssistantChat.tsx": "09743e562d0f6e869650e496a5b1f5cf",
+      "src/components/assistant/AssistantLauncher.tsx": "acf782a0cc6d4c0e99108a9a991af55f",
+      "src/components/blog/BlogArticle.tsx": "e13a804341b1b7afb4344a8da7836540",
+      "src/components/blog/NewBlogPostDialog.tsx": "77aa92c1aa951c3362a445534798f097",
+      "src/components/deck/Deck.tsx": "f3d79d3bac96c2f61d3475960fe4c4f5",
+      "src/components/deck/SlideShell.tsx": "65aa6ed20a85c443e5e372c6b3f9cf73",
+      "src/components/deck/slides.tsx": "74e46d317c7e464bd0640d7c79e9a449",
+      "src/components/distribution/AssetUploads.tsx": "1f8f90f0fa46590706b7bcb33510673d",
+      "src/components/host/ArtistReferralsPanel.tsx": "2dbff93283c156d984f5e06c3f0fab3d",
+      "src/components/merch/ArtistMerchSection.tsx": "c6268f2cff0f26c459139cb1c9ceec80",
+      "src/components/merch/TrendingMerch.tsx": "bf9c88e3fca53496fe7b775cdeda14c0",
+      "src/components/play/BattleChallengePopup.tsx": "b19eb66b0d243d5c509201762cb6e91f",
+      "src/components/play/BattleChallenges.tsx": "df95e816b1f9a2681656f8d5232b0e57",
+      "src/components/play/BattleTournamentStatus.tsx": "62bd9b17418b77394d64586d69c65d4a",
+      "src/components/play/BoostCheckoutModal.tsx": "7f19f7adaddfbe98a38e03cfff64c50d",
+      "src/components/play/FreestyleBattle.tsx": "86d596a49af9715490af5b7bcd0542ae",
+      "src/components/play/FreestyleChallengePopup.tsx": "f522fbf66cf81900e34495d39b390038",
+      "src/components/play/FreestyleQueue.tsx": "386060a40cd1d1ea08d1fa21326b0d11",
+      "src/components/play/GenreBattleBoard.tsx": "50356e2e19d158c65eced91664020754",
+      "src/components/play/ImmersivePlayer.tsx": "1812590bb637e20935f34a66368d745f",
+      "src/components/play/PlayProfileHero.tsx": "55d7b1c8f8705e9dd8b51f356f6789bf",
+      "src/components/play/SkipLinePopup.tsx": "f7099c80d2f88d6eafeb27c21196e18e",
+      "src/components/play/SubmitToArenaModal.tsx": "a0a260c79802300e48eed9f1aa36087e",
+      "src/components/play/SubmitTrackDialog.tsx": "ad8ed03c016981cd8ce64e34d546a406",
+      "src/components/play/WaveformBackground.tsx": "6e660097f52e7f7b85f75b2b8b845dc5",
+      "src/components/player/GlobalPlayer.tsx": "4b3102c328ca5fdf9f2b5bbed3464c92",
+      "src/components/player/ListeningSessionPanel.tsx": "391784c9cc1d6d171d2d369f0bb3805a",
+      "src/components/player/MediaSessionSync.tsx": "adc28cce182c90c01bad5ad82c8c425a",
+      "src/components/player/MusicDetails.tsx": "430a4ebc78dfe7b4a659ceb68162023f",
+      "src/components/pwa/InstallPromptPopup.tsx": "06e68215d237df32bb0875e7c8bb281e",
+      "src/components/pwa/InstallTunevio.tsx": "6ece4d9e2236c8db890c214368701c71",
+      "src/components/rank/RankBadge.tsx": "0803316a03f1f20b7b88c3637e13d1c6",
+      "src/components/settings/AccountOverview.tsx": "0990f58d3ca7cc01cf65ea92f6e9e9d5",
+      "src/components/settings/AddProfileTrackDialog.tsx": "06c161d3fc4b5dc9a501c6e215887425",
+      "src/components/settings/GeneralSettingsShell.tsx": "2170b5e6e30d5ec2b1fccc9e30cc8207",
+      "src/components/settings/SettingsShell.tsx": "3b44e68a01d73d7ed2eb2b568bc4b573",
+      "src/components/settings/SettingsSidebar.tsx": "5b9ef5ba510e34648d9f29e05bd031ae",
+      "src/components/site/FutureShell.tsx": "7eeda79dbdc621f0af26b0d62b23ac0c",
+      "src/components/site/GrowthShowcase.tsx": "f2bdaebb3905f375ff1f3bddfb37a90a",
+      "src/components/site/IntroSplash.tsx": "114d4bf2ef5aa3ed46cead6fc382667f",
+      "src/components/site/LegalPage.tsx": "d8ecf7868f81c3c6ad4a45ef012ba4d0",
+      "src/components/site/LiveRosterSheet.tsx": "8c335d7b91377375cf591e9566620387",
+      "src/components/site/MobileBottomNav.tsx": "fa62d8e797f4fa3aebfe2ddcee5f85f9",
+      "src/components/site/MusicVideoPlayer.tsx": "20841e9215762132dd2834cb0baf1a26",
+      "src/components/site/OnePager.tsx": "7d6a0b9a9df45ea63abfc48d60d3569a",
+      "src/components/site/PlatformCapabilities.tsx": "54cbdd10d700364261c7227eab06e05f",
+      "src/components/site/PlayArenaIntro.tsx": "566a59c806f3a547643b10f43c079d31",
+      "src/components/site/SiteFooter.tsx": "26c6349ca8ed2942f802be677a262079",
+      "src/components/site/SiteHeader.tsx": "1e1d867bb7b942daefb3a0e37d598867",
+      "src/components/site/TrialGate.tsx": "c0d43ee59cc17249850642ee14edd559",
+      "src/components/site/VideoComments.tsx": "4adcd530fe8d76893405995ee1bf0a81",
+      "src/components/site/VideoPlayer.tsx": "01e8a9af82169c464f4e0a23212ebae7",
+      "src/components/store/ArtistStoreSection.tsx": "f605c83a010f86a3a8b0154f4da0cf5f",
+      "src/components/store/NfcPagePreview.tsx": "866a374192033982375313209d798887",
+      "src/components/store/StoreProductCard.tsx": "4fa7c0c451a2c53d16be5a6041a2a1a2",
+      "src/components/stream/AGENTS.md": "96079a600ef8b03db1a18a0cf495d501",
+      "src/components/stream/ArtistChallengesPanel.tsx": "0e1b0d93d234b503bd7cda85fe241254",
+      "src/components/stream/AudioPlaybackUnblocker.test.tsx": "8f92229c4325d456e46c271cbe07bcfb",
+      "src/components/stream/AudioPlaybackUnblocker.tsx": "cfdc4a4966e273c26b2ba67c0127e06c",
+      "src/components/stream/BackstageQueue.tsx": "cd0990b682a8e47e0c80e763caa884c6",
+      "src/components/stream/BattleArena.tsx": "f8cbe6b6f764f6e04031701a6b7a8249",
+      "src/components/stream/BattleHostControls.tsx": "29c0cd51735b13d7d7c7edf207ad90d6",
+      "src/components/stream/BattleReplays.tsx": "1b99d0fa3281a247795acf53b3780bba",
+      "src/components/stream/ConfirmedBattleMatchups.tsx": "4ca57179954918350563e9392a6b642c",
+      "src/components/stream/ConnectedPlatformsSection.tsx": "f43a85e3bbe00b6d7199b5d443e4ebf9",
+      "src/components/stream/CrowdPanel.tsx": "8f9ef80f6c46506c0efbe76c2fcdc94f",
+      "src/components/stream/DeviceSelector.tsx": "3c1e44cfb121aef844aaef8a5c55bb2a",
+      "src/components/stream/GreenRoom.tsx": "16984eb5906082c9e0e2d1d422ea36f9",
+      "src/components/stream/HostEarningsCard.tsx": "57f9068c38f20aeee48979336941932d",
+      "src/components/stream/HypePassPanel.tsx": "a555d339078dbd96e2865735b8e2e693",
+      "src/components/stream/InCrowdBanner.tsx": "9ab7916104558b1894077ed78b595794",
+      "src/components/stream/LiveCardPreview.tsx": "e9bf4abe1a7e93df46153ec1086a5d1e",
+      "src/components/stream/LiveChat.tsx": "fbe7125579f37197d02464eb3492384f",
+      "src/components/stream/LiveKitConnectionGuard.tsx": "ea3774d56d816849b40604e914af457f",
+      "src/components/stream/LiveStage.tsx": "e52c0838feb4179ea69b69e7e17d86a6",
+      "src/components/stream/ModeToggle.tsx": "213b05342da7dd931ab26b07939638b1",
+      "src/components/stream/NowPlayingHeader.tsx": "f254b631358abdcabb2cb4154f8f1a60",
+      "src/components/stream/NowPlayingMini.tsx": "5f3e7334316e05a1081abf0dd389f022",
+      "src/components/stream/RaiseHandButton.tsx": "e0e6633dd87830ea7ae94dd8ecc1a567",
+      "src/components/stream/RaiseHandPanel.tsx": "698ec97fce089a9a3b0cf21fba8dfa5c",
+      "src/components/stream/RecordButton.tsx": "648e02064f2c1806e069bfc33b123676",
+      "src/components/stream/SelfMicrophoneButton.tsx": "48a6bfae4bbd56c5e5474c432b883adf",
+      "src/components/stream/StageAudioShell.tsx": "dfea7af07ca2e888fee866a50f267378",
+      "src/components/stream/StageMuteEnforcement.tsx": "510da3397850140725f3a8eddd725eef",
+      "src/components/stream/StageNavigationConnection.tsx": "565ce8c19e44371340c84bb3d56bcdb3",
+      "src/components/stream/StageReconnectBanner.tsx": "8397539fba029b284a00e10c1f1a695c",
+      "src/components/stream/StageRoom.tsx": "7ea3845625f58dd1cd0eb19e8a551e50",
+      "src/components/stream/StreamDestinationSelector.tsx": "1d37afafc3e509d33816331d527d3f9c",
+      "src/components/stream/StreamThumbnailDialog.tsx": "f5cdfa3b342df3422ca6669ecb11112f",
+      "src/components/stream/StreamThumbnailImage.tsx": "f181a5210eeaada7d9d27022ef06bac8",
+      "src/components/stream/StudioStub.tsx": "25294b0239019f864a86556bab32bafb",
+      "src/components/stream/TipModal.tsx": "4ca87a505a57c313ae8d4aa50c43bfcf",
+      "src/components/studio/LiveProductionDashboard.tsx": "9251e4fe8d0c51eaa7572f3f4ec3eaf0",
+      "src/components/studio/StagesAndBroadcasts.tsx": "bfe5ffb266129c5a17291c5e4df51890",
+      "src/components/studio/StudioLayoutCustomizer.tsx": "0a0a755c5e0b7d92e041031c79277163",
+      "src/components/studio/StudioLiveStage.tsx": "18e89739f7a7936073bbeeb81ab74570",
+      "src/components/studio/StudioStageRoom.tsx": "f41e69b7155934ee93ce62e1bd2769f8",
+      "src/components/tunevio/ArtistMarquee.tsx": "1282f58bbf22faed6b3820d2ae129543",
+      "src/components/tunevio/ContentRail.tsx": "830a81a100fbd1f13903f9508f636057",
+      "src/components/tunevio/LandingPage.tsx": "395406afa6b8bccc88b42142137c4da3",
+      "src/components/tunevio/TunevioHome.tsx": "535f8d6dfd4725438db2116151ac122b",
+      "src/components/tunevio/cards.tsx": "45c57260e8250e349c2a35a0b49e25cc",
+      "src/components/ui/accordion.tsx": "1152021ea2d7f6dbffa8a9c49b4fc657",
+      "src/components/ui/alert-dialog.tsx": "6c6d8c338274d9ea9213cb3f846aa441",
+      "src/components/ui/alert.tsx": "f993d7e96b1e25ce50e68ed97e11d2a8",
+      "src/components/ui/aspect-ratio.tsx": "c5c364545e1b25a94e9e752cd67ad048",
+      "src/components/ui/avatar.tsx": "536668fcc1e56498401aa542ed0de788",
+      "src/components/ui/badge.tsx": "81cade001fc4260f9943e18dcd79449b",
+      "src/components/ui/breadcrumb.tsx": "bb9ac254f12662b20d5d50b84308bf3a",
+      "src/components/ui/button-group.tsx": "f10e07c96e62161432c70e75d4e0c4b9",
+      "src/components/ui/button.tsx": "4870ecf032591e7dc71cd4e3c36bb683",
+      "src/components/ui/calendar.tsx": "415d91d7006d4cc654e27620fca340f6",
+      "src/components/ui/card.tsx": "d6c48ea36221b9cdc3576d305d12d5d5",
+      "src/components/ui/carousel.tsx": "e324c68ae00cd5aed49317638abd429a",
+      "src/components/ui/chart.tsx": "6a3baf94f2e89f1f97d4d7a28f3622d2",
+      "src/components/ui/checkbox.tsx": "142bf28afc40346e352be4b29aad7d55",
+      "src/components/ui/collapsible.tsx": "767631bbc344945c236f185f4078d71d",
+      "src/components/ui/command.tsx": "77e272fff1663d59706fb13e7994314d",
+      "src/components/ui/context-menu.tsx": "e9d689beb53d9adb63165bfe64838bf6",
+      "src/components/ui/dialog.tsx": "0878ebc40a6d6fa3aaa1da3f0a879703",
+      "src/components/ui/drawer.tsx": "8be333e8fd8e42576b1b5f72f07f4337",
+      "src/components/ui/dropdown-menu.tsx": "a674cf69830585ae1fe11fc61d3b36e1",
+      "src/components/ui/form.tsx": "1b0aa6302b9017ea2a1307c22a1d2983",
+      "src/components/ui/hover-card.tsx": "61e2e6b95ce28939056a397b0a4d9b9f",
+      "src/components/ui/input-group.tsx": "2c3fcb29ad6181afc9d0e4d353d7b4dc",
+      "src/components/ui/input-otp.tsx": "58cff10c8942cac8483c0bcd65d39d3c",
+      "src/components/ui/input.tsx": "962daebde14319230f0cbf88a8472f70",
+      "src/components/ui/label.tsx": "7e35df4ca8edd0835efd97ca7937ef92",
+      "src/components/ui/menubar.tsx": "5870465653e12c3d0e35a2fad6f9faa9",
+      "src/components/ui/navigation-menu.tsx": "169a6451373dc5e17c1b3da2e646d0f2",
+      "src/components/ui/pagination.tsx": "fac6cdbb4bbf78b273d85cd36d6cbb49",
+      "src/components/ui/popover.tsx": "f18aa1da2144f25ee60795c539c51bcd",
+      "src/components/ui/progress.tsx": "55c462e5c9dd678dcf2c0c510b014ac4",
+      "src/components/ui/radio-group.tsx": "357bc630a588800655147312e167ac54",
+      "src/components/ui/resizable.tsx": "d9fcb9203c749fcab4e125a99bb12a86",
+      "src/components/ui/scroll-area.tsx": "87b65d3eb26f2b02ff35a7acea585ba5",
+      "src/components/ui/select.tsx": "fb94c321fd086b05a9ae57362d422e32",
+      "src/components/ui/separator.tsx": "e970901b62fe8b73d2b9254fad77f583",
+      "src/components/ui/sheet.tsx": "f9dab8daf0021ef0481f3913acb1dc4e",
+      "src/components/ui/sidebar.tsx": "1569d08f4b4c4e139d4b6d070f0e05e3",
+      "src/components/ui/signed-img.tsx": "4c07f1f2982130eebf3f11232e5c3afb",
+      "src/components/ui/skeleton.tsx": "41b182e6e2fc3805960d41e767d4a972",
+      "src/components/ui/slider.tsx": "4752f1bfa26426988d325599e01c335b",
+      "src/components/ui/sonner.tsx": "97f59f60be3413196d095fcbf7383216",
+      "src/components/ui/spinner.tsx": "28b695734ef3b6840b47d713ae3d31ce",
+      "src/components/ui/switch.tsx": "82f5d8b0c59bb7ff305caa9f502e79ff",
+      "src/components/ui/table.tsx": "7cc889989d53894b659903c73aded96e",
+      "src/components/ui/tabs.tsx": "e3558f35f8b847fee9f67da1120a7bce",
+      "src/components/ui/textarea.tsx": "28a5b8c2caa9c86b73ca82fab179c356",
+      "src/components/ui/toggle-group.tsx": "ac26383acf721d116ca8e3ab5c5355d5",
+      "src/components/ui/toggle.tsx": "b98a69052f115695d2a9455da07632be",
+      "src/components/ui/tooltip.tsx": "8d58847748e1b0d4b2b7572b846af09a",
+      "src/contexts/CartContext.tsx": "68488bbdcb7692277871128152af4453",
+      "src/hooks/use-mobile.tsx": "c0a0bdd4638c391a1dd06ac82074e60b",
+      "src/hooks/useArtistSubscription.ts": "aac9c08e2c900ae5e4812a41073d9416",
+      "src/integrations/lovable/index.ts": "e9cf6e6968dd0392b2222ee0745ecece",
+      "src/integrations/supabase/auth-attacher.ts": "dad043cda134d909e52de0346c16625e",
+      "src/integrations/supabase/auth-middleware.ts": "33dfc13f37a37f6397e66d67eb63644d",
+      "src/integrations/supabase/client.server.ts": "24c2f9d3dadbb91e13970a31918bc153",
+      "src/integrations/supabase/client.ts": "3a64714432051d16e6cacf8c69945f67",
+      "src/integrations/supabase/previewAuthStorage.ts": "91a2fb985d2b9c9cf27a5151806d0d50",
+      "src/integrations/supabase/types.ts": "469209748c2a512feca9bc1d08bc831f",
+      "src/lib/AGENTS.md": "44aadf38986fe598c092a4db20516d3e",
+      "src/lib/account-access.test.ts": "614b0655102fdc50224eaf547e7a833a",
+      "src/lib/account-access.ts": "bf768093eaee62cd9fdac41d3b93d415",
+      "src/lib/admin-analytics.functions.ts": "556baae88892b0cc34d95d28fe006073",
+      "src/lib/admin-audit.functions.ts": "2f605a2e0376efa142634fed5b72660f",
+      "src/lib/admin-guard.ts": "c7088ede64e2eb35342065d5860366ce",
+      "src/lib/admin-merch.functions.ts": "e46d7638444c6ddb4ddad6985501e429",
+      "src/lib/admin-overview.functions.ts": "0bfd31cf393ee40d05b6b1d7d0bf7c5d",
+      "src/lib/admin-sections.functions.ts": "4034857b7e808ccfcf46f75e0a1c8680",
+      "src/lib/admin-users.functions.ts": "dc3eaa619065ea9e13183140a9dc333f",
+      "src/lib/ai/run-id.server.ts": "d11e1b80a100307dd8bce52de258203c",
+      "src/lib/announcement-edit.test.ts": "8d956403a3009a1863a98f4a93c99943",
+      "src/lib/announcement-edit.ts": "015c554d22931f9b3830f88db0278afc",
+      "src/lib/announcement-email.server.ts": "94691a34980dfbd1ddd56418f95b3d9b",
+      "src/lib/announcements.functions.ts": "b3891dd91449b2fd20e48f4da5c7377a",
+      "src/lib/arena-events.functions.ts": "e1cf440084d40451b48480b576d98a42",
+      "src/lib/arena-picker.test.ts": "de5828df89263070baa82cc68ab07bfc",
+      "src/lib/arena-picker.ts": "34b3c5c1a0c6b8b02051105fadad679e",
+      "src/lib/arena-room-audio.test.ts": "9f24a71964643d7919f1bab5e51cbfeb",
+      "src/lib/arena-room-audio.ts": "0ccb19b79b1c74b2a7844c54c078506b",
+      "src/lib/artist-activation.functions.test.ts": "c0ce324c4ec4583eab8a16883857e974",
+      "src/lib/artist-activation.functions.ts": "e03ebfc9870858149b803bb3fa1568ed",
+      "src/lib/artist-analytics.functions.ts": "30f1253638c50165e1f5add6e3f3d93a",
+      "src/lib/artist-battle-status.functions.test.ts": "c86a25415898c1bf7f32720f620d32e1",
+      "src/lib/artist-battle-status.functions.ts": "8c5a0e68119e466eb1200ffb8b932811",
+      "src/lib/artist-follows.functions.ts": "ef9c775f5ca79d5215b7c8d198b077d8",
+      "src/lib/artist-follows.test.ts": "ec01b90df2cf54ba3abafea96b02a6f8",
+      "src/lib/artist-meta.functions.test.ts": "6950cd8db685b057da42231de1054143",
+      "src/lib/artist-meta.functions.ts": "5c227ae00f4af2c4e0affb7b4748df68",
+      "src/lib/artist-navigation.test.ts": "80595b021ff328b9e448cb7720e5f59a",
+      "src/lib/artist-navigation.ts": "1df4b872c7cc6a38349e4cdd25564be0",
+      "src/lib/artist-profile-tracks.test.ts": "037b1631a8e31ae4756f42fe982ef6d9",
+      "src/lib/artist-profile-tracks.ts": "8bdf61a4aa879327b93fae5907cd835c",
+      "src/lib/artist-referrals.functions.ts": "3be509dff7d027266220cac76870ba4c",
+      "src/lib/artist-status.functions.ts": "429e48124ab167072f26f4c8a5c88d34",
+      "src/lib/artist-status.test.ts": "019fa20731e3c397ba266b3b9bc1ef36",
+      "src/lib/artist-status.ts": "4d4856db587a3df3a588d2836c056caa",
+      "src/lib/artist-store.functions.ts": "5a73534dfe53b5ac44e02fdaf73d3df4",
+      "src/lib/artist-store.test.ts": "d4ec3816f246114732e93a22824587ad",
+      "src/lib/artist-store.ts": "126b23bd03f7de7a3626d2276e290bd6",
+      "src/lib/artist-subscription.functions.ts": "a8aced6bb974fb8ee6ddbb5c24e9e29a",
+      "src/lib/artist-titles.ts": "d39381b4ce90a89bcafa8cdedc563e3d",
+      "src/lib/artists-directory.functions.ts": "eb3cc4c2ade223e3f2d47e22e675445a",
+      "src/lib/assistant-admin.functions.ts": "b45c8c216f24035ff2b5fbe66c8c9bbe",
+      "src/lib/assistant-request.test.ts": "d016129d86380923d2fa61420a6cf13d",
+      "src/lib/assistant-request.ts": "a1faee29c0471fc0a70abfb88413d5b0",
+      "src/lib/assistant.test.ts": "92c913059936c053371f0b884774b23b",
+      "src/lib/assistant.ts": "4cb6f4248b12fb1f0f8350b52ad06bd3",
+      "src/lib/audio-duration.test.ts": "da46cba71f541a40f1b781177c27c8c1",
+      "src/lib/audio-duration.ts": "1957b359b5a57553b96e3b7a6d4b0c43",
+      "src/lib/audio/arena-slot-engine.test.ts": "f8c9c63a23937fefbc14f24b636a51c3",
+      "src/lib/audio/arena-slot-engine.ts": "53152823c5033514df2177ce2a9cb9ec",
+      "src/lib/audio/arena-sync.ts": "2382d5edd7c6e925b1b929655365fc63",
+      "src/lib/audio/audio-clock.test.ts": "1b88113554ce80fefa8bc0e583c42403",
+      "src/lib/audio/audio-clock.ts": "949a8fc188572371573abf0afa65bbb8",
+      "src/lib/audio/crossfade-engine.test.ts": "285831c833f41bc2b8b2721d4def91a8",
+      "src/lib/audio/crossfade-engine.ts": "a25d3874821dc24d17207181d4ede67e",
+      "src/lib/audio/preload-engine.test.ts": "2dcd379ebb30926e740f6620581a5d5c",
+      "src/lib/audio/preload-engine.ts": "fe7bc23184bd9fa48ef7da24fd88af89",
+      "src/lib/audio/slot-scheduler.test.ts": "4e01173feaea62fa9f2e4a41f7e2d0ed",
+      "src/lib/audio/slot-scheduler.ts": "c6be2ad51ab2787a4d99d82551a491a2",
+      "src/lib/audio/track-loader.ts": "194b231cbcc5c833698b3099b3b3cccd",
+      "src/lib/audio/useArenaSlotEngine.ts": "7a29c2f4d74e870a55dd29624e3c2ca5",
+      "src/lib/audit.server.ts": "6c11f928137b09f3b07b70fcc3c33d3f",
+      "src/lib/auth-context.tsx": "1d232d9a3d745cb7c10f24c9c2d48e2a",
+      "src/lib/battle-challenges.functions.test.ts": "489d379041a3ffefb7b9e92d1fc4d50d",
+      "src/lib/battle-challenges.functions.ts": "f9c810525009d1e18a5b8d3ccab8f1e3",
+      "src/lib/battle-challenges.test.ts": "7396d1ef1ae968fc7d8c8cd1fbafec2d",
+      "src/lib/battle-challenges.ts": "4e9176d09d343b0c209fb2aba28c1f95",
+      "src/lib/battle-engine.functions.ts": "19e877d07fe27fb2710779f5815b47c9",
+      "src/lib/battle-engine.voting.test.ts": "b747bbd23070a89a35a2e7971e310155",
+      "src/lib/battle-genres.test.ts": "82530dd0c8cb6f9bee4bb4cfc563f122",
+      "src/lib/battle-genres.ts": "e937791043e98cef4493791d178f0070",
+      "src/lib/battle-interactions.test.ts": "062a00ce2a67a9a7f8d1c2601564b034",
+      "src/lib/battle-interactions.ts": "9797f4899685f5f452d8fbae8bf8b7f6",
+      "src/lib/battle-notifications.server.test.ts": "337cbb8d0ec4f42e1bbab39ff58422df",
+      "src/lib/battle-notifications.server.ts": "3fed9370f20ded467b8b34f4003933a5",
+      "src/lib/battle-reactions.functions.ts": "233a2488a2fee4ae56a1e744a3b9b1c7",
+      "src/lib/battle-reactions.server.ts": "d3461d4d84e03a53276e8506e725800b",
+      "src/lib/battle-replay.test.ts": "f0d195f08163da504b77d941a779ea5a",
+      "src/lib/battle-replay.ts": "b9427a6c613fa35cb580029976b20107",
+      "src/lib/battle-scores.test.ts": "8d20ba8946b0cebea62ddc8895f940ef",
+      "src/lib/battle-scores.ts": "5b8b8c7b02723d904939ef405eef8086",
+      "src/lib/battle-tournament.database.test.ts": "1e9647b2a04b6d83987e66fb3b24713b",
+      "src/lib/battle-tournament.functions.ts": "385242a21a90b31355d72e61eefcceea",
+      "src/lib/battle-tournament.test.ts": "37bed3cc8ebec893a5c931bdda861726",
+      "src/lib/battle-tournament.ts": "d8403cbc432d680e86aeb844f8edd583",
+      "src/lib/battle-voting.ts": "64a5f33dadb329135f915199917b18fd",
+      "src/lib/battles.functions.ts": "ce61b7289004b55db34f29935a196738",
+      "src/lib/blog-automation.test.ts": "03338ff684f716eda3279b1abbf856d3",
+      "src/lib/blog-automation.ts": "1df46b425979996dfa24e64321f1280b",
+      "src/lib/blog-posts.ts": "07e46047b20f4219633253cb30e6f349",
+      "src/lib/booking-checkout.functions.ts": "741db3d984aa8837b7f7ce98f8cdfa67",
+      "src/lib/booking-packages.ts": "f62d6ae15f5ed2ceeb1be49f741fe15e",
+      "src/lib/boost-economy.functions.ts": "95657af29e3870beb596743c8c7fa9f9",
+      "src/lib/broadcasts.functions.ts": "5d936a216ab3f025269be9219b68dd45",
+      "src/lib/cancellation-email-admin.functions.ts": "86f1ea18f5e210075753b0ed5c280293",
+      "src/lib/cancellation-email.test.ts": "2e57f6ebf09541c1391d80ee97935153",
+      "src/lib/cancellation-email.ts": "cd7fe5573e2bf27aa4bebce8a061b694",
+      "src/lib/catalog-import.functions.ts": "a073a71a79149bcab69ef158d9d6f253",
+      "src/lib/catalog-import.test.ts": "4b24dc0dc4998fbe6d9036db77d8e906",
+      "src/lib/catalog-import.ts": "a2321239fe405e5c7a127c7e56c00440",
+      "src/lib/charts.functions.ts": "bf32e9a0e59ad059fe56859ff829c204",
+      "src/lib/confirmed-freestyle.test.ts": "b3b0f0eda4ebc462b61750ca5f050850",
+      "src/lib/confirmed-freestyle.ts": "cca5171482b04c89806172eaf7bc68ae",
+      "src/lib/deck-content.server.ts": "7c1bfd4bcdeb3c388de8898baac7303d",
+      "src/lib/deck-gate.functions.ts": "73a6ede7f7c7540ccf39c44df5e93e22",
+      "src/lib/direct-messages.functions.ts": "00162bbf820f066e1ec9d8d0f4c561f4",
+      "src/lib/disable-zoom.ts": "36ffafbf88e11ae10bbe830a47b537a5",
+      "src/lib/distribution-upload.ts": "11c0b62e850568644bfb52fb5499f3af",
+      "src/lib/distribution.functions.ts": "0e3b1885d15df27e8ce9e0fe4466b9e7",
+      "src/lib/email-send-log.ts": "4bd8df6061380418ee5f010b37e345c3",
+      "src/lib/email-templates/block-booking-confirmation.tsx": "acd3aadf189b08e9f1470974034045c1",
+      "src/lib/email-templates/checkout-cancellation.tsx": "1596baeb85f469c22f471a1295ed58cf",
+      "src/lib/email-templates/direct-message.tsx": "9b277db8fe62dde172b6a86fca6293a7",
+      "src/lib/email-templates/email-change.tsx": "78bb39a54681503f84fbbc078b95c90f",
+      "src/lib/email-templates/invite.tsx": "99872fbc0cf4554de6f11a5c3212b8e2",
+      "src/lib/email-templates/live-stream-started.tsx": "2f9f04bd3648b14258552f92385fc063",
+      "src/lib/email-templates/magic-link.tsx": "bd918ab367b264b9be8959afe99d1e1f",
+      "src/lib/email-templates/reauthentication.tsx": "4823b907c290c73cec183183db0d6bfe",
+      "src/lib/email-templates/recovery.tsx": "81b8ddc5327447907bd921618ed5abab",
+      "src/lib/email-templates/registry.ts": "d5ab2ed0541b1b4b74bc7dd1991f533d",
+      "src/lib/email-templates/send-email.ts": "133f57d1d9160592ceab49b7242bad47",
+      "src/lib/email-templates/signup.tsx": "d056e6dc6501c6324dca7c3458395aac",
+      "src/lib/email-templates/studio-booking-confirmation.tsx": "a17351a86d5c9d0f7be9e3b946865af7",
+      "src/lib/events.functions.ts": "a81855a3e71044a282f96d98398e9d91",
+      "src/lib/freestyle-queue.database.test.ts": "4e92f0a73567338ce3f2ab7ef8ae4ab0",
+      "src/lib/freestyle.database.test.ts": "852060ddaac29cd2caad82431684b5a2",
+      "src/lib/freestyle.functions.ts": "afe8da3e5ba21ed5ebb0ff098cb624cc",
+      "src/lib/home-feed-artists.test.ts": "9e15a6a9870d32cf1276ccf1de81920a",
+      "src/lib/home-feed-artists.ts": "682633d2452acfa72ca8fa6ed7a8478f",
+      "src/lib/home-feed.functions.ts": "df9368e09561249c52bf4965e4c3c45e",
+      "src/lib/homepage.functions.ts": "5c3f32732c3593d6155e046f56917076",
+      "src/lib/horizontal-scroll.ts": "5b60a340810a8ce55ecc4a6e581f1c99",
+      "src/lib/host-identity.ts": "aca4b5171e5ceabf067e01b9957676a0",
+      "src/lib/host-referral.ts": "145cc94e004dfa06a3b52c56c5c53a3a",
+      "src/lib/host-tiers.functions.ts": "006c55eab20f7b4692071d4f6bd127ca",
+      "src/lib/idempotency.test.ts": "ff17613579ad4cd0df0115533839715c",
+      "src/lib/idempotency.ts": "e0743be8ebfa4f313b43eb46ef89d712",
+      "src/lib/intro-audio.test.ts": "bea28e98d0a857e041bd64f925023856",
+      "src/lib/intro-audio.ts": "d7d779f87d0c87fd6b4eabf3f7e73813",
+      "src/lib/invites.functions.ts": "47f74a903a43999ff20ac3cea4ffec61",
+      "src/lib/labels.functions.ts": "fc6e814e8ebc44fde91ad657d040bf1d",
+      "src/lib/leaderboard.functions.ts": "cd967cf347ba07781306843dacf1fc10",
+      "src/lib/listening-session.ts": "3e2b77685ce287bba7a9345a0c624f65",
+      "src/lib/live-broadcast.functions.ts": "c4320731fb652d6a6d42d71550bdad48",
+      "src/lib/live-categories.ts": "3cba2f55dec446dbf77df33b62b49263",
+      "src/lib/live-directory.external.test.ts": "a58d868e797c50dd66834199495a5429",
+      "src/lib/live-directory.server.ts": "9248969856e2c07bf224ffdc699e0f3f",
+      "src/lib/live-directory.test.ts": "80de2619879defd0272d321f01f10aa9",
+      "src/lib/live-directory.ts": "74a2fe9d024e5a4f3d78af1792577468",
+      "src/lib/live-on-air.test.ts": "af218b983d4b1c75506c9a4295124c04",
+      "src/lib/live-on-air.ts": "fbc36d8f513210e7c9bea18ba74d3929",
+      "src/lib/live-preview.test.ts": "569e662ae7cf616d15e5d91d3bd178d2",
+      "src/lib/live-preview.ts": "3d92a1e2895c572ee9c3bb3bea7c0db5",
+      "src/lib/live-roster.test.ts": "336afb6c7991db9d25551e84076011d3",
+      "src/lib/live-roster.ts": "fef256bac706a3d754ff38ba504242bf",
+      "src/lib/live-stage-navigation.test.ts": "b3d153150b3b9c8b82dd5eb903fa74a0",
+      "src/lib/live-stage-navigation.ts": "405e0ba01f1ea5d439f0092c6155c809",
+      "src/lib/live-video-slots.test.ts": "8487f2f7d52f996999bb5743418796e4",
+      "src/lib/live-video-slots.ts": "fa4839f75a917ee52f0defa6daab8e48",
+      "src/lib/livekit.functions.ts": "a6f64039ac53d128a7bdc899b3ed963a",
+      "src/lib/mcp/index.ts": "b66b102ebbbf76041c2320bb6b410174",
+      "src/lib/mcp/tools/about.ts": "3d321ec36ff7571babce8ac0918c607c",
+      "src/lib/mcp/tools/list-artists.ts": "0a9ced83c4061ac2fb5b2e53bde91e6d",
+      "src/lib/media-engine/MediaEngine.test.ts": "64182820896f4f29d7acbb19880eb343",
+      "src/lib/media-engine/MediaEngine.ts": "fc128bef90014a18cc42fed8b0b04621",
+      "src/lib/media-engine/MediaEngineContext.tsx": "17312c082eec1eb24b9fd9bf03e0db39",
+      "src/lib/media-engine/errors.ts": "1137a2e86678f50a674f9709a70e3e18",
+      "src/lib/merch-pricing.test.ts": "b291d131342b1650010cdd44e1b93d5e",
+      "src/lib/merch.public.functions.ts": "eee82950034a2b1b85de70a129bf0949",
+      "src/lib/mobile-keyboard.test.ts": "1eaade72f41e7705e94245dff1791ef8",
+      "src/lib/mobile-keyboard.ts": "336e6035311908d52c016eb40d7bd198",
+      "src/lib/moderation.functions.ts": "05150434e18260d0b4da37600ae8a08a",
+      "src/lib/nfc-admin.functions.ts": "aab8e99b7a0b772e0611f3a085043fbc",
+      "src/lib/nfc-pages.functions.ts": "fe3438a06d0217f3077c06c378800591",
+      "src/lib/nfc-pages.test.ts": "0960f411fe78d951261872d8134a0727",
+      "src/lib/nfc-pages.ts": "dde23fe7409b6c4fbbeb603e0b95954d",
+      "src/lib/notifications.functions.ts": "dbc5a91c27e9f7074dd768ec04ff83b5",
+      "src/lib/off-the-block-videos.ts": "32e40b0436d67218925c1c205f894db0",
+      "src/lib/payouts.functions.ts": "af1f13f94e3c724a19fd8432aaeffe9b",
+      "src/lib/play-arena-live.functions.ts": "52b615aba4d156ba1efca31ac7ed81f3",
+      "src/lib/play-arena-submissions.functions.ts": "aa72235b8649002cd2825e92afa6ee19",
+      "src/lib/play-arena.functions.ts": "331d3fde6088959064f1fcb0d467da22",
+      "src/lib/play-audience.functions.ts": "d68019a4115d95796f2f248da1d1c32a",
+      "src/lib/play-audio.functions.ts": "de4111be0c12fc88fce1654d1a6ec7d8",
+      "src/lib/play-battle-completion.test.ts": "72162ce67217d24702695c1fd7496eb5",
+      "src/lib/play-checkout.functions.ts": "e4549f3b599b13e79ece2bd470d2b17b",
+      "src/lib/play-counts.functions.ts": "b25eec8294a5a72f5cfcb6115c52fe82",
+      "src/lib/play-profile-submission.test.ts": "8df3c5dc81acd7d57d3daa8fadc503c0",
+      "src/lib/play.functions.ts": "3c0c6ebc26fa415efb5bab52dc78435c",
+      "src/lib/playback-progress.test.ts": "1d4f870780ec5b6e7ab30b2c62975a8c",
+      "src/lib/playback-progress.ts": "c87bdcc322a1504582dc49dc5d7414c8",
+      "src/lib/playback-store.ts": "afe2a371890d8605a33fb2ec7ce123b9",
+      "src/lib/player-context.tsx": "c6891abceedd8a2453c87227e249f9f4",
+      "src/lib/power-ups.functions.ts": "fbb42aa12a00e55a52fc0c8bcce5bb6b",
+      "src/lib/profile-edits.test.ts": "bd42543eae75c749c4b5bd948c38d41c",
+      "src/lib/profile-edits.ts": "f57134f0950c39dc8c8f8667a1f67309",
+      "src/lib/profile-live.test.ts": "5f2269a61cb65a287001ff7ead01c61d",
+      "src/lib/profile-live.ts": "947af9df5a495f16eeeddc39e8d566d0",
+      "src/lib/profile-platforms.test.ts": "a11b9d9f5964b9c27ae89cfa6d406054",
+      "src/lib/profile-platforms.ts": "ee7f76082f059ac6e52fa540c333a352",
+      "src/lib/profile-track-upload.test.ts": "3660451ae7c6f8a6ddc588a16e10fc1e",
+      "src/lib/profile-track-upload.ts": "56e9885aced2f6193d61166f7e44744c",
+      "src/lib/public-artwork.test.ts": "0fd235c9d5c2b28fba8aab0ac858fa24",
+      "src/lib/public-artwork.ts": "5bd173788a23066df95155687f0ca68d",
+      "src/lib/push-settings.functions.ts": "005f65c857b536b2ba1351cbce1a9a85",
+      "src/lib/pwa-config.ts": "7881c484b1c2ad40efea33eec55635fd",
+      "src/lib/pwa.test.ts": "cf438ce5aedd106552079e169fa46085",
+      "src/lib/pwa.ts": "adf2cb1fb950d1f179a0cdb27b1860b3",
+      "src/lib/queue.functions.ts": "55504f9edf41aa5dd2e3b926ae49e8a7",
+      "src/lib/ranks.ts": "2f8539f8e7999d6e3df777cdf05cb576",
+      "src/lib/realtime-health.ts": "a29413cfe115dc2bef2c17a3002747cc",
+      "src/lib/recordings.functions.ts": "75605759f7adadbc41154e19c98fbbc2",
+      "src/lib/revenue.functions.ts": "73d21845df9a0496accc572854c250dd",
+      "src/lib/rights-integrations.server.ts": "29d07c541a41e8a9d4a2d5fbdf7bdb4e",
+      "src/lib/rights.functions.ts": "2a4c162930cdf73b550ddf68540ba13f",
+      "src/lib/rights.test.ts": "4e930f66a133bb7590112041a035e362",
+      "src/lib/rights.ts": "63dbf41295b67774dfac6ed18153314f",
+      "src/lib/server-time.functions.ts": "cc80b0e89b37994da6bd130abfc5332e",
+      "src/lib/session-auth-middleware.ts": "10d46b3011ec1702b12970ff0af2a799",
+      "src/lib/session-token.test.ts": "19e831a4b053f56bb2131bd64433b21c",
+      "src/lib/session-token.ts": "4fcf1c7644eca8a5515aaf14829d4497",
+      "src/lib/settings-navigation.test.ts": "bc8d86c9a38502f0a49fe4f1fc914ed4",
+      "src/lib/settings-navigation.ts": "a0712cb541a1d6aed4c1d8e0550da136",
+      "src/lib/signed-audio.functions.ts": "78c7ba7146393b9596197ee2f7e6a7f1",
+      "src/lib/signed-avatar.functions.ts": "4c6e9672f08d72d4e00e4e3b4dbf1f51",
+      "src/lib/site-nav.functions.ts": "ba907ccde3f3ce5f6ec8093f70353bd0",
+      "src/lib/stage-connection-context.tsx": "a42371f516e2aa2485632c330c2ba72f",
+      "src/lib/stage-microphone.test.ts": "fadece8d8c682e7882c2939047c610a3",
+      "src/lib/stage-microphone.ts": "833c32f6674ce27515bf334058880d9e",
+      "src/lib/stage-navigation-connection.ts": "0f95996eae6a9d87cb157201731b4c16",
+      "src/lib/stage-rooms.functions.ts": "7c8a18b86eeecf2f3b8fba2a24018bea",
+      "src/lib/stage-roster.test.ts": "e70d252063be485a390e9ac4b20d83eb",
+      "src/lib/stage-roster.ts": "49d00468dcbc23be928981e491168308",
+      "src/lib/stage.functions.ts": "e32ad304c69b08c2e6962c146c91bbe6",
+      "src/lib/store-admin.functions.ts": "898a0efd7e169edc7c683b533b9c3ec8",
+      "src/lib/store-catalog.test.ts": "25faa52e77e0db9a4909260095bddb94",
+      "src/lib/store-catalog.ts": "44fa5f64365b1daa377225c0a22419de",
+      "src/lib/store-ledger.server.ts": "1082af71ad877ea21ff57e7258494e0b",
+      "src/lib/stream-events.functions.ts": "e264b62e9153165bb09489b2714da52e",
+      "src/lib/stream-platforms.functions.ts": "47e9c3e37f38750282d7ec64e3d92830",
+      "src/lib/stream-platforms/oauth-providers.server.ts": "82ac4b130a44a130368db3421a0d9fd5",
+      "src/lib/stream-platforms/registry.ts": "a246ebf2d504c56a4a07c9aed916b0df",
+      "src/lib/stream-platforms/state.server.ts": "24ea84182dfc33e01f572cbf026326ec",
+      "src/lib/stream-thumbnail.functions.ts": "fb151fcf32570656eb658ac6906cbc75",
+      "src/lib/stream-thumbnail.test.ts": "13d3bb45af09ef0e4ad9e1099efa269d",
+      "src/lib/stream-thumbnail.ts": "ddeafe6c4b1bf6968ba864935191e4c8",
+      "src/lib/streams.functions.ts": "3114178114e340ab3e2fb456ecd39759",
+      "src/lib/stripe.server.ts": "f69a66e02233c916e760b1debb412829",
+      "src/lib/stripe.ts": "82d2b3cd808d2034d9e503c2533bbb6d",
+      "src/lib/tips.functions.ts": "6fb07d14c07188bb73294dae73b86c6d",
+      "src/lib/track-likes.functions.ts": "7c2f393d68109caf649d8287421e9eb7",
+      "src/lib/trial.test.ts": "3cf13c17dc68c528180c45d1341a5958",
+      "src/lib/trial.ts": "57d9e3afdf6b1828d1271582dd594363",
+      "src/lib/tunevio-subscriptions.functions.ts": "cf93d9577b342bcd7e4def7059f32f6a",
+      "src/lib/tunevio-subscriptions.test.ts": "62ab36d8ba97b51f5aeb40931b63a225",
+      "src/lib/use-live-stage-navigation.ts": "82e7b20fe0592dce796f8b4dbe32441e",
+      "src/lib/use-stage-presence.ts": "d8f04854de65f46cd663a5673ece75ee",
+      "src/lib/useArenaLive.ts": "019929c9cec6cbca8facb11454dcb318",
+      "src/lib/useAudioPeaks.ts": "dff8ac3269b7082e897b6e3c130fb97e",
+      "src/lib/useBattleScores.ts": "ba8806a9af6dd9e7e1844e335e4b15e7",
+      "src/lib/useListeningSession.ts": "98bf6ade2eb1e3b326ea23a4feb4220e",
+      "src/lib/usePlayQueue.ts": "e6d20eadf5a83608a8d273b8d2b63fbc",
+      "src/lib/usePodcastState.ts": "60aa4c0d40e02a5f414d2dc66f4858eb",
+      "src/lib/useRenderActive.ts": "7cb4ef94d80fde0dca5bb06e20c539d3",
+      "src/lib/useSharedAudioGraph.ts": "837600387f9aeed6bb5a4bf56dfc634c",
+      "src/lib/useSignedAudio.ts": "325ded0a5d7666a918a7d0983993cd58",
+      "src/lib/useSignedAvatar.ts": "4a7ab789d7e5e2fdaede6f28a1926431",
+      "src/lib/useStageGateway.ts": "a21d730827b14d9d008dd9278eda9bd5",
+      "src/lib/useStageState.ts": "14778b92ab7b99183560189c72f24622",
+      "src/lib/utils.ts": "d9837f38cc05303254571985e3164050",
+      "src/lib/validate-return-url.test.ts": "c2c06ccfed1acd1e756a50991f4436ab",
+      "src/lib/validate-return-url.ts": "59fc3f10c4ce9e81003cb32419fe2ae2",
+      "src/lib/video-engagement.functions.ts": "bec4e1fa28e7054f45f4291645ec6148",
+      "src/lib/video-genre.test.ts": "e4080fb745ae7f34dd49c42dfe23ff43",
+      "src/lib/video-genre.ts": "e5ea4cb29863a49c34f673a920b73a7f",
+      "src/lib/video-sign.functions.ts": "8af2c31b75ee305c492403ef16a95644",
+      "src/lib/video-upload-allowance.test.ts": "8c272fc83e6ecb24cda0d7bac7aa8d0d",
+      "src/lib/video-upload-allowance.ts": "f58fbcf2c05ef4cd51947fef54312ad7",
+      "src/lib/video-urls.ts": "769fe13479ad7725e42070a0c4d489e0",
+      "src/lib/vote-attempts.functions.ts": "fd6ebda3f9015c7316ba8619e6281196",
+      "src/lib/vote-math.test.ts": "1a2d3e1f564912f614f4b116695e8564",
+      "src/lib/vote-math.ts": "ead2b7b1f526d6994dd1229a9b9080e6",
+      "src/lib/web-push.server.test.ts": "477070988463807ba37eae8f23199109",
+      "src/lib/web-push.server.ts": "b7d1888bb834db28b8ced3a2d14f86ee",
+      "src/lib/web-push.test.ts": "a26f24ff457ead49f857d8168509d639",
+      "src/lib/web-push.ts": "f2eec288a395ddd71788fc30c75a5329",
+      "src/routeTree.gen.ts": "7e994edc75c3fadadaeecdbcd9a51108",
+      "src/router.tsx": "a2ce892aa9550cd62ff6bfd98a39732b",
+      "src/routes/[.]lovable.oauth.consent.tsx": "ec14003a4978c07b8b9435482da23fd8",
+      "src/routes/[.mcp]/invoke-tool/$tool.ts": "2cc296128352d61d70726e7428ef5ca5",
+      "src/routes/[.mcp]/list-tools.ts": "bc1d258eb3237605d066b9a536a63d5d",
+      "src/routes/[.well-known]/oauth-protected-resource.ts": "2dbcc907a7d3ab43955e6dbbb99e7a1d",
+      "src/routes/__root.tsx": "79b472737e232fa54e74b669223087ee",
+      "src/routes/acceptable-use.tsx": "296592b325e1320df09867bc094b3c6d",
+      "src/routes/access-denied.tsx": "3c101d330024b3cfa77bf79e3c8dc7f1",
+      "src/routes/admin.analytics.tsx": "d0eb03e539a2202dda1089ba7693a35d",
+      "src/routes/admin.announcements.tsx": "394b51201627ba8fa6e89dc2d2d93293",
+      "src/routes/admin.artist-referrals.tsx": "876778d3a4f2f1c6c8aeae8d76553c19",
+      "src/routes/admin.artists.tsx": "2c7c5c425d19f52c6591f1dcf576cad8",
+      "src/routes/admin.assistant.tsx": "b6c69ec0f6b3d7edb3920d166601f666",
+      "src/routes/admin.audit.tsx": "9d456d4b7ecb739e9a63945708740c90",
+      "src/routes/admin.block-bookings.tsx": "b0c1e119a672f1a0e09c23ae3e401fbb",
+      "src/routes/admin.bookings.tsx": "1cd17c742ab2f9a2b5e5375efa83e6f4",
+      "src/routes/admin.cancellation-emails.tsx": "e528311113605b6de1f02efc21416501",
+      "src/routes/admin.content.tsx": "66d674b502d0fe83fb50ea49c6e0848f",
+      "src/routes/admin.dashboard.tsx": "b4784f44753a8f4c6083727cfe95f41e",
+      "src/routes/admin.events.tsx": "72839cee9ce779c47361d299a173d161",
+      "src/routes/admin.host-tiers.tsx": "cc20128ea7e9160306453b48f0eca3da",
+      "src/routes/admin.index.tsx": "4f64931d2c818cddc16661b43e25be9a",
+      "src/routes/admin.login.tsx": "dc16d384aa41411aa2a355119fe8a127",
+      "src/routes/admin.merch.tsx": "e7c19864f68db18c49bf6009eeb79373",
+      "src/routes/admin.merchandise.tsx": "5b9c97153696b7dcd8a2c750f48144a2",
+      "src/routes/admin.messages.tsx": "a704751d07057b060a3f41bd13d5f0c8",
+      "src/routes/admin.navigation.tsx": "69ba4f2f828482d125712be48e60504a",
+      "src/routes/admin.nfc-orders.tsx": "7af85b869bcb09461ef286b0810ea4f9",
+      "src/routes/admin.ops.tsx": "d1cd5a3ee647c1a9db7bf9e0d4cc9f2c",
+      "src/routes/admin.payouts.tsx": "acd9344e9f5686ca6e9eb87d148b76e5",
+      "src/routes/admin.profile.tsx": "550c8b79a2986a698d75f96bd37a81c8",
+      "src/routes/admin.rights.tsx": "fa3fb42abfaaf4f4a5dd2fc374c66825",
+      "src/routes/admin.security.tsx": "e6d432a20320ed94cf73417e22228684",
+      "src/routes/admin.settings.tsx": "51e15b3253e4ae8f9a0129856693b110",
+      "src/routes/admin.streams.tsx": "923a361e6fda72d65233cbedf9aab670",
+      "src/routes/admin.studio-bookings.tsx": "8514bb77179dc761e2182e4ef0e1df85",
+      "src/routes/admin.tickets.tsx": "c1e174871ddb16ccbdd1589682f474a0",
+      "src/routes/admin.transactions.tsx": "dfa1740d8a24ba0a82cc83dd51844838",
+      "src/routes/admin.tsx": "19358c0e571faf09149ac7c33fa6e09e",
+      "src/routes/admin.users.tsx": "9554340c948051cd1181adfadc99574c",
+      "src/routes/admin.vote-attempts.tsx": "9865fd5ba4fb1e619038395b99514c6b",
+      "src/routes/api/assistant/chat.ts": "dd565bd1023b133fec62c9480c512d03",
+      "src/routes/api/battle/react.ts": "9563959987f3988bad8c569e6f7f3d75",
+      "src/routes/api/oauth/$platform.callback.ts": "cf527080c805bfc8c8dd735b56e5af9f",
+      "src/routes/api/public/block-booking.ts": "76c70fbbc17383404639bcc66a43ae22",
+      "src/routes/api/public/checkout-cancellation-email.ts": "7d9226b477e1d2d32c797ca90edcea79",
+      "src/routes/api/public/hooks/process-payouts.ts": "f88455cd8f1219e5abc2df80715fb715",
+      "src/routes/api/public/hooks/push-notification.ts": "56362f9d91be063d9774b8f05be9a822",
+      "src/routes/api/public/payments/webhook.ts": "a5e9c4a0b0ab0cfa030de528d280f365",
+      "src/routes/api/public/studio-booking.ts": "c952a1fa03e7a48e49ea0ffa26555824",
+      "src/routes/artist-analytics.tsx": "dca123fcd686447300016e36317bc62b",
+      "src/routes/artist-dashboard.tsx": "58ec2420201a7f4e8379216263c597eb",
+      "src/routes/artist-store.$productId.tsx": "989e072a3a047de652ca295953b7f668",
+      "src/routes/artist-store.index.tsx": "a4bff15fbc7b4d926ebd5b32416d4f77",
+      "src/routes/artist-store.manage.tsx": "04b5be4631f6151506d37c0ed6406be3",
+      "src/routes/artist-store.orders.tsx": "59b407e3f9c2efb904ead2ee52115015",
+      "src/routes/artist-store.pages.$pageId.tsx": "9066e31b0cc468327f62eadd8b93a730",
+      "src/routes/artist-store.pages.index.tsx": "9055162bf53409f415ed4a8827f84486",
+      "src/routes/artist-store.tags.tsx": "8d3f0f470aea27b0eb354f4a369e93a5",
+      "src/routes/artist-store.tsx": "b84e50bc30fda8193b51eb9118ed71d2",
+      "src/routes/artist-submission.tsx": "0acf27fa9f2c8441e0c2563ae1c00a94",
+      "src/routes/artist.$id.tsx": "3759f7b7e2983403895cc31e01b119a8",
+      "src/routes/artist.upgrade.tsx": "c9fa974e8fea0b482a44bc4fcda2a6d5",
+      "src/routes/artist_.$id.connections.tsx": "944078ef919f3879587a9981af771eae",
+      "src/routes/artists.tsx": "ee50c25a3ecdc7f53913b102b0b1560c",
+      "src/routes/blog.$slug.tsx": "f021bb197fc8d8738117aec15050a25b",
+      "src/routes/blog.can-you-play-music-on-live-stream.tsx": "95b65de84f3fbb1c302974cdeea33564",
+      "src/routes/blog.how-artists-get-paid-for-streaming-music.tsx": "c120bb186468cba41a51fbfa133b2854",
+      "src/routes/blog.how-to-live-stream-music.tsx": "c71395ad13bc4ee9745ee094c55b0225",
+      "src/routes/blog.index.tsx": "55da7e7a569c7e66f4a5030733530a7e",
+      "src/routes/blog.live-stream-music-twitch-youtube-facebook.tsx": "d8f8a374d1cc8b263050eae8c4ce5016",
+      "src/routes/broadcast.$broadcastId.manage.tsx": "2b9356d8f0b0e3a7e4a41d0da5158929",
+      "src/routes/broadcast.$broadcastId.tsx": "6388a905dd8db8c47b64ea0ec8548cc8",
+      "src/routes/broadcast.index.tsx": "c9691c8100a1c41f753a7ab7683c34a3",
+      "src/routes/charts.tsx": "71e0e74c8bfa9cd1f7e2125247b12ab5",
+      "src/routes/checkout.cancel.tsx": "93a893d635a0a99f98fad75694a76ac2",
+      "src/routes/checkout.return.tsx": "b2bbddf478412a0909916cf0e01c74c6",
+      "src/routes/contact.tsx": "1f9fed2721eeef18cfafcbbb0a8966c9",
+      "src/routes/cookie-policy.tsx": "601fd9d48d963b65a852cbbac2ea3ba3",
+      "src/routes/creator-agreement.tsx": "3a3675bbf1f1dc7fb672880f4b8468ab",
+      "src/routes/credits.tsx": "f811e9dd442eea38233a346735d5c8e7",
+      "src/routes/deck.tsx": "d06ed262919a725179057a23de0b9a89",
+      "src/routes/discover.tsx": "396fec6cdc9f0f80c3b3643af756cf8e",
+      "src/routes/distribution.tsx": "3d32451d5ab0c4a1b12cbf3d689e217e",
+      "src/routes/dmca.tsx": "6f31ded70fa7dfe21da9c97ad8a075d8",
+      "src/routes/earnings.tsx": "e2cdcffe99251e3177cc81d39345a813",
+      "src/routes/email/unsubscribe.ts": "d8a4cfe3d9b2bfe9739f7be9d7bf2383",
+      "src/routes/events.tsx": "de1fe724d10be6f06b54e456be869ed9",
+      "src/routes/forgot-password.tsx": "97629acaac52afaca3af35180c2c244d",
+      "src/routes/go-live.tsx": "210457397f8dbc2b19695743c96b112f",
+      "src/routes/help.tsx": "cd1dc0572e2b0bc8b8b1761db69b8f38",
+      "src/routes/home.tsx": "59e6fc273ad3496dd744f937ca05050f",
+      "src/routes/host-earnings.tsx": "72ce5629ad8448dbff268aed1b4c4294",
+      "src/routes/import-catalog.tsx": "647c8f1321e3929c42932dcbbfb5d9a7",
+      "src/routes/index.tsx": "3676e803939266dacea9b9c19ba703dd",
+      "src/routes/install.tsx": "923d8f534d74b3392736cc6f6705f6f4",
+      "src/routes/invite.$code.tsx": "d2a450f690afea469bdd95de9c5b73eb",
+      "src/routes/join.$username.tsx": "4d0745d653c8efecc91be88ace5d4097",
+      "src/routes/label-invite.$code.tsx": "0ce743f6d9c7bb3086f8e4ffb98de112",
+      "src/routes/labels.$labelId.tsx": "f5db99612c5bc2ced9e5b61b8accfb83",
+      "src/routes/labels.index.tsx": "487ae5d78b12f694df5c6659b6378b60",
+      "src/routes/leaderboard.tsx": "e2aec4420f4869fe2b1651fa952a6bc0",
+      "src/routes/library.tsx": "7e194f959444018ed20927a01c3222f2",
+      "src/routes/live.tsx": "286c6359771a3392ba54c4f79cc6125d",
+      "src/routes/login.tsx": "6678002486a0fb13a4a57e1970ca7ed0",
+      "src/routes/lovable/email/auth/preview.ts": "10da6cc74a24ca0b2aa80e6fac3d322b",
+      "src/routes/lovable/email/auth/webhook.ts": "e9f2dd058ad53bbe5f16bcd7687e1836",
+      "src/routes/lovable/email/events.ts": "6c2ecd13a8dec0bca5c2016e25e1d972",
+      "src/routes/lovable/email/transactional/preview.ts": "04c9b9a4ef204d62a0ce0d32d47e0c00",
+      "src/routes/mcp.ts": "300ada44271329e833b338d197b2395b",
+      "src/routes/messages.tsx": "f5748e0e7dbba00aa9034374e0107266",
+      "src/routes/mic-drop.tsx": "e95b6f9e4832a27ef20d7cab1d0c8dfe",
+      "src/routes/network.tsx": "6eb01eb0e848dfa5532b0fe42b5219fd",
+      "src/routes/nfc.$code.ts": "4ec57548986ed6d7854559c7240faaab",
+      "src/routes/notifications.tsx": "4a99498d7b49e1517df9d06f62c42e74",
+      "src/routes/off-the-block.tsx": "caf79f6205596e9cc22e30e156bb4608",
+      "src/routes/p.$code.tsx": "8ad50e4bae42906514689aeed4af0d4d",
+      "src/routes/pay.$bookingId.tsx": "3794265c480560dddea4e99db53b7865",
+      "src/routes/pay.return.tsx": "e5a1112efa1df905bf32125eb84920bf",
+      "src/routes/payouts.tsx": "c8198dc46267f30b038076b8c8a2e285",
+      "src/routes/play.$room.tsx": "8dfd05e46ac436a2b60e767e2355b1cd",
+      "src/routes/play.audience.$room.tsx": "3907950fc311243a77cc47b92a08655c",
+      "src/routes/play.challenges.tsx": "a0da888a4fb11551218d38d4b40c6911",
+      "src/routes/play.index.tsx": "ce5e16a4a9769f43e5026c31630725c8",
+      "src/routes/play.ranks.tsx": "0f166985cbb82154eded561bb1a23fd6",
+      "src/routes/pricing.tsx": "9c1b30aed8e53de7d4b873f8326e7eca",
+      "src/routes/privacy.tsx": "d8770eeb77e39831be7df70c84ca9be3",
+      "src/routes/profile.tsx": "9f971c870ae7bb0c4b49ec707b13e64a",
+      "src/routes/recordings.tsx": "1f2ce9adeae6adff82150eea62e6ecc5",
+      "src/routes/refund-policy.tsx": "6676c9cadf4b93361dde517b4788d1b9",
+      "src/routes/reset-password.tsx": "f7e720d781a757334ccf471960d40971",
+      "src/routes/rights.tsx": "b791c8a117058d030b4e4e22757deead",
+      "src/routes/search.tsx": "657ed4381824a7955318a41644264a41",
+      "src/routes/settings.appearance.tsx": "b3cba7cf665fe6ca41c028c0b412e8a7",
+      "src/routes/settings.artist-info.tsx": "24cc719ecb9a19d04c12f7cbed8fd71e",
+      "src/routes/settings.billing.tsx": "35ab7950d98a80099767b51b926fc9b9",
+      "src/routes/settings.broadcast-help.tsx": "95f291278fcf8b4f7e4b8faa286bf80b",
+      "src/routes/settings.connected-apps.tsx": "28d36af3f18236091e8ba0c4bf25f389",
+      "src/routes/settings.events.tsx": "8e72ed8bcc3a88a7d498f4ad8ece3b59",
+      "src/routes/settings.index.tsx": "b4ccec6e37ed52befdb7a7af50b64752",
+      "src/routes/settings.membership.tsx": "6f424e4eacf4fe7fba6cdcddeac7262d",
+      "src/routes/settings.music-media.tsx": "a0c03026cd207c8d247fba40f5b925d8",
+      "src/routes/settings.notifications.tsx": "c6c9ea15e6ef810ae5a31b44c72f0c87",
+      "src/routes/settings.payouts.tsx": "dd2ae4794db70e53083161c473525182",
+      "src/routes/settings.profile.tsx": "9d46901e7607eae788816ac0e2d9ffae",
+      "src/routes/settings.security.tsx": "6d9e1fa6afb3361ca2eb089257813f45",
+      "src/routes/settings.social-links.tsx": "15a6bc9940480c52315114b0d718e5ce",
+      "src/routes/settings.tsx": "0d08a2b0997d6e3674a48dfd1d87006c",
+      "src/routes/signup.tsx": "10e1f7fc4b340b6ecd70d8ac98c4ca1e",
+      "src/routes/sitemap[.]xml.ts": "676e17f25659bca4c7ea3aecc8c5f219",
+      "src/routes/stage.$roomId.tsx": "36ca078a721e56c21319d11c162e3328",
+      "src/routes/store.tsx": "2fa6e0ac3422a87355b49fdae609bf73",
+      "src/routes/stream-studio.tsx": "cb170960b2eace7f23038f08e3dee114",
+      "src/routes/stream.$room.tsx": "76556855abb614a349c1f1cbe40c94b0",
+      "src/routes/studio.tsx": "7052aece0707591d95929f7d7be2a6f4",
+      "src/routes/terms.tsx": "f0cb5d2690a552e605a60b90b7f6cfa7",
+      "src/routes/tunevio.tsx": "9218766dd2ca3d2b73c622625d3a09d8",
+      "src/routes/unsubscribe.tsx": "dcb4cecbaad856058d40dbc46e7afeb9",
+      "src/routes/upload.tsx": "d694f2d4f240d0c06a2e1dd4ea6de897",
+      "src/routes/user.$id.tsx": "4cadfb222c1418e468790c189e2f51d8",
+      "src/routes/videos.$id.tsx": "158d144dbe4236330ac564c2ac26595c",
+      "src/routes/videos.index.tsx": "89b6f7db40e75bf4bb9f404562aeb4e6",
+      "src/start.ts": "7f4dc49aeb77662edd8481a891150dbe",
+      "src/styles.css": "8de9fdbf1ce47f65f5d4bb3f34b1c429",
+      "src/types/play-arena.types.ts": "9ba13d55b1f83abcd7e9f8039e2b3d74",
+      "src/utils/payments.functions.ts": "7bccb372e8e43c2aaf9bda9109488f20",
+      "supabase/config.toml": "2d1dc86e57ed7a3710159d4a26060d64",
+      "supabase/migrations/20260502184216_c38ef8e1-560f-4cc1-8477-9994397ebffe.sql": "af8844a6be1da4b2551739c188ad9466",
+      "supabase/migrations/20260502184651_dc3013ee-7616-41c9-ae06-ded5f280293f.sql": "9630fdbd9573a485ecd329fed0a75b9f",
+      "supabase/migrations/20260503121912_271bf9f7-84e1-4505-b50c-b95ef10e7766.sql": "5d3988c2a914404bf6100ad4d21236f3",
+      "supabase/migrations/20260503122929_f2bdb842-9e7f-46ce-9656-b5d82d10736c.sql": "8a4e61cdaaadbde469bf2cd3b427e405",
+      "supabase/migrations/20260503123227_f3dc590f-4b07-4e81-8b2d-4db9244be018.sql": "f77f90190da48ed67c67e58b2c2477c6",
+      "supabase/migrations/20260503123854_4915e52b-8a48-404d-ab6a-cfa674fc34bd.sql": "928d16b01aff8e4a341c45a4aa4fa045",
+      "supabase/migrations/20260503123910_62a00639-8346-473c-ad52-59d9e33697d5.sql": "0f346a24d20a42077a80d5da903e8521",
+      "supabase/migrations/20260509194810_d007ddca-7073-4cc0-a9a0-733355695a53.sql": "5e61748478ed5688675ad0759b1fbc84",
+      "supabase/migrations/20260523045241_ab1bb9bf-8fa6-4515-9ff8-c5c37ba9bfdb.sql": "9f86ed98c3923977ea5375fe28b6b56f",
+      "supabase/migrations/20260524053619_1b7b36a3-22f8-45db-9372-7f981dcb73fc.sql": "28c01708877a60c53ee5dcf065bee7bd",
+      "supabase/migrations/20260524060056_7d0d70be-dedc-4e86-92d8-93b4607a8244.sql": "4099349980be65c3a0301d4e6422339b",
+      "supabase/migrations/20260524060126_a6b1e69a-61a1-4779-a6b9-13feafda443d.sql": "3ecf4d4546d25c00b66284eef476f7fe",
+      "supabase/migrations/20260524060148_241e083f-1a00-4629-bb83-897d98dec78a.sql": "95b1b1a9f581724cd5e915157ebf66c7",
+      "supabase/migrations/20260524144702_0c5ffcdb-071a-48b2-8885-9ec6ad9a9acd.sql": "e18a97cb0040ef4dd0bfaabff2a7cce7",
+      "supabase/migrations/20260524171223_a0ab86f6-e814-4eea-b9e7-f1bbdf7b4cfb.sql": "c911a3cf1932742be3d94f1766fa9713",
+      "supabase/migrations/20260524171254_587c901b-f799-4732-9fc4-41ab2d1abb16.sql": "5f5eb7b441b53eabd27967c4bb771c55",
+      "supabase/migrations/20260525122159_de01e3d8-b063-4861-a7bd-1bc363df6931.sql": "d15d52aeaec8c3cce630546b8a6930d5",
+      "supabase/migrations/20260526044816_8730de7d-cfc3-46de-a6de-34b818a0a057.sql": "d4cdbd74e1339d57481bc11b9ea4a901",
+      "supabase/migrations/20260526044849_c89a117a-a2d2-4d8c-9dd4-1505bfe9ef59.sql": "e8fd4272318489467b06868a48dbf064",
+      "supabase/migrations/20260527030748_7f626013-4599-4a9a-9b78-59ee83f03a15.sql": "ffaaa656fd3e94efcea8e142a739fadd",
+      "supabase/migrations/20260527235332_6f30fc6c-d84c-4d83-b7ca-6bfe51df4ae8.sql": "24feef6bac0d2b3abd19bb0bf98fe894",
+      "supabase/migrations/20260528000453_674ad95a-e0d0-49c1-9bdc-9f8bc49a4cdf.sql": "feee9d969e91a0d967e4b44590834fb8",
+      "supabase/migrations/20260528000525_c96a259d-e57d-4f96-bc4f-5cc5bc0eff48.sql": "e9ad0ef4a0a5e684da858b5d41d957c3",
+      "supabase/migrations/20260528001437_1e0cba8b-55a9-4667-b579-454e20310305.sql": "fc9c356559844efe71d0846797478d69",
+      "supabase/migrations/20260528010804_a8f7f002-c52f-4c49-9a46-16c20aca4be6.sql": "a754ea2e64cc1ca020845675428199fc",
+      "supabase/migrations/20260528013918_96fe537b-0e8b-402c-8cee-339a629da276.sql": "6c0501421b51f0a7669d8645f18925ef",
+      "supabase/migrations/20260528015251_b9677fcb-bcce-43aa-b997-a51c0263cc9d.sql": "76c38a7f6f2f97de82531dd70941bf0a",
+      "supabase/migrations/20260530053013_b3176e22-f9a1-48ab-a35e-704fc185d921.sql": "06ba45e1cb58ee152b5c4caf43fdc10c",
+      "supabase/migrations/20260531133317_50d10982-8862-4d9e-8a68-0cb8a91eae3b.sql": "bb12c418378515e43c5baf5cbf78b6c5",
+      "supabase/migrations/20260601070358_c6483fd6-9d38-4074-aec8-6aa2df5ba7be.sql": "ef5a6ccad671e4f19524a489a8d32e83",
+      "supabase/migrations/20260601071949_a6c6d640-a937-4b61-917f-9fe0231e9eab.sql": "8033775df281cf5a1ca821d2d49b21d0",
+      "supabase/migrations/20260604160645_4f57c51f-daeb-4814-b529-13212db613a5.sql": "0ba64c5298dd1921e9834bb028284fb0",
+      "supabase/migrations/20260604161606_53f8b9c0-8f5e-4af9-ba6e-743c09af3d69.sql": "0c91187f6951e9ea0d019dfbe4d1eacf",
+      "supabase/migrations/20260604164548_2a99af35-90a0-42d7-9ede-7bf2315878d2.sql": "368207d490f4c9e9be6bd78beff5c565",
+      "supabase/migrations/20260604165245_169aec82-ec08-48b3-a9d1-44b775f064e5.sql": "c3d770602589a2a5dfc5a3899968ed72",
+      "supabase/migrations/20260604170235_00d356c9-b316-4841-90a7-b45b638f116f.sql": "e9925034d894e46c856564b3974688e0",
+      "supabase/migrations/20260604170254_2584bdce-aad5-4e4a-b404-b12caa1f1ecd.sql": "7cd2055397ce59a571c092bbeb8eb217",
+      "supabase/migrations/20260604174449_dac93be5-040d-4834-acf1-c68a13a3d611.sql": "ce01986ba93f2da741f9a7916ed25ad7",
+      "supabase/migrations/20260605234016_04417dfe-8077-4719-bb19-19571863ec34.sql": "1b8c4039fc37bc0b0dd76179b36165ad",
+      "supabase/migrations/20260609004747_6588a87d-f0e0-4a43-abdc-1aa8f871c353.sql": "1b8c4039fc37bc0b0dd76179b36165ad",
+      "supabase/migrations/20260609010626_a687774c-44be-478e-a024-2f4a169e59b1.sql": "e8060a244909ca8c6613819e51282712",
+      "supabase/migrations/20260609044645_045bd7d1-68e4-48fa-933c-955e0565997f.sql": "62c981a407a0735099ef50c0e3699170",
+      "supabase/migrations/20260609050158_a3cc64e9-68b9-48a7-bccc-3e1abd2bfb43.sql": "5c33bcabc0a80bb2502b25da07e3962a",
+      "supabase/migrations/20260609050230_ad0d2ef8-801b-44e9-9e00-4a8fbd44e093.sql": "2aa80dd8dedd24dc751b4bdcc23a3b4e",
+      "supabase/migrations/20260609050303_9694feda-158e-4431-8653-d7630e7a3335.sql": "2cf20e89e580b476b1edd2ffc3822ffd",
+      "supabase/migrations/20260609175256_026648bc-1a0a-4fe1-95ae-758d6ead3735.sql": "343621c5a83dc0bc512d9189a05fe790",
+      "supabase/migrations/20260609225524_6d762302-1aa0-43df-9df7-c1afa825ad6b.sql": "b3259245e411ebd81b01265a34a2d2bb",
+      "supabase/migrations/20260610032241_39e6ec3d-6741-41ea-bb4d-60df4d3decd6.sql": "c8be4afa95533d0bde4b3a7f11192d7f",
+      "supabase/migrations/20260610032726_115d7ed1-632c-4801-bd4f-c89f076b4b18.sql": "691ae04a3c98406f70e0bf1b190a1bb6",
+      "supabase/migrations/20260610034643_6224a3cd-035d-4a67-b4e6-6f8ad56fcb7b.sql": "86d20c17db011f08504193b43475f112",
+      "supabase/migrations/20260610061434_ab4a80d4-575b-431e-bfb7-cf1ec632e6c7.sql": "eeb988cca24f2cab62be95db1a3ab82f",
+      "supabase/migrations/20260610061912_d9eecd4b-8fcf-4a58-ab4f-1ce23d63553e.sql": "622d1b9ef2942d0c27a83a90fabe9939",
+      "supabase/migrations/20260610070014_04a4a19d-2325-42d9-9faa-396ef89017b7.sql": "0362c005babc46eb9025088bd72d58a6",
+      "supabase/migrations/20260610082611_f5829dc0-f6ed-45f6-ba72-e5f9d7c666ab.sql": "8382cec99bb2cf90db2e751951224822",
+      "supabase/migrations/20260610183941_1a1cbb58-7e95-4b09-880d-9681e084830c.sql": "9a99a1cd48bb98b5c413b2a347e95007",
+      "supabase/migrations/20260610184144_2685c8cb-b701-48c4-8ed6-2ab86ddc5ef7.sql": "dfe0d3f3f524819e79a5d9b9d6b7aa37",
+      "supabase/migrations/20260610191943_b78ea600-ca7d-49fa-bd4b-b7b9e43cc175.sql": "113d2c2c6ddbaf094f42fdad6521aaf0",
+      "supabase/migrations/20260610200513_2e29225a-aade-4238-b003-04a29e6731be.sql": "325806e71f77a0ed56f1ba76c9ed11ae",
+      "supabase/migrations/20260610204339_40b4b663-8942-4176-bc2a-93b3e79ab546.sql": "532e655042ac14571bc2ed309e7d1a33",
+      "supabase/migrations/20260610210002_3e0182ad-454e-4bff-b37d-b8b901c14a78.sql": "44604baf14e25a0a125a3d861c6156b7",
+      "supabase/migrations/20260610213008_df5ffc04-8611-4763-8ead-c1aa3b2e90f6.sql": "a5f5ae353e8e555c827c13ecc0b9b9d1",
+      "supabase/migrations/20260612002343_ba882d66-ba11-459a-b00c-c4251704aaea.sql": "def14af2628473fcb5e22bce40225036",
+      "supabase/migrations/20260613004620_42dc2f65-05c7-49c7-9414-e7683ea1cd02.sql": "0d63e0b3a3eec2b399d935b60d684f12",
+      "supabase/migrations/20260613233442_1f368ea2-5945-407f-85e5-a5dcecde0b0c.sql": "c4d3777d71758fb0e5a8713fb872c5b7",
+      "supabase/migrations/20260614001535_ef84c90f-39ce-4e3b-a7ab-e87c250e0ab3.sql": "bed45df7a3a4d42b8bf2672b643e133a",
+      "supabase/migrations/20260614004854_b4c50b27-be84-4e9a-9ae7-d2120e6eafcb.sql": "8c4d20dcac09b7e2a89132bf6b28027a",
+      "supabase/migrations/20260614005150_2be11ecd-ab28-4f5d-8d8e-8b8a1dc9ede9.sql": "308d997fd0e75f8a90a8faab83d3f334",
+      "supabase/migrations/20260614015944_35eabb2f-bf38-4f12-b66b-90ed9a7e6d07.sql": "74011fefbda8f4a9a9f9325a80f03546",
+      "supabase/migrations/20260614031817_9c6a8033-c8d9-4f0c-ba2b-82afd835b971.sql": "e2f9e621af1b04fd07fd8f414f5e16e4",
+      "supabase/migrations/20260614033257_b47ce158-a778-416b-a6b6-8f6446d4c1e5.sql": "5274069910383f171aba5d85da56a134",
+      "supabase/migrations/20260614033618_f13668bc-e463-4059-a43a-8344b037f751.sql": "fb8e59bdf78309adfba94a0a1bf37b21",
+      "supabase/migrations/20260614034056_812f1788-af2c-4656-b166-fd0c6f427403.sql": "5f2c1a60021f2b426f25bcac5f210c61",
+      "supabase/migrations/20260614040202_ec196397-71b2-4472-9bb2-0da34c9430b7.sql": "91b83164ab0256051aacbc17c7ffcc40",
+      "supabase/migrations/20260614040845_5839890b-1f49-43ab-b558-d242bf0f0882.sql": "89f0ee68636d06e9e783da8db16a4713",
+      "supabase/migrations/20260614041151_50574c34-fa3f-42cd-a368-887dd894dcae.sql": "86a34a029824868fa577beb424016aea",
+      "supabase/migrations/20260614041222_2ae6ba2b-6213-4e20-a431-995990f0b4f5.sql": "156bae4f01df18ae0cfe4b517ee0e7ee",
+      "supabase/migrations/20260614042539_08b8d82d-7c45-4e7f-8be7-f1edd2f66a15.sql": "0e55b17f2ea5293f420ce421b9d5e626",
+      "supabase/migrations/20260614042626_8442a13c-40ab-4de2-85fd-c5282030789c.sql": "e43cc6c9e05199270cf734c9ef01b3dc",
+      "supabase/migrations/20260614044600_delete_orphan_videos.sql": "1cf1821b36fcf531261891c12b1102af",
+      "supabase/migrations/20260614045158_97f68d8f-ea6b-4862-9a01-f8f35738ed80.sql": "9e05285e0b35d8c2869a1644f0934ca9",
+      "supabase/migrations/20260614151410_ca688019-819f-414b-bbdf-23f9d159ed83.sql": "19a6c7717cab243f5c2dab8d129c8c45",
+      "supabase/migrations/20260616040623_0586808e-7110-4d2a-89ab-309490911245.sql": "ecec25bb4625da9fcdbb8deff6395306",
+      "supabase/migrations/20260616055131_cfd918b6-5b1c-489a-8050-77f3d7c84134.sql": "1d8e061c67983420f76d7ff069150ed5",
+      "supabase/migrations/20260616055738_5a1e0861-7f3f-4c60-87ad-d11198143981.sql": "f2cc34e5b5964b2854f3379ff5c1d4d0",
+      "supabase/migrations/20260616060217_254ef2bc-94dd-4343-8c53-0f96e6b380fe.sql": "84d09f4acc4621fa89f4f47906a6b3b5",
+      "supabase/migrations/20260616060506_05c61006-4979-4b0b-a2e4-7e03ca169f88.sql": "d201f57430a820c45f0dc7fd4fe185d7",
+      "supabase/migrations/20260616060839_35fd0aa9-a7f1-4be7-b119-f44d9247abab.sql": "eef599cda4c67e662a7ae5fdc383bd96",
+      "supabase/migrations/20260616061111_fb101c06-d2d5-42d4-95a3-d0beefa98d9c.sql": "25582edad0c3c34c448b898a0a41a6ca",
+      "supabase/migrations/20260616062323_b09785f2-2c0c-4203-8d8d-78b8e40c4da5.sql": "bceef6b77115db0490090037f44a0eb2",
+      "supabase/migrations/20260616062733_012674da-e2d6-473d-9da1-52492243aadc.sql": "053b8f2474df1a9bfde94ec8647f278d",
+      "supabase/migrations/20260616063115_3ee7ef4e-7bae-4386-a22e-7e9846f64af7.sql": "28a623d162ab3c40a2b33f7d6d770cbd",
+      "supabase/migrations/20260616063503_df8fbd50-111b-4127-9e08-600ffa07a902.sql": "c39119a0aced8fc2202bbf6a1cd7e379",
+      "supabase/migrations/20260616063717_3b4aeb7a-298c-45d3-8266-0ec41aef8752.sql": "b6a7d3701c32f0df37dea752c7f7afa9",
+      "supabase/migrations/20260616063846_f4f49e48-7b72-4442-874a-cb63a7d8d60f.sql": "59b69642f6402673d033ae10c1fd11a9",
+      "supabase/migrations/20260616064640_c185f405-9603-4f13-8add-b22a49305376.sql": "14449e2086a980850445687aa0777460",
+      "supabase/migrations/20260616064716_ad86b337-f0d3-4f84-9e0f-1d66c4427234.sql": "1c88e6777dd2656af274b2d5c13d14ba",
+      "supabase/migrations/20260616070701_2df03863-a1bb-49c5-9a23-2b3b5680a277.sql": "404e0bda90c2e727e7566ce5d4e60c5d",
+      "supabase/migrations/20260616071408_37136802-93eb-43e5-8d6b-e534d22aa924.sql": "ebb5bd3972072d177e81dce9a5544917",
+      "supabase/migrations/20260616080000_allow_play_mode.sql": "9a0cdcf10a9ed9cd5fb48446486e85b7",
+      "supabase/migrations/20260616093007_07170ab0-4905-4c45-bc83-c5b3e4c588a3.sql": "e76f8dd9deb616c2dd2c8b3740f530a0",
+      "supabase/migrations/20260618120000_allow_vote_recalc.sql": "eb47a8d0e04319638f8746af0f39102c",
+      "supabase/migrations/20260619173711_55251ec0-50be-4b5e-9b0d-227259e90c89.sql": "ef9b923eba3e4bb58d74ed691d82c007",
+      "supabase/migrations/20260619190137_292a2af6-aa14-4681-88de-072c08401c5d.sql": "6d5091c8bad24dccf7e57b121d305e85",
+      "supabase/migrations/20260619192230_d5e855bc-a4c6-45b2-a06e-e0ebd9cf6621.sql": "d61989d8fd697cf24fe41fd08bb030b4",
+      "supabase/migrations/20260619200416_d29c024d-3956-49cf-9554-a7150e4e388d.sql": "f8d918b44587780a54146de4e737625b",
+      "supabase/migrations/20260619201640_6c16a2ac-fbd2-4f71-ac2e-3d5a9e130598.sql": "5bf3c5b633251df5f604eafa9230484b",
+      "supabase/migrations/20260619210841_580dd3f7-9d08-4ea0-b9cd-4e50cda6516c.sql": "5609f2c7c4757db9a2e089fa57c2460f",
+      "supabase/migrations/20260619213858_95522f79-9d16-43d0-9567-cfcf222ae434.sql": "3e5b280cad561e3f6eb9d44b3819c531",
+      "supabase/migrations/20260619215745_acb6322b-a3ed-42eb-bd6e-5f6f66ef6dfb.sql": "369a31cb3496a345fe83daed9e6eabc6",
+      "supabase/migrations/20260619220420_bd1bf196-cd7b-4f21-aa64-c866afea44cd.sql": "ff6933dd972832d3d2e8bedad80ab3e8",
+      "supabase/migrations/20260619222447_keep_stage_guests.sql": "67cb3b3894aeb77eea5ade00eb5f9e3a",
+      "supabase/migrations/20260620005119_b2b13151-00f4-44f0-86e7-d61588e41d98.sql": "2d72f8a765134cc2958b60a2dba44b34",
+      "supabase/migrations/20260620013329_1e66d1f6-fa24-4458-b2ad-dc5c362f1832.sql": "150e71f774d6d01590eb4283453446f0",
+      "supabase/migrations/20260620021300_2bf02b64-ace5-4c59-a4a7-fb2e34d04edd.sql": "6c6b2f521f1dcee4c56f1f9466d329e3",
+      "supabase/migrations/20260620234919_0118943d-f001-435f-a05d-2041eb90af4a.sql": "c3cb7115a0ec560039a1f48e8d6aeab1",
+      "supabase/migrations/20260620235300_557f1eb7-b407-4270-a14a-73428c3123df.sql": "d5fe4b93beae794ddad813ac0410bd82",
+      "supabase/migrations/20260621000604_35c28865-10cd-48ee-828e-a4d61fd89ca8.sql": "09c8e1d65fc231274800d40fac329280",
+      "supabase/migrations/20260621012451_db618af9-0ad4-4454-a7fa-39d949035436.sql": "b56e986a3c7689934853b607dc987375",
+      "supabase/migrations/20260622002854_d56fc85b-d653-4e75-8930-dd6d27a1c8da.sql": "930b2f37aebdc532c3171f2a30f79504",
+      "supabase/migrations/20260622185723_89607149-ed3e-4ab3-9f23-de91cf7109a8.sql": "ce66f64242b0087d7a1d8d00524427e0",
+      "supabase/migrations/20260622194457_e2530ae4-8657-41f8-b3df-86e61815511b.sql": "9e8ad1e354e127ee0abcc017eae21170",
+      "supabase/migrations/20260622195505_88354826-a1a5-4dee-881a-e9c470432793.sql": "5d98da44b1afb77af8d1a33c3a05edb6",
+      "supabase/migrations/20260622210409_23cda1d1-7b05-4482-9dc5-03392c5974d9.sql": "c8c83e9df534244c1512e5e751dba567",
+      "supabase/migrations/20260622210744_523de4c4-4758-4ffb-8aca-6828782d949c.sql": "68683747eb153d558a00f04c40f53ac1",
+      "supabase/migrations/20260622215511_3731e0b2-3114-4671-8d52-09ff62f4405e.sql": "a7bbac1a541b4a6bdde0bb45e61cb46d",
+      "supabase/migrations/20260623000705_a8f85413-7c38-4478-8107-bc58a338d65a.sql": "4c74908e0fd344f63668aca4c3a45abd",
+      "supabase/migrations/20260623024331_9568bddf-6af7-4ee4-b829-1453afbf27c1.sql": "2a7f674466a4ea79abc0ab40ad98cedc",
+      "supabase/migrations/20260623161905_6a106ddf-d085-4e2d-87eb-a6930db85608.sql": "35aabe7585701ac4d7508a9508d418f6",
+      "supabase/migrations/20260623200147_194319b9-a814-49cb-995d-82c0b554561c.sql": "f687608d2e129230b1caf93e6a5d9f28",
+      "supabase/migrations/20260623213152_157ca2a9-9a96-441c-91e4-0b0dad65f097.sql": "9a590635d7075fb902760bd8344c4eac",
+      "supabase/migrations/20260623213450_37503268-b8bd-402f-a0a9-1d918587faf4.sql": "b107fc695e302eeaacda103f8d44a662",
+      "supabase/migrations/20260623214416_849de253-7175-4937-87d0-882031c4d5af.sql": "cb2d5c1b4584292c94810f10d5494f10",
+      "supabase/migrations/20260623215912_1be5a340-87ae-4e07-aa40-1a49d18265f5.sql": "ffed909100beed6582ce2d4a29e5f8cc",
+      "supabase/migrations/20260623220555_64ece31d-da6b-479e-913e-e329e6bcfc54.sql": "13fdfc9f14c84d8404613d1ed92e7bcf",
+      "supabase/migrations/20260623235140_3d8f6a64-777b-4cc4-933a-44e1043b41a7.sql": "16c9abd4b06e1c7b0c9b944b337804b4",
+      "supabase/migrations/20260624002001_0e37e345-6dd3-4998-9833-41a23e318555.sql": "9287e14d02f11a79efce880f4fe574ac",
+      "supabase/migrations/20260624005523_520b0f5d-85a2-4e2d-9a11-6acf3aed3c7c.sql": "5c7ba1691d01d74d5638e200e6e5c913",
+      "supabase/migrations/20260624005657_ab5a715f-401b-408c-90f8-3fd3042e53e3.sql": "f241b5aa65be798f715f863fc965c856",
+      "supabase/migrations/20260624010610_598c6abc-26f3-4283-be8f-a6a869e71eb6.sql": "41e4ecebba37967ae5e00c74f0b3775a",
+      "supabase/migrations/20260624012704_47982c5d-b886-445f-bcb5-51f744b6d184.sql": "fd3f9010cf467a603308aecce9e64bcc",
+      "supabase/migrations/20260624061222_5ded0c8f-4081-4ed6-81ef-11ac84acf12d.sql": "f33567ba8a5024d1d0eb3e66d9f1f343",
+      "supabase/migrations/20260624214632_b657844c-b6d5-4171-ba2e-592d266cc1ed.sql": "dbf651bf3a6030a57eb67e8078eb6f5a",
+      "supabase/migrations/20260625025558_383fd914-c6d3-49e6-93f3-e33c37240d90.sql": "565344b1d3b49c2aa742c2e716833349",
+      "supabase/migrations/20260627003120_2b51d7d2-2ab2-4fe0-9d59-8cba8b3063b7.sql": "20bbc7893ff8ae43d28d58ce677589e3",
+      "supabase/migrations/20260627025512_32958a2d-28c4-423c-ab00-80a4fb786405.sql": "29f2ee24db7d3409c6e1172f55ffadd7",
+      "supabase/migrations/20260627042131_e8cda1b3-a753-4c7c-ae44-da4ed8647c36.sql": "0558b2f320a6ebdc7c4bbaa73270d550",
+      "supabase/migrations/20260627134230_1a11c64f-979b-4120-be35-7b816f3c02b7.sql": "e520594f1a02ff76537f6d95c44252a0",
+      "supabase/migrations/20260627140011_f1447fa5-f083-421a-9062-5746c500244f.sql": "6ee31f0cabd3dec2336113b2ba621597",
+      "supabase/migrations/20260627141140_e988056c-9f05-46da-9d64-a23c694a7063.sql": "aa5bca347dcbeb4cfe11bdf5a8adaaf1",
+      "supabase/migrations/20260627141452_0efcc006-7f61-406e-a745-50e7f0a433fc.sql": "7abc723f5f6d7b0199e708488f90adaf",
+      "supabase/migrations/20260627143941_7421ff3f-920c-47d3-a0f0-5be6b9aa961d.sql": "ed73dc7c5c294a16691b10890311225f",
+      "supabase/migrations/20260627151121_17884311-bb9c-4e60-b648-9d6cde5020f9.sql": "c7226f4fa78667797b5e3c05d428ec75",
+      "supabase/migrations/20260627152344_fcfe7038-eabe-46d9-ada5-0145b05dc009.sql": "458212c144ce20497eca8fd35e267b2c",
+      "supabase/migrations/20260628023152_2c5e0437-fae9-4cc0-be7a-cac6014c0b8a.sql": "9ab0ea38a51a70e0f29f141dc59cb9fe",
+      "supabase/migrations/20260628033527_10727c04-a770-40a7-aa8c-3dc52d01019f.sql": "6ca1d344643c2c5a300bf47a89a390a1",
+      "supabase/migrations/20260628034043_e12301fb-f7dd-4637-b241-5cef212e83bb.sql": "623da051d82f7a1d76e1c5ef4e13aa4b",
+      "supabase/migrations/20260628040341_4cc98978-09a1-4e6f-90a6-13661fa67530.sql": "e4c8a5e4a6267cbc40194955e0845f1c",
+      "supabase/migrations/20260628042200_33367df4-ed58-47b1-a917-3bf8236a2e1d.sql": "6378a5d47da78338de12dc6809ee777a",
+      "supabase/migrations/20260628162603_fe05d5a3-94ff-40eb-95c7-ee7b55a69aed.sql": "fcbfced7faeefd6764bcad1421f02869",
+      "supabase/migrations/20260628163108_dd79d6fd-e379-40f0-a609-4c743a9f1548.sql": "208996de9d5b973d76970362d75b8d62",
+      "supabase/migrations/20260628163146_866a8280-0eb3-4ff7-b46d-4c9e9d7cff12.sql": "af37bc592469ab0b00bf32983fdde2bd",
+      "supabase/migrations/20260628163734_e39fe9d0-fab9-4e76-b691-2797beec2ae8.sql": "098a1e36c92cc2c4ec5489c58844c9da",
+      "supabase/migrations/20260628164359_192b34ef-0e54-4292-801d-02faf594042e.sql": "4c9ecdf0c07d192750afa4d955d98219",
+      "supabase/migrations/20260628164650_10f06465-242a-4a34-bfc9-098b56d55f31.sql": "8f1592bc99494dfccf8fdacc33a5f9cf",
+      "supabase/migrations/20260628171151_23acf596-f994-4d58-8ddc-485ffbcb98ab.sql": "b932f2a76c23d689f96c02b2ac39b9a3",
+      "supabase/migrations/20260628171648_16ef9afc-b96d-4678-a178-8313099cc516.sql": "7cd5a1d30fc70ca92a636023bda76b0e",
+      "supabase/migrations/20260628172801_964a8fb7-25e6-4b6b-be47-4bfed796e2f8.sql": "b2a15d793cfa0a2e843e46cb05d14d05",
+      "supabase/migrations/20260628172935_4036a6b4-5d62-45b5-bd5d-6efc8192c11d.sql": "2862fefea4fde620b687c35a9f44ab9f",
+      "supabase/migrations/20260628175400_fd37c9df-fad1-4c76-96ab-0a4d9f6b50e8.sql": "4ebfeb81ee34401588545328f4e294d6",
+      "supabase/migrations/20260702090000_battle_hype_pass_system.sql": "c1b9120374cf74f2d5a6cd691d10785a",
+      "supabase/migrations/20260702130000_fix_battle_vote_engine.sql": "1c901650567459a105e0ae9e40e01db8",
+      "supabase/migrations/20260704100000_payout_request_guard.sql": "5991626c899fd226f8a2da4ea9d7de9a",
+      "supabase/migrations/20260705053237_43af5e42-b326-4df5-a336-7da2e5a29f66.sql": "13d108fdf0c3974ea80f4d7a9773b8f5",
+      "supabase/migrations/20260705075111_e14b655b-b0c7-41ce-bf8b-69d27716aee4.sql": "59c760c86d7f0ded090a391e402a7f61",
+      "supabase/migrations/20260705174552_44204593-fbb4-460d-8840-68c252f3f680.sql": "027bda7fc04cd897b671b97a0b7dfc62",
+      "supabase/migrations/20260705183833_0c522974-56d5-4de2-943f-08d574f2f1ae.sql": "b36763b14df9fa4528311124c177ebc1",
+      "supabase/migrations/20260705192504_f9623d16-3a29-40fa-b642-984a5af0bfd6.sql": "26c1603f47e0afc85aceef0df891c4e0",
+      "supabase/migrations/20260705205955_687e34c8-2946-42f0-af27-46b1c785da37.sql": "6fe14d4b0fb99d3194856e6a27f554ff",
+      "supabase/migrations/20260705213829_b92c659c-4e7a-4fee-a675-8c4efe7cb76a.sql": "374714b44044e3cd166012f2b63b1370",
+      "supabase/migrations/20260705224752_743cdd0c-bc9d-4877-bd32-b5ca7d61e89e.sql": "17fe6808618095d10ea5718b88320abc",
+      "supabase/migrations/20260709021559_ab25d7bb-939b-429a-9a51-003f40a34500.sql": "41fd1452c7aade6632d9dd6c405e749d",
+      "supabase/migrations/20260712035307_a4133c28-7b50-4ab8-99c2-709cebc6e9f2.sql": "7265a78e43aae46d814c09ba5a228281",
+      "supabase/migrations/20260907025228_b5a0047f-d4ca-4fa4-9975-001ad7b025fe.sql": "27b8cff54df724c2f21707c0faa0c77a",
+      "supabase/migrations/20260907025418_3171d022-1423-4b68-82c1-d75bc9ade177.sql": "13779c3002ff378b42768ea7bf281c6e",
+      "supabase/migrations/20260907031016_d7b2ad73-645e-4e78-92ea-42a890d27566.sql": "9df0a61f84e2ac8fd12f1d594935b73d",
+      "supabase/migrations/20260907033253_3b35a959-23a4-4deb-a614-3475641146a3.sql": "7b7d41b9745c3cde8c27dbb5a31f5db3",
+      "supabase/migrations/20260907034258_de2c3e03-06e9-4d35-bd4e-ddd8eba546d0.sql": "181f4f61abe930d2697262dbd3153cdf",
+      "supabase/migrations/20260907034826_6d22e050-0ab8-4509-b171-177bdcdce8f0.sql": "84fc1caf5214982f093582039a1f876d",
+      "supabase/migrations/20260907040105_870c7fc2-968b-4002-a3b2-8cb536203d17.sql": "752a610f8bdea9a9029e7d837dab20fe",
+      "supabase/migrations/20260907040143_b9714e4b-915b-4356-b728-eceb27d5af16.sql": "185e110766912a192a8a1260a3bc2990",
+      "supabase/migrations/20260907041102_0e227a82-096a-4c0c-a84f-516d13eda27b.sql": "5a822d2364f85b5f0d210f339780f1e0",
+      "supabase/migrations/20260908155022_90cd2f1a-f22a-4ab7-9535-60ccbe0060ae.sql": "1bfe7d072dbb3174c9ba4d6b4a67a4f0",
+      "supabase/migrations/20260908170339_2ce90f52-ec15-45ec-986f-2f33b176f4f4.sql": "0461daac8dc648f8bc6b130eb5fdb999",
+      "supabase/migrations/20260909100338_2b47be65-ce3a-450a-99af-3bbfc674e6d5.sql": "25041170e5a1f153e919b3bf6c7ae38d",
+      "supabase/migrations/20260909205143_81e71443-4632-4816-8cd3-f08861fe11f2.sql": "973d51b05071a240dba959e158acde3d",
+      "supabase/migrations/20260909213655_025c8127-9a46-4f68-a53c-ad7828a29af6.sql": "4158eb57dca2f52ff9cdfe6909169e67",
+      "supabase/migrations/20261001180902_ee24fb18-f930-424f-93d9-a0ad5349388d.sql": "b2d1cb76e22d7a24dcfd88aace0d7ba3",
+      "supabase/migrations/20261001181337_a81445fc-66f9-45d6-916a-a3226177595f.sql": "54b0ce32c03f6df8aec46669717c6ab0",
+      "tests/sql/rls.sql": "ab5af43504283d5308200f079b1076ce",
+      "tsconfig.json": "994abf64c2b9f78b568879f80ed0170e",
+      "vite.config.ts": "37d3c6585aa24714539657cf77990ac8",
+      "vitest.config.ts": "2753d01c1f8714454f7314d8e1e98d26",
+      "wrangler.jsonc": "aa31611de2d4a59e44bbf734b179d147"
+    },
+    "pipeline_version": 8
+  },
+  "tokens": {
+    "color": [
+      {
+        "name": "--freestyle-blue",
+        "raw": "#1469e8",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--freestyle-red",
+        "raw": "#db2439",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--fsq-violet",
+        "raw": "#C53DFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--background",
+        "raw": "oklch(0 0 0)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--foreground",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--card",
+        "raw": "oklch(0.20 0.008 240)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--card-foreground",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--popover",
+        "raw": "#111111",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--popover-foreground",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--primary",
+        "raw": "#00E6FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--primary-foreground",
+        "raw": "#0B0B0B",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--secondary",
+        "raw": "oklch(0.22 0.008 240)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--secondary-foreground",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--muted",
+        "raw": "#111111",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--muted-foreground",
+        "raw": "#A0A0A0",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--accent",
+        "raw": "oklch(0.49 0.27 264)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--accent-foreground",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--destructive",
+        "raw": "oklch(0.63 0.23 26)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--destructive-foreground",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--border",
+        "raw": "#1c1c1f",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--input",
+        "raw": "#1c1c1f",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--ring",
+        "raw": "#00E6FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--blood",
+        "raw": "#00E6FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--blood-glow",
+        "raw": "oklch(0.49 0.27 264)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--bone",
+        "raw": "#FFFFFF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--ash",
+        "raw": "#6A6A6A",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--trust",
+        "raw": "#0000FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--success",
+        "raw": "#00C853",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--status-live",
+        "raw": "#FF3434",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--brand-cyan",
+        "raw": "oklch(0.84 0.15 207)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--brand-blue",
+        "raw": "#0000FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--brand-silver",
+        "raw": "oklch(0.83 0.008 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--brand-ink",
+        "raw": "oklch(0.13 0.005 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--upload-accent",
+        "raw": "color-mix(in srgb, var(--brand-blue) 65%, var(--brand-cyan))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-base",
+        "raw": "oklch(0.10 0.002 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-surface",
+        "raw": "oklch(0.15 0.004 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-card",
+        "raw": "oklch(0.19 0.005 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-card-hover",
+        "raw": "oklch(0.24 0.006 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-active",
+        "raw": "oklch(0.30 0.008 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-cyan",
+        "raw": "#00e6ff",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--studio-ink",
+        "raw": "#0B0B0B",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--studio-blue",
+        "raw": "#0000FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--studio-cyan",
+        "raw": "#00E6FF",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--studio-bright",
+        "raw": "#F5F5F5",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-50",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-100",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-200",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-300",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-blue-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-50",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-100",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-200",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-300",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-sky-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-50",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-100",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-200",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-300",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-violet-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-50",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-100",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-200",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-300",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-purple-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-50",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-100",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-200",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-300",
+        "raw": "color-mix(in oklch, var(--brand-blue) 65%, var(--brand-silver))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-indigo-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-200",
+        "raw": "color-mix(in oklch, var(--brand-silver) 85%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-300",
+        "raw": "color-mix(in oklch, var(--brand-silver) 70%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-400",
+        "raw": "color-mix(in oklch, var(--brand-silver) 50%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-500",
+        "raw": "color-mix(in oklch, var(--brand-silver) 40%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-600",
+        "raw": "color-mix(in oklch, var(--brand-silver) 30%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-pink-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-200",
+        "raw": "color-mix(in oklch, var(--brand-silver) 85%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-300",
+        "raw": "color-mix(in oklch, var(--brand-silver) 70%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-400",
+        "raw": "color-mix(in oklch, var(--brand-silver) 50%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-500",
+        "raw": "color-mix(in oklch, var(--brand-silver) 40%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-600",
+        "raw": "color-mix(in oklch, var(--brand-silver) 30%, var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-700",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-800",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-900",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--color-fuchsia-950",
+        "raw": "color-mix(in oklch, var(--brand-blue) 70%, var(--brand-ink))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tw-ring-color",
+        "raw": "color-mix(in srgb, var(--brand-cyan) 50%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--reference-panel",
+        "raw": "oklch(0.21 0.012 250)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--reference-action",
+        "raw": "oklch(0.98 0 0)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--artwork-play-backdrop",
+        "raw": "oklch(0 0 0 / 65%)",
+        "source": "src/styles.css"
+      }
+    ],
+    "typography": [
+      {
+        "name": "--font-display",
+        "raw": "\"Inter\", system-ui, sans-serif",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--font-brush",
+        "raw": "\"Inter\", system-ui, sans-serif",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--font-cond",
+        "raw": "\"Inter\", system-ui, sans-serif",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--font-body",
+        "raw": "\"Inter\", system-ui, sans-serif",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--freestyle-button-text",
+        "raw": "#ffffff",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-line",
+        "raw": "rgba(255, 255, 255, 0.08)",
+        "source": "src/styles.css"
+      }
+    ],
+    "radius": [
+      {
+        "name": "--radius-sm",
+        "raw": "calc(var(--radius) - 4px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-md",
+        "raw": "calc(var(--radius) - 2px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-xl",
+        "raw": "calc(var(--radius) + 4px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius",
+        "raw": "0.25rem",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--radius-lg",
+        "raw": "1.125rem",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-radius",
+        "raw": "16px",
+        "source": "src/styles.css"
+      }
+    ],
+    "shadow": [
+      {
+        "name": "--shadow-blood",
+        "raw": "0 20px 60px -10px rgb(0 230 255 / 0.45)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--shadow-deep",
+        "raw": "0 40px 80px -20px rgb(0 0 0 / 0.9)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--upload-shadow",
+        "raw": "inset 0 0 14px color-mix(in srgb, var(--upload-accent) 14%, transparent), 0 0 14px color-mix(in srgb, var(--upload-accent) 12%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tv-shadow",
+        "raw": "0 18px 40px -20px rgba(0, 0, 0, 0.9)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--music-shadow",
+        "raw": "0 16px 60px color-mix(in srgb, var(--background) 65%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tw-ring-shadow",
+        "raw": "none",
+        "source": "src/styles.css"
+      }
+    ],
+    "other": [
+      {
+        "name": "--status-live-on-air",
+        "raw": "color-mix(in srgb, var(--brand-blue) 55%, var(--brand-cyan))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--gradient-blood",
+        "raw": "linear-gradient(135deg, var(--brand-cyan), var(--brand-blue))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--gradient-dark",
+        "raw": "linear-gradient(180deg, #0B0B0B, #050505)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--fsq-led-angle",
+        "raw": "360deg",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--stage-glow",
+        "raw": "color-mix(in srgb, var(--brand-blue) 55%, var(--brand-cyan))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--store-shade",
+        "raw": "linear-gradient(90deg, var(--background) 0%, color-mix(in oklch, var(--background) 94%, transparent) 24%, color-mix(in oklch, var(--background) 25%, transparent) 62%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--upload-edge",
+        "raw": "color-mix(in srgb, var(--upload-accent) 65%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--upload-fill",
+        "raw": "linear-gradient(125deg, color-mix(in srgb, var(--upload-accent) 12%, var(--background)), var(--background) 65%, color-mix(in srgb, var(--upload-accent) 9%, var(--background)))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--live-glass",
+        "raw": "linear-gradient(145deg, color-mix(in srgb, var(--brand-silver) 7%, var(--card)), var(--card) 70%)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--live-glow",
+        "raw": "0 0 24px color-mix(in srgb, var(--brand-cyan) 9%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--studio-glass",
+        "raw": "color-mix(in srgb, var(--studio-bright) 5%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--studio-edge",
+        "raw": "color-mix(in srgb, var(--studio-bright) 14%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tw-gradient-from",
+        "raw": "color-mix(in srgb, var(--brand-blue) 10%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tw-gradient-to",
+        "raw": "color-mix(in srgb, var(--brand-blue) 10%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tw-gradient-via",
+        "raw": "color-mix(in srgb, var(--brand-blue) 10%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--cinema-shade",
+        "raw": "linear-gradient(90deg, color-mix(in oklch, var(--background) 92%, transparent), color-mix(in oklch, var(--background) 48%, transparent) 48%, transparent 85%), linear-gradient(0deg, var(--background), transparent 65%)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--music-shade",
+        "raw": "linear-gradient(180deg, color-mix(in srgb, var(--background) 45%, transparent), color-mix(in srgb, var(--background) 90%, transparent) 55%, var(--background))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--tunevio-launcher-bottom",
+        "raw": "calc(env(safe-area-inset-bottom) + 76px)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--music-progress-track",
+        "raw": "color-mix(in oklab, var(--muted-foreground) 30%, var(--background))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--music-player-fill",
+        "raw": "color-mix(in oklab, var(--brand-silver) 12%, var(--background))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--music-detail-wash",
+        "raw": "linear-gradient(180deg, color-mix(in oklab, var(--brand-silver) 8%, transparent), color-mix(in oklab, var(--background) 75%, transparent) 65%, var(--background))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--reference-cover-shade",
+        "raw": "linear-gradient(180deg, transparent 15%, color-mix(in oklab, var(--background) 30%, transparent) 45%, var(--background) 100%)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--welcome-edge",
+        "raw": "color-mix(in oklch, var(--brand-silver) 22%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--welcome-glass",
+        "raw": "linear-gradient(145deg, color-mix(in oklch, var(--brand-silver) 6%, var(--background)), var(--background) 80%)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--welcome-shade",
+        "raw": "linear-gradient(180deg, color-mix(in oklch, var(--background) 40%, transparent), color-mix(in oklch, var(--background) 65%, transparent) 55%, var(--background))",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--welcome-glow",
+        "raw": "0 0 26px color-mix(in oklch, var(--primary) 15%, transparent)",
+        "source": "src/styles.css"
+      },
+      {
+        "name": "--welcome-metal",
+        "raw": "linear-gradient(180deg, var(--foreground) 20%, var(--brand-silver) 75%, var(--muted-foreground))",
+        "source": "src/styles.css"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "CartButton",
+      "file": "src/components/CartDrawer",
+      "import_path": ""
+    },
+    {
+      "name": "CartDrawer",
+      "file": "src/components/CartDrawer",
+      "import_path": ""
+    },
+    {
+      "name": "FuturisticCalendar",
+      "file": "src/components/FuturisticCalendar",
+      "import_path": "",
+      "props": [
+        {
+          "name": "selected",
+          "type": "any"
+        },
+        {
+          "name": "onSelect",
+          "type": "function"
+        },
+        {
+          "name": "disabled",
+          "type": "function"
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "default": "absolute top-0 left-0 w-3 h-3 border-t border-l"
+        },
+        {
+          "name": "accent",
+          "type": "string",
+          "default": "#D4A24C"
+        }
+      ]
+    },
+    {
+      "name": "MessageBell",
+      "file": "src/components/MessageBell",
+      "import_path": ""
+    },
+    {
+      "name": "NotificationBell",
+      "file": "src/components/NotificationBell",
+      "import_path": ""
+    },
+    {
+      "name": "PaymentTestModeBanner",
+      "file": "src/components/PaymentTestModeBanner",
+      "import_path": ""
+    },
+    {
+      "name": "ModeToggle",
+      "file": "src/components/PodcastMode",
+      "import_path": ""
+    },
+    {
+      "name": "PodcastStudio",
+      "file": "src/components/PodcastMode",
+      "import_path": ""
+    },
+    {
+      "name": "RealtimeHealthBanner",
+      "file": "src/components/RealtimeHealthBanner",
+      "import_path": ""
+    },
+    {
+      "name": "StripeEmbeddedCheckoutCart",
+      "file": "src/components/StripeEmbeddedCheckout",
+      "import_path": ""
+    },
+    {
+      "name": "UnreadBadge",
+      "file": "src/components/UnreadBadge",
+      "import_path": ""
+    },
+    {
+      "name": "AdminShell",
+      "file": "src/components/admin/AdminShell",
+      "import_path": ""
+    },
+    {
+      "name": "PageHeader",
+      "file": "src/components/admin/AdminShell",
+      "import_path": ""
+    },
+    {
+      "name": "Card",
+      "file": "src/components/admin/AdminShell",
+      "import_path": ""
+    },
+    {
+      "name": "EmptyState",
+      "file": "src/components/admin/AdminShell",
+      "import_path": ""
+    },
+    {
+      "name": "BookingsView",
+      "file": "src/components/admin/BookingsView",
+      "import_path": "",
+      "props": [
+        {
+          "name": "table",
+          "type": "enum",
+          "values": [
+            "studio_bookings",
+            "block_bookings"
+          ],
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "subtitle",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "searchPlaceholder",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "searchFields",
+          "type": "any",
+          "required": true
+        },
+        {
+          "name": "renderDetailHead",
+          "type": "function",
+          "required": true
+        },
+        {
+          "name": "renderDetailCells",
+          "type": "function",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "DistributionReviewQueue",
+      "file": "src/components/admin/DistributionReviewQueue",
+      "import_path": ""
+    },
+    {
+      "name": "SectionPage",
+      "file": "src/components/admin/SectionPage",
+      "import_path": ""
+    },
+    {
+      "name": "Conversation",
+      "file": "src/components/ai-elements/conversation",
+      "import_path": ""
+    },
+    {
+      "name": "ConversationContent",
+      "file": "src/components/ai-elements/conversation",
+      "import_path": ""
+    },
+    {
+      "name": "ConversationEmptyState",
+      "file": "src/components/ai-elements/conversation",
+      "import_path": "",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "default": "No messages yet"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "default": "Start a conversation to see messages here"
+        },
+        {
+          "name": "icon",
+          "type": "any"
+        }
+      ]
+    },
+    {
+      "name": "ConversationScrollButton",
+      "file": "src/components/ai-elements/conversation",
+      "import_path": ""
+    },
+    {
+      "name": "ConversationDownload",
+      "file": "src/components/ai-elements/conversation",
+      "import_path": "",
+      "props": [
+        {
+          "name": "messages",
+          "type": "any",
+          "required": true
+        },
+        {
+          "name": "filename",
+          "type": "string",
+          "default": "conversation.md"
+        },
+        {
+          "name": "formatMessage",
+          "type": "function"
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "file": "src/components/ai-elements/message",
+      "import_path": "",
+      "props": [
+        {
+          "name": "from",
+          "type": "any",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "MessageContent",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageActions",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageAction",
+      "file": "src/components/ai-elements/message",
+      "import_path": "",
+      "props": [
+        {
+          "name": "tooltip",
+          "type": "string"
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Previous branch"
+        }
+      ]
+    },
+    {
+      "name": "MessageBranch",
+      "file": "src/components/ai-elements/message",
+      "import_path": "",
+      "props": [
+        {
+          "name": "defaultBranch",
+          "type": "number",
+          "default": "0"
+        },
+        {
+          "name": "onBranchChange",
+          "type": "function"
+        }
+      ]
+    },
+    {
+      "name": "MessageBranchContent",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageBranchSelector",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageBranchPrevious",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageBranchNext",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageBranchPage",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "MessageToolbar",
+      "file": "src/components/ai-elements/message",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputProvider",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "LocalReferencedSourcesContext",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputActionAddAttachments",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": "",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Add photos or files"
+        }
+      ]
+    },
+    {
+      "name": "PromptInputActionAddScreenshot",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": "",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "default": "Add photos or files"
+        }
+      ]
+    },
+    {
+      "name": "PromptInput",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": "",
+      "props": [
+        {
+          "name": "accept",
+          "type": "string"
+        },
+        {
+          "name": "multiple",
+          "type": "boolean"
+        },
+        {
+          "name": "globalDrop",
+          "type": "boolean"
+        },
+        {
+          "name": "syncHiddenInput",
+          "type": "boolean"
+        },
+        {
+          "name": "maxFiles",
+          "type": "number"
+        },
+        {
+          "name": "maxFileSize",
+          "type": "number"
+        },
+        {
+          "name": "onError",
+          "type": "function"
+        },
+        {
+          "name": "onSubmit",
+          "type": "function",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "PromptInputBody",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTextarea",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputHeader",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputFooter",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTools",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputButton",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": "",
+      "props": [
+        {
+          "name": "tooltip",
+          "type": "any"
+        }
+      ]
+    },
+    {
+      "name": "PromptInputActionMenu",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputActionMenuTrigger",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputActionMenuContent",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputActionMenuItem",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputSubmit",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": "",
+      "props": [
+        {
+          "name": "status",
+          "type": "any"
+        },
+        {
+          "name": "onStop",
+          "type": "function"
+        }
+      ]
+    },
+    {
+      "name": "PromptInputSelect",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputSelectTrigger",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputSelectContent",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputSelectItem",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputSelectValue",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputHoverCard",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputHoverCardTrigger",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputHoverCardContent",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTabsList",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTab",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTabLabel",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTabBody",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputTabItem",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommand",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommandInput",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommandList",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommandEmpty",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommandGroup",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommandItem",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "PromptInputCommandSeparator",
+      "file": "src/components/ai-elements/prompt-input",
+      "import_path": ""
+    },
+    {
+      "name": "ActivateArtistButton",
+      "file": "src/components/artist/ActivateArtistButton",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistDashboardShell",
+      "file": "src/components/artist/ArtistDashboardShell",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistLiveRoom",
+      "file": "src/components/artist/ArtistLiveRoom",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistStatusProvider",
+      "file": "src/components/artist/ArtistStatusBeacon",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistStatusBeacon",
+      "file": "src/components/artist/ArtistStatusBeacon",
+      "import_path": ""
+    },
+    {
+      "name": "FollowersModal",
+      "file": "src/components/artist/FollowersModal",
+      "import_path": ""
+    },
+    {
+      "name": "FriendPlusButton",
+      "file": "src/components/artist/FriendPlusButton",
+      "import_path": ""
+    },
+    {
+      "name": "LiveSetlist",
+      "file": "src/components/artist/LiveSetlist",
+      "import_path": ""
+    },
+    {
+      "name": "ProfileBattleCard",
+      "file": "src/components/artist/ProfileBattleCard",
+      "import_path": ""
+    },
+    {
+      "name": "ProfileLiveBar",
+      "file": "src/components/artist/ProfileLiveBar",
+      "import_path": ""
+    },
+    {
+      "name": "ProfileMessageButton",
+      "file": "src/components/artist/ProfileMessageButton",
+      "import_path": ""
+    },
+    {
+      "name": "ProfilePlatformLinks",
+      "file": "src/components/artist/ProfilePlatformLinks",
+      "import_path": ""
+    },
+    {
+      "name": "StreamingWorldMap",
+      "file": "src/components/artist/StreamingWorldMap",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistTrialBanner",
+      "file": "src/components/artist/TrialBanner",
+      "import_path": ""
+    },
+    {
+      "name": "AssistantRobot",
+      "file": "src/components/assistant/AssistantChat",
+      "import_path": ""
+    },
+    {
+      "name": "AssistantChat",
+      "file": "src/components/assistant/AssistantChat",
+      "import_path": ""
+    },
+    {
+      "name": "AssistantLauncher",
+      "file": "src/components/assistant/AssistantLauncher",
+      "import_path": ""
+    },
+    {
+      "name": "BlogArticle",
+      "file": "src/components/blog/BlogArticle",
+      "import_path": "",
+      "props": [
+        {
+          "name": "category",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "readTime",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "intro",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "children",
+          "type": "any",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "NewBlogPostDialog",
+      "file": "src/components/blog/NewBlogPostDialog",
+      "import_path": ""
+    },
+    {
+      "name": "ScaledSlide",
+      "file": "src/components/deck/Deck",
+      "import_path": ""
+    },
+    {
+      "name": "Deck",
+      "file": "src/components/deck/Deck",
+      "import_path": ""
+    },
+    {
+      "name": "SlideShell",
+      "file": "src/components/deck/SlideShell",
+      "import_path": ""
+    },
+    {
+      "name": "Slide1",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide2",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide3",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide4",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide5",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide6",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide7",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide8",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide9",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide10",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide11",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide12",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "Slide13",
+      "file": "src/components/deck/slides",
+      "import_path": ""
+    },
+    {
+      "name": "ArtworkUploader",
+      "file": "src/components/distribution/AssetUploads",
+      "import_path": ""
+    },
+    {
+      "name": "AudioUploader",
+      "file": "src/components/distribution/AssetUploads",
+      "import_path": ""
+    },
+    {
+      "name": "ArtworkThumb",
+      "file": "src/components/distribution/AssetUploads",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistReferralsPanel",
+      "file": "src/components/host/ArtistReferralsPanel",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistMerchSection",
+      "file": "src/components/merch/ArtistMerchSection",
+      "import_path": ""
+    },
+    {
+      "name": "TrendingMerch",
+      "file": "src/components/merch/TrendingMerch",
+      "import_path": ""
+    },
+    {
+      "name": "BattleChallengePopup",
+      "file": "src/components/play/BattleChallengePopup",
+      "import_path": ""
+    },
+    {
+      "name": "StatusBadge",
+      "file": "src/components/play/BattleChallenges",
+      "import_path": ""
+    },
+    {
+      "name": "BattleChallenges",
+      "file": "src/components/play/BattleChallenges",
+      "import_path": ""
+    },
+    {
+      "name": "BattleTournamentStatus",
+      "file": "src/components/play/BattleTournamentStatus",
+      "import_path": ""
+    },
+    {
+      "name": "BoostCheckoutModal",
+      "file": "src/components/play/BoostCheckoutModal",
+      "import_path": ""
+    },
+    {
+      "name": "FreestyleBattle",
+      "file": "src/components/play/FreestyleBattle",
+      "import_path": "",
+      "props": [
+        {
+          "name": "streamId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "hostId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "room",
+          "type": "string"
+        },
+        {
+          "name": "participants",
+          "type": "object",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "FreestyleChallengePopup",
+      "file": "src/components/play/FreestyleChallengePopup",
+      "import_path": ""
+    },
+    {
+      "name": "FreestyleQueue",
+      "file": "src/components/play/FreestyleQueue",
+      "import_path": "",
+      "props": [
+        {
+          "name": "streamId",
+          "type": "string"
+        },
+        {
+          "name": "hostId",
+          "type": "string"
+        },
+        {
+          "name": "onSelect",
+          "type": "function"
+        },
+        {
+          "name": "overview",
+          "type": "boolean",
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "GenreBattleBoard",
+      "file": "src/components/play/GenreBattleBoard",
+      "import_path": ""
+    },
+    {
+      "name": "ImmersivePlayer",
+      "file": "src/components/play/ImmersivePlayer",
+      "import_path": ""
+    },
+    {
+      "name": "PlayProfileHero",
+      "file": "src/components/play/PlayProfileHero",
+      "import_path": ""
+    },
+    {
+      "name": "SkipLinePopup",
+      "file": "src/components/play/SkipLinePopup",
+      "import_path": ""
+    },
+    {
+      "name": "SubmitToArenaModal",
+      "file": "src/components/play/SubmitToArenaModal",
+      "import_path": ""
+    },
+    {
+      "name": "SubmitTrackDialog",
+      "file": "src/components/play/SubmitTrackDialog",
+      "import_path": ""
+    },
+    {
+      "name": "WaveformBackground",
+      "file": "src/components/play/WaveformBackground",
+      "import_path": ""
+    },
+    {
+      "name": "GlobalPlayer",
+      "file": "src/components/player/GlobalPlayer",
+      "import_path": ""
+    },
+    {
+      "name": "ListeningSessionPanel",
+      "file": "src/components/player/ListeningSessionPanel",
+      "import_path": "",
+      "props": [
+        {
+          "name": "isHost",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "hostPresent",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "listenerCount",
+          "type": "number",
+          "required": true
+        },
+        {
+          "name": "participants",
+          "type": "any",
+          "required": true
+        },
+        {
+          "name": "currentTrackTitle",
+          "type": "string"
+        },
+        {
+          "name": "currentArtist",
+          "type": "string"
+        },
+        {
+          "name": "playbackState",
+          "type": "enum",
+          "values": [
+            "playing",
+            "paused",
+            "stopped"
+          ],
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "MediaSessionSync",
+      "file": "src/components/player/MediaSessionSync",
+      "import_path": ""
+    },
+    {
+      "name": "MusicDetails",
+      "file": "src/components/player/MusicDetails",
+      "import_path": ""
+    },
+    {
+      "name": "InstallPromptPopup",
+      "file": "src/components/pwa/InstallPromptPopup",
+      "import_path": ""
+    },
+    {
+      "name": "InstallTunevio",
+      "file": "src/components/pwa/InstallTunevio",
+      "import_path": ""
+    },
+    {
+      "name": "RankBadgeStatic",
+      "file": "src/components/rank/RankBadge",
+      "import_path": ""
+    },
+    {
+      "name": "RankBadge",
+      "file": "src/components/rank/RankBadge",
+      "import_path": ""
+    },
+    {
+      "name": "AccountOverview",
+      "file": "src/components/settings/AccountOverview",
+      "import_path": ""
+    },
+    {
+      "name": "AddProfileTrackDialog",
+      "file": "src/components/settings/AddProfileTrackDialog",
+      "import_path": ""
+    },
+    {
+      "name": "GeneralSettingsShell",
+      "file": "src/components/settings/GeneralSettingsShell",
+      "import_path": ""
+    },
+    {
+      "name": "SettingsShell",
+      "file": "src/components/settings/SettingsShell",
+      "import_path": ""
+    },
+    {
+      "name": "Row",
+      "file": "src/components/settings/SettingsShell",
+      "import_path": ""
+    },
+    {
+      "name": "SettingsSidebar",
+      "file": "src/components/settings/SettingsSidebar",
+      "import_path": ""
+    },
+    {
+      "name": "FutureShell",
+      "file": "src/components/site/FutureShell",
+      "import_path": ""
+    },
+    {
+      "name": "HUDFrame",
+      "file": "src/components/site/FutureShell",
+      "import_path": ""
+    },
+    {
+      "name": "SectionTag",
+      "file": "src/components/site/FutureShell",
+      "import_path": ""
+    },
+    {
+      "name": "GrowthShowcase",
+      "file": "src/components/site/GrowthShowcase",
+      "import_path": ""
+    },
+    {
+      "name": "IntroSplash",
+      "file": "src/components/site/IntroSplash",
+      "import_path": ""
+    },
+    {
+      "name": "LegalPage",
+      "file": "src/components/site/LegalPage",
+      "import_path": ""
+    },
+    {
+      "name": "LiveRosterSheet",
+      "file": "src/components/site/LiveRosterSheet",
+      "import_path": "",
+      "props": [
+        {
+          "name": "open",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "onOpenChange",
+          "type": "function",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "MobileBottomNav",
+      "file": "src/components/site/MobileBottomNav",
+      "import_path": ""
+    },
+    {
+      "name": "MobileBottomNavSpacer",
+      "file": "src/components/site/MobileBottomNav",
+      "import_path": ""
+    },
+    {
+      "name": "MusicVideoPlayer",
+      "file": "src/components/site/MusicVideoPlayer",
+      "import_path": ""
+    },
+    {
+      "name": "OnePager",
+      "file": "src/components/site/OnePager",
+      "import_path": ""
+    },
+    {
+      "name": "PlatformCapabilities",
+      "file": "src/components/site/PlatformCapabilities",
+      "import_path": ""
+    },
+    {
+      "name": "PlayArenaIntro",
+      "file": "src/components/site/PlayArenaIntro",
+      "import_path": ""
+    },
+    {
+      "name": "SiteFooter",
+      "file": "src/components/site/SiteFooter",
+      "import_path": ""
+    },
+    {
+      "name": "SiteHeader",
+      "file": "src/components/site/SiteHeader",
+      "import_path": ""
+    },
+    {
+      "name": "TrialGate",
+      "file": "src/components/site/TrialGate",
+      "import_path": ""
+    },
+    {
+      "name": "CommentAvatar",
+      "file": "src/components/site/VideoComments",
+      "import_path": ""
+    },
+    {
+      "name": "VideoComments",
+      "file": "src/components/site/VideoComments",
+      "import_path": ""
+    },
+    {
+      "name": "VideoPlayer",
+      "file": "src/components/site/VideoPlayer",
+      "import_path": "",
+      "props": [
+        {
+          "name": "videos",
+          "type": "any",
+          "required": true
+        },
+        {
+          "name": "initialIndex",
+          "type": "number",
+          "default": "0"
+        }
+      ]
+    },
+    {
+      "name": "ArtistStoreSection",
+      "file": "src/components/store/ArtistStoreSection",
+      "import_path": ""
+    },
+    {
+      "name": "NfcPagePreview",
+      "file": "src/components/store/NfcPagePreview",
+      "import_path": ""
+    },
+    {
+      "name": "StoreProductCard",
+      "file": "src/components/store/StoreProductCard",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistChallengesPanel",
+      "file": "src/components/stream/ArtistChallengesPanel",
+      "import_path": ""
+    },
+    {
+      "name": "AudioPlaybackUnblocker",
+      "file": "src/components/stream/AudioPlaybackUnblocker",
+      "import_path": ""
+    },
+    {
+      "name": "BackstageQueue",
+      "file": "src/components/stream/BackstageQueue",
+      "import_path": ""
+    },
+    {
+      "name": "BattleArena",
+      "file": "src/components/stream/BattleArena",
+      "import_path": ""
+    },
+    {
+      "name": "CreateBattleDialog",
+      "file": "src/components/stream/BattleArena",
+      "import_path": ""
+    },
+    {
+      "name": "BattleHostControls",
+      "file": "src/components/stream/BattleHostControls",
+      "import_path": ""
+    },
+    {
+      "name": "BattleReplays",
+      "file": "src/components/stream/BattleReplays",
+      "import_path": ""
+    },
+    {
+      "name": "ConfirmedBattleMatchups",
+      "file": "src/components/stream/ConfirmedBattleMatchups",
+      "import_path": ""
+    },
+    {
+      "name": "ConnectedPlatformsSection",
+      "file": "src/components/stream/ConnectedPlatformsSection",
+      "import_path": ""
+    },
+    {
+      "name": "CrowdPanel",
+      "file": "src/components/stream/CrowdPanel",
+      "import_path": ""
+    },
+    {
+      "name": "DeviceSelector",
+      "file": "src/components/stream/DeviceSelector",
+      "import_path": ""
+    },
+    {
+      "name": "GreenRoom",
+      "file": "src/components/stream/GreenRoom",
+      "import_path": ""
+    },
+    {
+      "name": "HostEarningsCard",
+      "file": "src/components/stream/HostEarningsCard",
+      "import_path": ""
+    },
+    {
+      "name": "HypePassPanel",
+      "file": "src/components/stream/HypePassPanel",
+      "import_path": ""
+    },
+    {
+      "name": "InCrowdBanner",
+      "file": "src/components/stream/InCrowdBanner",
+      "import_path": ""
+    },
+    {
+      "name": "LiveCardPreview",
+      "file": "src/components/stream/LiveCardPreview",
+      "import_path": ""
+    },
+    {
+      "name": "LiveChat",
+      "file": "src/components/stream/LiveChat",
+      "import_path": ""
+    },
+    {
+      "name": "LiveKitFatalBanner",
+      "file": "src/components/stream/LiveKitConnectionGuard",
+      "import_path": ""
+    },
+    {
+      "name": "LiveStage",
+      "file": "src/components/stream/LiveStage",
+      "import_path": "",
+      "props": [
+        {
+          "name": "token",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "serverUrl",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "onEnd",
+          "type": "function",
+          "required": true
+        },
+        {
+          "name": "onInvite",
+          "type": "function",
+          "required": true
+        },
+        {
+          "name": "hostImage",
+          "type": "string"
+        },
+        {
+          "name": "guestImage",
+          "type": "string"
+        },
+        {
+          "name": "onViewerCount",
+          "type": "function"
+        },
+        {
+          "name": "streamId",
+          "type": "string"
+        },
+        {
+          "name": "publish",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "showHostTools",
+          "type": "boolean",
+          "default": "true"
+        },
+        {
+          "name": "profileHost",
+          "type": "object"
+        },
+        {
+          "name": "audioOnly",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "arenaAudio",
+          "type": "boolean",
+          "default": "false"
+        },
+        {
+          "name": "raiseHandAuth",
+          "type": "any"
+        }
+      ]
+    },
+    {
+      "name": "LiveStageContent",
+      "file": "src/components/stream/LiveStage",
+      "import_path": ""
+    },
+    {
+      "name": "ProfileStage",
+      "file": "src/components/stream/LiveStage",
+      "import_path": ""
+    },
+    {
+      "name": "CameraPublishSync",
+      "file": "src/components/stream/LiveStage",
+      "import_path": ""
+    },
+    {
+      "name": "NowPlayingHeader",
+      "file": "src/components/stream/NowPlayingHeader",
+      "import_path": ""
+    },
+    {
+      "name": "NowPlayingMini",
+      "file": "src/components/stream/NowPlayingMini",
+      "import_path": ""
+    },
+    {
+      "name": "RaiseHandButton",
+      "file": "src/components/stream/RaiseHandButton",
+      "import_path": ""
+    },
+    {
+      "name": "RaiseHandPanel",
+      "file": "src/components/stream/RaiseHandPanel",
+      "import_path": ""
+    },
+    {
+      "name": "RecordButton",
+      "file": "src/components/stream/RecordButton",
+      "import_path": "",
+      "props": [
+        {
+          "name": "streamId",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "SelfMicrophoneButton",
+      "file": "src/components/stream/SelfMicrophoneButton",
+      "import_path": ""
+    },
+    {
+      "name": "StageAudioShell",
+      "file": "src/components/stream/StageAudioShell",
+      "import_path": ""
+    },
+    {
+      "name": "StageMuteEnforcement",
+      "file": "src/components/stream/StageMuteEnforcement",
+      "import_path": ""
+    },
+    {
+      "name": "StageNavigationConnection",
+      "file": "src/components/stream/StageNavigationConnection",
+      "import_path": ""
+    },
+    {
+      "name": "StageReconnectBanner",
+      "file": "src/components/stream/StageReconnectBanner",
+      "import_path": ""
+    },
+    {
+      "name": "StageRoom",
+      "file": "src/components/stream/StageRoom",
+      "import_path": ""
+    },
+    {
+      "name": "AudienceRow",
+      "file": "src/components/stream/StageRoom",
+      "import_path": ""
+    },
+    {
+      "name": "StreamDestinationSelector",
+      "file": "src/components/stream/StreamDestinationSelector",
+      "import_path": ""
+    },
+    {
+      "name": "SavedStreamDestinations",
+      "file": "src/components/stream/StreamDestinationSelector",
+      "import_path": ""
+    },
+    {
+      "name": "StreamThumbnailDialog",
+      "file": "src/components/stream/StreamThumbnailDialog",
+      "import_path": ""
+    },
+    {
+      "name": "StreamThumbnailImage",
+      "file": "src/components/stream/StreamThumbnailImage",
+      "import_path": ""
+    },
+    {
+      "name": "StudioStub",
+      "file": "src/components/stream/StudioStub",
+      "import_path": ""
+    },
+    {
+      "name": "TipModal",
+      "file": "src/components/stream/TipModal",
+      "import_path": ""
+    },
+    {
+      "name": "LiveProductionDashboard",
+      "file": "src/components/studio/LiveProductionDashboard",
+      "import_path": ""
+    },
+    {
+      "name": "StagePanel",
+      "file": "src/components/studio/LiveProductionDashboard",
+      "import_path": ""
+    },
+    {
+      "name": "HowItWorks",
+      "file": "src/components/studio/LiveProductionDashboard",
+      "import_path": ""
+    },
+    {
+      "name": "KeyPointsCard",
+      "file": "src/components/studio/LiveProductionDashboard",
+      "import_path": ""
+    },
+    {
+      "name": "StagesAndBroadcasts",
+      "file": "src/components/studio/StagesAndBroadcasts",
+      "import_path": ""
+    },
+    {
+      "name": "StudioLayoutProvider",
+      "file": "src/components/studio/StudioLayoutCustomizer",
+      "import_path": ""
+    },
+    {
+      "name": "StudioColumn",
+      "file": "src/components/studio/StudioLayoutCustomizer",
+      "import_path": ""
+    },
+    {
+      "name": "StudioBlock",
+      "file": "src/components/studio/StudioLayoutCustomizer",
+      "import_path": ""
+    },
+    {
+      "name": "CustomizeLayoutButton",
+      "file": "src/components/studio/StudioLayoutCustomizer",
+      "import_path": ""
+    },
+    {
+      "name": "StudioLiveStage",
+      "file": "src/components/studio/StudioLiveStage",
+      "import_path": ""
+    },
+    {
+      "name": "StudioLiveStageContent",
+      "file": "src/components/studio/StudioLiveStage",
+      "import_path": ""
+    },
+    {
+      "name": "StudioCameraPublishSync",
+      "file": "src/components/studio/StudioLiveStage",
+      "import_path": ""
+    },
+    {
+      "name": "StudioStageRoom",
+      "file": "src/components/studio/StudioStageRoom",
+      "import_path": ""
+    },
+    {
+      "name": "StudioAudienceRow",
+      "file": "src/components/studio/StudioStageRoom",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistMarquee",
+      "file": "src/components/tunevio/ArtistMarquee",
+      "import_path": ""
+    },
+    {
+      "name": "ContentRail",
+      "file": "src/components/tunevio/ContentRail",
+      "import_path": ""
+    },
+    {
+      "name": "ListSection",
+      "file": "src/components/tunevio/ContentRail",
+      "import_path": ""
+    },
+    {
+      "name": "LandingPage",
+      "file": "src/components/tunevio/LandingPage",
+      "import_path": ""
+    },
+    {
+      "name": "TunevioHome",
+      "file": "src/components/tunevio/TunevioHome",
+      "import_path": ""
+    },
+    {
+      "name": "CardShell",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "Artwork",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "PlayFab",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "MediaCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": "",
+      "props": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "subtitle",
+          "type": "string"
+        },
+        {
+          "name": "imageUrl",
+          "type": "string"
+        },
+        {
+          "name": "shape",
+          "type": "enum",
+          "values": [
+            "square",
+            "circle"
+          ],
+          "default": "square"
+        },
+        {
+          "name": "badge",
+          "type": "any"
+        },
+        {
+          "name": "onPlay",
+          "type": "function"
+        },
+        {
+          "name": "onOpen",
+          "type": "function"
+        },
+        {
+          "name": "playing",
+          "type": "boolean"
+        },
+        {
+          "name": "to",
+          "type": "string",
+          "default": "/artist/$id"
+        },
+        {
+          "name": "params",
+          "type": "object"
+        },
+        {
+          "name": "footer",
+          "type": "any"
+        }
+      ]
+    },
+    {
+      "name": "AlbumCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "TrackCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "ArtistCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "PlaylistCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "LiveArenaCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "LiveStreamCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "FeaturedCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "QuickAccessCard",
+      "file": "src/components/tunevio/cards",
+      "import_path": ""
+    },
+    {
+      "name": "Avatar",
+      "file": "src/components/ui/avatar",
+      "import_path": ""
+    },
+    {
+      "name": "AvatarImage",
+      "file": "src/components/ui/avatar",
+      "import_path": ""
+    },
+    {
+      "name": "AvatarFallback",
+      "file": "src/components/ui/avatar",
+      "import_path": ""
+    },
+    {
+      "name": "Badge",
+      "file": "src/components/ui/badge",
+      "import_path": "",
+      "props": [
+        {
+          "name": "variant",
+          "type": "enum",
+          "values": [
+            "default",
+            "secondary",
+            "destructive",
+            "outline"
+          ],
+          "default": "default"
+        }
+      ]
+    },
+    {
+      "name": "ButtonGroup",
+      "file": "src/components/ui/button-group",
+      "import_path": "",
+      "props": [
+        {
+          "name": "orientation",
+          "type": "enum",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        }
+      ]
+    },
+    {
+      "name": "ButtonGroupSeparator",
+      "file": "src/components/ui/button-group",
+      "import_path": ""
+    },
+    {
+      "name": "ButtonGroupText",
+      "file": "src/components/ui/button-group",
+      "import_path": ""
+    },
+    {
+      "name": "Button",
+      "file": "src/components/ui/button",
+      "import_path": "",
+      "props": [
+        {
+          "name": "variant",
+          "type": "enum",
+          "values": [
+            "default",
+            "destructive",
+            "outline",
+            "secondary",
+            "ghost",
+            "link"
+          ],
+          "default": "default"
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "values": [
+            "default",
+            "sm",
+            "lg",
+            "icon"
+          ],
+          "default": "default"
+        },
+        {
+          "name": "asChild",
+          "type": "boolean",
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Command",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandDialog",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandInput",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandList",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandEmpty",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandGroup",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandItem",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandShortcut",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "CommandSeparator",
+      "file": "src/components/ui/command",
+      "import_path": ""
+    },
+    {
+      "name": "Dialog",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogPortal",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogOverlay",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogTrigger",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogClose",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogContent",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogHeader",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogFooter",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogTitle",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "DialogDescription",
+      "file": "src/components/ui/dialog",
+      "import_path": ""
+    },
+    {
+      "name": "Drawer",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerPortal",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerOverlay",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerTrigger",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerClose",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerContent",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerHeader",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerFooter",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerTitle",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DrawerDescription",
+      "file": "src/components/ui/drawer",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenu",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuTrigger",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuContent",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuItem",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuCheckboxItem",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuRadioItem",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuLabel",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuSeparator",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuShortcut",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuGroup",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuPortal",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuSub",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuSubContent",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuSubTrigger",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "DropdownMenuRadioGroup",
+      "file": "src/components/ui/dropdown-menu",
+      "import_path": ""
+    },
+    {
+      "name": "HoverCard",
+      "file": "src/components/ui/hover-card",
+      "import_path": ""
+    },
+    {
+      "name": "HoverCardTrigger",
+      "file": "src/components/ui/hover-card",
+      "import_path": ""
+    },
+    {
+      "name": "HoverCardContent",
+      "file": "src/components/ui/hover-card",
+      "import_path": ""
+    },
+    {
+      "name": "InputGroup",
+      "file": "src/components/ui/input-group",
+      "import_path": ""
+    },
+    {
+      "name": "InputGroupAddon",
+      "file": "src/components/ui/input-group",
+      "import_path": "",
+      "props": [
+        {
+          "name": "align",
+          "type": "enum",
+          "values": [
+            "inline-start",
+            "inline-end",
+            "block-start",
+            "block-end"
+          ],
+          "default": "inline-start"
+        }
+      ]
+    },
+    {
+      "name": "InputGroupButton",
+      "file": "src/components/ui/input-group",
+      "import_path": "",
+      "props": [
+        {
+          "name": "size",
+          "type": "enum",
+          "values": [
+            "xs",
+            "sm",
+            "icon-xs",
+            "icon-sm"
+          ],
+          "default": "xs"
+        }
+      ]
+    },
+    {
+      "name": "InputGroupText",
+      "file": "src/components/ui/input-group",
+      "import_path": ""
+    },
+    {
+      "name": "InputGroupInput",
+      "file": "src/components/ui/input-group",
+      "import_path": ""
+    },
+    {
+      "name": "InputGroupTextarea",
+      "file": "src/components/ui/input-group",
+      "import_path": ""
+    },
+    {
+      "name": "Input",
+      "file": "src/components/ui/input",
+      "import_path": ""
+    },
+    {
+      "name": "Select",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectGroup",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectValue",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectTrigger",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectContent",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectLabel",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectItem",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectSeparator",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectScrollUpButton",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "SelectScrollDownButton",
+      "file": "src/components/ui/select",
+      "import_path": ""
+    },
+    {
+      "name": "Separator",
+      "file": "src/components/ui/separator",
+      "import_path": ""
+    },
+    {
+      "name": "SignedImg",
+      "file": "src/components/ui/signed-img",
+      "import_path": ""
+    },
+    {
+      "name": "SignedBackground",
+      "file": "src/components/ui/signed-img",
+      "import_path": "",
+      "props": [
+        {
+          "name": "src",
+          "type": "string"
+        },
+        {
+          "name": "fallbackBackground",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Spinner",
+      "file": "src/components/ui/spinner",
+      "import_path": ""
+    },
+    {
+      "name": "Table",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableHeader",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableBody",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableFooter",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableHead",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableRow",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableCell",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "TableCaption",
+      "file": "src/components/ui/table",
+      "import_path": ""
+    },
+    {
+      "name": "Textarea",
+      "file": "src/components/ui/textarea",
+      "import_path": ""
+    },
+    {
+      "name": "Tooltip",
+      "file": "src/components/ui/tooltip",
+      "import_path": ""
+    },
+    {
+      "name": "TooltipTrigger",
+      "file": "src/components/ui/tooltip",
+      "import_path": ""
+    },
+    {
+      "name": "TooltipContent",
+      "file": "src/components/ui/tooltip",
+      "import_path": ""
+    },
+    {
+      "name": "TooltipProvider",
+      "file": "src/components/ui/tooltip",
+      "import_path": ""
+    },
+    {
+      "name": "CartProvider",
+      "file": "src/contexts/CartContext",
+      "import_path": ""
+    },
+    {
+      "name": "Constants",
+      "file": "src/integrations/supabase/types",
+      "import_path": ""
+    },
+    {
+      "name": "ArenaSlotEngine",
+      "file": "src/lib/audio/arena-slot-engine",
+      "import_path": ""
+    },
+    {
+      "name": "ArenaAudioClock",
+      "file": "src/lib/audio/audio-clock",
+      "import_path": ""
+    },
+    {
+      "name": "TrackBufferLoader",
+      "file": "src/lib/audio/track-loader",
+      "import_path": ""
+    },
+    {
+      "name": "EmailChangeEmail",
+      "file": "src/lib/email-templates/email-change",
+      "import_path": "",
+      "props": [
+        {
+          "name": "siteName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "oldEmail",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "newEmail",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "confirmationUrl",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "InviteEmail",
+      "file": "src/lib/email-templates/invite",
+      "import_path": "",
+      "props": [
+        {
+          "name": "siteName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "siteUrl",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "confirmationUrl",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "MagicLinkEmail",
+      "file": "src/lib/email-templates/magic-link",
+      "import_path": "",
+      "props": [
+        {
+          "name": "siteName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "confirmationUrl",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "ReauthenticationEmail",
+      "file": "src/lib/email-templates/reauthentication",
+      "import_path": "",
+      "props": [
+        {
+          "name": "token",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "RecoveryEmail",
+      "file": "src/lib/email-templates/recovery",
+      "import_path": "",
+      "props": [
+        {
+          "name": "siteName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "confirmationUrl",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "SignupEmail",
+      "file": "src/lib/email-templates/signup",
+      "import_path": "",
+      "props": [
+        {
+          "name": "siteName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "siteUrl",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "recipient",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "confirmationUrl",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "MediaEngine",
+      "file": "src/lib/media-engine/MediaEngine",
+      "import_path": ""
+    },
+    {
+      "name": "MediaEngineProvider",
+      "file": "src/lib/media-engine/MediaEngineContext",
+      "import_path": ""
+    },
+    {
+      "name": "PlaybackProgress",
+      "file": "src/lib/playback-progress",
+      "import_path": ""
+    },
+    {
+      "name": "PlayerProvider",
+      "file": "src/lib/player-context",
+      "import_path": ""
+    },
+    {
+      "name": "StageConnectionProvider",
+      "file": "src/lib/stage-connection-context",
+      "import_path": ""
+    },
+    {
+      "name": "LocalSpeakingSignalPublisher",
+      "file": "src/lib/stage-connection-context",
+      "import_path": ""
+    }
+  ],
+  "assets": [
+    {
+      "file": "src/assets/artist-store-hero.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/audience.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/audience.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/badge-battle-champion.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-bronze-performer.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-bwf-founder.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-diamond-star.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-featured-artist.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-gold-creator.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-hall-of-fame.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-legend-elite.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-platinum-icon.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-silver-artist.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-superstar.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-top-streamer.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-trending-artist.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/badge-verified-artist.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/bwf-intro.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/bwf-join-bg.jpeg.asset.json",
+      "kind": "image",
+      "format": "jpeg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/bwf-logo-source.png",
+      "kind": "logo",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/bwf-logo.jpg",
+      "kind": "logo",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/bwf-logo.png",
+      "kind": "logo",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/camera.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/default-artist-avatar.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/discover-hero.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/flyer-off-the-block.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/flyer-studio.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/go-live-logo.png.asset.json",
+      "kind": "logo",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/grunge-bg.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/grunge-bg.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/hero-rapper-poster.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/hero-rapper.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/landing-arena-battle.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/landing-community.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/landing-dj-vote.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/landing-live-crowd.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/landing-studio-artist.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/music-video.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/music-video.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/off-the-block-hero.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/play-arena-1v1-battle.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/rights-shield.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/store-collection.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/stream-guest.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/stream-host.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/stream-host.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/studio-hero.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-assistant.png",
+      "kind": "image",
+      "format": "png"
+    },
+    {
+      "file": "src/assets/tunevio-blog-intro.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-header-logo.png.asset.json",
+      "kind": "logo",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-icon.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-intro-soundtrack.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-intro.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-logo.png.asset.json",
+      "kind": "logo",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-mic-walkup-black.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-mic-walkup.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-play-icon-small.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-play-icon.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/tunevio-social.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/videos/tunevio-logo-intro.mp4.asset.json",
+      "kind": "video",
+      "format": "mp4",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/viral-thumbs.jpg",
+      "kind": "image",
+      "format": "jpg"
+    },
+    {
+      "file": "src/assets/viral-thumbs.jpg.asset.json",
+      "kind": "image",
+      "format": "jpg",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1560.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1680.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1681.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1682.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1683.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1684.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-IMG_1685.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    },
+    {
+      "file": "src/assets/welcome-apps.png.asset.json",
+      "kind": "image",
+      "format": "png",
+      "pointer": true
+    }
+  ]
+}
