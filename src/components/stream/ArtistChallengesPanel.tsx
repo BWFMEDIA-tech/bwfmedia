@@ -17,6 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { ConfirmedBattleMatchups, type ConfirmedMatchup } from "./ConfirmedBattleMatchups";
 import { CreateBattleDialog } from "./BattleArena";
+import { FreestyleQueue } from "@/components/play/FreestyleQueue";
 import { BattleTournamentStatus } from "@/components/play/BattleTournamentStatus";
 
 type HostChallenge = {
@@ -50,7 +51,7 @@ function Avatar({ url, name }: { url: string | null; name: string }) {
 }
 
 /** Host battle management: review, schedule and start artist challenges. */
-export function ArtistChallengesPanel({ streamId }: { streamId?: string }) {
+export function ArtistChallengesPanel({ streamId, hostId, roomName }: { streamId?: string; hostId?: string; roomName?: string }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const decline = useServerFn(declineBattleChallenge);
@@ -108,6 +109,8 @@ export function ArtistChallengesPanel({ streamId }: { streamId?: string }) {
   return (
     <div className="space-y-3">
       <BattleTournamentStatus hostControls />
+      {streamId && <FreestyleQueue streamId={streamId} hostId={hostId}
+        onSelect={roomName ? () => { toast.message("Open the 1v1 Freestyle Battle tab to start this slot battle"); navigate({ to: "/play/$room", params: { room: roomName } }); } : undefined} />}
       {streamId && <section className="space-y-3 border-b border-border pb-3">
         <h3 className="text-sm font-bold">Create 1v1 Battle</h3>
         <ConfirmedBattleMatchups selectedId={selected?.id ?? null} onSelect={setSelected} />
