@@ -10,7 +10,7 @@ import {
   MonitorUp, UserPlus, Share2, MoreHorizontal, Eye, Circle, Send, Smile,
   Heart, Flame, Music2, PartyPopper, Sparkles, Crown, Copy, Check,
   CheckCircle2, X as XIcon, Instagram, Facebook, MessageCircle, Mail,
-  Headphones, Wifi, PhoneOff, ChevronRight, GripVertical, PanelLeftClose, PanelLeftOpen,
+  Headphones, Wifi, PhoneOff, ChevronRight, GripVertical, ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -206,7 +206,7 @@ function Sidebar() {
           title={collapsed ? "Expand menu" : "Minimize menu"}
           className="rounded-lg p-2 text-white/60 transition hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00E6FF]"
         >
-          {collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </button>
       </div>
 
