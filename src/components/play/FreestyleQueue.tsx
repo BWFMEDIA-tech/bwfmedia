@@ -63,15 +63,15 @@ export function FreestyleQueue({ streamId, hostId, onSelect, overview = false }:
     </Link>;
   };
   if (overview && (!auth.user || (!state.isPending && !state.isError && slots.length === 0))) return null;
-  return <section aria-label="Freestyle Battle Queue" className={`space-y-6 py-5 text-foreground ${overview ? 'play-confirmed-battles' : ''}`}>
-    <header className="flex flex-wrap items-center justify-between gap-3"><h2 className="flex items-center gap-2 text-xl font-bold"><Swords className="text-primary" />{streamId ? 'Freestyle Battle Queue' : overview ? 'Confirmed Freestyle battles' : '1v1 Freestyle Battle Challenge'}</h2>{!overview && <p className="text-sm text-muted-foreground">{state.data ? `${slots.length}/10 · ${10 - slots.length} available` : '—/10'}</p>}</header>
+  return <section aria-label="Freestyle Battle Queue" className={`min-w-0 space-y-4 py-3 text-foreground ${overview ? 'play-confirmed-battles' : ''}`}>
+    <header className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:justify-between"><h2 className="flex min-w-0 items-center gap-2 text-base font-bold sm:text-lg"><Swords className="h-4 w-4 shrink-0 text-primary" />{streamId ? 'Freestyle Battle Queue' : overview ? 'Confirmed Freestyle battles' : '1v1 Freestyle Battle Challenge'}</h2>{!overview && <p className="shrink-0 text-right text-xs text-muted-foreground">{state.data ? `${slots.length}/10 · ${10 - slots.length} available` : '—/10'}</p>}</header>
     {!auth.user ? <Link to="/login" className="text-primary">Sign in to view slots and challenge an artist</Link> : state.isPending ? <p className="text-muted-foreground">Loading matchups…</p> : state.isError ? <p role="alert">Could not load matchups. <Button variant="link" onClick={() => void state.refetch()}>Retry</Button></p> : <>
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
         {slots.map(c => {
-          return <article key={c.id} className="fsq-slot" data-state="filled">
-            <div className="flex items-center justify-between gap-2 px-4 pt-4"><span className="fsq-slot-label">Slot {c.slot_number}</span><span className="fsq-status" data-status={c.status === 'live' ? 'live' : 'filled'}>{c.status === 'live' ? 'Live' : c.status === 'scheduled' ? 'Scheduled' : 'Accepted'}</span></div>
-            <div className="px-4 pb-6 pt-5">
-              <div className="flex items-center gap-2 sm:gap-3">{slotArtist(c.artist_a_id, 'a')}<span className="fsq-vs" aria-hidden="true">VS</span>{slotArtist(c.artist_b_id, 'b')}</div>
+          return <article key={c.id} className="fsq-slot min-w-0 w-full" data-state="filled">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 pt-3"><span className="fsq-slot-label">Slot {c.slot_number}</span><span className="fsq-status" data-status={c.status === 'live' ? 'live' : 'filled'}>{c.status === 'live' ? 'Live' : c.status === 'scheduled' ? 'Scheduled' : 'Accepted'}</span></div>
+            <div className="px-3 pb-3 pt-3">
+              <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">{slotArtist(c.artist_a_id, 'a')}<span className="fsq-vs" aria-hidden="true">VS</span>{slotArtist(c.artist_b_id, 'b')}</div>
               {c.scheduled_at && <p className="pt-2 text-center text-xs text-muted-foreground">{new Date(c.scheduled_at).toLocaleString()}</p>}
               {streamId && canHost && c.status !== 'live' && (!c.stream_id || c.stream_id === streamId) && <div className="flex flex-wrap justify-center gap-1 pt-3">
                 {onSelect && <Button size="sm" disabled={busy} onClick={() => onSelect(c)}><Play className="h-3 w-3" />Select</Button>}
