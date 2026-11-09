@@ -212,8 +212,7 @@ function Sidebar() {
 
       <button
         aria-label="Go Live"
-        className={cn("mt-2 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold", collapsed ? "h-10 w-10 p-0" : "px-4 py-3")}
-        data-cls=" text-white shadow-lg transition hover:scale-[1.02] active:scale-95"
+        className={cn("mt-2 flex items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02] active:scale-95", collapsed ? "h-10 w-10 p-0" : "px-4 py-3")}
         style={{
           background: `linear-gradient(135deg, ${PURPLE}, ${BLUE})`,
           boxShadow: `0 8px 32px ${PURPLE_GLOW}`,
