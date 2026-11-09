@@ -148,7 +148,12 @@
 .fsq-name { display: block; font-size: 15px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
 .fsq-genre { display: block; font-size: 12px; color: var(--muted-foreground); }
 .fsq-vs { flex-shrink: 0; font-size: 30px; font-style: italic; font-weight: 900; line-height: 1; background: linear-gradient(100deg, var(--primary), #fff 50%, var(--fsq-violet)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 55%, transparent)) drop-shadow(0 0 14px color-mix(in srgb, var(--fsq-violet) 40%, transparent)); }
-.play-confirmed-battles .fsq-slot { border-radius: 8px; background: var(--card); box-shadow: none; border-color: var(--border); }
+@property --fsq-led-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.fsq-slot[data-state="filled"] { isolation: isolate; border-color: transparent; background: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--freestyle-blue) 28%, transparent), transparent 55%), radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--fsq-violet) 26%, transparent), transparent 55%), linear-gradient(160deg, #070b18, #03050c 60%, #0a0716); box-shadow: 0 0 18px color-mix(in srgb, var(--primary) 35%, transparent), 0 18px 40px -18px color-mix(in srgb, var(--primary) 60%, transparent); }
+.fsq-slot[data-state="filled"]::before { content: ""; position: absolute; inset: 0; z-index: -1; padding: 2px; border-radius: inherit; background: conic-gradient(from var(--fsq-led-angle), transparent 0 55%, color-mix(in srgb, var(--primary) 40%, transparent) 70%, #fff 78%, var(--primary) 82%, transparent 92%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; filter: drop-shadow(0 0 6px var(--primary)); animation: fsq-led 4s linear infinite; pointer-events: none; }
+.fsq-slot[data-state="filled"]::after { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: inherit; border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent); background: linear-gradient(180deg, rgb(255 255 255 / .05), transparent 40%); pointer-events: none; }
+@keyframes fsq-led { to { --fsq-led-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .fsq-slot[data-state="filled"]::before { animation: none; } }
 .play-confirmed-battles .fsq-artist { flex-direction: column; text-align: center; gap: 14px; }
 .play-confirmed-battles .fsq-ring { --fsq-ring: var(--brand-cyan); box-shadow: none; }
 .play-confirmed-battles .fsq-ring[data-side="b"] { --fsq-ring: var(--brand-blue); }
