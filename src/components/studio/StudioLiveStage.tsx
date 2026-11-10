@@ -32,6 +32,7 @@ import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { SelfMicrophoneButton } from "@/components/stream/SelfMicrophoneButton";
 import { StageMuteEnforcement } from "@/components/stream/StageMuteEnforcement";
 import { AudioPlaybackUnblocker } from "@/components/stream/AudioPlaybackUnblocker";
+import { useLiveBattleArtistIds } from "@/lib/freestyle-stage";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -419,19 +420,25 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
   const spotlight = useStudioStreamSpotlight(streamId);
+  // While a battle is running its two performers stay in the battle's own
+  // A/B video boxes instead of the stage ARTIST box.
+  const liveBattleArtistIds = useLiveBattleArtistIds(streamId);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host" | "guest";
   const buckets: Record<Panel, typeof cameraTracks> = { admin: [], middle: [], host: [], guest: [] };
   for (const t of cameraTracks) {
     const id = t.participant?.identity ?? "";
+    // A live battle keeps its performers in the battle's A/B boxes, so they
+    // are never added to the stage ARTIST box.
+    const isBattleArtist = liveBattleArtistIds.has(id);
     // Spotlight overrides: pin a participant exclusively to a panel.
     if (spotlight.host && id === spotlight.host) {
       buckets.admin.push(t);
       continue;
     }
     if (spotlight.artist && id === spotlight.artist) {
-      buckets.middle.push(t);
+      if (!isBattleArtist) buckets.middle.push(t);
       continue;
     }
     if (spotlight.cohost && id === spotlight.cohost) {
@@ -454,6 +461,8 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
     // Co-hosts always land in the CO-HOST box (on every device size).
     // Box 1 (left) = Host, box 3 (right) = Co-Host, on every device size.
     const panel: Panel = isHostRole ? "admin" : isAdminRole || isCoHostRole ? "host" : "middle";
+    // During a battle the ARTIST box stays clear of its performers.
+    if (isBattleArtist && panel === "middle") continue;
     // When a spotlight is active for a panel, suppress catch-alls there.
     if (spotlight.artist && panel === "middle") continue;
     if (spotlight.host && panel === "admin") continue;
@@ -471,7 +480,7 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
     );
     if (t) buckets[panel].push(t);
   };
-  ensureSpotlightEntry("middle", spotlight.artist);
+  ensureSpotlightEntry("middle", spotlight.artist && !liveBattleArtistIds.has(spotlight.artist) ? spotlight.artist : null);
   ensureSpotlightEntry("admin", spotlight.host);
   ensureSpotlightEntry("host", spotlight.cohost);
   ensureSpotlightEntry("guest", spotlight.guest);
