@@ -1,5 +1,9 @@
 # Roadmap
 
+## Freestyle record privacy
+- [x] Restrict raw battle records to hosts/moderators and the owning host; retain limited latest live-stream display state for artists and viewers
+- [x] Applied policy confirmed; 35 privacy/voting/isolation tests passed; signed-in challenge page opens without runtime errors and preview build OK
+
 ## Freestyle video-box placement
 - [ ] Let the host place an accepted matchup into Artist A and Artist B before starting; preserve fixed sides and existing camera permissions
 - [ ] Verify both names/photos appear in the boxes and accepted selection stays intact when joining video; physical camera checks remain device-dependent

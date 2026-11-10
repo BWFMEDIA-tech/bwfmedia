@@ -8,7 +8,7 @@ export const getFreestyleState = createServerFn({ method: 'POST' })
   .inputValidator(input => streamInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: initial, error } = await supabase.from('freestyle_battles').select('*').eq('stream_id', data.streamId).order('started_at', { ascending: false }).limit(1).maybeSingle();
+    const { data: initial, error } = await supabase.rpc('get_freestyle_display', { _stream_id: data.streamId }).maybeSingle();
     if (error) throw new Error(error.message);
     if (!initial) return { battle: null, artists: [], myVote: null, serverTime: Date.now() };
     if (initial.status === 'live' && Date.parse(initial.ends_at) <= Date.now()) {
@@ -16,7 +16,7 @@ export const getFreestyleState = createServerFn({ method: 'POST' })
       if (finishError) throw new Error(finishError.message);
     }
     const [battleResult, profiles, vote] = await Promise.all([
-      supabase.from('freestyle_battles').select('*').eq('id', initial.id).single(),
+      supabase.rpc('get_freestyle_display', { _stream_id: data.streamId }).maybeSingle(),
       supabase.from('profiles').select('id,display_name,stage_name,avatar_url,genre,genres').in('id', [initial.artist_a_id, initial.artist_b_id]),
       supabase.from('freestyle_votes').select('choice').eq('battle_id', initial.id).eq('user_id', userId).maybeSingle(),
     ]);
