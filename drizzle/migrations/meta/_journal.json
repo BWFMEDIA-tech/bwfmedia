@@ -442,6 +442,13 @@
       "when": 1794156318098,
       "tag": "0062_assistant_knowledge_expansion",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1794277152067,
+      "tag": "0063_restrict_freestyle_record_access",
+      "breakpoints": true
     }
   ]
 }

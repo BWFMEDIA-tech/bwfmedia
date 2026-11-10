@@ -7171,6 +7171,19 @@ export type Database = {
           tips_cents: number
         }[]
       }
+      get_freestyle_display: {
+        Args: { _stream_id: string }
+        Returns: {
+          artist_a_id: string
+          artist_b_id: string
+          ends_at: string
+          id: string
+          status: string
+          votes_a: number
+          votes_b: number
+          winner_id: string
+        }[]
+      }
       get_host_rate: {
         Args: { _user_id: string }
         Returns: {
