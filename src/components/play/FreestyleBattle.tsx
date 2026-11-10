@@ -28,23 +28,31 @@ export function FreestyleBattle(props: Props) {
   const [joinError, setJoinError] = useState('');
   const [placementId, setPlacementId] = useState('');
   const contentProps = { ...props, placementId, onPlace: setPlacementId };
+  const join = async () => {
+    if (!props.room) return;
+    setJoining(true); setJoinError('');
+    try {
+      const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Connection timed out. Please try again.')), 15000));
+      setConnection(await Promise.race([tokenFn({ data: { roomName: props.room } }), timeout]));
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Could not join live video';
+      setJoinError(msg === 'Stream is not live' ? 'The host has not started this live room yet. Try again once they go live.' : msg);
+    }
+    finally { setJoining(false); }
+  };
+  // Connect signed-in visitors automatically so Artist A/B video shows on every device.
+  const [autoTried, setAutoTried] = useState(false);
+  useEffect(() => {
+    if (existingRoom || connection || autoTried || !props.room || !auth.user) return;
+    setAutoTried(true); void join();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [existingRoom, connection, autoTried, props.room, auth.user?.id]);
   if (existingRoom) return <FreestyleContent {...contentProps} />;
   if (connection && auth.user) return <StageAudioShell token={connection.token} serverUrl={connection.wsUrl} streamId={props.streamId} userId={auth.user.id} isHost={auth.user.id === props.hostId} showHostTools={false} autoConnect arenaAudio onLeave={() => setConnection(null)}><FreestyleContent {...contentProps} /></StageAudioShell>;
   return <>
     <FreestyleContent {...contentProps} />
     <div className="mt-4 flex justify-center">
-      <Button disabled={joining || !props.room || !auth.user} onClick={async () => {
-        if (!props.room) return;
-        setJoining(true); setJoinError('');
-        try {
-          const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Connection timed out. Please try again.')), 15000));
-          setConnection(await Promise.race([tokenFn({ data: { roomName: props.room } }), timeout]));
-        } catch (error) {
-          const msg = error instanceof Error ? error.message : 'Could not join live video';
-          setJoinError(msg === 'Stream is not live' ? 'The host has not started this live room yet. Try again once they go live.' : msg);
-        }
-        finally { setJoining(false); }
-      }}><Radio />{joining ? 'Connecting…' : joinError ? 'Retry joining' : auth.user ? 'Join live video' : 'Sign in to watch and vote'}</Button>
+      <Button disabled={joining || !props.room || !auth.user} onClick={() => void join()}><Radio />{joining ? 'Connecting…' : joinError ? 'Retry joining' : auth.user ? 'Join live video' : 'Sign in to watch and vote'}</Button>
     </div>
     {!props.room && <p className="mt-2 text-center text-sm text-muted-foreground">The battle video room isn't open yet.</p>}
     {joinError && <p role="alert" className="mt-2 text-center text-sm text-destructive">{joinError}</p>}
