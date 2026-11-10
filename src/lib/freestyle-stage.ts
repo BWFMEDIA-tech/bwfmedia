@@ -8,6 +8,7 @@
  */
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getFreestyleState } from "./freestyle.functions";
 
 export type LiveBattleRow = {
   status?: string | null;
@@ -45,17 +46,19 @@ export function useLiveBattleArtistIds(streamId?: string | null): Set<string> {
     let cancelled = false;
 
     const refresh = async () => {
-      const { data } = await supabase
-        .from("freestyle_battles")
-        .select("artist_a_id, artist_b_id")
-        .eq("stream_id", streamId)
-        .eq("status", "live")
-        .limit(1);
-      if (cancelled) return;
-      setIds(battleArtistIds((data ?? []) as LiveBattleRow[]));
+      try {
+        const { battle } = await getFreestyleState({ data: { streamId } });
+        if (cancelled) return;
+        setIds(battleArtistIds(battle ? [battle] : []));
+      } catch {
+        // Retain the last known isolation state on transient connection errors.
+      }
     };
 
     void refresh();
+    // Restricted rows no longer emit audience realtime events; polling keeps
+    // the safe display state and stage isolation current for those viewers.
+    const timer = setInterval(() => void refresh(), 5000);
 
     // One channel per mount: a subscribed realtime channel cannot take a new
     // database callback, and the stage can mount more than once per page.
@@ -70,6 +73,7 @@ export function useLiveBattleArtistIds(streamId?: string | null): Set<string> {
 
     return () => {
       cancelled = true;
+      clearInterval(timer);
       supabase.removeChannel(channel);
     };
   }, [streamId]);
