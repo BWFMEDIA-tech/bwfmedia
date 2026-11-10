@@ -32,6 +32,7 @@ import { shouldRestoreStageMicrophone } from "@/lib/stage-microphone";
 import { SelfMicrophoneButton } from "@/components/stream/SelfMicrophoneButton";
 import { StageMuteEnforcement } from "@/components/stream/StageMuteEnforcement";
 import { AudioPlaybackUnblocker } from "@/components/stream/AudioPlaybackUnblocker";
+import { useLiveBattleArtistIds } from "@/lib/freestyle-stage";
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -419,6 +420,9 @@ export function StudioLiveStageContent({ onEnd, onInvite, hostImage, guestImage,
   const profiles = useParticipantProfiles(participants.map((p) => p.identity));
   const roleMap = useParticipantRoles(streamId, participants.map((p) => p.identity));
   const spotlight = useStudioStreamSpotlight(streamId);
+  // While a battle is running its two performers stay in the battle's own
+  // A/B video boxes instead of the stage ARTIST box.
+  const liveBattleArtistIds = useLiveBattleArtistIds(streamId);
 
   // Bucket camera tracks by role panel.
   type Panel = "admin" | "middle" | "host" | "guest";

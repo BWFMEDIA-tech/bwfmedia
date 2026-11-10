@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type LiveBattleRow = {
+  status?: string | null;
   artist_a_id: string | null;
   artist_b_id: string | null;
 };
@@ -22,6 +23,7 @@ export type LiveBattleRow = {
 export function battleArtistIds(rows: LiveBattleRow[]): Set<string> {
   const ids = new Set<string>();
   for (const row of rows) {
+    if (row.status && row.status !== "live") continue;
     if (row.artist_a_id) ids.add(row.artist_a_id);
     if (row.artist_b_id) ids.add(row.artist_b_id);
   }
