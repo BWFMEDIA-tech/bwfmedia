@@ -1,5 +1,9 @@
 # Roadmap
 
+## Mobile Freestyle video
+- [ ] Restore both assigned camera subscriptions and inline playback after joining/reconnecting, without stage placement or permission changes
+- [ ] Run video recovery and existing battle/privacy tests; verify phone layout; physical two-artist playback requires connected devices
+
 ## Freestyle record privacy
 - [x] Restrict raw battle records to hosts/moderators and the owning host; retain limited latest live-stream display state for artists and viewers
 - [x] Applied policy confirmed; 35 privacy/voting/isolation tests passed; signed-in challenge page opens without runtime errors and preview build OK
