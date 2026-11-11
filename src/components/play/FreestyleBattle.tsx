@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { useMaybeRoomContext, useTracks, useParticipants, VideoTrack, useLocalParticipant } from '@livekit/components-react';
-import { Track } from 'livekit-client';
+import { RoomEvent, Track } from 'livekit-client';
 import { Camera, CameraOff, MicOff, Eye, ThumbsUp, Trophy, Radio } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { SignedImg } from '@/components/ui/signed-img';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { freestylePlacement } from '@/lib/freestyle-placement';
+import { subscribeFreestyleCameras } from '@/lib/freestyle-video';
 import { StageAudioShell } from '@/components/stream/StageAudioShell';
 import { SelfMicrophoneButton } from '@/components/stream/SelfMicrophoneButton';
 import { useAuth } from '@/lib/auth-context';
@@ -153,15 +154,42 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
 }
 
 function ArtistCamera({ artistId, name, photo, hostId, artistA, artistB }: { artistId?: string; name: string; photo?: string | null; hostId: string; artistA?: string; artistB?: string }) {
+  const room = useMaybeRoomContext();
+  const video = useRef<HTMLVideoElement>(null);
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
   const tracks = useTracks([{ source: Track.Source.Camera, withPlaceholder: false }], { onlySubscribed: false });
   const participants = useParticipants();
   const track = tracks.find(t => t.participant.identity === artistId);
+  // Battle cameras need their own recovery: the Studio stage can be unmounted
+  // or intentionally exclude these artists, especially on a phone.
+  useEffect(() => {
+    if (!room || !artistId) return;
+    const subscribe = () => subscribeFreestyleCameras(room.remoteParticipants.values(), [artistId]);
+    subscribe();
+    room.on(RoomEvent.TrackPublished, subscribe);
+    room.on(RoomEvent.ParticipantConnected, subscribe);
+    room.on(RoomEvent.Reconnected, subscribe);
+    return () => {
+      room.off(RoomEvent.TrackPublished, subscribe);
+      room.off(RoomEvent.ParticipantConnected, subscribe);
+      room.off(RoomEvent.Reconnected, subscribe);
+    };
+  }, [room, artistId]);
+  useEffect(() => {
+    setPlaybackBlocked(false);
+    const element = video.current;
+    if (!element || !track?.publication?.track || track.publication.isMuted) return;
+    let active = true;
+    void element.play().catch(() => { if (active) setPlaybackBlocked(true); });
+    return () => { active = false; };
+  }, [artistId, track?.publication?.track, track?.publication?.isMuted]);
   const live = !!artistId && participants.some(p => p.identity === artistId) && !!track?.publication && !track.publication.isMuted;
   const micTrack = participants.find(p => p.identity === artistId);
   const micMuted = !!micTrack && !micTrack.isMicrophoneEnabled;
   const viewers = new Set(participants.filter(p => ![hostId, artistA, artistB].includes(p.identity) && !p.identity.startsWith('preview_')).map(p => p.identity)).size;
   return <div className="freestyle-camera relative bg-muted">
-    {track && track.publication && !track.publication.isMuted ? <VideoTrack trackRef={{ participant: track.participant, publication: track.publication, source: Track.Source.Camera }} className="h-full w-full object-cover" /> : photo ? <SignedImg src={photo} alt={name} className="h-full w-full object-contain" /> : <div className="grid h-full place-items-center"><CameraOff className="h-10 w-10 text-muted-foreground" /></div>}
+    {track && track.publication && !track.publication.isMuted ? <VideoTrack ref={video} autoPlay playsInline muted manageSubscription={false} aria-label={`${name} live camera`} trackRef={{ participant: track.participant, publication: track.publication, source: Track.Source.Camera }} className="h-full w-full object-cover" onPlaying={() => setPlaybackBlocked(false)} /> : photo ? <SignedImg src={photo} alt={name} className="h-full w-full object-contain" /> : <div className="grid h-full place-items-center"><CameraOff className="h-10 w-10 text-muted-foreground" /></div>}
+    {playbackBlocked && <div className="absolute inset-0 grid place-items-center bg-background/60"><Button size="sm" onClick={() => { void video.current?.play().then(() => setPlaybackBlocked(false)).catch(() => toast.error('Video could not start. Tap again or reconnect to the live room.')); }}><Radio />Show video</Button></div>}
     <div className="absolute bottom-2 left-2 flex items-center gap-3 rounded-sm bg-background/90 px-2 py-1 text-xs"><span className="flex items-center gap-1"><Radio className="h-3 w-3" />{live ? 'LIVE' : artistId && participants.some(p => p.identity === artistId) ? 'Camera off' : artistId ? 'Offline' : 'Waiting'}</span>{micMuted && <span className="flex items-center gap-1"><MicOff className="h-3 w-3" />Muted</span>}<span className="flex items-center gap-1"><Eye className="h-3 w-3" />{viewers} viewers</span></div>
   </div>;
 }
