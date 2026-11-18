@@ -449,6 +449,20 @@
       "when": 1794277152067,
       "tag": "0063_restrict_freestyle_record_access",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1795020236704,
+      "tag": "0064_host_earnings_rate_ignores_session",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1795020272769,
+      "tag": "0065_host_earnings_rate_named_columns",
+      "breakpoints": true
     }
   ]
 }

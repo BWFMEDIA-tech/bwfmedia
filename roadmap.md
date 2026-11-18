@@ -91,3 +91,8 @@
 
 ## Logo video intro
 - [x] Added animated Tunevio logo reveal as the opening intro video; hero black screen fixed with poster frame
+
+## Host earnings when someone else ends the room
+- [x] Calculate the host tier inside the room-closing trigger so an admin cleanup, moderator or automated task records earnings exactly like the host ending it themselves
+- [x] Applied as migrations 0064/0065; test room ended with no signed-in user recorded standard tier, $25 pool, $2.50 owed; test rows removed
+- [x] Admin console sign-in confirmed: admin account reaches the bookings console with no console errors
