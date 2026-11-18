@@ -84,7 +84,7 @@ export function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean
   };
 
   return (
-    <section id="genre-battles" className="scroll-mt-24 rounded-2xl border border-white/10 bg-[#0a0a14] p-5 sm:p-6">
+    <section id="genre-battles" className="pb-card pb-card-strong scroll-mt-24">
       <div className="flex items-center gap-2">
         <Swords className="h-4 w-4 text-[#00E6FF]" />
         <h3 className="text-xs font-bold tracking-widest text-white/50">1V1 BATTLES BY GENRE</h3>
@@ -101,7 +101,7 @@ export function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean
             <select
               value={pick}
               onChange={(e) => setPick(e.target.value as BattleGenre)}
-              className="w-full sm:w-64 rounded-lg border border-white/15 bg-black/40 px-3 py-2.5 text-base sm:text-sm text-white"
+              className="pb-input w-full sm:w-64 px-3 py-2.5 text-base sm:text-sm"
               aria-label="Battle genre"
             >
               <option value="" disabled>Choose your battle genre…</option>
@@ -110,7 +110,7 @@ export function GenreBattleBoard({ isAuthenticated }: { isAuthenticated: boolean
             <button
               onClick={join}
               disabled={busy || !tournament?.canSubmit}
-              className="rounded-lg bg-[#0000FF] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#0000CC] disabled:opacity-50"
+              className="pb-btn-primary pb-btn-strong px-4 py-2.5 text-sm font-bold disabled:opacity-50"
             >
               {data?.myGenre ? "SWITCH GENRE" : "FIND MATCH"}
             </button>
@@ -235,9 +235,7 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-        active ? "border-[#00E6FF] bg-[#00E6FF]/15 text-[#00E6FF]" : "border-white/15 text-white/70 hover:bg-white/5"
-      }`}
+      className={"pb-pill shrink-0"} data-active={active}
     >
       {children}
     </button>

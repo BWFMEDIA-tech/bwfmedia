@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Swords, Check, X, Trash2, Calendar } from "lucide-react";
+import { Swords, Check, X, Trash2, Calendar , Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SignedImg } from "@/components/ui/signed-img";
@@ -162,8 +162,8 @@ export function BattleChallenges({ userId }: { userId: string }) {
     <div className="space-y-4">
       <BattleTournamentStatus />
       {/* Challenge composer */}
-      <div className="rounded-xl border border-border bg-card/60 p-4">
-        <div className="mb-3 flex items-center gap-2">
+      <div className="pb-card">
+        <div className="mb-4 flex items-center gap-2">
           <Swords className="h-4 w-4 text-cyan-400" />
           <h3 className="text-sm font-bold">Challenge an artist</h3>
         </div>
@@ -172,7 +172,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search artists…"
-          className="mb-2"
+          className="pb-input mb-3"
         />
         {search.trim() && !block && (
           <div className="mb-3 max-h-48 space-y-1 overflow-y-auto">
@@ -200,7 +200,7 @@ export function BattleChallenges({ userId }: { userId: string }) {
             disabled={Boolean(block) || busy}
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
-            className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm"
+            className="pb-input h-11 flex-1 px-3"
           >
             <option value="">Select a genre…</option>
             {BATTLE_GENRES.map((g) => (
@@ -209,22 +209,22 @@ export function BattleChallenges({ userId }: { userId: string }) {
               </option>
             ))}
           </select>
-          <Button onClick={onSubmit} disabled={Boolean(block) || busy || !selectedArtist || !genre} className="sm:w-auto">
+          <Button onClick={onSubmit} disabled={Boolean(block) || busy || !selectedArtist || !genre} className="pb-btn-primary sm:w-auto">
             <Swords className="mr-2 h-4 w-4" /> Send challenge
           </Button>
         </div>
-        <p className="mt-2 text-[11px] text-muted-foreground">
+        <p className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground"><Info className="h-3.5 w-3.5 shrink-0" />
           {block ?? "Both artists must accept before the host can start the battle."}
         </p>
       </div>
 
       {/* Received challenges */}
       {received.length > 0 && (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+        <div className="pb-card">
           <h3 className="mb-3 text-sm font-bold">Challenges for you</h3>
           <div className="space-y-2">
             {received.map((c) => (
-              <div key={c.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2.5">
+              <div key={c.id} className="pb-row flex flex-wrap items-center gap-3 p-3">
                 <ArtistAvatar url={c.challenger_avatar} name={c.challenger_name} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{c.challenger_name}</p>
@@ -244,11 +244,11 @@ export function BattleChallenges({ userId }: { userId: string }) {
 
       {/* Sent / involved challenges */}
       {sent.length > 0 && (
-        <div className="rounded-xl border border-border bg-card/60 p-4">
-          <h3 className="mb-3 text-sm font-bold">Your challenges</h3>
+        <div className="pb-card">
+          <h3 className="mb-3 text-base font-semibold">Your challenges</h3>
           <div className="space-y-2">
             {sent.map((c) => (
-              <div key={c.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-2.5">
+              <div key={c.id} className="pb-row flex flex-wrap items-center gap-3 p-3">
                 <ArtistAvatar url={c.challenged_avatar} name={c.challenged_name} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">vs {c.challenged_name}</p>

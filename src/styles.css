@@ -1696,3 +1696,34 @@ html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; text-si
 @media (prefers-reduced-motion: reduce) {
   .ap-btn, .ap-btn:active { transition: none; transform: none; }
 }
+
+/* Premium battle challenges page (scoped to /play/challenges) */
+.pb-page {
+  background:
+    radial-gradient(60rem 30rem at 110% -10%, color-mix(in oklab, var(--brand-blue) 22%, transparent), transparent 60%),
+    radial-gradient(50rem 28rem at -20% 110%, color-mix(in oklab, var(--brand-cyan) 12%, transparent), transparent 60%),
+    var(--background);
+}
+.pb-segment { display: inline-flex; gap: .25rem; padding: .25rem; border-radius: 9999px; border: 1px solid color-mix(in oklab, var(--brand-cyan) 18%, transparent); background: color-mix(in oklab, var(--card) 60%, transparent); backdrop-filter: blur(16px); }
+.pb-segment-tab { border-radius: 9999px; color: var(--muted-foreground); transition: all 200ms ease; }
+.pb-segment-tab:hover { color: var(--foreground); }
+.pb-segment-tab[aria-selected="true"] { color: var(--brand-ink, #001018); background: linear-gradient(135deg, var(--brand-cyan), color-mix(in oklab, var(--brand-cyan) 60%, var(--brand-blue))); box-shadow: 0 0 18px color-mix(in oklab, var(--brand-cyan) 40%, transparent), inset 0 1px 0 rgb(255 255 255 / .35); font-weight: 600; }
+.pb-btn-outline { border-radius: .875rem; border: 1px solid color-mix(in oklab, var(--brand-cyan) 70%, transparent); color: var(--brand-cyan); background: color-mix(in oklab, var(--card) 40%, transparent); backdrop-filter: blur(12px); box-shadow: 0 0 14px color-mix(in oklab, var(--brand-cyan) 18%, transparent); font-weight: 600; transition: transform 200ms ease, box-shadow 200ms ease; }
+.pb-btn-outline:hover { transform: translateY(-1px); color: var(--brand-cyan); background: color-mix(in oklab, var(--brand-cyan) 8%, transparent); box-shadow: 0 0 22px color-mix(in oklab, var(--brand-cyan) 30%, transparent); }
+.pb-card { position: relative; border-radius: 1.5rem; padding: 1.25rem; border: 1px solid color-mix(in oklab, var(--brand-cyan) 16%, transparent); background: linear-gradient(160deg, color-mix(in oklab, var(--brand-blue) 9%, transparent), color-mix(in oklab, var(--card) 70%, transparent) 45%); backdrop-filter: blur(18px); box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 18px 40px -24px rgb(0 0 0 / .8); }
+@media (min-width: 640px) { .pb-card { padding: 1.5rem; } }
+.pb-card-strong { border-color: color-mix(in oklab, var(--brand-cyan) 30%, transparent); box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 0 32px -12px color-mix(in oklab, var(--brand-cyan) 35%, transparent); }
+.pb-input { border-radius: .875rem !important; border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent) !important; background: color-mix(in oklab, var(--background) 55%, transparent) !important; color: var(--foreground); transition: border-color 200ms ease, box-shadow 200ms ease; }
+.pb-input:focus, .pb-input:focus-visible { outline: none; border-color: var(--brand-cyan) !important; box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-cyan) 18%, transparent) !important; }
+.pb-btn-primary { border-radius: .875rem; color: var(--brand-ink, #001018); font-weight: 600; background: linear-gradient(135deg, var(--brand-cyan), color-mix(in oklab, var(--brand-cyan) 55%, var(--brand-blue))); box-shadow: 0 6px 20px -8px color-mix(in oklab, var(--brand-cyan) 60%, transparent); transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease; }
+.pb-btn-primary:not(:disabled):hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 10px 26px -8px color-mix(in oklab, var(--brand-cyan) 70%, transparent); }
+.pb-btn-strong { color: #fff; letter-spacing: .04em; background: linear-gradient(135deg, var(--brand-blue), color-mix(in oklab, var(--brand-blue) 55%, var(--brand-cyan))); box-shadow: 0 8px 24px -8px color-mix(in oklab, var(--brand-blue) 70%, transparent); }
+.pb-row { border-radius: 1rem; border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); background: color-mix(in oklab, var(--background) 50%, transparent); }
+.pb-pill { border-radius: 9999px; padding: .4rem .9rem; font-size: .75rem; font-weight: 600; border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent); color: var(--muted-foreground); background: color-mix(in oklab, var(--background) 40%, transparent); transition: all 180ms ease; }
+.pb-pill:hover { color: var(--foreground); border-color: color-mix(in oklab, var(--brand-cyan) 35%, transparent); }
+.pb-pill[data-active="true"] { color: var(--foreground); border-color: var(--brand-cyan); background: color-mix(in oklab, var(--brand-cyan) 12%, transparent); box-shadow: 0 0 14px color-mix(in oklab, var(--brand-cyan) 25%, transparent); }
+
+/* Phone bottom navigation: floating glass bar */
+.tunevio-phone-navigation.pb-nav { border: 0; background: transparent; backdrop-filter: none; padding-inline: .5rem; }
+.pb-nav-bar { margin: 0 auto .4rem; border-radius: 9999px; border: 1px solid color-mix(in oklab, var(--brand-cyan) 22%, transparent); background: linear-gradient(180deg, color-mix(in oklab, var(--brand-blue) 10%, transparent), color-mix(in oklab, var(--background) 88%, transparent)); backdrop-filter: blur(20px); box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 0 24px -8px color-mix(in oklab, var(--brand-cyan) 35%, transparent); }
+.pb-nav-item[aria-current="page"]::after { content: ""; position: absolute; bottom: 2px; left: 30%; right: 30%; height: 3px; border-radius: 9999px; background: var(--brand-cyan); box-shadow: 0 0 10px var(--brand-cyan); }

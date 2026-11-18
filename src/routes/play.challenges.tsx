@@ -27,16 +27,16 @@ function ChallengesPage() {
   const [tab, setTab] = useState<'freestyle' | 'songs'>('freestyle');
   const [uploadOpen, setUploadOpen] = useState(false);
   const [song, setSong] = useState<UploadedProfileTrack | null>(null);
-  return <main className="min-h-screen bg-background px-4 pb-24 pt-8 text-foreground sm:px-6">
+  return <main className="pb-page min-h-screen bg-background px-4 pb-24 pt-8 text-foreground sm:px-6">
     <div className="mx-auto max-w-6xl space-y-8">
       <header className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-2xl font-bold sm:text-3xl">Artist challenges</h1><Button asChild variant="ghost"><Link to="/play">Play Arena</Link></Button></header>
-      <div role="tablist" aria-label="Challenge type" className="flex flex-wrap gap-2">
-        <Button role="tab" aria-selected={tab === 'freestyle'} variant={tab === 'freestyle' ? 'default' : 'ghost'} onClick={() => setTab('freestyle')}><Swords />1v1 Freestyle</Button>
-        <Button role="tab" aria-selected={tab === 'songs'} variant={tab === 'songs' ? 'default' : 'ghost'} onClick={() => setTab('songs')}><Music2 />Song battles</Button>
+      <div role="tablist" aria-label="Challenge type" className="pb-segment">
+        <Button role="tab" aria-selected={tab === 'freestyle'} variant="ghost" className="pb-segment-tab" onClick={() => setTab('freestyle')}><Swords />1v1 Freestyle</Button>
+        <Button role="tab" aria-selected={tab === 'songs'} variant="ghost" className="pb-segment-tab" onClick={() => setTab('songs')}><Music2 />Song battles</Button>
       </div>
       <div role="tabpanel" aria-label={tab === 'freestyle' ? '1v1 Freestyle challenges' : 'Song battle challenges'}>
         {tab === 'freestyle' ? <FreestyleQueue /> : <div className="space-y-8">
-          {auth.user && <><Button onClick={() => setUploadOpen(true)}><Music2 />Upload new track</Button><BattleChallenges userId={auth.user.id} /></>}
+          {auth.user && <><Button variant="ghost" className="pb-btn-outline" onClick={() => setUploadOpen(true)}><Music2 />Upload new track</Button><BattleChallenges userId={auth.user.id} /></>}
           <GenreBattleBoard isAuthenticated={auth.isAuthenticated} />
         </div>}
       </div>

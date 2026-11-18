@@ -43,11 +43,11 @@ export function MobileBottomNav() {
     <>
     <nav
       aria-label="Primary"
-      className="tunevio-phone-navigation fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl md:hidden"
+      className="tunevio-phone-navigation pb-nav fixed bottom-0 left-0 right-0 z-40 md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul
-        className="mx-auto max-w-md grid"
+        className="pb-nav-bar max-w-md grid"
         style={{ gridTemplateColumns: `repeat(${TABS.length}, minmax(0, 1fr))` }}
       >
         {TABS.map((tab) => {
@@ -59,8 +59,8 @@ export function MobileBottomNav() {
           const followsStage = tab.to === "/play";
           const to = followsStage ? (stage.live ? stage.to : tab.to) : tab.to === "/artist-dashboard" ? dashboardTo : tab.to === "/profile" ? (auth.user ? "/artist/$id" : "/login") : tab.to;
           const className = cn(
-            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors",
-            active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+            "pb-nav-item relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors",
+            active ? "text-primary font-semibold" : "text-muted-foreground hover:text-foreground",
           );
           const content = (
             <>
