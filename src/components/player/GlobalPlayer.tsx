@@ -31,11 +31,11 @@ export function GlobalPlayer({ hidden = false }: { hidden?: boolean }) {
       (navigator as { standalone?: boolean }).standalone === true;
     if (!standalone) return;
     const onVisible = () => {
-      if (document.visibilityState === "visible" && p.track && !p.detailTrack) setExpanded(true);
+      if (document.visibilityState === "visible" && p.track && p.isPlaying && !p.detailTrack) setExpanded(true);
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
-  }, [hidden, p.track, p.detailTrack]);
+  }, [hidden, p.track, p.isPlaying, p.detailTrack]);
   const toggleLike = async () => {
     if (!track || saving) return;
     if (!auth.user) { toast.error("Sign in to save music"); return; }
