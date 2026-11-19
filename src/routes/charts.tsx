@@ -12,7 +12,7 @@ const PREVIEW = 20;
 
 const chartsQuery = (tab: ChartTab) =>
   queryOptions({
-    queryKey: ["charts", tab],
+    queryKey: ["charts-v2", tab],
     queryFn: () => getCharts({ data: { tab, limit: 100 } }),
     staleTime: 30_000,
     refetchInterval: 60_000,
@@ -50,7 +50,7 @@ function ChartsPage() {
   const [tab, setTab] = useState<ChartTab>("top_100");
   const [full, setFull] = useState(false);
   const { data, isLoading, isFetching, refetch, isError } = useQuery(chartsQuery(tab));
-  const rows = data?.tracks ?? [];
+  const rows: ChartTrack[] = Array.isArray(data) ? (data as ChartTrack[]) : (data?.tracks ?? []);
   const shown = full ? rows : rows.slice(0, PREVIEW);
   const active = TABS.find((t) => t.id === tab) ?? TABS[0];
 
