@@ -1890,6 +1890,12 @@ import { SignedBackground } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-98
 import { SignedImg } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985"
 ```
 
+**Props:**
+
+| Prop | Type | Default |
+|---|---|---|
+| `displayWidth` | number | `240` |
+
 ### SignupEmail
 
 ```ts

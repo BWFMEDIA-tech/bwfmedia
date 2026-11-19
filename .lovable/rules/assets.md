@@ -74,6 +74,7 @@ The full machine-readable catalog lives in this library's `design-system.json` (
 - `@/design-system/{slug}/assets/stream-host.jpg.asset.json` (jpg, R2 pointer)
 - `@/design-system/{slug}/assets/tunevio-assistant.png` (png)
 - `@/design-system/{slug}/assets/tunevio-blog-intro.png.asset.json` (png, R2 pointer)
+- `@/design-system/{slug}/assets/tunevio-charts-wordmark.webp.asset.json` (webp, R2 pointer)
 - `@/design-system/{slug}/assets/tunevio-icon.png.asset.json` (png, R2 pointer)
 - `@/design-system/{slug}/assets/tunevio-play-icon-small.png.asset.json` (png, R2 pointer)
 - `@/design-system/{slug}/assets/tunevio-play-icon.png.asset.json` (png, R2 pointer)
@@ -82,6 +83,5 @@ The full machine-readable catalog lives in this library's `design-system.json` (
 - `@/design-system/{slug}/assets/viral-thumbs.jpg.asset.json` (jpg, R2 pointer)
 - `@/design-system/{slug}/assets/welcome-C3E6EE5E-DDE1-48C2-9C67-3D0A9D925104.png.asset.json` (png, R2 pointer)
 - `@/design-system/{slug}/assets/welcome-IMG_1560.png.asset.json` (png, R2 pointer)
-- `@/design-system/{slug}/assets/welcome-IMG_1680.png.asset.json` (png, R2 pointer)
-- …and 6 more — full list in `design-system.json`
+- …and 7 more — full list in `design-system.json`
 
