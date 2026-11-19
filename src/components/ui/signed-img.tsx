@@ -13,7 +13,7 @@ export interface SignedImgProps extends React.ImgHTMLAttributes<HTMLImageElement
 const DPR = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 2;
 
 export const SignedImg = React.forwardRef<HTMLImageElement, SignedImgProps>(
-  ({ src, onError, displayWidth = 240, loading = "lazy", decoding = "async", ...props }, ref) => {
+  ({ src, onError, displayWidth = 240, loading = "lazy", decoding = "async", style, ...props }, ref) => {
   const resolved = useSignedAvatarUrl(
     typeof src === "string" ? src : undefined,
     displayWidth > 0 ? displayWidth * DPR : 0,
@@ -37,6 +37,8 @@ export const SignedImg = React.forwardRef<HTMLImageElement, SignedImgProps>(
       onError={handleError}
       loading={loading}
       decoding={decoding}
+      // Photos are mostly portraits: keep faces in frame instead of centre-cropping to the torso.
+      style={{ objectPosition: "50% 18%", ...style }}
       {...props}
     />
   );
@@ -75,6 +77,7 @@ export const SignedBackground = React.forwardRef<HTMLDivElement, SignedBackgroun
       <div
         ref={ref}
         style={{
+          backgroundPosition: "50% 18%",
           ...style,
           backgroundImage: resolved ? `url(${resolved})` : fallbackBackground,
         }}
