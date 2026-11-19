@@ -6,3 +6,4 @@
 - Grant LiveKit camera/mic publish to the two artists of a live freestyle battle or accepted/scheduled matchup on that stream, in addition to stage roles, because battle artists are not stage-promoted.
 - Keep a live freestyle battle's two performers out of the Stream Studio stage ARTIST box (exclusion driven by src/lib/freestyle-stage.ts), because they belong only in the battle's own A/B video boxes; the box releases when the battle stops being live.
 - Recover assigned Freestyle remote camera subscriptions on publish/reconnect and render muted inline video with gesture retry, because mobile playback must not depend on the separate Studio stage grid being mounted.
+- Batch thumbnail signing through existing endpoints in groups of at most 50 and release public artwork before private queue fallback, because per-image calls and unrelated authorization waits delay visible photos.

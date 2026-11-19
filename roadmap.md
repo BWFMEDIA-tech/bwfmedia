@@ -1,5 +1,10 @@
 # Roadmap
 
+## Image loading
+- [x] Measure visitor speed and inspect real Home artwork/thumbnail requests
+- [x] Batch thumbnail signing without changing permissions; release public artwork before private fallback
+- [x] 13 signing/artwork tests passed; signed-in Home verified at 1280px and 390px with one video-signing request, visible artwork loaded, no overflow/runtime errors; preview build OK
+
 ## Mobile Freestyle video
 - [x] Restore both assigned camera subscriptions and inline playback after joining/reconnecting, without stage placement or permission changes
 - [x] 28 camera recovery/battle/privacy/placement tests passed; phone challenge page has no overflow or runtime errors; preview build OK
