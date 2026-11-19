@@ -59,8 +59,10 @@ export const signAvatarUrl = createServerFn({ method: "POST" })
  * originalUrl -> signedUrl (or null when un-signable).
  */
 export const signAvatarUrls = createServerFn({ method: "POST" })
-  .inputValidator((data: { urls: string[]; expiresIn?: number }) => data)
+  .inputValidator((data: { urls: string[]; expiresIn?: number; width?: number }) => data)
   .handler(async ({ data }) => {
+    // Optional display width: serve a resized, compressed copy instead of the original upload.
+    const width = data.width ? Math.min(Math.max(Math.round(data.width), 64), 2000) : 0;
     const expiresIn = Math.min(Math.max(data.expiresIn ?? 3600, 60), 60 * 60 * 24);
     const out: Record<string, string | null> = {};
     const pathMap = new Map<string, string>(); // path -> originalUrl
@@ -79,6 +81,14 @@ export const signAvatarUrls = createServerFn({ method: "POST" })
     for (const [p, original] of pathMap) if (!allowed.has(p)) { out[original] = null; pathMap.delete(p); }
     if (pathMap.size === 0) return { results: out, expiresIn };
     const paths = Array.from(pathMap.keys());
+    if (width) {
+      const bucket = supabaseAdmin.storage.from("avatars");
+      await Promise.all(paths.map(async (p) => {
+        const { data: one } = await bucket.createSignedUrl(p, expiresIn, { transform: { width, quality: 75 } });
+        out[pathMap.get(p)!] = one?.signedUrl ?? null;
+      }));
+      return { results: out, expiresIn };
+    }
     const { data: signed, error } = await supabaseAdmin.storage
       .from("avatars")
       .createSignedUrls(paths, expiresIn);

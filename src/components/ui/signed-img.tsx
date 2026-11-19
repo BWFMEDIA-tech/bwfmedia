@@ -5,11 +5,19 @@ import { useSignedAvatarUrl } from "@/lib/useSignedAvatar";
  * Drop-in replacement for `<img>` that transparently signs private
  * `/storage/v1/object/public/avatars/...` URLs. Non-avatar URLs pass through.
  */
-export const SignedImg = React.forwardRef<
-  HTMLImageElement,
-  React.ImgHTMLAttributes<HTMLImageElement>
->(({ src, onError, ...props }, ref) => {
-  const resolved = useSignedAvatarUrl(typeof src === "string" ? src : undefined);
+export interface SignedImgProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  /** Largest CSS width this image is shown at; a resized copy is served. 0 = original. */
+  displayWidth?: number;
+}
+
+const DPR = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 2;
+
+export const SignedImg = React.forwardRef<HTMLImageElement, SignedImgProps>(
+  ({ src, onError, displayWidth = 240, loading = "lazy", decoding = "async", ...props }, ref) => {
+  const resolved = useSignedAvatarUrl(
+    typeof src === "string" ? src : undefined,
+    displayWidth > 0 ? displayWidth * DPR : 0,
+  );
   const [converted, setConverted] = React.useState<string | null>(null);
   React.useEffect(() => setConverted(null), [resolved]);
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -27,6 +35,8 @@ export const SignedImg = React.forwardRef<
       ref={ref}
       src={typeof src === "string" ? (converted ?? resolved) : src}
       onError={handleError}
+      loading={loading}
+      decoding={decoding}
       {...props}
     />
   );

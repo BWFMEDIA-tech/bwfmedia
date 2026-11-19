@@ -859,7 +859,7 @@ function ArtistSide({
               >
                 {/* album cover fills the disc and spins clockwise while playing */}
                 {coverUrl ? (
-                  <SignedImg
+                  <SignedImg displayWidth={640} loading="eager"
                     src={coverUrl}
                     alt={trackTitle ?? name}
                     className="absolute inset-0 z-30 h-full w-full rounded-full object-cover"

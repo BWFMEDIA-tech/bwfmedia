@@ -241,7 +241,7 @@ export function NowPlayingHeader({
         {/* Artwork */}
         <div className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl ring-2 ${badge.ring} bg-gradient-to-br ${badge.cls} ${badge.glow} sm:h-20 sm:w-20`}>
           {coverUrl ? (
-            <SignedImg src={coverUrl} alt="" className="h-full w-full object-cover" />
+            <SignedImg displayWidth={640} loading="eager" src={coverUrl} alt="" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <Music className="h-7 w-7 text-white/60" />

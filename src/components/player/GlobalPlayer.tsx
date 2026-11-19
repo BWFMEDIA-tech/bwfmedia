@@ -52,7 +52,7 @@ export function GlobalPlayer({ hidden = false }: { hidden?: boolean }) {
       <div className="music-mini-layout grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 md:grid-cols-[minmax(0,1fr)_minmax(320px,2fr)_minmax(0,1fr)] md:px-5">
         <div className="flex min-w-0 items-center gap-2">
           <Button variant="ghost" aria-label={`Open Now Playing: ${track.title}`} onClick={() => setExpanded(true)} className="h-auto min-w-0 flex-1 justify-start gap-3 px-0 text-left hover:bg-transparent">
-            <span className="h-12 w-12 shrink-0 overflow-hidden rounded bg-secondary">{track.coverUrl ? <SignedImg src={track.coverUrl} alt="" className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center"><Mic2 className="text-muted-foreground" /></span>}</span>
+            <span className="h-12 w-12 shrink-0 overflow-hidden rounded bg-secondary">{track.coverUrl ? <SignedImg displayWidth={64} loading="eager" src={track.coverUrl} alt="" className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center"><Mic2 className="text-muted-foreground" /></span>}</span>
             <span className="min-w-0"><span className="block truncate text-sm font-semibold">{track.title}</span><span className="mt-1 block truncate text-xs font-normal text-muted-foreground">{track.artist}</span></span>
           </Button>
           <Button variant="ghost" size="icon" aria-label={liked ? "Unsave track" : "Save track"} aria-pressed={liked} disabled={saving} onClick={() => void toggleLike()} className={`shrink-0 ${liked ? "text-primary" : "text-muted-foreground"}`}><Heart fill={liked ? "currentColor" : "none"} /></Button>

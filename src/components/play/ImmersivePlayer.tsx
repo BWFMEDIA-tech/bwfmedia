@@ -860,7 +860,7 @@ export function ImmersivePlayer({
             >
               <div className="h-full w-full overflow-hidden rounded-full border-2 border-white/20 shadow-[0_0_80px_-10px_rgba(0,0,255,0.7),inset_0_0_0_6px_rgba(0,0,0,0.85)]">
                 {track?.cover_url ? (
-                  <SignedImg src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
+                  <SignedImg displayWidth={640} loading="eager" src={track.cover_url} alt={track.title} className="h-full w-full object-cover" />
                 ) : (
                   <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#0000FF] to-[#004BFF]">
                     <Sparkles className="h-16 w-16 text-white/60" />
@@ -1281,7 +1281,7 @@ function UpNextPreview({ next, secondsUntil }: { next: PlayTrack; secondsUntil: 
       </div>
       <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#0000FF] to-[#0000FF]">
         {next.cover_url ? (
-          <SignedImg src={next.cover_url} alt="" className="h-full w-full object-cover" />
+          <SignedImg displayWidth={640} loading="eager" src={next.cover_url} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className="grid h-full w-full place-items-center"><Sparkles className="h-4 w-4 text-white/60" /></div>
         )}
@@ -1338,7 +1338,7 @@ function QueueItem({
         <span className="w-5 text-center text-[11px] font-black text-white/40">{index + 1}</span>
       )}
       <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-[#0000FF] to-[#0000FF]">
-        {track.cover_url && <SignedImg src={track.cover_url} alt="" className="h-full w-full object-cover" />}
+        {track.cover_url && <SignedImg displayWidth={640} loading="eager" src={track.cover_url} alt="" className="h-full w-full object-cover" />}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1 truncate text-xs font-semibold">

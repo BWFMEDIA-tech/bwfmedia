@@ -7,3 +7,4 @@
 - Keep a live freestyle battle's two performers out of the Stream Studio stage ARTIST box (exclusion driven by src/lib/freestyle-stage.ts), because they belong only in the battle's own A/B video boxes; the box releases when the battle stops being live.
 - Recover assigned Freestyle remote camera subscriptions on publish/reconnect and render muted inline video with gesture retry, because mobile playback must not depend on the separate Studio stage grid being mounted.
 - Batch thumbnail signing through existing endpoints in groups of at most 50 and release public artwork before private queue fallback, because per-image calls and unrelated authorization waits delay visible photos.
+- Serve avatars-bucket artwork through SignedImg's displayWidth (bucketed resized signed copies, lazy by default) with 24h links persisted in localStorage, because originals are multi-MB and fresh links defeat the browser cache.

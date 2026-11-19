@@ -60,7 +60,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="swara-music-detail music-detail-dialog left-0 top-0 block translate-x-0 translate-y-0 overflow-y-auto p-0">
-        {track.coverUrl && <SignedImg src={track.coverUrl} alt="" aria-hidden className="music-detail-backdrop" />}
+        {track.coverUrl && <SignedImg displayWidth={640} loading="eager" src={track.coverUrl} alt="" aria-hidden className="music-detail-backdrop" />}
         <div className="music-detail-shade" aria-hidden />
         <div className="music-detail-content relative mx-auto max-w-2xl px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-10 sm:pb-8">
           <header className="mb-3 grid sm:mb-6 grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
@@ -69,7 +69,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
             <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Music options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
           </header>
           <div className="music-detail-art mx-auto aspect-square overflow-hidden rounded-lg bg-secondary">
-            {track.coverUrl && failedCover !== track.coverUrl ? <SignedImg src={track.coverUrl} alt={`${track.title} artwork`} onError={() => setFailedCover(track.coverUrl ?? null)} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}
+            {track.coverUrl && failedCover !== track.coverUrl ? <SignedImg displayWidth={640} loading="eager" src={track.coverUrl} alt={`${track.title} artwork`} onError={() => setFailedCover(track.coverUrl ?? null)} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}
           </div>
           <div className={nowPlaying ? "mt-4 flex items-center justify-between gap-3 sm:mt-10" : "mt-7 text-center"}>
             <div className="min-w-0">

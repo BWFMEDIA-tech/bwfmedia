@@ -68,7 +68,7 @@ function ProfileHero({
       <div className="grid grid-cols-1 items-center gap-5 lg:grid-cols-12">
         <div className="flex items-center gap-4 lg:col-span-4">
           {user?.avatarUrl ? (
-            <SignedImg
+            <SignedImg displayWidth={640} loading="eager"
               src={user.avatarUrl}
               alt={user.displayName}
               className="h-20 w-20 shrink-0 rounded-xl object-cover sm:h-24 sm:w-24"
