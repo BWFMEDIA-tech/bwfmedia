@@ -1424,6 +1424,12 @@ import { ProfileLiveBar } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d
 import { ProfileMessageButton } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985"
 ```
 
+### ProfilePhotoGate
+
+```ts
+import { ProfilePhotoGate } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985"
+```
+
 ### ProfilePlatformLinks
 
 ```ts
@@ -2011,6 +2017,12 @@ import { Slide9 } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3
 
 ```ts
 import { SlideShell } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985"
+```
+
+### Slider
+
+```ts
+import { Slider } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985"
 ```
 
 ### Spinner

@@ -2,7 +2,7 @@
   "meta": {
     "name": "Tunevio",
     "package": "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "framework": "react",
     "css_framework": "tailwind",
     "starter_template": "custom_design_system_tailwind",
@@ -11,7 +11,7 @@
     ],
     "source_type": "local",
     "source_manifest": {
-      "#enrichment": "3e6538f0a072a01209cf04c3351c48b2312edcabb55ffe8581d374211760ddbe",
+      "#enrichment": "f2d08c5ec8bd452c2dd8f172410dcfcd3fee14846df7cca5b004a58452bc132a",
       ".gitignore": "6d9e901a692b46a83707c245fb03bc91",
       ".lovable/mcp/manifest.json": "ff83019c8b61493a47ab1482c79d6860",
       ".lovable/meta.yaml": "954a981e8847ec1692669dbb04ae9ae9",
@@ -317,6 +317,8 @@
       "src/components/player/ListeningSessionPanel.tsx": "391784c9cc1d6d171d2d369f0bb3805a",
       "src/components/player/MediaSessionSync.tsx": "adc28cce182c90c01bad5ad82c8c425a",
       "src/components/player/MusicDetails.tsx": "4e6ce08b9964306b99d9db754a5c5e0f",
+      "src/components/profile/ProfilePhotoGate.test.ts": "0b895827c7a5576403d26dd7db61af46",
+      "src/components/profile/ProfilePhotoGate.tsx": "6e7a312c722d824bb28ad0ab831c8c9c",
       "src/components/pwa/InstallPromptPopup.tsx": "06e68215d237df32bb0875e7c8bb281e",
       "src/components/pwa/InstallTunevio.tsx": "6ece4d9e2236c8db890c214368701c71",
       "src/components/rank/RankBadge.tsx": "0803316a03f1f20b7b88c3637e13d1c6",
@@ -389,7 +391,7 @@
       "src/components/tunevio/ContentRail.tsx": "830a81a100fbd1f13903f9508f636057",
       "src/components/tunevio/LandingPage.tsx": "395406afa6b8bccc88b42142137c4da3",
       "src/components/tunevio/TunevioHome.tsx": "535f8d6dfd4725438db2116151ac122b",
-      "src/components/tunevio/cards.tsx": "45c57260e8250e349c2a35a0b49e25cc",
+      "src/components/tunevio/cards.tsx": "5777fc5dcec32e91bad9a3c9958a1ccd",
       "src/components/ui/accordion.tsx": "1152021ea2d7f6dbffa8a9c49b4fc657",
       "src/components/ui/alert-dialog.tsx": "6c6d8c338274d9ea9213cb3f846aa441",
       "src/components/ui/alert.tsx": "f993d7e96b1e25ce50e68ed97e11d2a8",
@@ -428,7 +430,7 @@
       "src/components/ui/separator.tsx": "e970901b62fe8b73d2b9254fad77f583",
       "src/components/ui/sheet.tsx": "f9dab8daf0021ef0481f3913acb1dc4e",
       "src/components/ui/sidebar.tsx": "1569d08f4b4c4e139d4b6d070f0e05e3",
-      "src/components/ui/signed-img.tsx": "9f4e21f6c2add152a1b98dc2891a4c1a",
+      "src/components/ui/signed-img.tsx": "4847a7392114391d9ade00154afea780",
       "src/components/ui/skeleton.tsx": "41b182e6e2fc3805960d41e767d4a972",
       "src/components/ui/slider.tsx": "4752f1bfa26426988d325599e01c335b",
       "src/components/ui/sonner.tsx": "97f59f60be3413196d095fcbf7383216",
@@ -686,7 +688,7 @@
       "src/lib/settings-navigation.test.ts": "bc8d86c9a38502f0a49fe4f1fc914ed4",
       "src/lib/settings-navigation.ts": "a0712cb541a1d6aed4c1d8e0550da136",
       "src/lib/signed-audio.functions.ts": "78c7ba7146393b9596197ee2f7e6a7f1",
-      "src/lib/signed-avatar.functions.ts": "7b6901d32a0d68396404fefbb49c2a39",
+      "src/lib/signed-avatar.functions.ts": "c01f4fac5f31d506e05e8eaa583b5e31",
       "src/lib/site-nav.functions.ts": "ba907ccde3f3ce5f6ec8093f70353bd0",
       "src/lib/stage-connection-context.tsx": "a42371f516e2aa2485632c330c2ba72f",
       "src/lib/stage-microphone.test.ts": "fadece8d8c682e7882c2939047c610a3",
@@ -728,7 +730,7 @@
       "src/lib/useRenderActive.ts": "7cb4ef94d80fde0dca5bb06e20c539d3",
       "src/lib/useSharedAudioGraph.ts": "837600387f9aeed6bb5a4bf56dfc634c",
       "src/lib/useSignedAudio.ts": "325ded0a5d7666a918a7d0983993cd58",
-      "src/lib/useSignedAvatar.ts": "65eeb5dc82547bb6c52722486e8ed0c5",
+      "src/lib/useSignedAvatar.ts": "43b4a8dc68c033c0298248c2d140913c",
       "src/lib/useStageGateway.ts": "a21d730827b14d9d008dd9278eda9bd5",
       "src/lib/useStageState.ts": "14778b92ab7b99183560189c72f24622",
       "src/lib/utils.ts": "d9837f38cc05303254571985e3164050",
@@ -755,7 +757,7 @@
       "src/routes/[.mcp]/invoke-tool/$tool.ts": "2cc296128352d61d70726e7428ef5ca5",
       "src/routes/[.mcp]/list-tools.ts": "bc1d258eb3237605d066b9a536a63d5d",
       "src/routes/[.well-known]/oauth-protected-resource.ts": "2dbcc907a7d3ab43955e6dbbb99e7a1d",
-      "src/routes/__root.tsx": "79b472737e232fa54e74b669223087ee",
+      "src/routes/__root.tsx": "6fb21c93aed62de1d616c65f819bd8bd",
       "src/routes/acceptable-use.tsx": "296592b325e1320df09867bc094b3c6d",
       "src/routes/access-denied.tsx": "3c101d330024b3cfa77bf79e3c8dc7f1",
       "src/routes/admin.analytics.tsx": "d0eb03e539a2202dda1089ba7693a35d",
@@ -913,7 +915,7 @@
       "src/routes/videos.$id.tsx": "158d144dbe4236330ac564c2ac26595c",
       "src/routes/videos.index.tsx": "89b6f7db40e75bf4bb9f404562aeb4e6",
       "src/start.ts": "7f4dc49aeb77662edd8481a891150dbe",
-      "src/styles.css": "3a803557f9ca7fb9aa839d16af49758f",
+      "src/styles.css": "03a176818ff761d1bd3bf493a2a52b36",
       "src/types/play-arena.types.ts": "9ba13d55b1f83abcd7e9f8039e2b3d74",
       "src/utils/payments.functions.ts": "7bccb372e8e43c2aaf9bda9109488f20",
       "supabase/config.toml": "2d1dc86e57ed7a3710159d4a26060d64",
@@ -2845,6 +2847,11 @@
       "import_path": ""
     },
     {
+      "name": "ProfilePhotoGate",
+      "file": "src/components/profile/ProfilePhotoGate",
+      "import_path": ""
+    },
+    {
       "name": "InstallPromptPopup",
       "file": "src/components/pwa/InstallPromptPopup",
       "import_path": ""
@@ -3981,6 +3988,11 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "Slider",
+      "file": "src/components/ui/slider",
+      "import_path": ""
     },
     {
       "name": "Spinner",
