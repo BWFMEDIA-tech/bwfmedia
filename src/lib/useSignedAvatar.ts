@@ -26,17 +26,25 @@ function flushBatch() {
   if (urls.length === 0) return;
   signAvatarUrls({ data: { urls, expiresIn: TTL_SECONDS } })
     .then(async (res) => {
+      const now = Date.now();
+      const expiresIn = res?.expiresIn ?? TTL_SECONDS;
+      // Unrelated private queue fallbacks must not delay authorized public photos.
+      for (const [url, fns] of resolvers.entries()) {
+        const signed = res?.results?.[url];
+        if (!signed) continue;
+        cache.set(cacheKey(url), { url: signed, expiresAt: now + expiresIn * 1000 });
+        for (const fn of fns) fn(signed);
+      }
       const missing = urls.filter((url) => !res?.results?.[url]);
       const queued = missing.length
         ? await signQueuedArtworkUrls({ data: { urls: missing } }).catch(() => null)
         : null;
-      const now = Date.now();
-      const expiresIn = res?.expiresIn ?? TTL_SECONDS;
       for (const [url, fns] of resolvers.entries()) {
         const publicSigned = res?.results?.[url];
-        const signed = publicSigned ?? queued?.results?.[url] ?? null;
+        if (publicSigned) continue;
+        const signed = queued?.results?.[url] ?? null;
         if (signed) {
-          cache.set(cacheKey(url), { url: signed, expiresAt: now + (publicSigned ? expiresIn : 600) * 1000 });
+          cache.set(cacheKey(url), { url: signed, expiresAt: Date.now() + 600 * 1000 });
         }
         for (const fn of fns) fn(signed);
       }
