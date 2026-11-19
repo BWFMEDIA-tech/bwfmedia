@@ -10,7 +10,7 @@ const inflight = new Map<string, PendingEntry>();
 
 // Long-lived links keep the same URL across visits so the browser reuses its saved copy.
 const TTL_SECONDS = 60 * 60 * 24;
-const STORE_KEY = "tunevio:signed-img:v1";
+const STORE_KEY = "tunevio:signed-img:v2";
 function loadStore() {
   if (typeof window === "undefined") return;
   try {

@@ -84,7 +84,7 @@ export const signAvatarUrls = createServerFn({ method: "POST" })
     if (width) {
       const bucket = supabaseAdmin.storage.from("avatars");
       await Promise.all(paths.map(async (p) => {
-        const { data: one } = await bucket.createSignedUrl(p, expiresIn, { transform: { width, quality: 75 } });
+        const { data: one } = await bucket.createSignedUrl(p, expiresIn, { transform: { width, height: width, resize: "contain", quality: 75 } });
         out[pathMap.get(p)!] = one?.signedUrl ?? null;
       }));
       return { results: out, expiresIn };
