@@ -1727,3 +1727,34 @@ html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; text-si
 .tunevio-phone-navigation.pb-nav { border: 0; background: transparent; backdrop-filter: none; padding-inline: .5rem; }
 .pb-nav-bar { margin: 0 auto .4rem; border-radius: 9999px; border: 1px solid color-mix(in oklab, var(--brand-cyan) 22%, transparent); background: linear-gradient(180deg, color-mix(in oklab, var(--brand-blue) 10%, transparent), color-mix(in oklab, var(--background) 88%, transparent)); backdrop-filter: blur(20px); box-shadow: inset 0 1px 0 rgb(255 255 255 / .06), 0 0 24px -8px color-mix(in oklab, var(--brand-cyan) 35%, transparent); }
 .pb-nav-item[aria-current="page"]::after { content: ""; position: absolute; bottom: 2px; left: 30%; right: 30%; height: 3px; border-radius: 9999px; background: var(--brand-cyan); box-shadow: 0 0 10px var(--brand-cyan); }
+
+/* Tunevio Billboard (charts page only) */
+.tbb-page {
+  background:
+    radial-gradient(60% 40% at 50% 0%, color-mix(in srgb, var(--brand-blue) 28%, transparent), transparent 70%),
+    radial-gradient(40% 30% at 85% 20%, color-mix(in srgb, var(--brand-cyan) 10%, transparent), transparent 70%),
+    var(--background);
+}
+.tbb-chrome {
+  background: linear-gradient(180deg, #fff 0%, var(--brand-silver, #c9d2dc) 45%, #7f8a96 60%, #f4f7fa 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--brand-blue) 45%, transparent));
+}
+.tbb-tabs { background: color-mix(in srgb, var(--background) 70%, transparent); border: 1px solid color-mix(in srgb, var(--brand-blue) 30%, transparent); scrollbar-width: none; }
+.tbb-tabs::-webkit-scrollbar { display: none; }
+.tbb-tab-on { background: var(--gradient-blood); box-shadow: 0 0 16px color-mix(in srgb, var(--brand-blue) 55%, transparent); }
+.tbb-row {
+  background: linear-gradient(135deg, color-mix(in srgb, #fff 5%, transparent), color-mix(in srgb, var(--brand-blue) 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--brand-blue) 22%, transparent);
+  backdrop-filter: blur(10px);
+}
+.tbb-row-top {
+  border-color: color-mix(in srgb, var(--brand-cyan) 70%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--brand-blue) 45%, transparent), inset 0 0 40px color-mix(in srgb, var(--brand-cyan) 10%, transparent);
+  background: radial-gradient(80% 120% at 0% 0%, color-mix(in srgb, var(--brand-cyan) 16%, transparent), transparent 60%), linear-gradient(135deg, color-mix(in srgb, #fff 7%, transparent), color-mix(in srgb, var(--brand-blue) 12%, transparent));
+}
+.tbb-rank {
+  background: linear-gradient(180deg, #fff, #9aa5b1 55%, #e6ebf0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.tbb-cta { background: var(--gradient-blood); color: #fff; box-shadow: 0 0 20px color-mix(in srgb, var(--brand-blue) 50%, transparent); }

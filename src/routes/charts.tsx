@@ -1,17 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
-import { BarChart3, Flame, Heart, Play, Sparkles, Star, TrendingUp, Trophy, Music } from "lucide-react";
+import { ChevronRight, Crown, Flame, Heart, Music, Play, RefreshCw, Sparkles, Star, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 import { usePlayer } from "@/lib/player-context";
 import { getCharts, type ChartTab, type ChartTrack } from "@/lib/charts.functions";
+import logoAsset from "@/assets/tunevio-header-logo.png.asset.json";
+
+const PREVIEW = 20;
 
 const chartsQuery = (tab: ChartTab) =>
   queryOptions({
     queryKey: ["charts", tab],
-    queryFn: () => getCharts({ data: { tab, limit: 50 } }),
+    queryFn: () => getCharts({ data: { tab, limit: 100 } }),
     staleTime: 30_000,
+    refetchInterval: 60_000,
   });
 
 export const Route = createFileRoute("/charts")({
@@ -19,10 +23,10 @@ export const Route = createFileRoute("/charts")({
     meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { title: "Charts — Tunevio" },
-      { name: "description", content: "Ranked tracks on Tunevio." },
-      { property: "og:title", content: "Charts — Tunevio" },
-      { property: "og:description", content: "Ranked tracks on Tunevio." },
+      { title: "Top 100 Songs — Tunevio Billboard" },
+      { name: "description", content: "The hottest tracks on Tunevio, ranked by verified plays." },
+      { property: "og:title", content: "Top 100 Songs — Tunevio Billboard" },
+      { property: "og:description", content: "The hottest tracks on Tunevio, ranked by verified plays." },
     ],
   }),
   errorComponent: ({ error }) => (
@@ -34,210 +38,159 @@ export const Route = createFileRoute("/charts")({
   component: ChartsPage,
 });
 
-const TABS: { id: ChartTab; label: string; icon: React.ComponentType<{ className?: string }>; }[] = [
-  { id: "top_rated", label: "Top Rated", icon: Trophy },
-  { id: "trending", label: "Trending", icon: Flame },
-  { id: "most_played", label: "Most Played", icon: Play },
-  { id: "most_liked", label: "Most Liked", icon: Heart },
-  { id: "fresh_reviews", label: "Fresh Reviews", icon: Sparkles },
+const TABS: { id: ChartTab; label: string; icon: React.ComponentType<{ className?: string }>; metric: string }[] = [
+  { id: "top_100", label: "Top 100", icon: Trophy, metric: "Ranked by verified total plays" },
+  { id: "trending", label: "Trending", icon: Flame, metric: "Most verified plays in the last 7 days" },
+  { id: "most_played", label: "Most Played", icon: Play, metric: "Highest cumulative verified plays" },
+  { id: "most_liked", label: "Most Liked", icon: Heart, metric: "Most unique likes" },
+  { id: "fresh_reviews", label: "Fresh Reviews", icon: Sparkles, metric: "Newest rated tracks" },
 ];
 
 function ChartsPage() {
-  const [tab, setTab] = useState<ChartTab>("top_rated");
-  const { data: rows = [], isLoading } = useQuery(chartsQuery(tab));
+  const [tab, setTab] = useState<ChartTab>("top_100");
+  const [full, setFull] = useState(false);
+  const { data, isLoading, isFetching, refetch, isError } = useQuery(chartsQuery(tab));
+  const rows = data?.tracks ?? [];
+  const shown = full ? rows : rows.slice(0, PREVIEW);
   const active = TABS.find((t) => t.id === tab) ?? TABS[0];
 
   return (
-    <main className="swara-charts min-h-screen bg-background text-foreground pt-8 pb-24 md:pb-10">
-      <div className="mx-auto w-full max-w-6xl px-4 md:px-8">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <BarChart3 className="h-7 w-7 text-primary" />
-            <h1 className="text-3xl md:text-4xl font-semibold">Charts</h1>
-          </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ranked tracks on Tunevio.
+    <main className="tbb-page min-h-screen overflow-x-hidden pb-24 pt-6 text-foreground md:pb-10">
+      <div className="mx-auto w-full max-w-4xl px-3 md:px-6">
+        <header className="flex flex-col items-center text-center">
+          <img src={logoAsset.url} alt="Tunevio" className="h-14 w-auto object-contain md:h-20" />
+          <h1 className="tbb-chrome mt-3 text-3xl font-black tracking-tight md:text-5xl">TOP 100 SONGS</h1>
+          <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand-cyan md:text-xs">
+            The hottest tracks on Tunevio
           </p>
-        </div>
+        </header>
 
-        {/* Tabs */}
-        <div className="swara-chart-tabs mb-6 grid grid-cols-2 gap-1 rounded-xl border border-border bg-secondary p-1 sm:grid-cols-3 md:grid-cols-5">
+        <nav className="tbb-tabs mt-5 flex gap-1 overflow-x-auto rounded-2xl p-1" aria-label="Chart type">
           {TABS.map((t) => {
             const Icon = t.icon;
-            const isActive = t.id === tab;
+            const on = t.id === tab;
             return (
-              <Button
-                variant="ghost"
-                aria-pressed={isActive}
+              <button
                 key={t.id}
-                onClick={() => setTab(t.id)}
-                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow shadow-primary/30"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                type="button"
+                aria-pressed={on}
+                onClick={() => { setTab(t.id); setFull(false); }}
+                className={`flex shrink-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm ${
+                  on ? "tbb-tab-on text-white" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                <span className="truncate">{t.label}</span>
-              </Button>
+                <Icon className="h-3.5 w-3.5" />
+                {t.label}
+              </button>
             );
           })}
+        </nav>
+
+        <div className="mt-4 flex items-center justify-between gap-2 px-1 text-[11px] text-muted-foreground">
+          <span className="truncate">{active.metric}</span>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Refresh chart"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            {data ? `Updated ${new Date(data.updatedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : "Refresh"}
+          </button>
         </div>
 
-        {/* Section title */}
-        <div className="mb-3 flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <h2 className="text-lg font-bold">{active.label}</h2>
-          </div>
-          <div className="text-xs uppercase tracking-widest text-muted-foreground">
-            {rows.length} track{rows.length === 1 ? "" : "s"}
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="swara-chart-table overflow-hidden rounded-xl border border-border bg-background">
-          <div className="hidden md:grid grid-cols-[48px_1fr_80px_120px_80px_80px] gap-4 border-b border-border bg-secondary/40 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            <div>#</div>
-            <div>Track</div>
-            <div className="text-right">Time</div>
-            <div className="text-right">Rating</div>
-            <div className="text-right">Plays</div>
-            <div className="text-right">Likes</div>
-          </div>
-
+        <section className="mt-3 space-y-2">
           {isLoading ? (
-            <div className="p-10 text-center text-sm text-muted-foreground">Loading charts…</div>
+            Array.from({ length: 6 }).map((_, i) => <div key={i} className="tbb-row h-[72px] animate-pulse rounded-2xl" />)
+          ) : isError ? (
+            <div className="tbb-row rounded-2xl p-8 text-center text-sm text-muted-foreground">
+              Couldn't load this chart. <button className="text-brand-cyan underline" onClick={() => refetch()}>Try again</button>
+            </div>
           ) : rows.length === 0 ? (
-            <div className="p-10 text-center text-sm text-muted-foreground">No tracks yet in this chart.</div>
+            <div className="tbb-row rounded-2xl p-8 text-center text-sm text-muted-foreground">No eligible songs in this chart yet.</div>
           ) : (
-            <ul className="divide-y divide-border/50">
-              {rows.map((t, i) => (
-                <ChartRow key={t.id} track={t} index={i + 1} queue={rows} />
+            <ol className="space-y-2">
+              {shown.map((t, i) => (
+                <ChartRow key={t.id} track={t} rank={i + 1} queue={rows} tab={tab} />
               ))}
-            </ul>
+            </ol>
           )}
-        </div>
+        </section>
+
+        {!full && rows.length > PREVIEW && (
+          <div className="mt-5 flex justify-center">
+            <Button onClick={() => setFull(true)} className="tbb-cta rounded-full px-6 font-black tracking-wide">
+              VIEW FULL BILLBOARD 100 <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </main>
   );
 }
 
-function ChartRow({ track, index, queue }: { track: ChartTrack; index: number; queue: ChartTrack[] }) {
+function ChartRow({ track, rank, queue, tab }: { track: ChartTrack; rank: number; queue: ChartTrack[]; tab: ChartTab }) {
   const player = usePlayer();
   const canPlay = !!track.audioUrl;
+  const top = rank === 1;
 
   function handlePlay() {
     if (!track.audioUrl) return;
-    const playable = queue.flatMap((q) => q.audioUrl ? [{ id: q.id, title: q.title, artist: q.artistName, audioUrl: q.audioUrl, coverUrl: q.coverUrl ?? undefined }] : []);
-    player.play(
-      {
-        id: track.id,
-        title: track.title,
-        artist: track.artistName,
-        audioUrl: track.audioUrl,
-        coverUrl: track.coverUrl ?? undefined,
-      },
-      playable,
-    );
+    const playable = queue.flatMap((q) => (q.audioUrl ? [{ id: q.id, title: q.title, artist: q.artistName, audioUrl: q.audioUrl, coverUrl: q.coverUrl ?? undefined }] : []));
+    player.play({ id: track.id, title: track.title, artist: track.artistName, audioUrl: track.audioUrl, coverUrl: track.coverUrl ?? undefined }, playable);
   }
 
-  const rank =
-    index === 1 ? "text-primary" : index === 2 ? "text-brand-silver" : index === 3 ? "text-accent" : "text-muted-foreground";
+  const stat =
+    tab === "most_liked"
+      ? { value: track.likeCount, label: "likes" }
+      : tab === "trending"
+        ? { value: track.recentPlays, label: "plays / 7d" }
+        : { value: track.playCount, label: "plays" };
 
   return (
-    <li className="grid grid-cols-[36px_1fr_auto] md:grid-cols-[48px_1fr_80px_120px_80px_80px] items-center gap-3 md:gap-4 px-3 md:px-4 py-3 hover:bg-secondary/40">
-      <div className={`text-sm font-black tabular-nums ${rank}`}>{index}</div>
-
-      <Button
-        variant="ghost"
+    <li className={`tbb-row relative flex items-center gap-3 rounded-2xl px-3 ${top ? "tbb-row-top py-4" : "py-2.5"}`}>
+      <div className={`tbb-rank w-9 shrink-0 text-center font-black tabular-nums ${top ? "text-4xl" : "text-xl"}`}>
+        {top && <Crown className="mx-auto -mb-1 h-4 w-4 text-brand-cyan" aria-hidden />}
+        {rank}
+      </div>
+      <button
+        type="button"
         disabled={!canPlay}
-        aria-label={`Play ${track.title}`}
         onClick={handlePlay}
-        className="group flex h-auto min-w-0 justify-start gap-3 p-0 text-left hover:bg-transparent"
+        aria-label={`Play ${track.title}`}
+        className={`group relative aspect-square shrink-0 overflow-hidden rounded-xl bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${top ? "w-16 md:w-20" : "w-12 md:w-14"}`}
       >
-        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary">
-          {track.coverUrl ? (
-            <SignedImg src={track.coverUrl} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <div className="grid h-full w-full place-items-center text-muted-foreground">
-              <Music className="h-4 w-4" />
-            </div>
-          )}
-          {canPlay && (
-            <div className="absolute inset-0 grid place-items-center bg-background/50 opacity-0 transition group-hover:opacity-100">
-              <Play className="h-4 w-4 text-foreground" />
-            </div>
-          )}
-        </div>
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold">{track.title}</div>
-          {track.artistUserId ? (
-            <Link
-              to="/artist/$id"
-              params={{ id: track.artistUserId }}
-              onClick={(e) => e.stopPropagation()}
-              className="block truncate text-xs text-muted-foreground hover:text-primary transition"
-            >
-              {track.artistName}
-            </Link>
-          ) : (
-            <div className="truncate text-xs text-muted-foreground">{track.artistName}</div>
-          )}
-        </div>
-      </Button>
-
-      <div className="hidden md:block text-right text-xs tabular-nums text-muted-foreground">
-        {track.durationSeconds ? fmtTime(track.durationSeconds) : "—"}
-      </div>
-      <div className="hidden md:flex items-center justify-end gap-1 text-xs tabular-nums">
-        {track.ratingCount > 0 ? (
-          <>
-            <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-            <span className="font-bold text-primary">{track.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">({track.ratingCount})</span>
-          </>
+        {track.coverUrl ? (
+          <SignedImg src={track.coverUrl} alt="" className="h-full w-full object-cover" />
         ) : (
-          <span className="text-muted-foreground">—</span>
+          <Music className="m-auto h-4 w-4 text-muted-foreground" />
         )}
-      </div>
-      <div className="hidden md:block text-right text-xs tabular-nums text-muted-foreground">
-        {track.playCount > 0 ? fmtCount(track.playCount) : "—"}
-      </div>
-      <div className="hidden md:block text-right text-xs tabular-nums text-muted-foreground">
-        {track.likeCount > 0 ? fmtCount(track.likeCount) : "—"}
-      </div>
-
-      {/* Mobile compact stats */}
-      <div className="md:hidden flex items-center gap-3 text-[11px] tabular-nums text-muted-foreground">
-        {track.ratingCount > 0 && (
-          <span className="inline-flex items-center gap-1 text-primary">
-            <Star className="h-3 w-3 fill-primary" />
-            {track.rating.toFixed(1)}
+        {canPlay && (
+          <span className="absolute inset-0 grid place-items-center bg-black/40 opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+            <Play className="h-4 w-4 fill-white text-white" />
           </span>
         )}
-        {track.playCount > 0 && (
-          <span className="inline-flex items-center gap-1">
-            <Play className="h-3 w-3" />
-            {fmtCount(track.playCount)}
-          </span>
+      </button>
+      <div className="min-w-0 flex-1">
+        <div className={`truncate font-bold ${top ? "text-base md:text-lg" : "text-sm"}`}>{track.title}</div>
+        {track.artistUserId ? (
+          <Link to="/artist/$id" params={{ id: track.artistUserId }} className="block truncate text-xs text-muted-foreground hover:text-brand-cyan">
+            {track.artistName}
+          </Link>
+        ) : (
+          <div className="truncate text-xs text-muted-foreground">{track.artistName}</div>
         )}
-        {track.likeCount > 0 && (
-          <span className="inline-flex items-center gap-1">
-            <Heart className="h-3 w-3" />
-            {fmtCount(track.likeCount)}
-          </span>
-        )}
+        <div className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Star className={`h-3 w-3 ${track.ratingCount > 0 ? "fill-brand-cyan text-brand-cyan" : ""}`} />
+          {track.ratingCount > 0 ? track.rating.toFixed(1) : "—"}
+        </div>
+      </div>
+      <div className="shrink-0 text-right">
+        <div className={`font-black tabular-nums text-white ${top ? "text-xl" : "text-base"}`}>{fmtCount(stat.value)}</div>
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-brand-cyan">{stat.label}</div>
       </div>
     </li>
   );
-}
-
-function fmtTime(s: number) {
-  const m = Math.floor(s / 60);
-  const r = Math.floor(s % 60);
-  return `${m}:${r.toString().padStart(2, "0")}`;
 }
 
 function fmtCount(n: number) {
