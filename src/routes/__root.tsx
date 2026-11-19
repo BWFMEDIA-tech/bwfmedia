@@ -12,6 +12,7 @@ import { CartButton, CartDrawer } from "@/components/CartDrawer";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MobileBottomNav } from "@/components/site/MobileBottomNav";
+import { ProfilePhotoGate } from "@/components/profile/ProfilePhotoGate";
 import { IntroSplash } from "@/components/site/IntroSplash";
 import { AssistantLauncher } from "@/components/assistant/AssistantLauncher";
 import { InstallPromptPopup } from "@/components/pwa/InstallPromptPopup";
@@ -181,6 +182,7 @@ function RootComponent() {
         {showBottomNav && !["/help", "/go-live", "/messages"].includes(pathname) && !pathname.startsWith("/artist/") && !pathname.startsWith("/store/checkout") && <AssistantLauncher raised />}
         <Toaster position="top-center" richColors />
         <InstallPromptPopup />
+        <ProfilePhotoGate />
          <FreestyleChallengePopup />
          <BattleChallengePopup />
         </ArtistStatusProvider>
