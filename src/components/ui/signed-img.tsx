@@ -77,7 +77,10 @@ export const SignedBackground = React.forwardRef<HTMLDivElement, SignedBackgroun
       <div
         ref={ref}
         style={{
-          backgroundPosition: "50% 18%",
+          backgroundPosition: "center",
+          backgroundSize: "contain",
+          backgroundRepeat: "no-repeat",
+          backgroundColor: "#000",
           ...style,
           backgroundImage: resolved ? `url(${resolved})` : fallbackBackground,
         }}

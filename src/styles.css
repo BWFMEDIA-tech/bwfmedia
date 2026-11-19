@@ -1762,6 +1762,7 @@ html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; text-si
 /* Show whole photos/artwork — never chop them. Round avatars keep filling their circle, face-focused. */
 img.object-cover:not(.rounded-full):not([data-crop]):not(.rounded-full *) {
   object-fit: contain !important;
+  object-position: center !important;
   background-color: #000;
 }
 img.object-cover.rounded-full {
