@@ -38,11 +38,7 @@ export const SignedImg = React.forwardRef<HTMLImageElement, SignedImgProps>(
       loading={loading}
       decoding={decoding}
       // Round avatars keep faces in frame; artwork shows the whole image, letterboxed on black.
-      style={
-        /rounded-full/.test(props.className ?? "")
-          ? { objectPosition: "50% 18%", ...style }
-          : { objectFit: "contain", backgroundColor: "#000", ...style }
-      }
+      style={style}
       {...props}
     />
   );
