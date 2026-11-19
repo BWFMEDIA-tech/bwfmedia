@@ -37,8 +37,12 @@ export const SignedImg = React.forwardRef<HTMLImageElement, SignedImgProps>(
       onError={handleError}
       loading={loading}
       decoding={decoding}
-      // Photos are mostly portraits: keep faces in frame instead of centre-cropping to the torso.
-      style={{ objectPosition: "50% 18%", ...style }}
+      // Round avatars keep faces in frame; artwork shows the whole image, letterboxed on black.
+      style={
+        /rounded-full/.test(props.className ?? "")
+          ? { objectPosition: "50% 18%", ...style }
+          : { objectFit: "contain", backgroundColor: "#000", ...style }
+      }
       {...props}
     />
   );
