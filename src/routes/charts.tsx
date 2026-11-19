@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SignedImg } from "@/components/ui/signed-img";
 import { usePlayer } from "@/lib/player-context";
 import { getCharts, type ChartTab, type ChartTrack } from "@/lib/charts.functions";
-import logoAsset from "@/assets/tunevio-header-logo.png.asset.json";
+import logoAsset from "@/assets/tunevio-charts-wordmark.webp.asset.json";
 
 const PREVIEW = 20;
 
