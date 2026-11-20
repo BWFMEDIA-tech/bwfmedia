@@ -79,7 +79,7 @@ export const createBoostPackCheckout = createServerFn({ method: "POST" })
           credits: String(pack.credits),
         },
         payment_intent_data: {
-          description: `BWF Network — ${pack.name}`,
+          description: `Tunevio — ${pack.name}`,
           metadata: {
             kind: "boost_credit_pack",
             userId: context.userId,

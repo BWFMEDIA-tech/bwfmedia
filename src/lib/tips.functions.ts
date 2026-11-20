@@ -27,7 +27,7 @@ export const createTipCheckout = createServerFn({ method: 'POST' })
     try {
       const stripe = createStripeClient(data.environment);
       const tipUserId = context.userId ?? '';
-      const productName = data.artistId ? 'BWF Artist Tip' : 'BWF Live Tip';
+      const productName = data.artistId ? 'Tunevio Artist Tip' : 'Tunevio Live Tip';
       const session = await stripe.checkout.sessions.create({
         line_items: [{
           price_data: {

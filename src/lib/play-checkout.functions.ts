@@ -63,7 +63,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
         customer: customerId,
         metadata: { kind: "play_boost", userId: context.userId, credits: "2" },
         payment_intent_data: {
-          description: "BWFPLAY Skip-the-Line Boost (2 credits)",
+          description: "Tunevio Skip-the-Line Boost (2 credits)",
           metadata: { kind: "play_boost", userId: context.userId, credits: "2" },
         },
       });
