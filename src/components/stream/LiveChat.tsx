@@ -125,7 +125,6 @@ export function LiveChat({
     })();
 
     const channelName = `stream-chat-${streamId}-${Math.random().toString(36).slice(2, 10)}`;
-    console.log(`[LiveChat] MOUNT streamId=${streamId} channel=${channelName}`);
     const channel = supabase
       .channel(channelName)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "stream_messages", filter: `stream_id=eq.${streamId}` },
@@ -142,7 +141,6 @@ export function LiveChat({
         })
       .subscribe();
     return () => {
-      console.log(`[LiveChat] UNMOUNT streamId=${streamId} channel=${channelName}`);
       cancelled = true;
       supabase.removeChannel(channel);
     };

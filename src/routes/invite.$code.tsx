@@ -46,7 +46,6 @@ function InvitePage() {
   const [joinedAs, setJoinedAs] = useState<Role | null>(null);
 
   useEffect(() => {
-    console.log("[invite] page opened", { code });
     setLoading(true);
     resolveFn({ data: { code } })
       .then((r) => {
@@ -94,7 +93,6 @@ function InvitePage() {
       }
       setLk({ token, wsUrl });
       setJoinedAs(role);
-      console.log("[invite] joined room", { code, role, room: roomName });
 
       // If host or speaker, register as a stage participant with that role.
       if (auth.user && resolved.stream.mode === "stage") {

@@ -273,7 +273,7 @@ export const castBattleVote = createServerFn({ method: "POST" })
     const { getRequest, getRequestHeader, getRequestIP } = await import(
       "@tanstack/react-start/server"
     );
-    const { buildVoteTotals, validateVoteTotals, formatVoteDebugLog } = await import(
+    const { buildVoteTotals, validateVoteTotals } = await import(
       "@/lib/vote-math"
     );
 
@@ -350,8 +350,6 @@ export const castBattleVote = createServerFn({ method: "POST" })
         throw new Response("Vote recorded but totals are inconsistent — refresh", { status: 500 });
       }
     }
-    console.log(formatVoteDebugLog(data.roundId, totals));
-
     // Award XP for casting a vote (idempotent per round via reference_id).
     // Base vote = 5 XP, boosted vote = 25 XP.
     const weight = (res.weight as number) ?? 1;

@@ -198,7 +198,6 @@ export function StageAudioShell({
         <StageMuteEnforcement streamId={streamId} />
         <LocalSpeakingSignalPublisher />
         <AudioPlaybackUnblocker />
-        <ParticipantAudioLogger />
         <ReconnectAudioGuard serverUrl={serverUrl} token={token} />
         <StageReconnectBanner />
         {children}
@@ -268,9 +267,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
       if (localParticipant.permissions?.canPublish === false) return;
       localParticipant
         .setMicrophoneEnabled(true)
-        .then(() => {
-          console.log("[stage-audio] Mic enabled for stage role", { role });
-        })
+        .then(() => undefined)
         .catch((err) => {
           console.error("[stage-audio] Audio device error", err);
           toast.error(err?.message || "Microphone unavailable");
@@ -304,55 +301,6 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
     };
   }, [room, localParticipant, role, mutedUntil, permissionTick]);
 
-  return null;
-}
-
-/** Console-logs participant + track lifecycle so the audio pipeline is debuggable. */
-function ParticipantAudioLogger() {
-  const room = useRoomContext();
-  useEffect(() => {
-    if (!room) return;
-    const onConnected = (p: Participant) => {
-      console.log("[stage-audio] Participant connected");
-    };
-    const onDisconnected = (p: Participant) => {
-      console.log("[stage-audio] Participant disconnected");
-    };
-    const onSubscribed = (
-      _track: unknown,
-      pub: RemoteTrackPublication,
-      participant: RemoteParticipant,
-    ) => {
-      if (pub.kind === Track.Kind.Audio) {
-        console.log("[stage-audio] Audio track subscribed", {
-          trackSid: pub.trackSid,
-        });
-      }
-    };
-    const onState = (state: ConnectionState) => {
-      console.log("[stage-audio] Connection state:", state);
-    };
-    const onSpeakers = (speakers: Participant[]) => {
-      if (speakers.length) {
-        console.log(
-          "[stage-audio] Participant speaking",
-          speakers.map((s) => s.identity),
-        );
-      }
-    };
-    room.on(RoomEvent.ParticipantConnected, onConnected);
-    room.on(RoomEvent.ParticipantDisconnected, onDisconnected);
-    room.on(RoomEvent.TrackSubscribed, onSubscribed as any);
-    room.on(RoomEvent.ConnectionStateChanged, onState);
-    room.on(RoomEvent.ActiveSpeakersChanged, onSpeakers);
-    return () => {
-      room.off(RoomEvent.ParticipantConnected, onConnected);
-      room.off(RoomEvent.ParticipantDisconnected, onDisconnected);
-      room.off(RoomEvent.TrackSubscribed, onSubscribed as any);
-      room.off(RoomEvent.ConnectionStateChanged, onState);
-      room.off(RoomEvent.ActiveSpeakersChanged, onSpeakers);
-    };
-  }, [room]);
   return null;
 }
 
@@ -397,9 +345,6 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
           if (pub.kind === Track.Kind.Audio && !pub.isSubscribed) {
             try {
               (pub as RemoteTrackPublication).setSubscribed(true);
-              console.log("[stage-audio] Re-subscribed audio track", {
-                trackSid: pub.trackSid,
-              });
             } catch (err) {
               console.warn("[stage-audio] Failed to re-subscribe", err);
             }
@@ -419,7 +364,6 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       if (hasLiveAudio) return;
       try {
         await lp.setMicrophoneEnabled(true);
-        console.log("[stage-audio] Re-published mic after reconnect");
       } catch (err) {
         console.warn("[stage-audio] Mic republish failed, retrying", err);
         setTimeout(() => {
@@ -432,12 +376,10 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
     };
 
     const onReconnected = async () => {
-      console.log("[stage-audio] Room reconnected — restoring audio");
       resubscribeAllRemoteAudio();
       await republishMicIfNeeded();
     };
     const onReconnecting = () => {
-      console.log("[stage-audio] Room reconnecting…");
       const lp = room.localParticipant;
       if (lp) {
         wantsMic.current = lp.isMicrophoneEnabled;
@@ -451,7 +393,6 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
       if (pub.kind === Track.Kind.Audio && !pub.isSubscribed) {
         try {
           pub.setSubscribed(true);
-          console.log("[stage-audio] Auto-subscribed newly published audio");
         } catch (err) {
           console.warn("[stage-audio] Auto-subscribe failed", err);
         }
@@ -501,17 +442,14 @@ function ReconnectAudioGuard({ serverUrl, token }: { serverUrl: string; token: s
     ]);
     const onDisconnected = (reason?: DisconnectReason) => {
       if (reason !== undefined && NON_RECOVERABLE.has(reason)) {
-        console.log("[stage-audio] Disconnected (no rejoin)", reason);
         return;
       }
       rejoinAttempt += 1;
       const delay = Math.min(15000, 1000 * 2 ** Math.min(rejoinAttempt - 1, 3));
-      console.log("[stage-audio] Auto-rejoin in", delay, "ms (reason:", reason, ")");
       if (rejoinTimer) clearTimeout(rejoinTimer);
       rejoinTimer = setTimeout(async () => {
         try {
           await room.connect(serverUrlRef.current, tokenRef.current);
-          console.log("[stage-audio] Rejoined room");
           rejoinAttempt = 0;
           resubscribeAllRemoteAudio();
           await republishMicIfNeeded();

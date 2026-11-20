@@ -274,7 +274,6 @@ function useResilientLocalMediaPublish({
 
         if (!jobs.length) return;
 
-        console.log("[live-stage] restoring local media", { reason, labels });
         const results = await Promise.allSettled(jobs);
         let restored = false;
         let retryableFailure = false;

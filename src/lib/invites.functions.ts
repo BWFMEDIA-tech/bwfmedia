@@ -95,7 +95,6 @@ export const resolveInvite = createServerFn({ method: "POST" })
       return { ok: false, reason: "not_found" };
     }
 
-    console.log("[invite] opened", { streamId, allowed_role: row.allowed_role });
     return {
       ok: true,
       code: row.code,
