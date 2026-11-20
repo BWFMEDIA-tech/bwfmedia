@@ -1,5 +1,11 @@
 # Roadmap
 
+## Seven-day artist membership trial
+- [x] Apply seven-day trials to new artist membership checkouts, retain $9.99/month and unrelated plan trials
+- [x] Sixteen trial/pricing tests passed; browser confirmed Artist Pro seven-day trial/$9.99 and listener 30-day trials; preview build OK
+- [ ] Verify completed Stripe test checkout: no subscription or payment was created during this check
+- [ ] Require existing free artists to enroll: awaiting confirmation; existing billing agreements remain unchanged
+
 ## Image loading
 - [x] Measure visitor speed and inspect real Home artwork/thumbnail requests
 - [x] Batch thumbnail signing without changing permissions; release public artwork before private fallback

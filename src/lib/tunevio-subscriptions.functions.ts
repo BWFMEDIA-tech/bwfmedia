@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createStripeClient, type StripeEnv, getStripeErrorMessage } from "@/lib/stripe.server";
 import { validateReturnUrl } from "@/lib/validate-return-url";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { FREE_TRIAL_DAYS } from "@/lib/trial";
+import { getPlanTrialDays } from "@/lib/trial";
 
 export const TUNEVIO_PLANS = {
   listener_premium:     { role: "listener", label: "Premium",      priceCents:  699 },
@@ -79,11 +79,12 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
       const email = u.user?.email?.toLowerCase();
       const customerId = await resolveCustomerId(stripe, email, context.userId);
 
-      // One 30-day free trial per member: skip it if they've subscribed before.
-      const { count: priorSubs } = await context.supabase
+      // One free trial per member; fail closed if subscription history cannot be read.
+      const { count: priorSubs, error: historyError } = await context.supabase
         .from("subscriptions")
         .select("id", { count: "exact", head: true })
         .eq("user_id", context.userId);
+      if (historyError) throw historyError;
       const trialEligible = !priorSubs;
 
       const session = await stripe.checkout.sessions.create({
@@ -100,7 +101,7 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
           role: plan.role,
         },
         subscription_data: {
-          ...(trialEligible && { trial_period_days: FREE_TRIAL_DAYS }),
+          ...(trialEligible && { trial_period_days: getPlanTrialDays(data.planId) }),
           metadata: {
             kind: "tunevio_subscription",
             userId: context.userId,

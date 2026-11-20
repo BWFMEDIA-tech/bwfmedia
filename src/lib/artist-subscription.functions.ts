@@ -6,6 +6,7 @@ import {
   getStripeErrorMessage,
 } from "@/lib/stripe.server";
 import { validateReturnUrl } from "@/lib/validate-return-url";
+import { ARTIST_TRIAL_DAYS } from "@/lib/trial";
 
 const USERID_RE = /^[a-zA-Z0-9_-]+$/;
 
@@ -87,6 +88,12 @@ export const createArtistTrialCheckout = createServerFn({ method: "POST" })
         userId,
       });
 
+      const { count: priorSubs, error: historyError } = await supabase
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+      if (historyError) throw historyError;
+
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: stripePrice.id, quantity: 1 }],
         mode: "subscription",
@@ -95,11 +102,11 @@ export const createArtistTrialCheckout = createServerFn({ method: "POST" })
         customer: customerId,
         payment_method_collection: "always",
         subscription_data: {
-          trial_period_days: 30,
+          ...(!priorSubs && { trial_period_days: ARTIST_TRIAL_DAYS }),
           metadata: { userId, kind: "artist_membership" },
         },
         metadata: { userId, kind: "artist_membership" },
-      } as any);
+      });
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {

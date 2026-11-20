@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createStripeClient, type StripeEnv, getStripeErrorMessage } from "@/lib/stripe.server";
 import { validateReturnUrl } from "@/lib/validate-return-url";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { ARTIST_TRIAL_DAYS } from "@/lib/trial";
 
 const BoostSchema = z.object({
   returnUrl: z.string().url().refine((u) => {
@@ -89,6 +90,12 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
       const email = u.user?.email?.toLowerCase();
       const customerId = await resolveCustomerId(stripe, email, context.userId);
 
+      const { count: priorSubs, error: historyError } = await context.supabase
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", context.userId);
+      if (historyError) throw historyError;
+
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: price.id, quantity: 1 }],
         mode: "subscription",
@@ -96,7 +103,9 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
         return_url: data.returnUrl,
         customer: customerId,
         metadata: { kind: "play_membership", userId: context.userId },
+        payment_method_collection: "always",
         subscription_data: {
+          ...(!priorSubs && { trial_period_days: ARTIST_TRIAL_DAYS }),
           metadata: { kind: "play_membership", userId: context.userId },
         },
       });
