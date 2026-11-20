@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Starter song allowance
-- [ ] Enforce five successful song uploads for Starter accounts without changing other allowances or existing songs
-- [ ] Verify quota enforcement, upgrade guidance and pricing display
+- [x] Enforce five successful song uploads for Starter accounts using retained unique-song usage and atomic database enforcement; preserve existing songs and other allowances
+- [x] Six regression tests passed; temporary signed-in Starter artist saved five songs through the upload page, sixth blocked with Upgrade Plan link to /pricing; pricing displays five songs; test rows removed and preview build OK
 
 ## Seven-day artist membership trial
 - [x] Apply seven-day trials to new artist membership checkouts, retain $9.99/month and unrelated plan trials
