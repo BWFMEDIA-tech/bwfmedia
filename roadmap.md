@@ -1,5 +1,9 @@
 # Roadmap
 
+## Starter song allowance
+- [ ] Enforce five successful song uploads for Starter accounts without changing other allowances or existing songs
+- [ ] Verify quota enforcement, upgrade guidance and pricing display
+
 ## Seven-day artist membership trial
 - [x] Apply seven-day trials to new artist membership checkouts, retain $9.99/month and unrelated plan trials
 - [x] Sixteen trial/pricing tests passed; browser confirmed Artist Pro seven-day trial/$9.99 and listener 30-day trials; preview build OK

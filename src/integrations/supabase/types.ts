@@ -4952,6 +4952,21 @@ export type Database = {
           },
         ]
       }
+      song_upload_usage: {
+        Row: {
+          audio_key: string
+          user_id: string
+        }
+        Insert: {
+          audio_key: string
+          user_id: string
+        }
+        Update: {
+          audio_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stage_participants: {
         Row: {
           allow_camera: boolean
@@ -7233,6 +7248,7 @@ export type Database = {
           b_weight: number
         }[]
       }
+      get_song_upload_allowance: { Args: never; Returns: Json }
       get_stream_anomaly_summary: { Args: { _days?: number }; Returns: Json }
       get_stream_tip_totals: {
         Args: { p_stream_id: string }

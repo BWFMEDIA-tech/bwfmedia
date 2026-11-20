@@ -1,4 +1,5 @@
 - Centralize plan trial lengths in src/lib/trial.ts and apply them only to new, approved checkouts; fail closed on subscription-history errors, because unrelated plans and existing billing agreements must not change silently.
+- Enforce Starter song quotas with retained unique-audio usage and an atomic play_tracks trigger; preflight the shared uploader against the same allowance, because queue copies, signed URL refreshes, deletion and concurrent devices must not bypass upload limits.
 - Keep the legacy `/email/unsubscribe` token endpoint as a compatibility bridge to Lovable-managed subscription state, because already-sent emails still link to it; new email links remain Lovable-hosted.
 - Use the project-specific bearer middleware: validate tokens once, share recovery, retain server authorization. Shared account-access helpers validate redirects/errors and hydrate sessions; confirmation returns to /login and unknown roles to /home to avoid stale reads and host-only fallbacks.
 - Give each mounted notification bell its own Realtime topic, because the desktop and mobile headers coexist and subscribed channels cannot accept new database callbacks.

@@ -1,0 +1,1 @@
+Starter song upload allowance: maximum five successful unique song uploads per artist account. Preserve existing content; leave queue, video, stage, pricing and payment processing unchanged. No billing-cycle reset is introduced for the free Starter plan.

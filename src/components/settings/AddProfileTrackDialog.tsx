@@ -3,7 +3,7 @@ import { X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon } from "lucid
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { readAudioDurationSeconds } from "@/lib/audio-duration";
-import { saveUploadedProfileTrack, type UploadedProfileTrack } from "@/lib/profile-track-upload";
+import { checkSongUploadAllowance, saveUploadedProfileTrack, STARTER_SONG_LIMIT_MESSAGE, type UploadedProfileTrack } from "@/lib/profile-track-upload";
 import { Button } from "@/components/ui/button";
 
 const MAX_BYTES = 50 * 1024 * 1024;
@@ -30,6 +30,7 @@ export function AddProfileTrackDialog({
   const [coverUploading, setCoverUploading] = useState(false);
   const [coverProgress, setCoverProgress] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
   const saving = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
@@ -46,6 +47,7 @@ export function AddProfileTrackDialog({
     const durationSeconds = await readAudioDurationSeconds(file);
     setAudioDurationSeconds(durationSeconds);
     try {
+      await checkSongUploadAllowance(supabase);
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
       if (!uid) throw new Error("Sign in required");
@@ -65,6 +67,7 @@ export function AddProfileTrackDialog({
       setUploadedName(file.name);
       setProgress(100);
     } catch (e: any) {
+      if (e?.message === STARTER_SONG_LIMIT_MESSAGE) setLimitReached(true);
       toast.error(e?.message ?? "Upload failed"); setProgress(0);
     } finally { setUploading(false); }
   }
@@ -108,6 +111,7 @@ export function AddProfileTrackDialog({
       onAdded(saved);
       onClose();
     } catch (error) {
+      if (error instanceof Error && error.message === STARTER_SONG_LIMIT_MESSAGE) setLimitReached(true);
       toast.error(error instanceof Error ? error.message : "Failed to add track");
     } finally { saving.current = false; setBusy(false); }
   }
@@ -119,6 +123,12 @@ export function AddProfileTrackDialog({
           <X className="h-4 w-4" />
         </Button>
         <h2 className="text-xl font-bold mb-4">Add a track</h2>
+        {limitReached && (
+          <div role="alert" className="mb-4 space-y-3 text-sm text-muted-foreground">
+            <p>{STARTER_SONG_LIMIT_MESSAGE}</p>
+            <Button asChild variant="secondary"><a href="/pricing">Upgrade Plan</a></Button>
+          </div>
+        )}
         <div className="space-y-3">
           <input value={title} onChange={(e) => setTitle(e.target.value)} aria-label="Track title" placeholder="Track title"
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
@@ -194,7 +204,7 @@ export function AddProfileTrackDialog({
             </div>
           </div>
 
-          <Button onClick={submit} disabled={busy || uploading || coverUploading || !title.trim() || !artistName.trim() || !audioUrl}
+          <Button onClick={submit} disabled={limitReached || busy || uploading || coverUploading || !title.trim() || !artistName.trim() || !audioUrl}
             className="w-full">
             {busy ? "Adding…" : "Add to my profile"}
           </Button>
