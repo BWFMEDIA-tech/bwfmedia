@@ -767,6 +767,8 @@ import { FollowersModal } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d
 import { FreestyleBattle } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985"
 ```
 
+Render the existing stream’s separate Artist A/B battle experience. Hosts prepare accepted matchups; each assigned artist explicitly joins their own camera box using existing media permissions.
+
 **Props:**
 
 | Prop | Type | Default |
@@ -775,6 +777,18 @@ import { FreestyleBattle } from "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983
 | `hostId` | string | `—` |
 | `room` | string | `—` |
 | `participants` | object | `—` |
+
+**Examples:**
+
+_Stream freestyle battle_
+```tsx
+<FreestyleBattle streamId={stream.id} hostId={stream.host_id} room={stream.room_name} participants={participants} />
+```
+
+**Avoid:**
+
+- Never let an artist pick the other artist’s side or grant audience publication rights.
+- Do not use stage promotion to join a battle camera, override host mutes, or create a second connection when a room already exists.
 
 ### FreestyleChallengePopup
 

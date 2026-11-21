@@ -2,7 +2,7 @@
   "meta": {
     "name": "Tunevio",
     "package": "@ws-wlmm2vdsvca1rhvy79iv/27e4a45a-5178-4d5c-983d-86a01b3c0985",
-    "version": "1.14.0",
+    "version": "1.15.0",
     "framework": "react",
     "css_framework": "tailwind",
     "starter_template": "custom_design_system_tailwind",
@@ -11,7 +11,7 @@
     ],
     "source_type": "local",
     "source_manifest": {
-      "#enrichment": "f2d08c5ec8bd452c2dd8f172410dcfcd3fee14846df7cca5b004a58452bc132a",
+      "#enrichment": "cbb9a3242bd1935639a338facf74431bc2658df363060491fc744800c062c6d6",
       ".gitignore": "6d9e901a692b46a83707c245fb03bc91",
       ".lovable/mcp/manifest.json": "ff83019c8b61493a47ab1482c79d6860",
       ".lovable/meta.yaml": "954a981e8847ec1692669dbb04ae9ae9",
@@ -30,7 +30,7 @@
       ".lovable/starter-song-limit-note.md": "ae4e4ea08fbed61bedf8a8998e0861be",
       ".prettierignore": "e21a12aa81a8850840f9d9dcc8fa9b7b",
       ".prettierrc": "185ef0234746ab738ac1ab6cec5e2bd9",
-      "AGENTS.md": "4b08c8dc2a61ae6b8457896085d99fa9",
+      "AGENTS.md": "82d8924d8a147d257e9ad490c2844925",
       "bunfig.toml": "f8693c0a302bd41cbb5668cabfbac3b7",
       "capacitor.config.ts": "affbb3c320d4829c544d3c6692bfe29e",
       "components.json": "30d3d035361ce807021f5c54620962e9",
@@ -187,7 +187,7 @@
       "public/og-image.png": "516a17a774570948ece478b4696b7fd6",
       "public/push/worker.js": "26a17b90824dcd2a8c6bac9fe3610ae0",
       "public/robots.txt": "5ef9f07359d65dfcb3a5acebcc94b822",
-      "roadmap.md": "f2f2754fa519bb2d1bdb023c21b043c7",
+      "roadmap.md": "81c4913b75941d54fd2406df68907786",
       "scripts/check-auth-guard.ts": "74fd0ee932bdae9eabe56b01f32cc987",
       "src/assets/artist-store-hero.jpg": "798462dc5cbbd67270d845419c73930a",
       "src/assets/audience.jpg": "355a2fdd8e8e6d68ed42d8b2445f073b",
@@ -306,7 +306,7 @@
       "src/components/play/BattleChallenges.tsx": "030ab4720fdabae1ae2e9e87d7173070",
       "src/components/play/BattleTournamentStatus.tsx": "62bd9b17418b77394d64586d69c65d4a",
       "src/components/play/BoostCheckoutModal.tsx": "7f19f7adaddfbe98a38e03cfff64c50d",
-      "src/components/play/FreestyleBattle.tsx": "038f2088bc53d6a3424edc951967d5f3",
+      "src/components/play/FreestyleBattle.tsx": "1872ab73485371414199c1d3878afe43",
       "src/components/play/FreestyleChallengePopup.tsx": "f522fbf66cf81900e34495d39b390038",
       "src/components/play/FreestyleQueue.tsx": "2fea44be93255f9580b988d5c73f36e8",
       "src/components/play/GenreBattleBoard.tsx": "a53ec2eb5cf9a41ff2effcc7564fe5a6",
@@ -349,7 +349,7 @@
       "src/components/store/NfcPagePreview.tsx": "866a374192033982375313209d798887",
       "src/components/store/StoreProductCard.tsx": "4fa7c0c451a2c53d16be5a6041a2a1a2",
       "src/components/stream/AGENTS.md": "d121dbf2a221313e690f508baddb6b4b",
-      "src/components/stream/ArtistChallengesPanel.tsx": "0b009097ec9cc476b9f29b00f5e28e85",
+      "src/components/stream/ArtistChallengesPanel.tsx": "c99218a54ab4f2c3b3676f0d533180f9",
       "src/components/stream/AudioPlaybackUnblocker.test.tsx": "8f92229c4325d456e46c271cbe07bcfb",
       "src/components/stream/AudioPlaybackUnblocker.tsx": "cfdc4a4966e273c26b2ba67c0127e06c",
       "src/components/stream/BackstageQueue.tsx": "cd0990b682a8e47e0c80e763caa884c6",
@@ -375,8 +375,8 @@
       "src/components/stream/RaiseHandPanel.tsx": "698ec97fce089a9a3b0cf21fba8dfa5c",
       "src/components/stream/RecordButton.tsx": "648e02064f2c1806e069bfc33b123676",
       "src/components/stream/SelfMicrophoneButton.tsx": "48a6bfae4bbd56c5e5474c432b883adf",
-      "src/components/stream/StageAudioShell.tsx": "b6569ed8b7fe62c78bfcd6489de7c8f4",
-      "src/components/stream/StageMuteEnforcement.tsx": "510da3397850140725f3a8eddd725eef",
+      "src/components/stream/StageAudioShell.tsx": "b4d044ebac34e68036c8519dae36c104",
+      "src/components/stream/StageMuteEnforcement.tsx": "7f5ebda4e125872bd50be1da09346989",
       "src/components/stream/StageNavigationConnection.tsx": "565ce8c19e44371340c84bb3d56bcdb3",
       "src/components/stream/StageReconnectBanner.tsx": "8397539fba029b284a00e10c1f1a695c",
       "src/components/stream/StageRoom.tsx": "7ea3845625f58dd1cd0eb19e8a551e50",
@@ -585,6 +585,8 @@
       "src/lib/email-templates/studio-booking-confirmation.tsx": "a17351a86d5c9d0f7be9e3b946865af7",
       "src/lib/events.functions.ts": "a81855a3e71044a282f96d98398e9d91",
       "src/lib/freestyle-access.database.test.ts": "d3f8c34fc1dd5d0e6d740ecdd8288430",
+      "src/lib/freestyle-join.test.ts": "52c8ad911e3318878fe5e6967d6fded9",
+      "src/lib/freestyle-join.ts": "7dde10341806251600b1483b6e203be6",
       "src/lib/freestyle-placement.test.ts": "a4d482deddc47fb362554851d5066193",
       "src/lib/freestyle-placement.ts": "553d5f8586f1c519b94f4e88c2172aae",
       "src/lib/freestyle-queue.database.test.ts": "4e92f0a73567338ce3f2ab7ef8ae4ab0",
@@ -595,7 +597,7 @@
       "src/lib/freestyle-video.test.ts": "ebfdede55eec9c0944a633b9a515f3bc",
       "src/lib/freestyle-video.ts": "99f581789bd4bf0f70c3925d9b88e412",
       "src/lib/freestyle.database.test.ts": "852060ddaac29cd2caad82431684b5a2",
-      "src/lib/freestyle.functions.ts": "3e3b1a24a8abbb38109acca7121c6c6b",
+      "src/lib/freestyle.functions.ts": "b4607c5b85c49932acad9947517d43bb",
       "src/lib/home-feed-artists.test.ts": "9e15a6a9870d32cf1276ccf1de81920a",
       "src/lib/home-feed-artists.ts": "682633d2452acfa72ca8fa6ed7a8478f",
       "src/lib/home-feed.functions.ts": "df9368e09561249c52bf4965e4c3c45e",
@@ -630,7 +632,7 @@
       "src/lib/live-stage-navigation.ts": "405e0ba01f1ea5d439f0092c6155c809",
       "src/lib/live-video-slots.test.ts": "8487f2f7d52f996999bb5743418796e4",
       "src/lib/live-video-slots.ts": "fa4839f75a917ee52f0defa6daab8e48",
-      "src/lib/livekit.functions.ts": "db578f8168d1933d6619560b162ba064",
+      "src/lib/livekit.functions.ts": "287ba70e86df78f201a9b356027b4c57",
       "src/lib/mcp/index.ts": "b66b102ebbbf76041c2320bb6b410174",
       "src/lib/mcp/tools/about.ts": "3d321ec36ff7571babce8ac0918c607c",
       "src/lib/mcp/tools/list-artists.ts": "0a9ced83c4061ac2fb5b2e53bde91e6d",
@@ -726,6 +728,7 @@
       "src/lib/trial.ts": "48f69253bb22c11f10ce19807e00fb08",
       "src/lib/tunevio-subscriptions.functions.ts": "21965c9da633f4257f1f66f69b78c993",
       "src/lib/tunevio-subscriptions.test.ts": "62ab36d8ba97b51f5aeb40931b63a225",
+      "src/lib/use-freestyle-performers.ts": "80dd568e176393de2cd87f713bafe9f7",
       "src/lib/use-live-stage-navigation.ts": "82e7b20fe0592dce796f8b4dbe32441e",
       "src/lib/use-stage-presence.ts": "d8f04854de65f46cd663a5673ece75ee",
       "src/lib/useArenaLive.ts": "019929c9cec6cbca8facb11454dcb318",
@@ -880,7 +883,7 @@
       "src/routes/pay.$bookingId.tsx": "3794265c480560dddea4e99db53b7865",
       "src/routes/pay.return.tsx": "e5a1112efa1df905bf32125eb84920bf",
       "src/routes/payouts.tsx": "c8198dc46267f30b038076b8c8a2e285",
-      "src/routes/play.$room.tsx": "8dfd05e46ac436a2b60e767e2355b1cd",
+      "src/routes/play.$room.tsx": "2a86c8ea57dc133347b01cab3ea5f1d0",
       "src/routes/play.audience.$room.tsx": "3907950fc311243a77cc47b92a08655c",
       "src/routes/play.challenges.tsx": "cf77370213fbdfb469d2941a1444f93a",
       "src/routes/play.index.tsx": "ce5e16a4a9769f43e5026c31630725c8",
@@ -923,7 +926,7 @@
       "src/routes/videos.$id.tsx": "158d144dbe4236330ac564c2ac26595c",
       "src/routes/videos.index.tsx": "89b6f7db40e75bf4bb9f404562aeb4e6",
       "src/start.ts": "7f4dc49aeb77662edd8481a891150dbe",
-      "src/styles.css": "03a176818ff761d1bd3bf493a2a52b36",
+      "src/styles.css": "8c24e600438c4ccba921588f6e731f3d",
       "src/types/play-arena.types.ts": "9ba13d55b1f83abcd7e9f8039e2b3d74",
       "src/utils/payments.functions.ts": "7bccb372e8e43c2aaf9bda9109488f20",
       "supabase/config.toml": "2d1dc86e57ed7a3710159d4a26060d64",
@@ -2708,9 +2711,6 @@
       "name": "FreestyleBattle",
       "file": "src/components/play/FreestyleBattle",
       "import_path": "",
-      "usage": "Render the existing stream’s separate Artist A/B battle experience. Hosts prepare accepted matchups; each assigned artist explicitly joins their own camera box using existing media permissions.",
-      "examples": [{ "label": "Stream freestyle battle", "code": "<FreestyleBattle streamId={stream.id} hostId={stream.host_id} room={stream.room_name} participants={participants} />" }],
-      "antipatterns": ["Never let an artist pick the other artist’s side or grant audience publication rights.", "Do not use stage promotion to join a battle camera, override host mutes, or create a second connection when a room already exists."],
       "props": [
         {
           "name": "streamId",
@@ -2731,6 +2731,17 @@
           "type": "object",
           "required": true
         }
+      ],
+      "usage": "Render the existing stream’s separate Artist A/B battle experience. Hosts prepare accepted matchups; each assigned artist explicitly joins their own camera box using existing media permissions.",
+      "examples": [
+        {
+          "label": "Stream freestyle battle",
+          "code": "\u003cFreestyleBattle streamId={stream.id} hostId={stream.host_id} room={stream.room_name} participants={participants} /\u003e"
+        }
+      ],
+      "antipatterns": [
+        "Never let an artist pick the other artist’s side or grant audience publication rights.",
+        "Do not use stage promotion to join a battle camera, override host mutes, or create a second connection when a room already exists."
       ]
     },
     {
