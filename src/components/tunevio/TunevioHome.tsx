@@ -475,23 +475,24 @@ function MusicLiveHosts() {
           {hosts.map(host => {
             const name = host.host?.stage_name || host.host?.display_name || "Tunevio host";
             return (
-              <article key={host.host_id} className="group relative overflow-hidden rounded-lg border border-primary/30 bg-card transition-colors hover:border-primary/70">
+              <article key={host.host_id} className="group relative overflow-hidden rounded-2xl border border-tv-line bg-gradient-to-b from-card to-background shadow-xl shadow-primary/20 ring-1 ring-inset ring-white/5 transition-all duration-300 hover:-translate-y-1 hover:border-tv-cyan/60 hover:shadow-2xl hover:shadow-primary/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
                 <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-tv-cyan/80 to-transparent" />
                   <img src={tunevioLogo.url} alt="" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
-                  {host.host?.avatar_url && <SignedImg src={host.host.avatar_url} alt={name} displayWidth={400} className="absolute inset-0 h-full w-full object-cover" onError={event => { event.currentTarget.hidden = true; }} />}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-transparent" />
-                  <span className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-md bg-background/80 px-3 py-1.5 text-xs font-bold text-foreground">
+                  {host.host?.avatar_url && <SignedImg src={host.host.avatar_url} alt={name} displayWidth={400} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none" onError={event => { event.currentTarget.hidden = true; }} />}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                  <span className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-background/60 px-3 py-1.5 text-[11px] font-black tracking-[0.2em] text-foreground backdrop-blur-md">
                     <span className="h-2 w-2 rounded-full bg-destructive motion-safe:animate-pulse" />LIVE
                   </span>
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-background/80 px-2.5 py-1.5 text-xs font-semibold text-foreground" title="Listeners connected now, excluding the host">
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-background/60 px-2.5 py-1.5 text-xs font-semibold backdrop-blur-md text-foreground" title="Listeners connected now, excluding the host">
                     <Users className="h-4 w-4 text-primary" /><span className="tabular-nums">{host.viewer_count.toLocaleString()}</span><span className="sr-only">listeners</span>
                   </span>
-                  <h3 className="absolute bottom-3 left-4 right-4 break-words text-2xl font-bold text-foreground">{name}</h3>
+                  <h3 className="absolute bottom-3 left-4 right-4 break-words text-2xl font-black tracking-tight text-foreground drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">{name}</h3>
                 </div>
                 <div className="flex flex-col gap-4 p-4">
                   <p className="line-clamp-2 min-h-10 break-words text-sm text-brand-silver">{host.title}</p>
-                  {host.category && <span className="inline-flex w-fit items-center gap-1.5 rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"><Music2 className="h-3.5 w-3.5" />{liveCategoryLabel(host.category)}</span>}
-                  <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                  {host.category && <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-tv-cyan/30 bg-tv-cyan/10 px-2.5 py-1 text-xs font-semibold text-tv-cyan"><Music2 className="h-3.5 w-3.5" />{liveCategoryLabel(host.category)}</span>}
+                  <Button asChild className="w-full rounded-full bg-gradient-to-r from-primary to-tv-cyan font-bold text-primary-foreground shadow-lg shadow-primary/40 transition-shadow hover:shadow-primary/70">
                     <Link {...stageDestination(host)} aria-label={`Join ${name}’s stage`}><Radio className="h-4 w-4" />Join Stage</Link>
                   </Button>
                 </div>
