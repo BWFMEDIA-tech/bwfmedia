@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { SignedImg } from '@/components/ui/signed-img';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { freestylePlacement } from '@/lib/freestyle-placement';
+import { freestyleRemainingSeconds } from '@/lib/freestyle-timer';
 import { subscribeFreestyleCameras } from '@/lib/freestyle-video';
 import { StageAudioShell } from '@/components/stream/StageAudioShell';
 import { SelfMicrophoneButton } from '@/components/stream/SelfMicrophoneButton';
@@ -84,6 +85,7 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
   const artistB = placement?.artistB ?? '';
   const [duration, setDuration] = useState(180);
   const [busy, setBusy] = useState(false);
+  const [optimisticEndsAt, setOptimisticEndsAt] = useState<number | null>(null);
   const isHost = queue.data?.isAdmin || (queue.data?.isHost && auth.user?.id === hostId);
   useEffect(() => {
     const tick = () => setNow(Date.now());
@@ -94,7 +96,8 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
     const channel = supabase.channel(`freestyle-${streamId}-${crypto.randomUUID()}`).on('postgres_changes', { event: '*', schema: 'public', table: 'freestyle_battles', filter: `stream_id=eq.${streamId}` }, () => { void queryClient.invalidateQueries({ queryKey: ['freestyle', streamId] }); }).subscribe();
     return () => { void supabase.removeChannel(channel); };
   }, [streamId, auth.user?.id, queryClient]);
-  const remaining = battle ? Math.max(0, Math.ceil((Date.parse(battle.ends_at) - now - clockOffset) / 1000)) : duration;
+  const remaining = freestyleRemainingSeconds({ battle, optimisticEndsAt, duration, now, clockOffset });
+  useEffect(() => { if (battle?.status === 'live') setOptimisticEndsAt(null); }, [battle?.id, battle?.status]);
   useEffect(() => {
     if (battle?.status === 'live' && remaining === 0) void queryClient.invalidateQueries({ queryKey: ['freestyle', streamId] });
   }, [battle?.id, battle?.status, remaining === 0, streamId, queryClient]);
@@ -104,13 +107,13 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
   const candidates = participants.filter(p => ['host', 'co_host', 'speaker'].includes(p.stage_role ?? ''));
   const action = async (fn: () => Promise<unknown>) => {
     setBusy(true);
-    try { await fn(); await state.refetch(); }
-    catch (error) { toast.error(error instanceof Error ? error.message : 'Please try again'); }
+    try { await fn(); await state.refetch(); return true; }
+    catch (error) { toast.error(error instanceof Error ? error.message : 'Please try again'); return false; }
     finally { setBusy(false); }
   };
   return <section className="freestyle-arena" aria-label="1v1 Freestyle Battle">
     <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-      <div className="min-w-0"><h2 className="text-xl font-bold sm:text-3xl">1v1 <span className="text-primary">Freestyle</span> Battle</h2><p className="mt-1 text-xs text-muted-foreground">{battle ? battle.status === 'cancelled' ? 'Battle cancelled' : open ? 'Live freestyle' : battle.status === 'completed' ? 'Final result' : 'Validating final votes…' : 'Waiting for the host to start'}</p></div>
+      <div className="min-w-0"><h2 className="text-xl font-bold sm:text-3xl">1v1 <span className="text-primary">Freestyle</span> Battle</h2><p className="mt-1 text-xs text-muted-foreground">{battle ? battle.status === 'cancelled' ? 'Battle cancelled' : open ? 'Live freestyle' : battle.status === 'completed' ? 'Final result' : 'Validating final votes…' : optimisticEndsAt ? 'Starting…' : 'Waiting for the host to start'}</p></div>
       <div className="text-center"><p className="text-[10px] uppercase text-muted-foreground">Time remaining</p><p className="font-mono text-2xl font-bold tabular-nums">{String(Math.floor(remaining / 60)).padStart(2, '0')}:{String(remaining % 60).padStart(2, '0')}</p></div>
     </header>
     {state.isError && <p role="alert" className="mb-3 text-sm text-destructive">Could not load the battle. <Button variant="link" onClick={() => void state.refetch()}>Retry</Button></p>}
@@ -147,7 +150,10 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
       {open ? <div className="flex flex-wrap gap-2"><Button variant="outline" disabled={busy} onClick={() => { if (battle && window.confirm('End this battle and finalize votes?')) void action(() => end({ data: { battleId: battle.id } })); }}>End battle & record result</Button><Button variant="ghost" disabled={busy} onClick={() => { if (battle && window.confirm('Cancel this battle? The slot will be released.')) void action(() => cancel({ data: { battleId: battle.id } })); }}>Cancel battle</Button></div> : <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
         {(['a', 'b'] as const).map(side => <div key={side} className="min-w-0 text-sm"><p className="text-muted-foreground">Artist {side.toUpperCase()}</p><p className="break-words font-bold">{(() => { const p = queue.data?.profiles.find(p => p.id === (side === 'a' ? artistA : artistB)); return p?.stage_name || p?.display_name || 'Select an accepted matchup'; })()}</p></div>)}
         <label className="text-xs text-muted-foreground">Duration<select aria-label="Freestyle duration" className="mt-1 block h-10 rounded-md border border-input bg-background px-2 text-foreground" value={duration} onChange={e => setDuration(Number(e.target.value))}>{[60, 180, 300].map(s => <option key={s} value={s}>{s / 60} min</option>)}</select></label>
-        <Button className="self-end" disabled={busy || !artistA || !artistB || artistA === artistB || !room} onClick={() => void action(() => start({ data: { streamId, artistA, artistB, duration } }))}>{busy ? 'Starting…' : 'Start freestyle'}</Button>
+        <Button className="self-end" disabled={busy || !artistA || !artistB || artistA === artistB || !room} onClick={() => {
+          setOptimisticEndsAt(Date.now() + duration * 1000);
+          void action(() => start({ data: { streamId, artistA, artistB, duration } })).then(ok => { if (!ok) setOptimisticEndsAt(null); });
+        }}>{busy ? 'Starting…' : 'Start freestyle'}</Button>
       </div>}
     </div>}
   </section>;
