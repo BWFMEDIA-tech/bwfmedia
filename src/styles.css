@@ -127,10 +127,10 @@
 .freestyle-count { border: 1px solid var(--freestyle-side); border-radius: 6px; background: var(--background); }
 .freestyle-vs { position: absolute; left: 50%; top: 32%; transform: translate(-50%,-50%); display: grid; place-items: center; width: 56px; height: 56px; border: 1px solid var(--border); border-radius: 50%; background: var(--background); font-weight: 900; font-size: 23px; color: var(--foreground); }
 @media (max-width: 639px) {
-  .freestyle-grid { grid-template-columns: minmax(0,1fr); gap: 1rem; }
-  .freestyle-side[data-side="a"] { order: 1; }
-  .freestyle-side[data-side="b"] { order: 3; }
-  .freestyle-vs { order: 2; position: static; transform: none; justify-self: center; width: 36px; height: 36px; font-size: 17px; }
+  .freestyle-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0.75rem; }
+  .freestyle-camera { aspect-ratio: 3 / 4; }
+  .freestyle-label { top: 6px; left: 6px; padding: 3px 8px; font-size: 11px; }
+  .freestyle-vs { width: 36px; height: 36px; font-size: 17px; }
 }
 
 /* Freestyle queue slot cards: neon VS matchup design. */
