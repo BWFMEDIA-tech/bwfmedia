@@ -62,6 +62,8 @@ const STUDIO_BLOCKS: StudioBlockDef[] = [
   { id: "production", label: "Live Production Dashboard" },
   { id: "promotion", label: "Promotion Mode" },
   { id: "liveroom", label: "Live Room / Stage" },
+  { id: "battle", label: "Freestyle Battle" },
+  { id: "stage", label: "Stage — Host, Artist & Co-Host" },
 
   { id: "invite", label: "Invite Guest" },
   { id: "earnings", label: "Live Earnings" },
@@ -1248,26 +1250,32 @@ function StreamStudio() {
                       />
                     )}
 
-                    {streamMode === "play" && (
-                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} showLeaderboard={false} />
-                    )}
+                    {/* Freestyle battle — its own section, kept separate from
+                        the stage roster below. Rendered once in every mode so
+                        it never remounts (or drops battle video) on mode toggles. */}
+                    <StudioBlock id="battle" label="Freestyle Battle">
+                      <section aria-label="Freestyle battle" className="rounded-xl border border-cyan-500/25 bg-zinc-950/70 p-3">
+                        <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-cyan-300/80">Freestyle Battle — Artist A vs Artist B</div>
+                        <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} showLeaderboard={false} />
+                      </section>
+                    </StudioBlock>
 
-                    {/* Battle sits above the stage roster so the matchup is
-                        the first thing the host sees. */}
-                    {streamMode !== "play" && (
-                      <PlayArenaView stream={{ id: stream.id, title: stream.title, host_id: auth.user.id }} showChat={false} showLeaderboard={false} />
-                    )}
-
-                    <StudioStageRoom
-                      streamId={stream.id}
-                      participants={participants}
-                      canManage
-                      primaryHostId={auth.user.id}
-                      hostTransferMode={hostTransferMode}
-                      spotlight={spotlight}
-                      selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
-                    />
-                    {streamMode === "stage" && <StudioAudienceRow participants={participants} />}
+                    {/* Stage roster — host / artist / co-host boxes only. */}
+                    <StudioBlock id="stage" label="Stage — Host, Artist & Co-Host">
+                      <section aria-label="Stage roster" className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3">
+                        <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">Stage — Host, Artist & Co-Host</div>
+                        <StudioStageRoom
+                          streamId={stream.id}
+                          participants={participants}
+                          canManage
+                          primaryHostId={auth.user.id}
+                          hostTransferMode={hostTransferMode}
+                          spotlight={spotlight}
+                          selfProfile={{ user_id: auth.user.id, display_name: selfIdentity.display_name, avatar_url: selfIdentity.avatar_url }}
+                        />
+                        {streamMode === "stage" && <StudioAudienceRow participants={participants} />}
+                      </section>
+                    </StudioBlock>
                   </StageAudioShell>
                 )}
               </>
