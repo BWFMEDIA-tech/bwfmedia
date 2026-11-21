@@ -37,3 +37,4 @@
 - Keep text fields at 16px or larger on touch screens (global rule in styles.css), because iOS Safari/PWA/Capacitor zoom the page when a focused field's text is smaller.
 - Live directory previews use isolated, authenticated read-only LiveKit identities and camera-only subscriptions; exclude preview identities from visitor totals and release connections after the timed preview, because browsing must not publish, interrupt hosts or inflate fan counts.
 - Arena shares one clock, isolates mic/music graphs, stops muted capture and reuses LiveKit levels and stable callbacks to avoid audio churn.
+- Music's Live Hosts tab reuses the verified live-directory query and existing stage destinations, showing one newest live session per broadcaster without role filters or limits, because a discovery tab must not duplicate streaming or grant permissions.

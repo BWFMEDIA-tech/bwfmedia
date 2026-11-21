@@ -1,5 +1,10 @@
 # Roadmap
 
+## Music Live Hosts
+- [x] Add LIVE HOSTS beside Music with real profile photos, names, red live beacon, session title, listener totals, category and existing Join Stage links
+- [x] 24 live-host/directory tests passed; desktop and 430px phone tab navigation verified with no overflow or runtime errors; preview build OK
+- [ ] Verify populated cards and Join Stage with a real live host; no broadcaster was active during this check
+
 ## Starter song allowance
 - [x] Enforce five successful song uploads for Starter accounts using retained unique-song usage and atomic database enforcement; preserve existing songs and other allowances
 - [x] Six regression tests passed; temporary signed-in Starter artist saved five songs through the upload page, sixth blocked with Upgrade Plan link to /pricing; pricing displays five songs; test rows removed and preview build OK

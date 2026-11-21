@@ -17,7 +17,15 @@ import {
   Sparkles,
   TrendingUp,
   Users,
+  Radio,
+  Music2,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLiveStageFeed } from "@/lib/use-live-stage-navigation";
+import { stageDestination } from "@/lib/live-stage-navigation";
+import { currentLiveHosts } from "@/lib/live-hosts";
+import { liveCategoryLabel } from "@/lib/live-categories";
+import tunevioLogo from "@/assets/tunevio-icon.png.asset.json";
 import { getHomeFeed } from "@/lib/home-feed.functions";
 import { useAuth } from "@/lib/auth-context";
 import { usePlayer } from "@/lib/player-context";
@@ -36,10 +44,11 @@ import {
   toPlayerTrack,
 } from "@/components/tunevio/cards";
 
-type HomeChip = "all" | "music" | "videos" | "live" | "artists" | "arena";
+type HomeChip = "all" | "music" | "live-hosts" | "videos" | "live" | "artists" | "arena";
 const HOME_CHIPS: { id: HomeChip; label: string }[] = [
   { id: "all", label: "All" },
   { id: "music", label: "Music" },
+  { id: "live-hosts", label: "LIVE HOSTS" },
   { id: "videos", label: "Videos" },
   { id: "live", label: "Live" },
   { id: "artists", label: "Artists" },
@@ -149,7 +158,9 @@ export function TunevioHome() {
           {/* Filter chips */}
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {HOME_CHIPS.map((c) => (
-              <button
+              <Button
+                variant="ghost"
+                aria-pressed={chip === c.id}
                 key={c.id}
                 onClick={() => setChip(c.id)}
                 className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-bold transition ${
@@ -159,9 +170,11 @@ export function TunevioHome() {
                 }`}
               >
                 {c.label}
-              </button>
+              </Button>
             ))}
           </div>
+
+          {chip === "live-hosts" && <MusicLiveHosts />}
 
           {/* Charts */}
           {show("music") && (
@@ -420,7 +433,7 @@ export function TunevioHome() {
           />
           )}
 
-          {!isLoading && !feed?.charts.length ? (
+          {show("music") && !isLoading && !feed?.charts.length ? (
             <div className="rounded-2xl border border-tv-line bg-tv-surface p-10 text-center">
               <TrendingUp className="mx-auto h-8 w-8 text-white/30" />
               <p className="mt-3 text-sm font-bold">No music in the catalog yet</p>
@@ -432,6 +445,62 @@ export function TunevioHome() {
         </main>
       </div>
     </div>
+  );
+}
+
+/** Preview-only Music tab, sharing the same verified feed and permissions as Live. */
+function MusicLiveHosts() {
+  const feed = useLiveStageFeed();
+  const hosts = currentLiveHosts(feed.entries);
+  return (
+    <section aria-labelledby="music-live-hosts-title" className="space-y-5">
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="music-live-hosts-title" className="text-xl font-bold sm:text-2xl">Live Hosts</h2>
+        {!feed.isLoading && !feed.isError && <span className="text-sm text-muted-foreground">{hosts.length} live</span>}
+      </div>
+      {feed.isLoading ? (
+        <div role="status" className="flex items-center gap-2 py-12 text-muted-foreground"><Radio className="h-4 w-4 motion-safe:animate-pulse" />Finding live hosts…</div>
+      ) : feed.isError ? (
+        <div role="alert" className="space-y-3 py-12 text-center">
+          <p className="text-muted-foreground">Live hosts couldn’t be loaded.</p>
+          <Button variant="outline" onClick={feed.retry}>Try again</Button>
+        </div>
+      ) : hosts.length === 0 ? (
+        <div className="py-16 text-center">
+          <Radio className="mx-auto mb-4 h-8 w-8 text-primary" />
+          <p className="font-semibold">No hosts are live right now</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {hosts.map(host => {
+            const name = host.host?.stage_name || host.host?.display_name || "Tunevio host";
+            return (
+              <article key={host.host_id} className="group relative overflow-hidden rounded-lg border border-primary/30 bg-card transition-colors hover:border-primary/70">
+                <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+                  <img src={tunevioLogo.url} alt="" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
+                  {host.host?.avatar_url && <SignedImg src={host.host.avatar_url} alt={name} displayWidth={400} className="absolute inset-0 h-full w-full object-cover" onError={event => { event.currentTarget.hidden = true; }} />}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-transparent" />
+                  <span className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-md bg-background/80 px-3 py-1.5 text-xs font-bold text-foreground">
+                    <span className="h-2 w-2 rounded-full bg-destructive motion-safe:animate-pulse" />LIVE
+                  </span>
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-background/80 px-2.5 py-1.5 text-xs font-semibold text-foreground" title="Listeners connected now, excluding the host">
+                    <Users className="h-4 w-4 text-primary" /><span className="tabular-nums">{host.viewer_count.toLocaleString()}</span><span className="sr-only">listeners</span>
+                  </span>
+                  <h3 className="absolute bottom-3 left-4 right-4 break-words text-2xl font-bold text-foreground">{name}</h3>
+                </div>
+                <div className="flex flex-col gap-4 p-4">
+                  <p className="line-clamp-2 min-h-10 break-words text-sm text-brand-silver">{host.title}</p>
+                  {host.category && <span className="inline-flex w-fit items-center gap-1.5 rounded-md border border-primary/20 bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"><Music2 className="h-3.5 w-3.5" />{liveCategoryLabel(host.category)}</span>}
+                  <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                    <Link {...stageDestination(host)} aria-label={`Join ${name}’s stage`}><Radio className="h-4 w-4" />Join Stage</Link>
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
 
