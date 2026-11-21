@@ -1,3 +1,5 @@
+import "./styles.css"
+
 export { CartButton, CartDrawer } from "./components/CartDrawer"
 export { FuturisticCalendar } from "./components/FuturisticCalendar"
 export { MessageBell } from "./components/MessageBell"
