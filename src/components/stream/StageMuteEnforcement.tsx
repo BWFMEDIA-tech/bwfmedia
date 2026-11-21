@@ -4,6 +4,8 @@ import { RoomEvent, Track } from "livekit-client";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { activeMutedUserIds, shouldSilenceStageMicrophone } from "@/lib/stage-microphone";
+import { useFreestylePerformers } from '@/lib/use-freestyle-performers';
+import { silenceFreestyleMicrophone } from '@/lib/freestyle-join';
 
 /**
  * Enforces host moderation (stage_participants.muted_until) inside a video
@@ -18,6 +20,8 @@ import { activeMutedUserIds, shouldSilenceStageMicrophone } from "@/lib/stage-mi
  */
 export function StageMuteEnforcement({ streamId }: { streamId: string }) {
   const room = useRoomContext();
+  const performers = useFreestylePerformers(streamId);
+  const performerKey = [...performers].sort().join(',');
   const [muted, setMuted] = useState<Set<string>>(new Set());
   const [roles, setRoles] = useState<Map<string, string>>(new Map());
 
@@ -50,7 +54,7 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
     if (!room) return;
     const apply = () => {
       room.remoteParticipants.forEach((p) => {
-        const silence = shouldSilenceStageMicrophone(roles.get(p.identity), p.permissions?.canPublish, muted.has(p.identity));
+        const silence = silenceFreestyleMicrophone(shouldSilenceStageMicrophone(roles.get(p.identity), p.permissions?.canPublish, muted.has(p.identity)), performers.has(p.identity), p.permissions?.canPublish, muted.has(p.identity));
         p.audioTrackPublications.forEach((pub) => {
           if (pub.source === Track.Source.Microphone) pub.setEnabled(!silence);
         });
@@ -67,7 +71,7 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
       room.off(RoomEvent.ParticipantConnected, apply);
       room.off(RoomEvent.ParticipantPermissionsChanged, apply);
     };
-  }, [room, muted, roles]);
+  }, [room, muted, roles, performerKey]);
 
   // Switch off the local mic while host-muted, and keep it off if the
   // device or a self-unmute tap tries to re-enable it.
@@ -75,7 +79,7 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
     if (!room) return;
     const lp = room.localParticipant;
     const enforce = () => {
-      if (shouldSilenceStageMicrophone(roles.get(lp.identity), lp.permissions?.canPublish, muted.has(lp.identity)) && lp.isMicrophoneEnabled) {
+      if (silenceFreestyleMicrophone(shouldSilenceStageMicrophone(roles.get(lp.identity), lp.permissions?.canPublish, muted.has(lp.identity)), performers.has(lp.identity), lp.permissions?.canPublish, muted.has(lp.identity)) && lp.isMicrophoneEnabled) {
         lp.setMicrophoneEnabled(false).catch(() => {});
         if (muted.has(lp.identity)) toast.info("The host has muted you");
       }
@@ -89,7 +93,7 @@ export function StageMuteEnforcement({ streamId }: { streamId: string }) {
       room.off(RoomEvent.TrackUnmuted, enforce);
       room.off(RoomEvent.ParticipantPermissionsChanged, enforce);
     };
-  }, [room, muted, roles]);
+  }, [room, muted, roles, performerKey]);
 
   return null;
 }

@@ -19,6 +19,7 @@ import { useListeningSession } from "@/lib/useListeningSession";
 import type { PlayerTrack } from "@/lib/player-context";
 import { Button } from "@/components/ui/button";
 import { FreestyleBattle } from "@/components/play/FreestyleBattle";
+import { useFreestylePerformers } from '@/lib/use-freestyle-performers';
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -166,6 +167,15 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
   // IDs of users currently on stage as performers. Used to lock the
   // Artist A / Artist B selectors once anyone in the matchup goes live.
   const [view, setView] = useState<"player" | "battle" | "freestyle">("player");
+  const freestylePerformers = useFreestylePerformers(stream?.id ?? '');
+  const [freestyleOpened, setFreestyleOpened] = useState(false);
+  const [promptedStream, setPromptedStream] = useState('');
+  useEffect(() => {
+    if (stream && auth.user && (freestylePerformers.has(auth.user.id) || (auth.user.id === stream.host_id && freestylePerformers.size > 0)) && promptedStream !== stream.id) {
+      setView('freestyle'); setPromptedStream(stream.id);
+    }
+  }, [stream?.id, auth.user?.id, [...freestylePerformers].sort().join(','), promptedStream]);
+  useEffect(() => { if (view === 'freestyle') setFreestyleOpened(true); }, [view]);
   const onStageIds = new Set(
     stageState.participants
       .filter((p) => p.stage_role !== "listener" && p.stage_role !== "green_room")
@@ -183,7 +193,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
             </Button>
           ))}
         </div>
-        {view === "freestyle" && stream && <FreestyleBattle streamId={stream.id} hostId={stream.host_id} room={room} participants={battleParticipants} />}
+        {(view === 'freestyle' || freestyleOpened) && stream && <div className={view === 'freestyle' ? '' : 'hidden'}><FreestyleBattle streamId={stream.id} hostId={stream.host_id} room={room} participants={battleParticipants} /></div>}
         {view === "battle" && stream && (
           <div className="animate-in fade-in duration-300">
             <BattleArena streamId={stream.id} isHost={isHost} participants={battleParticipants} onStageIds={onStageIds} showEngagementPanels={showBattlePanels} />

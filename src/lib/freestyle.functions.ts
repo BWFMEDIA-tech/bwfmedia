@@ -48,6 +48,27 @@ export const startFreestyle = createServerFn({ method: 'POST' })
     return id;
   });
 
+/** Bind an already accepted pair to its video room without starting or rescheduling it. */
+export const prepareFreestyle = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(input => streamInput.extend({ challengeId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const [stream, admin, host] = await Promise.all([
+      context.supabase.from('streams').select('host_id,status').eq('id', data.streamId).single(),
+      context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'admin' }),
+      context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'host' }),
+    ]);
+    if (stream.error || admin.error || host.error || !stream.data || !(admin.data === true || (host.data === true && stream.data.host_id === context.userId))) throw new Error('Only the authorized host can place this matchup');
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+    const live = await supabaseAdmin.from('freestyle_battles').select('id').eq('stream_id', data.streamId).eq('status', 'live').limit(1);
+    if (live.error || live.data?.length) throw new Error('Finish the current battle before selecting another matchup');
+    const result = await supabaseAdmin.from('freestyle_challenges').update({ stream_id: data.streamId })
+      .eq('id', data.challengeId).in('status', ['accepted', 'scheduled']).not('slot_number', 'is', null)
+      .or(`stream_id.is.null,stream_id.eq.${data.streamId}`).select('id').maybeSingle();
+    if (result.error || !result.data) throw new Error('This accepted matchup is no longer available for this stage');
+    return { ok: true };
+  });
+
 export const getFreestyleQueue = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

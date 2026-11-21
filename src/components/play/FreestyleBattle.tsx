@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { useMaybeRoomContext, useTracks, useParticipants, VideoTrack, useLocalParticipant } from '@livekit/components-react';
 import { RoomEvent, Track } from 'livekit-client';
+import { TrackSource } from '@livekit/protocol';
 import { Camera, CameraOff, MicOff, Eye, ThumbsUp, Trophy, Radio } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -11,17 +12,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { freestylePlacement } from '@/lib/freestyle-placement';
 import { freestyleRemainingSeconds } from '@/lib/freestyle-timer';
 import { subscribeFreestyleCameras } from '@/lib/freestyle-video';
+import { assignedFreestyleSide, currentFreestyleMatchup } from '@/lib/freestyle-join';
 import { StageAudioShell } from '@/components/stream/StageAudioShell';
 import { SelfMicrophoneButton } from '@/components/stream/SelfMicrophoneButton';
 import { useAuth } from '@/lib/auth-context';
 import { getLiveKitToken } from '@/lib/livekit.functions';
-import { getFreestyleState, startFreestyle, voteFreestyle, endFreestyle, cancelFreestyle, getFreestyleQueue } from '@/lib/freestyle.functions';
+import { getFreestyleState, startFreestyle, voteFreestyle, endFreestyle, cancelFreestyle, getFreestyleQueue, prepareFreestyle } from '@/lib/freestyle.functions';
 import { FreestyleQueue } from './FreestyleQueue';
 import { supabase } from '@/integrations/supabase/client';
 
-type Props = { streamId: string; hostId: string; room?: string; participants: { user_id: string; display_name: string | null; stage_role?: string | null }[] };
+export interface FreestyleBattleProps { streamId: string; hostId: string; room?: string; participants: { user_id: string; display_name: string | null; stage_role?: string | null }[] }
 
-export function FreestyleBattle(props: Props) {
+export function FreestyleBattle(props: FreestyleBattleProps) {
   const existingRoom = useMaybeRoomContext();
   const auth = useAuth();
   const tokenFn = useServerFn(getLiveKitToken);
@@ -61,9 +63,9 @@ export function FreestyleBattle(props: Props) {
   </>;
 }
 
-interface FreestyleContentProps extends Props { placementId: string; onPlace: (id: string) => void }
+interface FreestyleContentProps extends FreestyleBattleProps { placementId: string; onPlace: (id: string) => void }
 
-function FreestyleContent({ streamId, hostId, participants, placementId, onPlace }: FreestyleContentProps) {
+function FreestyleContent({ streamId, hostId, placementId, onPlace }: FreestyleContentProps) {
   const auth = useAuth();
   const room = useMaybeRoomContext();
   const queryClient = useQueryClient();
@@ -73,14 +75,16 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
   const end = useServerFn(endFreestyle);
   const cancel = useServerFn(cancelFreestyle);
   const queueRead = useServerFn(getFreestyleQueue);
-  const queue = useQuery({ queryKey: ['freestyle-queue', auth.user?.id], queryFn: () => queueRead(), enabled: !!auth.user });
+  const prepare = useServerFn(prepareFreestyle);
+  const queue = useQuery({ queryKey: ['freestyle-queue', auth.user?.id], queryFn: () => queueRead(), enabled: !!auth.user, refetchInterval: 2000 });
   const key = ['freestyle', streamId, auth.user?.id];
   const state = useQuery({ queryKey: key, queryFn: () => read({ data: { streamId } }), enabled: !!auth.user, refetchInterval: 5000 });
   const battle = state.data?.battle;
   const [now, setNow] = useState(0);
   const [clockOffset, setClockOffset] = useState(0);
   useEffect(() => { if (state.data) setClockOffset(state.data.serverTime - Date.now()); }, [state.data]);
-  const placement = freestylePlacement(queue.data?.challenges ?? [], placementId, streamId);
+  const sharedMatchup = currentFreestyleMatchup(queue.data?.challenges ?? [], streamId);
+  const placement = freestylePlacement(queue.data?.challenges ?? [], sharedMatchup?.id ?? placementId, streamId);
   const artistA = placement?.artistA ?? '';
   const artistB = placement?.artistB ?? '';
   const [duration, setDuration] = useState(180);
@@ -104,12 +108,19 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
   const open = battle?.status === 'live' && remaining > 0;
   const selected = state.data?.myVote;
   const artists = state.data?.artists ?? [];
-  const candidates = participants.filter(p => ['host', 'co_host', 'speaker'].includes(p.stage_role ?? ''));
   const action = async (fn: () => Promise<unknown>) => {
     setBusy(true);
     try { await fn(); await state.refetch(); return true; }
     catch (error) { toast.error(error instanceof Error ? error.message : 'Please try again'); return false; }
     finally { setBusy(false); }
+  };
+  const place = async (id: string) => {
+    if (!isHost || busy || open) return;
+    await action(async () => {
+      await prepare({ data: { streamId, challengeId: id } });
+      onPlace(id);
+      await queryClient.invalidateQueries({ queryKey: ['freestyle-queue'] });
+    });
   };
   return <section className="freestyle-arena" aria-label="1v1 Freestyle Battle">
     <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -129,8 +140,9 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
           <div className="freestyle-frame">
             {room ? <ArtistCamera artistId={id} name={name} photo={artist?.avatar_url} hostId={hostId} artistA={placement && !open ? artistA : battle?.artist_a_id} artistB={placement && !open ? artistB : battle?.artist_b_id} /> : <div className="freestyle-camera grid place-items-center bg-muted">{artist?.avatar_url ? <SignedImg src={artist.avatar_url} alt={name} className="h-full w-full object-contain" /> : <CameraOff className="h-10 w-10 text-muted-foreground" />}</div>}
             <span className="freestyle-label">Artist {side.toUpperCase()}</span>
+            {room && id === auth.user?.id && (open || placement) && <LocalCameraControl streamId={streamId} artistA={open ? battle?.artist_a_id : artistA} artistB={open ? battle?.artist_b_id : artistB} />}
             <div className="flex min-w-0 items-center gap-3 p-3">{artist?.avatar_url && <SignedImg src={artist.avatar_url} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />}<div className="min-w-0"><p className="break-words font-bold">{name}</p><p className="text-xs text-muted-foreground">{genres?.join(' · ') || artist?.genre || '—'}</p></div></div>
-            {isHost && !open && <div className="px-3 pb-3"><Select value={placement ? placementId : ''} onValueChange={onPlace} disabled={busy}><SelectTrigger aria-label={`Place artist in video box ${side.toUpperCase()}`}><SelectValue placeholder={`Place Artist ${side.toUpperCase()}`} /></SelectTrigger><SelectContent>{(queue.data?.challenges ?? []).filter(c => freestylePlacement([c], c.id, streamId)).map(c => {
+            {isHost && !open && <div className="px-3 pb-3"><Select value={placement ? sharedMatchup?.id ?? placementId : ''} onValueChange={id => void place(id)} disabled={busy}><SelectTrigger aria-label={`Place artist in video box ${side.toUpperCase()}`}><SelectValue placeholder={`Place Artist ${side.toUpperCase()}`} /></SelectTrigger><SelectContent>{(queue.data?.challenges ?? []).filter(c => freestylePlacement([c], c.id, streamId)).map(c => {
               const profile = queue.data?.profiles.find(p => p.id === (side === 'a' ? c.artist_a_id : c.artist_b_id));
               return <SelectItem key={c.id} value={c.id}>Slot {c.slot_number} · {profile?.stage_name || profile?.display_name || 'Artist'}</SelectItem>;
             })}</SelectContent></Select></div>}
@@ -143,9 +155,8 @@ function FreestyleContent({ streamId, hostId, participants, placementId, onPlace
       })}
       <div className="freestyle-vs" aria-hidden="true">VS</div>
     </div>
-    {room && <LocalCameraControl artistIds={open ? [battle?.artist_a_id, battle?.artist_b_id] : [artistA, artistB, ...candidates.map(p => p.user_id)]} />}
     {!auth.user && <p className="mt-3 text-center text-sm text-muted-foreground">Sign in to watch and vote.</p>}
-    <FreestyleQueue streamId={streamId} hostId={hostId} onSelect={isHost && !open ? c => onPlace(c.id) : undefined} />
+    <FreestyleQueue streamId={streamId} hostId={hostId} onSelect={isHost && !open ? c => void place(c.id) : undefined} />
     {isHost && <div className="mt-5 border-t border-border pt-4">
       {open ? <div className="flex flex-wrap gap-2"><Button variant="outline" disabled={busy} onClick={() => { if (battle && window.confirm('End this battle and finalize votes?')) void action(() => end({ data: { battleId: battle.id } })); }}>End battle & record result</Button><Button variant="ghost" disabled={busy} onClick={() => { if (battle && window.confirm('Cancel this battle? The slot will be released.')) void action(() => cancel({ data: { battleId: battle.id } })); }}>Cancel battle</Button></div> : <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
         {(['a', 'b'] as const).map(side => <div key={side} className="min-w-0 text-sm"><p className="text-muted-foreground">Artist {side.toUpperCase()}</p><p className="break-words font-bold">{(() => { const p = queue.data?.profiles.find(p => p.id === (side === 'a' ? artistA : artistB)); return p?.stage_name || p?.display_name || 'Select an accepted matchup'; })()}</p></div>)}
@@ -200,8 +211,42 @@ function ArtistCamera({ artistId, name, photo, hostId, artistA, artistB }: { art
   </div>;
 }
 
-function LocalCameraControl({ artistIds }: { artistIds: (string | undefined)[] }) {
-  const { localParticipant, isCameraEnabled } = useLocalParticipant();
-  if (!artistIds.includes(localParticipant.identity)) return null;
-  return <div className="mt-4 flex flex-wrap justify-center gap-2"><SelfMicrophoneButton /><Button variant="outline" onClick={async () => { try { await localParticipant.setCameraEnabled(!isCameraEnabled); } catch { toast.error('Allow camera access and confirm your host-approved camera permission.'); } }}>{isCameraEnabled ? <CameraOff /> : <Camera />}{isCameraEnabled ? 'Camera off' : 'Camera on'}</Button></div>;
+interface LocalCameraControlProps { streamId: string; artistA?: string; artistB?: string }
+
+function LocalCameraControl({ streamId, artistA, artistB }: LocalCameraControlProps) {
+  const room = useMaybeRoomContext();
+  const token = useServerFn(getLiveKitToken);
+  const { localParticipant, isCameraEnabled, isMicrophoneEnabled } = useLocalParticipant();
+  const [joining, setJoining] = useState(false);
+  const [joined, setJoined] = useState(false);
+  const [error, setError] = useState('');
+  const side = assignedFreestyleSide(localParticipant.identity, artistA, artistB);
+  useEffect(() => { setJoined(false); setError(''); }, [artistA, artistB, streamId]);
+  if (!side || !room) return null;
+  const joinBox = async () => {
+    if (joining) return;
+    setJoining(true); setError('');
+    // Unlock playback in the tap gesture, without publishing an audience microphone.
+    void room.startAudio().catch(() => {});
+    try {
+      if (localParticipant.permissions?.canPublish !== true || (localParticipant.permissions.canPublishSources?.length && !localParticipant.permissions.canPublishSources.includes(TrackSource.CAMERA))) {
+        const fresh = await token({ data: { roomName: room.name } });
+        await room.disconnect();
+        await room.connect(fresh.wsUrl, fresh.token);
+      }
+      if (room.localParticipant.permissions?.canPublish !== true) throw new Error('The host must select your accepted matchup before you can join this box.');
+      await room.localParticipant.setCameraEnabled(true);
+      const mute = await supabase.from('stage_participants').select('muted_until').eq('stream_id', streamId).eq('user_id', room.localParticipant.identity).maybeSingle();
+      if (mute.error) throw new Error('Your camera is connected. Microphone approval could not be checked; please retry.');
+      if (!mute.data?.muted_until || Date.parse(mute.data.muted_until) <= Date.now()) await room.localParticipant.setMicrophoneEnabled(true);
+      setJoined(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Allow camera and microphone access, then try again.');
+    } finally { setJoining(false); }
+  };
+  return <div className="min-w-0 space-y-2 border-y border-border px-3 py-3">
+    {!joined && <><p className="text-center text-sm font-semibold">You’re Artist {side}</p><Button className="h-auto min-h-10 w-full whitespace-normal" disabled={joining} onClick={() => void joinBox()}><Camera className="shrink-0" />{joining ? 'Connecting camera…' : `Join Artist ${side} video box`}</Button></>}
+    {joined && <><p role="status" className="text-center text-xs text-muted-foreground">Artist {side} · {isCameraEnabled ? 'Camera live' : 'Camera off'} · {isMicrophoneEnabled ? 'Mic on' : 'Mic muted'}</p><div className="flex flex-wrap justify-center gap-2"><SelfMicrophoneButton /><Button size="sm" variant="outline" onClick={async () => { try { await localParticipant.setCameraEnabled(!isCameraEnabled); } catch { setError('Allow camera access, then try again.'); } }}>{isCameraEnabled ? <CameraOff /> : <Camera />}{isCameraEnabled ? 'Camera off' : 'Camera on'}</Button></div></>}
+    {error && <p role="alert" className="break-words text-center text-sm text-destructive">{error}</p>}
+  </div>;
 }

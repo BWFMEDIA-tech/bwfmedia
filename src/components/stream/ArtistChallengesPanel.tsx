@@ -19,6 +19,7 @@ import { ConfirmedBattleMatchups, type ConfirmedMatchup } from "./ConfirmedBattl
 import { CreateBattleDialog } from "./BattleArena";
 import { FreestyleQueue } from "@/components/play/FreestyleQueue";
 import { BattleTournamentStatus } from "@/components/play/BattleTournamentStatus";
+import { prepareFreestyle } from '@/lib/freestyle.functions';
 
 type HostChallenge = {
   id: string;
@@ -57,6 +58,7 @@ export function ArtistChallengesPanel({ streamId, hostId, roomName }: { streamId
   const decline = useServerFn(declineBattleChallenge);
   const schedule = useServerFn(scheduleBattleChallenge);
   const start = useServerFn(startBattleChallenge);
+  const prepare = useServerFn(prepareFreestyle);
 
   const [tab, setTab] = useState<(typeof TABS)[number]>("pending");
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
@@ -110,7 +112,7 @@ export function ArtistChallengesPanel({ streamId, hostId, roomName }: { streamId
     <div className="space-y-3">
       <BattleTournamentStatus hostControls />
       {streamId && <FreestyleQueue streamId={streamId} hostId={hostId}
-        onSelect={roomName ? () => { toast.message("Open the 1v1 Freestyle Battle tab to start this slot battle"); navigate({ to: "/play/$room", params: { room: roomName } }); } : undefined} />}
+        onSelect={roomName ? c => { void run(c.id, async () => { await prepare({ data: { streamId, challengeId: c.id } }); await queryClient.invalidateQueries({ queryKey: ['freestyle-queue'] }); navigate({ to: '/play/$room', params: { room: roomName } }); }, 'Artists can now join their assigned video boxes'); } : undefined} />}
       {streamId && <section className="space-y-3 border-b border-border pb-3">
         <h3 className="text-sm font-bold">Create 1v1 Battle</h3>
         <ConfirmedBattleMatchups selectedId={selected?.id ?? null} onSelect={setSelected} />

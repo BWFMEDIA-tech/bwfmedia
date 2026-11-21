@@ -32,6 +32,7 @@ import { setStageNavigationConnection } from "@/lib/stage-navigation-connection"
 import { getArenaRoomAudioOptions } from "@/lib/arena-room-audio";
 import { StageMuteEnforcement } from "./StageMuteEnforcement";
 import { AudioPlaybackUnblocker } from "./AudioPlaybackUnblocker";
+import { useFreestylePerformers } from '@/lib/use-freestyle-performers';
 
 /**
  * Wraps stage-mode (audio-only) UI in a LiveKit room.
@@ -210,6 +211,8 @@ export function StageAudioShell({
 
 function StageMicSync({ streamId, userId }: { streamId: string; userId: string }) {
   const { localParticipant } = useLocalParticipant();
+  const performers = useFreestylePerformers(streamId);
+  const isBattleArtist = performers.has(userId);
   const room = useRoomContext();
   const [role, setRole] = useState<string | null>(null);
   const [mutedUntil, setMutedUntil] = useState<string | null>(null);
@@ -272,7 +275,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
           console.error("[stage-audio] Audio device error", err);
           toast.error(err?.message || "Microphone unavailable");
         });
-    } else if (!canSpeak) {
+    } else if (!canSpeak && (!isBattleArtist || isHostMuted)) {
       localParticipant.setMicrophoneEnabled(false).catch(() => {});
     }
     if (prevCanSpeak === false && canSpeak) {
@@ -281,13 +284,13 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
       toast.info(isHostMuted ? "You've been muted by the host" : "You're back in the audience");
     }
     setPrevCanSpeak(canSpeak);
-  }, [role, mutedUntil, localParticipant, permissionTick]);
+  }, [role, mutedUntil, localParticipant, permissionTick, isBattleArtist]);
 
   useEffect(() => {
     if (!room || !localParticipant) return;
     const enforce = () => {
       const isHostMuted = !!mutedUntil && new Date(mutedUntil).getTime() > Date.now();
-      const approved = ["host", "co_host", "speaker"].includes(role ?? "") && localParticipant.permissions?.canPublish === true;
+      const approved = (isBattleArtist || ["host", "co_host", "speaker"].includes(role ?? "")) && localParticipant.permissions?.canPublish === true;
       if ((!approved || isHostMuted) && localParticipant.isMicrophoneEnabled) {
         localParticipant.setMicrophoneEnabled(false).catch(() => {});
         if (isHostMuted) toast.info("The host has muted you");
@@ -299,7 +302,7 @@ function StageMicSync({ streamId, userId }: { streamId: string; userId: string }
       room.off(RoomEvent.LocalTrackPublished, enforce);
       room.off(RoomEvent.TrackUnmuted, enforce);
     };
-  }, [room, localParticipant, role, mutedUntil, permissionTick]);
+  }, [room, localParticipant, role, mutedUntil, permissionTick, isBattleArtist]);
 
   return null;
 }

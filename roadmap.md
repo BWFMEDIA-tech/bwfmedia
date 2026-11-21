@@ -1,5 +1,11 @@
 # Roadmap
 
+## Assigned Freestyle joining
+- [x] Show each assigned artist a Join Artist A/B video box prompt using the shared stream matchup; all host selection paths persist the accepted pair
+- [x] Enable camera/microphone on explicit join, preserving host mutes and audience read-only access; keep video mounted across tab changes
+- [x] 54 assignment/media/privacy/queue regressions passed; signed-in Studio and 390px challenge page verified without overflow or runtime errors
+- [ ] Verify actual A/B join prompts and simultaneous playback on physical devices; no active battle room available during this check
+
 ## Music Live Hosts
 - [x] Add LIVE HOSTS beside Music with real profile photos, names, red live beacon, session title, listener totals, category and existing Join Stage links
 - [x] 24 live-host/directory tests passed; desktop and 430px phone tab navigation verified with no overflow or runtime errors; preview build OK

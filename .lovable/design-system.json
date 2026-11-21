@@ -2708,6 +2708,9 @@
       "name": "FreestyleBattle",
       "file": "src/components/play/FreestyleBattle",
       "import_path": "",
+      "usage": "Render the existing stream’s separate Artist A/B battle experience. Hosts prepare accepted matchups; each assigned artist explicitly joins their own camera box using existing media permissions.",
+      "examples": [{ "label": "Stream freestyle battle", "code": "<FreestyleBattle streamId={stream.id} hostId={stream.host_id} room={stream.room_name} participants={participants} />" }],
+      "antipatterns": ["Never let an artist pick the other artist’s side or grant audience publication rights.", "Do not use stage promotion to join a battle camera, override host mutes, or create a second connection when a room already exists."],
       "props": [
         {
           "name": "streamId",
