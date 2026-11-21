@@ -134,28 +134,30 @@ function GuestPage() {
     })();
   }, [lk, streamId, auth.user?.id, streamMeta?.status]);
 
-  // Auto-rejoin: if the signed-in user already has a stage row for this
-  // stream (i.e. they were on stage before refreshing), connect to LiveKit
-  // immediately without re-prompting for a name.
+  // Auto-join: a signed-in member landing on a live stream connects straight
+  // away as a listener — Join Stage must open the stage, not a second form.
+  // Guests still enter a name. If the auto-join fails, the join form stays
+  // available as a manual fallback.
+  const [autoJoinFailed, setAutoJoinFailed] = useState(false);
   useEffect(() => {
     if (lk || !streamId || !auth.user || streamMeta?.status !== "live") return;
     const uid = auth.user.id;
     let cancelled = false;
     (async () => {
-      const { data: existing } = await supabase
-        .from("stage_participants")
-        .select("stage_role")
-        .eq("stream_id", streamId)
-        .eq("user_id", uid)
-        .maybeSingle();
-      if (cancelled || !existing) return;
       try {
+        const { data: existing } = await supabase
+          .from("stage_participants")
+          .select("stage_role")
+          .eq("stream_id", streamId)
+          .eq("user_id", uid)
+          .maybeSingle();
         const t = await authTokenFn({ data: { roomName: room } });
         if (cancelled) return;
         setLk({ token: t.token, wsUrl: t.wsUrl });
-        toast.success("Reconnected to the stream");
+        if (existing) toast.success("Reconnected to the stream");
       } catch (e: any) {
-        console.warn("Auto-rejoin failed", e?.message);
+        console.warn("Auto-join failed", e?.message);
+        if (!cancelled) setAutoJoinFailed(true);
       }
     })();
     return () => { cancelled = true; };
@@ -189,6 +191,16 @@ function GuestPage() {
   }
 
   if (!lk) {
+    // Signed-in members auto-join; show a connecting state instead of a form.
+    if (auth.user && !autoJoinFailed) {
+      return (
+        <div className="min-h-screen grid place-items-center bg-[#050509] text-white">
+          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-white/40">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Joining the stage…
+          </div>
+        </div>
+      );
+    }
     return (
       <div
         className="min-h-screen bg-[#050509] text-white flex items-center justify-center p-6 bg-cover bg-center bg-no-repeat"
@@ -197,6 +209,7 @@ function GuestPage() {
         <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#0d0d18]/85 backdrop-blur-md p-6 shadow-2xl">
           <h1 className="text-2xl font-bold mb-1">Join the stream</h1>
           <p className="text-sm text-white/60 mb-4">Room: <span className="text-white">{room}</span></p>
+          {autoJoinFailed && <p role="alert" className="mb-3 text-sm text-destructive">Couldn't connect automatically — try again.</p>}
           {!auth.user && <input aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
             className="w-full rounded-lg border border-input bg-background/40 px-3 py-2 text-sm mb-3" />}
           <Button onClick={join} disabled={joining || (!auth.user && !name.trim())} className="w-full">
