@@ -62,9 +62,19 @@ export const prepareFreestyle = createServerFn({ method: 'POST' })
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const live = await supabaseAdmin.from('freestyle_battles').select('id').eq('stream_id', data.streamId).eq('status', 'live').limit(1);
     if (live.error || live.data?.length) throw new Error('Finish the current battle before selecting another matchup');
-    const result = await supabaseAdmin.from('freestyle_challenges').update({ stream_id: data.streamId })
-      .eq('id', data.challengeId).in('status', ['accepted', 'scheduled']).not('slot_number', 'is', null)
-      .or(`stream_id.is.null,stream_id.eq.${data.streamId}`).select('id').maybeSingle();
+    // A matchup bound to a stream that has since ended (host restarted the live)
+    // may move to this live stage; one bound to another still-live stage may not.
+    const current = await supabaseAdmin.from('freestyle_challenges').select('stream_id').eq('id', data.challengeId).maybeSingle();
+    if (current.error || !current.data) throw new Error('This accepted matchup is no longer available for this stage');
+    const boundId = current.data.stream_id;
+    if (boundId && boundId !== data.streamId) {
+      const bound = await supabaseAdmin.from('streams').select('status').eq('id', boundId).maybeSingle();
+      if (bound.error || bound.data?.status === 'live') throw new Error('This matchup is already placed on another live stage');
+    }
+    let update = supabaseAdmin.from('freestyle_challenges').update({ stream_id: data.streamId })
+      .eq('id', data.challengeId).in('status', ['accepted', 'scheduled']).not('slot_number', 'is', null);
+    update = boundId ? update.eq('stream_id', boundId) : update.is('stream_id', null);
+    const result = await update.select('id').maybeSingle();
     if (result.error || !result.data) throw new Error('This accepted matchup is no longer available for this stage');
     return { ok: true };
   });
