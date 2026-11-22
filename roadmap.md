@@ -1,5 +1,12 @@
 # Roadmap
 
+## App Store preparation
+- [x] Inspect existing account settings, sign-in and mobile configuration; prepare scoped implementation plan
+- [ ] Add secure account deletion and Apple sign-in after plan approval
+- [ ] Prepare production-safe iPhone configuration and review-safeguard audit after plan approval
+- [ ] Confirm iPhone digital purchase strategy; no existing web Stripe payments changed
+- [ ] Native signing, TestFlight and physical-device verification require Apple Developer access and Mac/Xcode
+
 ## Assigned Freestyle joining
 - [x] Show each assigned artist a Join Artist A/B video box prompt using the shared stream matchup; all host selection paths persist the accepted pair
 - [x] Enable camera/microphone on explicit join, preserving host mutes and audience read-only access; keep video mounted across tab changes
