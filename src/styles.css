@@ -58,6 +58,14 @@
 }
 
 :root {
+  /* Apple provider styling is intentionally monochrome, independent of brand colors. */
+  --apple-black: #000000;
+  --apple-white: #ffffff;
+  --apple-height: 48px;
+  --apple-compact-height: 44px;
+  --apple-min-width: 140px;
+  --apple-title-size: 20.64px;
+  --apple-compact-title-size: 18.92px;
   --freestyle-blue: #1469e8;
   --freestyle-red: #db2439;
   --freestyle-button-text: #ffffff;
@@ -114,6 +122,14 @@
   --shadow-blood: 0 20px 60px -10px rgb(0 230 255 / 0.45);
   --shadow-deep: 0 40px 80px -20px rgb(0 0 0 / 0.9);
 }
+
+.apple-sign-in-button { min-width: var(--apple-min-width); padding-block: 0; padding-inline: 8%; gap: 0; font-family: system-ui, sans-serif; font-weight: 500; letter-spacing: 0; margin-block: calc(var(--spacing) * 1.5); border-radius: var(--radius-md); }
+.apple-sign-in-default { height: var(--apple-height); font-size: var(--apple-title-size); }
+.apple-sign-in-compact { height: var(--apple-compact-height); font-size: var(--apple-compact-title-size); }
+.apple-sign-in-button img { height: 100%; width: auto; flex-shrink: 0; }
+.apple-sign-in-white, .apple-sign-in-white:hover { background: var(--apple-white); color: var(--apple-black); }
+.apple-sign-in-black, .apple-sign-in-black:hover { background: var(--apple-black); color: var(--apple-white); }
+.apple-sign-in-outline, .apple-sign-in-outline:hover { background: var(--apple-white); color: var(--apple-black); border: 1px solid var(--apple-black); }
 
 .freestyle-arena { color: var(--foreground); }
 .freestyle-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 3.5rem; position: relative; }

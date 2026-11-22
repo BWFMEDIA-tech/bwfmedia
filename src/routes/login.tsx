@@ -5,6 +5,8 @@ import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { accountErrorMessage, safeAccountDestination } from "@/lib/account-access";
+import { AppleSignInButton } from "@/components/auth/AppleSignInButton";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -34,7 +36,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
 
   // If a session already exists (e.g. returning from Google OAuth), move on.
@@ -68,17 +70,18 @@ function LoginPage() {
     };
   }, [next, nav]);
 
-  const onGoogle = async () => {
+  const onSocial = async (provider: "google" | "apple") => {
+    if (loading || socialLoading) return;
     setFailed(null);
-    setGoogleLoading(true);
+    setSocialLoading(provider);
     try {
       try { if (next) sessionStorage.setItem("bwf:post-login", next); } catch { /* Optional storage. */ }
-      const result = await lovable.auth.signInWithOAuth("google", {
+      const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: window.location.origin + "/login",
       });
       if (result.error) {
-        setGoogleLoading(false);
-        toast.error(result.error.message ?? "Google sign-in failed");
+        setSocialLoading(null);
+        toast.error(result.error.message ?? "Sign-in failed");
         return;
       }
       // They chose to sign in, so remember on this device that an account
@@ -93,16 +96,16 @@ function LoginPage() {
       if (error || !data.user) throw new Error("Sign-in did not complete");
       await nav({ to: next ?? "/home", replace: true });
     } catch {
-      setGoogleLoading(false);
-      toast.error("Unable to connect to Google. Please try again.");
+      setSocialLoading(null);
+      toast.error(`Unable to connect to ${provider === "apple" ? "Apple" : "Google"}. Please try again.`);
     } finally {
-      setGoogleLoading(false);
+      setSocialLoading(null);
     }
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading || googleLoading) return;
+    if (loading || socialLoading) return;
     setLoading(true);
     setFailed(null);
     try {
@@ -203,11 +206,12 @@ function LoginPage() {
           <span className="h-px flex-1 bg-white/10" />
         </div>
 
-        <button
+        <Button
           type="button"
-          onClick={onGoogle}
-          disabled={googleLoading}
-          className="flex w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 py-3 font-cond text-xs font-bold uppercase tracking-[0.2em] text-bone transition-colors hover:bg-white/10 disabled:opacity-50"
+          variant="outline"
+          onClick={() => onSocial("google")}
+          disabled={loading || !!socialLoading}
+          className="h-12 w-full"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -215,8 +219,9 @@ function LoginPage() {
             <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.83z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38z"/>
           </svg>
-          {googleLoading ? "Connecting…" : "Continue with Google"}
-        </button>
+          {socialLoading === "google" ? "Connecting…" : "Continue with Google"}
+        </Button>
+        <AppleSignInButton className="w-full" onClick={() => onSocial("apple")} disabled={loading || !!socialLoading} aria-busy={socialLoading === "apple"} />
 
         {failed && (
           <div className="mt-4 rounded-md border border-blood/40 bg-blood/10 p-3 text-center">

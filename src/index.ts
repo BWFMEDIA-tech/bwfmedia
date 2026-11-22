@@ -1,5 +1,8 @@
 import "./styles.css"
 
+export { AppleSignInButton } from "./components/auth/AppleSignInButton"
+export type { AppleSignInButtonProps } from "./components/auth/AppleSignInButton"
+
 export { CartButton, CartDrawer } from "./components/CartDrawer"
 export { FuturisticCalendar } from "./components/FuturisticCalendar"
 export { MessageBell } from "./components/MessageBell"

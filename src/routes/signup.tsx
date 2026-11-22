@@ -7,6 +7,9 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { accountErrorMessage } from "@/lib/account-access";
 import { useAuth } from "@/lib/auth-context";
 import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
+import { AppleSignInButton } from "@/components/auth/AppleSignInButton";
+import { Button } from "@/components/ui/button";
+import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [
@@ -44,11 +47,31 @@ function SignupPage() {
   const [interests, setInterests] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirmationPending, setConfirmationPending] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(null);
+
+  async function onSocial(provider: "google" | "apple") {
+    if (loading || socialLoading || auth.user) return;
+    setSocialLoading(provider);
+    try {
+      // OAuth uses the existing confirmed-account/profile lifecycle. Never grant
+      // host or artist privileges from this client-side role picker.
+      const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/login" });
+      if (result.error) throw new Error(result.error.message ?? "Sign-in failed");
+      if (result.redirected) return;
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) throw new Error("Sign-in did not complete");
+      await nav({ to: "/home", replace: true });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to connect. Please try again.");
+    } finally {
+      setSocialLoading(null);
+    }
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (auth.user) return;
-    if (!role || loading) return;
+    if (!role || loading || socialLoading) return;
     // Strong password: 8+ chars, upper, lower, number
     const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!strong.test(password)) {
@@ -225,6 +248,12 @@ function SignupPage() {
           </>
         )}
 
+        {!confirmationPending && <div className="mt-5">
+          <Button type="button" variant="outline" className="h-12 w-full" onClick={() => onSocial("google")} disabled={loading || !!socialLoading}>
+            {socialLoading === "google" ? "Connecting…" : "Continue with Google"}
+          </Button>
+          <AppleSignInButton className="w-full" onClick={() => onSocial("apple")} disabled={loading || !!socialLoading} aria-busy={socialLoading === "apple"} />
+        </div>}
         <div className="mt-5 text-xs text-bone/60 text-center">
           Already have an account? <Link to="/login" className="text-blood hover:text-blood-glow transition-colors">Sign in</Link>
         </div>
