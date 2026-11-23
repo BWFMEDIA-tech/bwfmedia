@@ -1,5 +1,5 @@
-// @auth-exempt: signed-out visitors may ask general help questions. A Bearer
-// token is verified inline (getClaims + sub) before any history is read or saved,
+// @auth-exempt: route verifies the Bearer token inline (getClaims + sub) and
+// rejects signed-out callers before any AI call; history reads/saves use it,
 // and roles come only from user_roles. The assistant has no tools and cannot
 // change anything.
 import { createFileRoute } from "@tanstack/react-router";
@@ -67,6 +67,8 @@ export const Route = createFileRoute("/api/assistant/chat")({
           const r = await userDb.from("user_roles").select("role").eq("user_id", userId);
           roles = (r.data ?? []).map((x: any) => String(x.role));
         }
+        // Sign-in required so anonymous callers cannot run up AI costs.
+        if (!userId) return json(401, { error: "Please sign in to use the Tunevio assistant." });
         const audience = audienceFromRoles(roles);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
