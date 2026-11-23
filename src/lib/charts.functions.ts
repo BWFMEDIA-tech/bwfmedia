@@ -1,6 +1,7 @@
 // @auth-exempt: public read of non-sensitive track data.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { rankUnique } from "@/lib/chart-ranking";
 
 export type ChartTab = "top_100" | "trending" | "most_played" | "most_liked" | "fresh_reviews";
@@ -39,6 +40,13 @@ export const getCharts = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<ChartResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb = supabaseAdmin as any;
+    // Audio links are only returned to signed-in listeners.
+    let signedIn = false;
+    try {
+      const auth = getRequestHeader("authorization") ?? "";
+      const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+      if (token) signedIn = !!(await supabaseAdmin.auth.getUser(token)).data.user;
+    } catch { signedIn = false; }
 
     // Over-fetch so duplicates and artwork-less rows can be dropped and
     // still leave a full chart.
@@ -95,7 +103,7 @@ export const getCharts = createServerFn({ method: "GET" })
         artistName: r.artist_name,
         artistUserId: r.artist_user_id ?? null,
         coverUrl: r.cover_url ?? null,
-        audioUrl: r.audio_url ?? null,
+        audioUrl: signedIn ? (r.audio_url ?? null) : null,
         durationSeconds: r.duration_seconds ?? null,
         playCount: r.play_count ?? 0,
         recentPlays: recent.get(r.id) ?? 0,

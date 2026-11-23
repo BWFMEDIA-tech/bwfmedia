@@ -512,6 +512,13 @@
       "when": 1795414025344,
       "tag": "0072_report_owner_capture_and_account_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1795439618857,
+      "tag": "0073_harden_label_roles_and_recording_paths",
+      "breakpoints": true
     }
   ]
 }

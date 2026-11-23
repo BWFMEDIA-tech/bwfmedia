@@ -131,16 +131,22 @@ export const signAudioUrl = createServerFn({ method: "POST" })
       }
     }
 
+    const refersToPath = (u: unknown) =>
+      typeof u === "string" && (u === path || (u.includes("/storage/") && extractPath(u) === path));
+    if (path.includes("..")) {
+      audit("invalid", "invalid_path", null);
+      return { url: null as string | null, expiresIn: 0 };
+    }
+
     if (!authorized) {
       // Look up a published track whose audio_url contains this path.
       const { data: track } = await supabaseAdmin
         .from("play_tracks")
-        .select("id")
+        .select("id, audio_url")
         .in("status", ["queued", "playing", "completed"])
         .ilike("audio_url", `%${path}%`)
-        .limit(1)
-        .maybeSingle();
-      if (track?.id) {
+        .limit(20);
+      if ((track ?? []).some((t: any) => refersToPath(t.audio_url))) {
         authorized = true;
         reason = "published_track";
       }
@@ -150,13 +156,12 @@ export const signAudioUrl = createServerFn({ method: "POST" })
       // Song currently playing on a live artist's setlist.
       const { data: item } = await (supabaseAdmin as any)
         .from("live_setlist_items")
-        .select("id, streams!inner(status)")
+        .select("id, audio_url, streams!inner(status)")
         .eq("status", "playing")
         .eq("streams.status", "live")
         .ilike("audio_url", `%${path}%`)
-        .limit(1)
-        .maybeSingle();
-      if (item?.id) {
+        .limit(20);
+      if ((item ?? []).some((t: any) => refersToPath(t.audio_url))) {
         authorized = true;
         reason = "live_setlist";
       }

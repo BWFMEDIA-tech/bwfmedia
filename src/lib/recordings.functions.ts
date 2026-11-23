@@ -83,6 +83,9 @@ export const getRecordingSignedUrl = createServerFn({ method: 'POST' })
     if (error) throw new Error(error.message);
     if (!rec) throw new Error('Recording not found');
     if (rec.host_id !== userId) throw new Error('Only the recording owner can access this recording');
+    if (!rec.storage_path.startsWith(`${userId}/`) || rec.storage_path.includes('..')) {
+      throw new Error('Invalid recording path');
+    }
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const { data: signed, error: sErr } = await supabaseAdmin.storage
       .from('stream-recordings')

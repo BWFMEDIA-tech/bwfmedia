@@ -185,7 +185,10 @@ export const createLabelInvite = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await requireRole(context, data.label_id, data.kind === "artist" ? "manageRoster" : "manageTeam");
+    const myInviteRole = await requireRole(context, data.label_id, data.kind === "artist" ? "manageRoster" : "manageTeam");
+    if (data.kind !== "artist" && data.role === "owner" && myInviteRole !== "owner") {
+      throw new Error("Only an owner can grant ownership");
+    }
     const code = `lbl_${crypto.randomUUID().replace(/-/g, "").slice(0, 18)}`;
     const { error } = await context.supabase.from("label_invites").insert({
       label_id: data.label_id,

@@ -54,17 +54,8 @@ export const getArtistLeaderboard = createServerFn({ method: "GET" }).handler(
       (profRes.data ?? []).map((p: any) => [p.id, p]),
     );
 
-    // 3. XP — latest balance_after per user
-    const xpRes = await sb
-      .from("xp_ledger")
-      .select("user_id, balance_after, created_at")
-      .in("user_id", ids)
-      .order("created_at", { ascending: false })
-      .limit(5000);
+    // XP balances are private to each artist; not exposed publicly.
     const xpByUser = new Map<string, number>();
-    for (const row of xpRes.data ?? []) {
-      if (!xpByUser.has(row.user_id)) xpByUser.set(row.user_id, row.balance_after ?? 0);
-    }
 
     // 4. Battle wins
     const winsRes = await sb
