@@ -10,6 +10,7 @@ import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { AppleSignInButton } from "@/components/auth/AppleSignInButton";
 import { Button } from "@/components/ui/button";
 import { lovable } from "@/integrations/lovable/index";
+import { finishAccountOAuth } from "@/lib/account-social";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [
@@ -56,11 +57,13 @@ function SignupPage() {
       // OAuth uses the existing confirmed-account/profile lifecycle. Never grant
       // host or artist privileges from this client-side role picker.
       const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/login" });
-      if (result.error) throw new Error(result.error.message ?? "Sign-in failed");
-      if (result.redirected) return;
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) throw new Error("Sign-in did not complete");
-      await nav({ to: "/home", replace: true });
+      const outcome = await finishAccountOAuth(result, async () => {
+        const { data, error } = await supabase.auth.getUser();
+        return { user: data.user, error };
+      });
+      try { window.localStorage.setItem("tunevio:has-account", "1"); } catch { /* Optional browser preference. */ }
+      if (outcome.redirected) return;
+      await nav({ to: outcome.destination, replace: true });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to connect. Please try again.");
     } finally {
@@ -133,7 +136,7 @@ function SignupPage() {
   </div>;
 
   return (
-    <div className="relative min-h-screen bg-black text-bone flex items-center justify-center p-6 overflow-x-hidden">
+    <div className="relative min-h-screen bg-black text-bone flex items-center justify-center p-4 sm:p-6 overflow-x-hidden">
       <video
         className="absolute inset-0 w-full h-full object-cover opacity-40"
         src={heroRapperVideo.url}
@@ -148,7 +151,7 @@ function SignupPage() {
         style={{ background: "radial-gradient(60% 50% at 50% 30%, rgba(225,29,42,0.35), transparent 70%)" }}
       />
 
-      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-blood/30 bg-black/60 backdrop-blur-md p-8">
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-blood/30 bg-black/60 backdrop-blur-md p-4 sm:p-8">
         <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-5">
           <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
           <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
@@ -166,6 +169,13 @@ function SignupPage() {
           </span>
         </h1>
         <p className="mt-3 mb-6 text-sm text-bone/60">Your music. Your stage. Your audience.</p>
+
+        {!confirmationPending && <div className="mb-5">
+          <Button type="button" variant="outline" className="h-11 w-full" onClick={() => onSocial("google")} disabled={loading || !!socialLoading}>
+            {socialLoading === "google" ? "Connecting…" : "Continue with Google"}
+          </Button>
+          <AppleSignInButton size="compact" className="w-full" onClick={() => onSocial("apple")} disabled={loading || !!socialLoading} aria-busy={socialLoading === "apple"} />
+        </div>}
 
         {confirmationPending && (
           <div role="status" className="mt-4 text-sm text-bone">
@@ -248,12 +258,6 @@ function SignupPage() {
           </>
         )}
 
-        {!confirmationPending && <div className="mt-5">
-          <Button type="button" variant="outline" className="h-12 w-full" onClick={() => onSocial("google")} disabled={loading || !!socialLoading}>
-            {socialLoading === "google" ? "Connecting…" : "Continue with Google"}
-          </Button>
-          <AppleSignInButton className="w-full" onClick={() => onSocial("apple")} disabled={loading || !!socialLoading} aria-busy={socialLoading === "apple"} />
-        </div>}
         <div className="mt-5 text-xs text-bone/60 text-center">
           Already have an account? <Link to="/login" className="text-blood hover:text-blood-glow transition-colors">Sign in</Link>
         </div>

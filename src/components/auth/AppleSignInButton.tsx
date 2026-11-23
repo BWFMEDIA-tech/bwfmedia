@@ -1,9 +1,9 @@
 import { forwardRef } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Button, type ButtonProps } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import blackLogo from "@/assets/logos/apple-sign-in-black.svg";
-import whiteLogo from "@/assets/logos/apple-sign-in-white.svg";
+import { Button, type ButtonProps } from "../ui/button";
+import { cn } from "../../lib/utils";
+import blackLogo from "../../assets/logos/apple-sign-in-black.svg";
+import whiteLogo from "../../assets/logos/apple-sign-in-white.svg";
 
 const appleVariants = cva("apple-sign-in-button", {
   variants: {

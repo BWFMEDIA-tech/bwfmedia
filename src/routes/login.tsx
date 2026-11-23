@@ -7,6 +7,7 @@ import heroRapperVideo from "@/assets/hero-rapper.mp4.asset.json";
 import { accountErrorMessage, safeAccountDestination } from "@/lib/account-access";
 import { AppleSignInButton } from "@/components/auth/AppleSignInButton";
 import { Button } from "@/components/ui/button";
+import { finishAccountOAuth } from "@/lib/account-social";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -79,11 +80,10 @@ function LoginPage() {
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: window.location.origin + "/login",
       });
-      if (result.error) {
-        setSocialLoading(null);
-        toast.error(result.error.message ?? "Sign-in failed");
-        return;
-      }
+      const outcome = await finishAccountOAuth(result, async () => {
+        const { data, error } = await supabase.auth.getUser();
+        return { user: data.user, error };
+      }, next);
       // They chose to sign in, so remember on this device that an account
       // exists and future visits to the public welcome page go to sign-in.
       try {
@@ -91,10 +91,8 @@ function LoginPage() {
       } catch {
         // Storage unavailable — skip the remember step.
       }
-      if (result.redirected) return;
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) throw new Error("Sign-in did not complete");
-      await nav({ to: next ?? "/home", replace: true });
+      if (outcome.redirected) return;
+      await nav({ to: outcome.destination, replace: true });
     } catch {
       setSocialLoading(null);
       toast.error(`Unable to connect to ${provider === "apple" ? "Apple" : "Google"}. Please try again.`);
@@ -156,7 +154,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-bone flex items-center justify-center p-6 overflow-hidden">
+    <div className="relative min-h-screen bg-black text-bone flex items-center justify-center p-4 sm:p-6 overflow-hidden">
       <video
         className="absolute inset-0 w-full h-full object-cover opacity-40"
         src={heroRapperVideo.url}
@@ -171,7 +169,7 @@ function LoginPage() {
         style={{ background: "radial-gradient(60% 50% at 50% 30%, rgba(225,29,42,0.35), transparent 70%)" }}
       />
 
-      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-blood/30 bg-black/60 backdrop-blur-md p-8">
+      <div className="relative z-10 w-full max-w-sm rounded-2xl border border-blood/30 bg-black/60 backdrop-blur-md p-4 sm:p-8">
         <div className="inline-flex w-fit items-center gap-2 rounded-full bg-blood/90 px-3 py-1 mb-5">
           <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
           <span className="font-cond tracking-[0.3em] text-[10px] uppercase text-white font-bold">
@@ -190,28 +188,12 @@ function LoginPage() {
         </h1>
         <p className="mt-3 mb-6 text-sm text-bone/60">Welcome back to the stage.</p>
 
-        <form onSubmit={submit} className="flex flex-col gap-3">
-          <input type="email" required placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
-            className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
-          <input type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-            className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
-          <button disabled={loading} className="rounded-md bg-blood text-white py-3 font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors disabled:opacity-50">
-            {loading ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
-
-        <div className="my-4 flex items-center gap-3">
-          <span className="h-px flex-1 bg-white/10" />
-          <span className="font-cond text-[10px] uppercase tracking-[0.3em] text-bone/40">or</span>
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
-
         <Button
           type="button"
           variant="outline"
           onClick={() => onSocial("google")}
           disabled={loading || !!socialLoading}
-          className="h-12 w-full"
+          className="h-11 w-full"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -221,7 +203,22 @@ function LoginPage() {
           </svg>
           {socialLoading === "google" ? "Connecting…" : "Continue with Google"}
         </Button>
-        <AppleSignInButton className="w-full" onClick={() => onSocial("apple")} disabled={loading || !!socialLoading} aria-busy={socialLoading === "apple"} />
+        <AppleSignInButton size="compact" className="w-full" onClick={() => onSocial("apple")} disabled={loading || !!socialLoading} aria-busy={socialLoading === "apple"} />
+
+        <div className="my-4 flex items-center gap-3">
+          <span className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">or</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+        <form onSubmit={submit} className="flex flex-col gap-3">
+          <input type="email" required placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
+            className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
+          <input type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+            className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
+          <Button disabled={loading || !!socialLoading} type="submit" className="h-11 w-full">
+            {loading ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
 
         {failed && (
           <div className="mt-4 rounded-md border border-blood/40 bg-blood/10 p-3 text-center">

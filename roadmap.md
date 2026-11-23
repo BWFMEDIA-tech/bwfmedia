@@ -2,8 +2,10 @@
 
 ## App Store preparation
 - [x] Inspect existing account settings, sign-in and mobile configuration; prepare scoped implementation plan
-- [ ] Add secure account deletion and Apple sign-in after plan approval
-- [ ] Prepare production-safe iPhone configuration and review-safeguard audit after plan approval
+- [x] Enable Apple sign-in and add official, equally sized provider buttons using existing account verification and public return paths
+- [x] Replace preview URL/insecure transport in iPhone configuration and document review-safeguard findings and native handoff
+- [ ] Enable complete account deletion after owner confirms legally retained financial records; current cascading payout/stream references must be made safe first
+- [x] Audit live moderation, direct messages, rights, privacy and support; document missing general user report/block flows as submission gaps
 - [ ] Confirm iPhone digital purchase strategy; no existing web Stripe payments changed
 - [ ] Native signing, TestFlight and physical-device verification require Apple Developer access and Mac/Xcode
 

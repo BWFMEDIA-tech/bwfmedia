@@ -1905,6 +1905,23 @@
   },
   "components": [
     {
+      "name": "AppleSignInButton",
+      "file": "src/components/auth/AppleSignInButton",
+      "import_path": "",
+      "usage": "Use for managed Apple sign-in on account entry screens. Choose white on dark surfaces and black or outline on light surfaces; keep equal prominence with other sign-in providers.",
+      "examples": [
+        {
+          "label": "Dark account screen",
+          "code": "<AppleSignInButton variant=\"white\" onClick={continueWithApple} disabled={busy}>Continue with Apple</AppleSignInButton>"
+        }
+      ],
+      "antipatterns": [
+        "Do not recolor Apple's logo or replace it with an icon-library symbol.",
+        "Do not hide Apple below other providers or place a black button on a dark surface.",
+        "Do not use this button to start a separate Apple SDK flow; invoke the existing managed OAuth helper."
+      ]
+    },
+    {
       "name": "CartButton",
       "file": "src/components/CartDrawer",
       "import_path": ""
