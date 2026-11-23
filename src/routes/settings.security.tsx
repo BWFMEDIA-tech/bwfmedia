@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { SettingsShell, Card } from "@/components/settings/SettingsShell";
 import { DeleteAccountSection } from "@/components/settings/DeleteAccountSection";
+import { BlockedUsersSection } from "@/components/safety/BlockedUsersSection";
 
 export const Route = createFileRoute("/settings/security")({
   head: () => ({ meta: [
@@ -54,6 +55,7 @@ function SecurityPage() {
         <p className="mb-3 text-xs text-white/60">Sign out of every device including this one.</p>
         <button onClick={signOutAll} disabled={busy} className="inline-flex items-center gap-2 rounded-lg border border-red-600/40 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-600/10"><LogOut className="h-4 w-4" />Sign out everywhere</button>
       </Card>
+      <BlockedUsersSection />
       <DeleteAccountSection signedIn={!!user} appleConnected={user?.identities?.some((identity) => identity.provider === "apple") ?? false} />
     </SettingsShell>
   );

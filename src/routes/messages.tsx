@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { isSoftwareKeyboardOpen } from "@/lib/mobile-keyboard";
+import { ContentSafetyMenu } from "@/components/safety/ContentSafetyMenu";
+import { usePersonalBlocks } from "@/components/safety/usePersonalBlocks";
 
 const searchSchema = z.object({
   to: z.string().uuid().optional(),
@@ -67,6 +69,7 @@ function MessagesPage() {
   const search = useSearch({ from: "/messages" });
   const sendFn = useServerFn(sendDirectMessage);
   const markReadFn = useServerFn(markConversationRead);
+  const blocks = usePersonalBlocks();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileLite>>({});
@@ -144,6 +147,7 @@ function MessagesPage() {
     const uid = auth.user.id;
     const map = new Map<string, Conversation>();
     for (const m of messages) {
+      if (m.recipient_id === uid && blocks.data?.blockedIds.includes(m.sender_id)) continue;
       const otherId = m.sender_id === uid ? m.recipient_id : m.sender_id;
       const other = profiles[otherId] ?? { id: otherId, display_name: null, avatar_url: null };
       const existing = map.get(otherId);
@@ -165,7 +169,7 @@ function MessagesPage() {
       });
     }
     return [...map.values()].sort((a, b) => b.last.created_at.localeCompare(a.last.created_at));
-  }, [messages, profiles, auth.user?.id, search.to]);
+  }, [messages, profiles, auth.user?.id, search.to, blocks.data]);
 
   const activeMessages = useMemo(() => {
     if (!auth.user || !activeId) return [];
@@ -173,9 +177,9 @@ function MessagesPage() {
     return messages.filter(
       (m) =>
         (m.sender_id === uid && m.recipient_id === activeId) ||
-        (m.sender_id === activeId && m.recipient_id === uid),
+        (m.sender_id === activeId && m.recipient_id === uid && !blocks.data?.blockedIds.includes(m.sender_id)),
     );
-  }, [messages, activeId, auth.user?.id]);
+  }, [messages, activeId, auth.user?.id, blocks.data]);
 
   const scrollToLatest = (smooth = false) => {
     const el = scrollRef.current;
@@ -290,7 +294,8 @@ function MessagesPage() {
   // Mark conversation read when opened
   useEffect(() => {
     if (!activeId || !auth.user) return;
-    const hasUnread = activeMessages.some((m) => m.recipient_id === auth.user!.id && !m.read_at);
+    const uid = auth.user.id;
+    const hasUnread = activeMessages.some((m) => m.recipient_id === uid && !m.read_at);
     if (hasUnread) {
       markReadFn({ data: { otherUserId: activeId } }).catch(() => {});
     }
@@ -314,7 +319,7 @@ function MessagesPage() {
   }, [searchQ, auth.user?.id]);
 
   const handleSend = async () => {
-    if (!activeId || !body.trim() || sending) return;
+    if (!activeId || !body.trim() || sending || blocks.data?.blockedIds.includes(activeId)) return;
     const text = body.trim();
     setSending(true);
     setBody("");
@@ -452,6 +457,7 @@ function MessagesPage() {
                     <h2 className="min-w-0 truncate text-lg font-semibold">{activeProfile?.display_name || "Unknown user"}</h2>
                     <ChevronRight className="h-4 w-4 shrink-0 text-white/40" />
                   </div>
+                  <ContentSafetyMenu target={{ targetType: "profile", targetId: activeId }} userId={activeId} label={activeProfile?.display_name ?? "Conversation"} />
                   <button
                     onClick={closeConversation}
                     className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/70 transition hover:border-brand-cyan/60 hover:bg-white/10 hover:text-white"
@@ -466,11 +472,11 @@ function MessagesPage() {
                     <p className="mt-12 text-center text-xs text-white/40">No messages yet. Say hi 👋</p>
                   ) : (
                     activeMessages.map((m, i) => {
-                      const mine = m.sender_id === auth.user!.id;
+                      const mine = m.sender_id === auth.user?.id;
                       const prev = activeMessages[i - 1];
                       const showDay = !prev || dayLabel(prev.created_at) !== dayLabel(m.created_at);
                       const senderProfile = mine
-                        ? { id: auth.user!.id, display_name: auth.user!.user_metadata?.display_name ?? null, avatar_url: auth.user!.user_metadata?.avatar_url ?? null }
+                        ? { id: m.sender_id, display_name: auth.user?.user_metadata?.display_name ?? null, avatar_url: auth.user?.user_metadata?.avatar_url ?? null }
                         : (activeProfile ?? { id: m.sender_id, display_name: null, avatar_url: null });
                       return (
                         <div key={m.id}>
@@ -492,6 +498,7 @@ function MessagesPage() {
                               </p>
                             </div>
                             {mine && <Avatar profile={senderProfile} />}
+                            {!mine && <ContentSafetyMenu target={{ targetType: "direct_message", targetId: m.id }} userId={m.sender_id} label="Private message" />}
                           </div>
                         </div>
                       );
@@ -502,6 +509,7 @@ function MessagesPage() {
                   onSubmit={(e) => { e.preventDefault(); handleSend(); composerRef.current?.focus(); }}
                   className="shrink-0 border-t border-white/10 bg-black/80 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:bg-transparent"
                 >
+                  {blocks.data?.blockedIds.includes(activeId) && <p className="mb-2 text-sm text-muted-foreground">User blocked. Unblock to send messages.</p>}
                   <div className="flex items-end gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pl-4 pr-1.5 transition focus-within:border-brand-cyan/60">
                     <textarea
                       ref={composerRef}
@@ -514,12 +522,13 @@ function MessagesPage() {
                       placeholder="Write a message…"
                       rows={1}
                       maxLength={4000}
+                      disabled={blocks.data?.blockedIds.includes(activeId) ?? false}
                       enterKeyHint="send"
                       className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-base outline-none placeholder:text-white/40 md:text-sm"
                     />
                     <button
                       type="submit"
-                      disabled={!body.trim() || sending}
+                      disabled={!body.trim() || sending || (blocks.data?.blockedIds.includes(activeId) ?? false)}
                       className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-blue text-white transition hover:opacity-90 disabled:opacity-40"
                       aria-label="Send"
                     >

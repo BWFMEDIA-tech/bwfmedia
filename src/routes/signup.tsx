@@ -11,6 +11,8 @@ import { AppleSignInButton } from "@/components/auth/AppleSignInButton";
 import { Button } from "@/components/ui/button";
 import { lovable } from "@/integrations/lovable/index";
 import { finishAccountOAuth } from "@/lib/account-social";
+import { requireSafetyAgreement } from "@/lib/content-safety";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [
@@ -49,9 +51,11 @@ function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [confirmationPending, setConfirmationPending] = useState(false);
   const [socialLoading, setSocialLoading] = useState<"google" | "apple" | null>(null);
+  const [safetyAccepted, setSafetyAccepted] = useState(false);
 
   async function onSocial(provider: "google" | "apple") {
     if (loading || socialLoading || auth.user) return;
+    try { requireSafetyAgreement(safetyAccepted); } catch (error) { toast.error(error instanceof Error ? error.message : 'Please accept the terms'); return; }
     setSocialLoading(provider);
     try {
       // OAuth uses the existing confirmed-account/profile lifecycle. Never grant
@@ -75,6 +79,7 @@ function SignupPage() {
     e.preventDefault();
     if (auth.user) return;
     if (!role || loading || socialLoading) return;
+    try { requireSafetyAgreement(safetyAccepted); } catch (error) { toast.error(error instanceof Error ? error.message : 'Please accept the terms'); return; }
     // Strong password: 8+ chars, upper, lower, number
     const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!strong.test(password)) {
@@ -84,6 +89,8 @@ function SignupPage() {
     const meta: Record<string, unknown> = {
       display_name: displayName,
       role,
+      terms_accepted_at: new Date().toISOString(),
+      terms_version: '2026-11-23',
     };
     if (role === "artist") {
       if (stageName) meta.stage_name = stageName;
@@ -171,6 +178,7 @@ function SignupPage() {
         <p className="mt-3 mb-6 text-sm text-bone/60">Your music. Your stage. Your audience.</p>
 
         {!confirmationPending && <div className="mb-5">
+          <div className="mb-4 flex items-start gap-3"><Checkbox id="signup-safety-agreement" checked={safetyAccepted} onCheckedChange={value => setSafetyAccepted(value === true)} className="mt-1" /><label htmlFor="signup-safety-agreement" className="text-xs leading-relaxed text-foreground">I agree to the <Link to="/terms" className="text-primary underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>. TUNEVIO has zero tolerance for objectionable content or abusive users.</label></div>
           <Button type="button" variant="outline" className="h-11 w-full" onClick={() => onSocial("google")} disabled={loading || !!socialLoading}>
             {socialLoading === "google" ? "Connecting…" : "Continue with Google"}
           </Button>
@@ -251,7 +259,7 @@ function SignupPage() {
                 className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
               <input type="password" required minLength={8} placeholder="Password (8+ chars, upper, lower, number)" value={password} onChange={(e) => setPassword(e.target.value)}
                 className="rounded-md border border-white/10 bg-black/50 px-3 py-2.5 text-sm text-bone placeholder:text-bone/40 focus:border-blood/60 focus:outline-none transition-colors" />
-              <button disabled={loading} className="rounded-md bg-blood text-white py-3 font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors disabled:opacity-50">
+              <button disabled={loading || !safetyAccepted} className="rounded-md bg-blood text-white py-3 font-cond font-bold tracking-[0.2em] text-xs uppercase hover:bg-blood-glow transition-colors disabled:opacity-50">
                 {loading ? "Creating…" : "Create account"}
               </button>
             </form>

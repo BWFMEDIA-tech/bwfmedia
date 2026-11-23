@@ -11,7 +11,9 @@
 - [x] Apply shared consumption-first controls to native iPhone memberships, boosts, tips, credit packs and billing upsells; preserve web payments, account access and physical merchandise
 - [x] Verify 22 purchase/sign-in/trial tests and signed-in browser/native-runtime simulation at 320/390px; music navigation and credit history work without checkout
 - [ ] Audit booking/generic-cart digital classifications and verify native purchase restrictions on a physical iPhone before submission
-- [ ] Implement general user reporting/blocking; preserve existing moderation
+- [x] Phase 1: private content reports, personal blocks with database-enforced DM protection, chat/music/live/profile reporting, admin review and signup safety agreement; preserve existing moderation and remove personal safety data on account deletion
+- [x] Phase 1 verification: 28 safety/payment/deletion tests passed; two real disposable members reported a DM, blocked failed sends, unblocked and read restored messages; authorized admin saved a review and dismissal; 320px signup consent and 390px messages verified without runtime errors
+- [ ] Existing site-wide security scan findings need a separate scoped review before App Store submission; unrelated access policies were not changed during Phase 1
 - [ ] Native signing, TestFlight and physical-device verification require Apple Developer access and Mac/Xcode
 
 ## Assigned Freestyle joining

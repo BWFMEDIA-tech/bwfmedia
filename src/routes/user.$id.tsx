@@ -3,12 +3,17 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SignedImg } from "@/components/ui/signed-img";
+import { ContentSafetyMenu } from "@/components/safety/ContentSafetyMenu";
 
 export const Route = createFileRoute("/user/$id")({
   head: ({ params }) => ({
     meta: [
       { title: `User Profile — Tunevio` },
       { name: "description", content: "Tunevio user profile." },
+      { property: "og:title", content: "User Profile — Tunevio" },
+      { property: "og:description", content: "View this Tunevio community profile." },
+      { property: "og:type", content: "profile" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: PublicProfilePage,
@@ -16,7 +21,7 @@ export const Route = createFileRoute("/user/$id")({
 
 function PublicProfilePage() {
   const { id } = useParams({ from: "/user/$id" });
-  const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null; bio: string | null } | null>(null);
+  const [profile, setProfile] = useState<{ id: string; display_name: string | null; avatar_url: string | null; bio: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +29,7 @@ function PublicProfilePage() {
     async function load() {
       const { data } = await supabase
         .from("public_profiles" as any)
-        .select("display_name, avatar_url, bio")
+        .select("id, display_name, avatar_url, bio")
         .eq("public_id", id)
         .maybeSingle();
       if (!mounted) return;
@@ -77,6 +82,7 @@ function PublicProfilePage() {
 
           <div>
             <h1 className="text-3xl font-black tracking-tight">{profile.display_name ?? "Unnamed"}</h1>
+            <ContentSafetyMenu target={{ targetType: 'profile', targetId: profile.id }} userId={profile.id} label={profile.display_name ?? 'User profile'} />
             {profile.bio && (
               <p className="mt-3 text-sm text-white/70 max-w-md mx-auto leading-relaxed">{profile.bio}</p>
             )}

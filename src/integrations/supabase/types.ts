@@ -3287,6 +3287,54 @@ export type Database = {
           },
         ]
       }
+      moderation_reports: {
+        Row: {
+          category: string
+          created_at: string
+          details: string
+          evidence: string
+          id: string
+          reporter_id: string
+          review_note: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_id: string
+          target_type: string
+          target_user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          details?: string
+          evidence?: string
+          id?: string
+          reporter_id?: string
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_id: string
+          target_type: string
+          target_user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          details?: string
+          evidence?: string
+          id?: string
+          reporter_id?: string
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_id?: string
+          target_type?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       nfc_pages: {
         Row: {
           code: string
@@ -6361,6 +6409,24 @@ export type Database = {
           id?: string
           reason?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
         }
         Relationships: []
       }

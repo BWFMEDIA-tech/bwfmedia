@@ -10,6 +10,7 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ContentSafetyMenu } from "@/components/safety/ContentSafetyMenu";
 
 export function formatPlayerTime(seconds: number) {
   if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
@@ -66,7 +67,7 @@ export function MusicDetails({ nowPlaying, onClose }: { nowPlaying: boolean; onC
           <header className="mb-3 grid sm:mb-6 grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-3">
             <Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Back to music" onClick={onClose}>{nowPlaying ? <ChevronDown /> : <ArrowLeft />}</Button>
             <div className="min-w-0 text-center text-xs text-brand-silver">{nowPlaying ? <span className="block truncate text-sm font-semibold text-foreground">{track.title}</span> : "TUNEVIO MUSIC"}</div>
-            <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-11 w-11 rounded-full" aria-label="Music options"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+            <ContentSafetyMenu target={{ targetType: 'track', targetId: track.id }} label={track.title} extraItems={<><DropdownMenuItem onSelect={() => void shareMusic(track)}><Share2 /> Share music</DropdownMenuItem><DropdownMenuItem onSelect={() => setCredits(true)}><Info /> Credits</DropdownMenuItem></>} />
           </header>
           <div className="music-detail-art mx-auto aspect-square overflow-hidden rounded-lg bg-secondary">
             {track.coverUrl && failedCover !== track.coverUrl ? <SignedImg displayWidth={640} loading="eager" src={track.coverUrl} alt={`${track.title} artwork`} onError={() => setFailedCover(track.coverUrl ?? null)} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center"><Mic2 className="h-16 w-16 text-muted-foreground" /></div>}

@@ -39,6 +39,7 @@ import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { useSignedVideoUrl } from "@/lib/video-urls";
 import { Button } from "@/components/ui/button";
+import { ContentSafetyMenu } from "@/components/safety/ContentSafetyMenu";
 
 function ProfileVideoCard({ v }: { v: { id: string; title: string; thumbnail_path: string | null; created_at: string } }) {
   const thumb = useSignedVideoUrl(v.thumbnail_path && !/^https?:/.test(v.thumbnail_path) ? v.thumbnail_path : null);
@@ -190,7 +191,7 @@ function ArtistProfilePage() {
         key={live.id}
         stream={live}
         artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null, tracks: (meta?.tracks ?? []).map((t) => ({ id: t.id, title: t.title, cover_url: t.cover_url })) }}
-        followSlot={!isOwner ? <FollowButton artistId={id} /> : null}
+        followSlot={!isOwner ? <><FollowButton artistId={id} /><ContentSafetyMenu target={{ targetType: 'profile', targetId: id }} userId={id} label={name} /></> : null}
         platformSlot={<ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />}
         onEnded={onLiveEnded}
       />
@@ -315,17 +316,7 @@ function HeroBanner({
           <>
             <FollowButton artistId={artist.id} />
             <PillButton icon={Share2} label="Share" onClick={() => shareProfile(artist.name)} />
-            <button
-              aria-label="More"
-              className="inline-flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-semibold text-white transition hover:bg-white/[0.08]"
-              style={{
-                borderColor: "color-mix(in srgb, var(--brand-blue) 40%, transparent)",
-                background: "color-mix(in srgb, var(--brand-blue) 8%, transparent)",
-                boxShadow: "inset 0 0 18px color-mix(in srgb, var(--brand-blue) 12%, transparent)",
-              }}
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
+            <ContentSafetyMenu target={{ targetType: 'profile', targetId: artist.id }} userId={artist.id} label={artist.name} />
           </>
         )}
       </div>

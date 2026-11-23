@@ -8,6 +8,8 @@ export const Route = createFileRoute("/terms")({
       { name: "description", content: "Terms governing use of Tunevio: artist profiles, memberships, studio bookings, media distribution, and platform features." },
       { property: "og:title", content: "Terms of Service — Tunevio" },
       { property: "og:description", content: "The terms that govern your use of the Tunevio platform and services." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TermsPage,
@@ -15,7 +17,7 @@ export const Route = createFileRoute("/terms")({
 
 function TermsPage() {
   return (
-    <LegalPage title="Terms of Service" effectiveDate="June 15, 2026">
+    <LegalPage title="Terms of Service" effectiveDate="November 23, 2026">
       <p>
         Welcome to Tunevio (https://tunevio.com) ("Tunevio," "Company," "we," "our," or "us"). These Terms of Service ("Terms")
         govern your access to and use of https://tunevio.com and all related websites, applications, content, services,
@@ -40,6 +42,7 @@ function TermsPage() {
       <p>If you believe content on the Platform infringes your copyright, submit a notice to our Copyright Agent at <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a> containing identification of the work and infringing material, your contact information, a good-faith statement, and a statement under penalty of perjury. We reserve the right to remove infringing material and terminate repeat infringers.</p>
 
       <h2>6. Prohibited Conduct</h2>
+      <p>TUNEVIO has zero tolerance for objectionable content or abusive users. Sexual exploitation, hateful or violent threats, harassment, and unlawful content are prohibited. Report content or block users using the safety menu on messages, music, profiles or live sessions. Blocked users cannot exchange new private messages with you and their live-chat messages are hidden for you. Reports are reviewed by administrators, who may remove content or suspend accounts. For safety concerns, contact <a href="mailto:tunevioapp@gmail.com">tunevioapp@gmail.com</a>.</p>
       <ul>
         <li>Violating any law</li>
         <li>Uploading content you do not own or infringing IP rights</li>

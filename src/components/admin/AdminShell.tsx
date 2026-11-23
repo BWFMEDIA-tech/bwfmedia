@@ -80,6 +80,7 @@ const NAV: NavEntry[] = [
   {
     kind: "group", key: "trust", label: "Trust & Safety", icon: ShieldCheck,
     children: [
+      { to: "/admin/reports", label: "Content Reports" },
       { to: "/admin/vote-attempts", label: "Battle Vote Attempts" },
       { to: "/admin/ops", label: "Live Ops Feed" },
       { to: "/admin/audit", label: "Audit Log" },

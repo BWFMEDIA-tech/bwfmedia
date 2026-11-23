@@ -498,6 +498,20 @@
       "when": 1795413121769,
       "tag": "0070_enforce_deleted_account_retention",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1795413793197,
+      "tag": "0071_personal_blocks_and_content_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1795414025344,
+      "tag": "0072_report_owner_capture_and_account_cleanup",
+      "breakpoints": true
     }
   ]
 }

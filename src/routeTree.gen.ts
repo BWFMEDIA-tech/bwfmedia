@@ -90,6 +90,7 @@ import { Route as AdminNfcOrdersRouteImport } from './routes/admin.nfc-orders'
 import { Route as AdminOpsRouteImport } from './routes/admin.ops'
 import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminRightsRouteImport } from './routes/admin.rights'
 import { Route as AdminSecurityRouteImport } from './routes/admin.security'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -576,6 +577,11 @@ const AdminPayoutsRoute = AdminPayoutsRouteImport.update({
 const AdminProfileRoute = AdminProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminRightsRoute = AdminRightsRouteImport.update({
@@ -1073,6 +1079,7 @@ export interface FileRoutesByFullPath {
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/rights': typeof AdminRightsRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -1233,6 +1240,7 @@ export interface FileRoutesByTo {
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/rights': typeof AdminRightsRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -1397,6 +1405,7 @@ export interface FileRoutesById {
   '/admin/ops': typeof AdminOpsRoute
   '/admin/payouts': typeof AdminPayoutsRoute
   '/admin/profile': typeof AdminProfileRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/rights': typeof AdminRightsRoute
   '/admin/security': typeof AdminSecurityRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -1562,6 +1571,7 @@ export interface FileRouteTypes {
     | '/admin/ops'
     | '/admin/payouts'
     | '/admin/profile'
+    | '/admin/reports'
     | '/admin/rights'
     | '/admin/security'
     | '/admin/settings'
@@ -1722,6 +1732,7 @@ export interface FileRouteTypes {
     | '/admin/ops'
     | '/admin/payouts'
     | '/admin/profile'
+    | '/admin/reports'
     | '/admin/rights'
     | '/admin/security'
     | '/admin/settings'
@@ -1885,6 +1896,7 @@ export interface FileRouteTypes {
     | '/admin/ops'
     | '/admin/payouts'
     | '/admin/profile'
+    | '/admin/reports'
     | '/admin/rights'
     | '/admin/security'
     | '/admin/settings'
@@ -2647,6 +2659,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProfileRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/rights': {
       id: '/admin/rights'
       path: '/rights'
@@ -3233,6 +3252,7 @@ interface AdminRouteChildren {
   AdminOpsRoute: typeof AdminOpsRoute
   AdminPayoutsRoute: typeof AdminPayoutsRoute
   AdminProfileRoute: typeof AdminProfileRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminRightsRoute: typeof AdminRightsRoute
   AdminSecurityRoute: typeof AdminSecurityRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -3268,6 +3288,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOpsRoute: AdminOpsRoute,
   AdminPayoutsRoute: AdminPayoutsRoute,
   AdminProfileRoute: AdminProfileRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AdminRightsRoute: AdminRightsRoute,
   AdminSecurityRoute: AdminSecurityRoute,
   AdminSettingsRoute: AdminSettingsRoute,

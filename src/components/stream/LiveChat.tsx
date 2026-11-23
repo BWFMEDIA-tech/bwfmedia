@@ -32,6 +32,8 @@ import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
 import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
+import { ContentSafetyMenu } from '@/components/safety/ContentSafetyMenu';
+import { usePersonalBlocks } from '@/components/safety/usePersonalBlocks';
 
 // BWF Immersive Cinema palette
 const PURPLE = "#0000FF";
@@ -71,6 +73,7 @@ export function LiveChat({
   const purchasesAvailable = useDigitalPurchasesAvailable();
   const toFn = useServerFn(timeoutUser);
   const banFn = useServerFn(banUser);
+  const blocks = usePersonalBlocks();
   const canMod =
     (!profileLayout && (auth.roles.includes("admin") || auth.roles.includes("moderator"))) ||
     (!!hostId && auth.user?.id === hostId);
@@ -102,6 +105,7 @@ export function LiveChat({
   const [durationLabel, setDurationLabel] = useState("00:00");
   const profileCache = useRef<Record<string, { display_name: string; avatar_url: string | null }>>({});
   const listRef = useRef<HTMLDivElement>(null);
+  const visibleMessages = messages.filter(message => !blocks.data?.blockedIds.includes(message.user_id));
 
   // Load history + realtime
   useEffect(() => {
@@ -204,12 +208,13 @@ export function LiveChat({
   };
 
   if (profileLayout) return <aside className="profile-chat-panel">
-    <div className="profile-chat-heading"><MessageCircle className="h-4 w-4 text-primary" /><h2>Live chat</h2><span className="ml-auto text-xs text-muted-foreground">{messages.length} messages</span></div>
+    <div className="profile-chat-heading"><MessageCircle className="h-4 w-4 text-primary" /><h2>Live chat</h2><span className="ml-auto text-xs text-muted-foreground">{visibleMessages.length} messages</span>{streamId && <ContentSafetyMenu target={{ targetType: 'stream', targetId: streamId }} label="Live session" />}</div>
     <div ref={listRef} className="profile-chat-messages">
       {messages.length === 0 && <div className="grid h-full min-h-48 place-content-center text-center"><MessageCircle className="mx-auto mb-3 h-8 w-8 text-primary" /><p className="text-sm text-muted-foreground">No messages yet</p></div>}
-      {messages.map(c => <div key={c.id} className={cn("profile-chat-message", c.body.startsWith("💎 TIP") && "profile-chat-tip")}>
+      {visibleMessages.map(c => <div key={c.id} className={cn("profile-chat-message", c.body.startsWith("💎 TIP") && "profile-chat-tip")}>
         <div className="relative shrink-0">{c.avatar_url ? <SignedImg src={c.avatar_url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" /> : <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-sm text-primary">{(c.display_name ?? "V").charAt(0)}</div>}<ArtistStatusBeacon userId={c.user_id} /></div>
         <div className="min-w-0 flex-1"><p className="mb-1 flex flex-wrap items-center gap-2 text-xs font-medium">{c.display_name}{c.user_id === hostId && <span className="rounded bg-trust/20 px-1.5 py-0.5 text-[10px] text-primary">Host</span>}</p><p className="break-words text-sm text-muted-foreground">{c.body}</p>{canMod && c.user_id !== auth.user?.id && <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Delete message" onClick={() => void onDelete(c.id)}><Trash2 className="h-3 w-3" /></Button>}</div>
+        {c.user_id !== auth.user?.id && <ContentSafetyMenu target={{ targetType: 'live_message', targetId: c.id }} userId={c.user_id} label={`Message from ${c.display_name ?? 'Viewer'}`} />}
       </div>)}
     </div>
     <div className="profile-chat-reactions">{["🔥", "👏", "💯", "🎶", "💙", "😂", "😮"].map(emoji => <Button key={emoji} variant="ghost" size="icon" title={`Add ${emoji}`} disabled={!auth.isAuthenticated} onClick={() => setMsg(m => (m + emoji).slice(0, 280))}>{emoji}</Button>)}</div>
@@ -293,6 +298,7 @@ export function LiveChat({
           <Eye className="h-3 w-3" style={{ color: CYAN }} />
           <span className="tabular-nums">{viewerCount || 0}</span>
         </div>
+        {streamId && <ContentSafetyMenu target={{ targetType: 'stream', targetId: streamId }} label="Live session" />}
       </div>
 
       {/* Messages */}
@@ -315,7 +321,7 @@ export function LiveChat({
           />
         )}
         <div className="space-y-2.5">
-        {messages.map((c) => {
+        {visibleMessages.map((c) => {
           const isTip = c.body.startsWith("💎 TIP");
           const isHost = !!hostId && c.user_id === hostId;
           const isSelf = c.user_id === auth.user?.id;
@@ -427,12 +433,7 @@ export function LiveChat({
                 </div>
               )}
             </div>
-            <button
-              className="self-start opacity-0 transition group-hover:opacity-100"
-              title="React"
-            >
-              <Heart className="h-3.5 w-3.5 text-white/40 hover:text-pink-400" />
-            </button>
+            {!isSelf && <ContentSafetyMenu target={{ targetType: 'live_message', targetId: c.id }} userId={c.user_id} label={`Message from ${c.display_name ?? 'Viewer'}`} />}
           </div>
           );
         })}
