@@ -5,6 +5,8 @@ import { registerTunevioPwa } from "@/lib/pwa";
 import { installHorizontalCardDragging } from "@/lib/horizontal-scroll";
 import { installZoomBlocker } from "@/lib/disable-zoom";
 import { ArtistStatusProvider } from "@/components/artist/ArtistStatusBeacon";
+import { canStartDigitalPurchase } from '@/lib/purchase-policy';
+import consumptionCss from '@/components/purchases/consumption.css?url';
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/contexts/CartContext";
@@ -97,6 +99,7 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      { rel: 'stylesheet', href: consumptionCss },
       {
         rel: "stylesheet",
         href: appCss,
@@ -146,6 +149,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset['tunevioConsumption'] = String(!canStartDigitalPurchase());
+    return () => { delete root.dataset['tunevioConsumption']; };
+  }, []);
   useEffect(() => installHorizontalCardDragging(), []);
   useEffect(() => installZoomBlocker(), []);
   useEffect(() => { void registerTunevioPwa().catch(() => { /* Installation must never interrupt the website. */ }); }, []);

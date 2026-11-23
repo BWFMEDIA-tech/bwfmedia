@@ -4,9 +4,13 @@
 - [x] Inspect existing account settings, sign-in and mobile configuration; prepare scoped implementation plan
 - [x] Enable Apple sign-in and add official, equally sized provider buttons using existing account verification and public return paths
 - [x] Replace preview URL/insecure transport in iPhone configuration and document review-safeguard findings and native handoff
-- [ ] Enable complete account deletion after owner confirms legally retained financial records; current cascading payout/stream references must be made safe first
+- [ ] Enable complete account deletion with confirmed seven-year payment/artist-earnings retention; audit and protect cascading financial references and uploaded content before deleting accounts
 - [x] Audit live moderation, direct messages, rights, privacy and support; document missing general user report/block flows as submission gaps
-- [ ] Confirm iPhone digital purchase strategy; no existing web Stripe payments changed
+- [x] Confirm iPhone digital purchase strategy: consumption-first; preserve existing web Stripe payments
+- [x] Apply shared consumption-first controls to native iPhone memberships, boosts, tips, credit packs and billing upsells; preserve web payments, account access and physical merchandise
+- [x] Verify 22 purchase/sign-in/trial tests and signed-in browser/native-runtime simulation at 320/390px; music navigation and credit history work without checkout
+- [ ] Audit booking/generic-cart digital classifications and verify native purchase restrictions on a physical iPhone before submission
+- [ ] Implement general user reporting/blocking; preserve existing moderation
 - [ ] Native signing, TestFlight and physical-device verification require Apple Developer access and Mac/Xcode
 
 ## Assigned Freestyle joining

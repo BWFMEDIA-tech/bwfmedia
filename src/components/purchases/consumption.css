@@ -1,0 +1,4 @@
+/* Native iPhone navigation must not promote digital checkout. Web/PWA unchanged. */
+html[data-tunevio-consumption="true"] a:is([href="/pricing"], [href^="/pricing?"], [href="/credits"], [href^="/credits?"]) {
+  display: none;
+}

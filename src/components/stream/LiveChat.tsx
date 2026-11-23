@@ -31,6 +31,7 @@ import { RankBadge } from "@/components/rank/RankBadge";
 import { SignedImg } from "@/components/ui/signed-img";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { Button } from "@/components/ui/button";
+import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 // BWF Immersive Cinema palette
 const PURPLE = "#0000FF";
@@ -67,6 +68,7 @@ export function LiveChat({
   profileLayout?: boolean;
 }) {
   const delFn = useServerFn(deleteMessage);
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const toFn = useServerFn(timeoutUser);
   const banFn = useServerFn(banUser);
   const canMod =
@@ -489,7 +491,7 @@ export function LiveChat({
               </button>
             ))}
           </div>
-          <button
+          {purchasesAvailable && <button
             onClick={() => {
               if (!streamId) {
                 toast.error("Stream not live yet");
@@ -505,7 +507,7 @@ export function LiveChat({
           >
             <Sparkles className="h-3 w-3 transition group-hover:rotate-12" />
             Tip
-          </button>
+          </button>}
         </div>
       </div>
 

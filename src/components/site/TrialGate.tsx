@@ -6,9 +6,12 @@ import { useAuth } from "@/lib/auth-context";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { getMyTunevioSubscription } from "@/lib/tunevio-subscriptions.functions";
 import { hasTrialAccess } from "@/lib/trial";
+import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
+import { ConsumptionNotice } from '@/components/purchases/ConsumptionNotice';
 
 /** Blocks a signed-in member's own profile until they start the 30-day trial (card on file). */
 export function TrialGate({ enabled, children }: { enabled: boolean; children: React.ReactNode }) {
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const auth = useAuth();
   const fetchSub = useServerFn(getMyTunevioSubscription);
   const isAdmin = (auth.roles ?? []).includes("admin" as never);
@@ -22,6 +25,7 @@ export function TrialGate({ enabled, children }: { enabled: boolean; children: R
   if (!active) return <>{children}</>;
   if (q.isLoading) return <div className="min-h-[60vh] grid place-items-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
   if (hasTrialAccess(q.data ?? null)) return <>{children}</>;
+  if (!purchasesAvailable) return <ConsumptionNotice />;
   return (
     <div className="min-h-[70vh] grid place-items-center px-6 pt-24">
       <div className="max-w-md text-center rounded-2xl border border-primary/40 bg-card p-8">

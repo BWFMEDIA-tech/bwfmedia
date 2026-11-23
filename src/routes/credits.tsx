@@ -6,12 +6,17 @@ import { Loader2, Zap, X, Sparkles, ShoppingCart, History, TrendingUp, TrendingD
 import { useAuth } from "@/lib/auth-context";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { getBoostWallet, createBoostPackCheckout } from "@/lib/boost-economy.functions";
+import { assertDigitalPurchaseAllowed, useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 export const Route = createFileRoute("/credits")({
   head: () => ({
     meta: [
       { title: "Boost Credits — Tunevio" },
       { name: "description", content: "Buy boost credits to push your favorite tracks up the Play Arena leaderboard." },
+      { property: "og:title", content: "Boost Credits — Tunevio" },
+      { property: "og:description", content: "View your Tunevio boost balance and activity." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CreditsPage,
@@ -45,6 +50,7 @@ const REASON_LABELS: Record<string, string> = {
 };
 
 function CreditsPage() {
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const { user, loading: authLoading } = useAuth();
   const fetchWallet = useServerFn(getBoostWallet);
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -99,14 +105,14 @@ function CreditsPage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight">Boost Credits</h1>
-          <p className="mt-1 text-sm text-white/60">Buy credits, then spend them to boost tracks in the Play Arena.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{purchasesAvailable ? 'Buy credits, then spend them to boost tracks in the Play Arena.' : 'Your boost balance and recent activity.'}</p>
         </div>
       </header>
 
       {/* Balance card */}
-      <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-fuchsia-600/20 via-pink-500/10 to-cyan-500/10 p-6">
+      <section className="rounded-lg border border-border bg-card p-6">
         <div className="flex items-center gap-4">
-          <div className="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-fuchsia-500 to-cyan-500">
+          <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/15 text-primary">
             <Zap className="h-7 w-7" />
           </div>
           <div className="flex-1">
@@ -118,7 +124,7 @@ function CreditsPage() {
       </section>
 
       {/* Packs */}
-      <section>
+      {purchasesAvailable && <section>
         <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/70">
           <ShoppingCart className="h-4 w-4" /> Buy credits
         </h2>
@@ -151,7 +157,7 @@ function CreditsPage() {
             );
           })}
         </div>
-      </section>
+      </section>}
 
       {/* Ledger */}
       <section>
@@ -160,7 +166,7 @@ function CreditsPage() {
         </h2>
         <div className="overflow-hidden rounded-2xl border border-white/10">
           {(wallet?.ledger ?? []).length === 0 ? (
-            <div className="p-8 text-center text-sm text-white/50">No activity yet. Buy a pack to get started.</div>
+            <div className="p-8 text-center text-sm text-muted-foreground">No activity yet.</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="bg-white/[0.03] text-left text-xs uppercase tracking-wider text-white/50">
@@ -194,7 +200,7 @@ function CreditsPage() {
         </div>
       </section>
 
-      {checkoutPack && (
+      {purchasesAvailable && checkoutPack && (
         <CheckoutModal pack={checkoutPack} onClose={() => { setCheckoutPack(null); refresh(); }} />
       )}
     </div>
@@ -204,6 +210,7 @@ function CreditsPage() {
 function CheckoutModal({ pack, onClose }: { pack: Pack; onClose: () => void }) {
   const checkoutFn = useServerFn(createBoostPackCheckout);
   const fetchClientSecret = async (): Promise<string> => {
+    assertDigitalPurchaseAllowed();
     const returnUrl = `${window.location.origin}/credits?checkout=success`;
     const res = await checkoutFn({
       data: { packId: pack.id, returnUrl, environment: getStripeEnvironment() },

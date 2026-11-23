@@ -28,6 +28,7 @@ import { BattleArena } from "@/components/stream/BattleArena";
 import { ProfilePlatformLinks } from "@/components/artist/ProfilePlatformLinks";
 import { useQuery } from "@tanstack/react-query";
 import { getArtistMeta } from "@/lib/artist-meta.functions";
+import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 type LiveStream = NonNullable<Awaited<ReturnType<typeof getArtistLiveStream>>>;
 
@@ -64,6 +65,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
   onEnded: () => void;
 }) {
   const auth = useAuth();
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const authToken = useServerFn(getLiveKitToken);
   const guestToken = useServerFn(getGuestLiveKitToken);
   const endLive = useServerFn(endStream);
@@ -254,7 +256,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
         <aside className="artist-live-sidebar min-w-0 space-y-4">
           <LiveSetlist streamId={stream.id} artistName={artist.name} isOwner={isOwner} tracks={artist.tracks ?? []} />
           <section><h2 className="mb-4 text-sm font-medium">This live</h2><div className="flex items-center gap-3"><Radio className="h-5 w-5 text-primary" /><div className="min-w-0"><p className="break-words text-sm">{stream.title}</p><p className="mt-1 text-xs text-muted-foreground">{artist.name}</p></div></div>{stream.started_at && <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />Started {new Date(stream.started_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>}</section>
-          <section><h2 className="mb-3 text-sm font-medium">Support the artist</h2><div className="flex items-center gap-3"><Gem className="h-8 w-8 text-primary" /><div><p className="text-sm">{artist.name}</p><p className="mt-1 text-xs text-muted-foreground">Send a tip</p></div><Button variant="outline" className="ml-auto" onClick={() => setShowTip(true)}>Tip</Button></div></section>
+          {purchasesAvailable && <section><h2 className="mb-3 text-sm font-medium">Support the artist</h2><div className="flex items-center gap-3"><Gem className="h-8 w-8 text-primary" /><div><p className="text-sm">{artist.name}</p><p className="mt-1 text-xs text-muted-foreground">Send a tip</p></div><Button variant="outline" className="ml-auto" onClick={() => setShowTip(true)}>Tip</Button></div></section>}
           {connection && canManage && <>
             <BackstageQueue streamId={stream.id} queue={queue} canManage />
           </>}
@@ -264,7 +266,7 @@ export function ArtistLiveRoom({ stream, artist, followSlot, platformSlot, onEnd
       <nav aria-label="Live room actions" className="profile-action-dock">
         <Button variant="ghost" onClick={() => document.querySelector<HTMLInputElement>('[aria-label="Live comment"]')?.focus()}><MessageCircle />Comment</Button>
         <Button variant="ghost" onClick={() => document.querySelector('.profile-chat-reactions')?.scrollIntoView({ behavior: "smooth", block: "center" })}><Heart />Reactions</Button>
-        <Button variant="outline" className="profile-tip-action" onClick={() => setShowTip(true)}><Gem />Tip</Button>
+        {purchasesAvailable && <Button variant="outline" className="profile-tip-action" onClick={() => setShowTip(true)}><Gem />Tip</Button>}
          {connection && !onStage && <Button variant="ghost" onClick={() => document.querySelector('.profile-stage-room')?.scrollIntoView({ behavior: "smooth", block: "center" })}><Hand />Raise Hand</Button>}
         <Button variant="ghost" onClick={share}><Share2 />Share</Button>
       </nav>

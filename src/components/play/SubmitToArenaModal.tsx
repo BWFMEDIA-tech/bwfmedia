@@ -6,6 +6,7 @@ import { getBoostWallet } from "@/lib/boost-economy.functions";
 import { listLiveArenas, submitSongToArena } from "@/lib/play-arena-submissions.functions";
 import { SignedImg } from "@/components/ui/signed-img";
 import { arenaSubmissionChoices } from "@/lib/arena-picker";
+import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 type Priority = "standard" | "boosted" | "featured";
 
@@ -19,6 +20,7 @@ export function SubmitToArenaModal({
   onSubmitted?: () => void;
 }) {
   const listArenas = useServerFn(listLiveArenas);
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const submit = useServerFn(submitSongToArena);
   const [arenas, setArenas] = useState<any[]>([]);
   const [arenaId, setArenaId] = useState<string>("");
@@ -58,7 +60,7 @@ export function SubmitToArenaModal({
   async function handleSubmit() {
     if (!arenaId) return toast.error("Pick an arena");
     if (boostCost > 0 && balance !== null && balance < boostCost) {
-      return toast.error(`Not enough boost credits — you need ${boostCost} but have ${balance}. Get more on the Credits page.`);
+      return toast.error(`Not enough boost credits — you need ${boostCost} but have ${balance}.${purchasesAvailable ? ' Get more on the Credits page.' : ''}`);
     }
     setSubmitting(true);
     try {
@@ -162,7 +164,7 @@ export function SubmitToArenaModal({
               <div className="mt-2 text-[10px] text-muted-foreground">
                 Priority placement costs {boostCost} boost credit{boostCost === 1 ? "" : "s"} —
                 {balance === null ? " checking your balance…" : ` you have ${balance}.`}{" "}
-                <a href="/credits" className="underline hover:text-primary">Get credits</a>
+                {purchasesAvailable && <a href="/credits" className="underline hover:text-primary">Get credits</a>}
               </div>
             )}
           </div>

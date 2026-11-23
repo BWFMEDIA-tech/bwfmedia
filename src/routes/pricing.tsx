@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useHydrated } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Check, Loader2, Sparkles, X } from "lucide-react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
@@ -7,6 +7,8 @@ import { useAuth } from "@/lib/auth-context";
 import { createTunevioCheckout, TUNEVIO_PLANS, type TunevioPlanId } from "@/lib/tunevio-subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { getPlanTrialDays } from "@/lib/trial";
+import { assertDigitalPurchaseAllowed, useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
+import { ConsumptionNotice } from '@/components/purchases/ConsumptionNotice';
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
@@ -39,6 +41,8 @@ const HIGHLIGHT: Partial<Record<TunevioPlanId, string>> = {
 };
 
 function PricingPage() {
+  const hydrated = useHydrated();
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>("listener");
   const [activePlan, setActivePlan] = useState<TunevioPlanId | null>(null);
@@ -52,6 +56,7 @@ function PricingPage() {
   );
 
   async function startCheckout(planId: TunevioPlanId) {
+    assertDigitalPurchaseAllowed();
     if (!user) {
       window.location.href = `/signup`;
       return;
@@ -80,6 +85,9 @@ function PricingPage() {
     setClientSecret(null);
     setActivePlan(null);
   }
+
+  if (!hydrated) return <div className="grid min-h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+  if (!purchasesAvailable) return <ConsumptionNotice />;
 
   return (
     <div className="swara-pricing min-h-screen bg-background text-foreground pt-12 pb-24">

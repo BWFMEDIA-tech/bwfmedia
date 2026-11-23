@@ -20,6 +20,7 @@ import type { PlayerTrack } from "@/lib/player-context";
 import { Button } from "@/components/ui/button";
 import { FreestyleBattle } from "@/components/play/FreestyleBattle";
 import { useFreestylePerformers } from '@/lib/use-freestyle-performers';
+import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 export const Route = createFileRoute("/play/$room")({
   head: () => ({ meta: [
@@ -60,6 +61,7 @@ function PlayArena() {
 }
 
 export function PlayArenaView({ stream, showChat = true, room, showBattlePanels = false, showLeaderboard = true }: { stream: { id: string; title: string; host_id: string } | null; showChat?: boolean; room?: string; showBattlePanels?: boolean; showLeaderboard?: boolean }) {
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const statusFn = useServerFn(getMyPlayStatus);
   const auth = useAuth();
   const [status, setStatus] = useState<{ membershipActive: boolean; boostCredits: number } | null>(null);
@@ -216,7 +218,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
           <div className="space-y-5">
             {/* Submit / Boost CTAs */}
             <div className="grid sm:grid-cols-2 gap-3">
-              <button
+              {(purchasesAvailable || status?.membershipActive) && <button
                 onClick={() => {
                   if (!auth.user) return toast.error("Sign in to submit a track");
                   if (!status?.membershipActive) return setModal("membership");
@@ -232,8 +234,8 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
                     ? "You're a Tunevio Artist — drop a song into the queue."
                     : "Become a Tunevio Artist ($9.99/mo) to submit songs."}
                 </p>
-              </button>
-              <button
+              </button>}
+              {purchasesAvailable && <button
                 onClick={() => { if (!auth.user) return toast.error("Sign in to boost"); setModal("boost"); }}
                 className="rounded-2xl border border-[#00E6FF]/40 bg-gradient-to-br from-[#00E6FF]/20 to-[#0000FF]/10 p-4 text-left hover:border-[#00E6FF] transition"
               >
@@ -246,7 +248,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
                     <span className="ml-1 text-[#00E6FF]">You have {status.boostCredits}.</span>
                   )}
                 </p>
-              </button>
+              </button>}
             </div>
 
             {/* Host-only leaderboard with delete + How it works */}
@@ -268,7 +270,7 @@ export function PlayArenaView({ stream, showChat = true, room, showBattlePanels 
       <SkipLinePopup queued={queued} />
       <MembershipPromoPopup
         userId={auth.user?.id ?? null}
-        eligible={!!auth.user && auth.roles.includes("artist") && status !== null && !status.membershipActive}
+        eligible={purchasesAvailable && !!auth.user && auth.roles.includes("artist") && status !== null && !status.membershipActive}
         onUpgrade={() => setModal("membership")}
       />
       {modal === "boost" && <BoostCheckoutModal kind="boost" onClose={() => { setModal(null); refreshStatus(); }} />}

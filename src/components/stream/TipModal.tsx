@@ -6,6 +6,7 @@ import { createTipCheckout } from "@/lib/tips.functions";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
 import type { AuthState } from "@/lib/auth-context";
+import { assertDigitalPurchaseAllowed, useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 const PURPLE = "#00E6FF";
 const BLUE = "#0000FF";
@@ -27,6 +28,7 @@ export function TipModal({
   onClose: () => void;
 }) {
   const tipFn = useServerFn(createTipCheckout);
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const [amount, setAmount] = useState(initialAmount ?? 10);
   const [custom, setCustom] = useState("");
   const [message, setMessage] = useState("");
@@ -36,6 +38,7 @@ export function TipModal({
   const finalAmount = custom ? Math.max(1, Math.min(500, Number(custom) || 0)) : amount;
 
   const start = async () => {
+    assertDigitalPurchaseAllowed();
     if (!finalAmount || finalAmount < 1) {
       toast.error("Minimum tip is $1");
       return;
@@ -59,6 +62,8 @@ export function TipModal({
     }
     setClientSecret(result.clientSecret);
   };
+
+  if (!purchasesAvailable) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur">

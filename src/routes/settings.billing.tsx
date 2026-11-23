@@ -9,10 +9,12 @@ import { Link } from "@tanstack/react-router";
 import { getMyTunevioSubscription, createTunevioPortal } from "@/lib/tunevio-subscriptions.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { TUNEVIO_PLANS, type TunevioPlanId } from "@/lib/tunevio-subscriptions.functions";
+import { assertDigitalPurchaseAllowed, useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 export const Route = createFileRoute("/settings/billing")({ head: () => ({ meta: [{ title: "Billing & Subscriptions — Tunevio" }, { name: "description", content: "Manage your existing Tunevio subscription and view paid tips." }, { property: "og:title", content: "Billing & Subscriptions — Tunevio" }, { property: "og:description", content: "Your Tunevio subscription and payment history." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: BillingPage });
 
 function BillingPage() {
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const { user } = useAuth();
   const [tips, setTips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +32,7 @@ function BillingPage() {
   }, [user]);
 
   async function openPortal() {
+    assertDigitalPurchaseAllowed();
     setPortalLoading(true);
     try {
       const result = await createTunevioPortal({
@@ -69,16 +72,16 @@ function BillingPage() {
                 )}
               </div>
             </div>
-            <Button onClick={openPortal} disabled={portalLoading} variant="outline" className="w-full">
+            {purchasesAvailable && <Button onClick={openPortal} disabled={portalLoading} variant="outline" className="w-full">
               {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Manage subscription <ExternalLink className="h-3 w-3 ml-2" /></>}
-            </Button>
+            </Button>}
           </div>
         ) : (
           <div className="space-y-3">
             <div className="text-sm text-muted-foreground">You're on the free plan.</div>
-            <Button asChild className="w-full bg-foreground text-background rounded-full font-medium">
+            {purchasesAvailable && <Button asChild className="w-full bg-foreground text-background rounded-full font-medium">
               <Link to="/pricing">See plans</Link>
-            </Button>
+            </Button>}
           </div>
         )}
       </Card>

@@ -3,13 +3,15 @@ import { Sparkles, Clock } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useArtistSubscription } from "@/hooks/useArtistSubscription";
 import { useAuth } from "@/lib/auth-context";
+import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 export function ArtistTrialBanner() {
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const auth = useAuth();
   const { isTrialing, daysLeft, isActive, isLoading } = useArtistSubscription();
   const isArtist = auth.roles?.includes("artist");
   const ref = useRef<HTMLDivElement | null>(null);
-  const show = auth.isAuthenticated && isArtist && !isLoading && (isTrialing || !isActive);
+  const show = purchasesAvailable && auth.isAuthenticated && isArtist && !isLoading && (isTrialing || !isActive);
 
   useEffect(() => {
     if (typeof document === "undefined") return;

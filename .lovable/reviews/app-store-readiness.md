@@ -13,6 +13,8 @@
 - Latest preview build reports `build OK`. A complete Apple-provider login/callback, native sign-in, and physical iPhone behavior remain unverified.
 
 ## Account deletion safety finding — unresolved
+The owner confirmed that payment and artist earnings records must be retained for seven years after account deletion. The retention duration is no longer an open question; complete the dependency audit and protected archival/removal flow before enabling deletion.
+
 Do not call `auth.admin.deleteUser` against an existing Tunevio account yet. The live schema has cascading account references in subscriptions, payout requests, merchandise commissions, memberships, streams, and stage rooms. Deleting an account could delete payment/payout history and indirectly delete stream-associated earnings; battle participant references can also prevent deletion. Tracks use `SET NULL`, which would leave attributed published content after account removal unless explicitly removed.
 
 A production deletion flow must first establish the legally required financial retention policy and perform a complete dependency/storage audit. It must cancel recurring agreements through the payment provider, preserve payable earnings and required audit records, remove or anonymize non-required personal data, clean uploaded storage through its API, then delete only the server-verified caller's auth account. Apple revocation must be offered after successful account deletion using the managed `/~oauth/apple/revoke` flow. No account-deletion button or completed-account claim has been added while these safeguards are unresolved.
@@ -24,8 +26,12 @@ A production deletion flow must first establish the legally required financial r
 - No general user-report or user-block flow was located in direct messaging. A complete cross-surface reporting/blocking audit and implementation remains required for user-generated content under Apple's guideline 1.2.
 - Privacy policy contains an under-13 exclusion while Terms require adult account creation; the owner must provide an accurate App Store age rating and privacy declarations. No legal copy was silently changed.
 
-## Payment decision still needed
-Keep all existing Stripe agreements and web checkouts unchanged until the owner selects consumption-first iPhone launch or native Apple purchases. Review the current guidelines for each target storefront; US external-link rules and other permitted programs mean the earlier universal prohibition was too broad. Do not use device geolocation, locale, or user-agent as App Store storefront authorization.
+## Consumption-first payment preparation
+The owner selected consumption-first native iPhone launch. A shared Capacitor runtime policy now suppresses pricing, digital membership/boost checkout, credit-pack purchases, tip checkout, trial upsells, and billing-portal links in native iOS. Direct digital checkout callbacks also reject before creating payment sessions. Billing and credit history remain readable; existing subscription checks and live/music permissions remain authoritative. Browser and installed PWA payments, Android behavior, physical merchandise, and existing billing agreements are unchanged.
+
+This is client presentation policy, not a security boundary or completed App Store certification. It does not alter server authorization or cancel existing subscriptions. Review booking and generic-cart product classification and any new purchase surfaces before native submission. Native OAuth and hosted-origin Capacitor runtime detection still need physical-device verification. US external-link rules and other permitted programs mean the earlier universal prohibition was too broad; do not infer storefront authorization from geolocation, locale, or user-agent.
+
+Verified for this step: 22 purchase-policy, sign-in continuation and trial tests passed. A temporary signed-in member saw unchanged paid-plan and credit-pack controls in the web browser. In an explicitly simulated native-iOS runtime, paid-plan checkout was replaced by an account notice, Continue to music opened Home, and credit balance/history remained readable with purchase packs absent. The checked screens fit 320/390px widths with no runtime errors. No payment was created; this is not physical iPhone or App Store verification.
 
 ## Native handoff — not compiled or submitted
 This repository remains a TanStack web app with an existing Capacitor configuration. The development environment cannot compile, sign, or upload an iOS app. The HTTPS configuration change is not proof of native OAuth, background audio, camera, microphone, or purchase functionality.

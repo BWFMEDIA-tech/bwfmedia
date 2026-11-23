@@ -3,13 +3,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { X, Zap, Crown } from "lucide-react";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createBoostCheckout, createMembershipCheckout } from "@/lib/play-checkout.functions";
+import { assertDigitalPurchaseAllowed, useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 
 export function BoostCheckoutModal({
   kind, onClose,
 }: { kind: "boost" | "membership"; onClose: () => void }) {
   const boostFn = useServerFn(createBoostCheckout);
   const memFn = useServerFn(createMembershipCheckout);
+  const purchasesAvailable = useDigitalPurchasesAvailable();
   const fetchClientSecret = async (): Promise<string> => {
+    assertDigitalPurchaseAllowed();
     const returnUrl = `${window.location.origin}${window.location.pathname}?checkout=success`;
     const res = kind === "boost"
       ? await boostFn({ data: { returnUrl, environment: getStripeEnvironment() } })
@@ -18,6 +21,7 @@ export function BoostCheckoutModal({
     if (!res.clientSecret) throw new Error("Stripe did not return a client secret");
     return res.clientSecret;
   };
+  if (!purchasesAvailable) return null;
   return (
     <div className="fixed inset-0 z-[100] flex items-start sm:items-center justify-center overflow-y-auto p-2 sm:p-4 backdrop-blur-md bg-black/70">
       {/* Ambient brand glow */}
