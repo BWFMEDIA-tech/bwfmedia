@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "play_sessions select all" ON public.play_sessions;

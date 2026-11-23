@@ -533,6 +533,13 @@
       "when": 1795440672024,
       "tag": "0075_scope_labels_read",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1795442014185,
+      "tag": "0076_scope_play_sessions_read",
+      "breakpoints": true
     }
   ]
 }
