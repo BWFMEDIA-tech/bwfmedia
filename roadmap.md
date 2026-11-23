@@ -4,7 +4,8 @@
 - [x] Inspect existing account settings, sign-in and mobile configuration; prepare scoped implementation plan
 - [x] Enable Apple sign-in and add official, equally sized provider buttons using existing account verification and public return paths
 - [x] Replace preview URL/insecure transport in iPhone configuration and document review-safeguard findings and native handoff
-- [ ] Enable complete account deletion with confirmed seven-year payment/artist-earnings retention; audit and protect cascading financial references and uploaded content before deleting accounts
+- [x] Build Settings account deletion with seven-year payment/earnings retention; two disposable real accounts deleted, photo removed, old session rejected, sandbox payment and pending royalties/host earnings retained, premature financial deletion blocked
+- [ ] Verify paid-subscription cancellation and managed Apple disconnection on authorized test accounts; requires an actual Stripe test subscription and Apple sign-in/native handoff
 - [x] Audit live moderation, direct messages, rights, privacy and support; document missing general user report/block flows as submission gaps
 - [x] Confirm iPhone digital purchase strategy: consumption-first; preserve existing web Stripe payments
 - [x] Apply shared consumption-first controls to native iPhone memberships, boosts, tips, credit packs and billing upsells; preserve web payments, account access and physical merchandise

@@ -477,6 +477,27 @@
       "when": 1795157005448,
       "tag": "0067_starter_song_upload_allowance",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1795412730527,
+      "tag": "0068_account_deletion_financial_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1795412976766,
+      "tag": "0069_account_deletion_earnings_finalization",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1795413121769,
+      "tag": "0070_enforce_deleted_account_retention",
+      "breakpoints": true
     }
   ]
 }

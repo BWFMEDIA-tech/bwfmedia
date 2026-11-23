@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_receipts: {
+        Row: {
+          completed_at: string | null
+          financial_snapshot: Json
+          requested_at: string
+          retain_until: string
+          storage_manifest: Json
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          financial_snapshot?: Json
+          requested_at?: string
+          retain_until?: string
+          storage_manifest?: Json
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          financial_snapshot?: Json
+          requested_at?: string
+          retain_until?: string
+          storage_manifest?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -1590,20 +1617,6 @@ export type Database = {
             referencedRelation: "boost_credit_ledger"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "boost_spends_track_id_fkey"
-            columns: ["track_id"]
-            isOneToOne: false
-            referencedRelation: "play_track_boost_totals"
-            referencedColumns: ["track_id"]
-          },
-          {
-            foreignKeyName: "boost_spends_track_id_fkey"
-            columns: ["track_id"]
-            isOneToOne: false
-            referencedRelation: "play_tracks"
-            referencedColumns: ["id"]
-          },
         ]
       }
       boost_spends_access_audit: {
@@ -3136,15 +3149,7 @@ export type Database = {
           store_id?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "merch_commissions_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "shopify_stores"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       merch_products: {
         Row: {
@@ -3439,13 +3444,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "nfc_tag_orders_page_id_fkey"
-            columns: ["page_id"]
-            isOneToOne: false
-            referencedRelation: "nfc_pages"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "nfc_tag_orders_tag_product_id_fkey"
             columns: ["tag_product_id"]
@@ -5297,22 +5295,7 @@ export type Database = {
           variant_id?: string | null
           variant_label?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "store_orders_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "store_products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "store_orders_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "store_product_variants"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       store_product_variants: {
         Row: {
@@ -5665,22 +5648,7 @@ export type Database = {
           valid_stream?: boolean
           weighted_value?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "stream_events_track_id_fkey"
-            columns: ["track_id"]
-            isOneToOne: false
-            referencedRelation: "play_track_boost_totals"
-            referencedColumns: ["track_id"]
-          },
-          {
-            foreignKeyName: "stream_events_track_id_fkey"
-            columns: ["track_id"]
-            isOneToOne: false
-            referencedRelation: "play_tracks"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       stream_messages: {
         Row: {
@@ -6113,22 +6081,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "submission_payments_submission_id_fkey"
-            columns: ["submission_id"]
-            isOneToOne: false
-            referencedRelation: "live_queue_public"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "submission_payments_submission_id_fkey"
-            columns: ["submission_id"]
-            isOneToOne: false
-            referencedRelation: "live_submissions"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -6273,20 +6226,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "tips_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tips_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "tips_stream_id_fkey"
             columns: ["stream_id"]
@@ -7140,6 +7079,10 @@ export type Database = {
       }
       ensure_host_referral_code: { Args: { _user_id: string }; Returns: string }
       ensure_profile_stream: { Args: { _user_id: string }; Returns: string }
+      finalize_account_deletion_earnings: {
+        Args: { _stream_id: string }
+        Returns: undefined
+      }
       finalize_battle_replays: { Args: never; Returns: number }
       finalize_expired_freestyle_battles: { Args: never; Returns: number }
       finalize_freestyle_battle: { Args: { _id: string }; Returns: undefined }
@@ -7359,6 +7302,7 @@ export type Database = {
         Returns: string
       }
       month_bucket: { Args: { _ts: string }; Returns: string }
+      prepare_account_deletion: { Args: { _user_id: string }; Returns: Json }
       prepare_confirmed_battle: {
         Args: {
           _challenge_id: string
