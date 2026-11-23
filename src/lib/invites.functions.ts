@@ -128,11 +128,13 @@ export const recordInviteJoin = createServerFn({ method: "POST" })
     if (!row || !row.stream_id) return { ok: true };
     const { data: participant } = await client
       .from("stage_participants")
-      .select("user_id, invite_counted")
+      .select("user_id, invite_counted, invite_code")
       .eq("stream_id", row.stream_id)
       .eq("user_id", context.userId)
       .maybeSingle();
     if (!participant || (participant as any).invite_counted) return { ok: true };
+    // Only the code the caller actually joined with may be counted.
+    if ((participant as any).invite_code !== data.code.toLowerCase()) return { ok: true };
     const { error: markErr } = await client
       .from("stage_participants")
       .update({ invite_counted: true } as any)
@@ -185,7 +187,7 @@ export const joinStageFromInvite = createServerFn({ method: "POST" })
     const { error } = await client
       .from("stage_participants")
       .upsert(
-        { stream_id: data.streamId, user_id: context.userId, stage_role: data.role },
+        { stream_id: data.streamId, user_id: context.userId, stage_role: data.role, invite_code: data.code.toLowerCase() } as any,
         { onConflict: "stream_id,user_id" },
       );
     if (error) throw new Error("Could not join the stage");

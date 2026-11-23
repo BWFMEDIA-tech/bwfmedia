@@ -293,7 +293,11 @@ export const removeSubmission = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (sub.play_track_id) {
-      await supabaseAdmin.from("play_tracks").update({ status: "skipped" }).eq("id", sub.play_track_id);
+      // Only skip the track if it belongs to this arena and (for owners) to the caller.
+      let skip = supabaseAdmin.from("play_tracks").update({ status: "skipped" })
+        .eq("id", sub.play_track_id).eq("stream_id", sub.arena_id);
+      if (!isHost && !isAdmin) skip = skip.eq("artist_user_id", userId);
+      await skip;
     }
     await supabaseAdmin.from("play_arena_submissions").delete().eq("id", sub.id);
     await emit(supabaseAdmin, "queue_updated", sub.arena_id, userId, { removed: sub.id });

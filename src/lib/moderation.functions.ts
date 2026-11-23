@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { logAudit } from "@/lib/audit.server";
 
 // Public-safe read: list platform moderators with public profile identity only.
-export const listModerators = createServerFn({ method: "GET" }).handler(async () => {
+export const listModerators = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: roleRows, error } = await supabaseAdmin
     .from("user_roles")

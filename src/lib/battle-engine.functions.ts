@@ -682,8 +682,10 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       for (const n of needFallback) {
         const t = n.artistId ? assignedBattleTrack(subs ?? [], match.id, n.side, n.artistId) : null;
         if (t) {
-          if (n.side === "a") aTrack = t;
-          else bTrack = t;
+          // Display-only fallback: never expose audio for tracks not yet on air.
+          const shown = { ...t, audio_url: null };
+          if (n.side === "a") aTrack = shown;
+          else bTrack = shown;
         }
       }
     }

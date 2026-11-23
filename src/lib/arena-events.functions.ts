@@ -66,6 +66,17 @@ export const emitArenaEvent = createServerFn({ method: "POST" })
         type: battleType,
         payload: data.payload as { trackId?: string } | undefined,
       });
+    } else {
+      // Events without a battle transition skip the engine's host check, so
+      // verify the caller hosts this stream (or is an admin) before logging.
+      const { supabaseAdmin: sa } = await import("@/integrations/supabase/client.server");
+      const [{ data: stream }, { data: isAdmin }] = await Promise.all([
+        sa.from("streams").select("host_id").eq("id", match.stream_id as string).maybeSingle(),
+        sa.rpc("has_role", { _user_id: userId, _role: "admin" }),
+      ]);
+      if (stream?.host_id !== userId && isAdmin !== true) {
+        throw new Error("Only the battle host can log this event");
+      }
     }
 
     // Audit-trail insert uses the service-role client so the append is not

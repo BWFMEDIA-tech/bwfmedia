@@ -1,5 +1,6 @@
 // @auth-exempt: public read of non-sensitive data via anon-readable tables / narrow RLS.
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { computeStreaks, getArtistTitle } from "@/lib/artist-titles";
 import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
 import { avatarObjectPath, publicArtworkPaths } from "@/lib/public-artwork";
@@ -71,8 +72,15 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         heartLikes = count ?? 0;
       }
 
+      // Tip earnings are private: only the artist viewing their own profile sees them.
+      let viewerId: string | null = null;
+      try {
+        const auth = getRequestHeader("authorization") ?? "";
+        const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+        if (token) viewerId = (await supabaseAdmin.auth.getUser(token)).data.user?.id ?? null;
+      } catch { viewerId = null; }
       let tipsCents = 0;
-      if (streamIds.length) {
+      if (streamIds.length && viewerId === id) {
         const { data: tipsRows } = await sb
           .from("tips").select("amount_cents")
           .in("stream_id", streamIds).eq("status", "paid");

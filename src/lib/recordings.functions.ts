@@ -60,12 +60,23 @@ export const deleteRecording = createServerFn({ method: 'POST' })
   .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { data: rec } = await supabase
+      .from('stream_recordings')
+      .select('storage_path')
+      .eq('id', data.id)
+      .eq('host_id', userId)
+      .maybeSingle();
     const { error } = await supabase
       .from('stream_recordings')
       .delete()
       .eq('id', data.id)
       .eq('host_id', userId);
     if (error) throw new Error(error.message);
+    // Remove the file too, so any link shared earlier stops working.
+    if (rec?.storage_path && rec.storage_path.startsWith(`${userId}/`)) {
+      const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+      await supabaseAdmin.storage.from('stream-recordings').remove([rec.storage_path]);
+    }
     return { ok: true };
   });
 
@@ -89,7 +100,7 @@ export const getRecordingSignedUrl = createServerFn({ method: 'POST' })
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const { data: signed, error: sErr } = await supabaseAdmin.storage
       .from('stream-recordings')
-      .createSignedUrl(rec.storage_path, 60 * 60);
+      .createSignedUrl(rec.storage_path, 5 * 60);
     if (sErr || !signed) throw new Error(sErr?.message ?? 'Could not sign URL');
     return { url: signed.signedUrl };
   });

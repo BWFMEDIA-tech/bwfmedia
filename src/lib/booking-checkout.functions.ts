@@ -133,20 +133,7 @@ export const getBookingByStripeSession = createServerFn({ method: 'GET' })
         .maybeSingle();
       if (row) {
         const owns = isAdmin || (userEmail && row.email && row.email.toLowerCase() === userEmail);
-        if (!owns) {
-          // Return only non-PII status info
-          return {
-            table,
-            booking: {
-              id: row.id,
-              status: row.status,
-              package_id: row.package_id,
-              amount_cents: row.amount_cents,
-              amount_paid_cents: row.amount_paid_cents,
-              paid_at: row.paid_at,
-            },
-          };
-        }
+        if (!owns) return null;
         return { table, booking: row };
       }
     }

@@ -86,8 +86,9 @@ export const sendDirectMessage = createServerFn({ method: 'POST' })
         if (recipientEmail) {
           const senderName =
             senderProfile?.display_name || 'Someone on Tunevio'
-          const preview =
-            data.body.length > 200 ? data.body.slice(0, 197) + '…' : data.body
+          // Never forward sender-written text to an inbox; the email only
+          // says a message is waiting so it can't be used to spam or phish.
+          const preview = 'Open Tunevio to read your new message.'
           const { sendAndLog } = await import('@/lib/email-send-log')
           await sendAndLog(supabaseAdmin, {
             templateName: 'direct-message',

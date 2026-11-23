@@ -1,3 +1,4 @@
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -164,8 +165,17 @@ export const getStreamByRoom = createServerFn({ method: "POST" })
       .select("id, title, room_name, status, host_id, mode, stage_locked, started_at")
       .eq("room_name", data.roomName)
       .maybeSingle();
-    if (error) throw new Error(error.message);
-    return row;
+    if (error) throw new Error("Unable to load this room");
+    if (!row || row.title === "__profile_library__") return null;
+    if (row.status === "live") return row;
+    // Rooms that are not live are only visible to their host.
+    try {
+      const auth = getRequestHeader("authorization") ?? "";
+      const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+      const uid = token ? (await supabaseAdmin.auth.getUser(token)).data.user?.id : null;
+      if (uid && uid === row.host_id) return row;
+    } catch { /* fall through */ }
+    return { id: row.id, room_name: row.room_name, status: row.status, mode: row.mode, title: null, host_id: null, stage_locked: false, started_at: null };
   });
 
 /** Returns the current user's active (idle/live) stream if any. Used to

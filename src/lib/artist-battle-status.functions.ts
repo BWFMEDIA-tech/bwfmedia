@@ -3,7 +3,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { avatarObjectPath, publicArtworkPaths } from "@/lib/public-artwork";
 
 /** Battle rows that still mean "this artist has a live or upcoming matchup". */
-const ACTIVE_STATUSES = ["live", "scheduled", "accepted", "pending"] as const;
+// Pending invitations are private between the two artists; only confirmed battles are public.
+const ACTIVE_STATUSES = ["live", "scheduled", "accepted"] as const;
 const STATUS_RANK: Record<string, number> = { live: 0, scheduled: 1, accepted: 2, pending: 3 };
 
 export type ArtistBattleEntry = {

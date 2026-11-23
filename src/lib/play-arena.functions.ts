@@ -103,12 +103,14 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
       queueRows.forEach((r) => r.artist_user_id && ids.add(r.artist_user_id));
 
       let avatars: Record<string, string | null> = {};
+      let publicIds: Record<string, string | null> = {};
       if (ids.size) {
         const { data: profs } = await supabaseAdmin
           .from("profiles")
-          .select("id, avatar_url")
+          .select("id, avatar_url, public_id")
           .in("id", Array.from(ids));
         avatars = Object.fromEntries((profs ?? []).map((p) => [p.id, p.avatar_url]));
+        publicIds = Object.fromEntries((profs ?? []).map((p: any) => [p.id, p.public_id ?? null]));
       }
 
       const trending = streams[0]
@@ -148,7 +150,8 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
         id: r.id,
         position: r.position ?? idx + 1,
         artistName: r.artist_name ?? "Artist",
-        artistId: r.artist_user_id,
+        // Public profile id only; private account ids stay server-side.
+        artistId: r.artist_user_id ? publicIds[r.artist_user_id] ?? null : null,
         avatar: r.artist_user_id ? avatars[r.artist_user_id] ?? null : null,
         status: (r.status === "playing" ? "playing" : "queued") as "playing" | "queued",
       }));
