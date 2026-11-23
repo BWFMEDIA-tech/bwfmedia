@@ -526,6 +526,13 @@
       "when": 1795439968479,
       "tag": "0074_harden_battles_broadcasts_invites",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1795440672024,
+      "tag": "0075_scope_labels_read",
+      "breakpoints": true
     }
   ]
 }
