@@ -7232,6 +7232,13 @@ export type Database = {
         }[]
       }
       get_my_artist_dashboard: { Args: never; Returns: Json }
+      get_my_artist_referral_settings: {
+        Args: never
+        Returns: {
+          enabled: boolean
+          percentage: number
+        }[]
+      }
       get_my_labels: {
         Args: never
         Returns: {

@@ -2,7 +2,9 @@
 
 ## App Store preparation
 - [x] Confirm boost-pack payment descriptions already say Tunevio; replace legacy booking contact in confirmation emails and booking pages with tunevioapp@gmail.com, preserving checkout and booking behavior
-- [ ] Address flagged videos, profiles and referral-settings read access; awaiting discovery-versus-owner-only choice before changing legitimate access
+- [x] Preserve public profile/video discovery; restrict referral administration records to admins and expose only percentage/enabled to hosts
+- [x] Five referral access tests passed; verified applied permissions and signed-in admin page with limited settings response and no runtime errors
+- [ ] Confirm intended-public profile/video scan exceptions; awaiting security approval without restricting discovery
 - [x] Inspect existing account settings, sign-in and mobile configuration; prepare scoped implementation plan
 - [x] Enable Apple sign-in and add official, equally sized provider buttons using existing account verification and public return paths
 - [x] Replace preview URL/insecure transport in iPhone configuration and document review-safeguard findings and native handoff

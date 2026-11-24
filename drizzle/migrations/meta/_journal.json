@@ -540,6 +540,13 @@
       "when": 1795442014185,
       "tag": "0076_scope_play_sessions_read",
       "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1795492049275,
+      "tag": "0077_private_artist_referral_settings",
+      "breakpoints": true
     }
   ]
 }

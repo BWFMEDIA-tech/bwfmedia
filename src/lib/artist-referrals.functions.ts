@@ -26,13 +26,15 @@ export const getMyArtistReferrals = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const sb: any = context.supabase;
     const uid = context.userId;
-    const [{ data: code }, { data: settings }, { data: refs }, { data: comms }, { count: clicks }] = await Promise.all([
+    const [{ data: code }, { data: settingsRows, error: settingsError }, { data: refs }, { data: comms }, { count: clicks }] = await Promise.all([
       sb.from("host_referral_codes").select("code").eq("user_id", uid).maybeSingle(),
-      sb.from("artist_referral_settings").select("percentage,enabled").maybeSingle(),
+      context.supabase.rpc("get_my_artist_referral_settings"),
       sb.from("artist_referrals").select("artist_id,created_at").eq("host_id", uid).order("created_at", { ascending: false }),
       sb.from("artist_referral_commissions").select("*").eq("host_id", uid).order("created_at", { ascending: false }).limit(200),
       sb.from("artist_referral_clicks").select("id", { count: "exact", head: true }).eq("host_id", uid),
     ]);
+    const settings = settingsRows?.[0];
+    if (settingsError || !settings) throw new Error("Referral settings are available to hosts and administrators only.");
     const ids = (refs ?? []).map((r: any) => r.artist_id);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: profs }, { data: subs }] = ids.length
