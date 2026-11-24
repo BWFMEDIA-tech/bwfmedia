@@ -3,6 +3,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { appStoreLink } from "@/lib/app-store";
 
 const DISMISSED_KEY = "tunevio-install-prompt-dismissed";
 
@@ -79,6 +80,11 @@ export function InstallPromptPopup() {
 
   if (!signedIn || !visible || pathname === "/install") return null;
 
+  // The artist dashboard keeps a fixed 16rem sidebar on desktop; the card must
+  // clear it instead of covering the menu.
+  const clearArtistSidebar = pathname.startsWith("/artist-dashboard");
+  const storeLink = appStoreLink();
+
   const dismiss = () => {
     setVisible(false);
     try {
@@ -115,7 +121,7 @@ export function InstallPromptPopup() {
     <div
       role="dialog"
       aria-label="Install Tunevio"
-      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+76px)] z-[70] mx-auto max-w-sm rounded-2xl border border-primary/40 bg-background/95 p-4 shadow-[0_0_32px_rgba(0,230,255,0.25)] backdrop-blur-md md:inset-x-auto md:bottom-6 md:left-6"
+      className={`fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-[70] mx-auto max-h-[calc(100dvh_-_env(safe-area-inset-bottom)_-_112px)] max-w-sm overflow-y-auto overscroll-contain rounded-2xl border border-primary/40 bg-background/95 p-4 shadow-[0_0_32px_rgba(0,230,255,0.25)] backdrop-blur-md md:inset-x-auto md:bottom-6 md:max-h-[min(70vh,520px)] ${clearArtistSidebar ? "md:left-[calc(16rem+1.5rem)]" : "md:left-6"}`}
     >
       <button
         type="button"
@@ -133,10 +139,19 @@ export function InstallPromptPopup() {
             Add Tunevio to your home screen for music, live battles and artist stages — one tap away.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <Button size="sm" className="min-h-10" onClick={install} disabled={busy}>
-              <Download size={16} />
-              {busy ? "Opening…" : "Install now"}
-            </Button>
+            {storeLink ? (
+              <Button size="sm" className="min-h-10" asChild>
+                <a href={storeLink} target="_blank" rel="noopener noreferrer">
+                  <Download size={16} />
+                  Get it on the App Store
+                </a>
+              </Button>
+            ) : (
+              <Button size="sm" className="min-h-10" onClick={install} disabled={busy}>
+                <Download size={16} />
+                {busy ? "Opening…" : "Install now"}
+              </Button>
+            )}
             <Button size="sm" variant="ghost" className="min-h-10" onClick={dismiss}>
               Not now
             </Button>

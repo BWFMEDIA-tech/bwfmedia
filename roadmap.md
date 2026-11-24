@@ -1,6 +1,8 @@
 # Roadmap
 
 ## App Store preparation
+- [x] Keep the Install Tunevio card fully visible on the artist dashboard: it now clears the phone bottom bar, caps its height with internal scrolling, and sits right of the desktop sidebar; App Store button appears automatically once a live apps.apple.com URL is saved in src/lib/app-store.ts
+- [ ] Save the real App Store listing URL in src/lib/app-store.ts; awaiting the owner's apps.apple.com link (no live listing exists yet)
 - [x] Prepare 15 verified real-screen screenshots at 1179x2556, 1320x2868 and 2064x2752; privacy policy PDF/Markdown and age-rating PDF/CSV, with Tunevio operator and frequent mature-content references; six retention/purchase tests pass
 - [ ] Finalize submission materials: verify/recapture screenshots against signed iOS build, resolve Meta native tracking permission, review unconfirmed content frequencies and publish reviewed privacy policy; requires native build/device checks and owner content review
 - [x] Confirm boost-pack payment descriptions already say Tunevio; replace legacy booking contact in confirmation emails and booking pages with tunevioapp@gmail.com, preserving checkout and booking behavior
