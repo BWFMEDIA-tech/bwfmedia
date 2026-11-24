@@ -173,6 +173,15 @@ export const listFollowConnections = createServerFn({ method: "POST" })
     // Follow rows are private to their two members; after sign-in is verified the
     // list is read server-side and only public profile details are returned.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Lists are visible for your own account, admins, or public artist/host profiles.
+    if (data.userId !== context.userId) {
+      const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role")
+        .in("user_id", [data.userId, context.userId]).in("role", ["artist", "host", "admin"]);
+      const allowed = (roles ?? []).some((r) =>
+        (r.user_id === data.userId && (r.role === "artist" || r.role === "host")) ||
+        (r.user_id === context.userId && r.role === "admin"));
+      if (!allowed) return { people: [] };
+    }
     const matchCol = data.kind === "followers" ? "artist_id" : "follower_id";
     const otherCol = data.kind === "followers" ? "follower_id" : "artist_id";
     const { data: rows, error } = await supabaseAdmin

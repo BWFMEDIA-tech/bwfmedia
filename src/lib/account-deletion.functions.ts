@@ -44,6 +44,8 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       const plan = deletionPlan.parse(prepared.data);
       const buckets = new Map<string, string[]>();
       for (const file of plan.storage) {
+        // Defense in depth: never remove anything outside the user's own folder.
+        if (!file.path.startsWith(`${userId}/`) || file.path.includes("..")) continue;
         const paths = buckets.get(file.bucket) ?? [];
         paths.push(file.path);
         buckets.set(file.bucket, paths);

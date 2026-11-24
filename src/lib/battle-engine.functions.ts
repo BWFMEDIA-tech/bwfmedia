@@ -652,12 +652,15 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
         .from("play_tracks")
         .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, updated_at")
         .in("id", trackIds);
-      aTrack =
-        (tracks ?? []).find((t: any) => t.id === currentRound?.a_playing_track_id) ??
-        null;
-      bTrack =
-        (tracks ?? []).find((t: any) => t.id === currentRound?.b_playing_track_id) ??
-        null;
+      // Audio is only handed out while that side is actually on air in a live battle.
+      const present = (t: any) =>
+        t ? { ...t, audio_url: match.status === "live" && t.status === "playing" ? t.audio_url : null } : null;
+      aTrack = present(
+        (tracks ?? []).find((t: any) => t.id === currentRound?.a_playing_track_id) ?? null,
+      );
+      bTrack = present(
+        (tracks ?? []).find((t: any) => t.id === currentRound?.b_playing_track_id) ?? null,
+      );
     }
 
     // Fallback: if the host hasn't picked a track to play yet for a side,

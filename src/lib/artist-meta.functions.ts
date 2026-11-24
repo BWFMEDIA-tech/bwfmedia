@@ -39,6 +39,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         sb.from("play_tracks")
           .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
           .eq("artist_user_id", id)
+          // Only published songs are public; queued/unreleased audio stays private.
+          .in("status", ["playing", "completed"])
           .order("like_count", { ascending: false })
           .limit(200),
         sb.from("videos")

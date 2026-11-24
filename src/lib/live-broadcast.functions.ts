@@ -41,12 +41,25 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     const link = `/stream/${stream.room_name}`;
     const streamUrl = `https://tunevio.com${link}`;
 
-    // 2. Build recipient list: every profile except the host.
-    const { data: profiles } = await supabaseAdmin
-      .from("profiles")
-      .select("id")
-      .neq("id", stream.host_id);
-    const userIds = (profiles ?? []).map((p) => p.id as string);
+    // Server-chosen bounds: announce once per stream, only to the host's followers,
+    // with a sanitized, length-capped title.
+    const { count: already } = await supabaseAdmin
+      .from("notifications").select("id", { count: "exact", head: true })
+      .eq("stream_id", stream.id).eq("type", "live_stream_started");
+    if ((already ?? 0) > 0) return { notified: 0, emailed: 0 };
+    const safeTitle = String(stream.title ?? "")
+      .replace(/[\u0000-\u001f\u007f]/g, " ")
+      .replace(/\b(?:https?:\/\/|www\.)\S+/gi, "")
+      .replace(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|co|ly|me|app|xyz|info|biz|ru|cn)\b\S*/gi, "")
+      .replace(/\s+/g, " ").trim().slice(0, 80) || "Live now";
+
+    // 2. Recipients: the host's followers only.
+    const { data: followers } = await supabaseAdmin
+      .from("artist_follows")
+      .select("follower_id")
+      .eq("artist_id", stream.host_id)
+      .limit(5000);
+    const userIds = [...new Set((followers ?? []).map((p) => p.follower_id as string))].filter((id) => id !== stream.host_id);
     if (userIds.length === 0) return { notified: 0, emailed: 0 };
 
     // 3. Load preferences for all recipients in one query.
@@ -70,7 +83,7 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
         user_id: uid,
         type: "live_stream_started",
         title: `🔴 Live Now: ${hostName}`,
-        body: stream.title,
+        body: safeTitle,
         link,
         stream_id: stream.id,
         actor_id: stream.host_id,
@@ -91,13 +104,6 @@ export const broadcastStreamStarted = createServerFn({ method: "POST" })
     });
     let emailed = 0;
     if (emailRecipients.length > 0) {
-      // Titles are host-controlled: strip links/control chars and cap length
-      // so the platform email can't be used to deliver arbitrary messages.
-      const safeTitle = String(stream.title ?? "")
-        .replace(/[\u0000-\u001f\u007f]/g, " ")
-        .replace(/\b(?:https?:\/\/|www\.)\S+/gi, "")
-        .replace(/\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|co|ly|me|app|xyz|info|biz|ru|cn)\b\S*/gi, "")
-        .replace(/\s+/g, " ").trim().slice(0, 80) || "Live now";
       const tplData = { hostName, streamTitle: safeTitle, streamUrl };
 
       for (let i = 0; i < emailRecipients.length; i += 200) {
