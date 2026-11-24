@@ -547,6 +547,13 @@
       "when": 1795492049275,
       "tag": "0077_private_artist_referral_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1795531697727,
+      "tag": "0078_scope_signed_in_reads",
+      "breakpoints": true
     }
   ]
 }

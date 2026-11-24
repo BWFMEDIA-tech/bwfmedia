@@ -170,9 +170,12 @@ export const listFollowConnections = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = context.supabase;
+    // Follow rows are private to their two members; after sign-in is verified the
+    // list is read server-side and only public profile details are returned.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const matchCol = data.kind === "followers" ? "artist_id" : "follower_id";
     const otherCol = data.kind === "followers" ? "follower_id" : "artist_id";
-    const { data: rows, error } = await sb
+    const { data: rows, error } = await supabaseAdmin
       .from("artist_follows")
       .select("artist_id, follower_id, created_at")
       .eq(matchCol, data.userId)

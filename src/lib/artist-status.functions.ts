@@ -1,8 +1,9 @@
-// @auth-exempt: returns only public profile availability, never private presence records.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { resolveArtistStatus, type ArtistStatus } from "./artist-status";
 export const getArtistStatuses = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator(input => z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(input))
   .handler(async ({ data }) => {
     if (!data.ids.length) return {} as Record<string, ArtistStatus>;

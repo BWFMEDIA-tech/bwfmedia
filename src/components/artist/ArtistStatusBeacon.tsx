@@ -15,6 +15,8 @@ export function ArtistStatusProvider({ children }: { children: ReactNode }) {
   const read = useServerFn(getArtistStatuses);
   const touch = useServerFn(touchPresence);
   const { user } = useAuth();
+  const signedInRef = useRef(false);
+  signedInRef.current = !!user;
   const register = useCallback((id: string) => {
     ids.current.set(id, (ids.current.get(id) ?? 0) + 1);
     refreshRef.current();
@@ -28,7 +30,7 @@ export function ArtistStatusProvider({ children }: { children: ReactNode }) {
     const refresh = async () => {
       if (running) { pending = true; return; }
       const list = [...ids.current.keys()];
-      if (document.visibilityState === "hidden" || !list.length) return;
+      if (document.visibilityState === "hidden" || !list.length || !signedInRef.current) return;
       running = true;
       try {
         const batches = await Promise.all(Array.from({ length: Math.ceil(list.length / 200) }, (_, i) => read({ data: { ids: list.slice(i * 200, (i + 1) * 200) } })));
