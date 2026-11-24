@@ -61,6 +61,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as StreamStudioRouteImport } from './routes/stream-studio'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TunevioRouteImport } from './routes/tunevio'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
@@ -430,6 +431,11 @@ const StreamStudioRoute = StreamStudioRouteImport.update({
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -1051,6 +1057,7 @@ export interface FileRoutesByFullPath {
   '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1212,6 +1219,7 @@ export interface FileRoutesByTo {
   '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1377,6 +1385,7 @@ export interface FileRoutesById {
   '/store': typeof StoreRoute
   '/stream-studio': typeof StreamStudioRoute
   '/studio': typeof StudioRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tunevio': typeof TunevioRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1543,6 +1552,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/stream-studio'
     | '/studio'
+    | '/support'
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
@@ -1704,6 +1714,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/stream-studio'
     | '/studio'
+    | '/support'
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
@@ -1868,6 +1879,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/stream-studio'
     | '/studio'
+    | '/support'
     | '/terms'
     | '/tunevio'
     | '/unsubscribe'
@@ -2033,6 +2045,7 @@ export interface RootRouteChildren {
   StoreRoute: typeof StoreRoute
   StreamStudioRoute: typeof StreamStudioRoute
   StudioRoute: typeof StudioRoute
+  SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   TunevioRoute: typeof TunevioRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -2454,6 +2467,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -3429,6 +3449,7 @@ const rootRouteChildren: RootRouteChildren = {
   StoreRoute: StoreRoute,
   StreamStudioRoute: StreamStudioRoute,
   StudioRoute: StudioRoute,
+  SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   TunevioRoute: TunevioRoute,
   UnsubscribeRoute: UnsubscribeRoute,
