@@ -46,6 +46,7 @@ export const Route = createFileRoute("/off-the-block")({
         content: "Raw, on-location interviews from the block to the world. Tap in with Tunevio.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://tunevio.com/off-the-block" },
     ],
     links: [{ rel: "canonical", href: "https://tunevio.com/off-the-block" }],
@@ -292,7 +293,7 @@ function OffTheBlockPage() {
             </p>
             <div className="relative mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="mailto:bookbwfmedia@gmail.com"
+                href="mailto:tunevioapp@gmail.com"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 font-cond font-bold tracking-[0.25em] text-xs uppercase transition-all hover:scale-[1.02]"
                 style={{ background: GOLD, color: "#000", boxShadow: `0 0 30px ${GOLD}66` }}
               >
@@ -331,7 +332,7 @@ function OffTheBlockPage() {
             {[
               { Icon: Instagram, label: "@bwfmediatv", href: "https://instagram.com/bwfmediatv" },
               { Icon: Youtube, label: "Tunevio", href: "https://youtube.com/@bwfmediat" },
-              { Icon: Mail, label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
+              { Icon: Mail, label: "tunevioapp@gmail.com", href: "mailto:tunevioapp@gmail.com" },
             ].map(({ Icon, label, href }) => (
               <a
                 key={label}

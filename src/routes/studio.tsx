@@ -22,6 +22,7 @@ export const Route = createFileRoute("/studio")({
       { property: "og:title", content: "Tunevio Studio - Where Culture, Content & Creators Meet" },
       { property: "og:description", content: "Premium studio bookings for artists & creators. Professional sound, lighting, and brand-ready delivery." },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://tunevio.com/studio" },
     ],
     links: [{ rel: "canonical", href: "https://tunevio.com/studio" }],
@@ -315,7 +316,7 @@ function StudioPage() {
             {[
               { Icon: MapPin,    label: "Location Provided After Booking", href: "#" },
               { Icon: Instagram, label: "@bwfmediatv", href: "https://instagram.com/bwfmediatv" },
-              { Icon: Mail,      label: "bookbwfmedia@gmail.com", href: "mailto:bookbwfmedia@gmail.com" },
+              { Icon: Mail,      label: "tunevioapp@gmail.com", href: "mailto:tunevioapp@gmail.com" },
             ].map(({ Icon, label, href }) => (
               <a key={label} href={href} className="flex items-center gap-3 text-bone/85 hover:text-bone transition group">
                 <span className="w-8 h-8 grid place-items-center" style={{ border: `1px solid ${GOLD}55` }}>

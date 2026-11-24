@@ -103,8 +103,8 @@ const StudioBookingConfirmation = ({
 
         <Text style={footerText}>
           Questions? Reach out at{' '}
-          <a href="mailto:bookbwfmedia@gmail.com" style={link}>
-            bookbwfmedia@gmail.com
+          <a href="mailto:tunevioapp@gmail.com" style={link}>
+            tunevioapp@gmail.com
           </a>.
         </Text>
         <Text style={footerSmall}>
