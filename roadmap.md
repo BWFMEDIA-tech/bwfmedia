@@ -15,6 +15,7 @@
 - [x] Phase 1 verification: 28 safety/payment/deletion tests passed; two real disposable members reported a DM, blocked failed sends, unblocked and read restored messages; authorized admin saved a review and dismissal; 320px signup consent and 390px messages verified without runtime errors
 - [ ] Existing site-wide security scan findings need a separate scoped review before App Store submission; unrelated access policies were not changed during Phase 1
 - [x] Generate native iOS workspace (ios/) with camera, microphone, photo library permission descriptions and background audio mode; app loads https://tunevio.com over HTTPS
+- [x] Replace default iOS app icon with the glossy blue Tunevio icon (1024x1024 opaque RGB master, single-size asset catalog; Xcode generates all device sizes)
 - [ ] Native signing, TestFlight and physical-device verification require Apple Developer access and Mac/Xcode
 
 ## Assigned Freestyle joining
