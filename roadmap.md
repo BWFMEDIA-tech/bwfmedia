@@ -1,10 +1,12 @@
 # Roadmap
 
 ## App Store preparation
+- [x] Prepare 15 verified real-screen screenshots at 1179x2556, 1320x2868 and 2064x2752; privacy policy PDF/Markdown and age-rating PDF/CSV, with Tunevio operator and frequent mature-content references; six retention/purchase tests pass
+- [ ] Finalize submission materials: verify/recapture screenshots against signed iOS build, resolve Meta native tracking permission, review unconfirmed content frequencies and publish reviewed privacy policy; requires native build/device checks and owner content review
 - [x] Confirm boost-pack payment descriptions already say Tunevio; replace legacy booking contact in confirmation emails and booking pages with tunevioapp@gmail.com, preserving checkout and booking behavior
 - [x] Preserve public profile/video discovery; restrict referral administration records to admins and expose only percentage/enabled to hosts
 - [x] Five referral access tests passed; verified applied permissions and signed-in admin page with limited settings response and no runtime errors
-- [ ] Confirm intended-public profile/video scan exceptions; awaiting security approval without restricting discovery
+- [x] Approved intended-public profile/video scan exceptions; discovery remains available
 - [x] Inspect existing account settings, sign-in and mobile configuration; prepare scoped implementation plan
 - [x] Enable Apple sign-in and add official, equally sized provider buttons using existing account verification and public return paths
 - [x] Replace preview URL/insecure transport in iPhone configuration and document review-safeguard findings and native handoff
