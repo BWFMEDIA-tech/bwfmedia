@@ -91,10 +91,10 @@ export function TunevioHome() {
 
   const quickAccess = [
     { title: "Liked Songs", icon: <Heart className="h-5 w-5" />, gradient: "bg-secondary", to: "/library" },
-    { title: "Recently Played", imageUrl: feed?.discover[0]?.coverUrl ?? null, icon: <Clock className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-blue-600", section: "jump-back-in" },
-    { title: "Daily Mix", imageUrl: feed?.discover[1]?.coverUrl ?? feed?.popular[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-secondary", section: "made-for-you" },
-    { title: "Trending Now", imageUrl: feed?.trending[0]?.coverUrl ?? null, icon: <Flame className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-accent", section: "trending" },
-    { title: "New Releases", imageUrl: feed?.newReleases[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-accent to-tv-cyan", section: "new-releases" },
+    { title: "Recently Played", imageUrl: feed?.discover?.[0]?.coverUrl ?? null, icon: <Clock className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-blue-600", section: "jump-back-in" },
+    { title: "Daily Mix", imageUrl: feed?.discover?.[1]?.coverUrl ?? feed?.popular?.[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-secondary", section: "made-for-you" },
+    { title: "Trending Now", imageUrl: feed?.trending?.[0]?.coverUrl ?? null, icon: <Flame className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-accent", section: "trending" },
+    { title: "New Releases", imageUrl: feed?.newReleases?.[0]?.coverUrl ?? null, icon: <Sparkles className="h-5 w-5" />, gradient: "bg-gradient-to-br from-accent to-tv-cyan", section: "new-releases" },
     { title: "Your Queue", icon: <ListMusic className="h-5 w-5" />, gradient: "bg-secondary", to: "/library" },
     { title: "Following Artists", icon: <Users className="h-5 w-5" />, gradient: "bg-secondary", section: "artists-you-follow" },
     { title: "Play Arena", icon: <Mic2 className="h-5 w-5" />, gradient: "bg-gradient-to-br from-tv-cyan to-accent", to: "/mic-drop" },
@@ -211,32 +211,32 @@ export function TunevioHome() {
                 key="fresh"
                 title="Fresh Finds"
                 description="The newest uploads across the network."
-                imageUrl={feed?.newReleases[0]?.coverUrl}
-                count={feed?.newReleases.length ?? 0}
+                imageUrl={feed?.newReleases?.[0]?.coverUrl}
+                count={feed?.newReleases?.length ?? 0}
                 onPlay={() => playAll(feed?.newReleases)}
               />,
               <PlaylistCard
                 key="hot"
                 title="Hot Right Now"
                 description="What the platform is spinning today."
-                imageUrl={feed?.trending[0]?.coverUrl}
-                count={feed?.trending.length ?? 0}
+                imageUrl={feed?.trending?.[0]?.coverUrl}
+                count={feed?.trending?.length ?? 0}
                 onPlay={() => playAll(feed?.trending)}
               />,
               <PlaylistCard
                 key="top"
                 title="Chart Toppers"
                 description="Highest rated tracks on Tunevio."
-                imageUrl={feed?.charts[0]?.coverUrl}
-                count={feed?.charts.length ?? 0}
+                imageUrl={feed?.charts?.[0]?.coverUrl}
+                count={feed?.charts?.length ?? 0}
                 onPlay={() => playAll(feed?.charts)}
               />,
               <PlaylistCard
                 key="deep"
                 title="Deep Cuts"
                 description="Hidden gems rotating every 30 minutes."
-                imageUrl={feed?.discover[0]?.coverUrl}
-                count={feed?.discover.length ?? 0}
+                imageUrl={feed?.discover?.[0]?.coverUrl}
+                count={feed?.discover?.length ?? 0}
                 onPlay={() => playAll(feed?.discover)}
               />,
             ]}
@@ -433,7 +433,7 @@ export function TunevioHome() {
           />
           )}
 
-          {show("music") && !isLoading && !feed?.charts.length ? (
+          {show("music") && !isLoading && !feed?.charts?.length ? (
             <div className="rounded-2xl border border-tv-line bg-tv-surface p-10 text-center">
               <TrendingUp className="mx-auto h-8 w-8 text-white/30" />
               <p className="mt-3 text-sm font-bold">No music in the catalog yet</p>

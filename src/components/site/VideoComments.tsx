@@ -408,7 +408,7 @@ export function VideoComments({ videoId }: { videoId: string }) {
           </Button>
         </div>
       )}
-      {query.data?.comments.length === 0 && (
+      {query.data?.comments?.length === 0 && (
         <p className="py-8 text-sm text-muted-foreground">No comments yet.</p>
       )}
       <div className="divide-y divide-border/60">

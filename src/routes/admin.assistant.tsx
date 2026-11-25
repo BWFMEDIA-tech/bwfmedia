@@ -43,7 +43,7 @@ function AssistantAdmin() {
     <SectionPage title="AI Assistant" subtitle="Edit the help articles the assistant answers from, and review questions it couldn't answer."
       stats={[
         { label: "Questions asked", value: String(total), icon: MessageSquare, color: "#00E6FF" },
-        { label: "Unanswered", value: String(d?.unanswered.length ?? 0), icon: HelpCircle, color: "#3B82F6" },
+        { label: "Unanswered", value: String(d?.unanswered?.length ?? 0), icon: HelpCircle, color: "#3B82F6" },
         { label: "Not helpful", value: String(notHelpful.length), icon: ThumbsDown, color: "#ef4444" },
       ]}>
       <div className="space-y-6">
@@ -103,7 +103,7 @@ function AssistantAdmin() {
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-5">
             <h2 className="mb-3 text-lg font-bold">Couldn't answer</h2>
-            {!d?.unanswered.length ? <EmptyState icon={HelpCircle} title="Nothing yet" hint="Questions the assistant couldn't verify appear here." /> :
+            {!d?.unanswered?.length ? <EmptyState icon={HelpCircle} title="Nothing yet" hint="Questions the assistant couldn't verify appear here." /> :
               <ul className="space-y-2 text-sm">{d.unanswered.map((u: any) => <li key={u.id} className="border-b border-border pb-2">{u.question}<span className="ml-2 text-xs text-muted-foreground">{u.audience}</span></li>)}</ul>}
           </div>
           <div className="rounded-2xl border border-border bg-card p-5">

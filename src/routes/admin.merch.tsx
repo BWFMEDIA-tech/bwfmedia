@@ -55,7 +55,7 @@ function AdminMerch() {
         </div>
 
         <div className="mb-8 grid gap-4 sm:grid-cols-3">
-          <Stat label="Connected Stores" value={(stores.data?.stores.length ?? 0).toString()} />
+          <Stat label="Connected Stores" value={(stores.data?.stores?.length ?? 0).toString()} />
           <Stat label="Total Orders" value={totals.orders.toString()} />
           <Stat label="Platform Commission" value={fmt(totals.commission, "USD")} hint={`Gross ${fmt(totals.gross, "USD")}`} />
         </div>
@@ -78,7 +78,7 @@ function AdminMerch() {
                       <td className="py-2">{s.last_synced_at ? new Date(s.last_synced_at).toLocaleString() : "—"}</td>
                     </tr>
                   ))}
-                  {!stores.data?.stores.length && <tr><td colSpan={5} className="py-6 text-center text-white/50">No connected stores yet.</td></tr>}
+                  {!stores.data?.stores?.length && <tr><td colSpan={5} className="py-6 text-center text-white/50">No connected stores yet.</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -115,7 +115,7 @@ function AdminMerch() {
                       </td>
                     </tr>
                   ))}
-                  {!comms.data?.commissions.length && <tr><td colSpan={9} className="py-6 text-center text-white/50">No commission events yet.</td></tr>}
+                  {!comms.data?.commissions?.length && <tr><td colSpan={9} className="py-6 text-center text-white/50">No commission events yet.</td></tr>}
                 </tbody>
               </table>
             </div>

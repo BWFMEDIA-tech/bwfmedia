@@ -43,7 +43,7 @@ function Dashboard() {
             <Link to="/admin/streams" className="text-xs text-blue-400 hover:underline">View all</Link>
           </div>
           <p className="mb-4 text-xs text-white/40">Most recent streams across the network.</p>
-          {!data?.topShows.length ? (
+          {!data?.topShows?.length ? (
             <EmptyState icon={Radio} title="No streams yet" hint="Streams will appear here as hosts go live." />
           ) : (
             <div className="divide-y divide-white/5">
@@ -72,7 +72,7 @@ function Dashboard() {
             <Link to="/admin/audit" className="text-xs text-blue-400 hover:underline">View all</Link>
           </div>
           <p className="mb-4 text-xs text-white/40">Latest admin actions.</p>
-          {!data?.recentActivity.length ? (
+          {!data?.recentActivity?.length ? (
             <EmptyState icon={Activity} title="No activity yet" />
           ) : (
             <div className="space-y-3">
@@ -97,7 +97,7 @@ function Dashboard() {
             <Link to="/admin/artists" className="text-xs text-blue-400 hover:underline">View all</Link>
           </div>
           <p className="mb-4 text-xs text-white/40">By total streams hosted.</p>
-          {!data?.topArtists.length ? (
+          {!data?.topArtists?.length ? (
             <EmptyState icon={Users} title="No artists yet" hint="Users with the artist role will rank here." />
           ) : (
             <div className="divide-y divide-white/5">

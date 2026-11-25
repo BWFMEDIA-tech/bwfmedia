@@ -86,7 +86,7 @@ function ImportCatalogPage() {
     const body = "row,message\n" + errs.map((e) => `${e.row},"${e.message.replace(/"/g, '""')}"`).join("\n");
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([body], { type: "text/csv" })); a.download = "import-errors.csv"; a.click();
   };
-  const canNext = [!!distributor, !!parsed && !parsed.missingColumns.length && parsed.rows.length > 0, true, false][step];
+  const canNext = [!!distributor, !!parsed && !parsed.missingColumns?.length && (parsed.rows?.length ?? 0) > 0, true, false][step];
 
   if (auth.user && !isArtist) return <div className="mx-auto max-w-lg rounded-xl border border-border bg-card p-8 text-center"><h1 className="text-2xl font-bold">Import Catalog is for artists</h1><ActivateArtistButton className="mt-4" /></div>;
 
@@ -137,8 +137,8 @@ function ImportCatalogPage() {
           <input ref={inputRef} type="file" accept=".csv,text/csv" className="sr-only" onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
           <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground"><FileSpreadsheet className="h-4 w-4" />CSV metadata · up to 5 MB · {`${2000}`} rows</div>
           {fileError && <p role="alert" className="mt-4 rounded-md bg-destructive/15 px-3 py-2 text-sm text-destructive">{fileError}</p>}
-          {parsed?.missingColumns.length ? <p role="alert" className="mt-4 rounded-md bg-destructive/15 px-3 py-2 text-sm text-destructive">Missing required columns: {parsed.missingColumns.join(", ")}</p> : null}
-          {parsed && !parsed.missingColumns.length && !parsed.rows.length && <p role="alert" className="mt-4 rounded-md bg-destructive/15 px-3 py-2 text-sm text-destructive">No valid rows found. {parsed.errors[0]?.message}</p>}
+          {parsed?.missingColumns?.length ? <p role="alert" className="mt-4 rounded-md bg-destructive/15 px-3 py-2 text-sm text-destructive">Missing required columns: {parsed.missingColumns.join(", ")}</p> : null}
+          {parsed && !parsed.missingColumns?.length && !parsed.rows?.length && <p role="alert" className="mt-4 rounded-md bg-destructive/15 px-3 py-2 text-sm text-destructive">No valid rows found. {parsed.errors?.[0]?.message}</p>}
           <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground"><Lock className="h-3.5 w-3.5" />Your file is read in your browser and only its catalog details are saved to your account.</div>
         </section>
         <aside className="rounded-2xl border border-border bg-card/60 p-5">
@@ -189,7 +189,7 @@ function ImportCatalogPage() {
       {step < 3 && <div className="flex justify-between">
         <Button variant="outline" disabled={step === 0} onClick={() => setStep(step - 1)}><ArrowLeft className="mr-1 h-4 w-4" />Back</Button>
         {step < 2 ? <Button disabled={!canNext} onClick={() => setStep(step + 1)}>Continue<ArrowRight className="ml-1 h-4 w-4" /></Button>
-          : <Button disabled={run.isPending || !parsed?.rows.length} onClick={() => run.mutate()}>{run.isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}Import {parsed?.rows.length ?? 0} tracks as drafts</Button>}
+          : <Button disabled={run.isPending || !parsed?.rows?.length} onClick={() => run.mutate()}>{run.isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}Import {parsed?.rows?.length ?? 0} tracks as drafts</Button>}
       </div>}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">

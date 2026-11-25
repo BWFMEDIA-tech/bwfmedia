@@ -145,7 +145,7 @@ function AdminProfilePage() {
 
           <Card>
             <h3 className="mb-4 text-lg font-bold">Recent Admin Activity</h3>
-            {!data?.recentActions.length ? (
+            {!data?.recentActions?.length ? (
               <div className="py-6 text-center text-xs text-white/40">No actions yet</div>
             ) : (
               <div className="space-y-3">

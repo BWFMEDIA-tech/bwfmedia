@@ -40,7 +40,7 @@ function ArtistReferralsAdmin() {
         </section>
 
         <section className="rounded-xl border border-border bg-card">
-          <div className="border-b border-border px-4 py-3 font-semibold">Commissions ({d?.commissions.length ?? 0})</div>
+          <div className="border-b border-border px-4 py-3 font-semibold">Commissions ({d?.commissions?.length ?? 0})</div>
           <ul className="divide-y divide-border">
             {(d?.commissions ?? []).map((c: any) => (
               <li key={c.id} className="flex flex-wrap items-center gap-3 px-4 py-2 text-sm">
@@ -60,7 +60,7 @@ function ArtistReferralsAdmin() {
         </section>
 
         <section className="rounded-xl border border-border bg-card">
-          <div className="border-b border-border px-4 py-3 font-semibold">Referred artists ({d?.referrals.length ?? 0})</div>
+          <div className="border-b border-border px-4 py-3 font-semibold">Referred artists ({d?.referrals?.length ?? 0})</div>
           <ul className="divide-y divide-border">
             {(d?.referrals ?? []).map((r: any) => (
               <li key={r.id} className="px-4 py-2 text-sm">{new Date(r.created_at).toLocaleDateString()} · {n(r.artist_id)} via {n(r.host_id)} (/join/{r.code})</li>

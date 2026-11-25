@@ -34,7 +34,7 @@ function ArtistsAdmin() {
     >
       <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
         <h2 className="mb-4 text-lg font-bold">Top Artists</h2>
-        {!overview.data?.topArtists.length ? (
+        {!overview.data?.topArtists?.length ? (
           <EmptyState icon={Star} title="No artists yet" hint="Assign the artist role from User Management." />
         ) : (
           <div className="divide-y divide-white/5">

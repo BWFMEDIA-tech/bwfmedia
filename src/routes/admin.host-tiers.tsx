@@ -50,9 +50,9 @@ function HostTiersAdmin() {
       title="Host Tiers"
       subtitle="Host rates, room earnings and audited tier changes."
       stats={[
-        { label: "Hosts", value: String(d?.hosts.length ?? 0), icon: Users, color: "#00E6FF" },
+        { label: "Hosts", value: String(d?.hosts?.length ?? 0), icon: Users, color: "#00E6FF" },
         { label: "Host earnings", value: fmt(d?.hosts.reduce((a: number, h: any) => a + h.earned_cents, 0) ?? 0), icon: Banknote, color: "#0000FF" },
-        { label: "Tiers", value: String(d?.tiers.length ?? 0), icon: Crown, color: "#C0C8D8" },
+        { label: "Tiers", value: String(d?.tiers?.length ?? 0), icon: Crown, color: "#C0C8D8" },
       ]}
     >
       <div className="space-y-5">
@@ -65,7 +65,7 @@ function HostTiersAdmin() {
 
         <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
           <h2 className="mb-4 text-lg font-bold">Hosts</h2>
-          {!d?.hosts.length ? <EmptyState icon={Users} title="No hosts yet" hint="Hosts appear after their first finished room." /> : (
+          {!d?.hosts?.length ? <EmptyState icon={Users} title="No hosts yet" hint="Hosts appear after their first finished room." /> : (
             <div className="divide-y divide-white/5 text-sm">
               {d.hosts.map((h: any) => (
                 <div key={h.id} className="flex flex-wrap items-center gap-3 py-3">
@@ -89,7 +89,7 @@ function HostTiersAdmin() {
 
         <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
           <h2 className="mb-4 text-lg font-bold">Room earnings</h2>
-          {!d?.earnings.length ? <p className="text-sm text-white/50">None yet.</p> : (
+          {!d?.earnings?.length ? <p className="text-sm text-white/50">None yet.</p> : (
             <div className="divide-y divide-white/5 text-sm">
               {d.earnings.slice(0, 100).map((e: any) => (
                 <div key={e.id} className="flex flex-wrap items-center gap-3 py-2">
@@ -110,7 +110,7 @@ function HostTiersAdmin() {
 
         <div className="rounded-2xl border border-white/10 bg-[#0d0d18] p-5">
           <h2 className="mb-4 text-lg font-bold">Change history</h2>
-          {!d?.history.length ? <p className="text-sm text-white/50">No changes yet.</p> : (
+          {!d?.history?.length ? <p className="text-sm text-white/50">No changes yet.</p> : (
             <div className="divide-y divide-white/5 text-xs">
               {d.history.map((h: any) => (
                 <div key={h.id} className="py-2">
