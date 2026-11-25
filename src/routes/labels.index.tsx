@@ -1,3 +1,4 @@
+import { useHasPerk } from "@/components/billing/PlanGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -39,6 +40,7 @@ function LabelsPage() {
   const runLeave = useServerFn(leaveLabel);
   const [name, setName] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const labelPlan = useHasPerk("label_panel");
 
   const labels = useQuery({ queryKey: ["my-labels"], queryFn: () => fetchLabels(), enabled: !!auth.user });
   const memberships = useQuery({ queryKey: ["my-label-memberships"], queryFn: () => fetchMemberships(), enabled: !!auth.user });
@@ -85,12 +87,18 @@ function LabelsPage() {
             </h1>
             <p className="text-white/60 mt-2">Build a roster, invite your team, and manage releases together.</p>
           </div>
+          {!labelPlan.loading && !labelPlan.has ? (
+            <Link to="/pricing" className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-black bg-[#00E6FF] hover:brightness-110">
+              <Plus className="w-4 h-4" /> Get the Label Plan
+            </Link>
+          ) : (
           <button
             onClick={() => setShowForm((v) => !v)}
             className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-black bg-[#00E6FF] hover:brightness-110"
           >
             <Plus className="w-4 h-4" /> New label
           </button>
+          )}
         </div>
 
         {showForm && (

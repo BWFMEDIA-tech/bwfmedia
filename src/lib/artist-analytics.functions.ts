@@ -36,6 +36,9 @@ export const getMyStreamingAnalytics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ days: z.number().int().min(7).max(365).default(30) }).parse(input))
   .handler(async ({ data, context }) => {
+    const { data: allowed } = await (context.supabase as any)
+      .rpc("has_entitlement", { _user_id: context.userId, _perk: "analytics_advanced" });
+    if (!allowed) throw new Error("Advanced analytics are included with Artist Pro");
     const { data: analytics, error } = await (context.supabase as any)
       .rpc("get_my_streaming_analytics", { p_days: data.days });
     if (error) throw new Error("Unable to load your streaming analytics");

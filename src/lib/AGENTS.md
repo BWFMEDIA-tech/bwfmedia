@@ -19,3 +19,4 @@
 - Resolve customers through billing-ownership.server using verified identity and immutable subscription mappings, never email matching, because checkout and portal paths must share ownership checks.
 - Validate store/NFC object references against immutable row ownership in triggers and signing; use authenticated Storage for five-minute private previews and anonymous-policy public reads, because direct writes must not expose another owner's photos.
 - Authorize battle snapshots through anonymous or bearer-scoped match reads before privileged presentation reads; pending invitations stay participant/admin-only, because host setup must remain usable without making private matchups public.
+- Map plans to perks only in src/lib/entitlements.ts and mirror it in public.has_entitlement; enforce perks server-side (server functions and insert triggers), because UI locks alone can be bypassed.

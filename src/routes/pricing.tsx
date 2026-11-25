@@ -27,12 +27,12 @@ export const Route = createFileRoute("/pricing")({
 type Tab = "listener" | "artist";
 
 const FEATURES: Record<TunevioPlanId, string[]> = {
-  listener_premium:     ["Ad-free streaming", "Unlimited skips", "High-quality audio", "Offline listening"],
+  listener_premium:     ["Ad-free streaming", "Unlimited skips", "High-quality audio"],
   listener_fan_premium: ["Everything in Premium", "Exclusive fan-only drops", "Early access to releases", "Direct artist messaging"],
   listener_student:     ["Ad-free streaming", "Verified student discount", "Unlimited skips", "Cancel anytime"],
   artist_starter:       ["Upload up to 5 songs to Tunevio", "Upload a limited number of music videos, subject to storage and moderation limits", "Basic streaming and audience analytics", "Join the Battle Arena and compete in eligible battles", "Join another artist's live stage when invited or permitted"],
-  artist_pro:           ["Everything in Starter", "Advanced analytics and audience insights", "Promotional boosts and featured-placement tools", "Scheduled live events and promotional tools", "Enhanced artist profile customization", "Priority support", "Additional live-stream capabilities, if usage costs justify them"],
-  label_plan:           ["Manage multiple artists", "Label dashboard & roster tools", "Bulk uploads & scheduling", "Dedicated success manager"],
+  artist_pro:           ["Everything in Starter", "Advanced analytics: streams, countries, cities and top tracks", "Promotional boosts and featured-placement tools", "Scheduled live events and promotional tools", "Enhanced artist profile customization", "Priority support", "Additional live-stream capabilities, if usage costs justify them"],
+  label_plan:           ["Manage multiple artists", "Label management panel & roster invites", "Team roles and combined roster earnings", "Everything in Artist Pro"],
 };
 
 const HIGHLIGHT: Partial<Record<TunevioPlanId, string>> = {

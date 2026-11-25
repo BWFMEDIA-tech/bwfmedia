@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CalendarDays, Download, Globe2, Headphones, MapPin, Music2, Users } from "lucide-react";
+import { PlanGate } from "@/components/billing/PlanGate";
 import { ArtistDashboardShell } from "@/components/artist/ArtistDashboardShell";
 import { StreamingWorldMap } from "@/components/artist/StreamingWorldMap";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,14 @@ const COLORS = ["var(--brand-cyan)", "var(--brand-blue)", "var(--brand-silver)",
 const fmt = (value: number) => Number(value || 0).toLocaleString();
 
 function ArtistAnalyticsPage() {
+  return (
+    <ArtistDashboardShell>
+      <PlanGate perk="analytics_advanced" title="Advanced analytics"><ArtistAnalyticsContent /></PlanGate>
+    </ArtistDashboardShell>
+  );
+}
+
+function ArtistAnalyticsContent() {
   const [days, setDays] = useState(30);
   const fetchAnalytics = useServerFn(getMyStreamingAnalytics);
   const query = useQuery({ queryKey: ["my-streaming-analytics", days], queryFn: () => fetchAnalytics({ data: { days } }), refetchInterval: 15000, refetchOnWindowFocus: true });
@@ -44,7 +53,7 @@ function ArtistAnalyticsPage() {
   };
 
   return (
-    <ArtistDashboardShell>
+    <>
       <div className="mx-auto w-full max-w-[1600px]">
         <header className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
@@ -103,7 +112,7 @@ function ArtistAnalyticsPage() {
         </div>
         <p className="mt-3 text-center text-[11px] text-muted-foreground">Analytics use recorded Tunevio streams and update as listeners play your music.</p>
       </div>
-    </ArtistDashboardShell>
+    </>
   );
 }
 

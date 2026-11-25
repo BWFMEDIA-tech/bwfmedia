@@ -7326,6 +7326,10 @@ export type Database = {
         Args: { _role?: string; _user_id: string }
         Returns: boolean
       }
+      has_entitlement: {
+        Args: { _perk: string; _user_id: string }
+        Returns: boolean
+      }
       has_label_access: {
         Args: { _label_id: string; _roles: string[]; _user_id: string }
         Returns: boolean
