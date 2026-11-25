@@ -36,13 +36,18 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         sb.from("user_social_links")
           .select("provider, url, handle, sort_order")
           .eq("user_id", id).eq("enabled", true).order("sort_order", { ascending: true }),
-        sb.from("play_tracks")
-          .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
-          .eq("artist_user_id", id)
-          // Only published songs are public; queued/unreleased audio stays private.
-          .in("status", ["playing", "completed"])
-          .order("like_count", { ascending: false })
-          .limit(200),
+        (() => {
+          let q = sb.from("play_tracks")
+            .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
+            .eq("artist_user_id", id);
+          // Songs that played in the arena are public; profile-library
+          // uploads stay "queued" and must show on the artist's profile too.
+          // Queued rows in other streams (arena submission mirrors) stay hidden.
+          q = profileLibraryId
+            ? q.or(`status.in.(playing,completed),and(status.eq.queued,stream_id.eq.${profileLibraryId})`)
+            : q.in("status", ["playing", "completed"]);
+          return q.order("like_count", { ascending: false }).limit(200);
+        })(),
         sb.from("videos")
           .select("id, title, thumbnail_path, external_url, created_at")
           .eq("user_id", id)
