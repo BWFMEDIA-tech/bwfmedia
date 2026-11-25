@@ -103,7 +103,7 @@ function PricingPage() {
             Premium streaming for fans. Pro tools for artists and labels. Cancel anytime.
           </p>
           <div className="mt-5 mx-auto max-w-xl">
-            <p className="text-sm text-muted-foreground">Artist membership is $9.99/month with your payment approval, with no free trial. Other paid plans retain their 30-day trial. Trials are for first-time subscribers. Cancel anytime.</p>
+            <p className="text-sm text-muted-foreground">Every Tunevio plan bills from day one — no free trials. Artist membership is $9.99/month with your payment approval. Cancel anytime.</p>
           </div>
         </div>
 

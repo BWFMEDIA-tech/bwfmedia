@@ -9,10 +9,10 @@ describe("free trial", () => {
     expect(ARTIST_TRIAL_DAYS).toBe(0);
     expect(getPlanTrialDays(planId)).toBe(0);
   });
-  it.each(["listener_premium", "listener_fan_premium", "listener_student", "label_plan"])("preserves %s trial length", (planId) => {
-    expect(getPlanTrialDays(planId)).toBe(30);
+  it.each(["listener_premium", "listener_fan_premium", "listener_student", "label_plan"])("gives %s no free trial", (planId) => {
+    expect(getPlanTrialDays(planId)).toBe(0);
   });
-  it("lasts 30 days", () => expect(FREE_TRIAL_DAYS).toBe(30));
+  it("gives every plan zero trial days", () => expect(FREE_TRIAL_DAYS).toBe(0));
   it("blocks members with no card/subscription", () => expect(hasTrialAccess(null)).toBe(false));
   it("allows trialing members", () => expect(hasTrialAccess({ status: "trialing", current_period_end: future })).toBe(true));
   it("blocks expired trials", () => expect(hasTrialAccess({ status: "trialing", current_period_end: past })).toBe(false));

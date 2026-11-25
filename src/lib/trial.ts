@@ -1,7 +1,7 @@
-export const FREE_TRIAL_DAYS = 30;
+export const FREE_TRIAL_DAYS = 0;
 export const ARTIST_TRIAL_DAYS = 0;
 
-/** Artist memberships use the artist trial; unrelated paid plans retain theirs. */
+/** No plan offers a free trial; every paid plan bills from the first day. */
 export function getPlanTrialDays(planId: string): number {
   return ["artist_pro", "artist_monthly", "bwf_artist_membership_monthly"].includes(planId)
     ? ARTIST_TRIAL_DAYS

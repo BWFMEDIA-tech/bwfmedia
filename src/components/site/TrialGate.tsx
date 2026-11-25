@@ -9,7 +9,7 @@ import { hasTrialAccess } from "@/lib/trial";
 import { useDigitalPurchasesAvailable } from '@/lib/purchase-policy';
 import { ConsumptionNotice } from '@/components/purchases/ConsumptionNotice';
 
-/** Blocks a signed-in member's own profile until they start the 30-day trial (card on file). */
+/** Blocks a signed-in member's own profile until they hold a paid plan (card on file). */
 export function TrialGate({ enabled, children }: { enabled: boolean; children: React.ReactNode }) {
   const purchasesAvailable = useDigitalPurchasesAvailable();
   const auth = useAuth();
@@ -30,8 +30,8 @@ export function TrialGate({ enabled, children }: { enabled: boolean; children: R
     <div className="min-h-[70vh] grid place-items-center px-6 pt-24">
       <div className="max-w-md text-center rounded-2xl border border-primary/40 bg-card p-8">
         <Sparkles className="mx-auto h-8 w-8 text-primary" />
-        <h1 className="mt-4 text-2xl font-black">Start your 30-day free trial</h1>
-        <p className="mt-3 text-sm text-muted-foreground">Add a card to unlock your profile. You won't be charged for 30 days, and you can cancel anytime.</p>
+        <h1 className="mt-4 text-2xl font-black">Choose a Tunevio plan</h1>
+        <p className="mt-3 text-sm text-muted-foreground">Add a card to unlock your profile. Your plan bills monthly from day one, and you can cancel anytime.</p>
         <Link to="/pricing" className="mt-6 inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground">Choose a plan</Link>
       </div>
     </div>
