@@ -7049,6 +7049,10 @@ export type Database = {
         Args: { _choice: string; _match_id: string }
         Returns: string
       }
+      billing_customer_link_allowed: {
+        Args: { _customer: string; _environment: string }
+        Returns: boolean
+      }
       boost_spends_access_check: {
         Args: { _row_user_id: string }
         Returns: boolean
@@ -7378,6 +7382,10 @@ export type Database = {
         Returns: string
       }
       month_bucket: { Args: { _ts: string }; Returns: string }
+      nfc_images_owned: {
+        Args: { _owner: string; _tabs: Json }
+        Returns: boolean
+      }
       prepare_account_deletion: { Args: { _user_id: string }; Returns: Json }
       prepare_confirmed_battle: {
         Args: {
@@ -7511,6 +7519,14 @@ export type Database = {
       }
       start_new_battle_tournament: { Args: never; Returns: string }
       store_can_manage: { Args: { _artist: string }; Returns: boolean }
+      store_image_owned: {
+        Args: { _owner: string; _path: string }
+        Returns: boolean
+      }
+      store_images_owned: {
+        Args: { _owner: string; _paths: string[] }
+        Returns: boolean
+      }
       store_mark_order_paid: {
         Args: {
           _amount: number

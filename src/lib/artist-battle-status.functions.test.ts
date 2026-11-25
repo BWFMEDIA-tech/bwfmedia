@@ -17,6 +17,11 @@ vi.mock("@tanstack/react-start", () => ({
   }),
 }));
 
+vi.mock("@/lib/public-db.server", async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return { createPublicDb: () => supabaseAdmin };
+});
+
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
     from: (table: string) => {
@@ -49,8 +54,10 @@ function result(table: string, ops: string[]) {
     if (ops.includes("maybeSingle")) return { data: fixtures.profile, error: fixtures.profileError };
     return { data: fixtures.opponents, error: fixtures.opponentError };
   }
-  if (table === "battle_challenges") return { data: fixtures.songChallenges, error: fixtures.battleError };
-  if (table === "freestyle_challenges") return { data: fixtures.freestyleChallenges, error: fixtures.battleError };
+  const statusCall = fixtures.calls.find(c => c.table === table && c.operation === "in" && c.args[0] === "status");
+  const statuses = statusCall?.args[1] as string[] | undefined;
+  if (table === "battle_challenges") return { data: fixtures.songChallenges.filter(c => statuses?.includes(String(c['status']))), error: fixtures.battleError };
+  if (table === "freestyle_challenges") return { data: fixtures.freestyleChallenges.filter(c => statuses?.includes(String(c['status']))), error: fixtures.battleError };
   return { data: [], error: null };
 }
 
@@ -108,7 +115,7 @@ describe("artist battle status", () => {
         challenger_id: opponentId,
         challenged_id: accountId,
         genre: "Hip-Hop / Rap",
-        status: "pending",
+        status: "accepted",
         scheduled_at: null,
         created_at: "2026-11-07T18:39:33.000Z",
       },
@@ -117,10 +124,16 @@ describe("artist battle status", () => {
     expect(battles).toHaveLength(1);
     expect(battles[0]).toMatchObject({
       kind: "song",
-      status: "pending",
+      status: "accepted",
       direction: "received",
       opponent: { id: opponentPublicId, name: "Queen Candace", avatar: `https://signed.test/${avatarPath}` },
     });
+  });
+
+  it("never returns pending invitations from either public profile queue", async () => {
+    fixtures.songChallenges = [{ id: "private-song", challenger_id: accountId, challenged_id: opponentId, status: "pending" }];
+    fixtures.freestyleChallenges = [{ id: "private-freestyle", artist_a_id: accountId, artist_b_id: opponentId, status: "pending" }];
+    expect((await load({ data: { id: accountId } })).battles).toEqual([]);
   });
 
   it("marks a freestyle challenge the artist sent as sent and names the opponent", async () => {

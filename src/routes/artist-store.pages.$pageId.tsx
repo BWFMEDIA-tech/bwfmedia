@@ -47,12 +47,7 @@ function Builder() {
     const p: any = q.data?.page;
     if (!p) return;
     setName(p.name); setStatus(p.status); setTabs(p.tabs ?? []); setActive((p.tabs ?? []).length ? 0 : -1);
-    const paths = (p.tabs ?? []).flatMap((t: PageTab) => [t.cover, ...(t.images ?? [])]).filter(Boolean);
-    if (paths.length) supabase.storage.from("store-products").createSignedUrls(paths, 3600).then(({ data }) => {
-      const m: Record<string, string> = {};
-      for (const d of data ?? []) if (d.path && d.signedUrl) m[d.path] = d.signedUrl;
-      setUrls(m);
-    });
+    setUrls(q.data?.imageUrls ?? {});
   }, [q.data]);
 
   if (q.isLoading || !user) return <div className="grid h-[60vh] place-items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
@@ -66,9 +61,10 @@ function Builder() {
   function add(type: TabType) { setTabs((ts) => [...ts, newTab(type)]); setActive(tabs.length); }
 
   async function upload(file: File): Promise<string | null> {
+    if (!user) return null;
     if (!file.type.startsWith("image/") || file.size > 8 * 1024 * 1024) { toast.error("Use an image under 8 MB"); return null; }
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-    const p = `${user!.id}/pages/${crypto.randomUUID()}.${ext}`;
+    const p = `${user.id}/pages/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("store-products").upload(p, file, { contentType: file.type });
     if (error) { toast.error("Upload failed"); return null; }
     setUrls((u) => ({ ...u, [p]: URL.createObjectURL(file) }));

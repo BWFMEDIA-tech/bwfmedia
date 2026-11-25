@@ -1,5 +1,12 @@
 # Roadmap
 
+## Targeted security remediation
+- [x] Secure store image references and signing against cross-owner publication; preserve owner previews and public products/pages.
+- [x] Share verified billing ownership across checkout/portals; protect billing identifiers from direct account writes without changing existing Stripe records.
+- [x] Align public battle reads and invitation privacy across server functions and database policies.
+- [x] 605 tests passed; real temporary artists verified direct photo/billing/invitation denial, authorized owner/admin access and public photo URLs; database checks and quick security scan completed; temporary rows/files removed.
+- [ ] Review refreshed deep security scan when it completes; external scan result pending.
+
 ## App Store preparation
 - [x] Keep the Install Tunevio card fully visible on the artist dashboard: it now clears the phone bottom bar, caps its height with internal scrolling, and sits right of the desktop sidebar; App Store button appears automatically once a live apps.apple.com URL is saved in src/lib/app-store.ts
 - [ ] Save the real App Store listing URL in src/lib/app-store.ts; awaiting the owner's apps.apple.com link (no live listing exists yet)

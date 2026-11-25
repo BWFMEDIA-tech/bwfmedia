@@ -603,10 +603,19 @@ export const dispatchBattleEvent = createServerFn({ method: "POST" })
 export const getBattleRoomState = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    // Battle tables are signed-in-only under RLS, but the battle display is
-    // public for every viewer of the stream; read it on the server.
-    const { supabaseAdmin: sb } = await import("@/integrations/supabase/client.server");
-    const { data: match } = await sb
+    const { createPublicDb } = await import("@/lib/public-db.server");
+    return loadBattleRoomSnapshot(createPublicDb(), data);
+  });
+
+/** Host/participant preparation uses the caller's existing private-match read policy. */
+export const getMyBattleRoomState = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ streamId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => loadBattleRoomSnapshot(context.supabase, data));
+
+async function loadBattleRoomSnapshot(reader: any, data: { streamId: string }) {
+    // Select the match under RLS BEFORE privileged presentation reads.
+    const { data: match, error } = await reader
       .from("battle_matches")
       .select("*")
       .eq("stream_id", data.streamId)
@@ -614,6 +623,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
+    if (error) throw new Error("Battle is unavailable right now.");
     if (!match) {
       return {
         match: null,
@@ -633,6 +643,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
     // selected; the previous anonymous query silently returned no rows and
     // made both discs fall back to the colored vinyl placeholder.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin;
     const trackSb = supabaseAdmin;
     const { data: rounds } = await sb
       .from("battle_rounds")
@@ -671,7 +682,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
     if (!aTrack && match.artist_a_id) needFallback.push({ side: "a", artistId: match.artist_a_id as string });
     if (!bTrack && match.artist_b_id) needFallback.push({ side: "b", artistId: match.artist_b_id as string });
     if (needFallback.length) {
-      const artistIds = needFallback.map((n) => n.artistId!).filter(Boolean);
+      const artistIds = needFallback.flatMap((n) => n.artistId ? [n.artistId] : []);
       const { data: subs } = await trackSb
         .from("play_tracks")
         .select("id, title, cover_url, audio_url, artist_name, artist_user_id, status, created_at, updated_at, battle_match_id, battle_side")
@@ -757,7 +768,7 @@ export const getBattleRoomState = createServerFn({ method: "GET" })
       battleStatus: match.status as string,
       voteTotals,
     };
-  });
+}
 
 /** Queued tracks for a battle's two artists, used by the host control panel to pick which song to play. */
 export const getBattleArtistQueues = createServerFn({ method: "GET" })

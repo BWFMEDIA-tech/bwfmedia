@@ -9,7 +9,7 @@ import { usePlaybackPlaying, setPlaybackPlaying } from "@/lib/playback-store";
 import { SignedImg } from "@/components/ui/signed-img";
 import { createBattleMatch, castBattleVote, updateBattleArtists, agreeBattleGenre } from "@/lib/battles.functions";
 import { BATTLE_GENRES, type BattleGenre } from "@/lib/battle-genres";
-import { getBattleRoomState } from "@/lib/battle-engine.functions";
+import { getBattleRoomState, getMyBattleRoomState } from "@/lib/battle-engine.functions";
 import { validateVoteTotals } from "@/lib/vote-math";
 import { BattleHostControls } from "./BattleHostControls";
 import { RankBadge } from "@/components/rank/RankBadge";
@@ -61,7 +61,9 @@ function BattleArenaLive({
   /** Show the Hype Meter and post-battle Replay panels (Live Arena battle view). */
   showEngagementPanels?: boolean;
 }) {
-  const stateFn = useServerFn(getBattleRoomState);
+  const publicStateFn = useServerFn(getBattleRoomState);
+  const privateStateFn = useServerFn(getMyBattleRoomState);
+  const stateFn = isHost ? privateStateFn : publicStateFn;
   const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [myVote, setMyVote] = useState<"a" | "b" | null>(null);
   const [showCreate, setShowCreate] = useState(false);

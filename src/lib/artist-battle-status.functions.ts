@@ -1,4 +1,4 @@
-// @auth-exempt: public read of non-sensitive battle status (artist names, avatars, genre, status) via the admin client inside the handler.
+// Public confirmed-matchup reads are independently restricted by anonymous database policies.
 import { createServerFn } from "@tanstack/react-start";
 import { avatarObjectPath, publicArtworkPaths } from "@/lib/public-artwork";
 
@@ -31,7 +31,7 @@ type OpponentRow = {
 };
 
 /**
- * Who this artist is currently battling: pending, accepted, scheduled or live
+ * Who this artist is currently battling: accepted, scheduled or live
  * matchups from both the 1v1 song-battle queue and the freestyle queue.
  * Public so any visitor can see it on an artist profile; exposes only names,
  * avatars, genre and status — never raw account ids or private rows.
@@ -43,8 +43,8 @@ export const getArtistBattleStatus = createServerFn({ method: "GET" })
     return { id };
   })
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sb: any = supabaseAdmin;
+    const { createPublicDb } = await import("@/lib/public-db.server");
+    const sb = createPublicDb();
 
     // Directory links use public_id; older links use the account id.
     const profileRes = await sb
@@ -121,6 +121,7 @@ export const getArtistBattleStatus = createServerFn({ method: "GET" })
       .filter((p): p is string => !!p);
     const allowed = await publicArtworkPaths(sb, paths);
     const avatars = new Map<string, string | null>();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await Promise.all(
       [...byId.values()].map(async (r) => {
         const path = r.avatar_url ? avatarObjectPath(r.avatar_url) : null;
@@ -128,7 +129,7 @@ export const getArtistBattleStatus = createServerFn({ method: "GET" })
           avatars.set(r.id, null);
           return;
         }
-        const { data: signed } = await sb.storage.from("avatars").createSignedUrl(path, 3600);
+        const { data: signed } = await supabaseAdmin.storage.from("avatars").createSignedUrl(path, 3600);
         avatars.set(r.id, signed?.signedUrl ?? null);
       }),
     );

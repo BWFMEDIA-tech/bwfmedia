@@ -33,33 +33,7 @@ const PortalSchema = z.object({
   environment: z.enum(["sandbox", "live"]) as z.ZodType<StripeEnv>,
 });
 
-async function resolveCustomerId(
-  stripe: ReturnType<typeof createStripeClient>,
-  email: string | undefined,
-  userId: string,
-): Promise<string> {
-  if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new Error("Invalid userId");
-  const found = await stripe.customers.search({
-    query: `metadata['userId']:'${userId}'`,
-    limit: 1,
-  });
-  if (found.data.length) return found.data[0].id;
-  if (email) {
-    const ex = await stripe.customers.list({ email, limit: 1 });
-    if (ex.data.length) {
-      const c = ex.data[0];
-      if (c.metadata?.userId !== userId) {
-        await stripe.customers.update(c.id, { metadata: { ...c.metadata, userId } });
-      }
-      return c.id;
-    }
-  }
-  const created = await stripe.customers.create({
-    ...(email && { email }),
-    metadata: { userId },
-  });
-  return created.id;
-}
+
 
 export const createTunevioCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -75,9 +49,8 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
       if (!prices.data.length) throw new Error(`Price not configured: ${data.planId}`);
       const price = prices.data[0];
 
-      const { data: u } = await context.supabase.auth.getUser();
-      const email = u.user?.email?.toLowerCase();
-      const customerId = await resolveCustomerId(stripe, email, context.userId);
+      const { resolveBillingCustomer } = await import('@/lib/billing-ownership.server');
+      const customerId = await resolveBillingCustomer(stripe, context, data.environment);
 
       // One free trial per member; fail closed if subscription history cannot be read.
       const { count: priorSubs, error: historyError } = await context.supabase
@@ -133,6 +106,8 @@ export const createTunevioPortal = createServerFn({ method: "POST" })
         return { error: "No subscription found" };
       }
       const stripe = createStripeClient(data.environment);
+      const { verifyBillingCustomer } = await import('@/lib/billing-ownership.server');
+      await verifyBillingCustomer(stripe, context, sub.stripe_customer_id, data.environment);
       const portal = await stripe.billingPortal.sessions.create({
         customer: sub.stripe_customer_id as string,
         return_url: data.returnUrl,

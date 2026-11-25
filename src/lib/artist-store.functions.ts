@@ -6,6 +6,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PRODUCT_TYPES, FULFILLMENT_STATUSES, SHIPPING_REGIONS, DEFAULT_ARTIST_BPS, categoryOf, checkPurchasable, computeShipping, isSafeNfcPath } from "@/lib/artist-store";
 import { validateReturnUrl } from "@/lib/validate-return-url";
 
+import { isOwnedStoreImage, PRIVATE_STORE_IMAGE_TTL, PUBLIC_STORE_IMAGE_TTL } from "@/lib/store-image-path";
+
 const BUCKET = "store-products";
 const PRODUCT_COLS =
   "id, user_id, release_id, title, description, product_type, price_cents, currency, inventory, shipping_info, image_urls, status, is_featured, created_at, review_status, min_quantity, made_to_order";
@@ -25,18 +27,19 @@ function publicClient() {
   });
 }
 
-async function signImages<T extends { image_urls: string[] | null }>(_client: any, rows: T[]): Promise<(T & { images: string[] })[]> {
-  // Rows are already limited to published products; signing happens server-side
-  // so the private bucket needs no public read rule.
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const client = supabaseAdmin as any;
-  const paths = Array.from(new Set(rows.flatMap((r) => r.image_urls ?? [])));
+async function signImages<T extends { user_id: string; image_urls: string[] | null; status: string; review_status: string }>(client: any, rows: T[], ownerId?: string): Promise<(T & { images: string[] })[]> {
+  const allowedRows = rows.filter(r => ownerId ? r.user_id === ownerId : r.status === "published" && r.review_status === "approved");
+  const safeRows = allowedRows.map(r => ({ ...r, image_urls: (r.image_urls ?? []).filter(p => isOwnedStoreImage(p, r.user_id)) }));
+  // Owner previews use their authenticated Storage client; only validated public rows use privileged signing.
+  const signer = ownerId ? client : (await import("@/integrations/supabase/client.server")).supabaseAdmin;
+  const paths = Array.from(new Set(safeRows.flatMap(r => r.image_urls)));
   const map = new Map<string, string>();
   if (paths.length) {
-    const { data } = await client.storage.from(BUCKET).createSignedUrls(paths, 60 * 60 * 6);
+    const { data, error } = await signer.storage.from(BUCKET).createSignedUrls(paths, ownerId ? PRIVATE_STORE_IMAGE_TTL : PUBLIC_STORE_IMAGE_TTL);
+    if (error) throw new Error("Store photos are unavailable right now.");
     for (const d of data ?? []) if (d.signedUrl && d.path) map.set(d.path, d.signedUrl);
   }
-  return rows.map((r) => ({ ...r, images: (r.image_urls ?? []).map((p) => map.get(p)).filter(Boolean) as string[] }));
+  return safeRows.map(r => ({ ...r, images: r.image_urls.map(p => map.get(p)).filter((url): url is string => !!url) }));
 }
 
 async function attachArtists(client: any, rows: any[]) {
@@ -54,7 +57,7 @@ export const listStoreProducts = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const c = publicClient();
-    let q = c.from("store_products").select(PRODUCT_COLS).eq("status", "published").order("is_featured", { ascending: false }).order("created_at", { ascending: false }).limit(200);
+    let q = c.from("store_products").select(PRODUCT_COLS).eq("status", "published").eq("review_status", "approved").order("is_featured", { ascending: false }).order("created_at", { ascending: false }).limit(200);
     if (data.artistId) q = q.eq("user_id", data.artistId);
     const { data: rows, error } = await q;
     if (error) return { products: [], error: "Store is unavailable right now." };
@@ -65,7 +68,7 @@ export const getStoreProduct = createServerFn({ method: "GET" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const c = publicClient();
-    const { data: row } = await c.from("store_products").select(PRODUCT_COLS).eq("id", data.id).eq("status", "published").maybeSingle();
+    const { data: row } = await c.from("store_products").select(PRODUCT_COLS).eq("id", data.id).eq("status", "published").eq("review_status", "approved").maybeSingle();
     if (!row) return { product: null };
     const [signed] = await attachArtists(c, await signImages(c, [row]));
     let release: { id: string; title: string } | null = null;
@@ -99,7 +102,7 @@ export const getMyStore = createServerFn({ method: "GET" })
       allOrders = a ?? [];
     }
     return {
-      products: await signImages(sb, products ?? []),
+      products: await signImages(sb, products ?? [], context.userId),
       nfcLinks: links ?? [],
       orders: orders ?? [],
       allOrders,
@@ -133,7 +136,7 @@ export const saveStoreProduct = createServerFn({ method: "POST" })
   .inputValidator((d) => productSchema.parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
-    for (const p of data.image_urls) if (!p.startsWith(`${context.userId}/`)) throw new Error("Invalid image");
+    for (const p of data.image_urls) if (!isOwnedStoreImage(p, context.userId)) throw new Error("Invalid image");
     if (data.status === "published" && data.price_cents < 50) throw new Error("Set a price of at least $0.50 before publishing.");
     if (data.release_id) {
       const { data: rel } = await sb.from("distribution_releases").select("id").eq("id", data.release_id).eq("user_id", context.userId).maybeSingle();

@@ -1,0 +1,107 @@
+import { PGlite } from '@electric-sql/pglite';
+import { readFileSync } from 'node:fs';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+const db = new PGlite();
+const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
+async function actor(n: number | null, role = 'authenticated') {
+  await db.exec('RESET ROLE');
+  await db.query("SELECT set_config('test.uid',$1,false),set_config('test.role',$2,false)",[n ? id(n) : '',role]);
+  await db.exec(`SET ROLE ${role}`);
+}
+beforeAll(async () => {
+  await db.exec(`CREATE ROLE authenticated; CREATE ROLE anon; CREATE ROLE service_role;
+    CREATE SCHEMA auth; CREATE SCHEMA storage;
+    GRANT USAGE ON SCHEMA auth,storage TO authenticated,anon,service_role;
+    CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT nullif(current_setting('test.uid',true),'')::uuid $$;
+    CREATE FUNCTION auth.role() RETURNS text LANGUAGE sql AS $$ SELECT current_setting('test.role',true) $$;
+    CREATE FUNCTION public.has_role(uuid,text) RETURNS boolean LANGUAGE sql AS $$ SELECT ($1='${id(3)}' AND $2='admin') OR ($1='${id(4)}' AND $2='host') $$;
+    CREATE TABLE storage.objects(name text,bucket_id text);
+    GRANT SELECT,INSERT ON storage.objects TO authenticated,anon;
+    ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY owner_read ON storage.objects FOR SELECT TO authenticated USING(bucket_id='store-products' AND split_part(name,'/',1)=auth.uid()::text);
+    CREATE POLICY owner_upload ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='store-products' AND split_part(name,'/',1)=auth.uid()::text);
+    CREATE TABLE store_products(id uuid PRIMARY KEY,user_id uuid,image_urls text[],status text,review_status text);
+    CREATE TABLE nfc_pages(id uuid PRIMARY KEY,user_id uuid,tabs jsonb,status text);
+    CREATE TABLE user_accounts(user_id uuid PRIMARY KEY,stripe_customer_id text,stripe_connect_account_id text,subscription_plan text,subscription_status text,location text);
+    CREATE TABLE subscriptions(id uuid PRIMARY KEY,user_id uuid,stripe_customer_id text,environment text,status text);
+    CREATE TABLE payout_accounts(id uuid PRIMARY KEY,user_id uuid,stripe_account_id text);
+    CREATE TABLE battle_challenges(id uuid PRIMARY KEY,challenger_id uuid,challenged_id uuid,status text);
+    CREATE TABLE freestyle_challenges(id uuid PRIMARY KEY,artist_a_id uuid,artist_b_id uuid,status text);
+    CREATE TABLE battle_matches(id uuid PRIMARY KEY,host_id uuid,artist_a_id uuid,artist_b_id uuid,status text);
+    ALTER TABLE battle_matches ENABLE ROW LEVEL SECURITY;
+    GRANT SELECT ON battle_matches TO authenticated;
+    CREATE POLICY match_owner ON battle_matches FOR SELECT TO authenticated USING(status IN ('live','completed') OR auth.uid() IN(host_id,artist_a_id,artist_b_id) OR has_role(auth.uid(),'admin'));
+    INSERT INTO battle_matches VALUES('${id(601)}','${id(4)}','${id(2)}','${id(5)}','pending'),('${id(602)}','${id(4)}','${id(2)}','${id(5)}','live');
+    GRANT SELECT,INSERT,UPDATE ON store_products,nfc_pages,user_accounts TO authenticated;
+    GRANT SELECT ON subscriptions,payout_accounts TO authenticated;
+    GRANT SELECT,UPDATE ON battle_challenges TO authenticated;
+    GRANT SELECT ON freestyle_challenges TO authenticated;
+    GRANT SELECT ON store_products,nfc_pages TO anon;
+    ALTER TABLE store_products ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE nfc_pages ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE user_accounts ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE payout_accounts ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY store_owner ON store_products FOR ALL TO authenticated USING(user_id=auth.uid() OR has_role(auth.uid(),'admin')) WITH CHECK(user_id=auth.uid() OR has_role(auth.uid(),'admin'));
+    CREATE POLICY page_owner ON nfc_pages FOR ALL TO authenticated USING(user_id=auth.uid()) WITH CHECK(user_id=auth.uid());
+    CREATE POLICY account_owner ON user_accounts FOR ALL TO authenticated USING(user_id=auth.uid()) WITH CHECK(user_id=auth.uid());
+    CREATE POLICY sub_owner ON subscriptions FOR SELECT TO authenticated USING(user_id=auth.uid());
+    CREATE POLICY payout_owner ON payout_accounts FOR SELECT TO authenticated USING(user_id=auth.uid() OR has_role(auth.uid(),'admin'));
+    INSERT INTO storage.objects VALUES('${id(1)}/own.jpg','store-products'),('${id(2)}/private.jpg','store-products');
+    INSERT INTO store_products VALUES('${id(101)}','${id(1)}',ARRAY['${id(1)}/own.jpg'],'draft','draft'),('${id(102)}','${id(2)}',ARRAY['${id(2)}/private.jpg'],'draft','draft'),('${id(103)}','${id(2)}',ARRAY['${id(2)}/public.jpg'],'published','approved'),('${id(104)}','${id(2)}',ARRAY['${id(2)}/review.jpg'],'published','pending');
+    INSERT INTO nfc_pages VALUES('${id(201)}','${id(2)}','[{"cover":"${id(2)}/private.jpg"}]','draft'),('${id(202)}','${id(2)}','[{"cover":"${id(2)}/public.jpg"}]','published');
+    INSERT INTO user_accounts(user_id,stripe_customer_id,stripe_connect_account_id) VALUES('${id(1)}','cus_a','acct_a'),('${id(2)}','cus_b','acct_b');
+    INSERT INTO subscriptions VALUES('${id(301)}','${id(2)}','cus_b','live','active');
+    INSERT INTO payout_accounts VALUES('${id(302)}','${id(2)}','acct_b');
+    INSERT INTO battle_challenges VALUES('${id(401)}','${id(2)}','${id(5)}','pending'),('${id(402)}','${id(2)}','${id(5)}','accepted'),('${id(403)}','${id(2)}','${id(5)}','scheduled'),('${id(404)}','${id(2)}','${id(5)}','live');
+    INSERT INTO freestyle_challenges VALUES('${id(501)}','${id(2)}','${id(5)}','pending'),('${id(502)}','${id(2)}','${id(5)}','accepted');`);
+  await db.exec(readFileSync('drizzle/migrations/0080_secure_store_billing_and_matchup_ownership.sql','utf8'));
+  await db.exec(readFileSync('drizzle/migrations/0081_public_battle_snapshot_visibility.sql','utf8'));
+},30000);
+afterAll(() => db.close());
+describe.sequential('store photo database authorization', () => {
+  it('Artist A cannot read Artist B private storage', async () => {
+    await actor(1); expect((await db.query('SELECT name FROM storage.objects')).rows).toEqual([{name:`${id(1)}/own.jpg`}]);
+  });
+  it('Artist B can read their own private storage', async () => {
+    await actor(2); expect((await db.query('SELECT name FROM storage.objects')).rows).toEqual([{name:`${id(2)}/private.jpg`}]);
+  });
+  it('anonymous users cannot read private objects', async () => { await actor(null,'anon'); expect((await db.query('SELECT * FROM storage.objects')).rows).toEqual([]); });
+  it('admins retain authorized private photo reads', async () => { await actor(3); expect((await db.query('SELECT * FROM storage.objects')).rows).toHaveLength(2); });
+  it('cannot upload into another owner folder', async () => { await actor(1); await expect(db.query("INSERT INTO storage.objects VALUES($1,'store-products')",[`${id(2)}/forged.jpg`])).rejects.toThrow('row-level security'); });
+  it('blocks foreign image references through direct product inserts', async () => { await actor(1); await expect(db.query("INSERT INTO store_products VALUES($1,$2,ARRAY[$3],'published','draft')",[id(110),id(1),`${id(2)}/private.jpg`])).rejects.toThrow('Invalid store image ownership'); });
+  it('blocks foreign image references through product updates', async () => { await actor(1); await expect(db.query('UPDATE store_products SET image_urls=ARRAY[$1] WHERE id=$2',[`${id(2)}/private.jpg`,id(101)])).rejects.toThrow('Invalid store image ownership'); });
+  it('blocks forged NFC page image references', async () => { await actor(1); await expect(db.query("INSERT INTO nfc_pages VALUES($1,$2,$3,'published')",[id(210),id(1),JSON.stringify([{cover:`${id(2)}/private.jpg`}])])).rejects.toThrow('Invalid store image ownership'); });
+  it('blocks traversal through direct requests', async () => { await actor(1); await expect(db.query('UPDATE store_products SET image_urls=ARRAY[$1] WHERE id=$2',[`${id(1)}/../${id(2)}/private.jpg`,id(101)])).rejects.toThrow('Invalid store image ownership'); });
+  it('public catalog shows only approved published products', async () => { await actor(null,'anon'); expect((await db.query('SELECT id FROM store_products')).rows).toEqual([{id:id(103)}]); });
+  it('public NFC reads exclude draft pages', async () => { await actor(null,'anon'); expect((await db.query('SELECT id FROM nfc_pages')).rows).toEqual([{id:id(202)}]); });
+  it('owner can still read a draft product and edit their own references', async () => { await actor(1); expect((await db.query('UPDATE store_products SET image_urls=ARRAY[$1] WHERE id=$2 RETURNING id',[`${id(1)}/own.jpg`,id(101)])).rows).toEqual([{id:id(101)}]); });
+});
+describe.sequential('billing database authorization', () => {
+  it('Artist A cannot read Artist B billing profile', async () => { await actor(1); expect((await db.query('SELECT user_id FROM user_accounts')).rows).toEqual([{user_id:id(1)}]); });
+  it('Artist A cannot modify Artist B billing profile', async () => { await actor(1); expect((await db.query('UPDATE user_accounts SET location=$1 WHERE user_id=$2 RETURNING user_id',['forged',id(2)])).rows).toEqual([]); });
+  it('cannot claim another customer in own account settings', async () => { await actor(1); await expect(db.query("UPDATE user_accounts SET stripe_customer_id='cus_b' WHERE user_id=$1",[id(1)])).rejects.toThrow('Billing fields are managed'); });
+  it('cannot claim another Connect account', async () => { await actor(1); await expect(db.query("UPDATE user_accounts SET stripe_connect_account_id='acct_b' WHERE user_id=$1",[id(1)])).rejects.toThrow('Billing fields are managed'); });
+  it('cannot create an account with a claimed customer', async () => { await actor(6); await expect(db.query("INSERT INTO user_accounts(user_id,stripe_customer_id) VALUES($1,'cus_b')",[id(6)])).rejects.toThrow('Billing fields are managed'); });
+  it('owner retains normal settings editing', async () => { await actor(1); expect((await db.query("UPDATE user_accounts SET location='Chicago' WHERE user_id=$1 RETURNING location",[id(1)])).rows).toEqual([{location:'Chicago'}]); });
+  it('rejects a customer mapping hidden by RLS from Artist A', async () => { await actor(1); expect((await db.query('SELECT billing_customer_link_allowed($1,$2) AS allowed',['cus_b','live'])).rows).toEqual([{allowed:false}]); });
+  it('allows Artist B trusted customer mapping', async () => { await actor(2); expect((await db.query('SELECT billing_customer_link_allowed($1,$2) AS allowed',['cus_b','live'])).rows).toEqual([{allowed:true}]); });
+  it('preserves existing subscription ownership even on privileged updates', async () => { await actor(null,'service_role'); await db.exec('RESET ROLE'); await expect(db.query('UPDATE subscriptions SET user_id=$1 WHERE id=$2',[id(1),id(301)])).rejects.toThrow('Billing ownership cannot be reassigned'); });
+  it('preserves existing payout ownership', async () => { await actor(null,'service_role'); await db.exec('RESET ROLE'); await expect(db.query('UPDATE payout_accounts SET user_id=$1 WHERE id=$2',[id(1),id(302)])).rejects.toThrow('Billing ownership cannot be reassigned'); });
+  it('denies anonymous billing RPC requests', async () => { await actor(null,'anon'); await expect(db.query('SELECT billing_customer_link_allowed($1,$2)',['cus_b','live'])).rejects.toThrow('permission denied'); });
+});
+describe.sequential('battle invitation database authorization', () => {
+  it('anonymous room snapshot excludes pending matches', async () => { await actor(null,'anon'); expect((await db.query('SELECT id FROM battle_matches')).rows).toEqual([{id:id(602)}]); });
+  it('host retains pending match setup', async () => { await actor(4); expect((await db.query('SELECT id FROM battle_matches WHERE id=$1',[id(601)])).rows).toHaveLength(1); });
+  it('unrelated caller cannot identify private artists through vote helper', async () => { await actor(1); expect((await db.query("SELECT battle_vote_target_artist($1,'a') AS artist",[id(601)])).rows).toEqual([{artist:null}]); });
+  it('anonymous vote helper excludes private artists', async () => { await actor(null,'anon'); expect((await db.query("SELECT battle_vote_target_artist($1,'a') AS artist",[id(601)])).rows).toEqual([{artist:null}]); });
+  it('public vote helper preserves live artist targeting', async () => { await actor(null,'anon'); expect((await db.query("SELECT battle_vote_target_artist($1,'a') AS artist",[id(602)])).rows).toEqual([{artist:id(2)}]); });
+  it('Artist A cannot access Artist B private song invitation by id', async () => { await actor(1); expect((await db.query('SELECT id FROM battle_challenges WHERE id=$1',[id(401)])).rows).toEqual([]); });
+  it('Artist A cannot access Artist B private freestyle invitation by id', async () => { await actor(1); expect((await db.query('SELECT id FROM freestyle_challenges WHERE id=$1',[id(501)])).rows).toEqual([]); });
+  it('both participants can read their own pending invitations', async () => { for (const n of [2,5]) { await actor(n); expect((await db.query('SELECT id FROM battle_challenges WHERE id=$1',[id(401)])).rows).toHaveLength(1); expect((await db.query('SELECT id FROM freestyle_challenges WHERE id=$1',[id(501)])).rows).toHaveLength(1); } });
+  it('admins retain private invitation review', async () => { await actor(3); expect((await db.query("SELECT id FROM battle_challenges WHERE status='pending'")).rows).toHaveLength(1); expect((await db.query("SELECT id FROM freestyle_challenges WHERE status='pending'")).rows).toHaveLength(1); });
+  it('unrelated hosts cannot read pending invitations', async () => { await actor(4); expect((await db.query("SELECT id FROM battle_challenges WHERE status='pending'")).rows).toEqual([]); expect((await db.query("SELECT id FROM freestyle_challenges WHERE status='pending'")).rows).toEqual([]); });
+  it('anonymous visitors see confirmed song matchups but not invitations', async () => { await actor(null,'anon'); expect((await db.query('SELECT status FROM battle_challenges ORDER BY status')).rows).toEqual([{status:'accepted'},{status:'live'},{status:'scheduled'}]); });
+  it('anonymous visitors see only confirmed freestyle matchups', async () => { await actor(null,'anon'); expect((await db.query('SELECT status FROM freestyle_challenges')).rows).toEqual([{status:'accepted'}]); });
+});

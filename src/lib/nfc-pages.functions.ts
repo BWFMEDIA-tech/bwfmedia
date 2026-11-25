@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { checkTagQuantity, uniqueIds, type PageTab } from "@/lib/nfc-pages";
 import { validateReturnUrl } from "@/lib/validate-return-url";
+import { isOwnedStoreImage, PRIVATE_STORE_IMAGE_TTL, PUBLIC_STORE_IMAGE_TTL } from "@/lib/store-image-path";
 
 const BUCKET = "store-products";
 const path = z.string().max(300).regex(/^[0-9a-f-]{36}\/[A-Za-z0-9/_.-]+$/);
@@ -22,7 +23,7 @@ const tabSchema = z.object({
 });
 
 function ownedPaths(tabs: PageTab[], userId: string) {
-  return tabs.flatMap((t) => [t.cover, ...(t.images ?? [])]).filter((p): p is string => !!p && p.startsWith(`${userId}/`));
+  return tabs.flatMap((t) => [t.cover, ...(t.images ?? [])]).filter((p): p is string => isOwnedStoreImage(p, userId));
 }
 
 // ---------- Owner ----------
@@ -50,7 +51,14 @@ export const getMyPage = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const { data: page } = await sb.from("nfc_pages").select("id, name, code, status, tabs").eq("id", data.id).eq("user_id", context.userId).maybeSingle();
-    if (!page) return { page: null, tracks: [], videos: [] };
+    if (!page) return { page: null, tracks: [], videos: [], imageUrls: {} as Record<string, string> };
+    const imageUrls: Record<string, string> = {};
+    const paths = [...new Set(ownedPaths(page.tabs ?? [], context.userId))];
+    if (paths.length) {
+      const { data: signed, error } = await sb.storage.from(BUCKET).createSignedUrls(paths, PRIVATE_STORE_IMAGE_TTL);
+      if (error) throw new Error("Page photos are unavailable right now.");
+      for (const image of signed ?? []) if (image.path && image.signedUrl) imageUrls[image.path] = image.signedUrl;
+    }
     const [{ data: tracks }, { data: videos }] = await Promise.all([
       sb.from("play_tracks").select("id, title, cover_url, audio_url").eq("artist_user_id", context.userId).not("audio_url", "is", null).order("created_at", { ascending: false }).limit(200),
       sb.from("videos").select("id, title").eq("user_id", context.userId).order("created_at", { ascending: false }).limit(100),
@@ -58,7 +66,7 @@ export const getMyPage = createServerFn({ method: "GET" })
     // Same song uploaded twice shows once.
     const seen = new Set<string>();
     const uniqueTracks = (tracks ?? []).filter((t: any) => { const k = String(t.title).trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
-    return { page, tracks: uniqueTracks, videos: videos ?? [] };
+    return { page, tracks: uniqueTracks, videos: videos ?? [], imageUrls };
   });
 
 export const savePage = createServerFn({ method: "POST" })
@@ -69,7 +77,7 @@ export const savePage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const tabs = data.tabs.map((t) => ({ ...t, trackIds: t.trackIds ? uniqueIds(t.trackIds) : undefined }));
-    for (const p of tabs.flatMap((t) => [t.cover, ...(t.images ?? [])])) if (p && !p.startsWith(`${context.userId}/`)) throw new Error("Invalid image");
+    for (const p of tabs.flatMap((t) => [t.cover, ...(t.images ?? [])])) if (p && !isOwnedStoreImage(p, context.userId)) throw new Error("Invalid image");
     const ids = uniqueIds(tabs.flatMap((t) => t.trackIds ?? []));
     if (ids.length) {
       const { data: own } = await sb.from("play_tracks").select("id").eq("artist_user_id", context.userId).in("id", ids);
@@ -98,15 +106,17 @@ export const deletePage = createServerFn({ method: "POST" })
 export const getPublicPage = createServerFn({ method: "GET" })
   .inputValidator((d: { code: string }) => z.object({ code: z.string().regex(/^[a-z0-9]{6,32}$/) }).parse(d))
   .handler(async ({ data }) => {
+    const { createPublicDb } = await import("@/lib/public-db.server");
+    const publicDb = createPublicDb();
+    const { data: page } = await publicDb.from("nfc_pages").select("id, user_id, name, tabs").eq("code", data.code).eq("status", "published").maybeSingle();
+    if (!page) return { page: null };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
-    const { data: page } = await admin.from("nfc_pages").select("id, user_id, name, tabs").eq("code", data.code).eq("status", "published").maybeSingle();
-    if (!page) return { page: null };
     const tabs = (page.tabs ?? []) as PageTab[];
     const paths = ownedPaths(tabs, page.user_id);
     const signed = new Map<string, string>();
     if (paths.length) {
-      const { data: s } = await admin.storage.from(BUCKET).createSignedUrls(paths, 60 * 60 * 6);
+      const { data: s } = await admin.storage.from(BUCKET).createSignedUrls(paths, PUBLIC_STORE_IMAGE_TTL);
       for (const r of s ?? []) if (r.signedUrl && r.path) signed.set(r.path, r.signedUrl);
     }
     const trackIds = uniqueIds(tabs.flatMap((t) => t.trackIds ?? []));
