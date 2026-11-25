@@ -22,7 +22,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
     try {
       const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({ lookup_keys: ["play_boost_2pack"], limit: 1 });
-      if (!prices.data.length) throw new Error("Boost price not configured");
+      if (!prices?.data?.length) throw new Error("Boost price not configured");
       const price = prices.data[0];
 
       const { resolveBillingCustomer } = await import('@/lib/billing-ownership.server');
@@ -56,7 +56,7 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
       const prices = await stripe.prices.list({
         lookup_keys: ["bwf_artist_membership_monthly"], limit: 1,
       });
-      if (!prices.data.length) throw new Error("Membership price not configured");
+      if (!prices?.data?.length) throw new Error("Membership price not configured");
       const price = prices.data[0];
 
       const { resolveBillingCustomer } = await import('@/lib/billing-ownership.server');

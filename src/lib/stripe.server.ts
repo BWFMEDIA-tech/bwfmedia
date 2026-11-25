@@ -27,6 +27,13 @@ export function getConnectionApiKey(env: StripeEnv): string {
 
 export function createStripeClient(env: StripeEnv): Stripe {
   const connectionApiKey = getConnectionApiKey(env);
+  // Real Stripe keys (sk_/rk_) talk to Stripe directly; the managed gateway does not know them.
+  if (/^(sk|rk)_(live|test)_/.test(connectionApiKey)) {
+    return new Stripe(connectionApiKey, {
+      apiVersion: '2026-03-25.dahlia',
+      httpClient: Stripe.createFetchHttpClient(),
+    });
+  }
   const lovableApiKey = getEnv('LOVABLE_API_KEY');
 
   return new Stripe(connectionApiKey, {

@@ -49,7 +49,7 @@ export const createArtistTrialCheckout = createServerFn({ method: "POST" })
       const stripe = createStripeClient(data.environment);
 
       const prices = await stripe.prices.list({ lookup_keys: ["artist_monthly"] });
-      if (!prices.data.length) throw new Error("Artist membership price not found");
+      if (!prices?.data?.length) throw new Error("Artist membership price not found");
       const stripePrice = prices.data[0];
 
       const { resolveBillingCustomer } = await import('@/lib/billing-ownership.server');

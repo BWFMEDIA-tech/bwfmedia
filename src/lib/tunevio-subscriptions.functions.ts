@@ -46,7 +46,7 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
       }
       const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({ lookup_keys: [data.planId], limit: 1 });
-      if (!prices.data.length) throw new Error(`Price not configured: ${data.planId}`);
+      if (!prices?.data?.length) throw new Error(`Price not configured: ${data.planId}`);
       const price = prices.data[0];
 
       const { resolveBillingCustomer } = await import('@/lib/billing-ownership.server');
