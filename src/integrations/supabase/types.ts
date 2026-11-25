@@ -7345,6 +7345,10 @@ export type Database = {
         Args: { _track_id: string }
         Returns: number
       }
+      is_current_stream_moderator: {
+        Args: { _stream_id: string }
+        Returns: boolean
+      }
       is_stream_host: {
         Args: { _stream_id: string; _user_id: string }
         Returns: boolean
