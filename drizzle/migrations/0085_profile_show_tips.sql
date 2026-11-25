@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS show_tips boolean NOT NULL DEFAULT false;

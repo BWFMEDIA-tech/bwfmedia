@@ -60,6 +60,7 @@ function ProfileSettingsPage() {
   const [socials, setSocials] = useState<SocialLink[]>([]);
   const [brandName, setBrandName] = useState("");
   const [brandAvatarUrl, setBrandAvatarUrl] = useState("");
+  const [showTips, setShowTips] = useState(false);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
@@ -134,7 +135,7 @@ function ProfileSettingsPage() {
     (async () => {
       const uid = user.id;
       const [profileRes, accountRes, socialRes, msgRes] = await Promise.all([
-        supabase.from("profiles").select("display_name, stage_name, genre, avatar_url, bio, banner_url, username, genres, member_since, brand_name, brand_avatar_url").eq("id", uid).maybeSingle(),
+        supabase.from("profiles").select("display_name, stage_name, genre, avatar_url, bio, banner_url, username, genres, member_since, brand_name, brand_avatar_url, show_tips").eq("id", uid).maybeSingle(),
         supabase.from("user_accounts").select("location").eq("user_id", uid).maybeSingle(),
         supabase.from("user_social_links").select("id, provider, handle, url, enabled").eq("user_id", uid),
         supabase.from("stream_messages").select("id", { count: "exact", head: true }).eq("user_id", uid),
@@ -164,6 +165,7 @@ function ProfileSettingsPage() {
       setMemberSince((p as any)?.member_since ?? "");
       setBrandName((p as any)?.brand_name ?? "");
       setBrandAvatarUrl((p as any)?.brand_avatar_url ?? "");
+      setShowTips(!!(p as any)?.show_tips);
       const existing = (ls ?? []) as SocialLink[];
       const filled = SOCIAL_PROVIDERS.map((sp) => existing.find((e) => e.provider === sp.key) ?? { provider: sp.key, handle: "", url: "", enabled: false });
       setSocials(filled);
@@ -351,6 +353,18 @@ function ProfileSettingsPage() {
               </div>
             </div>
           )}
+        </Section>
+
+        <Section title="Profile Stats" icon={<Sparkles className="h-4 w-4 text-primary" />}>
+          <label className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-3">
+            <span className="text-sm">Show tips received on my profile</span>
+            <Switch aria-label="Show tips received" checked={showTips} onCheckedChange={async (v) => {
+              if (!user) return;
+              setShowTips(v);
+              const { error } = await supabase.from("profiles").update({ show_tips: v }).eq("id", user.id);
+              if (error) { setShowTips(!v); toast.error("Couldn't update setting"); } else toast.success(v ? "Tips now visible" : "Tips hidden");
+            }} />
+          </label>
         </Section>
 
         <Section title="Links & Socials" icon={<Share2 className="h-4 w-4 text-primary" />}>

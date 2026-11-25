@@ -452,7 +452,7 @@ function AboutBlock({ name, bio }: { name: string; bio: string | null }) {
   );
 }
 
-function StatsRow({ stats, title }: { stats: { songs: number; videos: number; likes: number; tipsCents: number; battleWins: number; currentStreak: number; bestStreak: number }; title: { key: string; label: string; minWins: number; color: string } | null }) {
+function StatsRow({ stats, title }: { stats: { songs: number; videos: number; likes: number; tipsCents: number; showTips?: boolean; battleWins: number; currentStreak: number; bestStreak: number }; title: { key: string; label: string; minWins: number; color: string } | null }) {
   const fmt = (n: number) => {
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
     if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
@@ -462,10 +462,8 @@ function StatsRow({ stats, title }: { stats: { songs: number; videos: number; li
     ? "$" + (stats.tipsCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })
     : "$0";
   const items = [
-    { icon: ListMusic,  label: "Songs Uploaded",  value: fmt(stats.songs) },
-    { icon: VideoIcon,  label: "Videos",          value: fmt(stats.videos) },
     { icon: ThumbsUp,   label: "Likes Received",  value: fmt(stats.likes) },
-    { icon: Dollar,     label: "Tips Received",   value: tips },
+    ...(stats.showTips ? [{ icon: Dollar, label: "Tips Received", value: tips }] : []),
     { icon: Trophy,     label: "Battle Wins",     value: fmt(stats.battleWins) },
     { icon: Flame,      label: "Win Streak",      value: fmt(stats.currentStreak) },
   ];
@@ -495,7 +493,7 @@ function StatsRow({ stats, title }: { stats: { songs: number; videos: number; li
           ))}
         </div>
       )}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {items.map((s) => (
           <div key={s.label} className="flex items-center gap-3">
             <s.icon className="h-4 w-4 shrink-0" style={{ color: RED }} />

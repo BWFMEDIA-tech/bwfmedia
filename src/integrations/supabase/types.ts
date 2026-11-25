@@ -4270,6 +4270,7 @@ export type Database = {
           id: string
           member_since: string | null
           public_id: string
+          show_tips: boolean
           stage_name: string | null
           updated_at: string
           username: string | null
@@ -4289,6 +4290,7 @@ export type Database = {
           id: string
           member_since?: string | null
           public_id?: string
+          show_tips?: boolean
           stage_name?: string | null
           updated_at?: string
           username?: string | null
@@ -4308,6 +4310,7 @@ export type Database = {
           id?: string
           member_since?: string | null
           public_id?: string
+          show_tips?: boolean
           stage_name?: string | null
           updated_at?: string
           username?: string | null

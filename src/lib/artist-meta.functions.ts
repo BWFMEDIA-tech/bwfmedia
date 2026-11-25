@@ -19,7 +19,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
     // Directory links use public_id; older links use the account id.
     // Resolve either before querying account-owned music, live rooms, and stats.
     const profileRes = await sb.from("profiles")
-      .select("id, display_name, stage_name, avatar_url, banner_url, bio, genre, genres, member_since, created_at")
+      .select("id, display_name, stage_name, avatar_url, banner_url, bio, genre, genres, member_since, created_at, show_tips")
       .or(`id.eq.${data.id},public_id.eq.${data.id}`).maybeSingle();
     if (profileRes.error) throw new Error("Unable to load artist profile. Please try again.");
     const id: string = profileRes.data?.id ?? data.id;
@@ -87,7 +87,8 @@ export const getArtistMeta = createServerFn({ method: "GET" })
         if (token) viewerId = (await supabaseAdmin.auth.getUser(token)).data.user?.id ?? null;
       } catch { viewerId = null; }
       let tipsCents = 0;
-      if (streamIds.length && viewerId === id) {
+      const showTips = !!(profileRes.data as any)?.show_tips;
+      if (streamIds.length && (viewerId === id || showTips)) {
         const { data: tipsRows } = await sb
           .from("tips").select("amount_cents")
           .in("stream_id", streamIds).eq("status", "paid");
@@ -169,6 +170,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           videos: videosRes.count ?? 0,
           likes: likeCount,
           tipsCents,
+          showTips,
           battleWins,
           currentStreak,
           bestStreak,
