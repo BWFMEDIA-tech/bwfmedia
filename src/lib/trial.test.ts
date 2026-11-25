@@ -5,9 +5,9 @@ const future = new Date(Date.now() + 86400000).toISOString();
 const past = new Date(Date.now() - 86400000).toISOString();
 
 describe("free trial", () => {
-  it.each(["artist_pro", "artist_monthly", "bwf_artist_membership_monthly"])("gives %s exactly seven free days", (planId) => {
-    expect(ARTIST_TRIAL_DAYS).toBe(7);
-    expect(getPlanTrialDays(planId)).toBe(7);
+  it.each(["artist_pro", "artist_monthly", "bwf_artist_membership_monthly"])("gives %s no free trial", (planId) => {
+    expect(ARTIST_TRIAL_DAYS).toBe(0);
+    expect(getPlanTrialDays(planId)).toBe(0);
   });
   it.each(["listener_premium", "listener_fan_premium", "listener_student", "label_plan"])("preserves %s trial length", (planId) => {
     expect(getPlanTrialDays(planId)).toBe(30);

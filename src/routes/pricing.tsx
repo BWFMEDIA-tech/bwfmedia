@@ -103,7 +103,7 @@ function PricingPage() {
             Premium streaming for fans. Pro tools for artists and labels. Cancel anytime.
           </p>
           <div className="mt-5 mx-auto max-w-xl">
-            <p className="text-sm text-muted-foreground">Artist membership includes a 7-day free trial, then $9.99/month with your payment approval. Other paid plans retain their 30-day trial. Trials are for first-time subscribers. Cancel anytime.</p>
+            <p className="text-sm text-muted-foreground">Artist membership is $9.99/month with your payment approval, with no free trial. Other paid plans retain their 30-day trial. Trials are for first-time subscribers. Cancel anytime.</p>
           </div>
         </div>
 
@@ -156,7 +156,7 @@ function PricingPage() {
                   <span className="text-muted-foreground text-sm">/month</span>
                 </div>
                 <div className="mt-2 text-xs font-semibold text-muted-foreground">
-                  {plan.priceCents === 0 ? "Included free" : `First ${getPlanTrialDays(planId)} days free`}
+                  {plan.priceCents === 0 ? "Included free" : getPlanTrialDays(planId) === 0 ? "Billed monthly" : `First ${getPlanTrialDays(planId)} days free`}
                 </div>
                 <ul className="mt-6 mb-6 flex-1 space-y-4 border-t border-border pt-5 text-sm">
                   {FEATURES[planId].map((f) => (
@@ -175,7 +175,7 @@ function PricingPage() {
                       : "bg-foreground text-background hover:bg-foreground/90"
                   }`}
                 >
-                  {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : plan.priceCents === 0 ? "Get started free" : `Start ${getPlanTrialDays(planId)}-day free trial`}
+                  {loadingPlan === planId ? <Loader2 className="h-4 w-4 animate-spin" /> : plan.priceCents === 0 ? "Get started free" : getPlanTrialDays(planId) === 0 ? "Subscribe" : `Start ${getPlanTrialDays(planId)}-day free trial`}
                 </Button>
               </div>
             );

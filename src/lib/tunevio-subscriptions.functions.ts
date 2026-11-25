@@ -74,7 +74,7 @@ export const createTunevioCheckout = createServerFn({ method: "POST" })
           role: plan.role,
         },
         subscription_data: {
-          ...(trialEligible && { trial_period_days: getPlanTrialDays(data.planId) }),
+          ...(trialEligible && getPlanTrialDays(data.planId) > 0 && { trial_period_days: getPlanTrialDays(data.planId) }),
           metadata: {
             kind: "tunevio_subscription",
             userId: context.userId,

@@ -77,7 +77,7 @@ export const createMembershipCheckout = createServerFn({ method: "POST" })
         metadata: { kind: "play_membership", userId: context.userId },
         payment_method_collection: "always",
         subscription_data: {
-          ...(!priorSubs && { trial_period_days: ARTIST_TRIAL_DAYS }),
+          ...(!priorSubs && ARTIST_TRIAL_DAYS > 0 && { trial_period_days: ARTIST_TRIAL_DAYS }),
           metadata: { kind: "play_membership", userId: context.userId },
         },
       });

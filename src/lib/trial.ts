@@ -1,5 +1,5 @@
 export const FREE_TRIAL_DAYS = 30;
-export const ARTIST_TRIAL_DAYS = 7;
+export const ARTIST_TRIAL_DAYS = 0;
 
 /** Artist memberships use the artist trial; unrelated paid plans retain theirs. */
 export function getPlanTrialDays(planId: string): number {
