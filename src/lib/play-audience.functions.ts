@@ -25,6 +25,16 @@ export const getAudiencePlayState = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!stream) return null;
 
+    const streamInfo = {
+      id: stream.id,
+      title: stream.title,
+      roomName: stream.room_name,
+      status: stream.status,
+      mode: stream.mode,
+    };
+    // Only expose the playing track while the room is actually broadcasting.
+    if (stream.status !== "live") return { stream: streamInfo, playing: null };
+
     // play_tracks is not anon-readable; read only public-safe columns server-side.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: playing } = await (supabaseAdmin as any)
