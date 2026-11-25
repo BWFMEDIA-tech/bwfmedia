@@ -7,7 +7,9 @@ const MIN_PAYOUT_CENTS = 2500; // $25 minimum
 
 type StripeEnv = "sandbox" | "live";
 function resolveEnv(): StripeEnv {
-  return process.env.STRIPE_LIVE_API_KEY ? "live" : "sandbox";
+  return process.env.STRIPE_RESTRICTED_API_KEY || process.env.STRIPE_SECRET_KEY || process.env.STRIPE_LIVE_API_KEY
+    ? "live"
+    : "sandbox";
 }
 
 /**

@@ -11,10 +11,18 @@ export type StripeEnv = 'sandbox' | 'live';
 
 const GATEWAY_STRIPE_BASE = 'https://connector-gateway.lovable.dev/stripe';
 
+const firstEnv = (keys: string[]): string => {
+  for (const key of keys) {
+    const value = process.env[key];
+    if (value) return value;
+  }
+  throw new Error(`${keys[0]} is not configured`);
+};
+
 export function getConnectionApiKey(env: StripeEnv): string {
   return env === 'sandbox'
-    ? getEnv('STRIPE_SANDBOX_API_KEY')
-    : getEnv('STRIPE_LIVE_API_KEY');
+    ? firstEnv(['STRIPE_TEST_API_KEY', 'STRIPE_SANDBOX_API_KEY'])
+    : firstEnv(['STRIPE_RESTRICTED_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_LIVE_API_KEY']);
 }
 
 export function createStripeClient(env: StripeEnv): Stripe {
