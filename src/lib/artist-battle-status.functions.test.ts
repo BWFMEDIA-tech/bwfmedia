@@ -96,7 +96,7 @@ describe("artist battle status", () => {
 
   it("reads only active matchups from both queues", async () => {
     await load({ data: { id: accountId } });
-    const active = ["live", "scheduled", "accepted", "pending"];
+    const active = ["live", "scheduled", "accepted"];
     expect(fixtures.calls).toContainEqual({ table: "battle_challenges", operation: "in", args: ["status", active] });
     expect(fixtures.calls).toContainEqual({ table: "freestyle_challenges", operation: "in", args: ["status", active] });
   });

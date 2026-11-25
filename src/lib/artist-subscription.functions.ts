@@ -24,12 +24,15 @@ async function resolveOrCreateCustomer(
     const existing = await stripe.customers.list({ email: options.email, limit: 1 });
     if (existing.data.length) {
       const customer = existing.data[0];
-      if (customer.metadata?.userId !== options.userId) {
+      const owner = customer.metadata?.userId;
+      if (!owner) {
         await stripe.customers.update(customer.id, {
           metadata: { ...customer.metadata, userId: options.userId },
         });
+        return customer.id;
       }
-      return customer.id;
+      if (owner === options.userId) return customer.id;
+      // Belongs to another account: never re-link, create a fresh customer.
     }
   }
   const created = await stripe.customers.create({
@@ -84,7 +87,7 @@ export const createArtistTrialCheckout = createServerFn({ method: "POST" })
       const stripePrice = prices.data[0];
 
       const customerId = await resolveOrCreateCustomer(stripe, {
-        email: data.customerEmail,
+        email: typeof context.claims?.email === "string" ? context.claims.email : undefined,
         userId,
       });
 
