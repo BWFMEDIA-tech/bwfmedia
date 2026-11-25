@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { deleteMyTracks } from "@/lib/track-delete.functions";
 import { useEffect, useState } from "react";
 import { BarChart3, Check, Headphones, Loader2, Music, Pencil, Play, Plus, Rocket, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,7 +67,7 @@ function MusicMediaPage() {
     const prev = tracks;
     setTracks((ts) => ts.filter((t) => !selected.has(t.id)));
     setSelected(new Set());
-    const { error } = await supabase.from("play_tracks").delete().in("id", ids);
+    const error = await deleteMyTracks({ data: { ids } }).then(() => null, (e: Error) => e);
     if (error) { setTracks(prev); return toast.error(error.message); }
     if (featuredTrack && ids.includes(featuredTrack)) {
       await supabase.from("profiles").update({ featured_track_id: null } as any).eq("id", user.id);
@@ -100,7 +101,7 @@ function MusicMediaPage() {
     if (!user || !confirm("Delete this track? This cannot be undone.")) return;
     const prev = tracks;
     setTracks((ts) => ts.filter((x) => x.id !== id));
-    const { error } = await supabase.from("play_tracks").delete().eq("id", id);
+    const error = await deleteMyTracks({ data: { ids: [id] } }).then(() => null, (e: Error) => e);
     if (error) { setTracks(prev); return toast.error(error.message); }
     if (featuredTrack === id) {
       await supabase.from("profiles").update({ featured_track_id: null } as any).eq("id", user.id);

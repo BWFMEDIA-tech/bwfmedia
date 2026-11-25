@@ -2,9 +2,18 @@
 import { createServerFn } from "@tanstack/react-start";
 
 export const getArtistMerch = createServerFn({ method: "GET" })
-  .inputValidator((d: { userId: string }) => d)
+  .inputValidator((d: { userId: string }) => {
+    const userId = typeof d?.userId === "string" ? d.userId : "";
+    if (!/^[0-9a-f-]{36}$/i.test(userId)) throw new Error("Invalid artist id");
+    return { userId };
+  })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Only storefronts with published products are public; others stay private.
+    const { count: publishedCount } = await supabaseAdmin
+      .from("merch_products").select("id", { count: "exact", head: true })
+      .eq("user_id", data.userId).eq("is_published", true);
+    if (!publishedCount) return { store: null, products: [] as any[] };
     const { data: store } = await supabaseAdmin
       .from("shopify_stores")
       .select("shop_domain, shop_name, currency")

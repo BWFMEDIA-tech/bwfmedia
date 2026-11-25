@@ -166,7 +166,7 @@ export const joinStageFromInvite = createServerFn({ method: "POST" })
     const client = adminClient();
     const { data: row } = await client
       .from("invite_codes")
-      .select("stream_id, allowed_role, expires_at")
+      .select("stream_id, allowed_role, expires_at, uses, max_uses")
       .eq("code", data.code.toLowerCase())
       .maybeSingle();
     if (!row) throw new Error("Invite not found");
@@ -183,6 +183,18 @@ export const joinStageFromInvite = createServerFn({ method: "POST" })
       .eq("id", data.streamId)
       .maybeSingle();
     if (!stream || stream.status !== "live" || stream.mode !== "stage") throw new Error("Live is not available");
+
+    // Enforce the invite's use limit atomically (optimistic on the current count).
+    const { data: already } = await client.from("stage_participants").select("id")
+      .eq("stream_id", data.streamId).eq("user_id", context.userId).eq("invite_code", data.code.toLowerCase()).maybeSingle();
+    if (!already) {
+      const used = Number((row as any).uses ?? 0);
+      const max = (row as any).max_uses as number | null;
+      if (max != null && used >= max) throw new Error("Invite has already been used");
+      const { data: claimed } = await client.from("invite_codes").update({ uses: used + 1 } as any)
+        .eq("code", data.code.toLowerCase()).eq("uses", used).select("code").maybeSingle();
+      if (!claimed) throw new Error("Invite has already been used");
+    }
 
     const { error } = await client
       .from("stage_participants")

@@ -7,7 +7,8 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 const Schema = z.object({
   streamId: z.string().uuid().optional(),
   artistId: z.string().uuid().optional(),
-  amountCents: z.number().int().min(100).max(50000),
+  // Tips are payer-chosen by design: whole dollars from $1 to $500 only.
+  amountCents: z.number().int().min(100).max(50000).refine((c) => c % 100 === 0, { message: 'Tip must be a whole-dollar amount' }),
   message: z.string().max(200).optional(),
   displayName: z.string().max(80).optional(),
   returnUrl: z.string().url().refine((u) => {

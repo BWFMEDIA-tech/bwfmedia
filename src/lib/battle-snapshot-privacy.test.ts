@@ -35,12 +35,12 @@ describe('battle room snapshot privacy', () => {
   it('public live battle still returns its authorized snapshot', async () => {
     f.publicMatch={id:'live',status:'live',current_round_id:null,active_side:null};
     const state=await publicLoad({data:{streamId:'live-stream'}});
-    expect(state.match.id).toBe('live'); expect(f.calls).toEqual(['public','admin:battle_rounds']);
+    expect(state.match.id).toBe('live'); expect(f.calls).toEqual(['public','public']);
   });
   it('authorized host retains pending battle preparation', async () => {
     const match={id:'pending',status:'pending',current_round_id:null,active_side:null};
     const state=await privateLoad({data:{streamId:'private-stream'},context:{supabase:reader(match,'host')}});
-    expect(state.match.id).toBe('pending'); expect(f.calls).toEqual(['host','admin:battle_rounds']);
+    expect(state.match.id).toBe('pending'); expect(f.calls).toEqual(['host','host']);
   });
   it('unrelated signed-in caller does not gain private snapshot access', async () => {
     const state=await privateLoad({data:{streamId:'private-stream'},context:{supabase:reader(null,'unrelated')}});

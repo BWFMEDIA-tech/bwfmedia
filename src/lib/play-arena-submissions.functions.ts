@@ -260,7 +260,10 @@ export const updateSubmissionStatus = createServerFn({ method: "POST" })
         : data.status === "played" ? "completed"
         : data.status === "skipped" ? "skipped"
         : "queued";
-      await supabaseAdmin.from("play_tracks").update({ status: trackStatus }).eq("id", sub.play_track_id);
+      await supabaseAdmin.from("play_tracks").update({ status: trackStatus })
+        .eq("id", sub.play_track_id)
+        .eq("stream_id", sub.arena_id)
+        .eq("artist_user_id", sub.artist_id);
     }
 
     const evtType =

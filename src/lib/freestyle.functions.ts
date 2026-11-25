@@ -70,6 +70,9 @@ export const prepareFreestyle = createServerFn({ method: 'POST' })
     if (boundId && boundId !== data.streamId) {
       const bound = await supabaseAdmin.from('streams').select('status').eq('id', boundId).maybeSingle();
       if (bound.error || bound.data?.status === 'live') throw new Error('This matchup is already placed on another live stage');
+      // A host may only re-home a matchup they previously placed; admins may move any.
+      const boundHost = await supabaseAdmin.from('streams').select('host_id').eq('id', boundId).maybeSingle();
+      if (admin.data !== true && boundHost.data?.host_id !== context.userId) throw new Error('This matchup belongs to another host');
     }
     let update = supabaseAdmin.from('freestyle_challenges').update({ stream_id: data.streamId })
       .eq('id', data.challengeId).in('status', ['accepted', 'scheduled']).not('slot_number', 'is', null);

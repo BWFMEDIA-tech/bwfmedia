@@ -356,6 +356,8 @@ export const updateMyStagePresence = createServerFn({ method: "POST" })
     if (updErr) throw new Error(updErr.message);
 
     if (updated) return { ok: true, participant: updated };
+    // Only a verified entry may create a roster row; status refreshes never seed one.
+    if (data.connectionStatus !== "connected") return { ok: true, participant: null };
 
     // The stream owner always re-enters as host (e.g. after a page refresh).
     const { data: ownStream } = await supabaseAdmin

@@ -645,7 +645,8 @@ async function loadBattleRoomSnapshot(reader: any, data: { streamId: string }) {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb = supabaseAdmin;
     const trackSb = supabaseAdmin;
-    const { data: rounds } = await sb
+    // Rounds are read under the caller's row access (public: live/completed only).
+    const { data: rounds } = await reader
       .from("battle_rounds")
       .select("*")
       .eq("match_id", match.id)

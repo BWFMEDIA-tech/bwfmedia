@@ -575,6 +575,13 @@
       "when": 1795577749114,
       "tag": "0081_public_battle_snapshot_visibility",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1795579081783,
+      "tag": "0082_harden_selected_security_findings",
+      "breakpoints": true
     }
   ]
 }

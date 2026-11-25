@@ -94,7 +94,9 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
 
       const battle = battleRes.data?.[0] ?? null;
       const streams = streamsRes.data ?? [];
-      const queueRows = queueRes.data ?? [];
+      // Only queue activity from public live streams is shown.
+      const liveStreamIds = new Set(streams.map((s) => s.id));
+      const queueRows = (queueRes.data ?? []).filter((r) => r.stream_id && liveStreamIds.has(r.stream_id));
 
       // Collect avatar lookups
       const ids = new Set<string>();
@@ -128,12 +130,12 @@ export const getArenaDashboard = createServerFn({ method: "GET" }).handler(
         ? {
             id: battle.id,
             artistA: {
-              id: battle.artist_a_id,
+              id: battle.artist_a_id ? publicIds[battle.artist_a_id] ?? null : null,
               name: battle.artist_a_name ?? "Artist A",
               avatar: battle.artist_a_id ? avatars[battle.artist_a_id] ?? null : null,
             },
             artistB: {
-              id: battle.artist_b_id,
+              id: battle.artist_b_id ? publicIds[battle.artist_b_id] ?? null : null,
               name: battle.artist_b_name ?? "Artist B",
               avatar: battle.artist_b_id ? avatars[battle.artist_b_id] ?? null : null,
             },

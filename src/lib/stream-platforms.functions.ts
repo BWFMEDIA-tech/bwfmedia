@@ -27,7 +27,10 @@ export const getStreamPlatformAuthorizeUrl = createServerFn({ method: "POST" })
       return { ok: false as const, reason: "not_configured", envVars: [cfg.clientIdEnv, cfg.clientSecretEnv] };
     }
     const clientId = process.env[cfg.clientIdEnv]!;
-    const redirectUri = providerRedirectUri(data.origin, data.platform);
+    const { validateReturnUrl } = await import("@/lib/validate-return-url");
+    // Only the app's own domains may receive the OAuth callback.
+    const safeOrigin = new URL(validateReturnUrl(data.origin)).origin;
+    const redirectUri = providerRedirectUri(safeOrigin, data.platform);
     const state = await signOAuthState({ userId: context.userId, platform: data.platform });
     const params = new URLSearchParams({
       client_id: clientId,
