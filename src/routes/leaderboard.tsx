@@ -102,7 +102,7 @@ function LeaderboardPage() {
                 </span>
               </h1>
               <p className="max-w-md text-sm text-white/60 sm:text-base">
-                Every vote, every win, every stream — calculated live. Only the loudest survive.
+                Every vote, every win, every stream - calculated live. Only the loudest survive.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2 sm:gap-3 sm:w-auto">
