@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { cropImageToSquare } from "@/lib/square-image";
 import { X, UploadCloud, Loader2, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,7 +73,8 @@ export function AddProfileTrackDialog({
     } finally { setUploading(false); }
   }
 
-  async function handleCover(file: File) {
+  async function handleCover(original: File) {
+    const file = await cropImageToSquare(original);
     if (file.size > MAX_COVER_BYTES) return toast.error("Max 8MB.");
     setCoverUploading(true); setCoverProgress(10);
     try {

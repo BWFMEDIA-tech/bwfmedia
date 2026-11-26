@@ -92,7 +92,7 @@ export function Artwork({
           alt={alt}
           onError={() => setFailed(src)}
           loading="lazy"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground">
@@ -498,7 +498,7 @@ export function LiveStreamCard({ stream }: { stream: FeedStream }) {
     <Link to="/live" className="block">
       <CardShell className="overflow-hidden">
         <div className="relative aspect-video">
-          {stream.thumbnailUrl ? <StreamThumbnailImage src={stream.thumbnailUrl} alt={stream.title} className="h-full w-full object-cover" /> : <Artwork alt={stream.title} rounded="rounded-none" className="h-full w-full" />}
+          {stream.thumbnailUrl ? <StreamThumbnailImage src={stream.thumbnailUrl} alt={stream.title} className="h-full w-full object-cover object-center" /> : <Artwork alt={stream.title} rounded="rounded-none" className="h-full w-full" />}
           <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-tv-magenta px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white">
             <Radio className="h-3 w-3" /> Live
           </span>
@@ -624,7 +624,7 @@ export function QuickAccessCard({
         )}
       >
         {imageUrl ? (
-          <SignedImg src={imageUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+          <SignedImg src={imageUrl} alt="" className="h-full w-full object-cover object-center" loading="lazy" />
         ) : (
           icon
         )}
