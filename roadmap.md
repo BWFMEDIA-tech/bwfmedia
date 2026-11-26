@@ -1,5 +1,10 @@
 # Roadmap
 
+## Live membership checkout return
+- [ ] Activate the completed Student subscription for its verified signed-in owner and confirm Settings → Billing reads it back.
+- [ ] Replace the legacy checkout-return screen with Tunevio plan confirmation and signed-in Stripe session verification, without waiting for a webhook.
+- [ ] Keep signed webhook renewal/cancellation synchronization intact and verify checkout, billing, and cancellation behavior with focused tests.
+
 ## Stripe payout setup update
 - [x] Replace legacy new-account creation with the tested Express controller; preserve existing payout account IDs and transfer processing.
 - [x] Twelve payout/billing tests passed; updated helper created a disposable live account and onboarding link, then removed the account.

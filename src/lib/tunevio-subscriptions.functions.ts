@@ -4,6 +4,15 @@ import { createStripeClient, type StripeEnv, getStripeErrorMessage } from "@/lib
 import { validateReturnUrl } from "@/lib/validate-return-url";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getPlanTrialDays } from "@/lib/trial";
+import {
+  assertTunevioCheckoutOwnership,
+  upsertTunevioSubscription,
+} from "@/lib/tunevio-subscription-sync.server";
+
+const CheckoutReturnSchema = z.object({
+  sessionId: z.string().regex(/^cs_(live|test)_[A-Za-z0-9]+$/),
+  environment: z.enum(["sandbox", "live"]) as z.ZodType<StripeEnv>,
+});
 
 export const TUNEVIO_PLANS = {
   listener_premium:     { role: "listener", label: "Premium",      priceCents:  699 },
@@ -131,4 +140,74 @@ export const getMyTunevioSubscription = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
     return sub ?? null;
+  });
+
+type ConfirmedSubscription = {
+  plan_type: string;
+  role: string | null;
+  status: string;
+  price_cents: number;
+  current_period_end: string | null;
+  renewal_date: string | null;
+  cancel_at_period_end: boolean;
+  stripe_subscription_id: string;
+};
+
+export const confirmTunevioCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => CheckoutReturnSchema.parse(input))
+  .handler(async ({ data, context }): Promise<
+    | { kind: "tunevio_subscription"; subscription: ConfirmedSubscription }
+    | { kind: "other_checkout" }
+    | { kind: "error"; error: string }
+  > => {
+    try {
+      const stripe = createStripeClient(data.environment);
+      const session = await stripe.checkout.sessions.retrieve(data.sessionId);
+      if (session.status !== "complete") throw new Error("This checkout is not complete yet");
+      if (session.mode !== "subscription" || session.metadata?.kind !== "tunevio_subscription") {
+        if (session.payment_status !== "paid" && session.payment_status !== "no_payment_required") {
+          throw new Error("This payment is still processing");
+        }
+        return { kind: "other_checkout" };
+      }
+
+      const subscriptionId = typeof session.subscription === "string"
+        ? session.subscription
+        : session.subscription?.id;
+      if (!subscriptionId) throw new Error("This checkout has no subscription");
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+        expand: ["items.data.price.product"],
+      });
+      assertTunevioCheckoutOwnership(session, subscription, context.userId);
+
+      const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id;
+      if (!customerId) throw new Error("This checkout has no billing customer");
+      const { verifyBillingCustomer } = await import("@/lib/billing-ownership.server");
+      await verifyBillingCustomer(stripe, context, customerId, data.environment);
+
+      // The session, subscription, customer and signed-in account have all been
+      // verified. Only now may the privileged writer activate the plan.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const saved = await upsertTunevioSubscription(supabaseAdmin, subscription, data.environment);
+      return {
+        kind: "tunevio_subscription",
+        subscription: {
+          plan_type: saved.plan_type,
+          role: saved.role,
+          status: saved.status,
+          price_cents: saved.price_cents,
+          current_period_end: saved.current_period_end,
+          renewal_date: saved.renewal_date,
+          cancel_at_period_end: saved.cancel_at_period_end,
+          stripe_subscription_id: saved.stripe_subscription_id,
+        },
+      };
+    } catch (error) {
+      const message = getStripeErrorMessage(error);
+      const safeMessage = /not complete yet|still processing|no subscription|no billing customer|could not be verified/i.test(message)
+        ? message
+        : "We could not verify this checkout for the signed-in account";
+      return { kind: "error", error: safeMessage };
+    }
   });
