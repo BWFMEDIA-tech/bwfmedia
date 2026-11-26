@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { checkSongUploadAllowance, saveUploadedProfileTrack, STARTER_SONG_LIMIT_MESSAGE } from "./profile-track-upload";
+import { ARTIST_UPLOAD_ONLY_MESSAGE, checkSongUploadAllowance, saveUploadedProfileTrack, STARTER_SONG_LIMIT_MESSAGE } from "./profile-track-upload";
 
 function setup(error: Error | null = null) {
   const saved = { id: "saved-profile-song", title: "New song", artist_name: "Artist", cover_url: "cover" };
@@ -32,6 +32,13 @@ it("blocks a sixth Starter song before saving", async () => {
   const { client, rpc, insert } = setup();
   rpc.mockResolvedValueOnce({ data: { limit: 5, used: 5, remaining: 0 }, error: null });
   await expect(saveUploadedProfileTrack(client, input)).rejects.toThrow(STARTER_SONG_LIMIT_MESSAGE);
+  expect(insert).not.toHaveBeenCalled();
+});
+
+it("blocks listener track uploads before storage or catalog saving", async () => {
+  const { client, rpc, insert } = setup();
+  rpc.mockRejectedValueOnce(new Error(ARTIST_UPLOAD_ONLY_MESSAGE));
+  await expect(saveUploadedProfileTrack(client, input)).rejects.toThrow(ARTIST_UPLOAD_ONLY_MESSAGE);
   expect(insert).not.toHaveBeenCalled();
 });
 

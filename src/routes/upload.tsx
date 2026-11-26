@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, Clapperboard, Mic, Music2, Package, Radio, Swords } from "lucide-react";
+import { ChevronRight, Clapperboard, Loader2, Mic, Music2, Package, Radio, Swords } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { hasArtistTools } from "@/lib/artist-navigation";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
+import { ARTIST_UPLOAD_ONLY_MESSAGE } from "@/lib/profile-track-upload";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -57,6 +61,17 @@ const OPTIONS = [
 ] as const;
 
 function UploadHub() {
+  const { user, roles, loading, rolesLoading } = useAuth();
+  if (loading || rolesLoading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (user && !hasArtistTools(roles)) {
+    return <div className="mx-auto max-w-lg px-4 py-16 text-center">
+      <Music2 className="mx-auto mb-4 h-10 w-10 text-primary" />
+      <h1 className="text-2xl font-bold">Artist uploads</h1>
+      <p className="mt-3 text-sm text-muted-foreground">{ARTIST_UPLOAD_ONLY_MESSAGE}</p>
+      <p className="mt-2 text-sm text-muted-foreground">You can still stream music and download your eligible purchases.</p>
+      <ActivateArtistButton className="mt-6" />
+    </div>;
+  }
   return (
     <div className="mx-auto max-w-md px-4 pb-24 pt-6 md:max-w-2xl md:pt-10">
       <h1 className="text-3xl font-black text-foreground">Upload</h1>

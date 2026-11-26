@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type UploadedProfileTrack = { id: string; title: string; artist_name: string; cover_url: string | null };
 
 export const STARTER_SONG_LIMIT_MESSAGE = "You've reached your 5-song upload limit. Upgrade your plan to upload more music.";
+export const ARTIST_UPLOAD_ONLY_MESSAGE = "Listener accounts cannot upload tracks. Activate your artist profile to upload music.";
 
 export async function checkSongUploadAllowance(client: SupabaseClient<Database>): Promise<void> {
   const { data, error } = await client.rpc("get_song_upload_allowance");

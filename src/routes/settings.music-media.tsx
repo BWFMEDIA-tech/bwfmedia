@@ -11,6 +11,9 @@ import { SubmitToArenaModal } from "@/components/play/SubmitToArenaModal";
 import { SignedImg } from "@/components/ui/signed-img";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { Button } from "@/components/ui/button";
+import { hasArtistTools } from "@/lib/artist-navigation";
+import { ActivateArtistButton } from "@/components/artist/ActivateArtistButton";
+import { ARTIST_UPLOAD_ONLY_MESSAGE } from "@/lib/profile-track-upload";
 
 export const Route = createFileRoute("/settings/music-media")({
   head: () => ({ meta: [
@@ -26,7 +29,8 @@ export const Route = createFileRoute("/settings/music-media")({
 
 function MusicMediaPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, roles, loading: authLoading, rolesLoading } = useAuth();
+  const canUpload = hasArtistTools(roles);
   const player = usePlayer();
   const [tracks, setTracks] = useState<any[]>([]);
   const [featuredTrack, setFeaturedTrack] = useState<string | null>(null);
@@ -77,7 +81,7 @@ function MusicMediaPage() {
   }
 
   async function reload() {
-    if (!user) return;
+    if (!user || !canUpload) return;
     // Only show the artist's profile-library tracks. Arena submissions
     // create mirror play_tracks rows in the arena's stream — filtering to
     // the profile stream keeps those copies out of this list.
@@ -88,7 +92,11 @@ function MusicMediaPage() {
     ]);
     setTracks(t ?? []); setFeaturedTrack((p as any)?.featured_track_id ?? null); setLoading(false);
   }
-  useEffect(() => { if (user) void reload(); }, [user]);
+  useEffect(() => {
+    if (authLoading || rolesLoading) return;
+    if (user && canUpload) void reload();
+    else setLoading(false);
+  }, [user?.id, canUpload, authLoading, rolesLoading]);
 
   async function setFeatured(id: string | null) {
     if (!user) return;
@@ -110,7 +118,18 @@ function MusicMediaPage() {
     toast.success("Track deleted");
   }
 
-  if (loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-white/60" /></div>;
+  if (authLoading || rolesLoading || loading) return <div className="grid h-64 place-items-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (user && !canUpload) {
+    return <SettingsShell title="Music & Media" blurb="Artist catalog tools">
+      <Card title="Your Tracks" icon={<Music className="h-4 w-4 text-primary" />}>
+        <div className="py-8 text-center">
+          <p className="text-sm text-muted-foreground">{ARTIST_UPLOAD_ONLY_MESSAGE}</p>
+          <p className="mt-2 text-sm text-muted-foreground">You can still stream music and download your eligible purchases.</p>
+          <ActivateArtistButton className="mt-5" />
+        </div>
+      </Card>
+    </SettingsShell>;
+  }
 
   return (
     <SettingsShell title="Music & Media" blurb="Pick what fans see first.">

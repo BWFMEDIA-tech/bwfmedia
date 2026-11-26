@@ -1,5 +1,9 @@
 # Roadmap
 
+## Listener music permissions
+- [x] Block track uploads for listener/non-artist accounts in the UI, audio storage, upload preflight, and catalog trigger while preserving existing artist uploads; direct listener RPC/storage denial and artist access verified.
+- [x] Confirm listeners retain real music streaming and eligible purchased-download access without enabling unapproved free downloads; 38 focused tests and signed-in playback/Purchases checks passed.
+
 ## Pay What You Want music store
 - [x] Add Artist Pro and Label Plan entitlement, private artist products, and webhook-only fan purchase records with a 60/40 digital-music split.
 - [x] Add artist release controls, square artwork upload, and the fan Choose Your Price experience with $1–$10,000 server-enforced pricing.
