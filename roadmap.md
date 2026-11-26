@@ -1,5 +1,9 @@
 # Roadmap
 
+## Stripe payout setup update
+- [x] Replace legacy new-account creation with the tested Express controller; preserve existing payout account IDs and transfer processing.
+- [x] Twelve payout/billing tests passed; updated helper created a disposable live account and onboarding link, then removed the account.
+
 ## Royalty Finder
 - [x] Add private catalog scan history and evidence-backed findings to the existing rights dashboard.
 - [x] Audit owned metadata, preserve registration statuses, support resolution and song rescans.

@@ -96,14 +96,8 @@ export const startConnectOnboarding = createServerFn({ method: "POST" })
       let accountId = existing?.stripe_account_id as string | undefined;
       if (!accountId) {
         const email = (claims?.email as string | undefined) ?? undefined;
-        const acct = await stripe.accounts.create({
-          type: "express",
-          email,
-          capabilities: {
-            transfers: { requested: true },
-          },
-          metadata: { lovable_user_id: userId },
-        });
+        const { createPayoutConnectAccount } = await import("@/lib/payout-connect.server");
+        const acct = await createPayoutConnectAccount(stripe, userId, email);
         accountId = acct.id;
         await supabaseAdmin.from("payout_accounts").insert({
           user_id: userId,
@@ -118,8 +112,9 @@ export const startConnectOnboarding = createServerFn({ method: "POST" })
         });
       }
 
+      if (!accountId) throw new Error("Unable to create payout account.");
       const link = await stripe.accountLinks.create({
-        account: accountId!,
+        account: accountId,
         type: "account_onboarding",
         return_url: data.returnUrl,
         refresh_url: data.refreshUrl,
