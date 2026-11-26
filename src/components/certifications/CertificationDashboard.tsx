@@ -9,8 +9,11 @@ const MEDAL: Record<string, string> = { bronze: "var(--cert-bronze)", silver: "v
 
 function Medal({ level, size = 64 }: { level: string; size?: number }) {
   if (level === "diamond") return <Gem style={{ width: size, height: size, color: MEDAL[level] }} aria-hidden />;
-  return <div className="grid place-items-center rounded-full" style={{ width: size, height: size, background: `radial-gradient(circle at 35% 30%, #fff8, ${MEDAL[level]} 45%, #0006 120%)` }}>
-    <Music style={{ width: size * 0.45, height: size * 0.45 }} className="text-background/80" aria-hidden />
+  const c = MEDAL[level];
+  return <div aria-hidden className="relative rounded-full" style={{ width: size, height: size, background: `repeating-radial-gradient(circle, #0000 0 2px, #0003 2px 3px), radial-gradient(circle at 35% 30%, #fff9, ${c} 45%, #0008 120%)`, boxShadow: "inset 0 0 10px #0007" }}>
+    <span className="absolute inset-0 rounded-full" style={{ background: "conic-gradient(from 20deg, #fff5, transparent 22%, #fff3 50%, transparent 72%, #fff5)" }} />
+    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-background/40" style={{ width: size * 0.34, height: size * 0.34, background: `radial-gradient(circle, ${c}, #0006)` }} />
+    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" style={{ width: Math.max(3, size * 0.07), height: Math.max(3, size * 0.07) }} />
   </div>;
 }
 
