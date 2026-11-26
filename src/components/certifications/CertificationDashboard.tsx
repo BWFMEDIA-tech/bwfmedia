@@ -1,14 +1,61 @@
-import { Check, Gem, Info, Music } from "lucide-react";
+import { useId } from "react";
+import { Check, Info, Music } from "lucide-react";
 import { SignedImg } from "@/components/ui/signed-img";
 import { CERT_LEVELS, compactStreams, milestoneProgress } from "@/lib/certifications";
 
 type Cert = { level: string; status: string; achieved_at: string; eligible_streams_at_issue: number; note: string | null };
 export type CertDashboardData = { profile: { display_name?: string | null; stage_name?: string | null; avatar_url?: string | null }; streams: number; certifications: Cert[] };
 
-const MEDAL: Record<string, string> = { bronze: "var(--cert-bronze)", silver: "var(--cert-silver)", gold: "var(--cert-gold)", platinum: "#9ca3af", diamond: "#e5e7eb" };
+const MEDAL: Record<string, string> = { bronze: "var(--cert-bronze)", silver: "var(--cert-silver)", gold: "var(--cert-gold)", platinum: "#9ca3af", diamond: "var(--cert-diamond)" };
+
+// Faceted brilliant-cut diamond: flat table, angled crown facets, pointed pavilion.
+function DiamondGem({ size = 64 }: { size?: number }) {
+  const uid = useId().replace(/:/g, "");
+  const body = `dg-body-${uid}`;
+  const face = `dg-face-${uid}`;
+  const sheen = `dg-sheen-${uid}`;
+  return (
+    <svg viewBox="0 0 100 84" width={size} height={size * 0.84} aria-hidden style={{ filter: "drop-shadow(0 0 8px rgba(0,230,255,.35))" }}>
+      <defs>
+        <linearGradient id={body} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#eafcff" />
+          <stop offset="0.45" stopColor="#5fe4ff" />
+          <stop offset="1" stopColor="#0a58c9" />
+        </linearGradient>
+        <linearGradient id={face} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="0.55" stopColor="#9beeff" />
+          <stop offset="1" stopColor="#2b8fe0" />
+        </linearGradient>
+        <linearGradient id={sheen} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.8" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {/* crown */}
+      <polygon points="30,10 5,32 37,32" fill={`url(#${body})`} />
+      <polygon points="70,10 95,32 63,32" fill={`url(#${body})`} />
+      <polygon points="30,10 70,10 63,32 37,32" fill={`url(#${face})`} />
+      <polygon points="30,10 70,10 63,32 37,32" fill={`url(#${sheen})`} opacity="0.45" />
+      {/* pavilion */}
+      <polygon points="5,32 27,32 50,80" fill={`url(#${body})`} opacity="0.82" />
+      <polygon points="27,32 50,32 50,80" fill={`url(#${face})`} opacity="0.9" />
+      <polygon points="50,32 73,32 50,80" fill={`url(#${body})`} opacity="0.95" />
+      <polygon points="73,32 95,32 50,80" fill={`url(#${face})`} opacity="0.7" />
+      {/* facet etching */}
+      <g stroke="#ffffff" strokeOpacity="0.5" strokeWidth="1" fill="none">
+        <path d="M30 10 5 32M30 10 37 32M70 10 63 32M70 10 95 32M5 32h90M27 32 50 80M50 32V80M73 32 50 80" />
+      </g>
+      <polygon points="30,10 70,10 63,32 37,32" fill="none" stroke="#eafcff" strokeOpacity="0.7" strokeWidth="1" />
+      {/* sparkle */}
+      <path d="M17 6 18.6 11 23.6 12.6 18.6 14.2 17 19.2 15.4 14.2 10.4 12.6 15.4 11Z" fill="#ffffff" opacity="0.85" />
+      <path d="M88 16 89.2 19.4 92.6 20.6 89.2 21.8 88 25.2 86.8 21.8 83.4 20.6 86.8 19.4Z" fill="#ffffff" opacity="0.7" />
+    </svg>
+  );
+}
 
 function Medal({ level, size = 64 }: { level: string; size?: number }) {
-  if (level === "diamond") return <Gem style={{ width: size, height: size, color: MEDAL[level] }} aria-hidden />;
+  if (level === "diamond") return <DiamondGem size={size} />;
   const c = MEDAL[level];
   return <div aria-hidden className="relative rounded-full" style={{ width: size, height: size, background: `repeating-radial-gradient(circle, #0000 0 2px, #0003 2px 3px), radial-gradient(circle at 35% 30%, #fff9, ${c} 45%, #0008 120%)`, boxShadow: "inset 0 0 10px #0007" }}>
     <span className="absolute inset-0 rounded-full" style={{ background: "conic-gradient(from 20deg, #fff5, transparent 22%, #fff3 50%, transparent 72%, #fff5)" }} />
