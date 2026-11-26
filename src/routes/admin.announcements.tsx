@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Pencil, Save, X } from "lucide-react";
-import type { SentAnnouncement } from "@/lib/announcement-edit";
+import { ANNOUNCEMENT_MAX_WORDS, countAnnouncementWords, type SentAnnouncement } from "@/lib/announcement-edit";
 import { toast } from "sonner";
 import { SectionPage } from "@/components/admin/SectionPage";
 import { useAuth } from "@/lib/auth-context";
@@ -39,6 +39,8 @@ function AnnouncementsAdmin() {
   const [busy, setBusy] = useState(false);
   const [email, setEmail] = useState(true);
   const [file, setFile] = useState<File | null>(null);
+  const wordCount = countAnnouncementWords(body);
+  const overWordLimit = wordCount > ANNOUNCEMENT_MAX_WORDS;
 
   async function loadSent(before?: string) {
     setLoading(true); setLoadError(false);
@@ -71,6 +73,7 @@ function AnnouncementsAdmin() {
     setAud((cur) => a === "everyone" ? ["everyone"] : cur.includes(a) ? cur.filter((x) => x !== a) : [...cur.filter((x) => x !== "everyone"), a]);
 
   async function submit() {
+    if (overWordLimit) return toast.error("Announcement messages must be 1,000 words or fewer.");
     if (!title.trim() || (!editing && !aud.length)) return toast.error("Add a title and pick who gets it.");
     const who = aud.map((a) => LABELS[a as keyof typeof LABELS]).join(", ");
     if (!editing && !confirm(`Send "${title}" to ${who}?`)) return;
@@ -122,7 +125,12 @@ function AnnouncementsAdmin() {
           ))}
         </div>
         <input aria-label="Announcement title" className={input} placeholder="Title (e.g. Friday Night Battle starts at 8pm)" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} />
-        <textarea aria-label="Announcement message" className={input} rows={3} placeholder="Message (optional)" maxLength={500} value={body} onChange={(e) => setBody(e.target.value)} />
+        <div className="space-y-1">
+          <textarea aria-label="Announcement message" aria-describedby="announcement-word-count" aria-invalid={overWordLimit} className={`${input} min-h-48 resize-y`} rows={8} placeholder="Message (optional)" value={body} onChange={(e) => setBody(e.target.value)} />
+          <p id="announcement-word-count" className={`text-right text-sm ${overWordLimit ? "text-destructive" : "text-muted-foreground"}`}>
+            {wordCount.toLocaleString("en-US")} / 1,000 words{overWordLimit ? " — shorten your message before sending" : ""}
+          </p>
+        </div>
         <input aria-label="Announcement link" className={input} placeholder="Link on Tunevio (optional, e.g. /live)" value={link} onChange={(e) => setLink(e.target.value)} />
         <div>
           <div className="mb-2 text-xs uppercase tracking-wider text-white/50">Photo or video (optional)</div>
@@ -144,7 +152,7 @@ function AnnouncementsAdmin() {
           <input type="checkbox" checked={email} onChange={(e) => setEmail(e.target.checked)} className="h-4 w-4" />
           Also email these members
         </label>}
-        <Button disabled={busy} onClick={submit} className="w-full">
+        <Button disabled={busy || overWordLimit} onClick={submit} className="w-full">
           {editing && <Save />}{busy ? "Saving…" : editing ? "Save changes" : "Send notification"}
         </Button>
         {editing && <Button variant="outline" className="w-full" disabled={busy} onClick={resetEditor}>Cancel</Button>}

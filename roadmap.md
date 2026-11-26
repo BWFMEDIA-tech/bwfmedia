@@ -1,5 +1,9 @@
 # Roadmap
 
+## Announcement message length
+- [x] Allow up to 1,000 words for new and edited announcements using shared validation and a live word counter, preserving existing delivery and paragraph formatting.
+- [x] Five tests pass; signed-in desktop/mobile editor accepts 1,000 words, blocks 1,001, and preserves paragraphs with no runtime errors. Preview build OK; no broadcast sent to members.
+
 ## Unified artist profile
 - [x] Remove duplicate artist profile navigation and correct the profile shortcut to the signed-in account without data changes.
 - [x] Verify profile routing, existing artist data, and mobile/desktop navigation; 28 tests pass, signed-in profile/editor checks pass, preview build OK.

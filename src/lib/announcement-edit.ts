@@ -1,9 +1,18 @@
 import { z } from "zod";
 
+export const ANNOUNCEMENT_MAX_WORDS = 1000;
+
+export function countAnnouncementWords(value: string): number {
+  return value.match(/\S+/gu)?.length ?? 0;
+}
+
 export const announcementContentSchema = z.object({
   kind: z.enum(["update", "event"]),
   title: z.string().trim().min(1).max(120),
-  body: z.string().trim().max(500).optional(),
+  body: z.string().trim().refine(
+    (value) => countAnnouncementWords(value) <= ANNOUNCEMENT_MAX_WORDS,
+    "Announcement messages must be 1,000 words or fewer",
+  ).optional(),
   link: z.string().trim().max(200).refine((value) => !value || (/^\/[A-Za-z0-9/_\-?=&.#]*$/.test(value) && !value.startsWith("//")), "Use a Tunevio page link").optional(),
   mediaPath: z.string().regex(/^[A-Za-z0-9/_\-.]+$/).max(300).optional(),
   mediaType: z.enum(["image", "video"]).optional(),
