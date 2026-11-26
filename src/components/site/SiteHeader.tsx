@@ -128,7 +128,7 @@ export function SiteHeader() {
       return hasArtistTools(auth.roles) ? [{ kind: "link", ...item, to: artistDashboardDestination(auth.roles) }] : [];
     }
     if (item.to === "/profile") {
-      return [auth.user ? { kind: "link", ...item, to: "/artist/$id", params: { id: auth.user.id } } : { kind: "link", ...item, to: "/login" }];
+      return [auth.user ? { kind: "link", ...item, label: hasArtistTools(auth.roles) ? "Profile" : item.label, to: "/artist/$id", params: { id: auth.user.id } } : { kind: "link", ...item, to: "/login" }];
     }
     if (item.to === "/live") return [{ kind: "link", ...item, to: stage.to, params: stage.live ? stage.params : undefined }];
     return [{ kind: "link", ...item }];

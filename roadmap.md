@@ -1,5 +1,11 @@
 # Roadmap
 
+## Unified artist profile
+- [x] Remove duplicate artist profile navigation and correct the profile shortcut to the signed-in account without data changes.
+- [x] Verify profile routing, existing artist data, and mobile/desktop navigation; 28 tests pass, signed-in profile/editor checks pass, preview build OK.
+- Rule: one signed-in account opens one existing profile, with one editor destination per menu.
+- Checked main desktop/mobile menu, bottom navigation, Home account photo, footer, General Settings/account overview, Artist Dashboard, exported legacy Settings sidebar, profile setup/quick links, Upload setup, Go Live, signup/activation, legacy profile/artist-info shortcuts, profile reader/owner controls, profile editing, account profile reads, and signup/role-grant database functions. Duplicate menu/editor links and the fixed-account shortcut were corrected; other paths already use the existing account or shared editor. No authentication configuration, stored records, permissions or database structure changed.
+
 ## Listener music permissions
 - [x] Block track uploads for listener/non-artist accounts in the UI, audio storage, upload preflight, and catalog trigger while preserving existing artist uploads; direct listener RPC/storage denial and artist access verified.
 - [x] Confirm listeners retain real music streaming and eligible purchased-download access without enabling unapproved free downloads; 38 focused tests and signed-in playback/Purchases checks passed.

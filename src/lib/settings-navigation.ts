@@ -9,7 +9,7 @@ export function settingsGroups(roles: readonly string[]): SettingsGroup[] {
   const earner = artist || roles.includes("host") || roles.includes("manager");
   const groups: (SettingsGroup | null)[] = [
     { key: "account", label: "Account", items: [
-      { to: "/settings/profile", label: "Profile" },
+      { to: "/settings/profile", label: artist ? "Edit Profile" : "Profile" },
       { to: "/settings/security", label: "Email, Password & Security" },
       { to: "/settings/billing", label: "Plan & Billing" },
       { to: "/settings/membership", label: "Membership" },
@@ -19,8 +19,6 @@ export function settingsGroups(roles: readonly string[]): SettingsGroup[] {
       { to: "/settings/notifications", label: "Notifications" },
     ] },
     artist ? { key: "artist", label: "Artist Tools", items: [
-      { to: "/profile", label: "My Profile" },
-      { to: "/settings/artist-info", label: "Artist Profile" },
       { to: "/settings/social-links", label: "Social & Platform Links" },
       { to: "/upload", label: "Upload Music" },
       { to: "/settings/events", label: "Events & Showcases" },

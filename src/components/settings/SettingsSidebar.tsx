@@ -1,9 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { User, Mic2, Link2, Music, CreditCard, Bell, Palette, Shield, Receipt, Plug, HelpCircle, ExternalLink, Calendar, ShoppingBag, Radio, Banknote } from "lucide-react";
+import { User, Link2, Music, CreditCard, Bell, Palette, Shield, Receipt, Plug, HelpCircle, ExternalLink, Calendar, ShoppingBag, Radio, Banknote } from "lucide-react";
 
 const items = [
   { to: "/settings/profile", label: "Profile", icon: User },
-  { to: "/settings/artist-info", label: "Artist Info", icon: Mic2 },
   { to: "/settings/social-links", label: "Social Links", icon: Link2 },
   { to: "/settings/music-media", label: "Music & Media", icon: Music },
   { to: "/settings/events", label: "Upcoming Events", icon: Calendar },

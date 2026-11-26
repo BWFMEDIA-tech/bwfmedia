@@ -36,8 +36,7 @@ const GROUPS = [
     { to: "/labels", label: "Labels & Teams" },
   ] },
   { key: "settings", label: "Settings", icon: Settings, children: [
-    { to: "/settings/artist-info", label: "Artist Profile" },
-    { to: "/settings/profile", label: "Photo, Banner & Biography" },
+    { to: "/settings/profile", label: "Edit Profile" },
     { to: "/settings/social-links", label: "Social Links" },
     { to: "/settings", label: "Account Preferences" },
     { to: "/artist-store/manage", label: "Store" },

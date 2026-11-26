@@ -891,7 +891,7 @@ function OwnerSetupCard({ hasPhoto, hasBanner, hasBio, hasTracks }: { hasPhoto: 
   const steps = [
     { done: hasPhoto,  icon: ImageIcon, label: "Upload profile photo", to: "/settings/profile" },
     { done: hasBanner, icon: ImageIcon, label: "Upload banner image",  to: "/settings/profile" },
-    { done: hasBio,    icon: FileText,  label: "Add your bio",         to: "/settings/artist-info" },
+    { done: hasBio,    icon: FileText,  label: "Add your bio",         to: "/settings/profile" },
     { done: hasTracks, icon: Music,     label: "Upload your first track", to: "/play" },
   ];
   return (
@@ -916,8 +916,7 @@ function OwnerQuickLinks() {
     <SideCard>
       <h3 className="text-sm font-semibold mb-3">Artist Tools</h3>
       <div className="space-y-2 text-sm">
-        <Link to="/settings/artist-info" className="block px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10">Edit artist info</Link>
-        <Link to="/settings/profile" className="block px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10">Edit profile & photo</Link>
+        <Link to="/settings/profile" className="block px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10">Edit Profile</Link>
         <Link to="/play" className="block px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10">Upload a track</Link>
         <Link to="/artist-analytics" className="block px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10">Streaming analytics</Link>
       </div>

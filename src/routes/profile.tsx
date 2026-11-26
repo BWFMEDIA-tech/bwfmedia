@@ -1,12 +1,17 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/profile")({
-  beforeLoad: () => {
+  ssr: false,
+  beforeLoad: async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) {
+      throw redirect({ to: "/login", search: { redirect: "/profile" } as any });
+    }
     throw redirect({
       to: "/artist/$id",
-      params: { id: "ba0e0345-a5ed-45fc-af08-18d534192f04" },
+      params: { id: data.user.id },
       replace: true,
-      statusCode: 301,
     });
   },
   head: () => ({
