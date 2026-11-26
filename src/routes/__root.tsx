@@ -177,7 +177,7 @@ function RootComponent() {
             (isChrome
               ? "pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+60px)] md:pt-[calc(var(--bwf-banner-h,0px)+env(safe-area-inset-top)+64px)]"
               : "pt-[env(safe-area-inset-top)]") +
-            (showBottomNav ? " pb-[calc(env(safe-area-inset-bottom)+64px)] md:pb-0" : "")
+            (showBottomNav ? " pb-[calc(env(safe-area-inset-bottom)+64px)]" : "")
           }
         >
 

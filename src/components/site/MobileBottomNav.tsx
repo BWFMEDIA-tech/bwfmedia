@@ -39,11 +39,13 @@ export function MobileBottomNav() {
       root.style.removeProperty("--bwf-mobile-nav-h");
     };
   }, []);
+  // Shown only after sign-in, on every screen size.
+  if (!auth.user) return null;
   return (
     <>
     <nav
       aria-label="Primary"
-      className="tunevio-phone-navigation pb-nav fixed bottom-0 left-0 right-0 z-40 md:hidden"
+      className="tunevio-phone-navigation pb-nav fixed bottom-0 left-0 right-0 z-40"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul
@@ -108,5 +110,5 @@ export function MobileBottomNav() {
 }
 
 export function MobileBottomNavSpacer() {
-  return <div aria-hidden className="h-16 md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} />;
+  return <div aria-hidden className="h-16" style={{ paddingBottom: "env(safe-area-inset-bottom)" }} />;
 }
