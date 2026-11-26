@@ -45,6 +45,31 @@ export async function recordPwywCheckoutPaid(supabase: AdminClient, session: Str
   return true;
 }
 
+export async function confirmPwywCheckoutForBuyer(
+  stripe: Stripe,
+  supabase: AdminClient,
+  sessionId: string,
+  buyerUserId: string,
+  environment: "sandbox" | "live",
+): Promise<
+  | { kind: "other_checkout" }
+  | { kind: "pwyw_purchase"; status: "paid"; purchaseId: string; productTitle: string }
+  | { kind: "pwyw_purchase"; status: "processing" }
+> {
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  if (session.metadata?.["kind"] !== "pwyw_purchase") return { kind: "other_checkout" };
+  const { data: purchase, error } = await supabase.from("digital_music_purchases")
+    .select("id, buyer_user_id, product_title, status")
+    .eq("stripe_session_id", sessionId).eq("environment", environment).maybeSingle();
+  if (error || !purchase || purchase.buyer_user_id !== buyerUserId || session.metadata?.["buyerUserId"] !== buyerUserId) {
+    throw new Error("This music checkout could not be verified for the signed-in account");
+  }
+  if (purchase.status === "paid") return { kind: "pwyw_purchase", status: "paid", purchaseId: purchase.id, productTitle: purchase.product_title };
+  if (session.payment_status !== "paid") return { kind: "pwyw_purchase", status: "processing" };
+  await recordPwywCheckoutPaid(supabase, session, environment);
+  return { kind: "pwyw_purchase", status: "paid", purchaseId: purchase.id, productTitle: purchase.product_title };
+}
+
 export async function reversePwywPayment(supabase: AdminClient, paymentIntent: string, environment: "sandbox" | "live", reason: "refund" | "chargeback") {
   const { error } = await supabase.rpc("pwyw_reverse_purchase", { _payment_intent: paymentIntent, _environment: environment, _reason: reason });
   if (error) throw new Error(error.message);

@@ -259,6 +259,8 @@ export const createPwywCheckout = createServerFn({ method: "POST" })
             },
           }],
           automatic_tax: { enabled: true },
+          billing_address_collection: "required",
+          customer_update: { address: "auto", name: "auto" },
           metadata,
           payment_intent_data: { metadata },
         }, { idempotencyKey: `pwyw:${context.userId}:${data.checkoutKey}` });
@@ -292,6 +294,26 @@ export const createPwywCheckout = createServerFn({ method: "POST" })
       return { url: session.url, error: null };
     } catch (error) {
       return { url: null, error: error instanceof Error ? error.message : "Checkout is unavailable right now" };
+    }
+  });
+
+export const confirmPwywCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({
+    sessionId: z.string().regex(/^cs_(live|test)_[A-Za-z0-9]+$/),
+    environment: z.enum(["sandbox", "live"]),
+  }).parse(input))
+  .handler(async ({ data, context }) => {
+    try {
+      const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
+      const stripe = createStripeClient(data.environment);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { confirmPwywCheckoutForBuyer } = await import("@/lib/pwyw-payment.server");
+      return await confirmPwywCheckoutForBuyer(stripe, supabaseAdmin, data.sessionId, context.userId, data.environment);
+    } catch (error) {
+      const { getStripeErrorMessage } = await import("@/lib/stripe.server");
+      const message = getStripeErrorMessage(error);
+      return { kind: "error" as const, error: /still processing|not complete|could not be verified/i.test(message) ? message : "We could not verify this music checkout for the signed-in account" };
     }
   });
 

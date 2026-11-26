@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const retrieveIntent = vi.fn();
 vi.mock("./stripe.server", () => ({ createStripeClient: () => ({ paymentIntents: { retrieve: retrieveIntent } }) }));
-import { recordPwywCheckoutPaid } from "./pwyw-payment.server";
+import { confirmPwywCheckoutForBuyer, recordPwywCheckoutPaid } from "./pwyw-payment.server";
 
 function admin(purchase: any, rpcResult: { error: null | { message: string } } = { error: null }) {
   const rpc = vi.fn().mockResolvedValue(rpcResult);
@@ -48,5 +48,38 @@ describe("webhook-only Pay What You Want activation", () => {
   it("requests a Stripe retry if the purchase insert has not landed yet", async () => {
     const sb = admin(null);
     await expect(recordPwywCheckoutPaid(sb, { id: "cs_race", payment_status: "paid", metadata: { kind: "pwyw_purchase" } } as any, "live")).rejects.toThrow("not ready");
+  });
+});
+
+describe("buyer-confirmed Pay What You Want checkout", () => {
+  it("ignores membership and merchandise checkouts", async () => {
+    const stripe = { checkout: { sessions: { retrieve: vi.fn().mockResolvedValue({ id: "cs_plan", metadata: { kind: "tunevio_subscription" } }) } } };
+    await expect(confirmPwywCheckoutForBuyer(stripe as any, admin(null), "cs_plan", "buyer1", "live")).resolves.toEqual({ kind: "other_checkout" });
+  });
+
+  it("does not activate another account's purchase", async () => {
+    const stripe = { checkout: { sessions: { retrieve: vi.fn().mockResolvedValue({ id: "cs_test", payment_status: "paid", metadata: { kind: "pwyw_purchase", buyerUserId: "buyer1" } }) } } };
+    const sb = admin({ id: "purchase1", buyer_user_id: "someone_else", product_title: "Song", status: "pending" });
+    await expect(confirmPwywCheckoutForBuyer(stripe as any, sb, "cs_test", "buyer1", "live")).rejects.toThrow("could not be verified");
+    expect(sb.rpc).not.toHaveBeenCalled();
+  });
+
+  it("activates a paid checkout for its verified buyer", async () => {
+    const session = {
+      id: "cs_test", payment_status: "paid", payment_intent: "pi_test", amount_total: 101, total_details: { amount_tax: 1 },
+      metadata: { kind: "pwyw_purchase", buyerUserId: "buyer1", productId: "product1" },
+    };
+    const stripe = { checkout: { sessions: { retrieve: vi.fn().mockResolvedValue(session) } } };
+    const purchase = { id: "purchase1", buyer_user_id: "buyer1", product_id: "product1", product_title: "Song", amount_cents: 100, status: "pending" };
+    const sb = admin(purchase);
+    await expect(confirmPwywCheckoutForBuyer(stripe as any, sb, "cs_test", "buyer1", "live")).resolves.toEqual({ kind: "pwyw_purchase", status: "paid", purchaseId: "purchase1", productTitle: "Song" });
+    expect(sb.rpc).toHaveBeenCalledWith("pwyw_mark_purchase_paid", expect.objectContaining({ _session_id: "cs_test", _total_collected: 101, _tax: 1 }));
+  });
+
+  it("leaves an unpaid asynchronous payment pending", async () => {
+    const stripe = { checkout: { sessions: { retrieve: vi.fn().mockResolvedValue({ id: "cs_test", payment_status: "unpaid", metadata: { kind: "pwyw_purchase", buyerUserId: "buyer1" } }) } } };
+    const sb = admin({ id: "purchase1", buyer_user_id: "buyer1", product_title: "Song", status: "pending" });
+    await expect(confirmPwywCheckoutForBuyer(stripe as any, sb, "cs_test", "buyer1", "live")).resolves.toEqual({ kind: "pwyw_purchase", status: "processing" });
+    expect(sb.rpc).not.toHaveBeenCalled();
   });
 });

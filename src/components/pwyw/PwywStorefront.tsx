@@ -39,7 +39,7 @@ export function PwywPriceDialog({ product, open, onOpenChange }: { product: any;
         productId: product.id,
         amountCents: cents,
         checkoutKey: checkoutKey.current,
-        returnUrl: `${window.location.origin}/library`,
+        returnUrl: `${window.location.origin}/checkout/return`,
         environment: getStripeEnvironment(),
       } });
       if (!result.url) { checkoutKey.current = ""; toast.error(result.error || "Checkout could not be opened"); return; }

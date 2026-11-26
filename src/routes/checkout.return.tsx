@@ -9,6 +9,7 @@ import {
   type TunevioPlanId,
 } from "@/lib/tunevio-subscriptions.functions";
 import { Button } from "@/components/ui/button";
+import { confirmPwywCheckout } from "@/lib/pwyw.functions";
 
 export const Route = createFileRoute("/checkout/return")({
   validateSearch: (search: Record<string, unknown>): { session_id?: string } => ({
@@ -34,6 +35,8 @@ type ReturnState =
   | { status: "signin" }
   | { status: "generic" }
   | { status: "error"; message: string }
+  | { status: "pwyw_paid"; productTitle: string }
+  | { status: "pwyw_processing" }
   | { status: "plan"; planType: string; priceCents: number | null; renewalDate: string | null; cancelAtPeriodEnd: boolean };
 
 function CheckoutReturn() {
@@ -60,9 +63,19 @@ function CheckoutReturn() {
 
     let active = true;
     setState({ status: "verifying" });
-    void confirmTunevioCheckout({
-      data: { sessionId, environment: sessionId.startsWith("cs_test_") ? "sandbox" : "live" },
-    }).then((result) => {
+    const checkoutInput = { sessionId, environment: sessionId.startsWith("cs_test_") ? "sandbox" as const : "live" as const };
+    void (async () => {
+      const music = await confirmPwywCheckout({ data: checkoutInput });
+      if (!active) return;
+      if (music.kind === "error") {
+        setState({ status: "error", message: music.error });
+        return;
+      }
+      if (music.kind === "pwyw_purchase") {
+        setState(music.status === "paid" ? { status: "pwyw_paid", productTitle: music.productTitle } : { status: "pwyw_processing" });
+        return;
+      }
+      const result = await confirmTunevioCheckout({ data: checkoutInput });
       if (!active) return;
       if (result.kind === "other_checkout") {
         setState({ status: "generic" });
@@ -77,7 +90,7 @@ function CheckoutReturn() {
           cancelAtPeriodEnd: result.subscription.cancel_at_period_end,
         });
       }
-    }).catch((error: unknown) => {
+    })().catch((error: unknown) => {
       if (active) setState({
         status: "error",
         message: error instanceof Error ? error.message : "We could not confirm this checkout.",
@@ -127,6 +140,39 @@ function CheckoutReturn() {
               </Button>
               <Button asChild variant="outline" className="min-h-12 rounded-full px-6">
                 <Link to="/">Back to Tunevio</Link>
+              </Button>
+            </div>
+          </>
+        ) : state.status === "pwyw_paid" ? (
+          <>
+            <CheckCircle2 className="mx-auto mb-6 h-16 w-16 text-primary" />
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-primary">Payment confirmed</p>
+            <h1 className="text-3xl font-bold sm:text-4xl">Your music is ready</h1>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
+              {state.productTitle} is now in your Library. You can stream or download it without paying again.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button asChild className="min-h-12 rounded-full px-6">
+                <Link to="/library" search={{ session_id: sessionId ?? "" }}>Open my purchases</Link>
+              </Button>
+              <Button asChild variant="outline" className="min-h-12 rounded-full px-6">
+                <Link to="/music-store">Back to Music Store</Link>
+              </Button>
+            </div>
+          </>
+        ) : state.status === "pwyw_processing" ? (
+          <>
+            <Loader2 className="mx-auto mb-6 h-14 w-14 text-primary" />
+            <h1 className="text-3xl font-bold">Payment is processing</h1>
+            <p className="my-7 text-sm leading-6 text-muted-foreground">
+              Stripe has not confirmed this payment yet. Your music will unlock after confirmation; no second payment is needed.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button onClick={() => setAttempt((value) => value + 1)} className="min-h-12 rounded-full px-6">
+                <RefreshCw /> Check again
+              </Button>
+              <Button asChild variant="outline" className="min-h-12 rounded-full px-6">
+                <Link to="/library" search={{ session_id: sessionId ?? "" }}>Open my purchases</Link>
               </Button>
             </div>
           </>

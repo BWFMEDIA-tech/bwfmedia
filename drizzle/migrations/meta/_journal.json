@@ -659,6 +659,20 @@
       "when": 1795669173799,
       "tag": "0093_clarify_pwyw_track_guard_return",
       "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1795669507833,
+      "tag": "0094_complete_pwyw_payment_activation",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1795670278436,
+      "tag": "0095_fix_pwyw_refund_status",
+      "breakpoints": true
     }
   ]
 }

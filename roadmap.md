@@ -5,7 +5,8 @@
 - [x] Add artist release controls, square artwork upload, and the fan Choose Your Price experience with $1–$10,000 server-enforced pricing.
 - [x] Add fan purchase access and artist sales reporting without duplicating the music catalog or changing physical merchandise.
 - [x] Run pricing, entitlement, ownership, webhook, refund, and native-iOS purchase-policy tests; verify signed-in plan gating, product publishing, mobile pricing, artwork display, and cleanup.
-- [ ] Complete a successful Stripe checkout and purchased playback/download; Stripe test mode rejects automatic tax without a head-office address and the owner chose to preserve existing settings.
+- [x] Restore secure payment activation, use the existing live head-office address, and verify a signed-in fan reaches a real $1 Stripe Checkout; temporary records and sessions were removed and 31 payment/pricing tests pass.
+- [ ] Complete an actual paid fan checkout and purchased playback/download; no buyer charge was submitted. Stripe webhook creation is currently access-denied, so background event delivery still requires Webhook Endpoints access.
 
 ## Live membership checkout return
 - [x] Activate the completed Student subscription for its verified signed-in owner and confirm Settings → Billing reads it back.
