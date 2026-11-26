@@ -680,6 +680,13 @@
       "when": 1795670449992,
       "tag": "0096_restrict_track_uploads_to_artists",
       "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1795727890788,
+      "tag": "0097_migration",
+      "breakpoints": true
     }
   ]
 }

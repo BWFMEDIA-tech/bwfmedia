@@ -1788,3 +1788,10 @@ img.object-cover.rounded-full {
   object-fit: cover !important;
   object-position: 50% 18%;
 }
+
+/* Certification dashboard (reference-matched medal palette, page scoped) */
+.cert-page { --cert-gold: #f0b429; --cert-gold-soft: #f7c948; --cert-bronze: #c97a4a; --cert-silver: #b8bcc4; --cert-panel: #121214; --cert-edge: rgba(255,255,255,.08); --cert-ok: #4ade80; }
+.cert-panel { background: var(--cert-panel); border: 1px solid var(--cert-edge); border-radius: 18px; }
+.cert-gold { color: var(--cert-gold); }
+.cert-bar { background: linear-gradient(90deg, #c98a12, var(--cert-gold-soft)); }
+.cert-next { border-color: var(--cert-gold) !important; box-shadow: 0 0 24px rgba(240,180,41,.35); }

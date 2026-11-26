@@ -18,6 +18,7 @@ import { Route as ArtistDashboardRouteImport } from './routes/artist-dashboard'
 import { Route as ArtistStoreRouteImport } from './routes/artist-store'
 import { Route as ArtistSubmissionRouteImport } from './routes/artist-submission'
 import { Route as ArtistsRouteImport } from './routes/artists'
+import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as ChartsRouteImport } from './routes/charts'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
@@ -80,6 +81,7 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminBlockBookingsRouteImport } from './routes/admin.block-bookings'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminCancellationEmailsRouteImport } from './routes/admin.cancellation-emails'
+import { Route as AdminCertificationsRouteImport } from './routes/admin.certifications'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
@@ -218,6 +220,11 @@ const ArtistSubmissionRoute = ArtistSubmissionRouteImport.update({
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificationsRoute = CertificationsRouteImport.update({
+  id: '/certifications',
+  path: '/certifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChartsRoute = ChartsRouteImport.update({
@@ -530,6 +537,11 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
 const AdminCancellationEmailsRoute = AdminCancellationEmailsRouteImport.update({
   id: '/cancellation-emails',
   path: '/cancellation-emails',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCertificationsRoute = AdminCertificationsRouteImport.update({
+  id: '/certifications',
+  path: '/certifications',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminContentRoute = AdminContentRouteImport.update({
@@ -1026,6 +1038,7 @@ export interface FileRoutesByFullPath {
   '/artist-store': typeof ArtistStoreRouteWithChildren
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
+  '/certifications': typeof CertificationsRoute
   '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
@@ -1087,6 +1100,7 @@ export interface FileRoutesByFullPath {
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
+  '/admin/certifications': typeof AdminCertificationsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
@@ -1191,6 +1205,7 @@ export interface FileRoutesByTo {
   '/artist-dashboard': typeof ArtistDashboardRoute
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
+  '/certifications': typeof CertificationsRoute
   '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
@@ -1251,6 +1266,7 @@ export interface FileRoutesByTo {
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
+  '/admin/certifications': typeof AdminCertificationsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
@@ -1358,6 +1374,7 @@ export interface FileRoutesById {
   '/artist-store': typeof ArtistStoreRouteWithChildren
   '/artist-submission': typeof ArtistSubmissionRoute
   '/artists': typeof ArtistsRoute
+  '/certifications': typeof CertificationsRoute
   '/charts': typeof ChartsRoute
   '/contact': typeof ContactRoute
   '/cookie-policy': typeof CookiePolicyRoute
@@ -1419,6 +1436,7 @@ export interface FileRoutesById {
   '/admin/block-bookings': typeof AdminBlockBookingsRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/cancellation-emails': typeof AdminCancellationEmailsRoute
+  '/admin/certifications': typeof AdminCertificationsRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
@@ -1527,6 +1545,7 @@ export interface FileRouteTypes {
     | '/artist-store'
     | '/artist-submission'
     | '/artists'
+    | '/certifications'
     | '/charts'
     | '/contact'
     | '/cookie-policy'
@@ -1588,6 +1607,7 @@ export interface FileRouteTypes {
     | '/admin/block-bookings'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
+    | '/admin/certifications'
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
@@ -1692,6 +1712,7 @@ export interface FileRouteTypes {
     | '/artist-dashboard'
     | '/artist-submission'
     | '/artists'
+    | '/certifications'
     | '/charts'
     | '/contact'
     | '/cookie-policy'
@@ -1752,6 +1773,7 @@ export interface FileRouteTypes {
     | '/admin/block-bookings'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
+    | '/admin/certifications'
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
@@ -1858,6 +1880,7 @@ export interface FileRouteTypes {
     | '/artist-store'
     | '/artist-submission'
     | '/artists'
+    | '/certifications'
     | '/charts'
     | '/contact'
     | '/cookie-policy'
@@ -1919,6 +1942,7 @@ export interface FileRouteTypes {
     | '/admin/block-bookings'
     | '/admin/bookings'
     | '/admin/cancellation-emails'
+    | '/admin/certifications'
     | '/admin/content'
     | '/admin/dashboard'
     | '/admin/events'
@@ -2026,6 +2050,7 @@ export interface RootRouteChildren {
   ArtistStoreRoute: typeof ArtistStoreRouteWithChildren
   ArtistSubmissionRoute: typeof ArtistSubmissionRoute
   ArtistsRoute: typeof ArtistsRoute
+  CertificationsRoute: typeof CertificationsRoute
   ChartsRoute: typeof ChartsRoute
   ContactRoute: typeof ContactRoute
   CookiePolicyRoute: typeof CookiePolicyRoute
@@ -2192,6 +2217,13 @@ declare module '@tanstack/react-router' {
       path: '/artists'
       fullPath: '/artists'
       preLoaderRoute: typeof ArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certifications': {
+      id: '/certifications'
+      path: '/certifications'
+      fullPath: '/certifications'
+      preLoaderRoute: typeof CertificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/charts': {
@@ -2626,6 +2658,13 @@ declare module '@tanstack/react-router' {
       path: '/cancellation-emails'
       fullPath: '/admin/cancellation-emails'
       preLoaderRoute: typeof AdminCancellationEmailsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/certifications': {
+      id: '/admin/certifications'
+      path: '/certifications'
+      fullPath: '/admin/certifications'
+      preLoaderRoute: typeof AdminCertificationsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/content': {
@@ -3299,6 +3338,7 @@ interface AdminRouteChildren {
   AdminBlockBookingsRoute: typeof AdminBlockBookingsRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
   AdminCancellationEmailsRoute: typeof AdminCancellationEmailsRoute
+  AdminCertificationsRoute: typeof AdminCertificationsRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventsRoute: typeof AdminEventsRoute
@@ -3335,6 +3375,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBlockBookingsRoute: AdminBlockBookingsRoute,
   AdminBookingsRoute: AdminBookingsRoute,
   AdminCancellationEmailsRoute: AdminCancellationEmailsRoute,
+  AdminCertificationsRoute: AdminCertificationsRoute,
   AdminContentRoute: AdminContentRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEventsRoute: AdminEventsRoute,
@@ -3446,6 +3487,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistStoreRoute: ArtistStoreRouteWithChildren,
   ArtistSubmissionRoute: ArtistSubmissionRoute,
   ArtistsRoute: ArtistsRoute,
+  CertificationsRoute: CertificationsRoute,
   ChartsRoute: ChartsRoute,
   ContactRoute: ContactRoute,
   CookiePolicyRoute: CookiePolicyRoute,

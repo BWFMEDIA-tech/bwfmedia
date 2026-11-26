@@ -28,6 +28,7 @@ const GROUPS = [
   ] },
   { key: "performance", label: "Performance", icon: BarChart3, children: [
     { to: "/artist-analytics", label: "Streams & Audience Growth" },
+    { to: "/certifications", label: "Certifications & Milestones" },
     { to: "/charts", label: "Charts" },
     { to: "/leaderboard", label: "Leaderboard" },
   ] },

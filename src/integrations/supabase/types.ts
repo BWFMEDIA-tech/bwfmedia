@@ -272,6 +272,66 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_certifications: {
+        Row: {
+          achieved_at: string
+          artist_id: string
+          created_at: string
+          eligible_streams_at_issue: number
+          id: string
+          issued_by: string | null
+          level: string
+          note: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          achieved_at?: string
+          artist_id: string
+          created_at?: string
+          eligible_streams_at_issue?: number
+          id?: string
+          issued_by?: string | null
+          level: string
+          note?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          achieved_at?: string
+          artist_id?: string
+          created_at?: string
+          eligible_streams_at_issue?: number
+          id?: string
+          issued_by?: string | null
+          level?: string
+          note?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_certifications_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_certifications_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_exclusive_content: {
         Row: {
           artist_id: string
@@ -7534,6 +7594,10 @@ export type Database = {
       }
       get_battle_replay: { Args: { _match_id: string }; Returns: Json }
       get_battle_tournament_state: { Args: never; Returns: Json }
+      get_certification_streams: {
+        Args: { _artist_id: string }
+        Returns: number
+      }
       get_creator_balance_cents: {
         Args: { _user_id: string }
         Returns: {
