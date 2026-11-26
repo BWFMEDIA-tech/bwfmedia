@@ -1,5 +1,11 @@
 # Roadmap
 
+## Pay What You Want music store
+- [ ] Add Artist Pro and Label Plan entitlement, private artist products, and webhook-only fan purchase records with a 60/40 digital-music split.
+- [ ] Add artist release controls and the fan Choose Your Price experience with $1–$10,000 server-enforced pricing.
+- [ ] Add fan purchase access and artist sales reporting without duplicating the music catalog or changing physical merchandise.
+- [ ] Run pricing, entitlement, ownership, checkout, webhook, refund, and native-iOS purchase-policy tests; verify the signed-in fan and artist flows.
+
 ## Live membership checkout return
 - [x] Activate the completed Student subscription for its verified signed-in owner and confirm Settings → Billing reads it back.
 - [x] Replace the legacy checkout-return screen with Tunevio plan confirmation and signed-in Stripe session verification, without waiting for a webhook.
