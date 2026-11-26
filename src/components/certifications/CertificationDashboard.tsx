@@ -68,7 +68,7 @@ export function CertificationDashboard({ data }: { data: CertDashboardData }) {
 
       <section className="cert-panel p-5">
         <h2 className="mb-4 text-sm uppercase tracking-wider">Your milestone path</h2>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex gap-4 overflow-x-auto pb-2 pt-4">
           {CERT_LEVELS.map((l) => {
             const cert = issued.get(l.key);
             const isNext = next?.key === l.key;
