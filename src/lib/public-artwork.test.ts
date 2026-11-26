@@ -5,9 +5,9 @@ const owner = "85a8f0da-bb21-4b1c-a727-2b6ed507d9ce";
 const path = `${owner}/cover.jpg`;
 const url = (p: string) => `https://example.test/storage/v1/object/public/avatars/${p}?v=123`;
 
-function database(profiles: object[], tracks: { cover_url: string; status: string; artist_user_id?: string; streams?: { title: string; host_id: string } }[]) {
+function database(profiles: object[], tracks: { cover_url: string; status: string; artist_user_id?: string; streams?: { title: string; host_id: string } }[], products: { artwork_url: string; status: string; pwyw_enabled: boolean }[] = []) {
   return { from: (table: string) => {
-    let rows = table === "profiles" ? profiles : tracks;
+    let rows: object[] = table === "profiles" ? profiles : table === "pwyw_products" ? products : tracks;
     const query = {
       select: () => query,
       in: (column: string, values: string[]) => {
@@ -15,6 +15,10 @@ function database(profiles: object[], tracks: { cover_url: string; status: strin
         return query;
       },
       or: () => query,
+      eq: (column: string, value: unknown) => {
+        if (table === "pwyw_products") rows = (rows as typeof products).filter((product) => product[column as keyof typeof product] === value);
+        return query;
+      },
       then: (resolve: (result: { data: object[] }) => void) => resolve({ data: rows }),
     };
     return query;
@@ -58,6 +62,12 @@ describe("public artwork signing boundary", () => {
   it("allows current brand photos and banners but not unreferenced files", async () => {
     const db = database([{ brand_avatar_url: url(`${owner}/brand.png`), banner_url: url(`${owner}/banner.jpg`) }], []);
     expect([...await publicArtworkPaths(db, [`${owner}/brand.png`, `${owner}/banner.jpg`, path])]).toEqual([`${owner}/brand.png`, `${owner}/banner.jpg`]);
+  });
+  it("allows exact artwork from a published Pay What You Want product only", async () => {
+    const db = database([], [], [{ artwork_url: url(path), status: "published", pwyw_enabled: true }]);
+    expect(await publicArtworkPaths(db, [path, `${owner}/private.jpg`])).toEqual(new Set([path]));
+    const draft = database([], [], [{ artwork_url: url(path), status: "draft", pwyw_enabled: true }]);
+    expect((await publicArtworkPaths(draft, [path])).size).toBe(0);
   });
   it("normalizes expired signed references and rejects invalid owner paths", () => {
     expect(avatarObjectPath(`https://example.test/storage/v1/object/sign/avatars/${path}?token=expired`)).toBe(path);

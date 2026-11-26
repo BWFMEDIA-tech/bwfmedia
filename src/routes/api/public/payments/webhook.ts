@@ -358,6 +358,11 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
                 await markStoreOrderPaid(event.data.object, env);
                 break;
               }
+              if ((event.data.object as any)?.metadata?.kind === 'pwyw_purchase') {
+                const { recordPwywCheckoutPaid } = await import('@/lib/pwyw-payment.server');
+                await recordPwywCheckoutPaid(getSupabase(), event.data.object as any, env);
+                break;
+              }
               // Environment fence: tips / boosts / bookings live in ONE
               // production database with no environment column, so a
               // signature-valid SANDBOX event (test-card payment) must never
@@ -400,24 +405,38 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
               if (ch.refunded && ch.payment_intent) {
                 await markTagOrderClosed({ intent: ch.payment_intent }, env, 'refunded');
                 await closeStoreOrderByIntent(ch.payment_intent, env, 'refund');
+                const { reversePwywPayment } = await import('@/lib/pwyw-payment.server');
+                await reversePwywPayment(getSupabase(), ch.payment_intent, env, 'refund');
               }
               break;
             }
             case 'charge.dispute.created': {
               const d: any = event.data.object;
-              if (d.payment_intent) await closeStoreOrderByIntent(d.payment_intent, env, 'chargeback');
+              if (d.payment_intent) {
+                await closeStoreOrderByIntent(d.payment_intent, env, 'chargeback');
+                const { reversePwywPayment } = await import('@/lib/pwyw-payment.server');
+                await reversePwywPayment(getSupabase(), d.payment_intent, env, 'chargeback');
+              }
               break;
             }
             case 'checkout.session.async_payment_failed': {
               const s: any = event.data.object;
               if (s?.metadata?.kind === 'nfc_tag_order') await markTagOrderClosed({ session: s.id }, env, 'cancelled');
               if (s?.metadata?.kind === 'store_order') await getSupabase().from('store_orders').update({ status: 'failed' }).eq('stripe_session_id', s.id).eq('status', 'pending');
+              if (s?.metadata?.kind === 'pwyw_purchase') {
+                const { markPwywCheckoutIncomplete } = await import('@/lib/pwyw-payment.server');
+                await markPwywCheckoutIncomplete(getSupabase(), s, env, 'failed');
+              }
               break;
             }
             case 'checkout.session.expired': {
               const s: any = event.data.object;
               if (s?.metadata?.kind === 'nfc_tag_order') await markTagOrderClosed({ session: s.id }, env, 'cancelled');
               if (s?.metadata?.kind === 'store_order') await getSupabase().from('store_orders').update({ status: 'expired' }).eq('stripe_session_id', s.id).eq('status', 'pending');
+              if (s?.metadata?.kind === 'pwyw_purchase') {
+                const { markPwywCheckoutIncomplete } = await import('@/lib/pwyw-payment.server');
+                await markPwywCheckoutIncomplete(getSupabase(), s, env, 'expired');
+              }
               await sendStripeCancellationEmail(getSupabase(), s.customer_email ?? s.customer_details?.email, s.id);
               break;
             }

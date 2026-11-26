@@ -1,0 +1,2 @@
+CREATE POLICY pwyw_products_admin_insert ON public.pwyw_products FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY pwyw_product_tracks_admin_insert ON public.pwyw_product_tracks FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'admin'));

@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Clock, Film, Heart, ListMusic, Music2, Play, Users } from "lucide-react";
+import { Clock, Film, Heart, ListMusic, Music2, Play, ShoppingBag, Users } from "lucide-react";
+import { PwywLibrary } from "@/components/pwyw/PwywLibrary";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { getSavedVideos } from "@/lib/video-engagement.functions";
@@ -13,9 +14,12 @@ import { TrackCard, toPlayerTrack } from "@/components/tunevio/cards";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/library")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    session_id: typeof search.session_id === "string" ? search.session_id : undefined,
+  }),
   head: () => ({ meta: [
     { title: "Music Library — Tunevio" },
-    { name: "description", content: "Your saved music, followed artists, recently played tracks, saved videos and queue on Tunevio." },
+    { name: "description", content: "Your saved music, purchases, followed artists, recently played tracks, saved videos and queue on Tunevio." },
     { property: "og:title", content: "Music Library — Tunevio" },
     { property: "og:description", content: "Listen to saved Tunevio catalog tracks and your current queue." },
     { property: "og:type", content: "website" },
@@ -27,7 +31,8 @@ export const Route = createFileRoute("/library")({
 function LibraryPage() {
   const auth = useAuth();
   const player = usePlayer();
-  const [mode, setMode] = useState<Mode>("saved");
+  const search = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(search.session_id ? "purchases" : "saved");
   const uid = auth.user?.id;
   const fetchSavedVideos = useServerFn(getSavedVideos);
   const follows = useQuery({ queryKey: ["library-follows", uid], enabled: !!uid && mode === "artists", queryFn: async () => {
@@ -68,6 +73,7 @@ function LibraryPage() {
     {!auth.user && mode !== "queue" ? <Button asChild variant="outline"><Link to="/login">Sign in to view your library</Link></Button> : mode === "artists" ? <section><h2 className="mb-5 text-lg font-semibold">Followed artists</h2>{follows.isPending ? <p className="py-8 text-sm text-muted-foreground">Loading artists…</p> : follows.isError ? <Retry onRetry={() => void follows.refetch()} /> : follows.data.length ? <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{follows.data.map(a => <Link key={a.id} to="/artist/$id" params={{ id: a.id }} className="group rounded-xl border border-border bg-card p-4 text-center hover:border-primary">{a.avatar_url ? <img src={a.avatar_url} alt="" className="mx-auto h-20 w-20 rounded-full object-cover ring-2 ring-primary/50" /> : <span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-secondary"><Users className="h-7 w-7 text-muted-foreground" /></span>}<span className="mt-3 block truncate font-semibold group-hover:text-primary">{a.stage_name || a.display_name || "Tunevio artist"}</span>{a.genre && <span className="block truncate text-xs text-muted-foreground">{a.genre}</span>}</Link>)}</div> : <Empty text="You’re not following any artists yet." to="/artists" cta="Find artists" />}</section>
     : mode === "recent" ? <section><h2 className="mb-5 text-lg font-semibold">Recently played</h2>{recent.isPending || feed.isPending ? <p className="py-8 text-sm text-muted-foreground">Loading recent plays…</p> : recent.isError ? <Retry onRetry={() => void recent.refetch()} /> : recentTracks.length || unavailableRecent.length ? <div className="space-y-2">{recentTracks.map(track => <TrackCard key={track.id} track={track} queue={recentTracks} />)}<Unavailable count={unavailableRecent.length} /></div> : <Empty text="No recent plays yet." to="/discover" cta="Discover music" />}</section>
     : mode === "videos" ? <section><h2 className="mb-5 text-lg font-semibold">Saved videos</h2>{videos.isPending ? <p className="py-8 text-sm text-muted-foreground">Loading videos…</p> : videos.isError ? <Retry onRetry={() => void videos.refetch()} /> : videos.data.length ? <div className="divide-y divide-border">{videos.data.map(v => { const vid = (v as { videos?: { id: string; title: string; artist: string | null } | null }).videos; return vid ? <Link key={v.video_id} to="/videos/$id" params={{ id: vid.id }} className="flex items-center gap-4 py-4 hover:text-primary"><Film className="h-5 w-5 text-primary" /><span className="min-w-0"><span className="block truncate">{vid.title}</span><span className="block truncate text-xs text-muted-foreground">{vid.artist ?? "Tunevio artist"}</span></span></Link> : null; })}</div> : <Empty text="No saved videos yet." to="/videos" cta="Browse videos" />}</section>
+    : mode === "purchases" ? <PwywLibrary checkoutSession={search.session_id} />
     : null}
     {mode === "saved" && auth.user ? <>
       <div className="mb-5 flex items-center gap-4"><span className="grid h-16 w-16 place-items-center rounded-lg bg-secondary"><Heart className="h-7 w-7 text-primary" /></span><div className="flex-1"><h2 className="text-lg font-semibold">Liked music</h2><p className="mt-1 text-sm text-muted-foreground">{saved.length + unavailableSaved.length} saved{unavailableSaved.length ? ` · ${unavailableSaved.length} unavailable` : ""}</p></div><Button size="icon" variant="secondary" aria-label="Play saved music" className="rounded-full" disabled={!playable.length} onClick={() => { const first = playable[0]; if (first) player.play(first, playable); }}><Play fill="currentColor" /></Button></div>
@@ -76,9 +82,10 @@ function LibraryPage() {
   </main>;
 }
 
-type Mode = "saved" | "artists" | "recent" | "videos" | "queue";
+type Mode = "saved" | "purchases" | "artists" | "recent" | "videos" | "queue";
 const MODES: { id: Mode; label: string; icon: typeof Heart }[] = [
   { id: "saved", label: "Saved music", icon: Heart },
+  { id: "purchases", label: "Purchases", icon: ShoppingBag },
   { id: "artists", label: "Artists", icon: Users },
   { id: "recent", label: "Recent", icon: Clock },
   { id: "videos", label: "Videos", icon: Film },

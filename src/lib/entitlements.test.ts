@@ -7,8 +7,8 @@ const past = "2026-10-01T00:00:00Z";
 const sub = (plan: string, status: string, end: string | null = future) => ({ plan_type: plan, price_id: plan, status, current_period_end: end });
 
 describe("plan perks", () => {
-  it("Artist Pro unlocks the full dashboard only", () => {
-    expect(perksFor([sub("artist_pro", "active")], false, now)).toEqual(["analytics_advanced"]);
+  it("Artist Pro unlocks the full dashboard and Pay What You Want store", () => {
+    expect(perksFor([sub("artist_pro", "active")], false, now)).toEqual(["analytics_advanced", "pwyw_store"]);
   });
   it("Label Plan unlocks the label management panel", () => {
     expect(perksFor([sub("label_plan", "active")], false, now)).toContain("label_panel");
@@ -18,7 +18,7 @@ describe("plan perks", () => {
     expect(perksFor([], false, now)).toEqual([]);
   });
   it("canceled plans keep perks until the paid period ends", () => {
-    expect(perksFor([sub("artist_pro", "canceled", future)], false, now)).toEqual(["analytics_advanced"]);
+    expect(perksFor([sub("artist_pro", "canceled", future)], false, now)).toEqual(["analytics_advanced", "pwyw_store"]);
     expect(perksFor([sub("artist_pro", "canceled", past)], false, now)).toEqual([]);
   });
   it("admins always get full access", () => {

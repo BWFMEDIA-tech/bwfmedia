@@ -43,6 +43,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MicDropRouteImport } from './routes/mic-drop'
+import { Route as MusicSalesRouteImport } from './routes/music-sales'
+import { Route as MusicStoreRouteImport } from './routes/music-store'
 import { Route as NetworkRouteImport } from './routes/network'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OffTheBlockRouteImport } from './routes/off-the-block'
@@ -341,6 +343,16 @@ const MessagesRoute = MessagesRouteImport.update({
 const MicDropRoute = MicDropRouteImport.update({
   id: '/mic-drop',
   path: '/mic-drop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MusicSalesRoute = MusicSalesRouteImport.update({
+  id: '/music-sales',
+  path: '/music-sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MusicStoreRoute = MusicStoreRouteImport.update({
+  id: '/music-store',
+  path: '/music-store',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NetworkRoute = NetworkRouteImport.update({
@@ -1039,6 +1051,8 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
+  '/music-sales': typeof MusicSalesRoute
+  '/music-store': typeof MusicStoreRoute
   '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
@@ -1202,6 +1216,8 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
+  '/music-sales': typeof MusicSalesRoute
+  '/music-store': typeof MusicStoreRoute
   '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
@@ -1367,6 +1383,8 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/messages': typeof MessagesRoute
   '/mic-drop': typeof MicDropRoute
+  '/music-sales': typeof MusicSalesRoute
+  '/music-store': typeof MusicStoreRoute
   '/network': typeof NetworkRoute
   '/notifications': typeof NotificationsRoute
   '/off-the-block': typeof OffTheBlockRoute
@@ -1534,6 +1552,8 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/mic-drop'
+    | '/music-sales'
+    | '/music-store'
     | '/network'
     | '/notifications'
     | '/off-the-block'
@@ -1697,6 +1717,8 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/mic-drop'
+    | '/music-sales'
+    | '/music-store'
     | '/network'
     | '/notifications'
     | '/off-the-block'
@@ -1861,6 +1883,8 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/messages'
     | '/mic-drop'
+    | '/music-sales'
+    | '/music-store'
     | '/network'
     | '/notifications'
     | '/off-the-block'
@@ -2027,6 +2051,8 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MessagesRoute: typeof MessagesRoute
   MicDropRoute: typeof MicDropRoute
+  MusicSalesRoute: typeof MusicSalesRoute
+  MusicStoreRoute: typeof MusicStoreRoute
   NetworkRoute: typeof NetworkRoute
   NotificationsRoute: typeof NotificationsRoute
   OffTheBlockRoute: typeof OffTheBlockRoute
@@ -2341,6 +2367,20 @@ declare module '@tanstack/react-router' {
       path: '/mic-drop'
       fullPath: '/mic-drop'
       preLoaderRoute: typeof MicDropRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/music-sales': {
+      id: '/music-sales'
+      path: '/music-sales'
+      fullPath: '/music-sales'
+      preLoaderRoute: typeof MusicSalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/music-store': {
+      id: '/music-store'
+      path: '/music-store'
+      fullPath: '/music-store'
+      preLoaderRoute: typeof MusicStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/network': {
@@ -3431,6 +3471,8 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MessagesRoute: MessagesRoute,
   MicDropRoute: MicDropRoute,
+  MusicSalesRoute: MusicSalesRoute,
+  MusicStoreRoute: MusicStoreRoute,
   NetworkRoute: NetworkRoute,
   NotificationsRoute: NotificationsRoute,
   OffTheBlockRoute: OffTheBlockRoute,

@@ -1909,6 +1909,148 @@ export type Database = {
         }
         Relationships: []
       }
+      digital_music_earnings: {
+        Row: {
+          amount_cents: number
+          artist_cents: number
+          artist_fee_cents: number
+          created_at: string
+          entry_type: string
+          environment: string
+          fee_cents: number
+          id: string
+          platform_cents: number
+          purchase_id: string
+          seller_user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          artist_cents: number
+          artist_fee_cents: number
+          created_at?: string
+          entry_type: string
+          environment: string
+          fee_cents: number
+          id?: string
+          platform_cents: number
+          purchase_id: string
+          seller_user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          artist_cents?: number
+          artist_fee_cents?: number
+          created_at?: string
+          entry_type?: string
+          environment?: string
+          fee_cents?: number
+          id?: string
+          platform_cents?: number
+          purchase_id?: string
+          seller_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_music_earnings_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "digital_music_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      digital_music_purchases: {
+        Row: {
+          amount_cents: number
+          artist_cents: number
+          artist_fee_cents: number
+          artist_user_id: string
+          buyer_user_id: string
+          checkout_key: string
+          checkout_url: string | null
+          created_at: string
+          currency: string
+          environment: string
+          fee_cents: number
+          id: string
+          paid_at: string | null
+          platform_cents: number
+          platform_fee_cents: number
+          product_id: string
+          product_title: string
+          product_type: string
+          refunded_at: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          tax_cents: number
+          total_collected_cents: number | null
+          track_ids: string[]
+        }
+        Insert: {
+          amount_cents: number
+          artist_cents: number
+          artist_fee_cents?: number
+          artist_user_id: string
+          buyer_user_id: string
+          checkout_key: string
+          checkout_url?: string | null
+          created_at?: string
+          currency?: string
+          environment: string
+          fee_cents?: number
+          id?: string
+          paid_at?: string | null
+          platform_cents: number
+          platform_fee_cents?: number
+          product_id: string
+          product_title: string
+          product_type: string
+          refunded_at?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tax_cents?: number
+          total_collected_cents?: number | null
+          track_ids: string[]
+        }
+        Update: {
+          amount_cents?: number
+          artist_cents?: number
+          artist_fee_cents?: number
+          artist_user_id?: string
+          buyer_user_id?: string
+          checkout_key?: string
+          checkout_url?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          fee_cents?: number
+          id?: string
+          paid_at?: string | null
+          platform_cents?: number
+          platform_fee_cents?: number
+          product_id?: string
+          product_title?: string
+          product_type?: string
+          refunded_at?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tax_cents?: number
+          total_collected_cents?: number | null
+          track_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digital_music_purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "pwyw_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       direct_messages: {
         Row: {
           body: string
@@ -4314,6 +4456,83 @@ export type Database = {
           stage_name?: string | null
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      pwyw_product_tracks: {
+        Row: {
+          position: number
+          product_id: string
+          track_id: string
+        }
+        Insert: {
+          position: number
+          product_id: string
+          track_id: string
+        }
+        Update: {
+          position?: number
+          product_id?: string
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pwyw_product_tracks_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "pwyw_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pwyw_products: {
+        Row: {
+          artist_user_id: string
+          artwork_url: string | null
+          created_at: string
+          description: string
+          id: string
+          max_price_cents: number
+          min_price_cents: number
+          product_type: string
+          pwyw_enabled: boolean
+          release_id: string | null
+          status: string
+          suggested_prices_cents: number[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artist_user_id: string
+          artwork_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          max_price_cents?: number
+          min_price_cents?: number
+          product_type: string
+          pwyw_enabled?: boolean
+          release_id?: string | null
+          status?: string
+          suggested_prices_cents?: number[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artist_user_id?: string
+          artwork_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          max_price_cents?: number
+          min_price_cents?: number
+          product_type?: string
+          pwyw_enabled?: boolean
+          release_id?: string | null
+          status?: string
+          suggested_prices_cents?: number[]
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -7528,6 +7747,25 @@ export type Database = {
           _track_a?: string
           _track_b?: string
         }
+        Returns: string
+      }
+      pwyw_mark_purchase_paid: {
+        Args: {
+          _environment: string
+          _fee: number
+          _payment_intent: string
+          _session_id: string
+          _tax: number
+          _total_collected: number
+        }
+        Returns: string
+      }
+      pwyw_purchased_track: {
+        Args: { _track_id: string; _user_id: string }
+        Returns: boolean
+      }
+      pwyw_reverse_purchase: {
+        Args: { _environment: string; _payment_intent: string; _reason: string }
         Returns: string
       }
       react_to_battle: {

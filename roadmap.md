@@ -1,10 +1,11 @@
 # Roadmap
 
 ## Pay What You Want music store
-- [ ] Add Artist Pro and Label Plan entitlement, private artist products, and webhook-only fan purchase records with a 60/40 digital-music split.
-- [ ] Add artist release controls and the fan Choose Your Price experience with $1–$10,000 server-enforced pricing.
-- [ ] Add fan purchase access and artist sales reporting without duplicating the music catalog or changing physical merchandise.
-- [ ] Run pricing, entitlement, ownership, checkout, webhook, refund, and native-iOS purchase-policy tests; verify the signed-in fan and artist flows.
+- [x] Add Artist Pro and Label Plan entitlement, private artist products, and webhook-only fan purchase records with a 60/40 digital-music split.
+- [x] Add artist release controls, square artwork upload, and the fan Choose Your Price experience with $1–$10,000 server-enforced pricing.
+- [x] Add fan purchase access and artist sales reporting without duplicating the music catalog or changing physical merchandise.
+- [x] Run pricing, entitlement, ownership, webhook, refund, and native-iOS purchase-policy tests; verify signed-in plan gating, product publishing, mobile pricing, artwork display, and cleanup.
+- [ ] Complete a successful Stripe checkout and purchased playback/download; Stripe test mode rejects automatic tax without a head-office address and the owner chose to preserve existing settings.
 
 ## Live membership checkout return
 - [x] Activate the completed Student subscription for its verified signed-in owner and confirm Settings → Billing reads it back.

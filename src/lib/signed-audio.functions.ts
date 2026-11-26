@@ -167,6 +167,28 @@ export const signAudioUrl = createServerFn({ method: "POST" })
       }
     }
 
+    if (!authorized && userId) {
+      // Paid music uses the immutable purchase snapshot, not current public
+      // visibility. Refunded and charged-back purchases no longer authorize.
+      const { data: candidates } = await supabaseAdmin
+        .from("play_tracks")
+        .select("id, audio_url")
+        .ilike("audio_url", `%${path}%`)
+        .limit(20);
+      for (const candidate of candidates ?? []) {
+        if (!refersToPath(candidate.audio_url)) continue;
+        const { data: purchased } = await supabaseAdmin.rpc("pwyw_purchased_track", {
+          _user_id: userId,
+          _track_id: candidate.id,
+        });
+        if (purchased) {
+          authorized = true;
+          reason = "pwyw_purchase";
+          break;
+        }
+      }
+    }
+
     if (!authorized) {
       audit("denied", "not_authorized", path);
       return { url: null as string | null, expiresIn: 0 };

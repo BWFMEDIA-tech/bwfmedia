@@ -14,6 +14,8 @@ const GROUPS = [
     { to: "/upload", label: "Upload Music & Video" },
     { to: "/settings/music-media", label: "Tracks, Releases & Artwork" },
     { to: "/distribution", label: "Release Status & Distribution" },
+    { to: "/music-sales", label: "Music Sales" },
+    { to: "/music-store", label: "Fan Music Store" },
     { to: "/rights", label: "Music Rights & Royalties" },
     { to: "/import-catalog", label: "Import Catalog" },
   ] },

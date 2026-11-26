@@ -617,6 +617,48 @@
       "when": 1795655060739,
       "tag": "0087_royalty_scan_input_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1795668365252,
+      "tag": "0088_add_pay_what_you_want_music_store",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1795668482684,
+      "tag": "0089_require_published_pwyw_product_tracks",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1795668791079,
+      "tag": "0090_restrict_pwyw_purchase_lookup_to_owner",
+      "breakpoints": true
+    },
+    {
+      "idx": 91,
+      "version": "7",
+      "when": 1795669082317,
+      "tag": "0091_complete_pwyw_admin_product_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1795669100078,
+      "tag": "0092_protect_pwyw_sold_track_audio",
+      "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1795669173799,
+      "tag": "0093_clarify_pwyw_track_guard_return",
+      "breakpoints": true
     }
   ]
 }
