@@ -1,5 +1,11 @@
 # Roadmap
 
+## Royalty Finder
+- [x] Add private catalog scan history and evidence-backed findings to the existing rights dashboard.
+- [x] Audit owned metadata, preserve registration statuses, support resolution and song rescans.
+- [x] Verify signed-in catalog scan (25 owned songs), persistent resolution, single-song rescan, phone layout and 20 evidence/privacy tests.
+- [ ] Enable official database matching and unmatched-recording detection; requires organization-approved API access, currently none connected.
+
 ## Targeted security remediation
 - [x] Secure store image references and signing against cross-owner publication; preserve owner previews and public products/pages.
 - [x] Share verified billing ownership across checkout/portals; protect billing identifiers from direct account writes without changing existing Stripe records.

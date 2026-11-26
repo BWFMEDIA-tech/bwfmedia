@@ -4683,6 +4683,127 @@ export type Database = {
           },
         ]
       }
+      royalty_catalog_scans: {
+        Row: {
+          coverage: Json
+          created_at: string
+          findings_count: number
+          id: string
+          total_tracks_scanned: number
+          track_id: string | null
+          user_id: string
+        }
+        Insert: {
+          coverage?: Json
+          created_at?: string
+          findings_count: number
+          id?: string
+          total_tracks_scanned: number
+          track_id?: string | null
+          user_id: string
+        }
+        Update: {
+          coverage?: Json
+          created_at?: string
+          findings_count?: number
+          id?: string
+          total_tracks_scanned?: number
+          track_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "royalty_catalog_scans_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "royalty_catalog_scans_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      royalty_scan_findings: {
+        Row: {
+          artist_name: string
+          created_at: string
+          evidence: string
+          id: string
+          issue_type: string
+          match_confidence: number | null
+          organization: string
+          recommended_action: string
+          resolved: boolean
+          resolved_at: string | null
+          scan_id: string
+          song_title: string
+          source: string
+          track_id: string | null
+          user_id: string
+        }
+        Insert: {
+          artist_name: string
+          created_at?: string
+          evidence: string
+          id?: string
+          issue_type: string
+          match_confidence?: number | null
+          organization: string
+          recommended_action: string
+          resolved?: boolean
+          resolved_at?: string | null
+          scan_id: string
+          song_title: string
+          source?: string
+          track_id?: string | null
+          user_id: string
+        }
+        Update: {
+          artist_name?: string
+          created_at?: string
+          evidence?: string
+          id?: string
+          issue_type?: string
+          match_confidence?: number | null
+          organization?: string
+          recommended_action?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          scan_id?: string
+          song_title?: string
+          source?: string
+          track_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "royalty_scan_findings_scan_id_user_id_fkey"
+            columns: ["scan_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "royalty_catalog_scans"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "royalty_scan_findings_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "royalty_scan_findings_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       royalty_statements: {
         Row: {
           amount_cents: number
@@ -7496,6 +7617,15 @@ export type Database = {
         Returns: number
       }
       run_trial_reminders: { Args: never; Returns: undefined }
+      save_royalty_catalog_scan: {
+        Args: {
+          p_coverage: Json
+          p_findings: Json
+          p_track_id?: string
+          p_track_ids: string[]
+        }
+        Returns: string
+      }
       set_host_status: {
         Args: { _host_id: string; _reason: string; _status: string }
         Returns: undefined

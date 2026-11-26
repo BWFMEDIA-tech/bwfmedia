@@ -15,6 +15,7 @@ import { hasArtistTools } from "@/lib/artist-navigation";
 import { RIGHTS_ORGS, STATUS_LABEL, canAddSplit, countRights, splitTotal, type OrgKey, type RightsStatus } from "@/lib/rights";
 import shield from "@/assets/rights-shield.jpg";
 import { SignedImg } from "@/components/ui/signed-img";
+import { RoyaltyFinder } from "@/components/billing/RoyaltyFinder";
 
 export const Route = createFileRoute("/rights")({
   ssr: false,
@@ -139,6 +140,8 @@ function Dashboard({ userId }: { userId: string }) {
           )}
         </aside>
       </div>
+
+      <RoyaltyFinder userId={userId} />
 
       <div className={`${glass} flex flex-col gap-3 border-primary/50 p-4 sm:flex-row sm:items-center`}>
         <Info className="h-6 w-6 shrink-0 text-primary" />

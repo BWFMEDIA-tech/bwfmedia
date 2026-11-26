@@ -14,7 +14,7 @@ const NOTES: Record<OrgKey, string> = {
   bmi: "No public API; data exchange via approved partners (CWR files).",
   songtrust: "Partner API access requires a business agreement.",
   soundexchange: "ISRC/repertoire data access requires an approved data agreement.",
-  mlc: "Bulk data and DQI access require MLC approval and a signed license.",
+  mlc: "The MLC Public Search API requires approved access; no authorized connection is configured.",
 };
 
 export function getIntegrationStatus(org: OrgKey): IntegrationStatus {

@@ -603,6 +603,20 @@
       "when": 1795650296686,
       "tag": "0085_profile_show_tips",
       "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1795654939693,
+      "tag": "0086_royalty_finder_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1795655060739,
+      "tag": "0087_royalty_scan_input_guards",
+      "breakpoints": true
     }
   ]
 }
