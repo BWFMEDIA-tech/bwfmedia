@@ -34,7 +34,7 @@ type ReturnState =
   | { status: "signin" }
   | { status: "generic" }
   | { status: "error"; message: string }
-  | { status: "plan"; planType: string; priceCents: number | null; renewalDate: string | null };
+  | { status: "plan"; planType: string; priceCents: number | null; renewalDate: string | null; cancelAtPeriodEnd: boolean };
 
 function CheckoutReturn() {
   const { session_id: sessionId } = Route.useSearch();
@@ -74,6 +74,7 @@ function CheckoutReturn() {
           planType: result.subscription.plan_type,
           priceCents: result.subscription.price_cents,
           renewalDate: result.subscription.renewal_date,
+          cancelAtPeriodEnd: result.subscription.cancel_at_period_end,
         });
       }
     }).catch((error: unknown) => {
@@ -116,7 +117,7 @@ function CheckoutReturn() {
               )}
               {state.renewalDate && (
                 <div className="mt-2 text-xs text-muted-foreground">
-                  Renews {new Date(state.renewalDate).toLocaleDateString()}
+                  {state.cancelAtPeriodEnd ? "Ends" : "Renews"} {new Date(state.renewalDate).toLocaleDateString()}
                 </div>
               )}
             </div>

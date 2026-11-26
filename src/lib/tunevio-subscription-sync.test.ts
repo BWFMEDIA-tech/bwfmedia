@@ -52,6 +52,13 @@ describe("Tunevio subscription synchronization", () => {
     });
   });
 
+  it("preserves the paid-through date when renewal is cancelled", () => {
+    const row = tunevioSubscriptionRecord({ ...subscription, cancel_at_period_end: true }, "live");
+    expect(row.cancel_at_period_end).toBe(true);
+    expect(row.status).toBe("active");
+    expect(row.renewal_date).toBe("2026-12-26T02:40:58.000Z");
+  });
+
   it("rejects a checkout session owned by a different account", () => {
     expect(() => assertTunevioCheckoutOwnership(session, subscription, "user-2"))
       .toThrow("could not be verified");
