@@ -166,6 +166,7 @@ import { Route as ArtistStorePagesIndexRouteImport } from './routes/artist-store
 import { Route as ArtistStorePagesPageIdRouteImport } from './routes/artist-store.pages.$pageId'
 import { Route as ArtistIdConnectionsRouteImport } from './routes/artist_.$id.connections'
 import { Route as BroadcastBroadcastIdManageRouteImport } from './routes/broadcast.$broadcastId.manage'
+import { Route as LabelsLabelIdShowcasesRouteImport } from './routes/labels.$labelId.showcases'
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as PlayAudienceRoomRouteImport } from './routes/play.audience.$room'
 import { Route as ApiOauthPlatformCallbackRouteImport } from './routes/api/oauth/$platform.callback'
@@ -971,6 +972,11 @@ const BroadcastBroadcastIdManageRoute =
     path: '/manage',
     getParentRoute: () => BroadcastBroadcastIdRoute,
   } as any)
+const LabelsLabelIdShowcasesRoute = LabelsLabelIdShowcasesRouteImport.update({
+  id: '/showcases',
+  path: '/showcases',
+  getParentRoute: () => LabelsLabelIdRoute,
+} as any)
 const LovableEmailEventsRoute = LovableEmailEventsRouteImport.update({
   id: '/lovable/email/events',
   path: '/lovable/email/events',
@@ -1142,7 +1148,7 @@ export interface FileRoutesByFullPath {
   '/invite/$code': typeof InviteCodeRoute
   '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
-  '/labels/$labelId': typeof LabelsLabelIdRoute
+  '/labels/$labelId': typeof LabelsLabelIdRouteWithChildren
   '/nfc/$code': typeof NfcCodeRoute
   '/p/$code': typeof PCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1185,6 +1191,7 @@ export interface FileRoutesByFullPath {
   '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
   '/artist/$id/connections': typeof ArtistIdConnectionsRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
+  '/labels/$labelId/showcases': typeof LabelsLabelIdShowcasesRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/artist-store/pages/': typeof ArtistStorePagesIndexRoute
@@ -1308,7 +1315,7 @@ export interface FileRoutesByTo {
   '/invite/$code': typeof InviteCodeRoute
   '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
-  '/labels/$labelId': typeof LabelsLabelIdRoute
+  '/labels/$labelId': typeof LabelsLabelIdRouteWithChildren
   '/nfc/$code': typeof NfcCodeRoute
   '/p/$code': typeof PCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1351,6 +1358,7 @@ export interface FileRoutesByTo {
   '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
   '/artist/$id/connections': typeof ArtistIdConnectionsRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
+  '/labels/$labelId/showcases': typeof LabelsLabelIdShowcasesRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/artist-store/pages': typeof ArtistStorePagesIndexRoute
@@ -1478,7 +1486,7 @@ export interface FileRoutesById {
   '/invite/$code': typeof InviteCodeRoute
   '/join/$username': typeof JoinUsernameRoute
   '/label-invite/$code': typeof LabelInviteCodeRoute
-  '/labels/$labelId': typeof LabelsLabelIdRoute
+  '/labels/$labelId': typeof LabelsLabelIdRouteWithChildren
   '/nfc/$code': typeof NfcCodeRoute
   '/p/$code': typeof PCodeRoute
   '/pay/$bookingId': typeof PayBookingIdRoute
@@ -1521,6 +1529,7 @@ export interface FileRoutesById {
   '/artist-store/pages/$pageId': typeof ArtistStorePagesPageIdRoute
   '/artist_/$id/connections': typeof ArtistIdConnectionsRoute
   '/broadcast/$broadcastId/manage': typeof BroadcastBroadcastIdManageRoute
+  '/labels/$labelId/showcases': typeof LabelsLabelIdShowcasesRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/play/audience/$room': typeof PlayAudienceRoomRoute
   '/artist-store/pages/': typeof ArtistStorePagesIndexRoute
@@ -1692,6 +1701,7 @@ export interface FileRouteTypes {
     | '/artist-store/pages/$pageId'
     | '/artist/$id/connections'
     | '/broadcast/$broadcastId/manage'
+    | '/labels/$labelId/showcases'
     | '/lovable/email/events'
     | '/play/audience/$room'
     | '/artist-store/pages/'
@@ -1858,6 +1868,7 @@ export interface FileRouteTypes {
     | '/artist-store/pages/$pageId'
     | '/artist/$id/connections'
     | '/broadcast/$broadcastId/manage'
+    | '/labels/$labelId/showcases'
     | '/lovable/email/events'
     | '/play/audience/$room'
     | '/artist-store/pages'
@@ -2027,6 +2038,7 @@ export interface FileRouteTypes {
     | '/artist-store/pages/$pageId'
     | '/artist_/$id/connections'
     | '/broadcast/$broadcastId/manage'
+    | '/labels/$labelId/showcases'
     | '/lovable/email/events'
     | '/play/audience/$room'
     | '/artist-store/pages/'
@@ -2117,7 +2129,7 @@ export interface RootRouteChildren {
   InviteCodeRoute: typeof InviteCodeRoute
   JoinUsernameRoute: typeof JoinUsernameRoute
   LabelInviteCodeRoute: typeof LabelInviteCodeRoute
-  LabelsLabelIdRoute: typeof LabelsLabelIdRoute
+  LabelsLabelIdRoute: typeof LabelsLabelIdRouteWithChildren
   NfcCodeRoute: typeof NfcCodeRoute
   PCodeRoute: typeof PCodeRoute
   PayBookingIdRoute: typeof PayBookingIdRoute
@@ -3255,6 +3267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BroadcastBroadcastIdManageRouteImport
       parentRoute: typeof BroadcastBroadcastIdRoute
     }
+    '/labels/$labelId/showcases': {
+      id: '/labels/$labelId/showcases'
+      path: '/showcases'
+      fullPath: '/labels/$labelId/showcases'
+      preLoaderRoute: typeof LabelsLabelIdShowcasesRouteImport
+      parentRoute: typeof LabelsLabelIdRoute
+    }
     '/lovable/email/events': {
       id: '/lovable/email/events'
       path: '/lovable/email/events'
@@ -3477,6 +3496,18 @@ const BroadcastBroadcastIdRouteChildren: BroadcastBroadcastIdRouteChildren = {
 const BroadcastBroadcastIdRouteWithChildren =
   BroadcastBroadcastIdRoute._addFileChildren(BroadcastBroadcastIdRouteChildren)
 
+interface LabelsLabelIdRouteChildren {
+  LabelsLabelIdShowcasesRoute: typeof LabelsLabelIdShowcasesRoute
+}
+
+const LabelsLabelIdRouteChildren: LabelsLabelIdRouteChildren = {
+  LabelsLabelIdShowcasesRoute: LabelsLabelIdShowcasesRoute,
+}
+
+const LabelsLabelIdRouteWithChildren = LabelsLabelIdRoute._addFileChildren(
+  LabelsLabelIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcceptableUseRoute: AcceptableUseRoute,
@@ -3557,7 +3588,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteCodeRoute: InviteCodeRoute,
   JoinUsernameRoute: JoinUsernameRoute,
   LabelInviteCodeRoute: LabelInviteCodeRoute,
-  LabelsLabelIdRoute: LabelsLabelIdRoute,
+  LabelsLabelIdRoute: LabelsLabelIdRouteWithChildren,
   NfcCodeRoute: NfcCodeRoute,
   PCodeRoute: PCodeRoute,
   PayBookingIdRoute: PayBookingIdRoute,

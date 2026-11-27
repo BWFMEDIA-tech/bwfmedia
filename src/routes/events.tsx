@@ -6,6 +6,7 @@ import { Calendar as CalendarIcon, MapPin, Clock, ExternalLink, Radio } from "lu
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { listPublicEvents, type EventRow } from "@/lib/events.functions";
+import { isSafeEventLink } from "@/lib/profile-events";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -143,6 +144,7 @@ function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean })
   const isLive = event.status === "live";
   return (
     <article className="swara-event-row flex min-w-0 items-start gap-4 border-b border-border py-5">
+      {event.cover_image_url && <img src={event.cover_image_url} alt={`${event.title} flyer`} loading="lazy" className="h-20 w-16 shrink-0 rounded object-contain bg-card" />}
       <div className="flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-card">
         <span className="text-xs text-muted-foreground">{new Date(event.starts_at).toLocaleDateString([], { month: "short" })}</span>
         <span className="mt-1 text-2xl font-semibold">{new Date(event.starts_at).getDate()}</span>
@@ -177,7 +179,7 @@ function EventCard({ event, withDate }: { event: EventRow; withDate?: boolean })
             )}
           </div>
         </div>
-        {event.link_url && (
+        {event.link_url && (isSafeEventLink(event.link_url) || (event.link_url.startsWith('/') && !event.link_url.startsWith('//'))) && (
           <Button asChild variant="ghost" size="icon" className="shrink-0 text-brand-silver">
           <a
             href={event.link_url}

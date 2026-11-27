@@ -2469,6 +2469,7 @@ export type Database = {
           ends_at: string | null
           event_type: string
           id: string
+          label_id: string | null
           link_url: string | null
           location: string | null
           starts_at: string
@@ -2484,6 +2485,7 @@ export type Database = {
           ends_at?: string | null
           event_type?: string
           id?: string
+          label_id?: string | null
           link_url?: string | null
           location?: string | null
           starts_at: string
@@ -2499,6 +2501,7 @@ export type Database = {
           ends_at?: string | null
           event_type?: string
           id?: string
+          label_id?: string | null
           link_url?: string | null
           location?: string | null
           starts_at?: string
@@ -2506,7 +2509,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       freestyle_battles: {
         Row: {
@@ -7491,6 +7502,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      can_manage_profile_events: { Args: never; Returns: boolean }
       cancel_freestyle_battle: { Args: { _id: string }; Returns: undefined }
       cast_battle_vote: {
         Args: {
@@ -7786,6 +7798,31 @@ export type Database = {
           tier: string
           user_id: string
         }[]
+      }
+      list_label_showcases: {
+        Args: { _label_id: string }
+        Returns: {
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          event_type: string
+          id: string
+          label_id: string | null
+          link_url: string | null
+          location: string | null
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       list_recent_battle_replays: {
         Args: { _stream_id: string }

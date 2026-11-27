@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -25,8 +26,13 @@ export const Route = createFileRoute("/labels/$labelId")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: LabelWorkspace,
+  component: LabelRoute,
 });
+
+function LabelRoute() {
+  const nested = useRouterState({ select: state => state.location.pathname.endsWith('/showcases') });
+  return nested ? <Outlet /> : <LabelWorkspace />;
+}
 
 const RELEASE_STATUS_STYLES: Record<string, string> = {
   draft: "bg-white/10 text-white/60",
@@ -116,6 +122,8 @@ function LabelWorkspace() {
         </div>
 
         <div className="flex gap-2 mb-6 overflow-x-auto">
+          <Button asChild variant="outline"><Link to="/labels/$labelId/showcases" params={{ labelId }}>Showcases</Link></Button>
+          {labelCan(myRole, 'editLabel') && <Button asChild variant="outline"><Link to="/settings/events">Add event</Link></Button>}
           {visibleTabs.map((t) => (
             <button
               key={t.id}

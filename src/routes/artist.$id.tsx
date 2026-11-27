@@ -3,6 +3,7 @@ import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { ArtistMerchSection } from "@/components/merch/ArtistMerchSection";
 import { ArtistStatusBeacon } from "@/components/artist/ArtistStatusBeacon";
 import { ArtistStoreSection } from "@/components/store/ArtistStoreSection";
+import { ArtistEventsSection } from "@/components/artist/ArtistEventsSection";
 import { PwywStorefront } from "@/components/pwyw/PwywStorefront";
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -193,7 +194,7 @@ function ArtistProfilePage() {
         stream={live}
         artist={{ ...artist, genre: meta?.genre ?? null, featuredTrack: topTrack ? { title: topTrack.title, cover: topTrack.cover_url, plays: topTrack.play_count ?? 0 } : null, tracks: (meta?.tracks ?? []).map((t) => ({ id: t.id, title: t.title, cover_url: t.cover_url })) }}
         followSlot={!isOwner ? <><FollowButton artistId={id} /><ContentSafetyMenu target={{ targetType: 'profile', targetId: id }} userId={id} label={name} /></> : null}
-        platformSlot={<ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />}
+        platformSlot={<><ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} /><ArtistEventsSection artistId={id} isOwner={ownerTools} /></>}
         onEnded={onLiveEnded}
       />
     );
@@ -215,6 +216,7 @@ function ArtistProfilePage() {
           <ProfileLiveBar live={live} isOwner={ownerTools} />
           {liveFeed.isError && <p role="status" className="text-sm text-muted-foreground">Live status is temporarily unconfirmed.</p>}
           <ProfilePlatformLinks links={meta.socials ?? []} isOwner={isOwner} />
+          <ArtistEventsSection artistId={id} isOwner={ownerTools} />
           {isOwner && !profileComplete && <OwnerSetupCard hasPhoto={!!artist.photo} hasBanner={!!artist.banner} hasBio={!!meta?.bio} hasTracks={(meta?.tracks?.length ?? 0) > 0} />}
           {(meta?.bio || (meta?.socials?.length ?? 0) > 0) && (
             <AboutBlock name={artist.name} bio={meta?.bio ?? null} />

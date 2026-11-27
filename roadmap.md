@@ -1,5 +1,10 @@
 # Roadmap
 
+## Profile showcases and events
+- [x] Reuse existing events for artist and label owner/manager event creation, editing and private flyer uploads, with immutable creators and optional label attribution.
+- [x] Display public upcoming/history events on normal/live artist profiles and a public label showcase page aggregating published label and active-roster events; preserve the existing private label workspace and sync the public calendar.
+- [x] Seventeen focused tests pass; signed-in draft/create/upload/publish/edit/delete and public profile/calendar readback verified, including loaded flyers, cross-owner image denial and 430px layout with no runtime errors. Temporary events and flyers removed; preview build OK. Label-role checks are enforced in the database; publishing as a separate label manager was not exercised.
+
 ## Announcement message length
 - [x] Allow up to 1,000 words for new and edited announcements using shared validation and a live word counter, preserving existing delivery and paragraph formatting.
 - [x] Five tests pass; signed-in desktop/mobile editor accepts 1,000 words, blocks 1,001, and preserves paragraphs with no runtime errors. Preview build OK; no broadcast sent to members.
