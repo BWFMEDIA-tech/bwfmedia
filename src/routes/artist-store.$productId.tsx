@@ -38,14 +38,15 @@ function ProductPage() {
   const [region, setRegion] = useState<"domestic" | "international">("domestic");
 
   const fetchClientSecret = useCallback(async () => {
+    const environment = getStripeEnvironment();
     const r = await startCheckout({
       data: {
         productId,
         quantity: qty,
         variantId,
         region,
-        environment: getStripeEnvironment(),
-        returnUrl: `${window.location.origin}/artist-store/orders?session_id={CHECKOUT_SESSION_ID}`,
+        environment,
+        returnUrl: `${window.location.origin}/artist-store/orders?session_id={CHECKOUT_SESSION_ID}&env=${environment}`,
       },
     });
     if (r.error || !r.clientSecret) {
@@ -140,13 +141,9 @@ function ProductPage() {
                 <span className="w-8 text-center text-sm font-bold">{qty}</span>
                 <button aria-label="More" className="p-3" onClick={() => setQty((n) => Math.min(10, p.made_to_order ? n + 1 : Math.min(stock, n + 1)))}><Plus className="h-4 w-4" /></button>
               </div>
-              {user ? (
-                <button disabled={soldOut || isOwner || needsOption || shipCents == null} onClick={() => setCheckout(true)} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">
-                  {isOwner ? "This is your product" : soldOut ? "Sold out" : needsOption ? "Choose an option" : `Buy now · ${formatPrice(unit * qty + (shipCents ?? 0), p.currency)}`}
-                </button>
-              ) : (
-                <Link to="/login" className="flex-1 rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-foreground">Sign in to buy</Link>
-              )}
+              <button disabled={soldOut || isOwner || needsOption || shipCents == null} onClick={() => setCheckout(true)} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">
+                {isOwner ? "This is your product" : soldOut ? "Sold out" : needsOption ? "Choose an option" : `Buy now · ${formatPrice(unit * qty + (shipCents ?? 0), p.currency)}`}
+              </button>
             </div>
           )}
           <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" /> Secure checkout. Price includes shipping; tax is added at checkout.</div>

@@ -111,6 +111,29 @@ export function computeSplit(i: { revenue_cents: number; cost_cents: number; fee
   return { profit_cents: profit, artist_cents: artist, platform_cents: profit - artist };
 }
 
+export function isStoreProductLive(p: { status?: string; review_status?: string | null }): boolean {
+  return p.status === "published" && p.review_status === "approved";
+}
+
+export function storeProductStatusLabel(p: { status?: string; review_status?: string | null }): string {
+  if (p.status === "archived") return "Archived";
+  if (p.status !== "published") return "Draft";
+  if (p.review_status === "pending") return "In review";
+  if (p.review_status === "approved") return "Live for fans";
+  return "Unavailable";
+}
+
+/** Guests have no account ownership; a verified signed-in buyer keeps their identity and email. */
+export function resolveStoreCheckoutBuyer(
+  user: { id: string; email?: string | null } | null,
+  sellerUserId: string,
+): { error: string | null; buyerUserId: string | null; buyerEmail: string | null } {
+  if (user?.id === sellerUserId) {
+    return { error: "You can't buy your own product.", buyerUserId: null, buyerEmail: null };
+  }
+  return { error: null, buyerUserId: user?.id ?? null, buyerEmail: user?.email ?? null };
+}
+
 export function formatPrice(cents: number, currency = "usd"): string {
   try {
     return new Intl.NumberFormat("en", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);

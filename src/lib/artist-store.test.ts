@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkPurchasable, isSafeNfcPath } from "./artist-store";
+import { checkPurchasable, isSafeNfcPath, isStoreProductLive, resolveStoreCheckoutBuyer, storeProductStatusLabel } from "./artist-store";
 
 describe("artist store rules", () => {
   it("blocks buying more than the stock left", () => {
@@ -19,5 +19,24 @@ describe("artist store rules", () => {
     expect(isSafeNfcPath("https://evil.com")).toBe(false);
     expect(isSafeNfcPath("//evil.com")).toBe(false);
     expect(isSafeNfcPath("/x<script>")).toBe(false);
+  });
+  it("shows only published and approved products to fans", () => {
+    expect(isStoreProductLive({ status: "published", review_status: "approved" })).toBe(true);
+    expect(isStoreProductLive({ status: "published", review_status: "pending" })).toBe(false);
+    expect(isStoreProductLive({ status: "draft", review_status: "approved" })).toBe(false);
+  });
+  it("labels owner-only product states accurately", () => {
+    expect(storeProductStatusLabel({ status: "draft", review_status: "approved" })).toBe("Draft");
+    expect(storeProductStatusLabel({ status: "published", review_status: "pending" })).toBe("In review");
+    expect(storeProductStatusLabel({ status: "published", review_status: "approved" })).toBe("Live for fans");
+  });
+  it("allows a guest buyer without creating account ownership", () => {
+    expect(resolveStoreCheckoutBuyer(null, "seller1")).toEqual({ error: null, buyerUserId: null, buyerEmail: null });
+  });
+  it("preserves a verified listener's order ownership", () => {
+    expect(resolveStoreCheckoutBuyer({ id: "listener1", email: "fan@example.com" }, "seller1")).toEqual({ error: null, buyerUserId: "listener1", buyerEmail: "fan@example.com" });
+  });
+  it("still prevents artists from buying their own products", () => {
+    expect(resolveStoreCheckoutBuyer({ id: "seller1", email: "artist@example.com" }, "seller1").error).toBe("You can't buy your own product.");
   });
 });

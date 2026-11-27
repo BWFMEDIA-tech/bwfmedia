@@ -197,3 +197,9 @@
 ## Certification & Milestone Dashboard
 - [x] Artist certification dashboard matching supplied reference image exactly
 - [x] Admin Certification Management (search, verify streams, issue/revoke/correct with audit log)
+
+## Artist profile shopping
+- [x] Show approved products with a clear Buy now action on public artist profiles; show draft, pending and published products only to their owner.
+- [x] Let visitors purchase physical products without mandatory sign-in while preserving verified signed-in ownership, server pricing, stock, shipping and webhook-only payment activation.
+- [x] Add a guest order receipt and verify owner/public visibility, checkout entry, mobile layout, focused tests and preview build without submitting a real charge.
+- [ ] Complete a test payment after Stripe test-mode automatic tax has a head-office address; Stripe currently rejects the guest session before an order is created.

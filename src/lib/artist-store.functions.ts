@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import type Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { PRODUCT_TYPES, FULFILLMENT_STATUSES, SHIPPING_REGIONS, DEFAULT_ARTIST_BPS, categoryOf, checkPurchasable, computeShipping, isSafeNfcPath } from "@/lib/artist-store";
+import { PRODUCT_TYPES, FULFILLMENT_STATUSES, SHIPPING_REGIONS, DEFAULT_ARTIST_BPS, categoryOf, checkPurchasable, computeShipping, isSafeNfcPath, resolveStoreCheckoutBuyer } from "@/lib/artist-store";
 import { validateReturnUrl } from "@/lib/validate-return-url";
 
 import { isOwnedStoreImage, PRIVATE_STORE_IMAGE_TTL, PUBLIC_STORE_IMAGE_TTL } from "@/lib/store-image-path";
@@ -12,11 +13,12 @@ const BUCKET = "store-products";
 const PRODUCT_COLS =
   "id, user_id, release_id, title, description, product_type, price_cents, currency, inventory, shipping_info, image_urls, status, is_featured, created_at, review_status, min_quantity, made_to_order";
 
-function publicClient() {
+function publicClient(token?: string) {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
   return createClient(process.env["SUPABASE_URL"]!, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     global: {
+      ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
         if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
@@ -56,12 +58,35 @@ export const listStoreProducts = createServerFn({ method: "GET" })
     z.object({ artistId: z.string().uuid().optional() }).parse(d ?? {}),
   )
   .handler(async ({ data }) => {
+    let ownerToken: string | null = null;
+    if (data.artistId) {
+      try {
+        const auth = getRequestHeader("authorization") ?? "";
+        const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+        if (token) {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: identity } = await supabaseAdmin.auth.getUser(token);
+          if (identity.user?.id === data.artistId) ownerToken = token;
+        }
+      } catch {
+        ownerToken = null;
+      }
+    }
+
+    if (ownerToken && data.artistId) {
+      const c = publicClient(ownerToken);
+      const { data: rows, error } = await c.from("store_products").select(PRODUCT_COLS)
+        .eq("user_id", data.artistId).order("is_featured", { ascending: false }).order("created_at", { ascending: false }).limit(200);
+      if (error) return { products: [], error: "Store is unavailable right now.", isOwner: true };
+      return { products: await attachArtists(c, await signImages(c, rows ?? [], data.artistId)), error: null as string | null, isOwner: true };
+    }
+
     const c = publicClient();
     let q = c.from("store_products").select(PRODUCT_COLS).eq("status", "published").eq("review_status", "approved").order("is_featured", { ascending: false }).order("created_at", { ascending: false }).limit(200);
     if (data.artistId) q = q.eq("user_id", data.artistId);
     const { data: rows, error } = await q;
-    if (error) return { products: [], error: "Store is unavailable right now." };
-    return { products: await attachArtists(c, await signImages(c, rows ?? [])), error: null as string | null };
+    if (error) return { products: [], error: "Store is unavailable right now.", isOwner: false };
+    return { products: await attachArtists(c, await signImages(c, rows ?? [])), error: null as string | null, isOwner: false };
   });
 
 export const getStoreProduct = createServerFn({ method: "GET" })
@@ -309,8 +334,22 @@ export const listMyStoreOrders = createServerFn({ method: "GET" })
     return { orders: data ?? [] };
   });
 
+// The high-entropy Stripe session ID is the guest's receipt token. Never expose address or email here.
+export const getStoreOrderReceipt = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({
+    sessionId: z.string().max(255).regex(/^cs_(live|test)_[A-Za-z0-9]+$/),
+    environment: z.enum(["sandbox", "live"]),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: order, error } = await (supabaseAdmin as any).from("store_orders")
+      .select("product_title, variant_label, quantity, unit_price_cents, amount_total_cents, currency, status, fulfillment_status, tracking_number, carrier, created_at, paid_at")
+      .eq("stripe_session_id", data.sessionId).eq("environment", data.environment).maybeSingle();
+    if (error || !order) return { order: null };
+    return { order };
+  });
+
 export const createStoreCheckout = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
     z.object({
       productId: z.string().uuid(),
@@ -321,14 +360,37 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
       environment: z.enum(["sandbox", "live"]),
     }).parse(d),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const returnUrl = validateReturnUrl(data.returnUrl);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
+    let user: { id: string; email?: string | null } | null = null;
+    try {
+      const auth = getRequestHeader("authorization") ?? "";
+      const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+      if (token) {
+        const { data: identity } = await admin.auth.getUser(token);
+        if (identity.user) user = { id: identity.user.id, email: identity.user.email ?? null };
+      }
+    } catch {
+      user = null;
+    }
     // Price and stock are always read from the database, never from the client.
     const { data: p } = await admin.from("store_products").select("id, user_id, title, description, price_cents, cost_cents, currency, inventory, status, review_status, min_quantity, made_to_order, product_type").eq("id", data.productId).maybeSingle();
     if (!p) return { error: "Product not found", clientSecret: null };
-    if (p.user_id === context.userId) return { error: "You can't buy your own product.", clientSecret: null };
+    const buyer = resolveStoreCheckoutBuyer(user, p.user_id);
+    if (buyer.error) return { error: buyer.error, clientSecret: null };
+    if (!buyer.buyerUserId) {
+      const ip = getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim();
+      if (ip) {
+        const { data: rate, error: rateError } = await admin.rpc("check_rate_limit", {
+          _bucket_key: `ip:${ip}`, _action: "guest_store_checkout", _max_hits: 10, _window_secs: 600,
+        });
+        if (rateError || !Array.isArray(rate) || rate[0]?.allowed !== true) {
+          return { error: "Too many checkout attempts. Please wait a few minutes and try again.", clientSecret: null };
+        }
+      }
+    }
     const { data: variants } = await admin.from("store_product_variants").select("id, label, price_cents, cost_cents, inventory").eq("product_id", p.id).eq("active", true);
     let variant: any = null;
     if ((variants ?? []).length) {
@@ -347,7 +409,6 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
     const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
     try {
       const stripe = createStripeClient(data.environment);
-      const email = (context.claims as any)?.email as string | undefined;
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         ui_mode: "embedded_page",
@@ -363,12 +424,12 @@ export const createStoreCheckout = createServerFn({ method: "POST" })
         automatic_tax: { enabled: true },
         shipping_address_collection: { allowed_countries: countries as any },
         shipping_options: [{ shipping_rate_data: { type: "fixed_amount", display_name: data.region === "domestic" ? "U.S. shipping" : "International shipping", fixed_amount: { amount: shippingCents, currency: p.currency || "usd" } } }],
-        ...(email ? { customer_email: email } : {}),
-        metadata: { kind: "store_order", productId: p.id, buyerUserId: context.userId },
+        ...(buyer.buyerEmail ? { customer_email: buyer.buyerEmail } : {}),
+        metadata: { kind: "store_order", productId: p.id, buyerUserId: buyer.buyerUserId ?? "" },
         payment_intent_data: { metadata: { kind: "store_order", productId: p.id } },
       } as Stripe.Checkout.SessionCreateParams);
       const { error } = await admin.from("store_orders").insert({
-        buyer_user_id: context.userId, buyer_email: email ?? null, seller_user_id: p.user_id, product_id: p.id, product_title: p.title,
+        buyer_user_id: buyer.buyerUserId, buyer_email: buyer.buyerEmail, seller_user_id: p.user_id, product_id: p.id, product_title: p.title,
         quantity: data.quantity, unit_price_cents: unitPrice, unit_cost_cents: unitCost, variant_id: variant?.id ?? null, variant_label: variant?.label ?? null,
         shipping_cents: shippingCents, shipping_region: data.region, currency: p.currency || "usd", status: "pending",
         environment: data.environment, stripe_session_id: session.id,
