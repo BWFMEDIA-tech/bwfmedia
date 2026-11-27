@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { validateReturnUrl } from "@/lib/validate-return-url";
 import { avatarObjectPath } from "@/lib/public-artwork";
+import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
 import {
   PWYW_MAX_CENTS,
   PWYW_MIN_CENTS,
@@ -89,7 +90,7 @@ export const getMyPwywStore = createServerFn({ method: "GET" })
     const [entitlement, productResult, catalogResult, salesResult, earningsResult] = await Promise.all([
       sb.rpc("has_entitlement", { _user_id: context.userId, _perk: "pwyw_store" }),
       sb.from("pwyw_products").select("*").eq("artist_user_id", context.userId).order("created_at", { ascending: false }),
-      sb.from("play_tracks").select("id, title, cover_url, audio_url, duration_seconds, artist_name, created_at").eq("artist_user_id", context.userId).not("audio_url", "is", null).order("created_at", { ascending: false }).limit(500),
+      sb.from("play_tracks").select("id, source_track_id, stream_id, title, cover_url, audio_url, duration_seconds, artist_name, created_at").eq("artist_user_id", context.userId).neq("status", "removed").not("audio_url", "is", null).order("created_at", { ascending: false }).limit(1000),
       sb.from("digital_music_purchases").select("id, product_id, product_title, product_type, amount_cents, currency, tax_cents, total_collected_cents, fee_cents, artist_fee_cents, artist_cents, platform_cents, environment, status, created_at, paid_at, refunded_at").eq("artist_user_id", context.userId).order("created_at", { ascending: false }).limit(500),
       sb.from("digital_music_earnings").select("purchase_id, entry_type, amount_cents, fee_cents, artist_fee_cents, artist_cents, platform_cents, environment, created_at").eq("seller_user_id", context.userId).order("created_at", { ascending: false }).limit(1000),
     ]);
@@ -100,9 +101,14 @@ export const getMyPwywStore = createServerFn({ method: "GET" })
       ? await sb.from("pwyw_product_tracks").select("product_id, track_id, position").in("product_id", ids).order("position")
       : { data: [], error: null };
     if (linksError) throw new Error("Your product track lists could not be loaded");
+    const catalogRows = catalogResult.data ?? [];
+    const catalog = dedupeArtistTracks(catalogRows, null).map((track: any) => ({
+      ...track,
+      alias_ids: catalogRows.filter((row: any) => row.source_track_id === track.id).map((row: any) => row.id),
+    }));
     return {
       canSell: !!entitlement.data && !entitlement.error,
-      catalog: catalogResult.data ?? [],
+      catalog,
       products: products.map((product: any) => ({
         ...product,
         track_ids: (links ?? []).filter((link: any) => link.product_id === product.id).sort((a: any, b: any) => a.position - b.position).map((link: any) => link.track_id),

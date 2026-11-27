@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
 
 export interface PlayTrack {
   id: string;
@@ -80,9 +81,9 @@ export function usePlayQueue(streamId: string | null) {
   }, [streamId]);
 
   const playing = tracks.find((t) => t.status === "playing") ?? null;
-  const queued = tracks.filter((t) => t.status === "queued");
-  const leaderboard = [...tracks]
-    .filter((t) => t.status === "playing" || t.status === "completed")
+  const queued = dedupeArtistTracks(tracks.filter((t) => t.status === "queued"), null);
+  const leaderboard = dedupeArtistTracks(tracks
+    .filter((t) => t.status === "playing" || t.status === "completed"), null)
     .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 

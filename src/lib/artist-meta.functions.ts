@@ -38,7 +38,7 @@ export const getArtistMeta = createServerFn({ method: "GET" })
           .eq("user_id", id).eq("enabled", true).order("sort_order", { ascending: true }),
         (() => {
           let q = sb.from("play_tracks")
-            .select("id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
+            .select("id, source_track_id, title, cover_url, like_count, dislike_count, play_count, duration_seconds, created_at, audio_url, stream_id")
             .eq("artist_user_id", id);
           // Songs that played in the arena are public; profile-library
           // uploads stay "queued" and must show on the artist's profile too.

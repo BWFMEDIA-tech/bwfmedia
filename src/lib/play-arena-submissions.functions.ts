@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
 
 /**
  * Play Arena — Song Submission Routing.
@@ -47,22 +48,14 @@ export const listArtistLibrary = createServerFn({ method: "GET" })
     const { supabase, userId } = context as any;
     const { data, error } = await supabase
       .from("play_tracks")
-      .select("id, title, artist_name, cover_url, audio_url, duration_seconds, created_at")
+      .select("id, source_track_id, stream_id, title, artist_name, cover_url, audio_url, duration_seconds, created_at")
       .eq("artist_user_id", userId)
+      .neq("status", "removed")
       .not("audio_url", "is", null)
       .order("created_at", { ascending: false })
-      .limit(100);
+      .limit(1000);
     if (error) throw new Error(error.message);
-    // Dedupe by title — keep most recent of each title to feel like a library
-    const seen = new Set<string>();
-    const out: any[] = [];
-    for (const t of data ?? []) {
-      const k = (t.title ?? "").toLowerCase().trim();
-      if (seen.has(k)) continue;
-      seen.add(k);
-      out.push(t);
-    }
-    return out;
+    return dedupeArtistTracks(data ?? [], null);
   });
 
 export const submitSongToArena = createServerFn({ method: "POST" })
@@ -83,8 +76,9 @@ export const submitSongToArena = createServerFn({ method: "POST" })
     // 1. Verify ownership of the song
     const { data: song, error: songErr } = await supabase
       .from("play_tracks")
-      .select("id, artist_user_id, artist_name, title, audio_url, cover_url, duration_seconds")
+      .select("id, source_track_id, artist_user_id, artist_name, title, audio_url, cover_url, duration_seconds")
       .eq("id", data.songId)
+      .neq("status", "removed")
       .maybeSingle();
     if (songErr) throw new Error(songErr.message);
     if (!song) throw new Error("Song not found");
@@ -106,7 +100,7 @@ export const submitSongToArena = createServerFn({ method: "POST" })
       .from("play_arena_submissions")
       .select("id, status")
       .eq("arena_id", data.arenaId)
-      .eq("song_id", data.songId)
+      .eq("song_id", song.source_track_id ?? song.id)
       .in("status", ["queued", "playing"])
       .maybeSingle();
     if (existing) throw new Error("This song is already in this arena's queue");
@@ -142,6 +136,7 @@ export const submitSongToArena = createServerFn({ method: "POST" })
       .from("play_tracks")
       .insert({
         stream_id: data.arenaId,
+        source_track_id: song.source_track_id ?? song.id,
         artist_user_id: userId,
         artist_name: song.artist_name,
         title: song.title,
@@ -162,7 +157,7 @@ export const submitSongToArena = createServerFn({ method: "POST" })
       .from("play_arena_submissions")
       .insert({
         artist_id: userId,
-        song_id: data.songId,
+        song_id: song.source_track_id ?? song.id,
         arena_id: data.arenaId,
         priority: data.priority,
         play_track_id: mirror.id,

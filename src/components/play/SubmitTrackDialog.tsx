@@ -6,6 +6,7 @@ import { submitPlayTrack, getSubmissionProfileTracks } from "@/lib/play.function
 import { SignedImg } from "@/components/ui/signed-img";
 import { AddProfileTrackDialog } from "@/components/settings/AddProfileTrackDialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function SubmitTrackDialog({ streamId, defaultArtistName, boostCredits, onClose, onSubmitted }: {
   streamId: string;
@@ -24,6 +25,7 @@ export function SubmitTrackDialog({ streamId, defaultArtistName, boostCredits, o
   const [busy, setBusy] = useState(false);
   const submitting = useRef(false);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -91,7 +93,8 @@ export function SubmitTrackDialog({ streamId, defaultArtistName, boostCredits, o
                 <Music2 className="h-3.5 w-3.5" /> Choose a song from your profile
               </div>
               <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
-                {profileTracks.map((t) => (
+                <Input aria-label="Search your songs" placeholder="Search your songs" value={search} onChange={(event) => setSearch(event.target.value)} />
+                {profileTracks.filter((t) => t.title.toLowerCase().includes(search.trim().toLowerCase())).map((t) => (
                   <Button key={t.id} type="button" variant="outline" aria-pressed={pickedProfileId === t.id} disabled={busy} onClick={() => setPickedProfileId(t.id)}
                     className={`flex h-auto w-full items-center gap-3 rounded-lg border p-2 text-left transition ${
                       pickedProfileId === t.id ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/50"
@@ -103,6 +106,7 @@ export function SubmitTrackDialog({ streamId, defaultArtistName, boostCredits, o
                     {pickedProfileId === t.id && <CheckCircle2 className="h-4 w-4 text-primary" />}
                   </Button>
                 ))}
+                {!profileTracks.some((t) => t.title.toLowerCase().includes(search.trim().toLowerCase())) && <p className="text-sm text-muted-foreground">No matching songs</p>}
               </div>
             </div>
           )}

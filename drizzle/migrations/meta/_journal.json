@@ -694,6 +694,20 @@
       "when": 1795746215921,
       "tag": "0098_profile_showcases",
       "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1795748253191,
+      "tag": "0099_link_original_songs_and_guard_arena_duplicates",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1795748434027,
+      "tag": "0100_preserve_original_song_deletion_behavior",
+      "breakpoints": true
     }
   ]
 }

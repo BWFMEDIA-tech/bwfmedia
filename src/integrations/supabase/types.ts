@@ -4220,6 +4220,7 @@ export type Database = {
           rank_score: number
           rank_updated_at: string
           score: number
+          source_track_id: string | null
           status: string
           stream_id: string
           title: string
@@ -4244,6 +4245,7 @@ export type Database = {
           rank_score?: number
           rank_updated_at?: string
           score?: number
+          source_track_id?: string | null
           status?: string
           stream_id: string
           title: string
@@ -4268,6 +4270,7 @@ export type Database = {
           rank_score?: number
           rank_updated_at?: string
           score?: number
+          source_track_id?: string | null
           status?: string
           stream_id?: string
           title?: string
@@ -4279,6 +4282,20 @@ export type Database = {
             columns: ["battle_match_id"]
             isOneToOne: false
             referencedRelation: "battle_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "play_tracks_source_track_id_fkey"
+            columns: ["source_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_track_boost_totals"
+            referencedColumns: ["track_id"]
+          },
+          {
+            foreignKeyName: "play_tracks_source_track_id_fkey"
+            columns: ["source_track_id"]
+            isOneToOne: false
+            referencedRelation: "play_tracks"
             referencedColumns: ["id"]
           },
           {
@@ -7969,6 +7986,7 @@ export type Database = {
         Args: { _host_id: string; _reason: string; _status: string }
         Returns: undefined
       }
+      song_audio_identity: { Args: { _audio: string }; Returns: string }
       spend_boost_credit: {
         Args: { _amount?: number; _reason?: string; _reference_id?: string }
         Returns: number

@@ -1,0 +1,2 @@
+ALTER TABLE public.play_tracks DROP CONSTRAINT play_tracks_source_track_id_fkey;
+ALTER TABLE public.play_tracks ADD CONSTRAINT play_tracks_source_track_id_fkey FOREIGN KEY(source_track_id) REFERENCES public.play_tracks(id) ON DELETE SET NULL;

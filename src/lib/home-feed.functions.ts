@@ -1,5 +1,6 @@
 // @auth-exempt: public read of non-sensitive catalog data for the home dashboard.
 import { createServerFn } from "@tanstack/react-start";
+import { dedupeArtistTracks } from "@/lib/artist-profile-tracks";
 
 export type FeedTrack = {
   id: string;
@@ -60,7 +61,7 @@ export type HomeFeed = {
 };
 
 const TRACK_COLS =
-  "id, title, artist_name, artist_user_id, cover_url, audio_url, duration_seconds, play_count, like_count, score, created_at";
+  "id, source_track_id, stream_id, title, artist_name, artist_user_id, cover_url, audio_url, duration_seconds, play_count, like_count, score, created_at";
 
 function mapTrack(r: any): FeedTrack {
   return {
@@ -124,7 +125,7 @@ export const getHomeFeed = createServerFn({ method: "GET" }).handler(async (): P
     ((artistRoleRes.data ?? []) as any[]).map((r) => r.user_id as string),
   );
   const { onlyArtistTracks: onlyArtistRaw, onlyWithArtwork, onePerRelease, onePerArtist } = await import("@/lib/home-feed-artists");
-  const onlyArtistTracks = (rows: any, ids: Set<string>) => onlyWithArtwork(onlyArtistRaw(rows, ids) as any[]);
+  const onlyArtistTracks = (rows: any, ids: Set<string>) => dedupeArtistTracks(onlyWithArtwork(onlyArtistRaw(rows, ids) as any[]), null);
 
   const trending = onlyArtistTracks(trendingRes.data, artistIds).slice(0, LIMIT).map(mapTrack);
   const newReleases = onePerArtist(onePerRelease(onlyArtistTracks(newRes.data, artistIds))).slice(0, LIMIT).map(mapTrack);

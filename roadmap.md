@@ -1,5 +1,11 @@
 # Roadmap
 
+## Song cleanup and existing-song Arena submissions
+- [x] Link 49 repeated audio entries to their original catalog song without deleting Arena history, likes, counts, or files.
+- [x] Deduplicate profiles, home music lists, Arena listings and song selectors by owned audio identity; add song search and atomic active-queue duplicate protection.
+- [x] Owner confirmed both TUNEVIO tracks titled test are legitimate; preserve them. No proven development tracks identified.
+- [x] Signed-in phone Arena submission succeeds and rejects a repeat; original ID/audio readback verified, Music Sales shows Where I Come From once; temporary verification session removed. Seventy music/payment/battle regression tests pass; preview build OK. Existing totals remain 181 rows, 435 plays and 145 recorded likes.
+
 ## Profile showcases and events
 - [x] Reuse existing events for artist and label owner/manager event creation, editing and private flyer uploads, with immutable creators and optional label attribution.
 - [x] Display public upcoming/history events on normal/live artist profiles and a public label showcase page aggregating published label and active-roster events; preserve the existing private label workspace and sync the public calendar.

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { runBattleEvent } from "@/lib/battle-engine.functions";
+import { dedupeArtistTracks, songAudioIdentity } from "@/lib/artist-profile-tracks";
 
 /** Read only the caller's existing artist-profile library, never queue mirrors. */
 export const getSubmissionProfileTracks = createServerFn({ method: "GET" })
@@ -10,13 +11,12 @@ export const getSubmissionProfileTracks = createServerFn({ method: "GET" })
     const { data: library, error: libraryError } = await context.supabase.from("streams")
       .select("id").eq("host_id", context.userId).eq("title", "__profile_library__").maybeSingle();
     if (libraryError) throw new Error("Unable to load profile library");
-    if (!library) return [];
     const { data: tracks, error } = await context.supabase.from("play_tracks")
-      .select("id, title, cover_url").eq("artist_user_id", context.userId)
-      .eq("stream_id", library.id).neq("status", "removed").not("audio_url", "is", null)
-      .order("created_at", { ascending: false });
+      .select("id, title, cover_url, audio_url, stream_id, source_track_id, created_at").eq("artist_user_id", context.userId)
+      .neq("status", "removed").not("audio_url", "is", null)
+      .order("created_at", { ascending: false }).limit(1000);
     if (error) throw new Error("Unable to load profile songs");
-    return tracks ?? [];
+    return dedupeArtistTracks(tracks ?? [], library?.id ?? null);
   });
 
 /** Submit a track to a stream's BWFPLAY queue. Requires active membership.
@@ -37,10 +37,10 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
     const { data: library, error: libraryError } = await supabase.from("streams")
       .select("id").eq("host_id", userId).eq("title", "__profile_library__").maybeSingle();
     if (libraryError) throw new Error("Unable to verify profile library");
-    if (!library || library.id === data.streamId) throw new Error("Choose a song already on your artist profile");
+    if (library?.id === data.streamId) throw new Error("Choose an Arena, not your profile library");
     const { data: source, error: sourceError } = await supabase.from("play_tracks")
-      .select("id, title, artist_name, audio_url, cover_url, duration_seconds")
-      .eq("id", data.profileTrackId).eq("artist_user_id", userId).eq("stream_id", library.id)
+      .select("id, source_track_id, title, artist_name, audio_url, cover_url, duration_seconds")
+      .eq("id", data.profileTrackId).eq("artist_user_id", userId)
       .neq("status", "removed").maybeSingle();
     if (sourceError) throw new Error("Unable to verify profile song");
     if (!source?.audio_url || !source.title) throw new Error("Choose a song already on your artist profile");
@@ -49,10 +49,10 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       throw new Error("This profile song needs audio uploaded to your artist profile before submitting");
     }
     const { data: queued, error: queueError } = await supabase.from("play_tracks")
-      .select("id").eq("artist_user_id", userId).eq("stream_id", data.streamId)
-      .in("status", ["queued", "playing"]).eq("audio_url", source.audio_url).limit(1);
+      .select("id, audio_url").eq("artist_user_id", userId).eq("stream_id", data.streamId)
+      .in("status", ["queued", "playing"]).limit(1000);
     if (queueError) throw new Error("Unable to check live queue");
-    if (queued?.length) throw new Error("This track is already in the live queue");
+    if (queued?.some((track) => track.audio_url && songAudioIdentity(track.audio_url) === songAudioIdentity(source.audio_url ?? ""))) throw new Error("This track is already in the live queue");
 
     // Stream must exist + accept submissions.
     const { data: stream } = await supabase
@@ -134,6 +134,7 @@ export const submitPlayTrack = createServerFn({ method: "POST" })
       .from("play_tracks")
       .insert({
         stream_id: data.streamId,
+        source_track_id: source.source_track_id ?? source.id,
         artist_user_id: userId,
         artist_name: source.artist_name,
         title: source.title,

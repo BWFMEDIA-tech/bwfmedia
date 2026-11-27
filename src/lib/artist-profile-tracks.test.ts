@@ -25,7 +25,7 @@ describe("dedupeArtistTracks", () => {
     ];
     const out = dedupeArtistTracks(rows, LIBRARY);
     expect(out).toHaveLength(1);
-    expect(out[0].stream_id).toBe(LIBRARY);
+    expect(out[0]?.stream_id).toBe(LIBRARY);
   });
 
   it("keeps the newest copy when the same song was submitted to multiple arenas", () => {
@@ -35,10 +35,34 @@ describe("dedupeArtistTracks", () => {
     ];
     const out = dedupeArtistTracks(rows, LIBRARY);
     expect(out).toHaveLength(1);
-    expect(out[0].created_at).toBe("2026-10-15T03:34:15Z");
+    expect(out[0]?.created_at).toBe("2026-10-15T03:34:15Z");
   });
 
   it("returns nothing when the artist has no tracks", () => {
     expect(dedupeArtistTracks([], LIBRARY)).toEqual([]);
+  });
+
+  it("shows Where I Come From once despite refreshed signing tokens", () => {
+    const rows = [
+      { ...row("Where I Come From", ARENA, "2026-10-15"), id: "mirror", source_track_id: "original", audio_url: "/storage/v1/object/sign/artist-audio/play/artist/song.mp3?token=new" },
+      { ...row("Where I Come From", LIBRARY, "2026-10-01"), id: "original", audio_url: "/storage/v1/object/sign/artist-audio/play/artist/song.mp3?token=old" },
+    ];
+    expect(dedupeArtistTracks(rows, LIBRARY).map((track) => track.id)).toEqual(["original"]);
+  });
+
+  it("preserves distinct legitimate recordings with the same title", () => {
+    const rows = [
+      { ...row("12345", LIBRARY, "2026-11-05"), audio_url: "/artist-audio/play/artist/first.m4a" },
+      { ...row("12345", LIBRARY, "2026-11-06"), audio_url: "/artist-audio/play/artist/second.m4a" },
+    ];
+    expect(dedupeArtistTracks(rows, LIBRARY)).toHaveLength(2);
+  });
+
+  it("keeps both legitimate TUNEVIO songs titled test", () => {
+    const rows = [
+      { ...row("test", ARENA, "2026-11-13"), audio_url: "/artist-audio/play/artist/whole-vibe.mp3" },
+      { ...row("test", ARENA, "2026-11-19"), audio_url: "/artist-audio/play/artist/Fallen_Soldier.mp3" },
+    ];
+    expect(dedupeArtistTracks(rows, null)).toHaveLength(2);
   });
 });

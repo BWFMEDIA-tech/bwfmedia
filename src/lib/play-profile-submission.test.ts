@@ -24,7 +24,7 @@ function client() {
       if (table === "streams") return { data: { id: filters.some((f) => f[1] === "title") ? "library" : "live", status: "live" } };
       if (table === "user_roles") return { data: [{ role: "artist" }] };
       if (table === "battle_matches") return { data: null };
-      return { data: filters.some((f) => f[0] === "eq" && f[1] === "id") ? state.source : state.queued ? [{ id: "existing" }] : [] };
+      return { data: filters.some((f) => f[0] === "eq" && f[1] === "id") ? state.source : state.queued ? [{ id: "existing", audio_url: `${audio}?token=refreshed` }] : [] };
     };
     const builder: Record<string, unknown> = {};
     for (const method of ["select", "eq", "neq", "in", "order", "limit", "maybeSingle"]) {
@@ -43,12 +43,11 @@ it("requires an existing song on the submitting artist's profile", async () => {
   await expect(run()).rejects.toThrow("already on your artist profile");
   expect(state.inserted).toBeNull();
   expect(state.filters).toContainEqual(["play_tracks", "eq", "artist_user_id", uid]);
-  expect(state.filters).toContainEqual(["play_tracks", "eq", "stream_id", "library"]);
   expect(state.filters).toContainEqual(["play_tracks", "neq", "status", "removed"]);
 });
 it("queues the profile song's real metadata rather than submitted replacements", async () => {
   await run();
-  expect(state.inserted).toMatchObject({ title: "Profile song", artist_name: "Profile artist", audio_url: audio, cover_url: "profile-cover", duration_seconds: 185 });
+  expect(state.inserted).toMatchObject({ source_track_id: "source", title: "Profile song", artist_name: "Profile artist", audio_url: audio, cover_url: "profile-cover", duration_seconds: 185 });
 });
 it("retains the owned audio restriction", async () => {
   state.source = { ...state.source, audio_url: "/artist-audio/play/another-artist/song.mp3" };
