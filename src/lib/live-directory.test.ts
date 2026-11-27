@@ -11,14 +11,14 @@ const service = (connected: Record<string, string>): OnAirRoomClient => ({
 });
 describe("unified live directory", () => {
   for (const role of ["artist", "host", "listener", "admin", "moderator"]) {
-    it(`includes a connected ${role} and its existing role label`, async () => {
+    it(`includes a connected ${role} without exposing internal roles`, async () => {
       const rows = directoryRows(await filterOnAirStreams(directoryCandidates([stream(role)], [], [], []), service({ [role]: role })));
       expect(rows.map(r => r.id)).toEqual([role]);
-      expect(liveAccountRoles([role])).toEqual([role]);
+      expect(liveAccountRoles([role])).toEqual(["artist", "host"].includes(role) ? [role] : []);
     });
   }
   it("deduplicates and allow-lists account role labels", () => {
-    expect(liveAccountRoles(["admin", "artist", "artist", "unknown"])).toEqual(["artist", "admin"]);
+    expect(liveAccountRoles(["admin", "artist", "artist", "host", "moderator", "manager", "listener", "member", "user", "unknown"])).toEqual(["artist", "host"]);
   });
   it("counts two connected visitors, including a guest, but excludes the host and stale stored counts", async () => {
     const liveService: OnAirRoomClient = {

@@ -8,7 +8,7 @@ export type DirectoryRow = {
   preview_room_name?: string;
   account_roles?: string[];
 };
-const PUBLIC_LIVE_ROLES = ["artist", "host", "listener", "admin", "moderator", "manager", "member", "user"];
+export const PUBLIC_LIVE_ROLES = ["artist", "host"] as const;
 /** Display labels only; never use these to grant room permissions. */
 export function liveAccountRoles(roles: string[]): string[] {
   return PUBLIC_LIVE_ROLES.filter(role => roles.includes(role));

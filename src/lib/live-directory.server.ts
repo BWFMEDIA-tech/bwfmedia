@@ -1,4 +1,4 @@
-import { directoryCandidates, directoryRows, externalBroadcastRows, liveAccountRoles, type DirectoryRow } from "./live-directory";
+import { directoryCandidates, directoryRows, externalBroadcastRows, liveAccountRoles, PUBLIC_LIVE_ROLES, type DirectoryRow } from "./live-directory";
 import { filterOnAirStreams, type OnAirRoomClient } from "./live-on-air";
 
 async function roomClient(): Promise<OnAirRoomClient> {
@@ -44,7 +44,7 @@ export async function readLiveDirectory(limit?: number) {
     const ids = hostIds.slice(offset, offset + 200);
     const [result, roleResult] = await Promise.all([
       db.from("profiles").select("id,display_name,avatar_url,stage_name").in("id", ids),
-      db.from("user_roles").select("user_id,role").in("user_id", ids),
+      db.from("user_roles").select("user_id,role").in("user_id", ids).in("role", [...PUBLIC_LIVE_ROLES]),
     ]);
     if (result.error || roleResult.error) throw new Error("Live directory temporarily unavailable");
     for (const p of result.data ?? []) profiles.set(p.id, { display_name: p.display_name, avatar_url: p.avatar_url, stage_name: p.stage_name });

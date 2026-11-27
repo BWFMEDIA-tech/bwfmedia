@@ -708,6 +708,13 @@
       "when": 1795748434027,
       "tag": "0100_preserve_original_song_deletion_behavior",
       "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1795749252595,
+      "tag": "0101_enforce_streaming_analytics_entitlement",
+      "breakpoints": true
     }
   ]
 }

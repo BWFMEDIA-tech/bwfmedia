@@ -4,6 +4,8 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
+    "test:security": "bunx vitest run src/lib/security-remediation.database.test.ts src/lib/streaming-analytics-security.database.test.ts src/lib/content-safety.database.test.ts src/lib/assistant.test.ts src/lib/live-directory.test.ts",
+    "prebuild": "bun run test:security",
     "dev": "vite dev",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=8192 vite build --mode development",

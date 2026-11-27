@@ -28,6 +28,19 @@ beforeAll(async () => {
     CREATE TABLE payout_accounts(id uuid PRIMARY KEY,user_id uuid,stripe_account_id text);
     CREATE TABLE battle_challenges(id uuid PRIMARY KEY,challenger_id uuid,challenged_id uuid,status text);
     CREATE TABLE freestyle_challenges(id uuid PRIMARY KEY,artist_a_id uuid,artist_b_id uuid,status text);
+    CREATE TABLE direct_messages(id uuid PRIMARY KEY,sender_id uuid,recipient_id uuid,body text);
+    CREATE TABLE store_earnings_ledger(id uuid PRIMARY KEY,seller_user_id uuid,amount_cents bigint);
+    GRANT SELECT ON direct_messages,store_earnings_ledger TO authenticated;
+    ALTER TABLE direct_messages ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE store_earnings_ledger ENABLE ROW LEVEL SECURITY;
+    CREATE POLICY dm_participants ON direct_messages FOR SELECT TO authenticated USING(auth.uid()=sender_id OR auth.uid()=recipient_id);
+    CREATE POLICY seller_earnings ON store_earnings_ledger FOR SELECT TO authenticated USING(auth.uid()=seller_user_id OR has_role(auth.uid(),'admin'));
+    CREATE POLICY own_audio ON storage.objects FOR SELECT TO authenticated USING(bucket_id='artist-audio' AND split_part(name,'/',1)='play' AND split_part(name,'/',2)=auth.uid()::text);
+    CREATE POLICY admin_audio ON storage.objects FOR SELECT TO authenticated USING(bucket_id='artist-audio' AND has_role(auth.uid(),'admin'));
+    CREATE POLICY own_video ON storage.objects FOR SELECT TO authenticated USING(bucket_id='videos' AND (split_part(name,'/',1)=auth.uid()::text OR has_role(auth.uid(),'admin')));
+    INSERT INTO direct_messages VALUES('${id(701)}','${id(2)}','${id(5)}','Private conversation');
+    INSERT INTO store_earnings_ledger VALUES('${id(702)}','${id(2)}',12500);
+    INSERT INTO storage.objects VALUES('play/${id(2)}/private.mp3','artist-audio'),('${id(2)}/private.mp4','videos');
     CREATE TABLE battle_matches(id uuid PRIMARY KEY,host_id uuid,artist_a_id uuid,artist_b_id uuid,status text);
     ALTER TABLE battle_matches ENABLE ROW LEVEL SECURITY;
     GRANT SELECT ON battle_matches TO authenticated;
@@ -65,10 +78,10 @@ describe.sequential('store photo database authorization', () => {
     await actor(1); expect((await db.query('SELECT name FROM storage.objects')).rows).toEqual([{name:`${id(1)}/own.jpg`}]);
   });
   it('Artist B can read their own private storage', async () => {
-    await actor(2); expect((await db.query('SELECT name FROM storage.objects')).rows).toEqual([{name:`${id(2)}/private.jpg`}]);
+    await actor(2); expect((await db.query("SELECT name FROM storage.objects WHERE bucket_id='store-products'")).rows).toEqual([{name:`${id(2)}/private.jpg`}]);
   });
   it('anonymous users cannot read private objects', async () => { await actor(null,'anon'); expect((await db.query('SELECT * FROM storage.objects')).rows).toEqual([]); });
-  it('admins retain authorized private photo reads', async () => { await actor(3); expect((await db.query('SELECT * FROM storage.objects')).rows).toHaveLength(2); });
+  it('admins retain authorized private photo reads', async () => { await actor(3); expect((await db.query("SELECT * FROM storage.objects WHERE bucket_id='store-products'")).rows).toHaveLength(2); });
   it('cannot upload into another owner folder', async () => { await actor(1); await expect(db.query("INSERT INTO storage.objects VALUES($1,'store-products')",[`${id(2)}/forged.jpg`])).rejects.toThrow('row-level security'); });
   it('blocks foreign image references through direct product inserts', async () => { await actor(1); await expect(db.query("INSERT INTO store_products VALUES($1,$2,ARRAY[$3],'published','draft')",[id(110),id(1),`${id(2)}/private.jpg`])).rejects.toThrow('Invalid store image ownership'); });
   it('blocks foreign image references through product updates', async () => { await actor(1); await expect(db.query('UPDATE store_products SET image_urls=ARRAY[$1] WHERE id=$2',[`${id(2)}/private.jpg`,id(101)])).rejects.toThrow('Invalid store image ownership'); });
@@ -77,6 +90,18 @@ describe.sequential('store photo database authorization', () => {
   it('public catalog shows only approved published products', async () => { await actor(null,'anon'); expect((await db.query('SELECT id FROM store_products')).rows).toEqual([{id:id(103)}]); });
   it('public NFC reads exclude draft pages', async () => { await actor(null,'anon'); expect((await db.query('SELECT id FROM nfc_pages')).rows).toEqual([{id:id(202)}]); });
   it('owner can still read a draft product and edit their own references', async () => { await actor(1); expect((await db.query('UPDATE store_products SET image_urls=ARRAY[$1] WHERE id=$2 RETURNING id',[`${id(1)}/own.jpg`,id(101)])).rows).toEqual([{id:id(101)}]); });
+});
+describe.sequential('new user zero private access', () => {
+  it('new account cannot read another seller earnings', async () => { await actor(6); expect((await db.query('SELECT * FROM store_earnings_ledger')).rows).toEqual([]); });
+  it('new account cannot read payout details', async () => { await actor(6); expect((await db.query('SELECT * FROM payout_accounts')).rows).toEqual([]); });
+  it('new account cannot read private direct messages', async () => { await actor(6); expect((await db.query('SELECT * FROM direct_messages')).rows).toEqual([]); });
+  it('new account cannot read unaccepted invitations', async () => { await actor(6); expect((await db.query("SELECT * FROM freestyle_challenges WHERE status='pending'")).rows).toEqual([]); });
+  it('new account cannot read private audio', async () => { await actor(6); expect((await db.query("SELECT * FROM storage.objects WHERE bucket_id='artist-audio'")).rows).toEqual([]); });
+  it('new account cannot read private videos', async () => { await actor(6); expect((await db.query("SELECT * FROM storage.objects WHERE bucket_id='videos'")).rows).toEqual([]); });
+  it('owner retains private media access', async () => { await actor(2); expect((await db.query("SELECT name FROM storage.objects WHERE bucket_id IN ('artist-audio','videos')")).rows).toHaveLength(2); });
+  it('owner retains earnings access', async () => { await actor(2); expect((await db.query('SELECT amount_cents FROM store_earnings_ledger')).rows).toEqual([{amount_cents:12500}]); });
+  it('admin retains earnings review', async () => { await actor(3); expect((await db.query('SELECT amount_cents FROM store_earnings_ledger')).rows).toEqual([{amount_cents:12500}]); });
+  it('anonymous users cannot read private audio or video', async () => { await actor(null,'anon'); expect((await db.query("SELECT * FROM storage.objects WHERE bucket_id IN ('artist-audio','videos')")).rows).toEqual([]); });
 });
 describe.sequential('billing database authorization', () => {
   it('Artist A cannot read Artist B billing profile', async () => { await actor(1); expect((await db.query('SELECT user_id FROM user_accounts')).rows).toEqual([{user_id:id(1)}]); });

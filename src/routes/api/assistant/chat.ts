@@ -7,7 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createOpenAI } from "@ai-sdk/openai";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import type { Database } from "@/integrations/supabase/types";
-import { ASSISTANT_ROUTES, UNANSWERED_MARKER, audienceFromRoles } from "@/lib/assistant";
+import { ASSISTANT_ROUTES, UNANSWERED_MARKER, allowedAssistantPath, audienceFromRoles } from "@/lib/assistant";
 import {
   createLovableAiGatewayRunIdFetch,
   getLovableAiGatewayRunId,
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/api/assistant/chat")({
         let body: { messages?: UIMessage[]; page?: string };
         try { body = await request.json(); } catch { return json(400, { error: "Invalid request." }); }
         const messages = Array.isArray(body.messages) ? body.messages.slice(-MAX_MESSAGES) : [];
-        const currentPage = typeof body.page === "string" && body.page.startsWith("/") ? body.page.slice(0, 200) : null;
+        const currentPage = typeof body.page === "string" && body.page.length <= 200 ? allowedAssistantPath(body.page) : null;
         const last = messages[messages.length - 1];
         if (!last || last.role !== "user") return json(400, { error: "Ask a question to get started." });
         const question = textOf(last).trim();

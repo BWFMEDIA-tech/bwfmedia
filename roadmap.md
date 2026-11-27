@@ -1,5 +1,11 @@
 # Roadmap
 
+## Permanent security safeguards
+- [x] Allow-list assistant page context and expose only artist/host live-directory badges; mark only these three approved findings fixed.
+- [x] Enforce advanced analytics entitlement inside the existing database function; applied guard confirmed with a database read.
+- [x] Add new-user negative-access tests and verify existing public discovery and authorized access; 726 tests pass, including the 108-test security gate, signed-in analytics and guest Home verified, preview build OK.
+- [ ] Require the Security regression tests check in repository release protection; repository settings and the platform publishing pipeline are outside this code change's control.
+
 ## Song cleanup and existing-song Arena submissions
 - [x] Link 49 repeated audio entries to their original catalog song without deleting Arena history, likes, counts, or files.
 - [x] Deduplicate profiles, home music lists, Arena listings and song selectors by owned audio identity; add song search and atomic active-queue duplicate protection.
