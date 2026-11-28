@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stale Stripe customer recovery
+- [ ] Recover missing/deleted customers in checkout and both billing portals with ownership and mode checks.
+- [ ] Replace only the two confirmed canceled sandbox references with a verified current customer; retain original references in the audit history.
+- [ ] Run billing/payment/security regressions and verify signed-in checkout and billing management without making a charge.
+
 ## Permanent security safeguards
 - [x] Allow-list assistant page context and expose only artist/host live-directory badges; mark only these three approved findings fixed.
 - [x] Enforce advanced analytics entitlement inside the existing database function; applied guard confirmed with a database read.

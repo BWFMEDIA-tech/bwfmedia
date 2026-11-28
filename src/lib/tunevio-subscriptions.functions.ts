@@ -115,10 +115,10 @@ export const createTunevioPortal = createServerFn({ method: "POST" })
         return { error: "No subscription found" };
       }
       const stripe = createStripeClient(data.environment);
-      const { verifyBillingCustomer } = await import('@/lib/billing-ownership.server');
-      await verifyBillingCustomer(stripe, context, sub.stripe_customer_id, data.environment);
+      const { resolveBillingCustomer } = await import('@/lib/billing-ownership.server');
+      const customerId = await resolveBillingCustomer(stripe, context, data.environment);
       const portal = await stripe.billingPortal.sessions.create({
-        customer: sub.stripe_customer_id as string,
+        customer: customerId,
         return_url: data.returnUrl,
       });
       return { url: portal.url };

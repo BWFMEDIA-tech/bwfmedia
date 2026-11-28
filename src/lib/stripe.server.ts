@@ -20,9 +20,13 @@ const firstEnv = (keys: string[]): string => {
 };
 
 export function getConnectionApiKey(env: StripeEnv): string {
-  return env === 'sandbox'
+  if (env !== 'sandbox' && env !== 'live') throw new Error('Invalid payment environment');
+  const key = env === 'sandbox'
     ? firstEnv(['STRIPE_TEST_API_KEY', 'STRIPE_SANDBOX_API_KEY'])
     : firstEnv(['STRIPE_RESTRICTED_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_LIVE_API_KEY']);
+  const mode = /^(?:sk|rk)_(live|test)_/.exec(key)?.[1];
+  if (mode && mode !== (env === 'live' ? 'live' : 'test')) throw new Error('Stripe key does not match the payment environment');
+  return key;
 }
 
 export function createStripeClient(env: StripeEnv): Stripe {
